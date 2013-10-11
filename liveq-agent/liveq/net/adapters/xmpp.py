@@ -17,6 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import socket
+
 from liveq.net.adapter import Adapter
 from liveq.config import AdapterConfig
 
@@ -32,11 +34,17 @@ class Config(AdapterConfig):
 	Populate the adapter configuration using the stored config hash
 	"""
 	def __init__(self,config):
+
+		# Prepare some template macros
+		macros = {
+			'hostname': socket.gethostname()
+		}
+
 		self.SERVER = config["server"]
 		self.DOMAIN = config["domain"]
 		self.USERNAME = config["username"]
 		self.PASSWORD = config["password"]
-		self.RESOURCE = config["resource"]
+		self.RESOURCE = config["resource"] % macros
 
 	"""
 	Create an XMPP Adapter instance with the given configuration
