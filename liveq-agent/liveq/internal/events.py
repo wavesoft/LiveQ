@@ -17,26 +17,37 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class JobLogger:
+class EventDispatcher:
 
 	"""
-	Log different types of messages
+	Initialize event dispatcher variables
 	"""
-	def debug(self, text):
-		self.write(text, "Debug")
-	def warn(self, text):
-		self.write(text, "Warn")
-	def error(self, text):
-		self.write(text, "Error")
+	def __init__(self):
+		self.__eventHandlers = {}
 
 	"""
-	Log an arbitrary message to the logger
+	Add an event listener object in the listeners
 	"""
-	def write(self, text, class="Message"):
-		pass
+	def addEventHandler(self,event,handler):
+
+		# Allocate event groups
+		if not event in self.__eventHandlers:
+			self.__eventHandlers[event] = []
+
+		# Append entry
+		self.__eventHandlers[event].append( handler )
 
 	"""
-	Import loglines from the given filename
+	Remove an event listener object from the listeners
 	"""
-	def importFile(self,filename):
-		pass
+	def removeEventHandler(self,event,handler):
+
+		# Check for event names
+		if not event in self.__eventHandlers:
+			return
+
+		# Remove handler
+		try:
+			self.__eventHandlers[event].remove(handler)
+		except ValueError:
+			pass

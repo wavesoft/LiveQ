@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -17,26 +18,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class JobLogger:
+import sys
+import logging
+from liveq.config import Config
+from liveq.internal.exceptions import *
 
-	"""
-	Log different types of messages
-	"""
-	def debug(self, text):
-		self.write(text, "Debug")
-	def warn(self, text):
-		self.write(text, "Warn")
-	def error(self, text):
-		self.write(text, "Error")
+# Setup logging
+logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
 
-	"""
-	Log an arbitrary message to the logger
-	"""
-	def write(self, text, class="Message"):
-		pass
+# Load configuration
+try:
+	Config.readFile( "config/liveq.conf" )
+except ConfigException as e:
+	print("[ERROR] Error parsing configuration: %s" % e)
 
-	"""
-	Import loglines from the given filename
-	"""
-	def importFile(self,filename):
-		pass
+# Tests
+print Config.ADAPTER.SERVER
+
+adapter = Config.ADAPTER.instance({})
+adapter.connect()
+adapter.process(block=True)

@@ -17,26 +17,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class JobLogger:
-
-	"""
-	Log different types of messages
-	"""
-	def debug(self, text):
-		self.write(text, "Debug")
-	def warn(self, text):
-		self.write(text, "Warn")
-	def error(self, text):
-		self.write(text, "Error")
-
-	"""
-	Log an arbitrary message to the logger
-	"""
-	def write(self, text, class="Message"):
-		pass
-
-	"""
-	Import loglines from the given filename
-	"""
-	def importFile(self,filename):
-		pass
+"""
+An exception occured while in the configuration
+"""
+class ConfigException(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)

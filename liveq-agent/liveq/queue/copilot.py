@@ -17,26 +17,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class JobLogger:
+from liveq.config import QueueConfig
 
-	"""
-	Log different types of messages
-	"""
-	def debug(self, text):
-		self.write(text, "Debug")
-	def warn(self, text):
-		self.write(text, "Warn")
-	def error(self, text):
-		self.write(text, "Error")
+"""
+Configuration implementation
+"""
+class Config(QueueConfig):
 
-	"""
-	Log an arbitrary message to the logger
-	"""
-	def write(self, text, class="Message"):
-		pass
-
-	"""
-	Import loglines from the given filename
-	"""
-	def importFile(self,filename):
+	def __init__(self,config):
 		pass
