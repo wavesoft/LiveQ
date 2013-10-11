@@ -22,6 +22,8 @@ import sys
 import signal
 import logging
 import time
+
+from liveq.apps.helpers.hugedata import Hugedata
 from liveq.config import Config
 from liveq.internal.exceptions import *
 from liveq.internal.application import STATE_RUNNING
@@ -42,8 +44,12 @@ logging.basicConfig(level=Config.LOG_LEVEL, format='%(levelname)-8s %(message)s'
 
 # ======== TEST
 
-#print FLATParser.parse("/tmp/data/dump/DELPHI_2002_069_CONF_603_d01-x01-y01.dat")
-#sys.exit(0)
+src = FLATParser.parse("/tmp/data/dump/DELPHI_2002_069_CONF_603_d01-x01-y01.dat")
+dst = Hugedata.jsCompress(src)
+
+print dst
+
+sys.exit(0)
 
 #adapter = Config.ADAPTER.instance({})
 #adapter.connect()
