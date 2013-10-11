@@ -17,6 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
+
 class EventDispatcher:
 
 	"""
@@ -51,3 +53,17 @@ class EventDispatcher:
 			self.__eventHandlers[event].remove(handler)
 		except ValueError:
 			pass
+
+	"""
+	Dispatch an event to the appropriate listeners
+	"""
+	def dispatchEvent(self,event,*args):
+		logging.debug("Dispatching event %s %s" % (event, args))
+
+		# Check for event names
+		if not event in self.__eventHandlers:
+			return
+
+		# Dispatch
+		for handler in self.__eventHandlers[event]:
+			handler(self, *args)

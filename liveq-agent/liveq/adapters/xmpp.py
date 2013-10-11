@@ -18,8 +18,10 @@
 ################################################################
 
 import socket
+import string
+import random
 
-from liveq.net.adapter import Adapter
+from liveq.internal.adapter import Adapter
 from liveq.config import AdapterConfig
 
 from sleekxmpp import ClientXMPP
@@ -37,7 +39,8 @@ class Config(AdapterConfig):
 
 		# Prepare some template macros
 		macros = {
-			'hostname': socket.gethostname()
+			'hostname'	: socket.gethostname(),
+			'random'	: ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
 		}
 
 		self.SERVER = config["server"]

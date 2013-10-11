@@ -17,8 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from liveq.internal.exceptions import ConfigException
 import ConfigParser
+import logging
+
+from liveq.internal.exceptions import ConfigException
 
 """
 [[ Overridable Queue Configuration ]]
@@ -54,6 +56,13 @@ class QueueConfig:
 		# Return instance
 		return inst
 
+	"""
+	Overridable function to create a queue
+	"""
+	def instance(self,userconfig):
+		raise NotImplementedError("The queue config class did not implement the instance() function")
+
+
 """
 [[ Overridable Adapter Configuration ]]
 The adapter can subclass this module and provide it's custom implementation.
@@ -88,6 +97,11 @@ class AdapterConfig:
 		# Return instance
 		return inst
 
+	"""
+	Overridable function to create an adapter
+	"""
+	def instance(self,userconfig):
+		raise NotImplementedError("The adapter config class did not implement the instance() function")
 
 """
 [[ Overridable Application Configuration ]]
@@ -123,6 +137,12 @@ class AppConfig:
 		# Return instance
 		return inst
 
+	"""
+	Overridable function to create an application
+	"""
+	def instance(self,userconfig):
+		raise NotImplementedError("The application config class did not implement the instance() function")
+
 
 """
 [[ Global Configuration ]]
@@ -137,6 +157,8 @@ class Config:
 
 	ADAPTER_CLASS = ""
 	ADAPTER = None
+
+	LOG_LEVEL = logging.INFO
 
 	"""
 	Read the actual configuration from the file
@@ -155,3 +177,25 @@ class Config:
 		Config.QUEUE = QueueConfig.fromClass( Config.QUEUE_CLASS, config._sections["queue"] )
 		Config.ADAPTER = AdapterConfig.fromClass( Config.ADAPTER_CLASS, config._sections["adapter"] )
 		Config.APP = AppConfig.fromClass( Config.APP_CLASS, config._sections["app"] )
+
+		# Setup logging levels
+		level_map = {
+
+			# String mapping
+			"debug": logging.DEBUG,
+			"info": logging.INFO,
+			"warn": logging.WARNING,
+			"warning": logging.WARNING,
+			"error": logging.ERROR,
+			"critical": logging.CRITICAL,
+			"fatal": logging.FATAL,
+
+			# Numeric mapping
+			"5": logging.DEBUG,
+			"4": logging.INFO,
+			"3": logging.WARNING,
+			"2": logging.ERROR,
+			"1": logging.CRITICAL,
+			"0": logging.FATAL,
+		}
+		Config.LOG_LEVEL = level_map[ config.get("liveq", "loglevel", "info") ]

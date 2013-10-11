@@ -20,21 +20,52 @@
 
 import sys
 import logging
+import time
 from liveq.config import Config
 from liveq.internal.exceptions import *
 
-# Setup logging
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)-8s %(message)s')
-
 # Load configuration
 try:
-	Config.readFile( "config/liveq.conf" )
+	Config.readFile( "config/liveq.conf.local" )
 except ConfigException as e:
-	print("[ERROR] Error parsing configuration: %s" % e)
+	print("ERROR   Configuration exception: %s" % e)
+	sys.exit(1)
+except Exception as e:
+	print("ERROR   Unexpected exception %s while reading configuration: %s" % (e.__class__.__name__, e))
+	sys.exit(1)
 
-# Tests
+# Configure logging
+logging.basicConfig(level=Config.LOG_LEVEL, format='%(levelname)-8s %(message)s')
+
+# ======== TEST
 print Config.ADAPTER.SERVER
 
-adapter = Config.ADAPTER.instance({})
-adapter.connect()
-adapter.process(block=True)
+#adapter = Config.ADAPTER.instance({})
+#adapter.connect()
+#adapter.process(block=True)
+
+runconfig = {
+
+	# Run configuration
+	"beam": "ee", 
+	"process": "zhad", 
+	"energy": 91.2, 
+	"params": "-",
+	"specific": "-",
+	"generator": "pythia8",
+	"version": "8.175",
+	"events": 10000,
+	"seed": 123123,
+
+	# Tune configuration
+	"tune": {
+		"TimeShower:alphaSvalue": 0.31
+	}
+
+}
+
+jobapp = Config.APP.instance({})
+jobapp.setConfig( runconfig )
+jobapp.start()
+time.sleep(20)
+jobapp.kill()

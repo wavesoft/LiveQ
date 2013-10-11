@@ -17,45 +17,53 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-"""
-Job template that is overloaded by each job
-"""
-class JobApplication:
+from liveq.internal.job.parameters import JobParameters
+from liveq.internal.job.results import JobResults
+from liveq.internal.job.app import JobApplication
+from liveq.internal.job.logs import JobLogger
+
+class Job:
 
 	"""
-	Launch application binaries
+	Job constructor
+	"""
+	def __init__(self,app,cfg):
+		self.app = app
+		self.config = cfg
+		self.instance = None
+		self.logger = JobLogger()
+		self.results = JobResults()
+
+	"""
+	Start the simulation with the given parameter set
 	"""
 	def start(self):
-		pass
+
+		# Instantiate the given application configuration
+		self.instance = self.app.instance(self.logger, self.results)
+
+		# Set the config
+		self.instance.setConfig( self.config.render() )
+
+		# Start the job
+		self.instance.start()
 
 	"""
-	Kill all instances
+	Abort a running job
 	"""
-	def kill(self):
-		pass
+	def stop(self):
+		
+		# Kill the instance
+		self.instance.kill()
 
 	"""
-	Reload configuration (this might mean restarting the simulation)
+	Callback from the application
 	"""
-	def reload(self):
-		pass
+	def update(self, cfg):
 
-	"""
-	Set/Update configuration files
-	"""
-	def setConfig(self,config):
-		pass
+		# Update config
+		self.config = cfg
 
-"""
-Application manager that creates JobApplicationInstances
-"""
-class JobApplicationManager:
-
-	"""
-	Instantiate an application
-	"""
-	def instantiate(self,logger,results):
-
-		inst = JobApplicationInstance()
-		pass
-
+		# Commit changes and reload config
+		self.instance.setConfig( self.config.render() )
+		self.instance.reload()

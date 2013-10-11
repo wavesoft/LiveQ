@@ -26,3 +26,8 @@ class Config(QueueConfig):
 
 	def __init__(self,config):
 		pass
+
+
+class CopilotQueue():
+	pass
+
