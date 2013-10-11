@@ -19,8 +19,8 @@
 
 from liveq.internal.job.parameters import JobParameters
 from liveq.internal.job.results import JobResults
-from liveq.internal.job.app import JobApplication
 from liveq.internal.job.logs import JobLogger
+from liveq.internal.application import JobApplication
 
 class Job:
 

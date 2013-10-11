@@ -17,15 +17,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import glob
+import tempfile
 import time
 import copy
 import os, signal
 import shlex, subprocess, threading
 
 from multiprocessing import Process
-from liveq.internal.application import JobApplication
-from liveq.internal.exceptions import JobConfigException, JobInternalException, IntegrityException
+from liveq.internal.application import *
+from liveq.internal.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
 from liveq.config import AppConfig
+from liveq.apps.helpers.FLAT import FLATParser
 
 """
 Configuration implementation
@@ -48,16 +51,9 @@ class Config(AppConfig):
 		return MCPlots(self, userconfig)
 
 """
-MCPlots implementation of the parametric job
+MCPlots implementation of the JobApplication
 """
 class MCPlots(JobApplication):
-
-	STOPPED = 0
-	KILLING = 1
-	KILLED = 2
-	STARTING = 3
-	STARTED = 4
-	COMPLETED = 5
 
 	"""
 	Initialize JobApplication
@@ -69,66 +65,13 @@ class MCPlots(JobApplication):
 		self.tunename = ""
 		self.tunefile = ""
 		self.monitorThread = None
-		self.state = MCPlots.STOPPED
+		self.state = STATE_ABORTED
 
-	"""
-	Application monitor [Thread]
-	"""
-	def monitor(self):
-		self.logger.debug("Started monitor thread")
-
-		# Reset variables
-		runtime = 0
-
-		# Wait until the process changes state
-		while True:
-			res = self.process.poll()
-
-			# Check if the process changed state
-			if res != None:
-
-				# Check if such an action is expected
-				if self.state == MCPlots.KILLING:
-					self.logger.debug("EXPECTED Process state changed to %i" % res)
-
-					# The exit was caused by the kill() function
-					# It will take care of notifying the listeners for the action taken
-
-				else:
-					self.logger.debug("UNEXPECTED Process state changed to %i" % res)
-
-					# Check the cause of the termination
-					if res == 0:
-
-						# Everything was OK
-						self.state = MCPlots.COMPLETED
-
-						# Dispatch the event to the listeners
-						self.dispatchEvent("job_completed")
-
-					else:
-
-						# An error occured
-						self.state = MCPlots.STOPPED
-
-						# Dispatch the event to the listeners
-						self.dispatchEvent("job_aborted", res)
-
-
-				# Exit the main loop
-				break
-
-			# When it's time to send updates, do it
-			if not runtime % self.config.UPDATE_INTERVAL:
-				# Dispatch the event to the listeners
-				self.dispatchEvent("job_data", { })
-
-			# Runtime clock and CPU anti-hoging
-			time.sleep(1)
-			runtime += 1
-
-		self.logger.debug("Exiting monitor thread")
-
+	##################################################################################
+	###
+	### JobApplication Implementation
+	###
+	##################################################################################
 
 	"""
 	Create a process
@@ -137,17 +80,23 @@ class MCPlots(JobApplication):
 
 		# If it's already running, raise an exception
 		# (The caller might meant to reload() instead of start())
-		if self.state == MCPlots.STARTING:
+		if self.state == STATE_RUNNING:
 			raise JobInternalException("Calling start() on a job that is already running")
 
 		# Check for race condition errors
-		if self.state == MCPlots.STARTING:
+		if self.state == STATE_STARTING:
 			raise IntegrityException("Race condition detected")
-		self.state = MCPlots.STARTING
+		self.state = STATE_STARTING
+
+		# Create a new temporary directory for the job data
+		self.jobdir = tempfile.mkdtemp()
+		if not self.jobdir:
+			raise JobRuntimeException("Unable to create temporary directory")
 
 		# Prepare macros for the cmdline
 		rundict = copy.deepcopy(self.jobconfig)
 		rundict["tune"] = self.config.TUNE
+		rundict["jobdir"] = self.jobdir
 
 		# Prepare cmdline arguments
 		args = shlex.split( self.config.EXEC % rundict)
@@ -164,7 +113,7 @@ class MCPlots(JobApplication):
 		# Let listeners know of the event
 		self.dispatchEvent("job_started")
 
-		self.state = MCPlots.STARTED
+		self.state = STATE_RUNNING
 
 	"""
 	Kill a running thread
@@ -172,13 +121,13 @@ class MCPlots(JobApplication):
 	def kill(self):
 
 		# If it's already stopped, silently exit
-		if self.state == MCPlots.STOPPED:
+		if (self.state == STATE_ABORTED) or (self.state == STATE_COMPLETED):
 			return
 
 		# Check for race condition errors
-		if self.state == MCPlots.KILLING:
+		if self.state == STATE_KILLING:
 			raise IntegrityException("Race condition detected")
-		self.state = MCPlots.KILLING
+		self.state = STATE_KILLING
 
 		# Get process group
 		gid = os.getpgid(self.process.pid)
@@ -187,10 +136,8 @@ class MCPlots(JobApplication):
 		self.logger.debug("Killing mcplots process with PID=%i, GID=%i" % (self.process.pid, gid))
 		os.killpg( gid, signal.SIGTERM )
 
-		# Clean temp dir (with caution)
-		if len(self.config.WORKDIR) > 1:
-			self.logger.debug("Cleaning-up temp directory %s/tmp" % self.config.WORKDIR)
-			os.system("rm -rf %s/tmp" % self.config.WORKDIR)
+		# Cleanup job
+		self.cleanup()
 
 		# Wait for monitor thread to complete
 		self.monitorThread.join()
@@ -199,7 +146,7 @@ class MCPlots(JobApplication):
 		self.dispatchEvent("job_aborted", -1)
 
 		# We are now officially killed
-		self.state = MCPlots.KILLED
+		self.state = STATE_ABORTED
 
 	"""
 	MCPlots generators do not provide reload functionality.
@@ -233,3 +180,155 @@ class MCPlots(JobApplication):
 					f.write("%s = %s\n" % (key, value))
 		except IOError as e:
 			raise JobConfigException("Unable to open tune file (%s) for writing: %s" % (self.tunefile, str(e)))
+
+	##################################################################################
+	###
+	### Internal functions
+	###
+	##################################################################################
+
+	"""
+	Helper to cleanup current job files
+	"""
+	def cleanup(self):
+
+		# Clean temp dir (with caution)
+		if len(self.config.WORKDIR) > 1:
+			self.logger.debug("Cleaning-up temp directory %s/tmp" % self.config.WORKDIR)
+			os.system("rm -rf '%s/tmp'" % self.config.WORKDIR)
+
+		# Clean job dir (with caution)
+		if len(self.jobdir) > 1:
+			self.logger.debug("Cleaning-up job directory %s" % self.jobdir)
+			os.system("rm -rf '%s'" % self.jobdir)
+
+	"""
+	Helper function to read the histograms from the dump folder
+	"""
+	def readIntermediateHistograms(self):
+
+		# Collective results
+		histograms = { }
+
+		# Find histograms in the dump directory of the job
+		for histogram in glob.glob("%s/dump/*.dat" % self.jobdir):
+			self.logger.debug("Loading flat file %s" % histogram)
+
+			# Read histogram data
+			histo = FLATParser.parse( histogram )
+			if not 'METADATA' in histo:
+				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
+				continue
+			if not 'HISTOGRAM' in histo:
+				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
+				continue
+			if not 'HISTOSTATS' in histo:
+				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
+				continue
+
+			# Prepare data to store on the collective dict
+			meta = histo['METADATA']['d']
+			if not meta:
+				self.logger.warn("Missing METADATA dict in file %s" % histogram)
+				continue
+			h_data = histo['HISTOGRAM']['v']
+			if not h_data:
+				self.logger.warn("Missing HISTOGRAM values in file %s" % histogram)
+				continue
+			h_stat = histo['HISTOSTATS']['v']
+			if not h_stat:
+				self.logger.warn("Missing HISTOSTATS values in file %s" % histogram)
+				continue
+			h_name = histo['HISTOGRAM']['d']['AidaPath']
+			if not h_stat:
+				self.logger.warn("Missing AidaPath in HISTOGRAM section in file %s" % histogram)
+				continue
+
+			# Store entry on the collective histograms
+			histograms[h_name] = {
+				'meta': dict((k, meta[k]) for k in ('crosssection',)),
+				'histo': h_data,
+				'stats': h_stat
+			}
+
+		# Return the collective results
+		return histograms
+
+
+	"""
+	Helper function to collect and submit the real (not intermediate) output
+	"""
+	def collectAndSubmitOutput(self):
+		pass
+
+	"""
+	Application monitor [Thread]
+	"""
+	def monitor(self):
+		self.logger.debug("Started monitor thread")
+
+		# Reset variables
+		runtime = 0
+
+		# Wait until the process changes state
+		while True:
+			res = self.process.poll()
+
+			# Check if the process changed state
+			if res != None:
+
+				# Check if such an action is expected
+				if self.state == STATE_KILLING:
+					self.logger.debug("EXPECTED Process state changed to %i" % res)
+
+					# The exit was caused by the kill() function
+					# It will take care of notifying the listeners for the action taken
+
+				else:
+					self.logger.debug("UNEXPECTED Process state changed to %i" % res)
+
+					# Check the cause of the termination
+					if res == 0:
+
+						# Everything was OK
+						self.state = STATE_COMPLETED
+
+						# Collect and submit job output
+						self.collectAndSubmitOutput()
+
+						# Job is completed, do cleanup
+						self.cleanup()
+
+						# Dispatch the event to the listeners
+						self.dispatchEvent("job_completed")
+
+					else:
+
+						# An error occured
+						self.state = STATE_ABORTED
+
+						# Job is completed, do cleanup
+						self.cleanup()
+
+						# Dispatch the event to the listeners
+						self.dispatchEvent("job_aborted", res)
+
+				# In any of these cases, exit the loop
+				break
+
+			# When it's time to send updates, read the histograms
+			# and dispatch the update event to the targets
+			if not runtime % self.config.UPDATE_INTERVAL:
+
+				# Fetch itermediate results from the job
+				results = self.readIntermediateHistograms()
+
+				# Let listeners know we have intermediate data available
+				if results:
+					self.dispatchEvent("job_data", False, results)
+
+			# Runtime clock and CPU anti-hoging
+			time.sleep(1)
+			runtime += 1
+
+		self.logger.debug("Exiting monitor thread")

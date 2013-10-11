@@ -19,10 +19,13 @@
 ################################################################
 
 import sys
+import signal
 import logging
 import time
 from liveq.config import Config
 from liveq.internal.exceptions import *
+from liveq.internal.application import STATE_RUNNING
+from liveq.apps.helpers.FLAT import FLATParser
 
 # Load configuration
 try:
@@ -38,7 +41,9 @@ except Exception as e:
 logging.basicConfig(level=Config.LOG_LEVEL, format='%(levelname)-8s %(message)s')
 
 # ======== TEST
-print Config.ADAPTER.SERVER
+
+#print FLATParser.parse("/tmp/data/dump/DELPHI_2002_069_CONF_603_d01-x01-y01.dat")
+#sys.exit(0)
 
 #adapter = Config.ADAPTER.instance({})
 #adapter.connect()
@@ -67,5 +72,12 @@ runconfig = {
 jobapp = Config.APP.instance({})
 jobapp.setConfig( runconfig )
 jobapp.start()
-time.sleep(20)
-jobapp.kill()
+
+def signal_handler(signal, frame):
+        jobapp.kill()
+
+signal.signal(signal.SIGINT, signal_handler)
+
+while jobapp.state == STATE_RUNNING:
+	logging.debug("****************** MAIN LOOP ******************")
+	time.sleep(1)

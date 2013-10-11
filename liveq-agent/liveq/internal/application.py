@@ -21,6 +21,18 @@ import logging
 from liveq.internal.events import EventDispatcher
 
 """
+State constants
+"""
+# Final state constants
+STATE_ABORTED 	= 0
+STATE_RUNNING 	= 1
+STATE_COMPLETED = 2
+
+# Intermediate state constants
+STATE_KILLING 	= 10
+STATE_STARTING 	= 11
+
+"""
 Job template that is overloaded by each job
 """
 class JobApplication(EventDispatcher):
