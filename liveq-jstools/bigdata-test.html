@@ -6,9 +6,11 @@
 		<script type="text/javascript">
 
 			// Some data for testing hugedata decompression
-			var data = "eNrVVl1PWzEM/TV9XLCdOHYeO2ADaWxo9B2VcscqDYp6S7X9+/kWWOvslhWVl0m3qnzixCf+zEDeD4hOTi9GXy5Gw9GFCYM4HBAMVgvXlTycXo/Px4vva5jo4Oj40/nJ6SUB0CXkcnn45fOHywzx4Brw3U/7/QLsNsjRgA4f9yzXB/D77iOCsFJ61jCxRPYIqWwCqHF3MYodmEUjRVRNeXNNA2BCRIqcSHm1j5/JPpGrbEOIqeIbi6OLhLuLCUPWqCAETLGQU00hCakCIzLk3Meusg0hpeIBBu8d79uXxYyBRe3P7COqY27OIwQsGrmoMPaxq2wbwKnimyH74OErRLD9OTKBJiBxJ3MOyFIEbQ0p9Ya2sm0AU02vOHeiwCtExGCplaKRECEXW6EglpSFCqXur5deqUIpUStAfF2g7i5qDuaZZAygJHTn5BhKLogpS84KvYlXmYagmCqAXbBYd5WSVSxrAWQsicmtRQ1RIBZJyDFLH7PKrgFS+bGA4067SzFkzJzNQxwJXa50AcurYJasCKmPWmXYAKqpefI+Li9KHIQilWzdgjRp1Ug4RTOOXIChN9lK7bUi7FuDu+xuAoaSMpvVzmmZfSkFLZZ9atVhaUjPobRvY1ys5tPHr8Oz/2k8FVFLk6raY4KyBdp/4mCH+XQA8y/TFmj/KULsWx1I4GoMr6E3GAvCEnwnwGhauA16g1avJNYGfR110dct0P7t2yo3qI9ZLIFy3gLt3ZPtVRREkw8bBSvXLdDevTYpBUwu/MVGoXoSG9DeLTTaoIvZH2+3toawBdqvM6bO6zlWLyXN1bBYQ3/1vLPj0fBoOBr+o+XNrtpmvhxf/Wg2m96AeHPBGb1p7pr5eDGbVxs2cKd/P59NmrattP+gTrc74uZXpfoMOs3Jw6I+8hFyWu19M5l+m04qzTXstK+a8W2l+Qg5rWUzb6ezu0rxD+rvPp6Pb/+6+hPo7zOftW3bTBbV0TbU0J7IVl729FNf1nfN0jvBZpTrp23TXNdXX0HO9Hy6bBabatbggzO0eLir0+MR8uc0y2mPZ9YwvzwmV+krR78BFdjq9g==";
+			var data = "<place buffer here>";
 
-			window.xdata = JSON.parse(JXG.decompress( data ));
+			function decode() {
+				window.xdata = JSON.parse(JXG.decompress( data ));
+			}
 
 		</script>
 	</head>

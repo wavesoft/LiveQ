@@ -29,6 +29,7 @@ from liveq.internal.application import *
 from liveq.internal.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
 from liveq.config import AppConfig
 from liveq.apps.helpers.FLAT import FLATParser
+from liveq.apps.helpers.hugedata import Hugedata
 
 """
 Configuration implementation
@@ -325,7 +326,7 @@ class MCPlots(JobApplication):
 
 				# Let listeners know we have intermediate data available
 				if results:
-					self.dispatchEvent("job_data", False, results)
+					self.dispatchEvent("job_data", False, Hugedata.jsCompress(results))
 
 			# Runtime clock and CPU anti-hoging
 			time.sleep(1)
