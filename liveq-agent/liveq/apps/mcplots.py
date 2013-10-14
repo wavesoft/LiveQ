@@ -28,8 +28,8 @@ from multiprocessing import Process
 from liveq.internal.application import *
 from liveq.internal.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
 from liveq.config import AppConfig
-from liveq.apps.helpers.FLAT import FLATParser
-from liveq.apps.helpers.hugedata import Hugedata
+from liveq.utils.FLAT import FLATParser
+from liveq.utils.hugedata import Hugedata
 
 """
 Configuration implementation

@@ -21,11 +21,30 @@ import zlib
 import json
 import base64
 import urllib
+from liveq.utils.base85 import b85encode
 
+"""
+Hugedata Class
+
+This class provides an interface of managing huge data structures. It is currently
+used by the interface-updating mechanism, where many histograms needs to be pushed 
+to the client.
+"""
 class Hugedata:
 
+	"""
+	Compress huge data for javascript use
+
+	This function does the following:
+
+		1. Convers the given dictionary/array structure into a JSON array
+		2. Compresses it with gzip encoding
+		3. Optionally encodes it in base85
+
+	The data structure can be converted back to array using the jsxcompressor.js library.
+	"""
 	@staticmethod
-	def jsCompress(hugedat):
+	def jsCompress(hugedat, base85=True):
 
 		# Convert dictionary into a json string
 		json_data = json.dumps(hugedat)
@@ -33,5 +52,8 @@ class Hugedata:
 		# GZip data
 		gz_data = zlib.compress(urllib.quote(json_data), 9)
 
-		# Base64-encode
-		return base64.b64encode(gz_data)
+		# Base64-encode if specified
+		if base85:
+			return b85encode(gz_data)
+		else:
+			return gz_data
