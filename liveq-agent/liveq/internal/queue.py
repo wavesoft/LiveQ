@@ -17,24 +17,3 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from liveq.internal.events import EventDispatcher
-
-class Adapter(EventDispatcher):
-
-	"""
-	Initialize the adapter base class
-	"""
-	def __init__(self,config,userconfig):
-		EventDispatcher.__init__(self)
-
-	"""
-	Notify the queue endpoint that the job is available
-	"""
-	def job_available(self):
-		pass
-
-	"""
-	Notify the queue endpoint that the job is available
-	"""
-	def job_available(self):
-		pass
