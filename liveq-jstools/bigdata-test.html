@@ -6,21 +6,45 @@
 		<script src="lib/jsxcompressor.min.js" type="text/javascript"></script>
 		<script type="text/javascript">
 
-			// Some data for testing hugedata decompression
-			var data = "<place buffer here>";
+			function decode() {
+				var elm_in = document.getElementById("ta_input");
+				var elm_out = document.getElementById("ta_output");
 
-			function decompress(str) {
-			    return (new JXG.Util.Unzip(ascii85.decodeArray(str))).unzip()[0][0]
+
+				var t_start = (new Date()).getMilliseconds();
+				var str = JXG.decompress( elm_in.value );
+				var t_parse = (new Date()).getMilliseconds();
+				var struct = JSON.parse(str);
+				var t_unpack = (new Date()).getMilliseconds();
+
+				elm_out.value = str;
+				calclen('output');
+				var ratio = (elm_in.value.length / elm_out.value.length) * 100;
+
+				alert("Decoding took: " + (t_parse - t_start) + " ms\n" + 
+					  "Unpacking took: " + (t_unpack - t_parse) + " ms\n" +
+					  "Total time: " + (t_unpack - t_start) + " ms\n" +
+					  "Compression ratio: " + ratio.toFixed(2) + " %" );
 			}
 
-			function decode() {
-				window.xdata = JSON.parse(decompress(data));
-				//window.xdata = JSON.parse(JXG.decompress( data ));
+			function calclen(cls) {
+				var elm_ta = document.getElementById('ta_' + cls),
+					elm_len = document.getElementById('len_' + cls);
+				elm_len.innerHTML = "Len: <strong>" + elm_ta.value.length + "</strong>";
 			}
 
 		</script>
 	</head>
 <body>
-
+	<h1>Hugedata Payload Test</h1>
+	<p>Paste here your payload:</p>
+	<p>
+		<textarea id="ta_input" onchange="calclen('input')" style="width:100%; height:200px; margin-bottom: 0px;"></textarea>
+		<br/><span id="len_input">Len: <strong>0</strong></span>
+	</p>
+	<p><input type="button" onclick="decode()" value="Decode hugedata" /></p>
+	<p>
+		<textarea id="ta_output" onchange="calclen('output')" style="width:100%; height:400px; margin-bottom: 0px;"></textarea>
+		<br><span id="len_output">Len: <strong>0</strong></span></p>
 </body>
 </html>

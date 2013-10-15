@@ -19,9 +19,8 @@
 
 import zlib
 import json
-import base64
 import urllib
-from liveq.utils.base85 import b85encode
+from base64 import b64encode
 
 """
 Hugedata Class
@@ -39,12 +38,12 @@ class Hugedata:
 
 		1. Convers the given dictionary/array structure into a JSON array
 		2. Compresses it with gzip encoding
-		3. Optionally encodes it in base85
+		3. Optionally encodes it in Base64
 
 	The data structure can be converted back to array using the jsxcompressor.js library.
 	"""
 	@staticmethod
-	def jsCompress(hugedat, base85=True):
+	def jsCompress(hugedat, encode=True):
 
 		# Convert dictionary into a json string
 		json_data = json.dumps(hugedat)
@@ -53,7 +52,7 @@ class Hugedata:
 		gz_data = zlib.compress(urllib.quote(json_data), 9)
 
 		# Base64-encode if specified
-		if base85:
-			return b85encode(gz_data)
+		if encode:
+			return b64encode(gz_data)
 		else:
 			return gz_data
