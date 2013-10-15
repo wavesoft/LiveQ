@@ -17,17 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
-
-from liveq.server import MCPlotsServer, MCPlotsServerBus
-
-# Setup port defaults
-define("port", default=8888, help="run on the given port", type=int)
-
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+"""
+This class provides the basic interface to a currently running tuning job.
+"""
+class TuneJob:
+	pass

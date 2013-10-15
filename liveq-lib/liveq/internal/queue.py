@@ -17,17 +17,24 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
+"""
 
-from liveq.server import MCPlotsServer, MCPlotsServerBus
+"""
+class QueueSubscription:
+	
+	def leave(self):
 
-# Setup port defaults
-define("port", default=8888, help="run on the given port", type=int)
 
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+"""
+A queue is an object that links Jobs instances with the adapter
+"""
+class Queue:
+
+	def __init__(self, adapter):
+		self.datapter = adapter
+
+	def join(self, id):
+		pass
+
+	def create(self,id):
+		pass

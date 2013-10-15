@@ -17,17 +17,44 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
+import zmq
 
-from liveq.server import MCPlotsServer, MCPlotsServerBus
+"""
+Decorator to mark the method as "bound to a message"
+These methods are automatically bound to the bus messages by the constructor
+"""
+def bus_handler(method, name):
+	method.bound_message = name
+	return method
 
-# Setup port defaults
-define("port", default=8888, help="run on the given port", type=int)
+"""
+LiveQ Bus is an ZeroMQ bidirectional PubSub Node
+"""
+class LiveQBus:
 
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+	"""
+	Initialize LiveQ Bus, using the global configuration
+	"""
+	def __init__(self):
+		
+		# Register the functions marked for registry
+
+
+	"""
+	Send a message on the bus and wait for the specified response message
+	"""
+	def request(self, msg_send, msg_recv, data, timeout=1000):
+		pass
+
+	"""
+	Send a message on the bus and don't wait for any response
+	"""
+	def send(self, msg_send, data):
+		pass
+
+	"""
+	Register a listener of the given message on the bus
+	"""
+	def addListener(self, message, handler):
+		pass
+

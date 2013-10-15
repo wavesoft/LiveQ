@@ -17,17 +17,45 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
+import pickle
+from cStringIO import StringIO
 
-from liveq.server import MCPlotsServer, MCPlotsServerBus
+"""
+A histogram in the tune database
+"""
+class TuneHistogram:
 
-# Setup port defaults
-define("port", default=8888, help="run on the given port", type=int)
+	"""
+	Initialize a tune histogram
+	"""
+	def __init__(self):
+		self.bins = [ ]
 
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+"""
+A specific tune as a database object
+"""
+class Tune:
+
+	"""
+	Initialize a tune instance
+	"""
+	def __init__(self):
+		self.parameters = { }
+		self.histograms = [ ]
+
+
+	"""
+	Static method to create a tune instance from a picke object
+	"""
+	@staticmethod
+	def fromPicke(datastream):
+		dst = StringIO(datastream)
+		up = pickle.Unpickler(dst)
+
+
+	"""
+
+	"""
+	def 
+
+	pass
