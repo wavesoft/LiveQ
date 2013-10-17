@@ -18,6 +18,7 @@
 ################################################################
 
 import ConfigParser
+from liveq.config import configexceptions
 from liveq.config.core import CoreConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.store import StoreConfig
@@ -26,7 +27,6 @@ from liveq.config.store import StoreConfig
 Create a configuration for the JOB MANAGER based on the core config
 """
 class Config(CoreConfig, DatabaseConfig, StoreConfig):
-	pass
 
 	"""
 	Update class variables by reading the config file

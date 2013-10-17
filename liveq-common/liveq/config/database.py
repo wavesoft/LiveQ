@@ -21,52 +21,8 @@ import ConfigParser
 import logging
 
 from playhouse.proxy import Proxy
-from liveq.exceptions import ConfigException
-
-"""
-A database configuration instance specified by the configuration file
-Handles the following section:
-
-[database]
-class=liveq.classes.db.<class>
-
-"""
-class DatabaseConfigClass:
-	
-	"""
-	Instantiate a config class from the package specified
-	"""
-	@staticmethod
-	def fromClass(cls,cfg):
-		# Try to load the specified package
-		try:
-			mod = __import__(cls, fromlist=['']);
-		except ImportError as e:
-			raise ConfigException("Unable to load package %s (%s)" % (cls, e) )
-
-		# Make sure we have the required classes inside
-		if not hasattr(mod, "Config"):
-			raise ConfigException("The queue package %s has no configuration class defined" % cls)
-
-		# Validate integrity
-		if not issubclass(mod.Config, DatabaseConfigClass):
-			raise ConfigException("The class %s.Config is not a queue configuration" % cls)			
-
-		# Instantiate (safely)
-		try:
-			inst = mod.Config(cfg)
-		except Exception as e:
-			raise ConfigException("Unable to parse queue configuration (%s: %s)" % (e.__class__.__name__, e))
-
-		# Return instance
-		return inst
-
-	"""
-	Overridable function to create a queue
-	"""
-	def instance(self):
-		raise NotImplementedError("The queue config class did not implement the instance() function")
-
+from liveq.config import configexceptions
+from liveq.config.classes import DatabaseConfigClass
 
 """
 Database configuration class
@@ -85,6 +41,7 @@ class DatabaseConfig:
 	contents of the specified filename
 	"""
 	@staticmethod
+	@configexceptions(section="database")
 	def fromConfig(config):
 
 		# Populate classes

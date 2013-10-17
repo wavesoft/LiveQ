@@ -34,6 +34,15 @@ class BaseModel(Model):
     class Meta:
         database = DatabaseConfig.DB
 
+"""
+Create the core database models
+"""
+def createBaseTables():
+
+	# Create the tables in the basic model
+	for table in [ User, AgentGroup, AgentMetrics, Agent, Lab ]:
+		table.create_table(True)
+
 # -----------------------------------------------------
 #  Model Implementation
 # -----------------------------------------------------

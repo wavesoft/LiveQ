@@ -30,7 +30,7 @@ class Config(StoreConfigClass):
 	"""
 	def __init__(self,config):
 		self.HOST = config.get('server')
-		self.PORT = config.get('port')
+		self.PORT = int(config.get('port'))
 		self.DATABASE = config.get('db')
 
 	"""

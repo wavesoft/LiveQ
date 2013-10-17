@@ -21,6 +21,15 @@ import sys
 sys.path.append("../liveq-common")
 
 from jobmanager.config import Config
+from liveq.exceptions import ConfigException
 from liveq.models import *
 
-Config.fromFile("config/base.conf")
+# Parse configuration
+try:
+	Config.fromFile("config/base.conf")
+except ConfigException as e:
+	print "Configuration error: %s" % str(e)
+	sys.exit(1)
+
+# Ensure database is OK
+createBaseTables()

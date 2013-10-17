@@ -16,23 +16,3 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
-
-import sys
-sys.path.append("../liveq-common")
-
-from jobmanager.config import Config
-from liveq.exceptions import ConfigException
-from liveq.models import *
-
-# Parse configuration
-try:
-	Config.fromFile("config/base.conf")
-except ConfigException as e:
-	print "Configuration error: %s" % str(e)
-	sys.exit(1)
-
-User.create_table()
-AgentGroup.create_table()
-AgentMetrics.create_table()
-Agent.create_table()
-Lab.create_table()

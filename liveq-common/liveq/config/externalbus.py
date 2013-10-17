@@ -17,22 +17,35 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import sys
-sys.path.append("../liveq-common")
+import ConfigParser
+import logging
 
-from jobmanager.config import Config
 from liveq.exceptions import ConfigException
-from liveq.models import *
+from liveq.config import configexceptions
+from liveq.config.classes import BusConfigClass
 
-# Parse configuration
-try:
-	Config.fromFile("config/base.conf")
-except ConfigException as e:
-	print "Configuration error: %s" % str(e)
-	sys.exit(1)
+"""
+External Bus Configration
 
-User.create_table()
-AgentGroup.create_table()
-AgentMetrics.create_table()
-Agent.create_table()
-Lab.create_table()
+An external bus is a transport class that exchanges messages between the
+code LiveQ Components. 
+"""
+class ExternalBusConfig:
+
+	# Key-Value store instance and confguration
+	EBUS_CLASS = ""
+	EBUS_CONFIG = None
+	EBUS = None
+
+	"""
+	Update class variables by reading the config file
+	contents of the specified filename
+	"""
+	@staticmethod
+	@configexceptions(section="external-bus")
+	def fromConfig(config):
+
+		# Populate classes
+		StoreConfig.IBUS_CLASS = config.get("external-bus", "class")
+		StoreConfig.IBUS_CONFIG = BusConfigClass.fromClass( StoreConfig.IBUS_CLASS, config._sections["external-bus"] )
+		StoreConfig.IBUS = StoreConfig.IBUS_CONFIG.instance()

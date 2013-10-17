@@ -17,22 +17,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import sys
-sys.path.append("../liveq-common")
+from peewee import SqliteDatabase
+from liveq.config.database import DatabaseConfigClass
 
-from jobmanager.config import Config
-from liveq.exceptions import ConfigException
-from liveq.models import *
+"""
+Configuration endpoint
+"""
+class Config(DatabaseConfigClass):
 
-# Parse configuration
-try:
-	Config.fromFile("config/base.conf")
-except ConfigException as e:
-	print "Configuration error: %s" % str(e)
-	sys.exit(1)
+	"""
+	Populate the database configuration
+	"""
+	def __init__(self,config):
+		self.DATABASE = config['filename']
 
-User.create_table()
-AgentGroup.create_table()
-AgentMetrics.create_table()
-Agent.create_table()
-Lab.create_table()
+	"""
+	Create an SQL instance
+	"""
+	def instance(self):
+		return SqliteDatabase(self.DATABASE)
+

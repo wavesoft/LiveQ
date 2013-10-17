@@ -29,10 +29,10 @@ class Config(DatabaseConfigClass):
 	Populate the database configuration
 	"""
 	def __init__(self,config):
-		self.HOST = config.get('server')
-		self.DATABASE = config.get('database')
-		self.USERNAME = config.get('username')
-		self.PASSWORD = config.get('password')
+		self.HOST = config['server']
+		self.DATABASE = config['database']
+		self.USERNAME = config['username']
+		self.PASSWORD = config['password']
 
 	"""
 	Create an SQL instance
