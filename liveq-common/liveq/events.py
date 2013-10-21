@@ -30,7 +30,7 @@ class EventDispatcher:
 	"""
 	Add an event listener object in the listeners
 	"""
-	def addEventHandler(self,event,handler):
+	def on(self,event,handler):
 
 		# Allocate event groups
 		if not event in self.__eventHandlers:
@@ -42,7 +42,7 @@ class EventDispatcher:
 	"""
 	Remove an event listener object from the listeners
 	"""
-	def removeEventHandler(self,event,handler):
+	def off(self,event,handler):
 
 		# Check for event names
 		if not event in self.__eventHandlers:
@@ -57,7 +57,7 @@ class EventDispatcher:
 	"""
 	Dispatch an event to the appropriate listeners
 	"""
-	def dispatchEvent(self,event,*args):
+	def trigger(self,event,*args):
 		logging.debug("Dispatching event %s %s" % (event, args))
 
 		# Check for event names

@@ -28,7 +28,7 @@ from liveq.config.classes import BusConfigClass
 External Bus Configration
 
 An external bus is a transport class that exchanges messages between the
-code LiveQ Components. 
+code LiveQ Core and the Agents. 
 """
 class ExternalBusConfig:
 

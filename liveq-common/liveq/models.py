@@ -41,6 +41,8 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ User, AgentGroup, AgentMetrics, Agent, Lab ]:
+
+		# Do nothing if the table is already there
 		table.create_table(True)
 
 # -----------------------------------------------------
