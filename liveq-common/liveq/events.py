@@ -58,7 +58,7 @@ class EventDispatcher:
 	Dispatch an event to the appropriate listeners
 	"""
 	def trigger(self,event,*args):
-		logging.debug("Dispatching event %s %s" % (event, args))
+		logging.debug("Dispatching event '%s' %s" % (event, args))
 
 		# Check for event names
 		if not event in self.__eventHandlers:
@@ -67,3 +67,19 @@ class EventDispatcher:
 		# Dispatch
 		for handler in self.__eventHandlers[event]:
 			handler(self, *args)
+
+"""
+Static class container for global events
+"""
+class GlobalEvents:
+
+	"""
+	Create a system-wide event queue
+
+	In principle any event might appear here, but here is a short list
+	of the most common events:
+
+	- shutdown : Raised usually by user's input in order to safely shutdown the daemon
+
+	"""
+	System = EventDispatcher()

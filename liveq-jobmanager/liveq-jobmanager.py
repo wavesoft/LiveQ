@@ -33,3 +33,6 @@ except ConfigException as e:
 
 # Ensure database is OK
 createBaseTables()
+
+# Open a channel
+channel = Config.IBUS.openChannel("data")

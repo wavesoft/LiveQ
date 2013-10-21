@@ -19,6 +19,9 @@
 
 import logging
 
+"""
+Global class that implements event dispatching mechanism
+"""
 class EventDispatcher:
 
 	"""
@@ -67,3 +70,20 @@ class EventDispatcher:
 		# Dispatch
 		for handler in self.__eventHandlers[event]:
 			handler(self, *args)
+
+
+"""
+Static class container for global events
+"""
+class GlobalEvents:
+
+	"""
+	Create a system-wide event queue
+
+	In principle any event might appear here, but here is a short list
+	of the most common events:
+
+	- shutdown : Raised usually by user's input in order to safely shutdown the daemon
+
+	"""
+	System = EventDispatcher()

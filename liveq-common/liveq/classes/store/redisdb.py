@@ -18,7 +18,7 @@
 ################################################################
 
 import redis
-from liveq.config.store import StoreConfigClass
+from liveq.config.classes import StoreConfigClass
 
 """
 Configuration endpoint

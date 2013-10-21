@@ -18,7 +18,7 @@
 ################################################################
 
 from peewee import SqliteDatabase
-from liveq.config.database import DatabaseConfigClass
+from liveq.config.classes import DatabaseConfigClass
 
 """
 Configuration endpoint

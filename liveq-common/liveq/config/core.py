@@ -56,3 +56,6 @@ class CoreConfig:
 			"0": logging.FATAL,
 		}
 		CoreConfig.LOG_LEVEL = level_map[ config.get("general", "loglevel") ]
+
+		# Initialize config
+		logging.basicConfig(level=CoreConfig.LOG_LEVEL, format='%(levelname)-8s %(message)s')

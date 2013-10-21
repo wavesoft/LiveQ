@@ -46,6 +46,6 @@ class InternalBusConfig:
 	def fromConfig(config):
 
 		# Populate classes
-		StoreConfig.IBUS_CLASS = config.get("internal-bus", "class")
-		StoreConfig.IBUS_CONFIG = BusConfigClass.fromClass( StoreConfig.IBUS_CLASS, config._sections["internal-bus"] )
-		StoreConfig.IBUS = StoreConfig.IBUS_CONFIG.instance()
+		InternalBusConfig.IBUS_CLASS = config.get("internal-bus", "class")
+		InternalBusConfig.IBUS_CONFIG = BusConfigClass.fromClass( InternalBusConfig.IBUS_CLASS, config._sections["internal-bus"] )
+		InternalBusConfig.IBUS = InternalBusConfig.IBUS_CONFIG.instance()
