@@ -68,17 +68,3 @@ class JobApplication(EventDispatcher):
 	"""
 	def setConfig(self,config):
 		pass
-
-"""
-Application manager that creates JobApplicationInstances
-"""
-class JobApplicationManager:
-
-	"""
-	Instantiate an application
-	"""
-	def instantiate(self,logger,results):
-
-		inst = JobApplicationInstance()
-		pass
-

@@ -129,3 +129,40 @@ class StoreConfigClass:
 	def instance(self):
 		raise NotImplementedError("The StoreConfigClass did not implement the instance() function")
 
+
+"""
+Application configuration class
+"""
+class AppConfigClass:
+	
+	"""
+	Instantiate a config class from the package specified
+	"""
+	@staticmethod
+	def fromClass(cls,cfg):
+		# Try to load the specified package
+		try:
+			mod = __import__(cls, fromlist=['']);
+		except ImportError as e:
+			raise ConfigException("Unable to load package %s (%s)" % (cls, e) )
+
+		# Make sure we have the required classes inside
+		if not hasattr(mod, "Config"):
+			raise ConfigException("The store package %s has no configuration class defined" % cls)
+
+		# Validate integrity
+		if not issubclass(mod.Config, AppConfigClass):
+			raise ConfigException("The class %s.Config is not an application configuration" % cls)			
+
+		# Instantiate (safely)
+		inst = mod.Config(cfg)
+
+		# Return instance
+		return inst
+
+	"""
+	Overridable function to create a store
+	"""
+	def instance(self):
+		raise NotImplementedError("The AppConfigClass did not implement the instance() function")
+

@@ -17,25 +17,34 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import redis
-from liveq.config.classes import StoreConfigClass
+import ConfigParser
+import logging
+
+from liveq.config import configexceptions
+from liveq.config.classes import AppConfigClass
 
 """
-Configuration endpoint
+Application configuration class
+This class provides the configuration framework for instantiating application objects.
+This implementation supports only a single application.
 """
-class Config(StoreConfigClass):
+class AppConfig:
+
+	# General application information
+	APP_CLASS = ""
+	APP_CONFIG = None
+	APP = None
 
 	"""
-	Populate the database configuration
+	Update class variables by reading the config file
+	contents of the specified filename
 	"""
-	def __init__(self,config):
-		self.HOST = config['server']
-		self.PORT = int(config['port'])
-		self.DATABASE = config['db']
+	@staticmethod
+	@configexceptions(section="app")
+	def fromConfig(config):
 
-	"""
-	Create an SQL instance
-	"""
-	def instance(self):
-		return redis.StrictRedis(host=self.HOST, port=self.PORT, db=self.DATABASE)
+		# Populate app classes
+		AppConfig.APP_CLASS = config.get("app", "class")
+		AppConfig.APP_CONFIG = AppConfigClass.fromClass( AppConfig.APP_CLASS, config._sections["app"] )
+		AppConfig.APP = AppConfig.APP_CONFIG.instance()
 

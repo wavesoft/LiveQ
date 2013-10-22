@@ -31,13 +31,13 @@ class FLATParser:
 	Function to read a FLAT file into python structures
 	"""
 	@staticmethod
-	def parse(fname):
+	def parse(filename):
 		sections = {}
 		section = None
 		activesection = None
 
 		# Very simple FLAT file reader
-		with open(fname, 'r') as f:
+		with open(filename, 'r') as f:
 
 			# Read and chomb end-of-lie
 			while True:
