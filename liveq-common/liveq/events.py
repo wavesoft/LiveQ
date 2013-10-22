@@ -18,6 +18,7 @@
 ################################################################
 
 import logging
+import sys
 
 class EventDispatcher:
 
@@ -66,7 +67,10 @@ class EventDispatcher:
 
 		# Dispatch
 		for handler in self.__eventHandlers[event]:
-			handler(self, *args)
+			try:
+				handler(self, *args)
+			except Exception as e:
+				logging.error("Exception while dispatching event %s: %s" % (event, str(e)))
 
 """
 Static class container for global events

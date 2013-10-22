@@ -39,6 +39,13 @@ class NoBusChannelException(Exception):
 
 """
 A channel on a bus that the user can send messages or listen for other
+
+Events dispatched on this class:
+- 'open'	: When the channel is open
+- 'close'	: When the channel is closed
+- <message>	: When a message arrives from the bus. Each message has the 
+			  name specified while sending it.
+
 """
 class BusChannel(EventDispatcher):
 
@@ -54,11 +61,26 @@ class BusChannel(EventDispatcher):
 	def send(self, name, data):
 		raise NotImplementedError("The BusChannel did not implement the send() function")
 
+	"""
+	Reply to the last message received
+	"""
+	def reply(self, data):
+		raise NotImplementedError("The BusChannel did not implement the reply() function")
 
 """
 A template class that should be inherited by the Bus driver
+
+Events dispatched on this class:
+- 'channel'	: When a channel is created by a remote request
+
 """
-class Bus:
+class Bus(EventDispatcher):
+
+	"""
+	Initialize event dispatcher
+	"""
+	def __init__(self):
+		EventDispatcher.__init__(self)
 
 	"""
 	Open a named channel on the bus.

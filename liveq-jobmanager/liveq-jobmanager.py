@@ -20,7 +20,13 @@
 import sys
 sys.path.append("../liveq-common")
 
+import logging
+import time
+import signal
+import sys
+
 from jobmanager.config import Config
+from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 from liveq.models import *
 
@@ -34,5 +40,15 @@ except ConfigException as e:
 # Ensure database is OK
 createBaseTables()
 
-# Open a channel
-channel = Config.IBUS.openChannel("data")
+# Register CTRL+C Handler
+def signal_handler(signal, frame):
+	logging.info("** Caught signal. Shutting down **")
+	GlobalEvents.System.trigger('shutdown')
+	sys.exit(0)
+signal.signal(signal.SIGINT, signal_handler)
+
+c = Config.IBUS.openChannel("data")
+
+# Pause
+while True:
+	time.sleep(1)

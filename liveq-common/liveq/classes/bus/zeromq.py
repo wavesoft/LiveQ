@@ -28,8 +28,11 @@ from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
 from liveq.config.classes import BusConfigClass
 
-# Tunable parameter for the time to wait in the message loop
-MESSAGE_LOOP_DELAY = 0.01
+# Idle loop delay
+IDLE_LOOP_DELAY = 0.01
+
+# Timeout (in seconds) after sending a REQ message until we get a REP
+REQUEST_TIMEOUT = 30
 
 """
 ZeroMQ Bus channel
@@ -54,6 +57,7 @@ class ZeroMQChannel(BusChannel):
 		self.egress = Queue.Queue()
 		self._lastData = None
 		self._sentReply = False
+		self._lastMessage = None
 
 		# Start a event polling thread
 		self.running = True
@@ -67,7 +71,7 @@ class ZeroMQChannel(BusChannel):
 	"""
 	Shutdown handler
 	"""
-	def _shutdown(self):
+	def _shutdown(self, msg):
 
 		# Disable and disconnect
 		self.running = False
@@ -87,6 +91,7 @@ class ZeroMQChannel(BusChannel):
 			return None
 
 		# Dispatch event
+		self._lastMessage = msg
 		self.trigger( msg['name'], msg['data'] )
 
 		# Return frame
@@ -94,6 +99,8 @@ class ZeroMQChannel(BusChannel):
 
 	"""
 	Main thread that receives messages from the channel
+
+	TODO: Create different threads for PUB, SUB, REQ, and REP
 	"""
 	def mainThread(self):
 
@@ -103,6 +110,7 @@ class ZeroMQChannel(BusChannel):
 
 		# Local variables
 		socket = None
+		pendingrecv = None
 
 		# Depending on the channel type, create the
 		# appropriate socket type.
@@ -161,6 +169,19 @@ class ZeroMQChannel(BusChannel):
 		# Start main event loop
 		while self.running and not socket.closed:
 
+			# Check for timed out 'pending response' messages
+			if pendingrecv != None:
+
+				# Check for request timeout
+				if (time.time() - pendingrecv['_timestamp']) > REQUEST_TIMEOUT:
+
+					# Store None response and notify thread
+					pendingrecv['response'] = None
+					pendingrecv['event'].set()
+
+					# Reset pending egress message
+					pendingrecv = None
+
 			# Process incoming messages only if we
 			# are allowed to do so.
 			if not skiprecv:
@@ -171,15 +192,33 @@ class ZeroMQChannel(BusChannel):
 					# Receive frame
 					frame = socket.recv_json(zmq.NOBLOCK)
 
-					# Send data
-					self._sentReply = False
-					self._handleMessage( frame )
+					# Check if this was a response to a blocked
+					# message
+					if pendingrecv != None:
 
-					# Check if we should enforce reply and
-					# if yes, just respond with an empty hash
-					if forcereply and not self._sentReply:
-						self.logger.warn("[%s] Adding void reply because no send() occured" % self.name)
-						socket.send_json({})
+						# Handle and store response
+						pendingrecv['response'] = self._handleMessage( frame )
+
+						# Notify thread
+						pendingrecv['event'].set()
+
+						# Reset pending egress message
+						pendingrecv = None
+
+					# Nope, this was a regilar incoming message
+					else:
+
+						# Handle reply and reset _sentReply flag
+						# if nobody replies to the bus, we might have to
+						# respond with a default "Unhandled" message
+						self._sentReply = False
+						self._handleMessage( frame )
+
+						# Check if we should enforce reply and if nobody
+						# responded just respond with an empty hash
+						if forcereply and not self._sentReply:
+							self.logger.warn("[%s] Adding void reply because no send() occured" % self.name)
+							socket.send_json({})
 
 				except zmq.ZMQError as e:
 
@@ -191,21 +230,26 @@ class ZeroMQChannel(BusChannel):
 
 			# Process the egress queue since we can use socket
 			# *ONLY* from this thread
-			while not self.egress.empty():
+			while not self.egress.empty() and (pendingrecv == None):
 
 				# Pop and send message
 				msg = self.egress.get()
 				socket.send( msg['message'] )
 
 				# If we are blocking, wait for response
-				frame = socket.recv_json(zmq.NOBLOCK)
-				msg['response'] = self._handleMessage( frame )
+				if self.blocking:
 
-				# Notify thread
-				msg['event'].set()
+					# Mark the time it was sent in order to calculate timeouts
+					msg['_timestamp'] = time.time()
+
+					# This will also disable the egress processing
+					# until a message is arrived
+					pendingrecv = msg
+					break
+
 
 			# Sleep some time
-			time.sleep(MESSAGE_LOOP_DELAY)
+			time.sleep(IDLE_LOOP_DELAY)
 
 
 		# Let log receivers that we are through
@@ -254,6 +298,14 @@ class ZeroMQChannel(BusChannel):
 			# Return response
 			return message['response']
 
+	"""
+	Reply to a message on the bus
+	"""
+	def reply(self, data):
+		
+		# In our case that's the same with reply
+		return self.send(_lastMessage['name'], data)
+
 
 """
 ZeroMQ Bus instance
@@ -264,6 +316,8 @@ class ZeroMQBus(Bus):
 	Create an instance of a ZeroMQ Bus
 	"""
 	def __init__(self, config):
+		Bus.__init__(self)
+
 		self.config = config
 		self.context = zmq.Context()
 		self.logger = logging.getLogger("zmq-bus")
