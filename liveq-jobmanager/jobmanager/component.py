@@ -36,15 +36,56 @@ class JobManagerComponent(Component):
 	def __init__(self):
 		Component.__init__(self)
 
+		# Setup logger
+		self.logger = logging.getLogger("agent")
+		self.logger.info("JobManager component started")
+
+		# TODO: Uhnack this
+		Config.EBUS.updateRoster( "jmliveq-agent@t4t-xmpp.cern.ch", name="Agent", subscription="both" )
+
 		# Register the arbitrary channel creations that can happen
 		# when we have an incoming agent handshake
 		Config.EBUS.on('channel', self.onChannelCreation)
+
+		# Channel mapping
+		self.channels = { }
 
 	"""
 	Callback when a channel is up
 	"""
 	def onChannelCreation(self, channel):
-		pass
+		self.logger.warn("[%s] Channel created" % channel.name)
+
+		# Store on local map
+		self.channels[channel.name] = channel
+
+		# Handle bus messages and evnets
+		channel.on('open', self.onOpen, channel=channel)
+		channel.on('close', self.onClose, channel=channel)
+		channel.on('handshake', self.onHandshake, channel=channel)
+
+	"""
+	Callback when an agent becomes available
+	"""
+	def onOpen(self, channel=None):
+		self.logger.warn("[%s] Channel is open" % channel.name)
+
+	"""
+	Callback when an agent becomes unavailable
+	"""
+	def onClose(self, channel=None):
+		self.logger.warn("[%s] Channel is open" % channel.name)
+
+	"""
+	Callback when a handshake arrives in the bus
+	"""
+	def onHandshake(self, message, channel=None):
+		self.logger.warn("[%s] Handshaking" % channel.name)
+
+		# Reply with some data
+		channel.reply({
+				'some': 'data'
+			})
 
 	"""
 	Entry point

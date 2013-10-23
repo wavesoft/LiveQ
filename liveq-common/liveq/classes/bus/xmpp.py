@@ -142,7 +142,7 @@ class XMPPUserChannel(BusChannel):
 
 		# Store response data
 		if data:
-			response['body'] = json.dumps(data)
+			response['liveq']['body'] = json.dumps(data)
 
 		# Send and marked as replied
 		response.send()
@@ -291,7 +291,7 @@ class XMPPBus(Bus, ClientXMPP):
 	"""
 	Handler for the system-wide shutdown event
 	"""
-	def systemShutdown(self, event):
+	def systemShutdown(self):
 
 		# Mark us as under disconnection
 		self.disconnecting = True
@@ -324,7 +324,7 @@ class XMPPBus(Bus, ClientXMPP):
 		# Check if we can find a channel without resource
 		# (for load-balancing for example)
 		if not jid in self.channels:
-			parts = jid.split("/")
+			parts = str(jid).split("/")
 
 			# If such channel exists, use that instead.
 			# Otherwise, keep doing what we were supposed to do

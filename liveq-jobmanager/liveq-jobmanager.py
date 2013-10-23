@@ -29,6 +29,7 @@ import signal
 import sys
 
 from jobmanager.config import Config
+from jobmanager.component import JobManagerComponent
 
 from liveq import handleSIGINT
 from liveq.events import GlobalEvents
@@ -47,8 +48,5 @@ except ConfigException as e:
 # Hook sigint -> Shutdown
 handleSIGINT()
 
-c = Config.IBUS.openChannel("data")
-
-# Pause
-while True:
-	time.sleep(1)
+# Start job manager
+JobManagerComponent().run()

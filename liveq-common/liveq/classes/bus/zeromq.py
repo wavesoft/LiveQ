@@ -111,7 +111,7 @@ class ZeroMQChannel(BusChannel):
 	"""
 	Shutdown handler
 	"""
-	def _shutdown(self, msg):
+	def _shutdown(self):
 
 		# Disable and disconnect
 		self.running = False

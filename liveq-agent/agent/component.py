@@ -47,6 +47,9 @@ class AgentComponent(Component):
 		# (Currently that's the XMPP channel - but we prefer to be abstract)
 		self.serverChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
 
+		# TODO: Uhnack this
+		Config.EBUS.updateRoster( Config.SERVER_CHANNEL, name="Server", subscription="both" )
+
 		# Bind incoming message handlers
 		self.serverChannel.on('job_start', self.onJobStart)
 		self.serverChannel.on('job_cancel', self.onJobCancel)
@@ -65,6 +68,8 @@ class AgentComponent(Component):
 					'version': AgentComponent.VERSION,
 					'slots': 1
 				})
+
+			print "###### %s" % str(ans)
 
 			# Check for errors on handshake
 			if ans == None:
@@ -93,7 +98,7 @@ class AgentComponent(Component):
 	"""
 	Bus connection lost
 	"""
-	def onDisconnect(self, message):
+	def onDisconnect(self):
 		self.logger.info("Server channel connection lost")
 
 		# We lost the interaction with the server.

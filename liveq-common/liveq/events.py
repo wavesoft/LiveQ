@@ -32,14 +32,14 @@ class EventDispatcher:
 	"""
 	Add an event listener object in the listeners
 	"""
-	def on(self,event,handler):
+	def on(self,event,handler,**kwargs):
 
 		# Allocate event groups
 		if not event in self.__eventHandlers:
 			self.__eventHandlers[event] = []
 
 		# Append entry
-		self.__eventHandlers[event].append( handler )
+		self.__eventHandlers[event].append( [handler,kwargs] )
 
 	"""
 	Remove an event listener object from the listeners
@@ -52,7 +52,19 @@ class EventDispatcher:
 
 		# Remove handler
 		try:
-			self.__eventHandlers[event].remove(handler)
+
+			# Iterate over the handlers
+			i = 0
+			for k in self.__eventHandlers[event]:
+
+				# Check if the handler callback is the same
+				if k[0] == handler:
+					del self.__eventHandlers[event][i]
+					break
+
+				# Increment index
+				i += 1
+
 		except ValueError:
 			pass
 
@@ -69,7 +81,7 @@ class EventDispatcher:
 		# Dispatch
 		for handler in self.__eventHandlers[event]:
 			try:
-				handler(self, *args)
+				handler[0](*args, **handler[1])
 			except Exception as e:
 				logging.error("Exception while dispatching event %s: %s" % (event, str(e)))
 

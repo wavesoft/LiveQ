@@ -85,7 +85,7 @@ class Component(Scheduler):
 	Handler for the system-wide shutdown function
 	that forces main loop to exit
 	"""
-	def onShutdown(self, message):
+	def onShutdown(self):
 		self.running = False
 
 	"""
