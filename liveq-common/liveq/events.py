@@ -18,6 +18,7 @@
 ################################################################
 
 import logging
+import signal
 import sys
 
 class EventDispatcher:

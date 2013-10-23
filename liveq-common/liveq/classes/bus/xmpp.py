@@ -33,7 +33,37 @@ from sleekxmpp.xmlstream import register_stanza_plugin
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
+from liveq.config.core import StaticConfig
 from liveq.config.classes import BusConfigClass
+
+"""
+Configuration endpoint for the XMPP Bus
+"""
+class Config(BusConfigClass):
+
+	"""
+	Populate the database configuration
+	"""
+	def __init__(self,config):
+
+		# Prepare some template macros
+		macros = {
+			'hostname'	: socket.gethostname(),
+			'random'	: ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10)),
+			'uuid'		: StaticConfig.UUID
+		}
+
+		self.SERVER = config["server"]
+		self.DOMAIN = config["domain"]
+		self.USERNAME = config["username"]
+		self.PASSWORD = config["password"]
+		self.RESOURCE = config["resource"] % macros
+
+	"""
+	Create an ZeroMQ Bus instance
+	"""
+	def instance(self, runtimeConfig):
+		return XMPPBus(self)
 
 """
 Message Stanza
@@ -291,6 +321,16 @@ class XMPPBus(Bus, ClientXMPP):
 		# Get JID
 		jid = iq['from']
 
+		# Check if we can find a channel without resource
+		# (for load-balancing for example)
+		if not jid in self.channels:
+			parts = jid.split("/")
+
+			# If such channel exists, use that instead.
+			# Otherwise, keep doing what we were supposed to do
+			if parts[0] in self.channels:
+				jid = parts[0]
+
 		# Create a new channel if it is not already started
 		if not jid in self.channels:
 			c = XMPPUserChannel(self, jid)
@@ -326,31 +366,4 @@ class XMPPBus(Bus, ClientXMPP):
 		# Return channel instance
 		return self.channels[name]
 
-"""
-Configuration endpoint for the XMPP Bus
-"""
-class Config(BusConfigClass):
-
-	"""
-	Populate the database configuration
-	"""
-	def __init__(self,config):
-
-		# Prepare some template macros
-		macros = {
-			'hostname'	: socket.gethostname(),
-			'random'	: ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(10))
-		}
-
-		self.SERVER = config["server"]
-		self.DOMAIN = config["domain"]
-		self.USERNAME = config["username"]
-		self.PASSWORD = config["password"]
-		self.RESOURCE = config["resource"] % macros
-
-	"""
-	Create an ZeroMQ Bus instance
-	"""
-	def instance(self):
-		return XMPPBus(self)
 

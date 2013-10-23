@@ -18,72 +18,32 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+# ----------
 import sys
-import signal
-import logging
-import time
+sys.path.append("../liveq-common")
+# ----------
 
-from liveq.config import Config
-from liveq.internal.exceptions import *
-from liveq.internal.application import STATE_RUNNING
-from liveq.utils.FLAT import FLATParser
-from liveq.utils.hugedata import Hugedata
+import time
+import logging
+from agent.config import Config
+from liveq.exceptions import ConfigException
+from liveq import handleSIGINT
+
+# Prepare runtime configuration
+runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.readFile( "config/liveq.conf.local" )
+	Config.fromFile( "config/liveq.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
-except Exception as e:
-	print("ERROR   Unexpected exception %s while reading configuration: %s" % (e.__class__.__name__, e))
-	sys.exit(1)
 
-# Configure logging
-logging.basicConfig(level=Config.LOG_LEVEL, format='%(levelname)-8s %(message)s')
+# Hook sigint -> Shutdown
+handleSIGINT()
 
-# ======== TEST
+# Log our UUID
+logging.info("Starting agent %s" % Config.UUID)
 
-src = FLATParser.parse("/tmp/data/dump/DELPHI_2002_069_CONF_603_d01-x01-y01.dat")
-dst = Hugedata.jsCompress(src)
-
-print dst
-
-sys.exit(0)
-
-#adapter = Config.ADAPTER.instance({})
-#adapter.connect()
-#adapter.process(block=True)
-
-runconfig = {
-
-	# Run configuration
-	"beam": "ee", 
-	"process": "zhad", 
-	"energy": 91.2, 
-	"params": "-",
-	"specific": "-",
-	"generator": "pythia8",
-	"version": "8.175",
-	"events": 10000,
-	"seed": 123123,
-
-	# Tune configuration
-	"tune": {
-		"TimeShower:alphaSvalue": 0.31
-	}
-
-}
-
-jobapp = Config.APP.instance({})
-jobapp.setConfig( runconfig )
-jobapp.start()
-
-def signal_handler(signal, frame):
-        jobapp.kill()
-
-signal.signal(signal.SIGINT, signal_handler)
-
-while jobapp.state == STATE_RUNNING:
-	logging.debug("****************** MAIN LOOP ******************")
+while True:
 	time.sleep(1)

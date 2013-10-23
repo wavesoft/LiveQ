@@ -42,12 +42,12 @@ class DatabaseConfig:
 	"""
 	@staticmethod
 	@configexceptions(section="database")
-	def fromConfig(config):
+	def fromConfig(config, runtimeConfig):
 
 		# Populate classes
 		DatabaseConfig.DB_CLASS = config.get("database", "class")
 		DatabaseConfig.DB_CONFIG = DatabaseConfigClass.fromClass( DatabaseConfig.DB_CLASS, config._sections["database"] )
 
 		# Since we are using proxy, delegate the connection to the proxy
-		DatabaseConfig.DB_INSTANCE = DatabaseConfig.DB_CONFIG.instance()
+		DatabaseConfig.DB_INSTANCE = DatabaseConfig.DB_CONFIG.instance(runtimeConfig)
 		DatabaseConfig.DB.initialize( DatabaseConfig.DB_INSTANCE )

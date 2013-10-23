@@ -37,6 +37,6 @@ class Config(DatabaseConfigClass):
 	"""
 	Create an SQL instance
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		return MySQLDatabase(self.DATABASE, host=self.HOST, user=self.USERNAME, passwd=self.PASSWORD)
 

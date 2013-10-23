@@ -49,7 +49,7 @@ class Config(AppConfigClass):
 		if not os.path.isdir(self.WORKDIR):
 			raise ConfigException("Non-existing work dir specified in the application configuration")
 
-	def instance(self):
+	def instance(self, runtimeConfig):
 		return MCPlots(self)
 
 """

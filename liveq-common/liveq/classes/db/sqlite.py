@@ -34,6 +34,6 @@ class Config(DatabaseConfigClass):
 	"""
 	Create an SQL instance
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		return SqliteDatabase(self.DATABASE)
 

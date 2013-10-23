@@ -35,6 +35,46 @@ IDLE_LOOP_DELAY = 0.01
 REQUEST_TIMEOUT = 30
 
 """
+Configuration endpoint
+"""
+class Config(BusConfigClass):
+
+	"""
+	Populate the database configuration
+	"""
+	def __init__(self,config):
+		self.CHANNELS = { }
+
+		# Lookup for channels in the configuration
+		for k, v in config.iteritems():
+			
+			# Skip 'class'
+			if (k == "class") or (k == "__name__"):
+				continue
+
+			# Parse channel information
+			parts = k.split("-")
+			if not parts[0] in self.CHANNELS:
+				self.CHANNELS[parts[0]] = { 'addr': [], 'mode': '', 'topic': [] }
+			if len(parts) < 2:
+				raise Exception("Unexpected key '%s'" % k)
+
+			# Store address
+			if parts[1] == "addr":
+				self.CHANNELS[parts[0]]['addr'] = v.split(',')
+			elif parts[1] == "mode":
+				self.CHANNELS[parts[0]]['mode'] = v
+			elif parts[1] == "topic":
+				self.CHANNELS[parts[0]]['topic'] = v.split(',')
+
+	"""
+	Create an ZeroMQ Bus instance
+	"""
+	def instance(self, runtimeConfig):
+		return ZeroMQBus(self)
+
+
+"""
 ZeroMQ Bus channel
 """
 class ZeroMQChannel(BusChannel):
@@ -339,43 +379,3 @@ class ZeroMQBus(Bus):
 		# Return a ZeroMQ Channel instance
 		self.logger.debug("Oppening channel %s" % name)
 		return ZeroMQChannel(self.context, name, params)
-
-"""
-Configuration endpoint
-"""
-class Config(BusConfigClass):
-
-	"""
-	Populate the database configuration
-	"""
-	def __init__(self,config):
-		self.CHANNELS = { }
-
-		# Lookup for channels in the configuration
-		for k, v in config.iteritems():
-			
-			# Skip 'class'
-			if (k == "class") or (k == "__name__"):
-				continue
-
-			# Parse channel information
-			parts = k.split("-")
-			if not parts[0] in self.CHANNELS:
-				self.CHANNELS[parts[0]] = { 'addr': [], 'mode': '', 'topic': [] }
-			if len(parts) < 2:
-				raise Exception("Unexpected key '%s'" % k)
-
-			# Store address
-			if parts[1] == "addr":
-				self.CHANNELS[parts[0]]['addr'] = v.split(',')
-			elif parts[1] == "mode":
-				self.CHANNELS[parts[0]]['mode'] = v
-			elif parts[1] == "topic":
-				self.CHANNELS[parts[0]]['topic'] = v.split(',')
-
-	"""
-	Create an ZeroMQ Bus instance
-	"""
-	def instance(self):
-		return ZeroMQBus(self)
-

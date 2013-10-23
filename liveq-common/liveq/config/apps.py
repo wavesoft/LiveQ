@@ -41,10 +41,10 @@ class AppConfig:
 	"""
 	@staticmethod
 	@configexceptions(section="app")
-	def fromConfig(config):
+	def fromConfig(config, runtimeConfig):
 
 		# Populate app classes
 		AppConfig.APP_CLASS = config.get("app", "class")
 		AppConfig.APP_CONFIG = AppConfigClass.fromClass( AppConfig.APP_CLASS, config._sections["app"] )
-		AppConfig.APP = AppConfig.APP_CONFIG.instance()
+		AppConfig.APP = AppConfig.APP_CONFIG.instance(runtimeConfig)
 

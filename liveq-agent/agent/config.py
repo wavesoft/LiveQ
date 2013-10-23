@@ -18,34 +18,41 @@
 ################################################################
 
 import ConfigParser
-import logging
-
-from liveq.exceptions import ConfigException
+import os.path
 from liveq.config import configexceptions
-from liveq.config.classes import BusConfigClass
+from liveq.config.core import CoreConfig, StaticConfig
+from liveq.config.externalbus import ExternalBusConfig
 
 """
-Internal Bus Configration
-
-An internal bus is a transport class that exchanges messages between the
-code LiveQ Components. 
+Local configuration for the agent
 """
-class InternalBusConfig:
+class AgentConfig:
 
-	# Key-Value store instance and confguration
-	IBUS_CLASS = ""
-	IBUS_CONFIG = None
-	IBUS = None
+	SERVER_JID = ""
+
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
+
+		AgentConfig.SERVER_JID = config.get("agent", "server")
+
+"""
+Create a configuration for the JOB MANAGER based on the core config
+"""
+class Config(CoreConfig, ExternalBusConfig, StaticConfig, AgentConfig):
 
 	"""
 	Update class variables by reading the config file
 	contents of the specified filename
 	"""
 	@staticmethod
-	@configexceptions(section="internal-bus")
-	def fromConfig(config, runtimeConfig):
+	def fromFile(confFile, runtimeConfig):
 
-		# Populate classes
-		InternalBusConfig.IBUS_CLASS = config.get("internal-bus", "class")
-		InternalBusConfig.IBUS_CONFIG = BusConfigClass.fromClass( InternalBusConfig.IBUS_CLASS, config._sections["internal-bus"] )
-		InternalBusConfig.IBUS = InternalBusConfig.IBUS_CONFIG.instance(runtimeConfig)
+		# Read config file(s)
+		config = ConfigParser.SafeConfigParser()
+		config.read(confFile)
+
+		# Initialize subclasses
+		StaticConfig.initialize( os.path.dirname(confFile) . "/liveq.static.conf" )
+		CoreConfig.fromConfig( config, runtimeConfig )
+		ExternalBusConfig.fromConfig( config, runtimeConfig )
+		AgentConfig.fromConfig( config, runtimeConfig )

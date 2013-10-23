@@ -52,7 +52,7 @@ class BusConfigClass:
 	"""
 	Overridable function to create a bus
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		raise NotImplementedError("The BusConfigClass did not implement the instance() function")
 
 
@@ -89,7 +89,7 @@ class DatabaseConfigClass:
 	"""
 	Overridable function to create a database
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		raise NotImplementedError("The DatabaseConfigClass did not implement the instance() function")
 
 
@@ -126,7 +126,7 @@ class StoreConfigClass:
 	"""
 	Overridable function to create a store
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		raise NotImplementedError("The StoreConfigClass did not implement the instance() function")
 
 
@@ -163,6 +163,6 @@ class AppConfigClass:
 	"""
 	Overridable function to create a store
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		raise NotImplementedError("The AppConfigClass did not implement the instance() function")
 

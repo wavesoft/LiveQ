@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -17,35 +18,31 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+# ----------
 import sys
 sys.path.append("../liveq-common")
+# ----------
 
 import logging
 import time
 import signal
 import sys
-
 from jobmanager.config import Config
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
-from liveq.models import *
 
-# Parse configuration
+# Prepare runtime configuration
+runtimeConfig = { }
+
+# Load configuration
 try:
-	Config.fromFile("config/base.conf")
+	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
 except ConfigException as e:
-	print "Configuration error: %s" % str(e)
+	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
 
-# Ensure database is OK
-createBaseTables()
-
-# Register CTRL+C Handler
-def signal_handler(signal, frame):
-	logging.info("** Caught signal. Shutting down **")
-	GlobalEvents.System.trigger('shutdown')
-	sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
+# Hook sigint -> Shutdown
+handleSIGINT()
 
 c = Config.IBUS.openChannel("data")
 

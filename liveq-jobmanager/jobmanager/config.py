@@ -24,6 +24,7 @@ from liveq.config.database import DatabaseConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.externalbus import ExternalBusConfig
+from liveq.models import createBaseTables
 
 """
 Create a configuration for the JOB MANAGER based on the core config
@@ -35,15 +36,18 @@ class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, Externa
 	contents of the specified filename
 	"""
 	@staticmethod
-	def fromFile(files):
+	def fromFile(files, runtimeConfig):
 
 		# Read config file(s)
 		config = ConfigParser.SafeConfigParser()
 		config.read(files)
 
 		# Initialize subclasses
-		CoreConfig.fromConfig( config )
-		DatabaseConfig.fromConfig( config )
-		StoreConfig.fromConfig( config )
-		InternalBusConfig.fromConfig( config )
-		ExternalBusConfig.fromConfig( config )
+		CoreConfig.fromConfig( config, runtimeConfig )
+		DatabaseConfig.fromConfig( config, runtimeConfig )
+		StoreConfig.fromConfig( config, runtimeConfig )
+		InternalBusConfig.fromConfig( config, runtimeConfig )
+		ExternalBusConfig.fromConfig( config, runtimeConfig )
+
+		# Create core models on the database
+		createBaseTables()

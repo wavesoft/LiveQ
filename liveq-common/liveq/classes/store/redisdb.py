@@ -36,6 +36,6 @@ class Config(StoreConfigClass):
 	"""
 	Create an SQL instance
 	"""
-	def instance(self):
+	def instance(self, runtimeConfig):
 		return redis.StrictRedis(host=self.HOST, port=self.PORT, db=self.DATABASE)
 

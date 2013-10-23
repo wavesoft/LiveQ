@@ -20,6 +20,10 @@
 import ConfigParser
 import logging
 
+import os
+import uuid
+import atexit
+
 """
 Core configuration class
 Each agent overrides this one in order to create it's own
@@ -33,7 +37,7 @@ class CoreConfig:
 	contents of the specified filename
 	"""
 	@staticmethod
-	def fromConfig(config):
+	def fromConfig(config, runtimeConfig):
 
 		# Setup logging level mapping
 		level_map = {
@@ -59,3 +63,58 @@ class CoreConfig:
 
 		# Initialize config
 		logging.basicConfig(level=CoreConfig.LOG_LEVEL, format='%(levelname)-8s %(message)s')
+
+
+"""
+Static configuration
+"""
+class StaticConfig:
+
+	# Unique ID of this node
+	UUID = ""
+
+	@staticmethod
+	def initialize(staticFile=""):
+		
+		# If we don't have an etc folder specified, use the
+		# current folder that we are in.
+		if not staticFile:
+			staticFile = os.getcwd() + "/liveq.static.conf"
+
+		# Create a config parser
+		parser = ConfigParser.RawConfigParser()
+		parser.read( staticFile )
+
+		# Check if we have static section
+		if not parser.has_section("static"):
+			parser.add_section("static")
+
+		# Setup static parameters
+		if not parser.has_option("static", "uuid"):
+			parser.set("static", "uuid", uuid.uuid4().hex )
+
+		# Read parameters
+		# -----------------------
+		StaticConfig.UUID = parser.get("static", "uuid")
+		# -----------------------
+
+		# Save the parser
+		StaticConfig.__staticConfigFile = staticFile
+		StaticConfig.__staticConfigParser = parser
+
+		# Register the shutdown handler
+		def static_sync():
+
+			# Fetch static parser
+			parser = StaticConfig.__staticConfigParser
+
+			# Sync parameters
+			# -----------------------
+			parser.set("static", "uuid", StaticConfig.UUID )
+			# -----------------------
+
+			# Store changes
+			with open(StaticConfig.__staticConfigFile, 'wb') as configfile:
+				parser.write(configfile)
+
+		atexit.register( static_sync )

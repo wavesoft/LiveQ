@@ -43,9 +43,9 @@ class ExternalBusConfig:
 	"""
 	@staticmethod
 	@configexceptions(section="external-bus")
-	def fromConfig(config):
+	def fromConfig(config, runtimeConfig):
 
 		# Populate classes
 		ExternalBusConfig.EBUS_CLASS = config.get("external-bus", "class")
 		ExternalBusConfig.EBUS_CONFIG = BusConfigClass.fromClass( ExternalBusConfig.EBUS_CLASS, config._sections["external-bus"] )
-		ExternalBusConfig.EBUS = ExternalBusConfig.EBUS_CONFIG.instance()
+		ExternalBusConfig.EBUS = ExternalBusConfig.EBUS_CONFIG.instance(runtimeConfig)

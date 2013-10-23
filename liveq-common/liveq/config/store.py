@@ -41,9 +41,9 @@ class StoreConfig:
 	"""
 	@staticmethod
 	@configexceptions(section="store")
-	def fromConfig(config):
+	def fromConfig(config, runtimeConfig):
 
 		# Populate classes
 		StoreConfig.STORE_CLASS = config.get("store", "class")
 		StoreConfig.STORE_CONFIG = StoreConfigClass.fromClass( StoreConfig.STORE_CLASS, config._sections["store"] )
-		StoreConfig.STORE = StoreConfig.STORE_CONFIG.instance()
+		StoreConfig.STORE = StoreConfig.STORE_CONFIG.instance(runtimeConfig)
