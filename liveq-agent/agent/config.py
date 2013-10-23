@@ -28,12 +28,12 @@ Local configuration for the agent
 """
 class AgentConfig:
 
-	SERVER_JID = ""
+	SERVER_CHANNEL = ""
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 
-		AgentConfig.SERVER_JID = config.get("agent", "server")
+		AgentConfig.SERVER_CHANNEL = config.get("agent", "server")
 
 """
 Create a configuration for the JOB MANAGER based on the core config
@@ -52,7 +52,7 @@ class Config(CoreConfig, ExternalBusConfig, StaticConfig, AgentConfig):
 		config.read(confFile)
 
 		# Initialize subclasses
-		StaticConfig.initialize( os.path.dirname(confFile) . "/liveq.static.conf" )
+		StaticConfig.initialize( os.path.dirname(confFile) + "/liveq.static.conf" )
 		CoreConfig.fromConfig( config, runtimeConfig )
 		ExternalBusConfig.fromConfig( config, runtimeConfig )
 		AgentConfig.fromConfig( config, runtimeConfig )

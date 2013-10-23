@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,35 +17,41 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# ----------
-import sys
-sys.path.append("../liveq-common")
-# ----------
-
-import time
 import logging
+import time
 
-from agent.config import Config
-from agent.component import AgentComponent
+from jobmanager.config import Config
 
-from liveq.exceptions import ConfigException
-from liveq import handleSIGINT
+from liveq.io.bus import BusChannelException
+from liveq.component import Component
 
-# Prepare runtime configuration
-runtimeConfig = { }
+"""
+Core jobmanager
+"""
+class JobManagerComponent(Component):
 
-# Load configuration
-try:
-	Config.fromFile( "config/agent.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
+	"""
+	Setup job manager
+	"""
+	def __init__(self):
+		Component.__init__(self)
 
-# Hook sigint -> Shutdown
-handleSIGINT()
+		# Register the arbitrary channel creations that can happen
+		# when we have an incoming agent handshake
+		Config.EBUS.on('channel', self.onChannelCreation)
 
-# Banner
-logging.info("Starting agent %s" % Config.UUID)
+	"""
+	Callback when a channel is up
+	"""
+	def onChannelCreation(self, channel):
+		pass
 
-# Start Agent
-AgentComponent().run()
+	"""
+	Entry point
+	"""
+	def run(self):
+
+		# Start main FSM
+
+		# Run the component
+		Component.run(self)

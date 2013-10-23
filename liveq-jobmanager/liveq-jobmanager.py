@@ -27,7 +27,10 @@ import logging
 import time
 import signal
 import sys
+
 from jobmanager.config import Config
+
+from liveq import handleSIGINT
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 

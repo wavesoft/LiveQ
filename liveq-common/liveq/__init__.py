@@ -33,4 +33,6 @@ def handleSIGINT():
 		logging.info("** Caught signal. Shutting down **")
 		GlobalEvents.System.trigger('shutdown')
 		sys.exit(0)
+
+	# Register sigint handler
 	signal.signal(signal.SIGINT, signal_handler)

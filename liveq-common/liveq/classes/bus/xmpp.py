@@ -87,7 +87,7 @@ class XMPPUserChannel(BusChannel):
 	Initialize the XMPP Channel
 	"""
 	def __init__(self, bus, jid):
-		BusChannel.__init__(self)
+		BusChannel.__init__(self, jid)
 		self.bus = bus
 		self.jid = jid
 
@@ -275,18 +275,18 @@ class XMPPBus(Bus, ClientXMPP):
 		if not self.disconnecting:
 			self.logger.warn("[%s] Connection lost. Will reconnect in 5 seconds" % self.jid)
 
+			# Notify all channels that I/O is now closed
+			for jid, channel in self.channels.iteritems():
+				channel.trigger('close')
+
 			# Wait 5 seconds
 			time.sleep(5)
 
-			# Restart connection
+			# Reconnect, prohibiting re-triggering of the
+			# onDisconnect function
+			self.disconnecting = True
 			self.reconnect()
-
-			# Restart possible dead main thread
-			if not self.mainThread.isAlive():
-				self.mainThread.join()
-				self.mainThread = threading.Thread(target=self.process, kwargs={"blocking": True})
-				self.mainThread.start()
-
+			self.disconnecting = False
 
 	"""
 	Handler for the system-wide shutdown event

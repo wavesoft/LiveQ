@@ -83,7 +83,7 @@ class ZeroMQChannel(BusChannel):
 	Initialize the ZeroMQ Channel
 	"""
 	def __init__(self, context, name, params):
-		BusChannel.__init__(self)
+		BusChannel.__init__(self, name)
 
 		# Local variables
 		self.name = name

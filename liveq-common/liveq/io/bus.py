@@ -31,7 +31,7 @@ class BusChannelException(Exception):
 """
 The specified channel is missing
 """
-class NoBusChannelException(Exception):
+class NoBusChannelException(BusChannelException):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
@@ -52,8 +52,9 @@ class BusChannel(EventDispatcher):
 	"""
 	Initialize event dispatcher
 	"""
-	def __init__(self):
+	def __init__(self, name):
 		EventDispatcher.__init__(self)
+		self.name = name
 
 	"""
 	Sends a message to the bus
