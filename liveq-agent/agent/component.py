@@ -25,6 +25,8 @@ from agent.config import Config
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
+from liveq.classes.bus.xmppmsg import XMPPBus
+
 """
 Core agent
 """
@@ -48,7 +50,9 @@ class AgentComponent(Component):
 		self.serverChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
 
 		# TODO: Uhnack this
-		Config.EBUS.updateRoster( Config.SERVER_CHANNEL, name="Server", subscription="both" )
+		# This establishes a presence relationship with the given entity.
+		if isinstance(Config.EBUS, XMPPBus):
+			Config.EBUS.updateRoster( Config.SERVER_CHANNEL, name="Server", subscription="both" )
 
 		# Bind incoming message handlers
 		self.serverChannel.on('job_start', self.onJobStart)
@@ -67,17 +71,16 @@ class AgentComponent(Component):
 			ans = self.serverChannel.send('handshake', {
 					'version': AgentComponent.VERSION,
 					'slots': 1
-				})
-
-			print "###### %s" % str(ans)
+				}, waitReply=True)
 
 			# Check for errors on handshake
 			if ans == None:
-				self.logger.warn("No job manager were found online")
+				self.logger.warn("No job manager was found online")
 				self.schedule(self.stateRetry)
 
 			# Handshake complete
 			# (Everything else is asynchronous)
+			self.logger.info("Handhake with server completed: %s" % str(ans))
 
 		except BusChannelException as e:
 
@@ -126,7 +129,7 @@ class AgentComponent(Component):
 		# Start with the handshake
 		self.schedule(self.stateHandshake)
 
-		# Block, waiting for run
+		# Do component's default task : Wait
 		Component.run(self)
 
 

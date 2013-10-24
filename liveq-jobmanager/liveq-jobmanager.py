@@ -49,4 +49,4 @@ except ConfigException as e:
 handleSIGINT()
 
 # Start job manager
-JobManagerComponent().run()
+JobManagerComponent.runThreaded()

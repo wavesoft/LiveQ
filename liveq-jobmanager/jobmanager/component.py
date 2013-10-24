@@ -25,6 +25,8 @@ from jobmanager.config import Config
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
+from liveq.classes.bus.xmppmsg import XMPPBus
+
 """
 Core jobmanager
 """
@@ -41,7 +43,10 @@ class JobManagerComponent(Component):
 		self.logger.info("JobManager component started")
 
 		# TODO: Uhnack this
-		Config.EBUS.updateRoster( "jmliveq-agent@t4t-xmpp.cern.ch", name="Agent", subscription="both" )
+		# This establishes a presence relationship with the given entity.
+		if isinstance(Config.EBUS, XMPPBus):
+			for jid in Config.TRUSTED_CHANNELS:
+				Config.EBUS.updateRoster( jid, name="Server", subscription="both" )
 
 		# Register the arbitrary channel creations that can happen
 		# when we have an incoming agent handshake

@@ -57,14 +57,10 @@ class Scheduler:
 		# Run frame loop
 		while not self.stack.empty():
 
-			# Call next function
+			# Fetch next frame
 			frame = self.stack.get()
-
-			# Safely
-			try:
-				frame[0](*frame[1], **frame[2])
-			except Exception as e:
-				logging.error("Exception while handing scheduled function %s: %s" % (str(frame[0]), str(e)))
+			# Execute it
+			frame[0](*frame[1], **frame[2])
 
 
 """
@@ -86,7 +82,23 @@ class Component(Scheduler):
 	that forces main loop to exit
 	"""
 	def onShutdown(self):
+		logging.debug("Shutting down component %s" % self.__class__.__name__)
 		self.running = False
+
+		# Empty scheduler queue
+		self.stack = Queue.LifoQueue()
+
+	"""
+	Override scheduler to prohibit adding new frames
+	if we are not running any more
+	"""
+	def schedule(self, function, *args, **kwargs):
+
+		# Allow function scheduling only on system shutdown
+		if self.running:
+			Scheduler.schedule(self, function, *args, **kwargs)
+		else:
+			logging.warn("Attemp to schedule function call on system shutdown")
 
 	"""
 	Main loop of the component
@@ -104,4 +116,27 @@ class Component(Scheduler):
 		# Run main loop as long as we are running
 		while self.running:
 			self.step()
+
+	"""
+	Class method to run the component in a different thread
+	that will allow signals to reach main thread.
+
+	(This is a hack to allow threads to use Event() objects while
+	still allowing signals to reach main thread.)
+	"""
+	@classmethod
+	def runThreaded(cls):
+
+		# Define a main thread function
+		def thread_main():
+			cls().run()
+
+		# Start and wait for thread to exit
+		# (join also blocks signals)
+		thread = threading.Thread(target=thread_main)
+		thread.start()
+
+		# Wait
+		while thread.is_alive():
+			time.sleep(1)
 

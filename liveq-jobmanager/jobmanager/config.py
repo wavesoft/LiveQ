@@ -27,9 +27,22 @@ from liveq.config.externalbus import ExternalBusConfig
 from liveq.models import createBaseTables
 
 """
+Local configuration for the job manager
+"""
+class JobManagerConfig:
+
+	TRUSTED_CHANNELS = []
+
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
+
+		channels = str(config.get("jobmanager", "trusted-channels"))
+		JobManagerConfig.TRUSTED_CHANNELS = channels.split(",")
+
+"""
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, ExternalBusConfig):
+class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, ExternalBusConfig, JobManagerConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -48,6 +61,7 @@ class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, Externa
 		StoreConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		ExternalBusConfig.fromConfig( config, runtimeConfig )
+		JobManagerConfig.fromConfig( config, runtimeConfig )
 
 		# Create core models on the database
 		createBaseTables()

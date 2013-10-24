@@ -40,7 +40,7 @@ Configuration endpoint
 class Config(BusConfigClass):
 
 	"""
-	Populate the database configuration
+	Populate the ZeroMQ Bus configuration
 	"""
 	def __init__(self,config):
 		self.CHANNELS = { }

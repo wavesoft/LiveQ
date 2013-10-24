@@ -59,7 +59,7 @@ class BusChannel(EventDispatcher):
 	"""
 	Sends a message to the bus
 	"""
-	def send(self, name, data):
+	def send(self, name, data, waitReply=False, timeout=30):
 		raise NotImplementedError("The BusChannel did not implement the send() function")
 
 	"""
@@ -67,7 +67,7 @@ class BusChannel(EventDispatcher):
 	"""
 	def reply(self, data):
 		raise NotImplementedError("The BusChannel did not implement the reply() function")
-
+		
 """
 A template class that should be inherited by the Bus driver
 

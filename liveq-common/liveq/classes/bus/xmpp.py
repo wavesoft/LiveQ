@@ -42,7 +42,7 @@ Configuration endpoint for the XMPP Bus
 class Config(BusConfigClass):
 
 	"""
-	Populate the database configuration
+	Populate the XMPP Bus configuration
 	"""
 	def __init__(self,config):
 
@@ -60,7 +60,7 @@ class Config(BusConfigClass):
 		self.RESOURCE = config["resource"] % macros
 
 	"""
-	Create an ZeroMQ Bus instance
+	Create an XMPP Bus instance
 	"""
 	def instance(self, runtimeConfig):
 		return XMPPBus(self)
@@ -156,7 +156,7 @@ class XMPPUserChannel(BusChannel):
 		self.logger.debug("[%s] Sending message: (%s) %s" % (self.jid, message, str(data)) )
 
 		# Prepare an IQ Stanza
-		iq = self.bus.make_iq_get(queryxmlns='liveq:message',
+		iq = self.bus.make_iq_get(queryxmlns='jabber:client',
 			ito=self.jid)
 
 		# Populate body

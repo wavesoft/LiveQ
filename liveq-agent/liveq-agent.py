@@ -49,4 +49,5 @@ handleSIGINT()
 logging.info("Starting agent %s" % Config.UUID)
 
 # Start Agent
-AgentComponent().run()
+AgentComponent.runThreaded()
+

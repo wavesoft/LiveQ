@@ -83,7 +83,7 @@ class EventDispatcher:
 			try:
 				handler[0](*args, **handler[1])
 			except Exception as e:
-				logging.error("Exception while dispatching event %s: %s" % (event, str(e)))
+				logging.error("Exception while dispatching event %s to handler %s: %s" % (event, str(handler), str(e)))
 
 """
 Static class container for global events
