@@ -52,6 +52,12 @@ class JobManagerComponent(Component):
 		# when we have an incoming agent handshake
 		Config.EBUS.on('channel', self.onChannelCreation)
 
+		# Register callbacks from the internal message bus, such as
+		# job creation and abortion
+		Config.IBUS.on('job_start', self.onBusJobStart)
+		Config.IBUS.on('job_cancel', self.onBusJobCancel)
+		Config.IBUS.on('job_restart', self.onBusJobRestart)
+
 		# Channel mapping
 		self.channels = { }
 
@@ -65,26 +71,26 @@ class JobManagerComponent(Component):
 		self.channels[channel.name] = channel
 
 		# Handle bus messages and evnets
-		channel.on('open', self.onOpen, channel=channel)
-		channel.on('close', self.onClose, channel=channel)
-		channel.on('handshake', self.onHandshake, channel=channel)
+		channel.on('open', self.onAgentOnline, channel=channel)
+		channel.on('close', self.onAgentOffline, channel=channel)
+		channel.on('handshake', self.onAgentHandshake, channel=channel)
 
 	"""
 	Callback when an agent becomes available
 	"""
-	def onOpen(self, channel=None):
+	def onAgentOnline(self, channel=None):
 		self.logger.warn("[%s] Channel is open" % channel.name)
 
 	"""
 	Callback when an agent becomes unavailable
 	"""
-	def onClose(self, channel=None):
+	def onAgentOffline(self, channel=None):
 		self.logger.warn("[%s] Channel is open" % channel.name)
 
 	"""
 	Callback when a handshake arrives in the bus
 	"""
-	def onHandshake(self, message, channel=None):
+	def onAgentHandshake(self, message, channel=None):
 		self.logger.warn("[%s] Handshaking" % channel.name)
 
 		# Reply with some data

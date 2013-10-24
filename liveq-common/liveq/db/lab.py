@@ -17,41 +17,5 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# ----------
-import sys
-sys.path.append("../liveq-common")
-# ----------
+from liveq.models import Lab
 
-import logging
-import time
-import signal
-import sys
-
-from webserver.config import Config
-from webserver.server import MCPlotsServer, MCPlotsServerBus
-
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
-
-from liveq import handleSIGINT
-from liveq.exceptions import ConfigException
-
-# Prepare runtime configuration
-runtimeConfig = { }
-
-# Load configuration
-try:
-	Config.fromFile( "config/webserver.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
-
-# Setup port defaults
-define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
-
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()

@@ -25,13 +25,32 @@ import tornado.websocket
 import os.path
 import uuid
 
-from liveq.labsocket import LabSocketHandler
 from beta.internal.bus import bus_handler, LiveQBus
+
+from webserver.labsocket import LabSocketHandler
+from webserver.config import Config
 
 """
 LiveQ Bus connector
 """
-class ServerBus(LiveQBus):
+class ServerBus():
+
+	"""
+	Setup server bus by binding on the expected
+	incoming bus messages
+	"""
+	def __init__(self):
+
+		# Open the data channel on the internal bus
+		self.dataChannel = Config.IBUS.openChannel("data")
+
+		# Open the job request channel on the internal bus
+		self.jobChannel = Config.IBUS.openChannel("job")
+
+		# Open the interpolation channel on the internal bus
+		self.interpolateChannel = Config.IBUS.openChannel("interpolate")
+
+		# 
 	
 	"""
 	The user requested a tune with the given parameter set
@@ -43,6 +62,12 @@ class ServerBus(LiveQBus):
 
 		# Try to contact the tune server 
 		ans = self.request("tune_get", "tune_get_data", { "parameters": parameters, "lab": lab.id })
+
+		# Try to contact interpolator
+		result = self.interpolateChannel.send("interpolate", {
+				"parameters": parameters,
+				"lab": lab.id
+			}, waitReply=True)
 
 		# Check for errors
 		if not ans:
@@ -77,17 +102,27 @@ class ServerBus(LiveQBus):
 Tornado Application class of the LiveQ Server
 """
 class LiveQServer(tornado.web.Application):
-	def __init__(self, bus):
+	def __init__(self):
+
+		# Create a global instance of the internal
+		# message bus handler
+		self.bus = ServerBus()
+
+		# Setup handlers
 		handlers = [
 			(r"/", MainHandler),
 			(r"/labsocket/(.*)", LabSocketHandler),
 		]
+
+		# Setup tornado settings
 		settings = dict(
 			cookie_secret="ckjbe3n3809713g7baf13n8vapjtd64xfkjgd",
 			template_path=os.path.join(os.path.dirname(__file__), "templates"),
 			static_path=os.path.join(os.path.dirname(__file__), "static"),
 			xsrf_cookies=True,
 		)
+
+		# Setup tornado application
 		tornado.web.Application.__init__(self, handlers, **settings)
 
 """

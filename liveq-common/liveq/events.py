@@ -71,7 +71,7 @@ class EventDispatcher:
 	"""
 	Dispatch an event to the appropriate listeners
 	"""
-	def trigger(self,event,*args):
+	def trigger(self,event,*args,safe=True):
 		logging.debug("Dispatching event '%s' %s" % (event, args))
 
 		# Check for event names
@@ -80,10 +80,17 @@ class EventDispatcher:
 
 		# Dispatch
 		for handler in self.__eventHandlers[event]:
+
+			# If told so, run the code with exception handlers
 			try:
 				handler[0](*args, **handler[1])
 			except Exception as e:
 				logging.error("Exception while dispatching event %s to handler %s: %s" % (event, str(handler), str(e)))
+
+				# Re-throw exception if we are running unsafe
+				if not safe:
+					raise e
+
 
 """
 Static class container for global events
