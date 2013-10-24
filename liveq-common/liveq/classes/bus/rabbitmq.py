@@ -21,6 +21,7 @@ import logging
 import threading
 import time
 import pika
+import uuid
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
@@ -66,9 +67,26 @@ class RabbitMQChannel(BusChannel):
 		self.name = name
 		self.logger = logging.getLogger("rabbitmq-channel")
 
+		# Register shutdown handler
+		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)
+
+		# Start main thread
+		self.consumerThread = threading.Thread(target=_channelThread)
+		self.consumerThread.start()
+
+	"""
+	Main thread of the RabbitMQ Pika instance
+	(It's not thread-safe)
+	"""
+	def _channelThread(self):
+
+		# Establish a blocking connection to the RabbitMQ server
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+		               self.bus.config.SERVER ))
+
 		# Create channels for incoming and outgoing messages
-		self.outgoing = self.bus.connection.channel()
-		self.incoming = self.bus.connection.channel()		
+		self.outgoing = self.connection.channel()
+		self.incoming = self.connection.channel()		
 
 		# Prepare the appropriate names for the queues
 		qname_in = "%s:in"
@@ -88,8 +106,16 @@ class RabbitMQChannel(BusChannel):
 		self.incoming.basic_consume(self.onMessageArrived,
                       queue=qname_in)
 
-		# Start consumer thread
+		# Start consumer
 		self.incoming.start_consuming()
+
+	"""
+	Handle shutdown
+	"""
+	def systemShutdown(self):
+
+		# Stop pika consumer
+		self.incoming.stop_consuming()
 
 	"""
 	Callback function that receives messages from input queue
@@ -103,7 +129,16 @@ class RabbitMQChannel(BusChannel):
 	"""
 	Sends a message to the bus
 	"""
-	def send(self, name, data):
+	def send(self, name, data, waitReply=False, timeout=30):
+
+		# Pack data to send
+		jsonData = json.dumps({
+			'name': name,
+			'data': data
+			})
+
+		# Send data
+
 		pass
 
 	"""
@@ -125,10 +160,6 @@ class RabbitMQBus(Bus):
 
 		# Store config
 		self.config = config
-
-		# Establish a blocking connection to the RabbitMQ server
-		self.connection = pika.BlockingConnection(pika.ConnectionParameters(
-		               config.SERVER ))
 
 		# Register shutdown handler
 		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)

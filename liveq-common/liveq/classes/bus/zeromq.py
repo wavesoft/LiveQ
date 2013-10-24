@@ -298,7 +298,7 @@ class ZeroMQChannel(BusChannel):
 	"""
 	Sends a message to the bus
 	"""
-	def send(self, name, data):
+	def send(self, name, data, waitReply=False, timeout=30):
 		self.logger.debug("[%s] Sending: %s" % (self.name, str(data)))
 		
 		# Flag that we have responded (if required)

@@ -151,7 +151,7 @@ class XMPPUserChannel(BusChannel):
 	"""
 	Send a message on the bus
 	"""
-	def send(self, message, data):
+	def send(self, message, data, waitReply=False, timeout=30):
 		
 		self.logger.debug("[%s] Sending message: (%s) %s" % (self.jid, message, str(data)) )
 
