@@ -29,11 +29,15 @@ Local configuration for the agent
 class AgentConfig:
 
 	SERVER_CHANNEL = ""
+	AGENT_SLOTS = 1
+	AGENT_GROUP = []
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 
 		AgentConfig.SERVER_CHANNEL = config.get("agent", "server")
+		AgentConfig.AGENT_GROUP = config.get("agent", "group")
+		AgentConfig.AGENT_SLOTS = config.get("agent", "slots")
 
 """
 Create a configuration for the JOB MANAGER based on the core config

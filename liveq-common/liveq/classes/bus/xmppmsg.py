@@ -362,10 +362,12 @@ class XMPPUserChannel(BusChannel):
 			# Lock on the event
 			event.wait(timeout)
 
+			# Cleanup upon completion or timeout
+			del self.waitQueue[mid]
+
 			# Check if we just timed out
 			if not event.is_set():
 				self.logger.debug("[%s] Timeout waiting response on #%s" % (self.jid, mid) )
-				del self.waitQueue[mid]
 				return None
 
 			# Return data

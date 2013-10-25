@@ -40,16 +40,15 @@ class ServerBus():
 	def __init__(self):
 
 		# Open the data channel on the internal bus
-		self.dataChannel = Config.IBUS.openChannel("data")
+		#self.dataChannel = Config.IBUS.openChannel("data")
 
 		# Open the job request channel on the internal bus
-		self.jobChannel = Config.IBUS.openChannel("job")
+		#self.jobChannel = Config.IBUS.openChannel("job")
 
 		# Open the interpolation channel on the internal bus
-		self.interpolateChannel = Config.IBUS.openChannel("interpolate")
+		#self.interpolateChannel = Config.IBUS.openChannel("interpolate")
+		pass
 
-		# 
-	
 	"""
 	The user requested a tune with the given parameter set
 
@@ -99,7 +98,7 @@ class ServerBus():
 """
 Tornado Application class of the LiveQ Server
 """
-class LiveQServer(tornado.web.Application):
+class MCPlotsServer(tornado.web.Application):
 	def __init__(self):
 
 		# Create a global instance of the internal

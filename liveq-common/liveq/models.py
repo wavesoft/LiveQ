@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import datetime
 from peewee import *
 from liveq.config.database import DatabaseConfig
 
@@ -66,8 +67,8 @@ class AgentGroup(BaseModel):
 	Agent groups class
 	"""
 
-	#: The user where this group belongs to
-	owner = ForeignKeyField( User )
+	#: Add an additional UUID lookup index
+	uuid = CharField(max_length=128, index=True, unique=True)
 
 class AgentMetrics(BaseModel):
 	"""
@@ -75,16 +76,16 @@ class AgentMetrics(BaseModel):
 	"""
 
 	#: Add an additional UUID lookup index
-	uuid = CharField(max_length=32, index=True, unique=True)
+	uuid = CharField(max_length=128, index=True, unique=True)
 
 	#: Ammount of CPU time spent
-	cputime = IntegerField()
+	cputime = IntegerField(default=0)
 	#: Number of jobs sent to this agent
-	jobs_sent = IntegerField()
+	jobs_sent = IntegerField(default=0)
 	#: Number of jobs succeeded in this agent
-	jobs_succeed = IntegerField()
+	jobs_succeed = IntegerField(default=0)
 	#: Number of jobs failed in this agent
-	jobs_failed = IntegerField()
+	jobs_failed = IntegerField(default=0)
 
 
 class Agent(BaseModel):
@@ -93,17 +94,21 @@ class Agent(BaseModel):
 	"""
 
 	#: Add an additional UUID lookup index
-	uuid = CharField(max_length=32, index=True, unique=True)
+	uuid = CharField(max_length=128, index=True, unique=True)
 
 	#: When was the agent last seen active?
-	lastSeen = DateTimeField()
+	lastSeen = DateTimeField(default=datetime.datetime.now)
 	#: The feature string responded by the entity at discovery
-	features = CharField()
+	features = CharField(default="")
 	#: The version of the remote agent
-	version = IntegerField()
+	version = IntegerField(default=0)
+	#: The slots this agent can provide
+	slots = IntegerField(default=1)
+	#: The state of the agent
+	state = IntegerField(default=0)
+
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
-
 	#: Metrics are stored on another table for performance
 	metrics = ForeignKeyField(AgentMetrics)
 
@@ -115,7 +120,7 @@ class Lab(BaseModel):
 
 	#: Add an additional UUID lookup index that allows
 	#: annonymization of the Lab IDs
-	uuid = CharField(max_length=32, index=True, unique=True)
+	uuid = CharField(max_length=128, index=True, unique=True)
 
 	#: The SVN Revision of the base tools
 	revision = IntegerField()

@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import os
 import sys
 import signal
 import logging
@@ -30,10 +31,12 @@ def handleSIGINT():
 	"""
 
 	# Register CTRL+C Handler
-	def signal_handler(signal, frame):
+	def signal_handler(signum, frame):
 		logging.info("** Caught signal. Shutting down **")
 		GlobalEvents.System.trigger('shutdown')
-		sys.exit(0)
+
+		signal.signal(signum, signal.SIG_DFL)
+		os.kill(os.getpid(), signum) # Rethrow signal, this time without catching it
 
 	# Register sigint handler
 	signal.signal(signal.SIGINT, signal_handler)

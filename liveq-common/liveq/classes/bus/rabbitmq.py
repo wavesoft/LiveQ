@@ -29,6 +29,8 @@ import threading
 import time
 import pika
 import uuid
+import signal
+import json
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
@@ -48,7 +50,7 @@ class Config(BusConfigClass):
 		# If we are a server, flip queue directions
 		self.FLIP_QUEUES = False
 		if 'role' in config:
-			if config['role'].lower() = 'server':
+			if config['role'].lower() == 'server':
 				self.FLIP_QUEUES = True
 
 	def instance(self, runtimeConfig):
@@ -92,11 +94,11 @@ class RabbitMQChannel(BusChannel):
 		# Flip names if we are told to do so by the config
 		if self.bus.config.FLIP_QUEUES:
 			tmp = self.qname_out
-			self.qname_out = qname_in
+			self.qname_out = self.qname_in
 			self.qname_in = tmp
 
 		# Register shutdown handler
-		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)
+		GlobalEvents.System.on('shutdown', self.systemShutdown)
 
 		# Start ingress and egress threads
 		self.threadIn = threading.Thread(target=self.ingressThread)
@@ -111,20 +113,20 @@ class RabbitMQChannel(BusChannel):
 
 		# Establish a blocking connection to the RabbitMQ server
 		connection = pika.BlockingConnection(pika.ConnectionParameters(
-		               self.bus.config.SERVER ))
+					   self.bus.config.SERVER ))
 
 		# Create and setup channel
-		channel = self.connection.channel()		
+		channel = connection.channel()		
 
 		# Ensure queue exists
 		channel.queue_declare(self.qname_in)
 
 		# Setup callbacks
 		channel.basic_consume(self.onMessageArrived,
-                      queue=self.qname_in)
+					  queue=self.qname_in)
 
 		# Start consumer
-		self.incoming.start_consuming()
+		channel.start_consuming()
 
 
 	def egressThread(self):
@@ -134,10 +136,10 @@ class RabbitMQChannel(BusChannel):
 		
 		# Establish a blocking connection to the RabbitMQ server
 		connection = pika.BlockingConnection(pika.ConnectionParameters(
-		               self.bus.config.SERVER ))
+					   self.bus.config.SERVER ))
 
 		# Create and setup channel
-		channel = self.connection.channel()		
+		channel = connection.channel()		
 
 		# Ensure queue exists
 		channel.queue_declare(self.qname_out)
@@ -149,50 +151,89 @@ class RabbitMQChannel(BusChannel):
 			if not self.queue.empty():
 
 				# Fetch data
-				data = self.queue
+				data = self.queue.get()
 
+				# Send data
+				print " [%s] Sending %r" % (self.qname_out, data['data'])
+
+				# Send
+				channel.basic_publish(exchange='',
+                      routing_key=self.qname_out,
+                      properties=pika.BasicProperties(
+                            correlation_id  = data['id']
+                            ),
+                      body=data['data'])
+
+			# A small idle loop
+			time.sleep(0.05)
 
 	def systemShutdown(self):
 		"""
 		Handle shutdown
 		"""
-
+		
 		# Kill pika threads
-		signal.kill( self.threadIn )
-		signal.kill( self.threadOut )
+		#signal.kill( self.threadIn )
+		#signal.kill( self.threadOut )
+		pass
 
-	def onMessageArrived(ch, method, properties, body):
+	def onMessageArrived(self, ch, method, properties, body):
 		"""
 		Callback function that receives messages from input queue
 		"""
-	    print " [x] Received %r" % (body,)
+		print " [%s] Received %r" % (self.qname_in, body)
 
-	    # Decode data
-	    data = None
-	    try:
-	    	data = json.loads(body)
-	    except TypeError as e:
+		# Decode data
+		data = None
+		try:
+			data = json.loads(body)
+		except TypeError as e:
 			self.logger.debug("[%s] Invalid message arrived: Not in JSON" % self.name )
 			return
+
+		# Check if somebody waits for a response on this mid
+		if properties.correlation_id  in self.waitQueue:
+
+			# Fetch record
+			record = self.waitQueue[properties.correlation_id ]
+
+			# Update data and notify
+			record['data'] = data
+			record['event'].set()
+
+			# Acknowlege delivery
+			ch.basic_ack(delivery_tag = method.delivery_tag)
+
+			# And do nothing more
+			return
+
+		# Store the message ID for replying
+		self.replyID = properties.correlation_id
 
 		# Dispatch data
 		self.trigger(data['name'], data['data'])
 
-	    # Acknowlege delivery
-	    ch.basic_ack(delivery_tag = method.delivery_tag)
+		# Disable reply()
+		self.replyID = None
 
-	def send(self, name, data, waitReply=False, timeout=30):
+		# Acknowlege delivery
+		ch.basic_ack(delivery_tag = method.delivery_tag)
+
+	def send(self, name, data, waitReply=False, timeout=30, mid=None):
 		"""
 		Sends a message to the bus
 		"""
 
+		# Calculate message id if it's not specified
+		if not mid:
+			mid = uuid.uuid4().hex
+
 		# Prepare data to send
-		mid = uuid.uuid4().hex
 		data = {
-				'data': {
+				'data': json.dumps({
 					'name': name,
 					'data': data
-				},
+				}),
 				'id': mid
 			}
 
@@ -229,7 +270,9 @@ class RabbitMQChannel(BusChannel):
 		"""
 		Reply to a message on the bus
 		"""
-		pass
+
+		# Send as a message on the reply bus with the associated replyID
+		self.send("", data, mid=self.replyID)
 
 class RabbitMQBus(Bus):
 	"""
@@ -244,15 +287,6 @@ class RabbitMQBus(Bus):
 
 		# Store config
 		self.config = config
-
-		# Register shutdown handler
-		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)
-
-	def systemShutdown(self):
-		"""
-		System shutdown occured
-		"""
-		self.connection.close()
 
 	def openChannel(self, name):
 		"""

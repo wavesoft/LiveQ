@@ -34,7 +34,7 @@ class AgentComponent(Component, FSM):
 	"""
 
 	# Agent core version
-	VERSION = "1.0"
+	VERSION = 1
 
 	def __init__(self):
 		"""
@@ -76,7 +76,8 @@ class AgentComponent(Component, FSM):
 			# initial acknowledgement
 			ans = self.serverChannel.send('handshake', {
 					'version': AgentComponent.VERSION,
-					'slots': 1
+					'slots': Config.AGENT_SLOTS,
+					'group': Config.AGENT_GROUP
 				}, waitReply=True)
 
 			# Check for errors on handshake

@@ -30,10 +30,6 @@ import sys
 from webserver.config import Config
 from webserver.server import MCPlotsServer
 
-import tornado.options
-import tornado.ioloop
-from tornado.options import define, options
-
 from liveq import handleSIGINT
 from liveq.exceptions import ConfigException
 
@@ -47,11 +43,13 @@ except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
 
-# Setup port defaults
-define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
+# Handle SigINT
+handleSIGINT()
 
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+# Open a channel on RabbitMQ
+c = Config.IBUS.openChannel("data")
+
+c.send("hello", {"msg": "I am asking you, how are you?"})
+
+while True:
+	time.sleep(1)
