@@ -17,55 +17,55 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-"""
-An exception occured while in the configuration
-"""
 class ConfigException(Exception):
+	"""
+	An exception occured while in the configuration
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-An internal integrity check exception
-"""
 class IntegrityException(Exception):
+	"""
+	An internal integrity check exception
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-Base class of job exceptions
-"""
 class JobException(Exception):
+	"""
+	Base class of job exceptions
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-An exception occured when preparing to run a job
-"""
 class JobConfigException(JobException):
+	"""
+	An exception occured when preparing to run a job
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-An exception occured when running the job
-"""
 class JobRuntimeException(JobException):
+	"""
+	An exception occured when running the job
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-An internal exception occured while running a job
-"""
 class JobInternalException(JobException, IntegrityException):
+	"""
+	An internal exception occured while running a job
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):

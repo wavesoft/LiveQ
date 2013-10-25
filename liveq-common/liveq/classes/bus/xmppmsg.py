@@ -17,6 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+XMPP Messages Bus Class
+
+This class provides an XMPP bus implementation that uses <message /> stanzas for
+communication between the parties.
+"""
+
 import re
 import socket
 import string
@@ -40,15 +47,15 @@ from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelExcep
 from liveq.config.core import StaticConfig
 from liveq.config.classes import BusConfigClass
 
-"""
-Configuration endpoint for the XMPP Bus
-"""
 class Config(BusConfigClass):
+	"""
+	Configuration endpoint for the XMPP Bus
+	"""
 
-	"""
-	Populate the XMPP Bus configuration
-	"""
 	def __init__(self,config):
+		"""
+		Populate the XMPP Bus configuration
+		"""
 
 		# Prepare some template macros
 		macros = {
@@ -63,35 +70,36 @@ class Config(BusConfigClass):
 		self.PASSWORD = config["password"]
 		self.RESOURCE = config["resource"] % macros
 
-	"""
-	Create an XMPP Bus instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an XMPP Bus instance
+		"""
 		return XMPPBus(self)
 
-"""
-Reusable function to parse an incoming message
 
-The LiveQ Message format is the following:
-
- +--------------+---------------+--------- ... ---+
- | 2 bytes: "LQ"| 1 byte: Flags | Base64-Enc Data |
- +--------------+---------------+--------- ... ---+
-
-Flag is a letter between "A" and "P", representing a 4-bit
-integer number calculated as following:
-
-flag = ord( <char> ) - 65
-
-And the flags can be the following:
-
- ...x : The data are encrypted
- ..x. : The data are compressed
- .x.. : (Unused)
- x... : (Unused)
-
-"""
 def parseMsg(message):
+	"""
+	Reusable function to parse an incoming message
+
+	The LiveQ Message format is the following:
+
+	 +--------------+---------------+--------- ... ---+
+	 | 2 bytes: "LQ"| 1 byte: Flags | Base64-Enc Data |
+	 +--------------+---------------+--------- ... ---+
+
+	Flag is a letter between "A" and "P", representing a 4-bit
+	integer number calculated as following:
+
+	flag = ord( <char> ) - 65
+
+	And the flags can be the following:
+
+	 ...x : The data are encrypted
+	 ..x. : The data are compressed
+	 .x.. : (Unused)
+	 x... : (Unused)
+
+	"""
 
 	# Ensure basic quality
 	if not message:
@@ -137,12 +145,12 @@ def parseMsg(message):
 	# Return data map
 	return data
 
-"""
-Reusable function to convert a data hash to a LiveQ message
-
-This function is the reverse of parseMsg. Check that for more details
-"""
 def createMsg(message, compress=True, encrypt=False):
+	"""
+	Reusable function to convert a data hash to a LiveQ message
+
+	This function is the reverse of :func:`parseMsg`. Check that for more details
+	"""
 
 	# Convert message to JSON Notation
 	message = json.dumps(message)
@@ -169,15 +177,19 @@ def createMsg(message, compress=True, encrypt=False):
 	return "LQ" + chr(65 + flags) + message
 
 
-"""
-XMPP Channel between the server and a user
-"""
 class XMPPUserChannel(BusChannel):
+	"""
+	XMPP Channel
 
+	This channel uses <message /> stanzas of type *headline* for communication between
+	the parties. This allows interface with multiple recepients if the resource component
+	is missing from the JID.
 	"""
-	Initialize the XMPP Channel
-	"""
+
 	def __init__(self, bus, jid):
+		"""
+		Initialize the XMPP Channel
+		"""
 		BusChannel.__init__(self, jid)
 		self.bus = bus
 		self.jid = jid
@@ -204,17 +216,17 @@ class XMPPUserChannel(BusChannel):
 		self.logger = logging.getLogger("xmpp-channel")
 		self.logger.debug("[%s] Channel open" % self.jid)
 
-	"""
-	Generate next ID for communication
-	"""
 	def _nextID(self):
+		"""
+		Generate next ID for communication
+		"""
 		self.idCounter += 1
 		return self.idPrefix + str(self.idCounter)
 
-	"""
-	Handle error messages
-	"""
 	def _handleError(self, message):
+		"""
+		Handle error messages
+		"""
 
 		# Process incoming message
 		data = parseMsg(message['body'])
@@ -237,10 +249,10 @@ class XMPPUserChannel(BusChannel):
 			waiting['data'] = None
 			waiting['event'].set()
 
-	"""
-	Shutdown channel
-	"""
 	def _shutdown(self):
+		"""
+		Shutdown channel
+		"""
 
 		# Release all threads waiting in queues
 		for k, waiting in self.waitQueue.iteritems():
@@ -251,10 +263,10 @@ class XMPPUserChannel(BusChannel):
 		# Enter lockdown
 		self.lockdown = True
 
-	"""
-	Handle incoming message in this channel
-	"""
 	def _handle(self, message):
+		"""
+		Handle incoming message in this channel
+		"""
 
 		# Process incoming message
 		data = parseMsg(message['body'])
@@ -298,10 +310,10 @@ class XMPPUserChannel(BusChannel):
 		# Trigger the event
 		self.trigger(data['name'], data['data'])
 
-	"""
-	Reply to a message on the bus
-	"""
 	def reply(self, data):
+		"""
+		Reply to a message on the bus
+		"""
 
 		# If we are in shutdown lockdown, exit
 		if self.lockdown:
@@ -316,10 +328,10 @@ class XMPPUserChannel(BusChannel):
 		# Mark conversation as responded
 		self.responded = True
 
-	"""
-	Send a message on the bus
-	"""
 	def send(self, message, data, waitReply=False, timeout=30):
+		"""
+		Send a message on the bus
+		"""
 
 		# If we are in shutdown lockdown, exit
 		if self.lockdown:
@@ -359,10 +371,12 @@ class XMPPUserChannel(BusChannel):
 			# Return data
 			return record['data']
 
-"""
-XMPP Bus
-"""
 class XMPPBus(Bus, ClientXMPP):
+	"""
+	XMPP Bus
+
+	This bus uses <message /> stanzas that enables targeting multiple recepients.
+	"""
 	
 	# JID validation
 	JID_MATCH = re.compile(r"^(?:([^@/<>'\"]+)@)?([^@/<>'\"]+)(?:/([^<>'\"]*))?$")

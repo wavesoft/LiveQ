@@ -22,18 +22,25 @@ import signal
 import sys
 
 class EventDispatcher:
+	"""
+	This class provides the core functionality of registering event handlers
+	and firing events. It is very similar to jQuery's event system.
 
+	To fire an event you can use the :func:`trigger` function. To register an event
+	handler use the :func:`on` function and to unregister it use the :func:`off` function.
 	"""
-	Initialize event dispatcher variables
-	"""
+
 	def __init__(self):
+		"""
+		Initialize event dispatcher variables
+		"""
 		self.__eventHandlers = {}
 		self.safeEvents = True
 
-	"""
-	Add an event listener object in the listeners
-	"""
 	def on(self,event,handler,**kwargs):
+		"""
+		Add an event listener object in the listeners
+		"""
 
 		# Allocate event groups
 		if not event in self.__eventHandlers:
@@ -42,10 +49,10 @@ class EventDispatcher:
 		# Append entry
 		self.__eventHandlers[event].append( [handler,kwargs] )
 
-	"""
-	Remove an event listener object from the listeners
-	"""
 	def off(self,event,handler):
+		"""
+		Remove an event listener object from the listeners
+		"""
 
 		# Check for event names
 		if not event in self.__eventHandlers:
@@ -69,10 +76,10 @@ class EventDispatcher:
 		except ValueError:
 			pass
 
-	"""
-	Dispatch an event to the appropriate listeners
-	"""
 	def trigger(self,event,*args):
+		"""
+		Dispatch an event to the appropriate listeners
+		"""
 		logging.debug("Dispatching event '%s' %s" % (event, args))
 
 		# Check for event names
@@ -93,18 +100,18 @@ class EventDispatcher:
 					raise e
 
 
-"""
-Static class container for global events
-"""
 class GlobalEvents:
-
 	"""
-	Create a system-wide event queue
+	Static class container for global events
+	"""
+
+	System = EventDispatcher()
+	"""
+	A system-wide event queue
 
 	In principle any event might appear here, but here is a short list
 	of the most common events:
 
-	- shutdown : Raised usually by user's input in order to safely shutdown the daemon
+	* ``shutdown`` : Raised usually by user's input in order to safely shutdown the daemon
 
 	"""
-	System = EventDispatcher()

@@ -23,10 +23,11 @@ import logging
 
 from liveq.events import GlobalEvents
 
-"""
-Handle SIGINT and dispatch
-"""
 def handleSIGINT():
+	"""
+	Register a CTRL+C (SIGINT) handler and raise a system-wide ``shutdown`` signal
+	that will gracefully shutdown all the components.
+	"""
 
 	# Register CTRL+C Handler
 	def signal_handler(signal, frame):

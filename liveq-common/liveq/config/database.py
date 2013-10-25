@@ -24,25 +24,35 @@ from playhouse.proxy import Proxy
 from liveq.config import configexceptions
 from liveq.config.classes import DatabaseConfigClass
 
-"""
-Database configuration class
-Agents can include this class if they require a database configuration
-"""
 class DatabaseConfig:
+	"""
+	Database configuration class
+	Agents can include this class if they require a database configuration
+	"""
 
 	# Relational database instance and confguration that uses PeeWee for the ORM
+
+	#: Database driver class
 	DB_CLASS = ""
+
+	#: Database configuration variables
 	DB_CONFIG = None
+
+	#: The instance of the configuration class
 	DB_INSTANCE = None
+
+	#: The database object that can be used by PeeWee functions
+	#: right-away. Even if there is no ``Config`` instance yet, 
+	#: this can be accessed as a ``DatabaseConfig.DB`` property.
 	DB = Proxy()
 
-	"""
-	Update class variables by reading the config file
-	contents of the specified filename
-	"""
 	@staticmethod
 	@configexceptions(section="database")
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Populate classes
 		DatabaseConfig.DB_CLASS = config.get("database", "class")

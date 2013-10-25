@@ -30,6 +30,7 @@ class CoreConfig:
 	It reads configuration from the [general] section.
 	"""
 
+	#: The currently active system-wide log level
 	LOG_LEVEL = logging.INFO
 
 	@staticmethod

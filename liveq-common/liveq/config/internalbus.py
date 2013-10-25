@@ -24,26 +24,30 @@ from liveq.exceptions import ConfigException
 from liveq.config import configexceptions
 from liveq.config.classes import BusConfigClass
 
-"""
-Internal Bus Configration
-
-An internal bus is a transport class that exchanges messages between the
-code LiveQ Components. 
-"""
 class InternalBusConfig:
+	"""
+	Internal Bus Configration
 
-	# Key-Value store instance and confguration
+	An internal bus is a transport class that exchanges messages between the
+	code LiveQ Components. 
+	"""
+
+	#: The internal bus class string
 	IBUS_CLASS = ""
+
+	#: The internal bus configuration
 	IBUS_CONFIG = None
+	
+	#: The internal bus instance
 	IBUS = None
 
-	"""
-	Update class variables by reading the config file
-	contents of the specified filename
-	"""
 	@staticmethod
 	@configexceptions(section="internal-bus")
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Populate classes
 		InternalBusConfig.IBUS_CLASS = config.get("internal-bus", "class")

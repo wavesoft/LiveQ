@@ -21,21 +21,27 @@ import redis
 from liveq.config.classes import StoreConfigClass
 
 """
-Configuration endpoint
-"""
-class Config(StoreConfigClass):
+REDIS Store Class
 
+This class provides a REDIS implementation to the key-value store.
+"""
+
+class Config(StoreConfigClass):
 	"""
-	Populate the database configuration
+	Configuration endpoint
 	"""
+
 	def __init__(self,config):
+		"""
+		Populate the database configuration
+		"""
 		self.HOST = config['server']
 		self.PORT = int(config['port'])
 		self.DATABASE = config['db']
 
-	"""
-	Create an SQL instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an SQL instance
+		"""
 		return redis.StrictRedis(host=self.HOST, port=self.PORT, db=self.DATABASE)
 

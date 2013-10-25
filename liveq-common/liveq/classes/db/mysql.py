@@ -17,13 +17,19 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+MySQL Database Class
+
+This class provides a MySQL connection to the peewee databse back-end.
+"""
+
 from peewee import MySQLDatabase
 from liveq.config.classes import DatabaseConfigClass
 
-"""
-Configuration endpoint
-"""
 class Config(DatabaseConfigClass):
+	"""
+	Configuration endpoint for the MySQL
+	"""
 
 	"""
 	Populate the database configuration

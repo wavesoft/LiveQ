@@ -17,6 +17,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+0MQ Bus Class
+
+This class provides a ZeroMQ bus implementation.
+"""
+
 import Queue
 import signal
 import logging
@@ -34,15 +40,15 @@ IDLE_LOOP_DELAY = 0.01
 # Timeout (in seconds) after sending a REQ message until we get a REP
 REQUEST_TIMEOUT = 30
 
-"""
-Configuration endpoint
-"""
 class Config(BusConfigClass):
+	"""
+	0MQ Configuration endpoint
+	"""
 
-	"""
-	Populate the ZeroMQ Bus configuration
-	"""
 	def __init__(self,config):
+		"""
+		Populate the ZeroMQ Bus configuration
+		"""
 		self.CHANNELS = { }
 
 		# Lookup for channels in the configuration
@@ -67,22 +73,22 @@ class Config(BusConfigClass):
 			elif parts[1] == "topic":
 				self.CHANNELS[parts[0]]['topic'] = v.split(',')
 
-	"""
-	Create an ZeroMQ Bus instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an ZeroMQ Bus instance
+		"""
 		return ZeroMQBus(self)
 
 
-"""
-ZeroMQ Bus channel
-"""
 class ZeroMQChannel(BusChannel):
+	"""
+	ZeroMQ Bus channel
+	"""
 	
-	"""
-	Initialize the ZeroMQ Channel
-	"""
 	def __init__(self, context, name, params):
+		"""
+		Initialize the ZeroMQ Channel
+		"""
 		BusChannel.__init__(self, name)
 
 		# Local variables
@@ -108,21 +114,22 @@ class ZeroMQChannel(BusChannel):
 		# shutdown event
 		GlobalEvents.System.on('shutdown', self._shutdown)
 
-	"""
-	Shutdown handler
-	"""
 	def _shutdown(self):
+		"""
+		Shutdown handler
+		"""
 
 		# Disable and disconnect
 		self.running = False
 
-	"""
-	Helper function to handle and dispatch the event for 
-	the incoming message specified.
-
-	This function also returns the parsed data if successful.
-	"""
 	def _handleMessage(self, msg):
+		"""
+		Helper function to handle and dispatch the event for 
+		the incoming message specified.
+
+		This function also returns the parsed data if successful.
+		"""
+
 		self.logger.debug("[%s] Received: %s" % (self.name, str(msg)))
 
 		# Validate frame
@@ -137,12 +144,12 @@ class ZeroMQChannel(BusChannel):
 		# Return frame
 		return msg['data']
 
-	"""
-	Main thread that receives messages from the channel
-
-	TODO: Create different threads for PUB, SUB, REQ, and REP
-	"""
 	def mainThread(self):
+		"""
+		Main thread that receives messages from the channel
+
+		TODO: Create different threads for PUB, SUB, REQ, and REP
+		"""
 
 		# Local flags
 		skiprecv = False
@@ -295,10 +302,10 @@ class ZeroMQChannel(BusChannel):
 		# Let log receivers that we are through
 		self.logger.debug("[%s] ZeroMQ thread exiting" % self.name)
 
-	"""
-	Sends a message to the bus
-	"""
 	def send(self, name, data, waitReply=False, timeout=30):
+		"""
+		Sends a message to the bus
+		"""
 		self.logger.debug("[%s] Sending: %s" % (self.name, str(data)))
 		
 		# Flag that we have responded (if required)
@@ -338,34 +345,36 @@ class ZeroMQChannel(BusChannel):
 			# Return response
 			return message['response']
 
-	"""
-	Reply to a message on the bus
-	"""
 	def reply(self, data):
+		"""
+		Reply to a message on the bus
+		"""
 		
 		# In our case that's the same with reply
 		return self.send(_lastMessage['name'], data)
 
 
-"""
-ZeroMQ Bus instance
-"""
 class ZeroMQBus(Bus):
+	"""
+	ZeroMQ Bus instance.
+
+	This bus provides a lightweight mechanism of communicating with the internal components.
+	"""
 	
-	"""
-	Create an instance of a ZeroMQ Bus
-	"""
 	def __init__(self, config):
+		"""
+		Create an instance of a ZeroMQ Bus
+		"""
 		Bus.__init__(self)
 
 		self.config = config
 		self.context = zmq.Context()
 		self.logger = logging.getLogger("zmq-bus")
 
-	"""
-	Open ZeroMQ Channel
-	"""
 	def openChannel(self, name):
+		"""
+		Open ZeroMQ Channel
+		"""
 		
 		# Make sure we have the channel configured
 		if not name in self.config.CHANNELS:

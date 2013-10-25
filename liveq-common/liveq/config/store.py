@@ -24,24 +24,24 @@ from liveq.exceptions import ConfigException
 from liveq.config import configexceptions
 from liveq.config.classes import StoreConfigClass
 
-"""
-Store configuration class
-Agents can include this class if they require a Key-Value store configuration
-"""
 class StoreConfig:
+	"""
+	Store configuration class
+	Agents can include this class if they require a Key-Value store configuration
+	"""
 
 	# Key-Value store instance and confguration
 	STORE_CLASS = ""
 	STORE_CONFIG = None
 	STORE = None
 
-	"""
-	Update class variables by reading the config file
-	contents of the specified filename
-	"""
 	@staticmethod
 	@configexceptions(section="store")
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Populate classes
 		StoreConfig.STORE_CLASS = config.get("store", "class")

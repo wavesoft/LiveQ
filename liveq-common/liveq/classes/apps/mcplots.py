@@ -17,6 +17,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+MCPlots Application
+
+This class provides the application implementation required by the MCplots' 
+Virtual Atom Smasher game. 
+
+This application starts an MCPlots simulation based on the lab configuration and
+tune values specified by the user and sends in real-time histograms to the user.
+"""
+
 import glob
 import tempfile
 import time
@@ -32,10 +42,10 @@ from liveq.events import GlobalEvents
 from liveq.config.classes import AppConfigClass
 from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
 
-"""
-Configuration implementation
-"""
 class Config(AppConfigClass):
+	"""
+	Configuration implementation
+	"""
 
 	def __init__(self,config):
 		self.WORKDIR = config["work_dir"]
@@ -52,15 +62,16 @@ class Config(AppConfigClass):
 	def instance(self, runtimeConfig):
 		return MCPlots(self)
 
-"""
-MCPlots implementation of the JobApplication
-"""
 class MCPlots(JobApplication):
+	"""
+	MCPlots implementation of the JobApplication
+	"""
 
-	"""
-	Initialize JobApplication
-	"""
 	def __init__(self, config):
+		"""
+		Initialize JobApplication
+		"""
+
 		JobApplication.__init__(self, config)
 		self.config = config 
 		self.jobconfig = { }
@@ -75,10 +86,10 @@ class MCPlots(JobApplication):
 	###
 	##################################################################################
 
-	"""
-	Create a process
-	"""
 	def start(self):
+		"""
+		Create a process
+		"""
 
 		# If it's already running, raise an exception
 		# (The caller might meant to reload() instead of start())
@@ -117,10 +128,10 @@ class MCPlots(JobApplication):
 
 		self.state = STATE_RUNNING
 
-	"""
-	Kill a running thread
-	"""
 	def kill(self):
+		"""
+		Kill a running thread
+		"""
 
 		# If it's already stopped, silently exit
 		if (self.state == STATE_ABORTED) or (self.state == STATE_COMPLETED):
@@ -150,18 +161,18 @@ class MCPlots(JobApplication):
 		# We are now officially killed
 		self.state = STATE_ABORTED
 
-	"""
-	MCPlots generators do not provide reload functionality.
-	Use the classic kill/start approach
-	"""
 	def reload(self):
+		"""
+		MCPlots generators do not provide reload functionality.
+		Use the classic kill/start approach
+		"""
 		self.kill()
 		self.start()
 	
-	"""
-	Update instance configuration
-	"""
 	def setConfig(self,config):
+		"""
+		Update instance configuration
+		"""
 
 		# Store and validate job config
 		self.jobconfig = config
@@ -189,10 +200,10 @@ class MCPlots(JobApplication):
 	###
 	##################################################################################
 
-	"""
-	Helper to cleanup current job files
-	"""
 	def cleanup(self):
+		"""
+		Helper to cleanup current job files
+		"""
 
 		# Clean temp dir (with caution)
 		if len(self.config.WORKDIR) > 1:
@@ -204,10 +215,10 @@ class MCPlots(JobApplication):
 			self.logger.debug("Cleaning-up job directory %s" % self.jobdir)
 			os.system("rm -rf '%s'" % self.jobdir)
 
-	"""
-	Helper function to read the histograms from the dump folder
-	"""
 	def readIntermediateHistograms(self):
+		"""
+		Helper function to read the histograms from the dump folder
+		"""
 
 		# Collective results
 		histograms = { }
@@ -256,17 +267,17 @@ class MCPlots(JobApplication):
 		# Return the collective results
 		return histograms
 
-
-	"""
-	Helper function to collect and submit the real (not intermediate) output
-	"""
 	def collectAndSubmitOutput(self):
+		"""
+		Helper function to collect and submit the real (not intermediate) output
+		"""
 		pass
 
-	"""
-	Application monitor [Thread]
-	"""
 	def monitor(self):
+		"""
+		Application monitor [Thread]
+		"""
+
 		self.logger.debug("Started monitor thread")
 
 		# Reset variables

@@ -17,6 +17,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+RabbitMQ Bus implementation
+
+This class provides an RabbitMQ bus implementation.
+"""
+
 import Queue
 import logging
 import threading
@@ -28,15 +34,15 @@ from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
 from liveq.config.classes import BusConfigClass
 
-"""
-Configuration endpoint
-"""
 class Config(BusConfigClass):
+	"""
+	Configuration endpoint for the RabbitMQ Bus
+	"""
 
-	"""
-	Populate the ZeroMQ Bus configuration
-	"""
 	def __init__(self,config):
+		"""
+		Populate the ZeroMQ Bus configuration
+		"""
 		self.SERVER = config['server']
 
 		# If we are a server, flip queue directions
@@ -45,22 +51,30 @@ class Config(BusConfigClass):
 			if config['role'].lower() = 'server':
 				self.FLIP_QUEUES = True
 
-	"""
-	Create an ZeroMQ Bus instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an ZeroMQ Bus instance
+		"""
 		return RabbitMQBus(self)
 
 
-"""
-ZeroMQ Bus channel
-"""
 class RabbitMQChannel(BusChannel):
+	"""
+	RabbitMQ Bus channel
+
+	Upon initialization, this channel will start two threads
+	with two individual connections to the RabbitMQ server.
+	The first will be used for sending data to the input queue
+	and the other one will be used for receiving from the output queue.
+
+	This limitation is introduced because of the lack of thread safety
+	in the pika implementation.
+	"""
 	
-	"""
-	Initialize the ZeroMQ Channel
-	"""
 	def __init__(self, bus, name):
+		"""
+		Initialize the ZeroMQ Channel
+		"""
 		BusChannel.__init__(self, name)
 
 		# Prepare variables
@@ -90,10 +104,10 @@ class RabbitMQChannel(BusChannel):
 		self.threadIn.start()
 		self.threadOut.start()
 
-	"""
-	Incoming messages thread
-	"""
 	def ingressThread(self):
+		"""
+		Incoming messages thread
+		"""
 
 		# Establish a blocking connection to the RabbitMQ server
 		connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -113,10 +127,10 @@ class RabbitMQChannel(BusChannel):
 		self.incoming.start_consuming()
 
 
-	"""
-	Outgoing messages thread
-	"""
 	def egressThread(self):
+		"""
+		Outgoing messages thread
+		"""
 		
 		# Establish a blocking connection to the RabbitMQ server
 		connection = pika.BlockingConnection(pika.ConnectionParameters(
@@ -138,19 +152,19 @@ class RabbitMQChannel(BusChannel):
 				data = self.queue
 
 
-	"""
-	Handle shutdown
-	"""
 	def systemShutdown(self):
+		"""
+		Handle shutdown
+		"""
 
 		# Kill pika threads
 		signal.kill( self.threadIn )
 		signal.kill( self.threadOut )
 
-	"""
-	Callback function that receives messages from input queue
-	"""
 	def onMessageArrived(ch, method, properties, body):
+		"""
+		Callback function that receives messages from input queue
+		"""
 	    print " [x] Received %r" % (body,)
 
 	    # Decode data
@@ -167,10 +181,10 @@ class RabbitMQChannel(BusChannel):
 	    # Acknowlege delivery
 	    ch.basic_ack(delivery_tag = method.delivery_tag)
 
-	"""
-	Sends a message to the bus
-	"""
 	def send(self, name, data, waitReply=False, timeout=30):
+		"""
+		Sends a message to the bus
+		"""
 
 		# Prepare data to send
 		mid = uuid.uuid4().hex
@@ -211,21 +225,21 @@ class RabbitMQChannel(BusChannel):
 			return record['data']
 
 
-	"""
-	Reply to a message on the bus
-	"""
 	def reply(self, data):
+		"""
+		Reply to a message on the bus
+		"""
 		pass
 
-"""
-ZeroMQ Bus instance
-"""
 class RabbitMQBus(Bus):
+	"""
+	RabbitMQ Bus instance
+	"""
 	
-	"""
-	Create an instance of a ZeroMQ Bus
-	"""
 	def __init__(self, config):
+		"""
+		Create an instance of a ZeroMQ Bus
+		"""
 		Bus.__init__(self)
 
 		# Store config
@@ -234,14 +248,14 @@ class RabbitMQBus(Bus):
 		# Register shutdown handler
 		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)
 
-	"""
-	System shutdown occured
-	"""
 	def systemShutdown(self):
+		"""
+		System shutdown occured
+		"""
 		self.connection.close()
 
-	"""
-	Open ZeroMQ Channel
-	"""
 	def openChannel(self, name):
+		"""
+		Open ZeroMQ Channel
+		"""
 		return RabbitMQChannel(self, name)

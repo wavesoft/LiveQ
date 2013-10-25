@@ -15,9 +15,12 @@ Contents
    :maxdepth: 2
    :numbered:
 
+   part-framework
    config
    config-classes
    core
+
+   part-implementations
 
 Indices and tables
 ==================

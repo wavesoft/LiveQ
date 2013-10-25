@@ -30,9 +30,13 @@ class AppConfig(ComponentConfig):
 	This implementation supports only a single application.
 	"""
 
-	# General application information
+	#: The application package
 	APP_CLASS = ""
+
+	# The application configuration
 	APP_CONFIG = None
+
+	# The application instance
 	APP = None
 
 	@staticmethod

@@ -19,19 +19,19 @@
 
 import re
 
-"""
-Simple function to parser histograms in FLAT format
-"""
 class FLATParser:
+	"""
+	Simple function to parser histograms in FLAT format
+	"""
 
 	# Precompiled regex entry
 	WHITESPACE = re.compile("\s+")
 
-	"""
-	Function to read a FLAT file into python structures
-	"""
 	@staticmethod
 	def parse(filename):
+		"""
+		Function to read a FLAT file into python structures
+		"""
 		sections = {}
 		section = None
 		activesection = None

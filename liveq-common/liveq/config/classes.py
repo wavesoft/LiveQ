@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from lvieq.config import ComponentClassConfig
+from liveq.config import ComponentClassConfig
 from liveq.exceptions import ConfigException
 
 class BusConfigClass(ComponentClassConfig):

@@ -17,6 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+XMPP IQ Bus Class
+
+This class provides an XMPP bus implementation that uses <iq /> stanzas for
+communication between the parties.
+"""
+
 import re
 import socket
 import string
@@ -36,15 +43,15 @@ from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelExcep
 from liveq.config.core import StaticConfig
 from liveq.config.classes import BusConfigClass
 
-"""
-Configuration endpoint for the XMPP Bus
-"""
 class Config(BusConfigClass):
+	"""
+	Configuration endpoint for the XMPP Bus
+	"""
 
-	"""
-	Populate the XMPP Bus configuration
-	"""
 	def __init__(self,config):
+		"""
+		Populate the XMPP Bus configuration
+		"""
 
 		# Prepare some template macros
 		macros = {
@@ -59,16 +66,16 @@ class Config(BusConfigClass):
 		self.PASSWORD = config["password"]
 		self.RESOURCE = config["resource"] % macros
 
-	"""
-	Create an XMPP Bus instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an XMPP Bus instance
+		"""
 		return XMPPBus(self)
 
-"""
-Message Stanza
-"""
 class LiveQMessage(ElementBase):
+	"""
+	LiveQ Message IQ Stanza
+	"""
 	name = "query"
 	namespace = "liveq:message"
 	plugin_attrib = "liveq"
@@ -78,15 +85,15 @@ class LiveQMessage(ElementBase):
 # Register LiveQ Stanza
 register_stanza_plugin( Iq, LiveQMessage )
 
-"""
-XMPP Channel between the server and a user
-"""
 class XMPPUserChannel(BusChannel):
+	"""
+	XMPP Channel between the server and a user
+	"""
 
-	"""
-	Initialize the XMPP Channel
-	"""
 	def __init__(self, bus, jid):
+		"""
+		Initialize the XMPP Channel
+		"""
 		BusChannel.__init__(self, jid)
 		self.bus = bus
 		self.jid = jid
@@ -99,10 +106,10 @@ class XMPPUserChannel(BusChannel):
 		self.logger = logging.getLogger("xmpp-channel")
 		self.logger.debug("[%s] Channel open" % self.jid)
 
-	"""
-	Process incoming message
-	"""
 	def _process(self, message):
+		"""
+		Process incoming message
+		"""
 
 		# Process message
 		msg = message['liveq']
@@ -114,10 +121,10 @@ class XMPPUserChannel(BusChannel):
 
 		return data
 
-	"""
-	Handle incoming message in this channel
-	"""
 	def _handle(self, message):
+		"""
+		Handle incoming message in this channel
+		"""
 
 		# Process incoming message
 		data = self._process(message)
@@ -132,10 +139,10 @@ class XMPPUserChannel(BusChannel):
 		if not self.responded:
 			message.reply().send()
 
-	"""
-	Reply to a message on the bus
-	"""
 	def reply(self, data):
+		"""
+		Reply to a message on the bus
+		"""
 
 		# Create response
 		response = self.lastMessage.reply()
@@ -148,10 +155,10 @@ class XMPPUserChannel(BusChannel):
 		response.send()
 		self.responded = True
 
-	"""
-	Send a message on the bus
-	"""
 	def send(self, message, data, waitReply=False, timeout=30):
+		"""
+		Send a message on the bus
+		"""
 		
 		self.logger.debug("[%s] Sending message: (%s) %s" % (self.jid, message, str(data)) )
 
@@ -181,10 +188,12 @@ class XMPPUserChannel(BusChannel):
 			self.logger.warn("[%s] Timeout waiting response" % self.jid)
 
 
-"""
-XMPP Bus
-"""
 class XMPPBus(Bus, ClientXMPP):
+	"""
+	This XMPP Bus uses IQ messages to communicate with the client.
+
+	.. note:: This implementation is deprecated and is left only for reference.
+	"""
 	
 	# JID validation
 	JID_MATCH = re.compile(r"^(?:([^@/<>'\"]+)@)?([^@/<>'\"]+)(?:/([^<>'\"]*))?$")

@@ -32,40 +32,40 @@ STATE_COMPLETED = 2
 STATE_KILLING 	= 10
 STATE_STARTING 	= 11
 
-"""
-Job template that is overloaded by each job
-"""
 class JobApplication(EventDispatcher):
+	"""
+	Job template that is overloaded by each job
+	"""
 
-	"""
-	Constructor
-	"""
 	def __init__(self,cfg):
+		"""
+		Constructor
+		"""
 		EventDispatcher.__init__(self)
 		self.logger = logging.getLogger("application")
 		self.logger.debug("Class '%s' instantiated" % self.__class__.__name__)
 
-	"""
-	Launch application binaries
-	"""
 	def start(self):
+		"""
+		Launch application binaries
+		"""
 		raise NotImplementedError("The application class did not implement the start() function")
 
-	"""
-	Kill all instances
-	"""
 	def kill(self):
+		"""
+		Kill all instances
+		"""
 		raise NotImplementedError("The application class did not implement the kill() function")
 
-	"""
-	Reload configuration (this might mean restarting the simulation)
-	"""
 	def reload(self):
+		"""
+		Reload configuration (this might mean restarting the simulation)
+		"""
 		raise NotImplementedError("The application class did not implement the reload() function")
 
-	"""
-	Set/Update configuration files
-	"""
 	def setConfig(self,config):
+		"""
+		Set/Update configuration files
+		"""
 		raise NotImplementedError("The application class did not implement the setConfig() function")
 

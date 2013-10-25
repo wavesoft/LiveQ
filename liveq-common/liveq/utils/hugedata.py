@@ -22,28 +22,28 @@ import json
 import urllib
 from base64 import b64encode
 
-"""
-Hugedata Class
-
-This class provides an interface of managing huge data structures. It is currently
-used by the interface-updating mechanism, where many histograms needs to be pushed 
-to the client.
-"""
 class Hugedata:
-
 	"""
-	Compress huge data for javascript use
+	Hugedata Class
 
-	This function does the following:
+	This class provides an interface of managing huge data structures. It is currently
+	used by the interface-updating mechanism, where many histograms needs to be pushed 
+	to the client.
+	"""
+
+	@staticmethod
+	def jsCompress(hugedat, encode=True):
+		"""
+		Compress huge data for javascript use
+
+		This function does the following:
 
 		1. Convers the given dictionary/array structure into a JSON array
 		2. Compresses it with gzip encoding
 		3. Optionally encodes it in Base64
 
-	The data structure can be converted back to array using the jsxcompressor.js library.
-	"""
-	@staticmethod
-	def jsCompress(hugedat, encode=True):
+		The data structure can be converted back to array using the jsxcompressor.js library.
+		"""
 
 		# Convert dictionary into a json string
 		json_data = json.dumps(hugedat)

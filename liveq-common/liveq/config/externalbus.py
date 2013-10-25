@@ -24,26 +24,30 @@ from liveq.exceptions import ConfigException
 from liveq.config import configexceptions
 from liveq.config.classes import BusConfigClass
 
-"""
-External Bus Configration
-
-An external bus is a transport class that exchanges messages between the
-code LiveQ Core and the Agents. 
-"""
 class ExternalBusConfig:
+	"""
+	External Bus Configration
 
-	# Key-Value store instance and confguration
+	An external bus is a transport class that exchanges messages between the
+	code LiveQ Core and the Agents. 
+	"""
+
+	#: The external bus class string
 	EBUS_CLASS = ""
+
+	#: The external bus configuration
 	EBUS_CONFIG = None
+
+	#: The external bus instance
 	EBUS = None
 
-	"""
-	Update class variables by reading the config file
-	contents of the specified filename
-	"""
 	@staticmethod
 	@configexceptions(section="external-bus")
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Populate classes
 		ExternalBusConfig.EBUS_CLASS = config.get("external-bus", "class")

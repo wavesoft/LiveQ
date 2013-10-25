@@ -17,23 +17,29 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+"""
+SQLite Database Class
+
+This class provides a SQLite connection to the peewee databse back-end.
+"""
+
 from peewee import SqliteDatabase
 from liveq.config.classes import DatabaseConfigClass
 
-"""
-Configuration endpoint
-"""
 class Config(DatabaseConfigClass):
+	"""
+	Configuration endpoint
+	"""
 
-	"""
-	Populate the database configuration
-	"""
 	def __init__(self,config):
+		"""
+		Populate the database configuration
+		"""
 		self.DATABASE = config['filename']
 
-	"""
-	Create an SQL instance
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Create an SQL instance
+		"""
 		return SqliteDatabase(self.DATABASE)
 

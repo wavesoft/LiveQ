@@ -19,73 +19,71 @@
 
 from liveq.events import EventDispatcher
 
-"""
-An error on the channel
-"""
 class BusChannelException(Exception):
+	"""
+	An error on the channel
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return repr(self.value)
 
-"""
-The specified channel is missing
-"""
 class NoBusChannelException(BusChannelException):
+	"""
+	The specified channel is missing
+	"""
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
 		return "No channel '%s' is available on the bus" % str(self.value)
 
-"""
-A channel on a bus that the user can send messages or listen for other
-
-Events dispatched on this class:
-- 'open'	: When the channel is open
-- 'close'	: When the channel is closed
-- <message>	: When a message arrives from the bus. Each message has the 
-			  name specified while sending it.
-
-"""
 class BusChannel(EventDispatcher):
+	"""
+	A channel on a bus that the user can send messages or listen for other
 
+	Events dispatched on this class:
+	* ``open``	: When the channel is open
+	* ``close``	: When the channel is closed
+	* <message>	: When a message arrives from the bus. Each message has the name specified while sending it.
 	"""
-	Initialize event dispatcher
-	"""
+
 	def __init__(self, name):
+		"""
+		Initialize event dispatcher
+		"""
 		EventDispatcher.__init__(self)
 		self.name = name
 
-	"""
-	Sends a message to the bus
-	"""
 	def send(self, name, data, waitReply=False, timeout=30):
+		"""
+		Sends a message to the bus
+		"""
 		raise NotImplementedError("The BusChannel did not implement the send() function")
 
-	"""
-	Reply to the last message received
-	"""
 	def reply(self, data):
+		"""
+		Reply to the last message received
+		"""
 		raise NotImplementedError("The BusChannel did not implement the reply() function")
 		
-"""
-A template class that should be inherited by the Bus driver
-
-Events dispatched on this class:
-- 'channel'	: When a channel is created by a remote request
-
-"""
 class Bus(EventDispatcher):
+	"""
+	A template class that should be inherited by the Bus driver
+
+	Events dispatched on this class:
+	* ``channel``	: When a channel is created by a remote request
 
 	"""
-	Initialize event dispatcher
-	"""
+
 	def __init__(self):
+		"""
+		Initialize event dispatcher
+		"""
 		EventDispatcher.__init__(self)
 
-	"""
-	Open a named channel on the bus.
-	This function should return a BusChannel instance
-	"""
 	def openChannel(self, name):
+		"""
+		Open a named channel on the bus.
+		This function should return a BusChannel instance
+		"""
 		raise NotImplementedError("The Bus did not implement the openChannel() function")

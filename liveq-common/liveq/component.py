@@ -24,22 +24,23 @@ import logging
 
 from liveq.events import GlobalEvents
 
-"""
-Scheduler for functions
-(Just like stack, but does not pollute the stack)
-"""
 class Scheduler:
+	"""
+	Scheduler for functions
+	(Just like stack, but does not pollute the stack - Used for
+	very lightweight FSM implementations)
+	"""
 		
-	"""
-	Initialize scheduler
-	"""
 	def __init__(self):
+		"""
+		Initialize scheduler
+		"""
 		self.stack = Queue.LifoQueue()
 
-	"""
-	Schedule a function for execution
-	"""
 	def schedule(self, function, *args, **kwargs):
+		"""
+		Schedule a function for execution
+		"""
 
 		# Put new entry on stack
 		newRun = self.stack.empty()
@@ -49,10 +50,10 @@ class Scheduler:
 		if newRun:
 			self.__startFrameLoop()
 
-	"""
-	Run next frame
-	"""
 	def __startFrameLoop(self):
+		"""
+		Run next frame
+		"""
 
 		# Run frame loop
 		while not self.stack.empty():
@@ -63,36 +64,36 @@ class Scheduler:
 			frame[0](*frame[1], **frame[2])
 
 
-"""
-Core component is the base class for creating
-LiveQ applications.
-"""
 class Component(Scheduler):
+	"""
+	Core component is the base class for creating
+	LiveQ applications.
+	"""
 
-	"""
-	Setup the core component
-	"""
 	def __init__(self):
+		"""
+		Setup the core component
+		"""
 		Scheduler.__init__(self)
 		self.running = True
 		GlobalEvents.System.on('shutdown', self.onShutdown)
 
-	"""
-	Handler for the system-wide shutdown function
-	that forces main loop to exit
-	"""
 	def onShutdown(self):
+		"""
+		Handler for the system-wide shutdown function
+		that forces main loop to exit
+		"""
 		logging.debug("Shutting down component %s" % self.__class__.__name__)
 		self.running = False
 
 		# Empty scheduler queue
 		self.stack = Queue.LifoQueue()
 
-	"""
-	Override scheduler to prohibit adding new frames
-	if we are not running any more
-	"""
 	def schedule(self, function, *args, **kwargs):
+		"""
+		Override scheduler to prohibit adding new frames
+		if we are not running any more
+		"""
 
 		# Allow function scheduling only on system shutdown
 		if self.running:
@@ -100,32 +101,32 @@ class Component(Scheduler):
 		else:
 			logging.warn("Attemp to schedule function call on system shutdown")
 
-	"""
-	Main loop of the component
-	"""
 	def step(self):
+		"""
+		Main loop of the component
+		"""
 
 		# Unless implemented, just wait for 1 sec
 		time.sleep(1)
 
-	"""
-	Main function that unless overriden it waits for shutdown signal
-	"""
 	def run(self):
+		"""
+		Main function that unless overriden it waits for shutdown signal
+		"""
 
 		# Run main loop as long as we are running
 		while self.running:
 			self.step()
 
-	"""
-	Class method to run the component in a different thread
-	that will allow signals to reach main thread.
-
-	(This is a hack to allow threads to use Event() objects while
-	still allowing signals to reach main thread.)
-	"""
 	@classmethod
 	def runThreaded(cls):
+		"""
+		Class method to run the component in a different thread
+		that will allow signals to reach main thread.
+
+		(This is a hack to allow threads to use Event() objects while
+		still allowing signals to reach main thread.)
+		"""
 
 		# Define a main thread function
 		def thread_main():
