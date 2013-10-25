@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import Queue
 import logging
 import threading
 import time
@@ -66,62 +67,100 @@ class RabbitMQChannel(BusChannel):
 		self.bus = bus
 		self.name = name
 		self.logger = logging.getLogger("rabbitmq-channel")
+		self.running = True
+		self.queue = Queue.Queue()
+		self.waitQueue = { }
+
+		# Prepare the appropriate names for the queues
+		self.qname_in = "%s:in"
+		self.qname_out = "%s:out"
+
+		# Flip names if we are told to do so by the config
+		if self.bus.config.FLIP_QUEUES:
+			tmp = self.qname_out
+			self.qname_out = qname_in
+			self.qname_in = tmp
 
 		# Register shutdown handler
 		GlobalEvents.SystemEvents.on('shutdown', self.systemShutdown)
 
-		# Start main thread
-		self.consumerThread = threading.Thread(target=_channelThread)
-		self.consumerThread.start()
+		# Start ingress and egress threads
+		self.threadIn = threading.Thread(target=self.ingressThread)
+		self.threadOut = threading.Thread(target=self.egressThread)
+		self.threadIn.start()
+		self.threadOut.start()
 
 	"""
-	Main thread of the RabbitMQ Pika instance
-	(It's not thread-safe)
+	Incoming messages thread
 	"""
-	def _channelThread(self):
+	def ingressThread(self):
 
 		# Establish a blocking connection to the RabbitMQ server
-		self.connection = pika.BlockingConnection(pika.ConnectionParameters(
+		connection = pika.BlockingConnection(pika.ConnectionParameters(
 		               self.bus.config.SERVER ))
 
-		# Create channels for incoming and outgoing messages
-		self.outgoing = self.connection.channel()
-		self.incoming = self.connection.channel()		
+		# Create and setup channel
+		channel = self.connection.channel()		
 
-		# Prepare the appropriate names for the queues
-		qname_in = "%s:in"
-		qname_out = "%s:out"
-
-		# Flip names if we are told to do so by the config
-		if self.bus.config.FLIP_QUEUES:
-			tmp = qname_out
-			qname_out = qname_in
-			qname_in = tmp
-
-		# Ensure queues exist
-		self.outgoing.queue_declare(qname_out)
-		self.incoming.queue_declare(qname_in)
+		# Ensure queue exists
+		channel.queue_declare(self.qname_in)
 
 		# Setup callbacks
-		self.incoming.basic_consume(self.onMessageArrived,
-                      queue=qname_in)
+		channel.basic_consume(self.onMessageArrived,
+                      queue=self.qname_in)
 
 		# Start consumer
 		self.incoming.start_consuming()
+
+
+	"""
+	Outgoing messages thread
+	"""
+	def egressThread(self):
+		
+		# Establish a blocking connection to the RabbitMQ server
+		connection = pika.BlockingConnection(pika.ConnectionParameters(
+		               self.bus.config.SERVER ))
+
+		# Create and setup channel
+		channel = self.connection.channel()		
+
+		# Ensure queue exists
+		channel.queue_declare(self.qname_out)
+
+		# Start listening on the outgoing queue
+		while self.running:
+			
+			# If we have data to send, send them now
+			if not self.queue.empty():
+				data = self.queue
+
 
 	"""
 	Handle shutdown
 	"""
 	def systemShutdown(self):
 
-		# Stop pika consumer
-		self.incoming.stop_consuming()
+		# Kill pika threads
+		signal.kill( self.threadIn )
+		signal.kill( self.threadOut )
 
 	"""
 	Callback function that receives messages from input queue
 	"""
 	def onMessageArrived(ch, method, properties, body):
 	    print " [x] Received %r" % (body,)
+
+	    # Decode data
+	    data = None
+	    try:
+	    	data = json.loads(body)
+	    except TypeError as e:
+			self.logger.debug("[%s] Invalid message arrived: Not in JSON" % self.name )
+			return
+
+		# Dispatch data
+		self.trigger(data['name'], data['data'])
 
 	    # Acknowlege delivery
 	    ch.basic_ack(delivery_tag = method.delivery_tag)
@@ -131,15 +170,44 @@ class RabbitMQChannel(BusChannel):
 	"""
 	def send(self, name, data, waitReply=False, timeout=30):
 
-		# Pack data to send
-		jsonData = json.dumps({
-			'name': name,
-			'data': data
-			})
+		# Prepare data to send
+		mid = uuid.uuid4().hex
+		data = {
+				'data': {
+					'name': name,
+					'data': data
+				},
+				'id': mid
+			}
 
-		# Send data
+		# Queue data to the egress queue
+		self.queue.put(data)
 
-		pass
+		# If we are waiting for response, register this mid on the waiting list
+		if waitReply:
+
+			# Prepare data
+			event = threading.Event()
+			record = {
+				'event' : event,
+				'data' : None
+			}
+
+			# Register on waiting queue
+			self.waitQueue[mid] = record
+
+			# Lock on event
+			event.wait(timeout)
+
+			# Check if we just timed out
+			if not event.is_set():
+				self.logger.debug("[%s] Timeout waiting response on #%s" % (self.name, mid) )
+				del self.waitQueue[mid]
+				return None
+
+			# Otherwise return the data received
+			return record['data']
+
 
 	"""
 	Reply to a message on the bus
