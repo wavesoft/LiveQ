@@ -20,7 +20,7 @@
 import ConfigParser
 import logging
 
-from liveq.config import configexceptions
+from liveq.config import configexceptions, ComponentConfig
 from liveq.config.classes import AppConfigClass
 
 """
@@ -28,7 +28,7 @@ Application configuration class
 This class provides the configuration framework for instantiating application objects.
 This implementation supports only a single application.
 """
-class AppConfig:
+class AppConfig(ComponentConfig):
 
 	# General application information
 	APP_CLASS = ""

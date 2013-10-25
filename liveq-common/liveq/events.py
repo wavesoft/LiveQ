@@ -28,6 +28,7 @@ class EventDispatcher:
 	"""
 	def __init__(self):
 		self.__eventHandlers = {}
+		self.safeEvents = True
 
 	"""
 	Add an event listener object in the listeners
@@ -71,7 +72,7 @@ class EventDispatcher:
 	"""
 	Dispatch an event to the appropriate listeners
 	"""
-	def trigger(self,event,*args,safe=True):
+	def trigger(self,event,*args):
 		logging.debug("Dispatching event '%s' %s" % (event, args))
 
 		# Check for event names
@@ -88,7 +89,7 @@ class EventDispatcher:
 				logging.error("Exception while dispatching event %s to handler %s: %s" % (event, str(handler), str(e)))
 
 				# Re-throw exception if we are running unsafe
-				if not safe:
+				if not self.safeEvents:
 					raise e
 
 

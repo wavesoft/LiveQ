@@ -18,7 +18,7 @@
 ################################################################
 
 import logging
-from liveq.internal.events import EventDispatcher
+from liveq.events import EventDispatcher
 
 """
 State constants

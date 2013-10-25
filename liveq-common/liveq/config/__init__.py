@@ -89,3 +89,18 @@ def configexceptions(section=""):
 
 		return safe_f
 	return decorator
+
+
+"""
+Base configuration class from which Component Configurations are derrived
+
+Each subclass must implement the following static method:
+.. automethod:: ComponentConfig.fromConfig
+
+
+"""
+class ComponentConfig:
+
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
+		raise NotImplementedError("The ComponentConfig did not implement the fromConfig() function")

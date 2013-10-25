@@ -133,6 +133,8 @@ class RabbitMQChannel(BusChannel):
 			
 			# If we have data to send, send them now
 			if not self.queue.empty():
+
+				# Fetch data
 				data = self.queue
 
 
