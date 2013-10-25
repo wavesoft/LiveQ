@@ -12,14 +12,10 @@ Contents
 --------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :numbered:
 
    part-framework
-   config
-   config-classes
-   core
-
    part-implementations
 
 Indices and tables

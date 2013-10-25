@@ -21,7 +21,7 @@ import ConfigParser
 import os.path
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
-from liveq.config.internallbus import InternalBusConfig
+from liveq.config.internalbus import InternalBusConfig
 
 """
 Local configuration for the agent

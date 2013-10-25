@@ -1,12 +1,24 @@
 .. _part-implementations:
 
-LiveQ Implementations
-*********************
+###################################
+Virtual Atom Smasher Implementation
+###################################
 
 Based on the LiveQ Framework, there are three implementations that form the back-end framework
 for the *Virtual Atom Smasher* game.
 
+Contents
+--------
 
-*You might also be intereted to the following:*
+.. toctree::
+	:maxdepth: 1
+	:numbered:
+
+	imp-agent
+	imp-jobmanager
+	imp-webserver
+
+Links
+-------
 
 * :ref:`part-framework`

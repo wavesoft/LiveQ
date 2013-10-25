@@ -25,8 +25,6 @@ import tornado.websocket
 import os.path
 import uuid
 
-from beta.internal.bus import bus_handler, LiveQBus
-
 from webserver.labsocket import LabSocketHandler
 from webserver.config import Config
 
@@ -74,6 +72,7 @@ class ServerBus():
 
 			# We don't have a results database on the LiveQ bus
 			# perform dry-run by contacting directly the job manager
+			pass
 
 	
 	"""
@@ -94,7 +93,6 @@ class ServerBus():
 	def registerSocket(self, socket):
 		pass
 
-	@bus_handler("tune_data")
 	def zmq_tuneData(self, data):
 		pass
 

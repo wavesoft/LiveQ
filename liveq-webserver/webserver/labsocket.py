@@ -18,7 +18,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from ??? import LabDatabase
+#from ??? import LabDatabase
+from liveq.models import Lab
 from webserver.config import Config
 
 import tornado.websocket
@@ -60,7 +61,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.tuneid = None
 
         # Try to find a lab with the given ID
-        self.lab = LabDatabase.openLab( labid )
+        self.lab = Lab.select().where(Lab.id == labid)
         if not self.lab:
             logging.error("Unable to locate lab with id '%s'" % labid)
             return

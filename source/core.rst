@@ -7,16 +7,30 @@ This page contains all the core classes of the LiveQ Framework.
 Core Classes
 ------------
 
+Event Subsystem
+^^^^^^^^^^^^^^^
+
 .. automodule:: liveq.events
    :members:
+
+Exceptions & Errors
+^^^^^^^^^^^^^^^^^^^
 
 .. automodule:: liveq.exceptions
    :members:
 
-.. automodule:: liveq.component
-   :members:
+Database
+^^^^^^^^
 
 .. automodule:: liveq.models
+   :members:
+
+API Classes
+^^^^^^^^^^^
+
+These classes are usually subclassed by the implementations:
+
+.. automodule:: liveq.component
    :members:
 
 .. automodule:: liveq.io.application
