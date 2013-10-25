@@ -31,6 +31,8 @@ import pika
 import uuid
 import signal
 import json
+import random
+import string
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
@@ -88,8 +90,8 @@ class RabbitMQChannel(BusChannel):
 		self.waitQueue = { }
 
 		# Prepare the appropriate names for the queues
-		self.qname_in = "%s:in"
-		self.qname_out = "%s:out"
+		self.qname_in = "%s:in" % name
+		self.qname_out = "%s:out" % name
 
 		# Flip names if we are told to do so by the config
 		if self.bus.config.FLIP_QUEUES:
@@ -99,6 +101,10 @@ class RabbitMQChannel(BusChannel):
 
 		# Register shutdown handler
 		GlobalEvents.System.on('shutdown', self.systemShutdown)
+
+		# Prepare base prefix and counter for tagging messages
+		self.id_counter = 0
+		self.id_base = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(20))
 
 		# Start ingress and egress threads
 		self.threadIn = threading.Thread(target=self.ingressThread)
@@ -219,6 +225,13 @@ class RabbitMQChannel(BusChannel):
 		# Acknowlege delivery
 		ch.basic_ack(delivery_tag = method.delivery_tag)
 
+	def _nextID(self):
+		"""
+		Calculate the next ID
+		"""
+		self.id_counter += 1
+		return "%s:%i" % (self.id_base, self.id_counter)
+
 	def send(self, name, data, waitReply=False, timeout=30, mid=None):
 		"""
 		Sends a message to the bus
@@ -226,7 +239,7 @@ class RabbitMQChannel(BusChannel):
 
 		# Calculate message id if it's not specified
 		if not mid:
-			mid = uuid.uuid4().hex
+			mid = self._nextID()
 
 		# Prepare data to send
 		data = {
