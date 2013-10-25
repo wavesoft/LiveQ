@@ -26,11 +26,12 @@ from liveq.config.internalbus import InternalBusConfig
 from liveq.config.externalbus import ExternalBusConfig
 from liveq.models import createBaseTables
 
-"""
-Local configuration for the job manager
-"""
 class JobManagerConfig:
+	"""
+	Local configuration for the job manager
+	"""
 
+	#: The names of the channels the user is trusting
 	TRUSTED_CHANNELS = []
 
 	@staticmethod

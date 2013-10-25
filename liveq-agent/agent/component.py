@@ -26,20 +26,22 @@ from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
 from liveq.classes.bus.xmppmsg import XMPPBus
+from liveq.utils.fsm import FSM
 
-"""
-Core agent
-"""
-class AgentComponent(Component):
+class AgentComponent(Component, FSM):
+	"""
+	Core agent
+	"""
 
 	# Agent core version
 	VERSION = "1.0"
 
-	"""
-	Initialize AgentComponent component
-	"""
 	def __init__(self):
+		"""
+		Initialize AgentComponent component
+		"""
 		Component.__init__(self)
+		FSM.__init__(self)
 
 		# Setup logger
 		self.logger = logging.getLogger("agent")
@@ -52,17 +54,21 @@ class AgentComponent(Component):
 		# TODO: Uhnack this
 		# This establishes a presence relationship with the given entity.
 		if isinstance(Config.EBUS, XMPPBus):
-			Config.EBUS.updateRoster( Config.SERVER_CHANNEL, name="Server", subscription="both" )
+			self.logger.debug("Subscribing %s to my roster" % Config.SERVER_CHANNEL)
+			Config.EBUS.send_presence(pto=Config.SERVER_CHANNEL, ptype='subscribe')
 
 		# Bind incoming message handlers
 		self.serverChannel.on('job_start', self.onJobStart)
 		self.serverChannel.on('job_cancel', self.onJobCancel)
 		self.serverChannel.on('close', self.onDisconnect)
 
-	"""
-	[State] Establish server handshake
-	"""
+		# Start with the handshake
+		self.schedule(self.stateHandshake)
+
 	def stateHandshake(self):
+		"""
+		[State] Establish server handshake
+		"""
 		self.logger.debug("Entering state: HANDSHAKE")
 		try:
 
@@ -77,6 +83,7 @@ class AgentComponent(Component):
 			if ans == None:
 				self.logger.warn("No job manager was found online")
 				self.schedule(self.stateRetry)
+				return
 
 			# Handshake complete
 			# (Everything else is asynchronous)
@@ -88,20 +95,20 @@ class AgentComponent(Component):
 			self.schedule(self.stateRetry)
 			self.logger.warn("No reply from job manager")
 
-	"""
-	[State] Retry connection
-	"""
 	def stateRetry(self):
+		"""
+		[State] Retry connection
+		"""
 		self.logger.debug("Entering state: RETRY")
 		
 		# Wait some time and re-try handshake
 		time.sleep(5)
 		self.schedule(self.stateHandshake)
 
-	"""
-	Bus connection lost
-	"""
 	def onDisconnect(self):
+		"""
+		Bus connection lost
+		"""
 		self.logger.info("Server channel connection lost")
 
 		# We lost the interaction with the server.
@@ -109,30 +116,21 @@ class AgentComponent(Component):
 		# follow the retry protocol from there
 		self.schedule(self.stateHandshake)
 
-	"""
-	Bus message arrived to start job
-	"""
 	def onJobStart(self, message):
+		"""
+		Bus message arrived to start job
+		"""
 		pass
 
-	"""
-	Bus message arrived to cancel a running job
-	"""
 	def onJobCancel(self, message):
+		"""
+		Bus message arrived to cancel a running job
+		"""
 		pass
 
-	"""
-	Entry point of the agent
-	"""
-	def run(self):
-		
-		# Start with the handshake
-		self.schedule(self.stateHandshake)
-
-		# Do component's default task : Wait
-		Component.run(self)
-
-
-
-
-
+	def step(self):
+		"""
+		Run the next cycle of the FSM
+		"""
+		self.continueFSM()
+		time.sleep(0.5)

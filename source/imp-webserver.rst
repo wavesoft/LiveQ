@@ -16,6 +16,7 @@ The component configuration class is the following:
 
 .. autoclass:: webserver.config.Config
 	:members:
+	:inherited-members:
 
 
 Component

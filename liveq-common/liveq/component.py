@@ -24,47 +24,8 @@ import logging
 
 from liveq.events import GlobalEvents
 
-class Scheduler:
-	"""
-	Scheduler for functions
-	(Just like stack, but does not pollute the stack - Used for
-	very lightweight FSM implementations)
-	"""
-		
-	def __init__(self):
-		"""
-		Initialize scheduler
-		"""
-		self.stack = Queue.LifoQueue()
 
-	def schedule(self, function, *args, **kwargs):
-		"""
-		Schedule a function for execution
-		"""
-
-		# Put new entry on stack
-		newRun = self.stack.empty()
-		self.stack.put([function, args, kwargs])
-		
-		# Start frame execution if that's the first frame on stack
-		if newRun:
-			self.__startFrameLoop()
-
-	def __startFrameLoop(self):
-		"""
-		Run next frame
-		"""
-
-		# Run frame loop
-		while not self.stack.empty():
-
-			# Fetch next frame
-			frame = self.stack.get()
-			# Execute it
-			frame[0](*frame[1], **frame[2])
-
-
-class Component(Scheduler):
+class Component:
 	"""
 	Core component is the base class for creating
 	LiveQ applications.
@@ -74,7 +35,6 @@ class Component(Scheduler):
 		"""
 		Setup the core component
 		"""
-		Scheduler.__init__(self)
 		self.running = True
 		GlobalEvents.System.on('shutdown', self.onShutdown)
 
@@ -85,21 +45,6 @@ class Component(Scheduler):
 		"""
 		logging.debug("Shutting down component %s" % self.__class__.__name__)
 		self.running = False
-
-		# Empty scheduler queue
-		self.stack = Queue.LifoQueue()
-
-	def schedule(self, function, *args, **kwargs):
-		"""
-		Override scheduler to prohibit adding new frames
-		if we are not running any more
-		"""
-
-		# Allow function scheduling only on system shutdown
-		if self.running:
-			Scheduler.schedule(self, function, *args, **kwargs)
-		else:
-			logging.warn("Attemp to schedule function call on system shutdown")
 
 	def step(self):
 		"""

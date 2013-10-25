@@ -27,15 +27,15 @@ from liveq.component import Component
 
 from liveq.classes.bus.xmppmsg import XMPPBus
 
-"""
-Core jobmanager
-"""
 class JobManagerComponent(Component):
+	"""
+	Core jobmanager
+	"""
 
-	"""
-	Setup job manager
-	"""
 	def __init__(self):
+		"""
+		Setup job manager
+		"""
 		Component.__init__(self)
 
 		# Setup logger
@@ -46,7 +46,8 @@ class JobManagerComponent(Component):
 		# This establishes a presence relationship with the given entity.
 		if isinstance(Config.EBUS, XMPPBus):
 			for jid in Config.TRUSTED_CHANNELS:
-				Config.EBUS.updateRoster( jid, name="Server", subscription="both" )
+				self.logger.debug("Subscribing %s to my roster" % jid)
+				Config.EBUS.send_presence(pto=jid, ptype='subscribe')
 
 		# Register the arbitrary channel creations that can happen
 		# when we have an incoming agent handshake
@@ -61,10 +62,10 @@ class JobManagerComponent(Component):
 		# Channel mapping
 		self.channels = { }
 
-	"""
-	Callback when a channel is up
-	"""
 	def onChannelCreation(self, channel):
+		"""
+		Callback when a channel is up
+		"""
 		self.logger.warn("[%s] Channel created" % channel.name)
 
 		# Store on local map
@@ -75,22 +76,22 @@ class JobManagerComponent(Component):
 		channel.on('close', self.onAgentOffline, channel=channel)
 		channel.on('handshake', self.onAgentHandshake, channel=channel)
 
-	"""
-	Callback when an agent becomes available
-	"""
 	def onAgentOnline(self, channel=None):
+		"""
+		Callback when an agent becomes available
+		"""
 		self.logger.warn("[%s] Channel is open" % channel.name)
 
-	"""
-	Callback when an agent becomes unavailable
-	"""
 	def onAgentOffline(self, channel=None):
+		"""
+		Callback when an agent becomes unavailable
+		"""
 		self.logger.warn("[%s] Channel is open" % channel.name)
 
-	"""
-	Callback when a handshake arrives in the bus
-	"""
 	def onAgentHandshake(self, message, channel=None):
+		"""
+		Callback when a handshake arrives in the bus
+		"""
 		self.logger.warn("[%s] Handshaking" % channel.name)
 
 		# Reply with some data
@@ -98,10 +99,28 @@ class JobManagerComponent(Component):
 				'some': 'data'
 			})
 
-	"""
-	Entry point
-	"""
+	def onBusJobStart(self, message):
+		"""
+		Callback when we have a request for new job from the bus
+		"""
+		pass
+
+	def onBusJobCancel(self, message):
+		"""
+		Callback when we have a request for new job from the bus
+		"""
+		pass
+
+	def onBusJobRestart(self, message):
+		"""
+		Callback when we have a request for new job from the bus
+		"""
+		pass
+
 	def run(self):
+		"""
+		Entry point
+		"""
 
 		# Start main FSM
 

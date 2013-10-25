@@ -14,6 +14,8 @@ The component configuration class is the following:
 
 .. autoclass:: agent.config.Config
 	:members:
+	:inherited-members:
+	:private-members:
 
 
 Component

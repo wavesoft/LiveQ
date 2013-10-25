@@ -390,6 +390,10 @@ class XMPPBus(Bus, ClientXMPP):
 		Bus.__init__(self)
 		ClientXMPP.__init__(self, "%s@%s/%s" % (config.USERNAME, config.DOMAIN, config.RESOURCE), config.PASSWORD)
 
+		# Setup auto accept
+		self.auto_subscribe=True
+		self.auto_authorize=True
+
 		# Setup logging
 		self.logger = logging.getLogger("xmpp-bus")
 
@@ -423,6 +427,11 @@ class XMPPBus(Bus, ClientXMPP):
 		# Get JID
 		jid = str(event['from'])
 
+		# Notify bare id (if exists) that the connection is now open
+		barejid = jid.split("/")[0]
+		if barejid in self.channels:
+			self.channels[barejid].trigger('open')
+
 		# Notify that channel (if exist) that the connection is now open
 		if jid in self.channels:
 			self.channels[jid].trigger('open')
@@ -434,6 +443,11 @@ class XMPPBus(Bus, ClientXMPP):
 
 		# Get JID
 		jid = str(event['from'])
+
+		# Notify bare id (if exists) that the connection is now closed
+		barejid = jid.split("/")[0]
+		if barejid in self.channels:
+			self.channels[barejid].trigger('close')
 
 		# Notify that channel (if exist) that the connection is now closed
 		if jid in self.channels:

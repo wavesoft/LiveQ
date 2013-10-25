@@ -14,6 +14,7 @@ The component configuration class is the following:
 
 .. autoclass:: jobmanager.config.Config
 	:members:
+	:inherited-members:
 
 
 Component
