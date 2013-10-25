@@ -11,13 +11,16 @@ Basic Concepts
 Since the configuration is project-wide and static, all the configuration properties and configured
 objects are available globally as static member functions of a ``Config`` class.
 
-This global ``Config`` class is defined per project and inherits one or more core ``Component Config`` classes.
-Each one of these ``Component Config`` classes has it's own static members that hold the configuration for
+This global ``Config`` class is defined per project and inherits one or more core :class:`ComponentConfig <liveq.config.ComponentConfig>` classes.
+Each one of these :class:`ComponentConfig <liveq.config.ComponentConfig>` classes has it's own static members that hold the configuration for
 each component. By inheriting from them the ``Config`` class unifies all these properties.
 
-In addition, each one of the ``Component Config`` classes, has an overridable implementation, allowing each component
+In addition, each one of the :class:`ComponentConfig <liveq.config.ComponentConfig>` classes, has an overridable implementation, allowing each component
 to be dynamically configured in the future, without any changes on the code. Each one of this implementation is called
-``Compoment Class Config`` and is defined by the user in the configuration file.
+:class:`ComponentClassConfig <liveq.config.ComponentClassConfig>` and is defined by the user in the configuration file.
+
+Optionally, each application might have some specific run-time configuration parameters. These parameters can be specified
+at configuration time and can be used individually by each component class.
 
 A simple example
 ----------------
@@ -46,7 +49,7 @@ This configuration class is intended to be used with the following project confi
 		Use this method to load configuration from file
 		"""
 		@staticmethod
-		def fromFile(confFile, runtimeConfig={}):
+		def fromFile(confFile, runtimeConfig):
 
 			# Read config file(s)
 			config = ConfigParser.SafeConfigParser()

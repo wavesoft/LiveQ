@@ -23,25 +23,25 @@ import logging
 from liveq.config import configexceptions, ComponentConfig
 from liveq.config.classes import AppConfigClass
 
-"""
-Application configuration class
-This class provides the configuration framework for instantiating application objects.
-This implementation supports only a single application.
-"""
 class AppConfig(ComponentConfig):
+	"""
+	Application configuration class.
+	This class provides the configuration framework for instantiating application objects.
+	This implementation supports only a single application.
+	"""
 
 	# General application information
 	APP_CLASS = ""
 	APP_CONFIG = None
 	APP = None
 
-	"""
-	Update class variables by reading the config file
-	contents of the specified filename
-	"""
 	@staticmethod
 	@configexceptions(section="app")
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Populate app classes
 		AppConfig.APP_CLASS = config.get("app", "class")

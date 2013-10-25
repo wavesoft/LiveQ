@@ -24,20 +24,20 @@ import os
 import uuid
 import atexit
 
-"""
-Core configuration class
-Each agent overrides this one in order to create it's own
-"""
 class CoreConfig:
+	"""
+	Core configuration class provides the system-wide configuration parameters.
+	It reads configuration from the [general] section.
+	"""
 
 	LOG_LEVEL = logging.INFO
 
-	"""
-	Update public variables by reading the config
-	contents of the specified filename
-	"""
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
+		"""
+		Update public variables by reading the config
+		contents of the specified filename
+		"""
 
 		# Setup logging level mapping
 		level_map = {
@@ -64,17 +64,20 @@ class CoreConfig:
 		# Initialize config
 		logging.basicConfig(level=CoreConfig.LOG_LEVEL, format='%(levelname)-8s %(message)s')
 
-
-"""
-Static configuration
-"""
 class StaticConfig:
+	"""
+	Static configuration
+	"""
 
-	# Unique ID of this node
+	#: Unique ID of this node
 	UUID = ""
 
 	@staticmethod
 	def initialize(staticFile=""):
+		"""
+		Initialize the static configuration class. Unless the optional parameter ``staticFile=`` is defined,
+		the static configuration will be stored on ``<current dir>/liveq.static.conf``.
+		"""
 		
 		# If we don't have an etc folder specified, use the
 		# current folder that we are in.

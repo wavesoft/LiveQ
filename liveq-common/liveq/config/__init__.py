@@ -60,13 +60,13 @@ are also available statically under the Config.<X>_CONFIG and Config.<X>_CLASS v
 import ConfigParser
 from liveq.exceptions import ConfigException
 
-"""
-Decorator to catch usual exceptions and convert them into a more
-readable ConfigException.
-
-This decorator allows config readers to care a bit less about input validation
-"""
 def configexceptions(section=""):
+	"""
+	Decorator to catch usual exceptions and convert them into a more
+	readable ConfigException.
+
+	This decorator allows config readers to care a bit less about input validation
+	"""
 	def decorator(f):
 		def safe_f(*args, **kwargs):
 			try:
@@ -91,16 +91,48 @@ def configexceptions(section=""):
 	return decorator
 
 
-"""
-Base configuration class from which Component Configurations are derrived
-
-Each subclass must implement the following static method:
-.. automethod:: ComponentConfig.fromConfig
-
-
-"""
 class ComponentConfig:
+	"""
+	This class is the base class that all the configuration components must implement.
+	During it's construction, it's static members should be initialized.
+	"""
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
+		"""
+		This function should read the configuration from ``config`` and ``runtimeConfig`` and populate the
+		static members of the ``ComponentConfig`` class accordingly.
+
+		:param config: A ``ConfigParser`` instance that parsed the config file
+		:param runtimeConfig: A dictionary object that contains the run-time configuration.
+		"""
 		raise NotImplementedError("The ComponentConfig did not implement the fromConfig() function")
+
+class ComponentClassConfig:
+	"""
+	This class is the base class that all the configuration classes must implement
+
+	This class should initialize the environment and store the configuration required on it's member
+	functions during it's construction. Upon construction, it should implement the :func:`instance` function
+	"""
+
+	@staticmethod
+	def fromClass(pkg,config):
+		"""
+		Instantiate a ComponentClassConfig class from the package specified. This function will try to find a
+		configuration class with the name ``<pkg>.Class``.
+
+		The configuration object that parsed the input file is passed on the ``config`` parameter.
+
+		:param pkg: A string with the name of the package that contains a ``Config`` class.
+		:param config: A dictionary object that contains the collected configuration from the file. Usually that's the contents of the section.
+		"""
+		raise NotImplementedError("The ComponentClassConfig did not implement the fromClass() function")
+
+	def instance(self, runtimeConfig):
+		"""
+		This function creates the actual instance of the component of the current class.
+
+		:param runtimeConfig: A dictionary that contains the run-time configuraiton of the application.
+		"""
+		raise NotImplementedError("The ComponentClassConfig did not implement the instance() function")

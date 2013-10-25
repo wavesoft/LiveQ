@@ -17,18 +17,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+from lvieq.config import ComponentClassConfig
 from liveq.exceptions import ConfigException
 
-"""
-Transport Bus Configuration
-"""
-class BusConfigClass:
+class BusConfigClass(ComponentClassConfig):
+	"""
+	Transport Bus Configuration
+	"""
 	
-	"""
-	Instantiate a config class from the package specified
-	"""
 	@staticmethod
 	def fromClass(cls,cfg):
+		"""
+		Instantiate a config class from the package specified
+		"""
+
 		# Try to load the specified package
 		try:
 			mod = __import__(cls, fromlist=['']);
@@ -49,23 +51,25 @@ class BusConfigClass:
 		# Return instance
 		return inst
 
-	"""
-	Overridable function to create a bus
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Overridable function to create a bus
+		"""
+
 		raise NotImplementedError("The BusConfigClass did not implement the instance() function")
 
 
-"""
-Database Configuration
-"""
-class DatabaseConfigClass:
+class DatabaseConfigClass(ComponentClassConfig):
+	"""
+	Database Configuration
+	"""
 	
-	"""
-	Instantiate a config class from the package specified
-	"""
 	@staticmethod
 	def fromClass(cls,cfg):
+		"""
+		Instantiate a config class from the package specified
+		"""
+
 		# Try to load the specified package
 		try:
 			mod = __import__(cls, fromlist=['']);
@@ -86,23 +90,24 @@ class DatabaseConfigClass:
 		# Return instance
 		return inst
 
-	"""
-	Overridable function to create a database
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Overridable function to create a database
+		"""
 		raise NotImplementedError("The DatabaseConfigClass did not implement the instance() function")
 
 
-"""
-Store Configuration Class
-"""
-class StoreConfigClass:
+class StoreConfigClass(ComponentClassConfig):
+	"""
+	Store Configuration Class
+	"""
 	
-	"""
-	Instantiate a config class from the package specified
-	"""
 	@staticmethod
 	def fromClass(cls,cfg):
+		"""
+		Instantiate a config class from the package specified
+		"""
+
 		# Try to load the specified package
 		try:
 			mod = __import__(cls, fromlist=['']);
@@ -123,23 +128,25 @@ class StoreConfigClass:
 		# Return instance
 		return inst
 
-	"""
-	Overridable function to create a store
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Overridable function to create a store
+		"""
+
 		raise NotImplementedError("The StoreConfigClass did not implement the instance() function")
 
 
-"""
-Application configuration class
-"""
-class AppConfigClass:
+class AppConfigClass(ComponentClassConfig):
+	"""
+	Application configuration class
+	"""
 	
-	"""
-	Instantiate a config class from the package specified
-	"""
 	@staticmethod
 	def fromClass(cls,cfg):
+		"""
+		Instantiate a config class from the package specified
+		"""
+
 		# Try to load the specified package
 		try:
 			mod = __import__(cls, fromlist=['']);
@@ -160,9 +167,10 @@ class AppConfigClass:
 		# Return instance
 		return inst
 
-	"""
-	Overridable function to create a store
-	"""
 	def instance(self, runtimeConfig):
+		"""
+		Overridable function to create a store
+		"""
+
 		raise NotImplementedError("The AppConfigClass did not implement the instance() function")
 
