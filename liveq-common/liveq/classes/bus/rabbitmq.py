@@ -33,6 +33,7 @@ import signal
 import json
 import random
 import string
+import socket
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
@@ -117,22 +118,46 @@ class RabbitMQChannel(BusChannel):
 		Incoming messages thread
 		"""
 
-		# Establish a blocking connection to the RabbitMQ server
-		connection = pika.BlockingConnection(pika.ConnectionParameters(
-					   self.bus.config.SERVER ))
+		# Auto-resume on errors
+		while self.running:
+			try:
 
-		# Create and setup channel
-		channel = connection.channel()		
+				# Establish a blocking connection to the RabbitMQ server
+				connection = pika.BlockingConnection(pika.ConnectionParameters(
+							   self.bus.config.SERVER ))
 
-		# Ensure queue exists
-		channel.queue_declare(self.qname_in)
+				# Create and setup channel
+				channel = connection.channel()		
 
-		# Setup callbacks
-		channel.basic_consume(self.onMessageArrived,
-					  queue=self.qname_in)
+				# Ensure queue exists
+				channel.queue_declare(self.qname_in)
 
-		# Start consumer
-		channel.start_consuming()
+				# Setup callbacks
+				channel.basic_consume(self.onMessageArrived,
+							  queue=self.qname_in)
+
+				# Start consumer
+				self.logger.info("RabbitMQ Input channel %s is live" % self.qname_in)
+				channel.start_consuming()
+
+			except pika.exceptions.AMQPConnectionError as e:
+
+				# We got a connection error. Retry in a while
+				self.logger.error("Connection error to RabbitMQ server %s (%s)" % (self.bus.config.SERVER, str(e)))
+				time.sleep(5)
+
+			except Exception as e:
+
+				# Check for bad file description (means we disconnected)
+				if 'Bad file descriptor' in str(e):
+					self.logger.error("Disconnected from RabbitMQ server %s (%s)" % (self.bus.config.SERVER, str(e)))
+					time.sleep(5)
+
+				# Otherwise a more critical error occured
+				else:
+					self.logger.error("RabbitMQ Error: %s" % str(e))
+					time.sleep(5)
+
 
 
 	def egressThread(self):
@@ -140,48 +165,69 @@ class RabbitMQChannel(BusChannel):
 		Outgoing messages thread
 		"""
 		
-		# Establish a blocking connection to the RabbitMQ server
-		connection = pika.BlockingConnection(pika.ConnectionParameters(
-					   self.bus.config.SERVER ))
-
-		# Create and setup channel
-		channel = connection.channel()		
-
-		# Ensure queue exists
-		channel.queue_declare(self.qname_out)
-
-		# Start listening on the outgoing queue
+		# Auto-resume on errors
 		while self.running:
-			
-			# If we have data to send, send them now
-			if not self.queue.empty():
+			try:
+				# Establish a blocking connection to the RabbitMQ server
+				connection = pika.BlockingConnection(pika.ConnectionParameters(
+							   self.bus.config.SERVER ))
 
-				# Fetch data
-				data = self.queue.get()
+				# Create and setup channel
+				channel = connection.channel()		
 
-				# Send data
-				print " [%s] Sending %r" % (self.qname_out, data['data'])
+				# Ensure queue exists
+				channel.queue_declare(self.qname_out)
 
-				# Send
-				channel.basic_publish(exchange='',
-                      routing_key=self.qname_out,
-                      properties=pika.BasicProperties(
-                            correlation_id  = data['id']
-                            ),
-                      body=data['data'])
+				# Start listening on the outgoing queue
+				self.logger.info("RabbitMQ Output channel %s is live" % self.qname_out)
+				while self.running:
+					
+					# If we have data to send, send them now
+					if not self.queue.empty():
 
-			# A small idle loop
-			time.sleep(0.05)
+						# Fetch data
+						data = self.queue.get()
+
+						# Send data
+						print " [%s] Sending %r" % (self.qname_out, data['data'])
+
+						# Send
+						channel.basic_publish(exchange='',
+		                      routing_key=self.qname_out,
+		                      properties=pika.BasicProperties(
+		                            correlation_id  = data['id']
+		                            ),
+		                      body=data['data'])
+
+					# A small idle loop
+					time.sleep(0.05)
+
+			except pika.exceptions.AMQPConnectionError as e:
+
+				# We got a connection error. Retry in a while
+				self.logger.error("Connection error to RabbitMQ server %s (%s)" % (self.bus.config.SERVER, str(e)))
+				time.sleep(5)
+
+			except Exception as e:
+
+				# Check for bad file description (means we disconnected)
+				if 'Bad file descriptor' in str(e):
+					self.logger.error("Disconnected from RabbitMQ server %s (%s)" % (self.bus.config.SERVER, str(e)))
+					time.sleep(5)
+
+				# Otherwise a more critical error occured
+				else:
+					self.logger.error("RabbitMQ Error: %s" % str(e))
+					time.sleep(5)
 
 	def systemShutdown(self):
 		"""
 		Handle shutdown
 		"""
 		
-		# Kill pika threads
-		#signal.kill( self.threadIn )
-		#signal.kill( self.threadOut )
-		pass
+		# Mark as not running
+		self.running = False
+
 
 	def onMessageArrived(self, ch, method, properties, body):
 		"""

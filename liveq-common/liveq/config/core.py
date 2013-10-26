@@ -83,7 +83,7 @@ class StaticConfig:
 		# If we don't have an etc folder specified, use the
 		# current folder that we are in.
 		if not staticFile:
-			staticFile = os.getcwd() + "/liveq.static.conf"
+			staticFile = os.getcwd() + "/static.conf.local"
 
 		# Create a config parser
 		parser = ConfigParser.RawConfigParser()
