@@ -56,7 +56,7 @@ class Config(CoreConfig, ExternalBusConfig, StaticConfig, AgentConfig):
 		config.read(confFile)
 
 		# Initialize subclasses
-		StaticConfig.initialize( os.path.dirname(confFile) + "/liveq.static.conf" )
+		StaticConfig.initialize( os.path.dirname(confFile) + "/static.conf.local" )
 		CoreConfig.fromConfig( config, runtimeConfig )
 		ExternalBusConfig.fromConfig( config, runtimeConfig )
 		AgentConfig.fromConfig( config, runtimeConfig )

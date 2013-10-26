@@ -41,5 +41,5 @@ class Config(DatabaseConfigClass):
 		"""
 		Create an SQL instance
 		"""
-		return SqliteDatabase(self.DATABASE)
+		return SqliteDatabase(self.DATABASE, threadlocals=True)
 

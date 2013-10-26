@@ -86,3 +86,9 @@ class Component:
 		while thread.is_alive():
 			time.sleep(1)
 
+	@classmethod
+	def runStatic(cls):
+		"""
+		Start the application in the same thread
+		"""
+		cls().run()

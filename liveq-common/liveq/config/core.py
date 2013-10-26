@@ -24,6 +24,8 @@ import os
 import uuid
 import atexit
 
+from liveq.events import GlobalEvents
+
 class CoreConfig:
 	"""
 	Core configuration class provides the system-wide configuration parameters.
@@ -121,4 +123,6 @@ class StaticConfig:
 			with open(StaticConfig.__staticConfigFile, 'wb') as configfile:
 				parser.write(configfile)
 
+		# Register exit and shutdown handlers
 		atexit.register( static_sync )
+		GlobalEvents.System.on('shutdown', static_sync)
