@@ -50,11 +50,14 @@ class Config(BusConfigClass):
 		"""
 		self.SERVER = config['server']
 
-		# If we are a server, flip queue directions
-		self.FLIP_QUEUES = False
-		if 'role' in config:
-			if config['role'].lower() == 'server':
-				self.FLIP_QUEUES = True
+		# Check the names of the queues we want to serve
+		# On these queues, we are flipping the :in and :out queues
+		self.FLIP_QUEUES = [ ]
+		if 'serve' in config:
+
+			# Store in array
+			self.FLIP_QUEUES = str(config['serve'].split(","))
+
 
 	def instance(self, runtimeConfig):
 		"""
@@ -95,7 +98,7 @@ class RabbitMQChannel(BusChannel):
 		self.qname_out = "%s:out" % name
 
 		# Flip names if we are told to do so by the config
-		if self.bus.config.FLIP_QUEUES:
+		if name in self.bus.config.FLIP_QUEUES:
 			tmp = self.qname_out
 			self.qname_out = self.qname_in
 			self.qname_in = tmp

@@ -16,25 +16,3 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
-
-"""
-
-"""
-class QueueSubscription:
-	
-	def leave(self):
-
-
-"""
-A queue is an object that links Jobs instances with the adapter
-"""
-class Queue:
-
-	def __init__(self, adapter):
-		self.datapter = adapter
-
-	def join(self, id):
-		pass
-
-	def create(self,id):
-		pass

@@ -62,32 +62,6 @@ class User(BaseModel):
 	bindid = CharField(index=True, unique=True)
 
 
-class AgentGroup(BaseModel):
-	"""
-	Agent groups class
-	"""
-
-	#: Add an additional UUID lookup index
-	uuid = CharField(max_length=128, index=True, unique=True)
-
-class AgentMetrics(BaseModel):
-	"""
-	Agent metrics
-	"""
-
-	#: Add an additional UUID lookup index
-	uuid = CharField(max_length=128, index=True, unique=True)
-
-	#: Ammount of CPU time spent
-	cputime = IntegerField(default=0)
-	#: Number of jobs sent to this agent
-	jobs_sent = IntegerField(default=0)
-	#: Number of jobs succeeded in this agent
-	jobs_succeed = IntegerField(default=0)
-	#: Number of jobs failed in this agent
-	jobs_failed = IntegerField(default=0)
-
-
 class Agent(BaseModel):
 	"""
 	Agent instance class
@@ -109,13 +83,40 @@ class Agent(BaseModel):
 
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
-	#: Metrics are stored on another table for performance
-	metrics = ForeignKeyField(AgentMetrics)
+
+
+class AgentGroup(BaseModel):
+	"""
+	Agent groups class
+	"""
+
+	#: Add an additional UUID lookup index
+	uuid = CharField(max_length=128, index=True, unique=True)
+
+
+class AgentMetrics(BaseModel):
+	"""
+	Agent metrics
+	"""
+
+	#: Add an additional UUID lookup index
+	uuid = CharField(max_length=128, index=True, unique=True)
+
+	#: The related agent
+	agent = ForeignKeyField(Agent)
+	#: Ammount of CPU time spent
+	cputime = IntegerField(default=0)
+	#: Number of jobs sent to this agent
+	jobs_sent = IntegerField(default=0)
+	#: Number of jobs succeeded in this agent
+	jobs_succeed = IntegerField(default=0)
+	#: Number of jobs failed in this agent
+	jobs_failed = IntegerField(default=0)
 
 
 class Lab(BaseModel):
 	"""
-	Lab instance description
+	Lab reference description
 	"""
 
 	#: Add an additional UUID lookup index that allows
@@ -124,3 +125,26 @@ class Lab(BaseModel):
 
 	#: The SVN Revision of the base tools
 	revision = IntegerField()
+
+
+class LabInstance(BaseModel):
+	"""
+	Lab instance description
+	"""
+
+	#: The related lab
+	lab = ForeignKeyField(Lab)
+	#: The user instantiated the lab
+	user = ForeignKeyField(User)
+
+class JobState(BaseModel):
+	"""
+	Jobs state table
+	"""
+
+	#: The related agent
+	agent = ForeignKeyField(Agent)
+	#: The related lab instance
+	labinstance = ForeignKeyField(LabInstance)
+
+

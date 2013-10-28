@@ -17,44 +17,40 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import zmq
+import ConfigParser
+import os.path
+from liveq.config import configexceptions
+from liveq.config.core import CoreConfig
+from liveq.config.store import StoreConfig
+from liveq.config.internalbus import InternalBusConfig
 
 """
-Decorator to mark the method as "bound to a message"
-These methods are automatically bound to the bus messages by the constructor
+Local configuration for the agent
 """
-def bus_handler(method, name):
-	method.bound_message = name
-	return method
+class InterpolatorConfig:
 
-"""
-LiveQ Bus is an ZeroMQ bidirectional PubSub Node
-"""
-class LiveQBus:
-
-	"""
-	Initialize LiveQ Bus, using the global configuration
-	"""
-	def __init__(self):
-		
-		# Register the functions marked for registry
-
-
-	"""
-	Send a message on the bus and wait for the specified response message
-	"""
-	def request(self, msg_send, msg_recv, data, timeout=1000):
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
 		pass
 
-	"""
-	Send a message on the bus and don't wait for any response
-	"""
-	def send(self, msg_send, data):
-		pass
+"""
+Create a configuration for the JOB MANAGER based on the core config
+"""
+class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig):
 
 	"""
-	Register a listener of the given message on the bus
+	Update class variables by reading the config file
+	contents of the specified filename
 	"""
-	def addListener(self, message, handler):
-		pass
+	@staticmethod
+	def fromFile(confFile, runtimeConfig):
 
+		# Read config file(s)
+		config = ConfigParser.SafeConfigParser()
+		config.read(confFile)
+
+		# Initialize subclasses
+		CoreConfig.fromConfig( config, runtimeConfig )
+		StoreConfig.fromConfig( config, runtimeConfig )
+		InternalBusConfig.fromConfig( config, runtimeConfig )
+		InterpolatorConfig.fromConfig( config, runtimeConfig )

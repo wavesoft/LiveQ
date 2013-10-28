@@ -24,5 +24,5 @@ Component
 
 The web server's core component class is the following
 
-.. autoclass:: webserver.server.LiveQServer
+.. autoclass:: webserver.server.MCPlotsServer
 	:members:

@@ -52,23 +52,20 @@ class JobAgentManager:
 
 		except Agent.DoesNotExist:
 
-			# Allocate needed components for foreign key satisfaction
-			metrics = self.getAgentMetrics(uid)
-
 			# Return the new agent entry
 			return Agent.create(uuid=uid, group=self.GLOBAL_GROUP, metrics=metrics)
 
-	def getAgentMetrics(self, uid):
+	def getAgentMetrics(self, agent):
 		"""
 		Return the metrics field for the given agent
 		"""
 
 		# Fetch metrics record or create new
 		try:
-			return AgentMetrics.get(AgentMetrics.uuid==uid)
+			return AgentMetrics.get(AgentMetrics.agent==agent)
 
 		except AgentMetrics.DoesNotExist:
-			return AgentMetrics.create(uuid=uid)
+			return AgentMetrics.create(agent=agent)
 
 	def getGroup(self, gid):
 		"""

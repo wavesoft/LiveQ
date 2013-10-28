@@ -17,17 +17,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from liveq.config import QueueConfig
+import numpy as np
+from scipy.interpolate import Rbf
 
-"""
-Configuration implementation
-"""
-class Config(QueueConfig):
+class Interpolator:
 
-	def __init__(self,config):
+	def __init__(self, store):
 		pass
-
-
-class CopilotQueue():
-	pass
 
