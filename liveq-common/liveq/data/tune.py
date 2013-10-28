@@ -59,7 +59,7 @@ class Tune(dict):
 				vRound = tv['round']
 
 			# Append index value
-			tid += (":%." + str(vDecimals) + "f") % (v / vDecimals)
+			tid += (":%." + str(vDecimals) + "f") % (v / vRound)
 
 		# Return the tune id
 		return tid

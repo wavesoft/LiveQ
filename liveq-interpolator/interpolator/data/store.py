@@ -58,14 +58,24 @@ class HistogramStore:
 		nid = tune.getNeighborhoodID()
 
 		# Fetch neighbors from neighborhood
-		neighbors = HistogramStore._unpickle( Config.STORE.get("tune-" + nid) )
+		print " - Key: %s" % nid
+		ibuf = Config.STORE.get("tune-" + nid)
+		if ibuf == None:
+			print " - I.Buf: NONE"
+		else:
+			print " - I.Buf: %i" % len(buf)
+
+		neighbors = HistogramStore._unpickle( ibuf )
+		print " - Entries: %i" % len(neighbors)
 
 		# Append collection to the neighborhood
 		collection.tune = tune
 		neighbors.append(collection)
 
 		# Put neighbors back to the neighborhood store
-		Config.STORE.set("tune-" + nid, HistogramStore._pickle(neighbors) )
+		buf = HistogramStore._pickle(neighbors)
+		print " - Buf: %i" % len(buf)
+		Config.STORE.set("tune-" + nid, buf )
 
 	@staticmethod
 	def getNeighborhood(tune):

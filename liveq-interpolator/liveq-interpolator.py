@@ -99,7 +99,7 @@ def genObservables(number=50, bins=10):
 	return hc
 
 # Populate database with random data
-for i in range(0,100):
+for i in range(0,1000):
 
 	print "Entry %i:" % i
 
@@ -112,9 +112,7 @@ for i in range(0,100):
 	print "ok (%i ms)" % (t_after - t_before)
 
 	# Store
-	print " = Store: ",
 	t_before = int(round(time.time() * 1000))
 	HistogramStore.append( tune, data )
 	t_after = int(round(time.time() * 1000))
-	print "ok (%i ms)" % (t_after - t_before)
-	
+	print " = Store: ok (%i ms)" % (t_after - t_before)
