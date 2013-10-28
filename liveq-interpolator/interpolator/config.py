@@ -23,6 +23,7 @@ from liveq.config import configexceptions
 from liveq.config.core import CoreConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
+from liveq.config.tuneaddressing import TuneAddressingConfig
 
 """
 Local configuration for the agent
@@ -36,7 +37,7 @@ class InterpolatorConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig):
+class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig, TuneAddressingConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -54,3 +55,4 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig):
 		StoreConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		InterpolatorConfig.fromConfig( config, runtimeConfig )
+		TuneAddressingConfig.fromConfig( config, runtimeConfig )
