@@ -161,14 +161,19 @@ class HistogramCollection:
 		"""
 		Return the histogram object on the given index
 		"""
-		return self.historefs.__getitem__(self, index)
+		return self.historefs.__getitem__(index)
 
 	def __iter__(self):
 		"""
 		Return the iterator in the histogram references
 		"""
-		return self.historefs.__iter__(self)
+		return self.historefs.__iter__()
 
+	def __len__(self):
+		"""
+		Return the number of histograms
+		"""
+		return self.historefs.__len__()
 
 class Histogram:
 	"""

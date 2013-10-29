@@ -24,6 +24,50 @@ class Tune(dict):
 	The Tune object provides the basic parameters
 	"""
 
+	#: Pre-cached, sorted keys for each known lab id
+	LAB_TUNE_KEYS = { }
+
+	@staticmethod
+	def fromLabData(labid, data):
+		"""
+		Create a new tune instance using tha data labels from the given 
+		lab ID and the data given from the specified array
+		"""
+
+		# Check if we have the answer cached
+		ksorted = []
+		if labid in Tune.LAB_TUNE_KEYS:
+			ksorted = Tune.LAB_TUNE_KEYS[labid]
+
+		else:
+
+			# Otherwise, generate them
+			# TODO: Actually implement this
+			keys = []
+			i = 0
+			for v in data:
+				keys.append(chr(64 + i))
+				i += 1
+
+			# Sort keys
+			ksorted = sorted(keys)
+
+			# Store them on cache
+			Tune.LAB_TUNE_KEYS[labid] = ksorted
+
+		# Create tune instance
+		tune = Tune(labid=labid)
+
+		# Assign key/values
+		# TODO: Optimzie?
+		i = 0 
+		for v in data:
+			tune[ksorted[i]] = v
+			i += 1
+
+		# Return tune
+		return tune
+
 	def getNeighborhoodID(self, labid=None):
 		"""
 		Generate a unique ID for the specified tune set that can be used
@@ -81,10 +125,7 @@ class Tune(dict):
 		"""
 		
 		# Get LabID from kwargs
-		self.labid = None
-		if 'labid' in kwargs:
-			self.labid = kwargs['labid']
-			del kwargs['labid']
+		self.labid = kwargs.pop('labid', None)
 
 		# Setup dict with the rest arguments
 		dict.__init__(self, *args, **kwargs)

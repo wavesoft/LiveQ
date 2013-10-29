@@ -63,6 +63,8 @@ tune_keys = [ "Main:numberOfEvents","Main:timesToShow","Main:timesAllowErrors",
 		      "PhaseSpace:pTHatMin","PhaseSpace:pTHatMax","PhaseSpace:mHatMin","PhaseSpace:mHatMax",
 		      "ParticleDecays:limitTau0","ParticleDecays:tau0Max","Tune:pp" ]
 
+tune_keys = ['a','b','c','d']
+
 # Generate a random tune
 def genTune(labid):
 	
@@ -106,7 +108,7 @@ for i in range(0,1000):
 	# Generate random data
 	print " = Generate: ",
 	t_before = int(round(time.time() * 1000))
-	tune = genTune("test")
+	tune = genTune(1)
 	data = genObservables()
 	t_after = int(round(time.time() * 1000))
 	print "ok (%i ms)" % (t_after - t_before)
