@@ -25,26 +25,34 @@ from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.tuneaddressing import TuneAddressingConfig
 
-"""
-Local configuration for the agent
-"""
 class InterpolatorConfig:
+	"""
+	Local configuration for the interpolator
+	"""
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		pass
 
+<<<<<<< HEAD
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
 class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig, TuneAddressingConfig):
 
+=======
+class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig):
+>>>>>>> Working on job manager
 	"""
-	Update class variables by reading the config file
-	contents of the specified filename
+	Create a configuration for the INTERPOLATOR based on the core config
 	"""
+
 	@staticmethod
 	def fromFile(confFile, runtimeConfig):
+		"""
+		Update class variables by reading the config file
+		contents of the specified filename
+		"""
 
 		# Read config file(s)
 		config = ConfigParser.SafeConfigParser()

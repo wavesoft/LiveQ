@@ -26,9 +26,9 @@ from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
 from liveq.classes.bus.xmppmsg import XMPPBus
-from liveq.utils.fsm import FSM
+from liveq.utils.fsm import SimpleFSM
 
-class AgentComponent(Component, FSM):
+class AgentComponent(Component, SimpleFSM):
 	"""
 	Core agent
 	"""
@@ -133,5 +133,5 @@ class AgentComponent(Component, FSM):
 		"""
 		Run the next cycle of the FSM
 		"""
-		self.continueFSM()
+		self.stepFSM()
 		time.sleep(0.5)

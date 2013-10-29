@@ -17,9 +17,44 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class FSM:
+import uuid
+
+from liveq.config.store import StoreConfig
+
+class StoredFSM:
 	"""
-	Simple Finite-State-Machine.
+	A finite-state machine that is backed by an entry on the store.
+
+	.. note::
+		This class assumes that the component that uses it has already initialized a
+		:class:`StoreConfig` configuration.
+
+	"""
+
+	def __init__(self, id=None):
+		"""
+		Initialize StoredFSM
+		"""
+
+		# Make sure we have a StoreConfig initialized
+		if StoreConfig.STORE == None:
+			raise ConfigException("Using StoreFSM class wit no initialized StoreConfig!")
+
+		# Allocate an ID if it's missing
+		if not id:
+			id = str(uuid.uuid4())
+
+		# Store the FSM id
+		self._id = id
+
+		# Store the state information
+		self.state = { }
+		
+
+
+class SimpleFSM:
+	"""
+	A (very) Simple Finite-State-Machine implementation.
 	"""
 
 	def __init__(self):
@@ -28,7 +63,7 @@ class FSM:
 		"""
 		self.nextFunction = None
 
-	def continueFSM(self):
+	def stepFSM(self):
 		"""
 		Continues with the next FSM entry
 		"""
@@ -47,3 +82,4 @@ class FSM:
 		"""
 		if self.nextFunction != function:
 			self.nextFunction = function
+
