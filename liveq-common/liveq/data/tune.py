@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import numpy as np
 from liveq.config.tuneaddressing import TuneAddressingConfig
 
 class Tune(dict):
@@ -46,7 +47,7 @@ class Tune(dict):
 			keys = []
 			i = 0
 			for v in data:
-				keys.append(chr(64 + i))
+				keys.append(chr(65 + i))
 				i += 1
 
 			# Sort keys
@@ -59,11 +60,13 @@ class Tune(dict):
 		tune = Tune(labid=labid)
 
 		# Assign key/values
-		# TODO: Optimzie?
 		i = 0 
 		for v in data:
 			tune[ksorted[i]] = v
 			i += 1
+
+		# Assign precached data
+		tune._values = data
 
 		# Return tune
 		return tune
@@ -113,11 +116,17 @@ class Tune(dict):
 		Return the values as required by the interpolator
 		"""
 
-		# Sort keys ascending
-		ksorted = sorted(self.keys())
+		# Warm cache if it's cold
+		if self._values == None:
 
-		# Return a list of values sorted by key
-		return [ self[k] for k in ksorted ]
+			# Sort keys ascending
+			ksorted = sorted(self.keys())
+
+			# Cache values
+			self._values = np.array( [ self[k] for k in ksorted ] )
+
+		# Return them
+		return self._values
 
 	def __init__(self, *args, **kwargs):
 		"""
@@ -127,5 +136,15 @@ class Tune(dict):
 		# Get LabID from kwargs
 		self.labid = kwargs.pop('labid', None)
 
+		# Reset values
+		self._values = None
+
 		# Setup dict with the rest arguments
 		dict.__init__(self, *args, **kwargs)
+
+	def __setitem__(self, k, v):
+		"""
+		Override itemset operator in order to invalidate the value cache
+		"""
+		self._values = None
+		dict.__setitem__(self,k,v)

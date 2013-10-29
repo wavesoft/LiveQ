@@ -195,7 +195,7 @@ class Rbf(object):
 		# Pop data entry
 		data = kwargs.pop('data')
 		if not data:
-			raise ValueError("data= argument was not specified!")
+			raise ValueError("data= kwargument was not specified!")
 
 		# Process arguments
 		self.xi = asarray([asarray(a, dtype=float_).flatten()
@@ -213,7 +213,6 @@ class Rbf(object):
 
 			# Make di array and swap axes
 			# TODO: Try to skip python loop (use only numpy)
-			#self.di = 
 			self.di = swapaxes(array( [h.data for h in data] ), 0, 1)
 
 			if not all([x.size == len(data) for x in self.xi]):

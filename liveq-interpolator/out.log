@@ -1,0 +1,11003 @@
+Entry 0:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 5 ms
+ - I.Buf: 229848
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241390
+ - Store: 3 ms
+ = Store: ok (22 ms)
+Entry 1:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 2 ms
+ - I.Buf: 252806
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264372
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 2:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 3 ms
+ - I.Buf: 344818
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356303
+ - Store: 2 ms
+ = Store: ok (29 ms)
+Entry 3:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 264362
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275897
+ - Store: 1 ms
+ = Store: ok (22 ms)
+Entry 4:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 2 ms
+ - I.Buf: 183845
+ - Unpickle: 2 ms
+ - Entries: 7
+ - Pickle: 9 ms
+ - Buf: 195338
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 5:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 2 ms
+ - I.Buf: 229863
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241354
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 6:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 287328
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298859
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 7:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 3 ms
+ - I.Buf: 241354
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252833
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 8:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 6 ms
+ - I.Buf: 793223
+ - Unpickle: 22 ms
+ - Entries: 60
+ - Pickle: 40 ms
+ - Buf: 804732
+ - Store: 4 ms
+ = Store: ok (73 ms)
+Entry 9:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 202 ms
+ - I.Buf: 287348
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298870
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 10:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 205 ms
+ - I.Buf: 459790
+ - Unpickle: 11 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471249
+ - Store: 3 ms
+ = Store: ok (241 ms)
+Entry 11:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 218319
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229855
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 12:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 207 ms
+ - I.Buf: 298859
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310323
+ - Store: 2 ms
+ = Store: ok (229 ms)
+Entry 13:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 3 ms
+ - I.Buf: 206828
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218354
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 14:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1307 ms
+ - I.Buf: 804732
+ - Unpickle: 23 ms
+ - Entries: 61
+ - Pickle: 38 ms
+ - Buf: 816237
+ - Store: 5 ms
+ = Store: ok (1374 ms)
+Entry 15:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 207 ms
+ - I.Buf: 505774
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 22 ms
+ - Buf: 517293
+ - Store: 3 ms
+ = Store: ok (247 ms)
+Entry 16:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 229804
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241314
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 17:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 2 ms
+ - I.Buf: 195338
+ - Unpickle: 4 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206861
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 18:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 1 ms
+ - I.Buf: 218354
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229881
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 19:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 126327
+ - Unpickle: 1 ms
+ - Entries: 2
+ - Pickle: 6 ms
+ - Buf: 137850
+ - Store: 1 ms
+ = Store: ok (9 ms)
+Entry 20:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 200 ms
+ - I.Buf: 229855
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241375
+ - Store: 2 ms
+ = Store: ok (217 ms)
+Entry 21:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 5 ms
+ - I.Buf: 551795
+ - Unpickle: 15 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563265
+ - Store: 5 ms
+ = Store: ok (51 ms)
+Entry 22:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 410 ms
+ - I.Buf: 528804
+ - Unpickle: 18 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540292
+ - Store: 3 ms
+ = Store: ok (456 ms)
+Entry 23:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 4 ms
+ - I.Buf: 517293
+ - Unpickle: 14 ms
+ - Entries: 36
+ - Pickle: 24 ms
+ - Buf: 528799
+ - Store: 3 ms
+ = Store: ok (46 ms)
+Entry 24:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 845 ms
+ - I.Buf: 471249
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 21 ms
+ - Buf: 482809
+ - Store: 3 ms
+ = Store: ok (882 ms)
+Entry 25:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 515 ms
+ - I.Buf: 563265
+ - Unpickle: 14 ms
+ - Entries: 40
+ - Pickle: 26 ms
+ - Buf: 574806
+ - Store: 4 ms
+ = Store: ok (560 ms)
+Entry 26:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 203 ms
+ - I.Buf: 287340
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298783
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 27:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 1 ms
+ - I.Buf: 183803
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 9 ms
+ - Buf: 195355
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 28:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 275897
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287338
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 29:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 209 ms
+ - I.Buf: 298783
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310296
+ - Store: 2 ms
+ = Store: ok (230 ms)
+Entry 30:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 1 ms
+ - I.Buf: 160857
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172259
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 31:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 195361
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206849
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 32:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 218316
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229827
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 33:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 206845
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218332
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 34:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 218318
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229805
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 35:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 207 ms
+ - I.Buf: 344854
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 16 ms
+ - Buf: 356353
+ - Store: 2 ms
+ = Store: ok (234 ms)
+Entry 36:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 195391
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206825
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 37:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 195366
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206801
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 38:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 206 ms
+ - I.Buf: 448366
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459820
+ - Store: 3 ms
+ = Store: ok (241 ms)
+Entry 39:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 183904
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195309
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 40:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 301 ms
+ - I.Buf: 574806
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586291
+ - Store: 3 ms
+ = Store: ok (346 ms)
+Entry 41:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 1 ms
+ - I.Buf: 183823
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195330
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 42:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1739 ms
+ - I.Buf: 816237
+ - Unpickle: 22 ms
+ - Entries: 62
+ - Pickle: 39 ms
+ - Buf: 827712
+ - Store: 5 ms
+ = Store: ok (1806 ms)
+Entry 43:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 2 ms
+ - I.Buf: 287346
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298781
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 44:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 376 ms
+ - I.Buf: 264375
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275841
+ - Store: 2 ms
+ = Store: ok (396 ms)
+Entry 45:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 200 ms
+ - I.Buf: 356303
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367801
+ - Store: 3 ms
+ = Store: ok (227 ms)
+Entry 46:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 1 ms
+ - I.Buf: 218354
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229872
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 47:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 7 ms
+ - I.Buf: 827712
+ - Unpickle: 23 ms
+ - Entries: 63
+ - Pickle: 40 ms
+ - Buf: 839223
+ - Store: 5 ms
+ = Store: ok (76 ms)
+Entry 48:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 406 ms
+ - I.Buf: 839223
+ - Unpickle: 23 ms
+ - Entries: 64
+ - Pickle: 39 ms
+ - Buf: 850702
+ - Store: 6 ms
+ = Store: ok (475 ms)
+Entry 49:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 229805
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241338
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 50:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:0
+ - Fetch: 2 ms
+ - I.Buf: 137815
+ - Unpickle: 1 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149333
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 51:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 3 ms
+ - I.Buf: 298870
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310371
+ - Store: 2 ms
+ = Store: ok (25 ms)
+Entry 52:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 206 ms
+ - I.Buf: 367801
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379275
+ - Store: 3 ms
+ = Store: ok (234 ms)
+Entry 53:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 183825
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195384
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 54:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 409 ms
+ - I.Buf: 850702
+ - Unpickle: 28 ms
+ - Entries: 65
+ - Pickle: 41 ms
+ - Buf: 862257
+ - Store: 6 ms
+ = Store: ok (485 ms)
+Entry 55:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 197 ms
+ - I.Buf: 321839
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333265
+ - Store: 2 ms
+ = Store: ok (222 ms)
+Entry 56:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 409 ms
+ - I.Buf: 505796
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 24 ms
+ - Buf: 517322
+ - Store: 5 ms
+ = Store: ok (452 ms)
+Entry 57:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 2 ms
+ - I.Buf: 264372
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275866
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 58:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 275856
+ - Unpickle: 8 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287338
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 59:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 209 ms
+ - I.Buf: 540292
+ - Unpickle: 15 ms
+ - Entries: 38
+ - Pickle: 26 ms
+ - Buf: 551786
+ - Store: 4 ms
+ = Store: ok (255 ms)
+Entry 60:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 241375
+ - Unpickle: 6 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252824
+ - Store: 3 ms
+ = Store: ok (24 ms)
+Entry 61:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 3 ms
+ - I.Buf: 206849
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218352
+ - Store: 3 ms
+ = Store: ok (18 ms)
+Entry 62:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 2 ms
+ - I.Buf: 229864
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241361
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 63:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 3 ms
+ - I.Buf: 298828
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 14 ms
+ - Buf: 310353
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 64:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 1 ms
+ - I.Buf: 149359
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160872
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 65:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:0
+ - Fetch: 205 ms
+ - I.Buf: 126370
+ - Unpickle: 1 ms
+ - Entries: 2
+ - Pickle: 6 ms
+ - Buf: 137844
+ - Store: 1 ms
+ = Store: ok (213 ms)
+Entry 66:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 229827
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 11 ms
+ - Buf: 241353
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 67:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 9 ms
+ - I.Buf: 862257
+ - Unpickle: 27 ms
+ - Entries: 66
+ - Pickle: 45 ms
+ - Buf: 873735
+ - Store: 5 ms
+ = Store: ok (88 ms)
+Entry 68:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 3 ms
+ - I.Buf: 241390
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252828
+ - Store: 3 ms
+ = Store: ok (22 ms)
+Entry 69:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 298851
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310367
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 70:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 203 ms
+ - I.Buf: 310323
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321871
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 71:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 235 ms
+ - I.Buf: 528799
+ - Unpickle: 15 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540307
+ - Store: 3 ms
+ = Store: ok (278 ms)
+Entry 72:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 223 ms
+ - I.Buf: 252828
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 12 ms
+ - Buf: 264342
+ - Store: 1 ms
+ = Store: ok (242 ms)
+Entry 73:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 208 ms
+ - I.Buf: 356353
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367872
+ - Store: 3 ms
+ = Store: ok (235 ms)
+Entry 74:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 4 ms
+ - I.Buf: 459820
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471294
+ - Store: 3 ms
+ = Store: ok (41 ms)
+Entry 75:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:0
+ - Fetch: 1 ms
+ - I.Buf: 149360
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160870
+ - Store: 1 ms
+ = Store: ok (11 ms)
+Entry 76:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 211 ms
+ - I.Buf: 873735
+ - Unpickle: 24 ms
+ - Entries: 67
+ - Pickle: 42 ms
+ - Buf: 885214
+ - Store: 5 ms
+ = Store: ok (284 ms)
+Entry 77:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 612 ms
+ - I.Buf: 885214
+ - Unpickle: 26 ms
+ - Entries: 68
+ - Pickle: 43 ms
+ - Buf: 896712
+ - Store: 4 ms
+ = Store: ok (687 ms)
+Entry 78:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 200 ms
+ - I.Buf: 310367
+ - Unpickle: 6 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321887
+ - Store: 2 ms
+ = Store: ok (223 ms)
+Entry 79:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 310366
+ - Unpickle: 6 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321893
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 80:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 201 ms
+ - I.Buf: 540281
+ - Unpickle: 15 ms
+ - Entries: 38
+ - Pickle: 24 ms
+ - Buf: 551771
+ - Store: 3 ms
+ = Store: ok (244 ms)
+Entry 81:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 183832
+ - Unpickle: 2 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195375
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 82:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:2
+ - Fetch: 1 ms
+ - I.Buf: 114869
+ - Unpickle: 1 ms
+ - Entries: 1
+ - Pickle: 5 ms
+ - Buf: 126359
+ - Store: 1 ms
+ = Store: ok (8 ms)
+Entry 83:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 1 ms
+ - I.Buf: 206805
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218345
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 84:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 4 ms
+ - I.Buf: 379275
+ - Unpickle: 12 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390783
+ - Store: 3 ms
+ = Store: ok (36 ms)
+Entry 85:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 612 ms
+ - I.Buf: 896712
+ - Unpickle: 26 ms
+ - Entries: 69
+ - Pickle: 43 ms
+ - Buf: 908189
+ - Store: 5 ms
+ = Store: ok (688 ms)
+Entry 86:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 1 ms
+ - I.Buf: 160873
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172342
+ - Store: 1 ms
+ = Store: ok (11 ms)
+Entry 87:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 3394 ms
+ - I.Buf: 908189
+ - Unpickle: 25 ms
+ - Entries: 70
+ - Pickle: 43 ms
+ - Buf: 919693
+ - Store: 6 ms
+ = Store: ok (3470 ms)
+Entry 88:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 412 ms
+ - I.Buf: 551786
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 26 ms
+ - Buf: 563318
+ - Store: 3 ms
+ = Store: ok (456 ms)
+Entry 89:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 204 ms
+ - I.Buf: 275841
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287346
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 90:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 208 ms
+ - I.Buf: 551771
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563325
+ - Store: 4 ms
+ = Store: ok (251 ms)
+Entry 91:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 204 ms
+ - I.Buf: 264363
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275868
+ - Store: 2 ms
+ = Store: ok (223 ms)
+Entry 92:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 218292
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229804
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 93:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 195384
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206856
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 94:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 241361
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252770
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 95:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 206801
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218309
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 96:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 241344
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252798
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 97:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 2 ms
+ - I.Buf: 206861
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218343
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 98:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 218321
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229830
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 99:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:1
+ - Fetch: 1 ms
+ - I.Buf: 126323
+ - Unpickle: 1 ms
+ - Entries: 2
+ - Pickle: 5 ms
+ - Buf: 137837
+ - Store: 1 ms
+ = Store: ok (8 ms)
+Entry 100:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 1 ms
+ - I.Buf: 160840
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172300
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 101:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 2 ms
+ - I.Buf: 252833
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264325
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 102:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 386 ms
+ - I.Buf: 563318
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 27 ms
+ - Buf: 574825
+ - Store: 4 ms
+ = Store: ok (432 ms)
+Entry 103:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 206 ms
+ - I.Buf: 321893
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333347
+ - Store: 2 ms
+ = Store: ok (231 ms)
+Entry 104:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 414 ms
+ - I.Buf: 919693
+ - Unpickle: 26 ms
+ - Entries: 71
+ - Pickle: 45 ms
+ - Buf: 931206
+ - Store: 5 ms
+ = Store: ok (492 ms)
+Entry 105:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 207 ms
+ - I.Buf: 517378
+ - Unpickle: 13 ms
+ - Entries: 36
+ - Pickle: 24 ms
+ - Buf: 528877
+ - Store: 3 ms
+ = Store: ok (248 ms)
+Entry 106:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 160866
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172307
+ - Store: 1 ms
+ = Store: ok (12 ms)
+Entry 107:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 199 ms
+ - I.Buf: 586291
+ - Unpickle: 16 ms
+ - Entries: 42
+ - Pickle: 26 ms
+ - Buf: 597800
+ - Store: 4 ms
+ = Store: ok (246 ms)
+Entry 108:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 4 ms
+ - I.Buf: 482809
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494321
+ - Store: 3 ms
+ = Store: ok (41 ms)
+Entry 109:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:0
+ - Fetch: 2 ms
+ - I.Buf: 206848
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 8 ms
+ - Buf: 218339
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 110:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 229881
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241398
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 111:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 207 ms
+ - I.Buf: 494321
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505802
+ - Store: 3 ms
+ = Store: ok (247 ms)
+Entry 112:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 209 ms
+ - I.Buf: 471294
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482802
+ - Store: 3 ms
+ = Store: ok (246 ms)
+Entry 113:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 146 ms
+ - I.Buf: 252798
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264348
+ - Store: 2 ms
+ = Store: ok (164 ms)
+Entry 114:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:2:0
+ - Fetch: 1 ms
+ - I.Buf: 160859
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172286
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 115:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 4 ms
+ - I.Buf: 528877
+ - Unpickle: 18 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540340
+ - Store: 3 ms
+ = Store: ok (50 ms)
+Entry 116:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 241398
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252845
+ - Store: 1 ms
+ = Store: ok (20 ms)
+Entry 117:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 206825
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218341
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 118:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 206 ms
+ - I.Buf: 540307
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 25 ms
+ - Buf: 551805
+ - Store: 3 ms
+ = Store: ok (249 ms)
+Entry 119:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 5 ms
+ - I.Buf: 597800
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 28 ms
+ - Buf: 609284
+ - Store: 5 ms
+ = Store: ok (55 ms)
+Entry 120:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 4 ms
+ - I.Buf: 505802
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517254
+ - Store: 4 ms
+ = Store: ok (44 ms)
+Entry 121:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:2
+ - Fetch: 1 ms
+ - I.Buf: 183882
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195390
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 122:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 195361
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206770
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 123:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 195355
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206820
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 124:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:1
+ - Fetch: 3 ms
+ - I.Buf: 206802
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218303
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 125:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 4 ms
+ - I.Buf: 574825
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 27 ms
+ - Buf: 586267
+ - Store: 4 ms
+ = Store: ok (51 ms)
+Entry 126:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 252845
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 12 ms
+ - Buf: 264320
+ - Store: 1 ms
+ = Store: ok (22 ms)
+Entry 127:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 4 ms
+ - I.Buf: 517254
+ - Unpickle: 13 ms
+ - Entries: 36
+ - Pickle: 23 ms
+ - Buf: 528820
+ - Store: 4 ms
+ = Store: ok (45 ms)
+Entry 128:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 201 ms
+ - I.Buf: 367872
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379331
+ - Store: 2 ms
+ = Store: ok (229 ms)
+Entry 129:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 209 ms
+ - I.Buf: 609284
+ - Unpickle: 16 ms
+ - Entries: 44
+ - Pickle: 27 ms
+ - Buf: 620770
+ - Store: 4 ms
+ = Store: ok (258 ms)
+Entry 130:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 209 ms
+ - I.Buf: 540340
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 24 ms
+ - Buf: 551831
+ - Store: 3 ms
+ = Store: ok (251 ms)
+Entry 131:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 160872
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172331
+ - Store: 1 ms
+ = Store: ok (12 ms)
+Entry 132:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 206 ms
+ - I.Buf: 379331
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390847
+ - Store: 2 ms
+ = Store: ok (235 ms)
+Entry 133:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 195390
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206804
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 134:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 787 ms
+ - I.Buf: 931206
+ - Unpickle: 27 ms
+ - Entries: 72
+ - Pickle: 44 ms
+ - Buf: 942765
+ - Store: 6 ms
+ = Store: ok (866 ms)
+Entry 135:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 1 ms
+ - I.Buf: 183839
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195386
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 136:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 264348
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275822
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 137:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 3 ms
+ - I.Buf: 287338
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298835
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 138:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 1 ms
+ - I.Buf: 172331
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183831
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 139:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 218352
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229847
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 140:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 208 ms
+ - I.Buf: 620770
+ - Unpickle: 16 ms
+ - Entries: 45
+ - Pickle: 29 ms
+ - Buf: 632249
+ - Store: 4 ms
+ = Store: ok (258 ms)
+Entry 141:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 610 ms
+ - I.Buf: 632249
+ - Unpickle: 17 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643797
+ - Store: 4 ms
+ = Store: ok (661 ms)
+Entry 142:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 198 ms
+ - I.Buf: 528820
+ - Unpickle: 19 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540240
+ - Store: 3 ms
+ = Store: ok (245 ms)
+Entry 143:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 2215 ms
+ - I.Buf: 942765
+ - Unpickle: 27 ms
+ - Entries: 73
+ - Pickle: 45 ms
+ - Buf: 954224
+ - Store: 6 ms
+ = Store: ok (2294 ms)
+Entry 144:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 195330
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206813
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 145:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:2
+ - Fetch: 1 ms
+ - I.Buf: 160837
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172371
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 146:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 3 ms
+ - I.Buf: 287338
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298829
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 147:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 275868
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287331
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 148:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 229847
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241374
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 149:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 333347
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344848
+ - Store: 3 ms
+ = Store: ok (28 ms)
+Entry 150:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 412 ms
+ - I.Buf: 954224
+ - Unpickle: 27 ms
+ - Entries: 74
+ - Pickle: 50 ms
+ - Buf: 965721
+ - Store: 6 ms
+ = Store: ok (497 ms)
+Entry 151:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 241338
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252800
+ - Store: 1 ms
+ = Store: ok (20 ms)
+Entry 152:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 406 ms
+ - I.Buf: 540240
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 25 ms
+ - Buf: 551806
+ - Store: 4 ms
+ = Store: ok (450 ms)
+Entry 153:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 195 ms
+ - I.Buf: 310296
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321767
+ - Store: 2 ms
+ = Store: ok (219 ms)
+Entry 154:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 198 ms
+ - I.Buf: 551831
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 26 ms
+ - Buf: 563353
+ - Store: 3 ms
+ = Store: ok (242 ms)
+Entry 155:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 218332
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229818
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 156:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 343 ms
+ - I.Buf: 563353
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 26 ms
+ - Buf: 574873
+ - Store: 3 ms
+ = Store: ok (388 ms)
+Entry 157:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 5 ms
+ - I.Buf: 563325
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 26 ms
+ - Buf: 574830
+ - Store: 3 ms
+ = Store: ok (50 ms)
+Entry 158:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:0
+ - Fetch: 2 ms
+ - I.Buf: 160870
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172325
+ - Store: 2 ms
+ = Store: ok (13 ms)
+Entry 159:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 4 ms
+ - I.Buf: 390783
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402304
+ - Store: 3 ms
+ = Store: ok (33 ms)
+Entry 160:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 3 ms
+ - I.Buf: 275866
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287346
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 161:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 172379
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183854
+ - Store: 2 ms
+ = Store: ok (13 ms)
+Entry 162:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 206 ms
+ - I.Buf: 264342
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275875
+ - Store: 2 ms
+ = Store: ok (225 ms)
+Entry 163:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 241374
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252855
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 164:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 229830
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241366
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 165:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 201 ms
+ - I.Buf: 287346
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298843
+ - Store: 2 ms
+ = Store: ok (222 ms)
+Entry 166:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 198 ms
+ - I.Buf: 321871
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333310
+ - Store: 2 ms
+ = Store: ok (222 ms)
+Entry 167:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 517322
+ - Unpickle: 13 ms
+ - Entries: 36
+ - Pickle: 23 ms
+ - Buf: 528844
+ - Store: 4 ms
+ = Store: ok (43 ms)
+Entry 168:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 206770
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218255
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 169:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 241314
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252814
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 170:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 205 ms
+ - I.Buf: 551806
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563306
+ - Store: 3 ms
+ = Store: ok (249 ms)
+Entry 171:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 204 ms
+ - I.Buf: 252800
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264320
+ - Store: 2 ms
+ = Store: ok (222 ms)
+Entry 172:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 2 ms
+ - I.Buf: 218343
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229839
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 173:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 206856
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218381
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 174:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:0
+ - Fetch: 1 ms
+ - I.Buf: 126332
+ - Unpickle: 1 ms
+ - Entries: 2
+ - Pickle: 6 ms
+ - Buf: 137815
+ - Store: 1 ms
+ = Store: ok (9 ms)
+Entry 175:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 275875
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287393
+ - Store: 2 ms
+ = Store: ok (22 ms)
+Entry 176:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 195309
+ - Unpickle: 6 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206875
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 177:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 202 ms
+ - I.Buf: 310371
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321884
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 178:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 229804
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241384
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 179:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 3 ms
+ - I.Buf: 172364
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183892
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 180:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 203 ms
+ - I.Buf: 287331
+ - Unpickle: 7 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298842
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 181:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 206875
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218322
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 182:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 241366
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252813
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 183:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 416 ms
+ - I.Buf: 965721
+ - Unpickle: 27 ms
+ - Entries: 75
+ - Pickle: 48 ms
+ - Buf: 977234
+ - Store: 6 ms
+ = Store: ok (499 ms)
+Entry 184:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 208 ms
+ - I.Buf: 482802
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494296
+ - Store: 3 ms
+ = Store: ok (246 ms)
+Entry 185:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 210 ms
+ - I.Buf: 321884
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333335
+ - Store: 3 ms
+ = Store: ok (234 ms)
+Entry 186:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 3 ms
+ - I.Buf: 241384
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252783
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 187:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 413 ms
+ - I.Buf: 563306
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 25 ms
+ - Buf: 574834
+ - Store: 4 ms
+ = Store: ok (458 ms)
+Entry 188:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 333310
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 14 ms
+ - Buf: 344828
+ - Store: 3 ms
+ = Store: ok (28 ms)
+Entry 189:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 207 ms
+ - I.Buf: 551805
+ - Unpickle: 15 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563348
+ - Store: 3 ms
+ = Store: ok (251 ms)
+Entry 190:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 612 ms
+ - I.Buf: 977234
+ - Unpickle: 28 ms
+ - Entries: 76
+ - Pickle: 48 ms
+ - Buf: 988714
+ - Store: 6 ms
+ = Store: ok (696 ms)
+Entry 191:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 1508 ms
+ - I.Buf: 574830
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586314
+ - Store: 4 ms
+ = Store: ok (1554 ms)
+Entry 192:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 526 ms
+ - I.Buf: 586314
+ - Unpickle: 15 ms
+ - Entries: 42
+ - Pickle: 27 ms
+ - Buf: 597828
+ - Store: 4 ms
+ = Store: ok (573 ms)
+Entry 193:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:2:0
+ - Fetch: 1 ms
+ - I.Buf: 160857
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172306
+ - Store: 1 ms
+ = Store: ok (12 ms)
+Entry 194:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 275822
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287364
+ - Store: 2 ms
+ = Store: ok (22 ms)
+Entry 195:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 203 ms
+ - I.Buf: 310353
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321823
+ - Store: 2 ms
+ = Store: ok (227 ms)
+Entry 196:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 287364
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298855
+ - Store: 3 ms
+ = Store: ok (23 ms)
+Entry 197:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 406 ms
+ - I.Buf: 563348
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 25 ms
+ - Buf: 574866
+ - Store: 4 ms
+ = Store: ok (451 ms)
+Entry 198:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 4646 ms
+ - I.Buf: 597828
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 28 ms
+ - Buf: 609316
+ - Store: 4 ms
+ = Store: ok (4695 ms)
+Entry 199:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 201 ms
+ - I.Buf: 321767
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 15 ms
+ - Buf: 333269
+ - Store: 2 ms
+ = Store: ok (225 ms)
+Entry 200:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 429 ms
+ - I.Buf: 574834
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586269
+ - Store: 3 ms
+ = Store: ok (475 ms)
+Entry 201:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 287393
+ - Unpickle: 10 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298847
+ - Store: 2 ms
+ = Store: ok (27 ms)
+Entry 202:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 199 ms
+ - I.Buf: 264320
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275863
+ - Store: 1 ms
+ = Store: ok (218 ms)
+Entry 203:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 200 ms
+ - I.Buf: 287346
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298864
+ - Store: 2 ms
+ = Store: ok (221 ms)
+Entry 204:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 208 ms
+ - I.Buf: 609316
+ - Unpickle: 17 ms
+ - Entries: 44
+ - Pickle: 28 ms
+ - Buf: 620771
+ - Store: 4 ms
+ = Store: ok (258 ms)
+Entry 205:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 7 ms
+ - I.Buf: 988714
+ - Unpickle: 28 ms
+ - Entries: 77
+ - Pickle: 49 ms
+ - Buf: 1000190
+ - Store: 6 ms
+ = Store: ok (91 ms)
+Entry 206:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 201 ms
+ - I.Buf: 298781
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310286
+ - Store: 2 ms
+ = Store: ok (223 ms)
+Entry 207:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 206 ms
+ - I.Buf: 333269
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344773
+ - Store: 2 ms
+ = Store: ok (230 ms)
+Entry 208:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 252783
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264282
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 209:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 204 ms
+ - I.Buf: 298829
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310328
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 210:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 3 ms
+ - I.Buf: 298842
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310342
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 211:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 206 ms
+ - I.Buf: 333335
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 14 ms
+ - Buf: 344812
+ - Store: 2 ms
+ = Store: ok (231 ms)
+Entry 212:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 195375
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206829
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 213:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 206820
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218300
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 214:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 411 ms
+ - I.Buf: 1000190
+ - Unpickle: 29 ms
+ - Entries: 78
+ - Pickle: 49 ms
+ - Buf: 1011719
+ - Store: 6 ms
+ = Store: ok (496 ms)
+Entry 215:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 944 ms
+ - I.Buf: 321823
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333315
+ - Store: 2 ms
+ = Store: ok (967 ms)
+Entry 216:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 203 ms
+ - I.Buf: 310342
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321884
+ - Store: 3 ms
+ = Store: ok (226 ms)
+Entry 217:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 3 ms
+ - I.Buf: 252855
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 10 ms
+ - Buf: 264311
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 218:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 4 ms
+ - I.Buf: 321874
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333318
+ - Store: 2 ms
+ = Store: ok (27 ms)
+Entry 219:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 998 ms
+ - I.Buf: 1011719
+ - Unpickle: 29 ms
+ - Entries: 79
+ - Pickle: 52 ms
+ - Buf: 1023206
+ - Store: 6 ms
+ = Store: ok (1087 ms)
+Entry 220:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 2 ms
+ - I.Buf: 298864
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310326
+ - Store: 2 ms
+ = Store: ok (25 ms)
+Entry 221:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 344773
+ - Unpickle: 7 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356270
+ - Store: 2 ms
+ = Store: ok (28 ms)
+Entry 222:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 557 ms
+ - I.Buf: 252824
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264378
+ - Store: 2 ms
+ = Store: ok (575 ms)
+Entry 223:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 195390
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206880
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 224:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:0
+ - Fetch: 1 ms
+ - I.Buf: 126325
+ - Unpickle: 2 ms
+ - Entries: 2
+ - Pickle: 5 ms
+ - Buf: 137849
+ - Store: 1 ms
+ = Store: ok (9 ms)
+Entry 225:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 205 ms
+ - I.Buf: 298855
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 12 ms
+ - Buf: 310312
+ - Store: 2 ms
+ = Store: ok (227 ms)
+Entry 226:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 415 ms
+ - I.Buf: 620771
+ - Unpickle: 16 ms
+ - Entries: 45
+ - Pickle: 28 ms
+ - Buf: 632276
+ - Store: 5 ms
+ = Store: ok (465 ms)
+Entry 227:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 417 ms
+ - I.Buf: 574866
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586313
+ - Store: 4 ms
+ = Store: ok (463 ms)
+Entry 228:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 137850
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149376
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 229:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 791 ms
+ - I.Buf: 586313
+ - Unpickle: 19 ms
+ - Entries: 42
+ - Pickle: 27 ms
+ - Buf: 597805
+ - Store: 4 ms
+ = Store: ok (842 ms)
+Entry 230:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 3533 ms
+ - I.Buf: 390847
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402346
+ - Store: 3 ms
+ = Store: ok (3564 ms)
+Entry 231:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 344828
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356337
+ - Store: 2 ms
+ = Store: ok (28 ms)
+Entry 232:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 360 ms
+ - I.Buf: 333265
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344810
+ - Store: 3 ms
+ = Store: ok (386 ms)
+Entry 233:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 203 ms
+ - I.Buf: 597805
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 29 ms
+ - Buf: 609344
+ - Store: 4 ms
+ = Store: ok (252 ms)
+Entry 234:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 207 ms
+ - I.Buf: 344848
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356362
+ - Store: 3 ms
+ = Store: ok (234 ms)
+Entry 235:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 411 ms
+ - I.Buf: 586269
+ - Unpickle: 15 ms
+ - Entries: 42
+ - Pickle: 28 ms
+ - Buf: 597828
+ - Store: 4 ms
+ = Store: ok (459 ms)
+Entry 236:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 201 ms
+ - I.Buf: 310328
+ - Unpickle: 6 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321881
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 237:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 2807 ms
+ - I.Buf: 528844
+ - Unpickle: 14 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540282
+ - Store: 4 ms
+ = Store: ok (2850 ms)
+Entry 238:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 204 ms
+ - I.Buf: 310305
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321840
+ - Store: 2 ms
+ = Store: ok (228 ms)
+Entry 239:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 3 ms
+ - I.Buf: 402304
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 17 ms
+ - Buf: 413804
+ - Store: 3 ms
+ = Store: ok (34 ms)
+Entry 240:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 264378
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275857
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 241:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 197 ms
+ - I.Buf: 632276
+ - Unpickle: 18 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643793
+ - Store: 4 ms
+ = Store: ok (249 ms)
+Entry 242:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 252813
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264344
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 243:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 415 ms
+ - I.Buf: 1023206
+ - Unpickle: 30 ms
+ - Entries: 80
+ - Pickle: 50 ms
+ - Buf: 1034725
+ - Store: 7 ms
+ = Store: ok (504 ms)
+Entry 244:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 5 ms
+ - I.Buf: 574873
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 27 ms
+ - Buf: 586345
+ - Store: 3 ms
+ = Store: ok (51 ms)
+Entry 245:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 199 ms
+ - I.Buf: 333318
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344821
+ - Store: 2 ms
+ = Store: ok (225 ms)
+Entry 246:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 203 ms
+ - I.Buf: 344812
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356376
+ - Store: 3 ms
+ = Store: ok (229 ms)
+Entry 247:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 3 ms
+ - I.Buf: 344810
+ - Unpickle: 7 ms
+ - Entries: 21
+ - Pickle: 16 ms
+ - Buf: 356348
+ - Store: 2 ms
+ = Store: ok (28 ms)
+Entry 248:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 203 ms
+ - I.Buf: 597828
+ - Unpickle: 17 ms
+ - Entries: 43
+ - Pickle: 27 ms
+ - Buf: 609286
+ - Store: 4 ms
+ = Store: ok (252 ms)
+Entry 249:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 102 ms
+ - I.Buf: 333315
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344847
+ - Store: 3 ms
+ = Store: ok (127 ms)
+Entry 250:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 206880
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218357
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 251:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 206 ms
+ - I.Buf: 310326
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321855
+ - Store: 2 ms
+ = Store: ok (229 ms)
+Entry 252:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 4 ms
+ - I.Buf: 356348
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367834
+ - Store: 3 ms
+ = Store: ok (31 ms)
+Entry 253:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 3 ms
+ - I.Buf: 298847
+ - Unpickle: 10 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310373
+ - Store: 2 ms
+ = Store: ok (28 ms)
+Entry 254:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 205 ms
+ - I.Buf: 643797
+ - Unpickle: 18 ms
+ - Entries: 47
+ - Pickle: 30 ms
+ - Buf: 655335
+ - Store: 4 ms
+ = Store: ok (259 ms)
+Entry 255:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 205 ms
+ - I.Buf: 540282
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 27 ms
+ - Buf: 551764
+ - Store: 4 ms
+ = Store: ok (251 ms)
+Entry 256:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 275863
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287384
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 257:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 1133 ms
+ - I.Buf: 356337
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367868
+ - Store: 3 ms
+ = Store: ok (1160 ms)
+Entry 258:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 4 ms
+ - I.Buf: 494296
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505785
+ - Store: 3 ms
+ = Store: ok (44 ms)
+Entry 259:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 3 ms
+ - I.Buf: 321840
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333320
+ - Store: 3 ms
+ = Store: ok (27 ms)
+Entry 260:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 209 ms
+ - I.Buf: 586267
+ - Unpickle: 15 ms
+ - Entries: 42
+ - Pickle: 27 ms
+ - Buf: 597796
+ - Store: 4 ms
+ = Store: ok (256 ms)
+Entry 261:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:0
+ - Fetch: 1 ms
+ - I.Buf: 137829
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149346
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 262:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:1
+ - Fetch: 1 ms
+ - I.Buf: 137837
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149390
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 263:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 414 ms
+ - I.Buf: 655335
+ - Unpickle: 17 ms
+ - Entries: 48
+ - Pickle: 31 ms
+ - Buf: 666812
+ - Store: 4 ms
+ = Store: ok (467 ms)
+Entry 264:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 3 ms
+ - I.Buf: 206829
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218283
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 265:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 3 ms
+ - I.Buf: 505785
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517310
+ - Store: 3 ms
+ = Store: ok (43 ms)
+Entry 266:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 172306
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183861
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 267:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 211 ms
+ - I.Buf: 1034725
+ - Unpickle: 29 ms
+ - Entries: 81
+ - Pickle: 51 ms
+ - Buf: 1046211
+ - Store: 7 ms
+ = Store: ok (300 ms)
+Entry 268:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 149374
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 6 ms
+ - Buf: 160862
+ - Store: 1 ms
+ = Store: ok (11 ms)
+Entry 269:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 1 ms
+ - I.Buf: 172300
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183814
+ - Store: 2 ms
+ = Store: ok (13 ms)
+Entry 270:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 1 ms
+ - I.Buf: 172342
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183850
+ - Store: 2 ms
+ = Store: ok (13 ms)
+Entry 271:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 3 ms
+ - I.Buf: 321855
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333324
+ - Store: 3 ms
+ = Store: ok (27 ms)
+Entry 272:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 310286
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321807
+ - Store: 2 ms
+ = Store: ok (25 ms)
+Entry 273:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 207 ms
+ - I.Buf: 413804
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425333
+ - Store: 3 ms
+ = Store: ok (240 ms)
+Entry 274:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 218283
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229842
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 275:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 321887
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 15 ms
+ - Buf: 333338
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 276:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 397 ms
+ - I.Buf: 666812
+ - Unpickle: 19 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678306
+ - Store: 4 ms
+ = Store: ok (453 ms)
+Entry 277:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 287384
+ - Unpickle: 7 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298855
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 278:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 619 ms
+ - I.Buf: 1046211
+ - Unpickle: 37 ms
+ - Entries: 82
+ - Pickle: 51 ms
+ - Buf: 1057692
+ - Store: 6 ms
+ = Store: ok (715 ms)
+Entry 279:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 4 ms
+ - I.Buf: 310373
+ - Unpickle: 6 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321905
+ - Store: 3 ms
+ = Store: ok (27 ms)
+Entry 280:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 218309
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229824
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 281:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:2
+ - Fetch: 1 ms
+ - I.Buf: 172307
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183830
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 282:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 209 ms
+ - I.Buf: 609286
+ - Unpickle: 17 ms
+ - Entries: 44
+ - Pickle: 28 ms
+ - Buf: 620792
+ - Store: 4 ms
+ = Store: ok (259 ms)
+Entry 283:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 4 ms
+ - I.Buf: 551764
+ - Unpickle: 15 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563286
+ - Store: 3 ms
+ = Store: ok (48 ms)
+Entry 284:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 208 ms
+ - I.Buf: 425333
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436818
+ - Store: 3 ms
+ = Store: ok (242 ms)
+Entry 285:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 213 ms
+ - I.Buf: 1057692
+ - Unpickle: 31 ms
+ - Entries: 83
+ - Pickle: 52 ms
+ - Buf: 1069268
+ - Store: 6 ms
+ = Store: ok (304 ms)
+Entry 286:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 2 ms
+ - I.Buf: 252770
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264316
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 287:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 195 ms
+ - I.Buf: 264320
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275824
+ - Store: 2 ms
+ = Store: ok (215 ms)
+Entry 288:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 2 ms
+ - I.Buf: 229872
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241351
+ - Store: 3 ms
+ = Store: ok (19 ms)
+Entry 289:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 5 ms
+ - I.Buf: 517310
+ - Unpickle: 13 ms
+ - Entries: 36
+ - Pickle: 23 ms
+ - Buf: 528860
+ - Store: 3 ms
+ = Store: ok (45 ms)
+Entry 290:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 208 ms
+ - I.Buf: 643793
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 30 ms
+ - Buf: 655311
+ - Store: 4 ms
+ = Store: ok (260 ms)
+Entry 291:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 206 ms
+ - I.Buf: 264311
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275820
+ - Store: 2 ms
+ = Store: ok (225 ms)
+Entry 292:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 149376
+ - Unpickle: 1 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160870
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 293:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:0
+ - Fetch: 1 ms
+ - I.Buf: 183861
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195373
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 294:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:0
+ - Fetch: 2 ms
+ - I.Buf: 195337
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206822
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 295:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 241353
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252814
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 296:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 206 ms
+ - I.Buf: 367868
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379355
+ - Store: 2 ms
+ = Store: ok (234 ms)
+Entry 297:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 333320
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344833
+ - Store: 3 ms
+ = Store: ok (28 ms)
+Entry 298:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 204 ms
+ - I.Buf: 264325
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275863
+ - Store: 1 ms
+ = Store: ok (222 ms)
+Entry 299:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 946 ms
+ - I.Buf: 620792
+ - Unpickle: 17 ms
+ - Entries: 45
+ - Pickle: 28 ms
+ - Buf: 632289
+ - Store: 3 ms
+ = Store: ok (996 ms)
+Entry 300:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 196 ms
+ - I.Buf: 298855
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310338
+ - Store: 2 ms
+ = Store: ok (217 ms)
+Entry 301:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 172259
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183816
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 302:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 216 ms
+ - I.Buf: 344833
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356326
+ - Store: 3 ms
+ = Store: ok (242 ms)
+Entry 303:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 209 ms
+ - I.Buf: 609344
+ - Unpickle: 16 ms
+ - Entries: 44
+ - Pickle: 27 ms
+ - Buf: 620793
+ - Store: 4 ms
+ = Store: ok (257 ms)
+Entry 304:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 218255
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229825
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 305:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:2
+ - Fetch: 1 ms
+ - I.Buf: 172361
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183840
+ - Store: 1 ms
+ = Store: ok (13 ms)
+Entry 306:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 1187 ms
+ - I.Buf: 678306
+ - Unpickle: 18 ms
+ - Entries: 50
+ - Pickle: 31 ms
+ - Buf: 689814
+ - Store: 5 ms
+ = Store: ok (1243 ms)
+Entry 307:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 195373
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206828
+ - Store: 1 ms
+ = Store: ok (15 ms)
+Entry 308:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 209 ms
+ - I.Buf: 655311
+ - Unpickle: 21 ms
+ - Entries: 48
+ - Pickle: 30 ms
+ - Buf: 666769
+ - Store: 3 ms
+ = Store: ok (264 ms)
+Entry 309:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 412 ms
+ - I.Buf: 632289
+ - Unpickle: 17 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643800
+ - Store: 4 ms
+ = Store: ok (463 ms)
+Entry 310:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 209 ms
+ - I.Buf: 643800
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 30 ms
+ - Buf: 655357
+ - Store: 4 ms
+ = Store: ok (261 ms)
+Entry 311:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 4 ms
+ - I.Buf: 597796
+ - Unpickle: 15 ms
+ - Entries: 43
+ - Pickle: 28 ms
+ - Buf: 609310
+ - Store: 3 ms
+ = Store: ok (53 ms)
+Entry 312:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 410 ms
+ - I.Buf: 436818
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 19 ms
+ - Buf: 448353
+ - Store: 4 ms
+ = Store: ok (444 ms)
+Entry 313:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 433 ms
+ - I.Buf: 264344
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275818
+ - Store: 1 ms
+ = Store: ok (453 ms)
+Entry 314:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 275824
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287311
+ - Store: 2 ms
+ = Store: ok (22 ms)
+Entry 315:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 3 ms
+ - I.Buf: 275857
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287359
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 316:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 2 ms
+ - I.Buf: 195386
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206855
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 317:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 206 ms
+ - I.Buf: 586345
+ - Unpickle: 15 ms
+ - Entries: 42
+ - Pickle: 26 ms
+ - Buf: 597893
+ - Store: 4 ms
+ = Store: ok (252 ms)
+Entry 318:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 210 ms
+ - I.Buf: 264282
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275800
+ - Store: 2 ms
+ = Store: ok (229 ms)
+Entry 319:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 206 ms
+ - I.Buf: 402346
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413821
+ - Store: 3 ms
+ = Store: ok (237 ms)
+Entry 320:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 208 ms
+ - I.Buf: 413821
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425345
+ - Store: 3 ms
+ = Store: ok (239 ms)
+Entry 321:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 960 ms
+ - I.Buf: 367834
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379295
+ - Store: 2 ms
+ = Store: ok (988 ms)
+Entry 322:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 203 ms
+ - I.Buf: 563286
+ - Unpickle: 14 ms
+ - Entries: 40
+ - Pickle: 26 ms
+ - Buf: 574786
+ - Store: 3 ms
+ = Store: ok (248 ms)
+Entry 323:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 220 ms
+ - I.Buf: 344821
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 16 ms
+ - Buf: 356385
+ - Store: 2 ms
+ = Store: ok (247 ms)
+Entry 324:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 10 ms
+ - I.Buf: 1069268
+ - Unpickle: 30 ms
+ - Entries: 84
+ - Pickle: 53 ms
+ - Buf: 1080698
+ - Store: 6 ms
+ = Store: ok (101 ms)
+Entry 325:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 356385
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367905
+ - Store: 3 ms
+ = Store: ok (30 ms)
+Entry 326:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 410 ms
+ - I.Buf: 620793
+ - Unpickle: 17 ms
+ - Entries: 45
+ - Pickle: 28 ms
+ - Buf: 632297
+ - Store: 3 ms
+ = Store: ok (460 ms)
+Entry 327:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 208 ms
+ - I.Buf: 632297
+ - Unpickle: 16 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643811
+ - Store: 4 ms
+ = Store: ok (259 ms)
+Entry 328:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 211 ms
+ - I.Buf: 425345
+ - Unpickle: 10 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436869
+ - Store: 3 ms
+ = Store: ok (244 ms)
+Entry 329:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 3 ms
+ - I.Buf: 344847
+ - Unpickle: 12 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356348
+ - Store: 3 ms
+ = Store: ok (33 ms)
+Entry 330:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 218341
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229817
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 331:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 2 ms
+ - I.Buf: 241351
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252809
+ - Store: 1 ms
+ = Store: ok (20 ms)
+Entry 332:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 208 ms
+ - I.Buf: 379355
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390841
+ - Store: 3 ms
+ = Store: ok (237 ms)
+Entry 333:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 183854
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195377
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 334:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 3 ms
+ - I.Buf: 287311
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298784
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 335:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 23 ms
+ - I.Buf: 333338
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344895
+ - Store: 2 ms
+ = Store: ok (47 ms)
+Entry 336:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 199 ms
+ - I.Buf: 356270
+ - Unpickle: 9 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367777
+ - Store: 3 ms
+ = Store: ok (228 ms)
+Entry 337:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 209 ms
+ - I.Buf: 655357
+ - Unpickle: 18 ms
+ - Entries: 48
+ - Pickle: 30 ms
+ - Buf: 666781
+ - Store: 4 ms
+ = Store: ok (262 ms)
+Entry 338:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 4 ms
+ - I.Buf: 436869
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448390
+ - Store: 3 ms
+ = Store: ok (39 ms)
+Entry 339:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 2 ms
+ - I.Buf: 275863
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287332
+ - Store: 2 ms
+ = Store: ok (22 ms)
+Entry 340:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 229842
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241340
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 341:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 416 ms
+ - I.Buf: 1080698
+ - Unpickle: 31 ms
+ - Entries: 85
+ - Pickle: 53 ms
+ - Buf: 1092208
+ - Store: 7 ms
+ = Store: ok (509 ms)
+Entry 342:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 218381
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229852
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 343:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 195377
+ - Unpickle: 4 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206855
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 344:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 2 ms
+ - I.Buf: 310338
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321898
+ - Store: 2 ms
+ = Store: ok (25 ms)
+Entry 345:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 410 ms
+ - I.Buf: 666769
+ - Unpickle: 17 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678262
+ - Store: 4 ms
+ = Store: ok (463 ms)
+Entry 346:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 371 ms
+ - I.Buf: 1092208
+ - Unpickle: 32 ms
+ - Entries: 86
+ - Pickle: 55 ms
+ - Buf: 1103715
+ - Store: 6 ms
+ = Store: ok (466 ms)
+Entry 347:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 229825
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241330
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 348:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 3 ms
+ - I.Buf: 333324
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344860
+ - Store: 2 ms
+ = Store: ok (28 ms)
+Entry 349:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 183830
+ - Unpickle: 2 ms
+ - Entries: 7
+ - Pickle: 9 ms
+ - Buf: 195317
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 350:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1846 ms
+ - I.Buf: 1103715
+ - Unpickle: 31 ms
+ - Entries: 87
+ - Pickle: 54 ms
+ - Buf: 1115185
+ - Store: 6 ms
+ = Store: ok (1940 ms)
+Entry 351:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 401 ms
+ - I.Buf: 574786
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586242
+ - Store: 4 ms
+ = Store: ok (447 ms)
+Entry 352:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 203 ms
+ - I.Buf: 367777
+ - Unpickle: 13 ms
+ - Entries: 23
+ - Pickle: 17 ms
+ - Buf: 379275
+ - Store: 2 ms
+ = Store: ok (236 ms)
+Entry 353:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 205 ms
+ - I.Buf: 321807
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333224
+ - Store: 3 ms
+ = Store: ok (229 ms)
+Entry 354:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 991 ms
+ - I.Buf: 528860
+ - Unpickle: 14 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540328
+ - Store: 3 ms
+ = Store: ok (1033 ms)
+Entry 355:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1494 ms
+ - I.Buf: 1115185
+ - Unpickle: 32 ms
+ - Entries: 88
+ - Pickle: 55 ms
+ - Buf: 1126697
+ - Store: 6 ms
+ = Store: ok (1589 ms)
+Entry 356:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 264316
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275844
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 357:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 183814
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195316
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 358:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 201 ms
+ - I.Buf: 356362
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367862
+ - Store: 3 ms
+ = Store: ok (228 ms)
+Entry 359:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 103 ms
+ - I.Buf: 367905
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379359
+ - Store: 3 ms
+ = Store: ok (132 ms)
+Entry 360:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 210 ms
+ - I.Buf: 689814
+ - Unpickle: 20 ms
+ - Entries: 51
+ - Pickle: 35 ms
+ - Buf: 701283
+ - Store: 4 ms
+ = Store: ok (270 ms)
+Entry 361:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 4 ms
+ - I.Buf: 379275
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 18 ms
+ - Buf: 390757
+ - Store: 3 ms
+ = Store: ok (34 ms)
+Entry 362:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 207 ms
+ - I.Buf: 356348
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367826
+ - Store: 3 ms
+ = Store: ok (233 ms)
+Entry 363:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 1634 ms
+ - I.Buf: 701283
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 33 ms
+ - Buf: 712807
+ - Store: 4 ms
+ = Store: ok (1692 ms)
+Entry 364:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 209 ms
+ - I.Buf: 540328
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 24 ms
+ - Buf: 551845
+ - Store: 3 ms
+ = Store: ok (250 ms)
+Entry 365:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 409 ms
+ - I.Buf: 643811
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 29 ms
+ - Buf: 655348
+ - Store: 5 ms
+ = Store: ok (461 ms)
+Entry 366:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 5 ms
+ - I.Buf: 586242
+ - Unpickle: 15 ms
+ - Entries: 42
+ - Pickle: 27 ms
+ - Buf: 597766
+ - Store: 4 ms
+ = Store: ok (52 ms)
+Entry 367:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 321905
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333306
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 368:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 195316
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206826
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 369:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 205 ms
+ - I.Buf: 356376
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367855
+ - Store: 3 ms
+ = Store: ok (232 ms)
+Entry 370:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 205 ms
+ - I.Buf: 287332
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298831
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 371:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 241364
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252764
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 372:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:0
+ - Fetch: 1 ms
+ - I.Buf: 137844
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149371
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 373:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 3 ms
+ - I.Buf: 321881
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333322
+ - Store: 2 ms
+ = Store: ok (27 ms)
+Entry 374:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 208 ms
+ - I.Buf: 321884
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 13 ms
+ - Buf: 333335
+ - Store: 2 ms
+ = Store: ok (232 ms)
+Entry 375:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 386 ms
+ - I.Buf: 678262
+ - Unpickle: 22 ms
+ - Entries: 50
+ - Pickle: 31 ms
+ - Buf: 689795
+ - Store: 4 ms
+ = Store: ok (444 ms)
+Entry 376:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 209 ms
+ - I.Buf: 310312
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321867
+ - Store: 2 ms
+ = Store: ok (233 ms)
+Entry 377:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 137836
+ - Unpickle: 1 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149309
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 378:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 395 ms
+ - I.Buf: 597766
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 27 ms
+ - Buf: 609286
+ - Store: 4 ms
+ = Store: ok (443 ms)
+Entry 379:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 321867
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333292
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 380:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 207 ms
+ - I.Buf: 333306
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344855
+ - Store: 2 ms
+ = Store: ok (231 ms)
+Entry 381:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 202 ms
+ - I.Buf: 597893
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 27 ms
+ - Buf: 609341
+ - Store: 4 ms
+ = Store: ok (250 ms)
+Entry 382:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 3 ms
+ - I.Buf: 356326
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367859
+ - Store: 3 ms
+ = Store: ok (30 ms)
+Entry 383:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 405 ms
+ - I.Buf: 655348
+ - Unpickle: 18 ms
+ - Entries: 48
+ - Pickle: 30 ms
+ - Buf: 666790
+ - Store: 6 ms
+ = Store: ok (461 ms)
+Entry 384:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 42 ms
+ - I.Buf: 448390
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459829
+ - Store: 4 ms
+ = Store: ok (79 ms)
+Entry 385:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 4 ms
+ - I.Buf: 333224
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344770
+ - Store: 3 ms
+ = Store: ok (29 ms)
+Entry 386:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 4 ms
+ - I.Buf: 390841
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402337
+ - Store: 3 ms
+ = Store: ok (34 ms)
+Entry 387:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:2
+ - Fetch: 1 ms
+ - I.Buf: 183840
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 9 ms
+ - Buf: 195383
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 388:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 202 ms
+ - I.Buf: 344860
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356351
+ - Store: 2 ms
+ = Store: ok (228 ms)
+Entry 389:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 203 ms
+ - I.Buf: 275820
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287335
+ - Store: 2 ms
+ = Store: ok (223 ms)
+Entry 390:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 414 ms
+ - I.Buf: 666781
+ - Unpickle: 18 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678264
+ - Store: 4 ms
+ = Store: ok (468 ms)
+Entry 391:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 183892
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195405
+ - Store: 1 ms
+ = Store: ok (14 ms)
+Entry 392:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 2 ms
+ - I.Buf: 229818
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241343
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 393:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:0
+ - Fetch: 1 ms
+ - I.Buf: 137815
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149352
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 394:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 2 ms
+ - I.Buf: 229839
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241372
+ - Store: 1 ms
+ = Store: ok (18 ms)
+Entry 395:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 202 ms
+ - I.Buf: 551845
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 25 ms
+ - Buf: 563337
+ - Store: 4 ms
+ = Store: ok (246 ms)
+Entry 396:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 211 ms
+ - I.Buf: 678264
+ - Unpickle: 19 ms
+ - Entries: 50
+ - Pickle: 32 ms
+ - Buf: 689834
+ - Store: 5 ms
+ = Store: ok (268 ms)
+Entry 397:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 382 ms
+ - I.Buf: 344895
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356413
+ - Store: 3 ms
+ = Store: ok (409 ms)
+Entry 398:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:1
+ - Fetch: 2 ms
+ - I.Buf: 218303
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229786
+ - Store: 306 ms
+ = Store: ok (322 ms)
+Entry 399:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 209 ms
+ - I.Buf: 356351
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367861
+ - Store: 616 ms
+ = Store: ok (849 ms)
+Entry 400:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 206 ms
+ - I.Buf: 252764
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264322
+ - Store: 887 ms
+ = Store: ok (1109 ms)
+Entry 401:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 206804
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218317
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 402:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 3685 ms
+ - I.Buf: 609341
+ - Unpickle: 18 ms
+ - Entries: 44
+ - Pickle: 28 ms
+ - Buf: 620836
+ - Store: 1504 ms
+ = Store: ok (5236 ms)
+Entry 403:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 419 ms
+ - I.Buf: 689834
+ - Unpickle: 25 ms
+ - Entries: 51
+ - Pickle: 32 ms
+ - Buf: 701288
+ - Store: 7 ms
+ = Store: ok (484 ms)
+Entry 404:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 209 ms
+ - I.Buf: 609310
+ - Unpickle: 16 ms
+ - Entries: 44
+ - Pickle: 28 ms
+ - Buf: 620752
+ - Store: 46 ms
+ = Store: ok (300 ms)
+Entry 405:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 418 ms
+ - I.Buf: 1126697
+ - Unpickle: 32 ms
+ - Entries: 89
+ - Pickle: 56 ms
+ - Buf: 1138225
+ - Store: 10 ms
+ = Store: ok (518 ms)
+Entry 406:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 3 ms
+ - I.Buf: 367859
+ - Unpickle: 8 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379302
+ - Store: 3 ms
+ = Store: ok (31 ms)
+Entry 407:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:2
+ - Fetch: 1 ms
+ - I.Buf: 218357
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229905
+ - Store: 902 ms
+ = Store: ok (917 ms)
+Entry 408:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 196 ms
+ - I.Buf: 206837
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218316
+ - Store: 3 ms
+ = Store: ok (212 ms)
+Entry 409:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 414 ms
+ - I.Buf: 1138225
+ - Unpickle: 32 ms
+ - Entries: 90
+ - Pickle: 58 ms
+ - Buf: 1149729
+ - Store: 1487 ms
+ = Store: ok (1993 ms)
+Entry 410:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 207 ms
+ - I.Buf: 367862
+ - Unpickle: 8 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379373
+ - Store: 4 ms
+ = Store: ok (236 ms)
+Entry 411:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 212 ms
+ - I.Buf: 609286
+ - Unpickle: 16 ms
+ - Entries: 44
+ - Pickle: 29 ms
+ - Buf: 620767
+ - Store: 5 ms
+ = Store: ok (263 ms)
+Entry 412:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 2 ms
+ - I.Buf: 344770
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356292
+ - Store: 931 ms
+ = Store: ok (956 ms)
+Entry 413:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 200 ms
+ - I.Buf: 321898
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 13 ms
+ - Buf: 333353
+ - Store: 319 ms
+ = Store: ok (540 ms)
+Entry 414:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 229817
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 11 ms
+ - Buf: 241349
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 415:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 1 ms
+ - I.Buf: 206813
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218352
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 416:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 205 ms
+ - I.Buf: 298831
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 12 ms
+ - Buf: 310355
+ - Store: 343 ms
+ = Store: ok (567 ms)
+Entry 417:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 3 ms
+ - I.Buf: 241372
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252857
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 418:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 207 ms
+ - I.Buf: 701288
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 33 ms
+ - Buf: 712784
+ - Store: 1418 ms
+ = Store: ok (1678 ms)
+Entry 419:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 390757
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402270
+ - Store: 4 ms
+ = Store: ok (35 ms)
+Entry 420:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 400 ms
+ - I.Buf: 689795
+ - Unpickle: 19 ms
+ - Entries: 51
+ - Pickle: 32 ms
+ - Buf: 701281
+ - Store: 603 ms
+ = Store: ok (1055 ms)
+Entry 421:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 207 ms
+ - I.Buf: 402337
+ - Unpickle: 9 ms
+ - Entries: 26
+ - Pickle: 19 ms
+ - Buf: 413806
+ - Store: 43 ms
+ = Store: ok (279 ms)
+Entry 422:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 205 ms
+ - I.Buf: 287359
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298858
+ - Store: 414 ms
+ = Store: ok (638 ms)
+Entry 423:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 410 ms
+ - I.Buf: 701281
+ - Unpickle: 18 ms
+ - Entries: 52
+ - Pickle: 33 ms
+ - Buf: 712761
+ - Store: 6 ms
+ = Store: ok (468 ms)
+Entry 424:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 4 ms
+ - I.Buf: 620836
+ - Unpickle: 20 ms
+ - Entries: 45
+ - Pickle: 29 ms
+ - Buf: 632353
+ - Store: 5 ms
+ = Store: ok (59 ms)
+Entry 425:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 210 ms
+ - I.Buf: 1149729
+ - Unpickle: 35 ms
+ - Entries: 91
+ - Pickle: 60 ms
+ - Buf: 1161198
+ - Store: 2627 ms
+ = Store: ok (2934 ms)
+Entry 426:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 3 ms
+ - I.Buf: 183850
+ - Unpickle: 2 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195325
+ - Store: 3 ms
+ = Store: ok (16 ms)
+Entry 427:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 3 ms
+ - I.Buf: 344855
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356384
+ - Store: 199 ms
+ = Store: ok (225 ms)
+Entry 428:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 195325
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206834
+ - Store: 42 ms
+ = Store: ok (56 ms)
+Entry 429:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 196 ms
+ - I.Buf: 712784
+ - Unpickle: 19 ms
+ - Entries: 53
+ - Pickle: 33 ms
+ - Buf: 724300
+ - Store: 1699 ms
+ = Store: ok (1948 ms)
+Entry 430:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 3 ms
+ - I.Buf: 298784
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310342
+ - Store: 4 ms
+ = Store: ok (26 ms)
+Entry 431:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 4 ms
+ - I.Buf: 632353
+ - Unpickle: 17 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643845
+ - Store: 5 ms
+ = Store: ok (56 ms)
+Entry 432:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 7 ms
+ - I.Buf: 1161198
+ - Unpickle: 34 ms
+ - Entries: 92
+ - Pickle: 61 ms
+ - Buf: 1172709
+ - Store: 9 ms
+ = Store: ok (113 ms)
+Entry 433:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 1 ms
+ - I.Buf: 195405
+ - Unpickle: 4 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206852
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 434:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 208 ms
+ - I.Buf: 724300
+ - Unpickle: 19 ms
+ - Entries: 54
+ - Pickle: 34 ms
+ - Buf: 735780
+ - Store: 301 ms
+ = Store: ok (564 ms)
+Entry 435:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 2 ms
+ - I.Buf: 298843
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310333
+ - Store: 601 ms
+ = Store: ok (622 ms)
+Entry 436:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 597 ms
+ - I.Buf: 1172709
+ - Unpickle: 34 ms
+ - Entries: 93
+ - Pickle: 59 ms
+ - Buf: 1184229
+ - Store: 10 ms
+ = Store: ok (702 ms)
+Entry 437:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 216 ms
+ - I.Buf: 712761
+ - Unpickle: 20 ms
+ - Entries: 53
+ - Pickle: 33 ms
+ - Buf: 724267
+ - Store: 6 ms
+ = Store: ok (277 ms)
+Entry 438:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:0
+ - Fetch: 1 ms
+ - I.Buf: 206822
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218334
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 439:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 207 ms
+ - I.Buf: 379359
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 16 ms
+ - Buf: 390873
+ - Store: 308 ms
+ = Store: ok (540 ms)
+Entry 440:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 1061 ms
+ - I.Buf: 666790
+ - Unpickle: 21 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678272
+ - Store: 5 ms
+ = Store: ok (1119 ms)
+Entry 441:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 4 ms
+ - I.Buf: 620752
+ - Unpickle: 16 ms
+ - Entries: 45
+ - Pickle: 29 ms
+ - Buf: 632274
+ - Store: 1201 ms
+ = Store: ok (1253 ms)
+Entry 442:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 687 ms
+ - I.Buf: 252814
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264343
+ - Store: 305 ms
+ = Store: ok (1009 ms)
+Entry 443:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 1 ms
+ - I.Buf: 218317
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229826
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 444:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 2 ms
+ - I.Buf: 310355
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321869
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 445:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 217 ms
+ - I.Buf: 712807
+ - Unpickle: 20 ms
+ - Entries: 53
+ - Pickle: 33 ms
+ - Buf: 724279
+ - Store: 7 ms
+ = Store: ok (278 ms)
+Entry 446:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 3 ms
+ - I.Buf: 321869
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333327
+ - Store: 3 ms
+ = Store: ok (28 ms)
+Entry 447:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 610 ms
+ - I.Buf: 735780
+ - Unpickle: 21 ms
+ - Entries: 55
+ - Pickle: 34 ms
+ - Buf: 747261
+ - Store: 6 ms
+ = Store: ok (672 ms)
+Entry 448:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 205 ms
+ - I.Buf: 287335
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298796
+ - Store: 3 ms
+ = Store: ok (227 ms)
+Entry 449:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 1 ms
+ - I.Buf: 218300
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229840
+ - Store: 412 ms
+ = Store: ok (427 ms)
+Entry 450:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 229840
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241331
+ - Store: 379 ms
+ = Store: ok (395 ms)
+Entry 451:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 209 ms
+ - I.Buf: 678272
+ - Unpickle: 19 ms
+ - Entries: 50
+ - Pickle: 31 ms
+ - Buf: 689826
+ - Store: 1212 ms
+ = Store: ok (1472 ms)
+Entry 452:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 252809
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264310
+ - Store: 3 ms
+ = Store: ok (22 ms)
+Entry 453:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 402270
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 17 ms
+ - Buf: 413744
+ - Store: 1023 ms
+ = Store: ok (1053 ms)
+Entry 454:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 209 ms
+ - I.Buf: 298858
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310336
+ - Store: 4 ms
+ = Store: ok (233 ms)
+Entry 455:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 418 ms
+ - I.Buf: 1184229
+ - Unpickle: 34 ms
+ - Entries: 94
+ - Pickle: 60 ms
+ - Buf: 1195725
+ - Store: 49 ms
+ = Store: ok (563 ms)
+Entry 456:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 212 ms
+ - I.Buf: 298835
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310323
+ - Store: 3 ms
+ = Store: ok (235 ms)
+Entry 457:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 5 ms
+ - I.Buf: 724279
+ - Unpickle: 20 ms
+ - Entries: 54
+ - Pickle: 33 ms
+ - Buf: 735830
+ - Store: 6 ms
+ = Store: ok (65 ms)
+Entry 458:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 413806
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425336
+ - Store: 4 ms
+ = Store: ok (37 ms)
+Entry 459:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 405 ms
+ - I.Buf: 620767
+ - Unpickle: 17 ms
+ - Entries: 45
+ - Pickle: 28 ms
+ - Buf: 632259
+ - Store: 5 ms
+ = Store: ok (456 ms)
+Entry 460:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 3 ms
+ - I.Buf: 333327
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344804
+ - Store: 603 ms
+ = Store: ok (628 ms)
+Entry 461:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 207 ms
+ - I.Buf: 390873
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402395
+ - Store: 307 ms
+ = Store: ok (541 ms)
+Entry 462:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 298 ms
+ - I.Buf: 275818
+ - Unpickle: 9 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287280
+ - Store: 3 ms
+ = Store: ok (322 ms)
+Entry 463:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 2 ms
+ - I.Buf: 206855
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 8 ms
+ - Buf: 218325
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 464:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 199 ms
+ - I.Buf: 724267
+ - Unpickle: 20 ms
+ - Entries: 54
+ - Pickle: 34 ms
+ - Buf: 735825
+ - Store: 1709 ms
+ = Store: ok (1964 ms)
+Entry 465:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 183816
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195347
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 466:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 206 ms
+ - I.Buf: 379373
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390877
+ - Store: 4 ms
+ = Store: ok (236 ms)
+Entry 467:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 199 ms
+ - I.Buf: 735825
+ - Unpickle: 20 ms
+ - Entries: 55
+ - Pickle: 34 ms
+ - Buf: 747235
+ - Store: 6 ms
+ = Store: ok (260 ms)
+Entry 468:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 208 ms
+ - I.Buf: 344804
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356353
+ - Store: 3 ms
+ = Store: ok (235 ms)
+Entry 469:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 202 ms
+ - I.Buf: 310342
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321843
+ - Store: 600 ms
+ = Store: ok (824 ms)
+Entry 470:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 207 ms
+ - I.Buf: 390877
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402329
+ - Store: 4 ms
+ = Store: ok (238 ms)
+Entry 471:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 185 ms
+ - I.Buf: 321843
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333305
+ - Store: 43 ms
+ = Store: ok (249 ms)
+Entry 472:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 2138 ms
+ - I.Buf: 1195725
+ - Unpickle: 34 ms
+ - Entries: 95
+ - Pickle: 62 ms
+ - Buf: 1207225
+ - Store: 2615 ms
+ = Store: ok (4851 ms)
+Entry 473:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 407 ms
+ - I.Buf: 367861
+ - Unpickle: 8 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379347
+ - Store: 5 ms
+ = Store: ok (436 ms)
+Entry 474:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 410 ms
+ - I.Buf: 632274
+ - Unpickle: 17 ms
+ - Entries: 46
+ - Pickle: 28 ms
+ - Buf: 643749
+ - Store: 6 ms
+ = Store: ok (462 ms)
+Entry 475:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 241340
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252786
+ - Store: 175 ms
+ = Store: ok (194 ms)
+Entry 476:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 218345
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229789
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 477:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 310336
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321865
+ - Store: 1520 ms
+ = Store: ok (1542 ms)
+Entry 478:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 416 ms
+ - I.Buf: 1207225
+ - Unpickle: 36 ms
+ - Entries: 96
+ - Pickle: 65 ms
+ - Buf: 1218698
+ - Store: 1333 ms
+ = Store: ok (1852 ms)
+Entry 479:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 207 ms
+ - I.Buf: 333292
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344835
+ - Store: 4 ms
+ = Store: ok (233 ms)
+Entry 480:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 321865
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 13 ms
+ - Buf: 333325
+ - Store: 308 ms
+ = Store: ok (332 ms)
+Entry 481:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 24 ms
+ - I.Buf: 344835
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356342
+ - Store: 4 ms
+ = Store: ok (51 ms)
+Entry 482:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 205 ms
+ - I.Buf: 379302
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390818
+ - Store: 4 ms
+ = Store: ok (235 ms)
+Entry 483:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 410 ms
+ - I.Buf: 689826
+ - Unpickle: 23 ms
+ - Entries: 51
+ - Pickle: 32 ms
+ - Buf: 701252
+ - Store: 1196 ms
+ = Store: ok (1663 ms)
+Entry 484:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1138 ms
+ - I.Buf: 1218698
+ - Unpickle: 36 ms
+ - Entries: 97
+ - Pickle: 64 ms
+ - Buf: 1230198
+ - Store: 10 ms
+ = Store: ok (1250 ms)
+Entry 485:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 264322
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275833
+ - Store: 812 ms
+ = Store: ok (831 ms)
+Entry 486:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 407 ms
+ - I.Buf: 413744
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425279
+ - Store: 4 ms
+ = Store: ok (439 ms)
+Entry 487:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1004 ms
+ - I.Buf: 1230198
+ - Unpickle: 36 ms
+ - Entries: 98
+ - Pickle: 65 ms
+ - Buf: 1241664
+ - Store: 464 ms
+ = Store: ok (1571 ms)
+Entry 488:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 206826
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218328
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 489:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 1 ms
+ - I.Buf: 275833
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287322
+ - Store: 305 ms
+ = Store: ok (324 ms)
+Entry 490:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 3 ms
+ - I.Buf: 229789
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241362
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 491:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 4 ms
+ - I.Buf: 643845
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 29 ms
+ - Buf: 655401
+ - Store: 299 ms
+ = Store: ok (350 ms)
+Entry 492:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 4 ms
+ - I.Buf: 459829
+ - Unpickle: 11 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471367
+ - Store: 343 ms
+ = Store: ok (380 ms)
+Entry 493:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 333322
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344831
+ - Store: 3 ms
+ = Store: ok (29 ms)
+Entry 494:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 2 ms
+ - I.Buf: 356292
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367768
+ - Store: 43 ms
+ = Store: ok (70 ms)
+Entry 495:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 425279
+ - Unpickle: 10 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436768
+ - Store: 4 ms
+ = Store: ok (37 ms)
+Entry 496:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 414 ms
+ - I.Buf: 1241664
+ - Unpickle: 36 ms
+ - Entries: 99
+ - Pickle: 64 ms
+ - Buf: 1253234
+ - Store: 2867 ms
+ = Store: ok (3384 ms)
+Entry 497:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 198 ms
+ - I.Buf: 367855
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379320
+ - Store: 4 ms
+ = Store: ok (227 ms)
+Entry 498:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 200 ms
+ - I.Buf: 735830
+ - Unpickle: 20 ms
+ - Entries: 55
+ - Pickle: 34 ms
+ - Buf: 747252
+ - Store: 308 ms
+ = Store: ok (563 ms)
+Entry 499:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 214 ms
+ - I.Buf: 1253234
+ - Unpickle: 50 ms
+ - Entries: 100
+ - Pickle: 73 ms
+ - Buf: 1264713
+ - Store: 863 ms
+ = Store: ok (1203 ms)
+Entry 500:
+ = Generate:  ok (3 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 207 ms
+ - I.Buf: 379295
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 16 ms
+ - Buf: 390779
+ - Store: 603 ms
+ = Store: ok (835 ms)
+Entry 501:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 209 ms
+ - I.Buf: 379320
+ - Unpickle: 10 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390842
+ - Store: 318 ms
+ = Store: ok (554 ms)
+Entry 502:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 205 ms
+ - I.Buf: 310323
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321881
+ - Store: 3 ms
+ = Store: ok (229 ms)
+Entry 503:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 205 ms
+ - I.Buf: 356384
+ - Unpickle: 9 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367851
+ - Store: 347 ms
+ = Store: ok (576 ms)
+Entry 504:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 206 ms
+ - I.Buf: 379347
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 16 ms
+ - Buf: 390857
+ - Store: 961 ms
+ = Store: ok (1193 ms)
+Entry 505:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 199 ms
+ - I.Buf: 287322
+ - Unpickle: 7 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298808
+ - Store: 3 ms
+ = Store: ok (223 ms)
+Entry 506:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 126359
+ - Unpickle: 1 ms
+ - Entries: 2
+ - Pickle: 5 ms
+ - Buf: 137862
+ - Store: 2 ms
+ = Store: ok (10 ms)
+Entry 507:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 202 ms
+ - I.Buf: 264310
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275820
+ - Store: 304 ms
+ = Store: ok (524 ms)
+Entry 508:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 206 ms
+ - I.Buf: 367768
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379273
+ - Store: 4 ms
+ = Store: ok (235 ms)
+Entry 509:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 657 ms
+ - I.Buf: 1264713
+ - Unpickle: 36 ms
+ - Entries: 101
+ - Pickle: 69 ms
+ - Buf: 1276218
+ - Store: 254 ms
+ = Store: ok (1019 ms)
+Entry 510:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 3 ms
+ - I.Buf: 356342
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367820
+ - Store: 4 ms
+ = Store: ok (30 ms)
+Entry 511:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 411 ms
+ - I.Buf: 643749
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 30 ms
+ - Buf: 655302
+ - Store: 5 ms
+ = Store: ok (464 ms)
+Entry 512:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 264343
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275842
+ - Store: 3 ms
+ = Store: ok (21 ms)
+Entry 513:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 356413
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367902
+ - Store: 607 ms
+ = Store: ok (634 ms)
+Entry 514:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 616 ms
+ - I.Buf: 655302
+ - Unpickle: 19 ms
+ - Entries: 48
+ - Pickle: 32 ms
+ - Buf: 666790
+ - Store: 176 ms
+ = Store: ok (844 ms)
+Entry 515:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 1998 ms
+ - I.Buf: 356353
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367853
+ - Store: 895 ms
+ = Store: ok (2917 ms)
+Entry 516:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 4 ms
+ - I.Buf: 425336
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436868
+ - Store: 5 ms
+ = Store: ok (39 ms)
+Entry 517:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 208 ms
+ - I.Buf: 275842
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 13 ms
+ - Buf: 287313
+ - Store: 3 ms
+ = Store: ok (230 ms)
+Entry 518:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 287280
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298793
+ - Store: 792 ms
+ = Store: ok (812 ms)
+Entry 519:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:0
+ - Fetch: 203 ms
+ - I.Buf: 218339
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229848
+ - Store: 3 ms
+ = Store: ok (220 ms)
+Entry 520:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 4 ms
+ - I.Buf: 367902
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379366
+ - Store: 4 ms
+ = Store: ok (33 ms)
+Entry 521:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 275800
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 13 ms
+ - Buf: 287324
+ - Store: 3 ms
+ = Store: ok (24 ms)
+Entry 522:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 207 ms
+ - I.Buf: 298796
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 12 ms
+ - Buf: 310293
+ - Store: 309 ms
+ = Store: ok (535 ms)
+Entry 523:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 206 ms
+ - I.Buf: 241362
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252830
+ - Store: 2 ms
+ = Store: ok (224 ms)
+Entry 524:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 959 ms
+ - I.Buf: 379273
+ - Unpickle: 15 ms
+ - Entries: 24
+ - Pickle: 18 ms
+ - Buf: 390733
+ - Store: 1970 ms
+ = Store: ok (2964 ms)
+Entry 525:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 862 ms
+ - I.Buf: 747235
+ - Unpickle: 22 ms
+ - Entries: 56
+ - Pickle: 36 ms
+ - Buf: 758747
+ - Store: 350 ms
+ = Store: ok (1271 ms)
+Entry 526:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 66 ms
+ - I.Buf: 390733
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402297
+ - Store: 2135 ms
+ = Store: ok (2229 ms)
+Entry 527:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 204 ms
+ - I.Buf: 218316
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229835
+ - Store: 3 ms
+ = Store: ok (221 ms)
+Entry 528:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 281 ms
+ - I.Buf: 632259
+ - Unpickle: 17 ms
+ - Entries: 46
+ - Pickle: 29 ms
+ - Buf: 643805
+ - Store: 5 ms
+ = Store: ok (333 ms)
+Entry 529:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:2
+ - Fetch: 2 ms
+ - I.Buf: 195383
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206846
+ - Store: 3 ms
+ = Store: ok (16 ms)
+Entry 530:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 206855
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218365
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 531:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 229826
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241348
+ - Store: 304 ms
+ = Store: ok (320 ms)
+Entry 532:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 409 ms
+ - I.Buf: 758747
+ - Unpickle: 20 ms
+ - Entries: 57
+ - Pickle: 37 ms
+ - Buf: 770261
+ - Store: 6 ms
+ = Store: ok (473 ms)
+Entry 533:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:0
+ - Fetch: 2 ms
+ - I.Buf: 149346
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 6 ms
+ - Buf: 160853
+ - Store: 604 ms
+ = Store: ok (614 ms)
+Entry 534:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 3 ms
+ - I.Buf: 287324
+ - Unpickle: 7 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298805
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 535:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 203 ms
+ - I.Buf: 563337
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 25 ms
+ - Buf: 574853
+ - Store: 237 ms
+ = Store: ok (481 ms)
+Entry 536:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 4 ms
+ - I.Buf: 390779
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402317
+ - Store: 311 ms
+ = Store: ok (341 ms)
+Entry 537:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 4 ms
+ - I.Buf: 333305
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344819
+ - Store: 3 ms
+ = Store: ok (30 ms)
+Entry 538:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 379366
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390876
+ - Store: 3 ms
+ = Store: ok (33 ms)
+Entry 539:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 333335
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344860
+ - Store: 302 ms
+ = Store: ok (327 ms)
+Entry 540:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 412 ms
+ - I.Buf: 770261
+ - Unpickle: 22 ms
+ - Entries: 58
+ - Pickle: 37 ms
+ - Buf: 781799
+ - Store: 804 ms
+ = Store: ok (1276 ms)
+Entry 541:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 207 ms
+ - I.Buf: 390857
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402322
+ - Store: 44 ms
+ = Store: ok (278 ms)
+Entry 542:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 252786
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264312
+ - Store: 3 ms
+ = Store: ok (21 ms)
+Entry 543:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:1
+ - Fetch: 1 ms
+ - I.Buf: 149390
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160833
+ - Store: 297 ms
+ = Store: ok (307 ms)
+Entry 544:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 205 ms
+ - I.Buf: 1276218
+ - Unpickle: 37 ms
+ - Entries: 102
+ - Pickle: 68 ms
+ - Buf: 1287731
+ - Store: 10 ms
+ = Store: ok (322 ms)
+Entry 545:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 608 ms
+ - I.Buf: 747261
+ - Unpickle: 21 ms
+ - Entries: 56
+ - Pickle: 36 ms
+ - Buf: 758745
+ - Store: 1633 ms
+ = Store: ok (2300 ms)
+Entry 546:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 206 ms
+ - I.Buf: 390818
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402345
+ - Store: 834 ms
+ = Store: ok (1068 ms)
+Entry 547:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 415 ms
+ - I.Buf: 1287731
+ - Unpickle: 41 ms
+ - Entries: 103
+ - Pickle: 70 ms
+ - Buf: 1299196
+ - Store: 3180 ms
+ = Store: ok (3708 ms)
+Entry 548:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 202 ms
+ - I.Buf: 448353
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459803
+ - Store: 5 ms
+ = Store: ok (238 ms)
+Entry 549:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 172286
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183820
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 550:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 218365
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229888
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 551:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 160862
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172345
+ - Store: 299 ms
+ = Store: ok (310 ms)
+Entry 552:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 199 ms
+ - I.Buf: 471367
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 21 ms
+ - Buf: 482861
+ - Store: 5 ms
+ = Store: ok (237 ms)
+Entry 553:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 4 ms
+ - I.Buf: 655401
+ - Unpickle: 17 ms
+ - Entries: 48
+ - Pickle: 30 ms
+ - Buf: 666883
+ - Store: 940 ms
+ = Store: ok (992 ms)
+Entry 554:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 189 ms
+ - I.Buf: 574853
+ - Unpickle: 15 ms
+ - Entries: 41
+ - Pickle: 26 ms
+ - Buf: 586331
+ - Store: 6 ms
+ = Store: ok (237 ms)
+Entry 555:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 402297
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413759
+ - Store: 4 ms
+ = Store: ok (35 ms)
+Entry 556:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 367826
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379291
+ - Store: 599 ms
+ = Store: ok (627 ms)
+Entry 557:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 172345
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183827
+ - Store: 2 ms
+ = Store: ok (13 ms)
+Entry 558:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 4 ms
+ - I.Buf: 643805
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 29 ms
+ - Buf: 655282
+ - Store: 5 ms
+ = Store: ok (57 ms)
+Entry 559:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 344860
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356366
+ - Store: 4 ms
+ = Store: ok (29 ms)
+Entry 560:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 264312
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275820
+ - Store: 898 ms
+ = Store: ok (917 ms)
+Entry 561:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 200 ms
+ - I.Buf: 482861
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 21 ms
+ - Buf: 494326
+ - Store: 5 ms
+ = Store: ok (239 ms)
+Entry 562:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 8 ms
+ - I.Buf: 1299196
+ - Unpickle: 38 ms
+ - Entries: 104
+ - Pickle: 70 ms
+ - Buf: 1310678
+ - Store: 11 ms
+ = Store: ok (129 ms)
+Entry 563:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 3 ms
+ - I.Buf: 321881
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333307
+ - Store: 1208 ms
+ = Store: ok (1233 ms)
+Entry 564:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 673 ms
+ - I.Buf: 367851
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379374
+ - Store: 4 ms
+ = Store: ok (702 ms)
+Entry 565:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 820 ms
+ - I.Buf: 1310678
+ - Unpickle: 43 ms
+ - Entries: 105
+ - Pickle: 70 ms
+ - Buf: 1322146
+ - Store: 11 ms
+ = Store: ok (946 ms)
+Entry 566:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 2 ms
+ - I.Buf: 229888
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241401
+ - Store: 3 ms
+ = Store: ok (19 ms)
+Entry 567:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 208 ms
+ - I.Buf: 655282
+ - Unpickle: 17 ms
+ - Entries: 48
+ - Pickle: 30 ms
+ - Buf: 666748
+ - Store: 6 ms
+ = Store: ok (263 ms)
+Entry 568:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 2750 ms
+ - I.Buf: 747252
+ - Unpickle: 20 ms
+ - Entries: 56
+ - Pickle: 35 ms
+ - Buf: 758768
+ - Store: 1241 ms
+ = Store: ok (4047 ms)
+Entry 569:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:0
+ - Fetch: 705 ms
+ - I.Buf: 229848
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241365
+ - Store: 3 ms
+ = Store: ok (722 ms)
+Entry 570:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 203 ms
+ - I.Buf: 390876
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402373
+ - Store: 4 ms
+ = Store: ok (234 ms)
+Entry 571:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 402329
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413859
+ - Store: 308 ms
+ = Store: ok (339 ms)
+Entry 572:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 198 ms
+ - I.Buf: 252830
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264345
+ - Store: 594 ms
+ = Store: ok (809 ms)
+Entry 573:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 206 ms
+ - I.Buf: 436768
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 19 ms
+ - Buf: 448267
+ - Store: 671 ms
+ = Store: ok (907 ms)
+Entry 574:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 410 ms
+ - I.Buf: 666790
+ - Unpickle: 19 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678261
+ - Store: 817 ms
+ = Store: ok (1279 ms)
+Entry 575:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 416 ms
+ - I.Buf: 758745
+ - Unpickle: 21 ms
+ - Entries: 57
+ - Pickle: 35 ms
+ - Buf: 770295
+ - Store: 7 ms
+ = Store: ok (480 ms)
+Entry 576:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 229852
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241376
+ - Store: 3 ms
+ = Store: ok (19 ms)
+Entry 577:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 2 ms
+ - I.Buf: 229835
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241341
+ - Store: 899 ms
+ = Store: ok (916 ms)
+Entry 578:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 413 ms
+ - I.Buf: 666748
+ - Unpickle: 18 ms
+ - Entries: 49
+ - Pickle: 32 ms
+ - Buf: 678226
+ - Store: 542 ms
+ = Store: ok (1006 ms)
+Entry 579:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 2001 ms
+ - I.Buf: 666883
+ - Unpickle: 18 ms
+ - Entries: 49
+ - Pickle: 31 ms
+ - Buf: 678357
+ - Store: 2847 ms
+ = Store: ok (4899 ms)
+Entry 580:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 207 ms
+ - I.Buf: 379291
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390811
+ - Store: 4 ms
+ = Store: ok (239 ms)
+Entry 581:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 287313
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298792
+ - Store: 3 ms
+ = Store: ok (23 ms)
+Entry 582:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:2
+ - Fetch: 1 ms
+ - I.Buf: 149344
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160821
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 583:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 206 ms
+ - I.Buf: 402395
+ - Unpickle: 9 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413840
+ - Store: 595 ms
+ = Store: ok (829 ms)
+Entry 584:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:2
+ - Fetch: 2 ms
+ - I.Buf: 160821
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172299
+ - Store: 1 ms
+ = Store: ok (12 ms)
+Entry 585:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 275844
+ - Unpickle: 5 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287339
+ - Store: 393 ms
+ = Store: ok (413 ms)
+Entry 586:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 3 ms
+ - I.Buf: 344819
+ - Unpickle: 7 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356333
+ - Store: 4 ms
+ = Store: ok (29 ms)
+Entry 587:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:2
+ - Fetch: 2 ms
+ - I.Buf: 310293
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321826
+ - Store: 43 ms
+ = Store: ok (66 ms)
+Entry 588:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 218322
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229857
+ - Store: 3 ms
+ = Store: ok (18 ms)
+Entry 589:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 208 ms
+ - I.Buf: 678357
+ - Unpickle: 19 ms
+ - Entries: 50
+ - Pickle: 33 ms
+ - Buf: 689892
+ - Store: 5 ms
+ = Store: ok (267 ms)
+Entry 590:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 207 ms
+ - I.Buf: 413759
+ - Unpickle: 14 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425275
+ - Store: 952 ms
+ = Store: ok (1192 ms)
+Entry 591:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 209 ms
+ - I.Buf: 241376
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252824
+ - Store: 3 ms
+ = Store: ok (227 ms)
+Entry 592:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 425275
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436765
+ - Store: 5 ms
+ = Store: ok (38 ms)
+Entry 593:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 212 ms
+ - I.Buf: 770295
+ - Unpickle: 21 ms
+ - Entries: 58
+ - Pickle: 36 ms
+ - Buf: 781802
+ - Store: 6 ms
+ = Store: ok (276 ms)
+Entry 594:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 207 ms
+ - I.Buf: 701252
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 32 ms
+ - Buf: 712782
+ - Store: 1199 ms
+ = Store: ok (1458 ms)
+Entry 595:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 208 ms
+ - I.Buf: 402345
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413774
+ - Store: 4 ms
+ = Store: ok (240 ms)
+Entry 596:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 3 ms
+ - I.Buf: 459803
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471309
+ - Store: 389 ms
+ = Store: ok (426 ms)
+Entry 597:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 207 ms
+ - I.Buf: 333325
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 16 ms
+ - Buf: 344856
+ - Store: 309 ms
+ = Store: ok (539 ms)
+Entry 598:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 1 ms
+ - I.Buf: 183831
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195339
+ - Store: 2 ms
+ = Store: ok (14 ms)
+Entry 599:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 207 ms
+ - I.Buf: 586331
+ - Unpickle: 16 ms
+ - Entries: 42
+ - Pickle: 27 ms
+ - Buf: 597794
+ - Store: 5 ms
+ = Store: ok (256 ms)
+Entry 600:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 229786
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241348
+ - Store: 502 ms
+ = Store: ok (517 ms)
+Entry 601:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 205 ms
+ - I.Buf: 781802
+ - Unpickle: 22 ms
+ - Entries: 59
+ - Pickle: 37 ms
+ - Buf: 793274
+ - Store: 7 ms
+ = Store: ok (272 ms)
+Entry 602:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 209 ms
+ - I.Buf: 356333
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367856
+ - Store: 4 ms
+ = Store: ok (236 ms)
+Entry 603:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 241331
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252779
+ - Store: 3 ms
+ = Store: ok (20 ms)
+Entry 604:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 402317
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 17 ms
+ - Buf: 413779
+ - Store: 4 ms
+ = Store: ok (33 ms)
+Entry 605:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 402373
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413872
+ - Store: 3 ms
+ = Store: ok (35 ms)
+Entry 606:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 413859
+ - Unpickle: 9 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425307
+ - Store: 303 ms
+ = Store: ok (334 ms)
+Entry 607:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 207 ms
+ - I.Buf: 678261
+ - Unpickle: 18 ms
+ - Entries: 50
+ - Pickle: 31 ms
+ - Buf: 689766
+ - Store: 7 ms
+ = Store: ok (264 ms)
+Entry 608:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 207 ms
+ - I.Buf: 494326
+ - Unpickle: 12 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505835
+ - Store: 4 ms
+ = Store: ok (247 ms)
+Entry 609:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 552 ms
+ - I.Buf: 425307
+ - Unpickle: 10 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436844
+ - Store: 305 ms
+ = Store: ok (887 ms)
+Entry 610:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 436844
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 19 ms
+ - Buf: 448346
+ - Store: 4 ms
+ = Store: ok (37 ms)
+Entry 611:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 2 ms
+ - I.Buf: 298792
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310314
+ - Store: 3 ms
+ = Store: ok (25 ms)
+Entry 612:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 413872
+ - Unpickle: 11 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425359
+ - Store: 4 ms
+ = Store: ok (37 ms)
+Entry 613:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 344856
+ - Unpickle: 12 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356369
+ - Store: 3 ms
+ = Store: ok (32 ms)
+Entry 614:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 229857
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 9 ms
+ - Buf: 241396
+ - Store: 615 ms
+ = Store: ok (631 ms)
+Entry 615:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 195347
+ - Unpickle: 4 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206832
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 616:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 207 ms
+ - I.Buf: 689766
+ - Unpickle: 18 ms
+ - Entries: 51
+ - Pickle: 31 ms
+ - Buf: 701226
+ - Store: 628 ms
+ = Store: ok (886 ms)
+Entry 617:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 208 ms
+ - I.Buf: 413779
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425273
+ - Store: 4 ms
+ = Store: ok (241 ms)
+Entry 618:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 205 ms
+ - I.Buf: 597794
+ - Unpickle: 16 ms
+ - Entries: 43
+ - Pickle: 27 ms
+ - Buf: 609335
+ - Store: 300 ms
+ = Store: ok (549 ms)
+Entry 619:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 3 ms
+ - I.Buf: 448346
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459817
+ - Store: 5 ms
+ = Store: ok (39 ms)
+Entry 620:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 7 ms
+ - I.Buf: 1322146
+ - Unpickle: 39 ms
+ - Entries: 106
+ - Pickle: 71 ms
+ - Buf: 1333690
+ - Store: 1950 ms
+ = Store: ok (2071 ms)
+Entry 621:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 402 ms
+ - I.Buf: 402322
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 17 ms
+ - Buf: 413798
+ - Store: 4 ms
+ = Store: ok (434 ms)
+Entry 622:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 1 ms
+ - I.Buf: 241341
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252792
+ - Store: 302 ms
+ = Store: ok (319 ms)
+Entry 623:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 549 ms
+ - I.Buf: 781799
+ - Unpickle: 21 ms
+ - Entries: 59
+ - Pickle: 36 ms
+ - Buf: 793268
+ - Store: 7 ms
+ = Store: ok (614 ms)
+Entry 624:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 260 ms
+ - I.Buf: 712782
+ - Unpickle: 19 ms
+ - Entries: 53
+ - Pickle: 34 ms
+ - Buf: 724287
+ - Store: 5 ms
+ = Store: ok (319 ms)
+Entry 625:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 3 ms
+ - I.Buf: 367820
+ - Unpickle: 8 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379329
+ - Store: 1384 ms
+ = Store: ok (1412 ms)
+Entry 626:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 183827
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195377
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 627:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 241348
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252819
+ - Store: 3 ms
+ = Store: ok (20 ms)
+Entry 628:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 252814
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264335
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 629:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 2 ms
+ - I.Buf: 287339
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298822
+ - Store: 301 ms
+ = Store: ok (322 ms)
+Entry 630:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 6567 ms
+ - I.Buf: 1333690
+ - Unpickle: 39 ms
+ - Entries: 107
+ - Pickle: 73 ms
+ - Buf: 1345188
+ - Store: 12 ms
+ = Store: ok (6693 ms)
+Entry 631:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 937 ms
+ - I.Buf: 218328
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229808
+ - Store: 1207 ms
+ = Store: ok (2158 ms)
+Entry 632:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 208 ms
+ - I.Buf: 241401
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252864
+ - Store: 3 ms
+ = Store: ok (227 ms)
+Entry 633:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1126 ms
+ - I.Buf: 1345188
+ - Unpickle: 43 ms
+ - Entries: 108
+ - Pickle: 79 ms
+ - Buf: 1356724
+ - Store: 303 ms
+ = Store: ok (1553 ms)
+Entry 634:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:2
+ - Fetch: 1 ms
+ - I.Buf: 195317
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206790
+ - Store: 600 ms
+ = Store: ok (613 ms)
+Entry 635:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:0
+ - Fetch: 205 ms
+ - I.Buf: 183820
+ - Unpickle: 3 ms
+ - Entries: 7
+ - Pickle: 8 ms
+ - Buf: 195381
+ - Store: 1073 ms
+ = Store: ok (1290 ms)
+Entry 636:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 1309 ms
+ - I.Buf: 701226
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 33 ms
+ - Buf: 712751
+ - Store: 2050 ms
+ = Store: ok (3412 ms)
+Entry 637:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 420 ms
+ - I.Buf: 758768
+ - Unpickle: 21 ms
+ - Entries: 57
+ - Pickle: 35 ms
+ - Buf: 770317
+ - Store: 47 ms
+ = Store: ok (524 ms)
+Entry 638:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 3 ms
+ - I.Buf: 390811
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402347
+ - Store: 1141 ms
+ = Store: ok (1170 ms)
+Entry 639:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 2205 ms
+ - I.Buf: 1356724
+ - Unpickle: 41 ms
+ - Entries: 109
+ - Pickle: 75 ms
+ - Buf: 1368184
+ - Store: 11 ms
+ = Store: ok (2336 ms)
+Entry 640:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 436765
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 19 ms
+ - Buf: 448290
+ - Store: 304 ms
+ = Store: ok (338 ms)
+Entry 641:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 210 ms
+ - I.Buf: 793268
+ - Unpickle: 22 ms
+ - Entries: 60
+ - Pickle: 38 ms
+ - Buf: 804741
+ - Store: 1061 ms
+ = Store: ok (1333 ms)
+Entry 642:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 215 ms
+ - I.Buf: 298808
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310334
+ - Store: 3 ms
+ = Store: ok (238 ms)
+Entry 643:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 1763 ms
+ - I.Buf: 413840
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 17 ms
+ - Buf: 425366
+ - Store: 642 ms
+ = Store: ok (2433 ms)
+Entry 644:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 200 ms
+ - I.Buf: 712751
+ - Unpickle: 19 ms
+ - Entries: 53
+ - Pickle: 35 ms
+ - Buf: 724273
+ - Store: 1082 ms
+ = Store: ok (1338 ms)
+Entry 645:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1016 ms
+ - I.Buf: 1368184
+ - Unpickle: 47 ms
+ - Entries: 110
+ - Pickle: 79 ms
+ - Buf: 1379727
+ - Store: 11 ms
+ = Store: ok (1155 ms)
+Entry 646:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 2 ms
+ - I.Buf: 367856
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379282
+ - Store: 4 ms
+ = Store: ok (31 ms)
+Entry 647:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 406 ms
+ - I.Buf: 724287
+ - Unpickle: 21 ms
+ - Entries: 54
+ - Pickle: 34 ms
+ - Buf: 735816
+ - Store: 6 ms
+ = Store: ok (469 ms)
+Entry 648:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 1 ms
+ - I.Buf: 241349
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252857
+ - Store: 3 ms
+ = Store: ok (20 ms)
+Entry 649:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 3 ms
+ - I.Buf: 425359
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436863
+ - Store: 3 ms
+ = Store: ok (36 ms)
+Entry 650:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 195339
+ - Unpickle: 3 ms
+ - Entries: 8
+ - Pickle: 9 ms
+ - Buf: 206807
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 651:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 264345
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275851
+ - Store: 3 ms
+ = Store: ok (21 ms)
+Entry 652:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:0
+ - Fetch: 2 ms
+ - I.Buf: 229824
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241359
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 653:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 206834
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218338
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 654:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 241396
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252852
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 655:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 189 ms
+ - I.Buf: 689892
+ - Unpickle: 19 ms
+ - Entries: 51
+ - Pickle: 31 ms
+ - Buf: 701390
+ - Store: 6 ms
+ = Store: ok (246 ms)
+Entry 656:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 5 ms
+ - I.Buf: 701390
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 32 ms
+ - Buf: 712886
+ - Store: 6 ms
+ = Store: ok (65 ms)
+Entry 657:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 310334
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321853
+ - Store: 3 ms
+ = Store: ok (26 ms)
+Entry 658:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 207 ms
+ - I.Buf: 275820
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 13 ms
+ - Buf: 287354
+ - Store: 3 ms
+ = Store: ok (230 ms)
+Entry 659:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 2 ms
+ - I.Buf: 252824
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264313
+ - Store: 3 ms
+ = Store: ok (21 ms)
+Entry 660:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 1601 ms
+ - I.Buf: 770317
+ - Unpickle: 21 ms
+ - Entries: 58
+ - Pickle: 37 ms
+ - Buf: 781812
+ - Store: 6 ms
+ = Store: ok (1666 ms)
+Entry 661:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:0:0
+ - Fetch: 2 ms
+ - I.Buf: 218334
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229896
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 662:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 275851
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287373
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 663:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 416 ms
+ - I.Buf: 1379727
+ - Unpickle: 40 ms
+ - Entries: 111
+ - Pickle: 77 ms
+ - Buf: 1391262
+ - Store: 10 ms
+ = Store: ok (546 ms)
+Entry 664:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 201 ms
+ - I.Buf: 471309
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 21 ms
+ - Buf: 482859
+ - Store: 4 ms
+ = Store: ok (239 ms)
+Entry 665:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 3 ms
+ - I.Buf: 402347
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413834
+ - Store: 3 ms
+ = Store: ok (34 ms)
+Entry 666:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 405 ms
+ - I.Buf: 505835
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517377
+ - Store: 4 ms
+ = Store: ok (446 ms)
+Entry 667:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 207 ms
+ - I.Buf: 413834
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425284
+ - Store: 4 ms
+ = Store: ok (239 ms)
+Entry 668:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 207 ms
+ - I.Buf: 413798
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425319
+ - Store: 3 ms
+ = Store: ok (239 ms)
+Entry 669:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 140 ms
+ - I.Buf: 448290
+ - Unpickle: 15 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459782
+ - Store: 4 ms
+ = Store: ok (180 ms)
+Entry 670:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 417 ms
+ - I.Buf: 1391262
+ - Unpickle: 41 ms
+ - Entries: 112
+ - Pickle: 75 ms
+ - Buf: 1402704
+ - Store: 9 ms
+ = Store: ok (545 ms)
+Entry 671:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:0
+ - Fetch: 2 ms
+ - I.Buf: 241365
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252829
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 672:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 208 ms
+ - I.Buf: 735816
+ - Unpickle: 20 ms
+ - Entries: 55
+ - Pickle: 34 ms
+ - Buf: 747238
+ - Store: 6 ms
+ = Store: ok (269 ms)
+Entry 673:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 3 ms
+ - I.Buf: 310333
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321865
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 674:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 1100 ms
+ - I.Buf: 425319
+ - Unpickle: 10 ms
+ - Entries: 28
+ - Pickle: 20 ms
+ - Buf: 436841
+ - Store: 3 ms
+ = Store: ok (1133 ms)
+Entry 675:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 530 ms
+ - I.Buf: 747238
+ - Unpickle: 20 ms
+ - Entries: 56
+ - Pickle: 35 ms
+ - Buf: 758786
+ - Store: 5 ms
+ = Store: ok (591 ms)
+Entry 676:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 287373
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298831
+ - Store: 2 ms
+ = Store: ok (22 ms)
+Entry 677:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 2 ms
+ - I.Buf: 367853
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379307
+ - Store: 3 ms
+ = Store: ok (31 ms)
+Entry 678:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 408 ms
+ - I.Buf: 459817
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 20 ms
+ - Buf: 471319
+ - Store: 4 ms
+ = Store: ok (445 ms)
+Entry 679:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 36 ms
+ - I.Buf: 379329
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390822
+ - Store: 3 ms
+ = Store: ok (66 ms)
+Entry 680:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 1 ms
+ - I.Buf: 218338
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229825
+ - Store: 1 ms
+ = Store: ok (17 ms)
+Entry 681:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 210 ms
+ - I.Buf: 793274
+ - Unpickle: 22 ms
+ - Entries: 60
+ - Pickle: 39 ms
+ - Buf: 804761
+ - Store: 5 ms
+ = Store: ok (278 ms)
+Entry 682:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 509 ms
+ - I.Buf: 758786
+ - Unpickle: 21 ms
+ - Entries: 57
+ - Pickle: 36 ms
+ - Buf: 770308
+ - Store: 5 ms
+ = Store: ok (572 ms)
+Entry 683:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 206 ms
+ - I.Buf: 425366
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 18 ms
+ - Buf: 436846
+ - Store: 4 ms
+ = Store: ok (239 ms)
+Entry 684:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:0
+ - Fetch: 0 ms
+ - I.Buf: 137849
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 6 ms
+ - Buf: 149344
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 685:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 821 ms
+ - I.Buf: 1402704
+ - Unpickle: 47 ms
+ - Entries: 113
+ - Pickle: 78 ms
+ - Buf: 1414199
+ - Store: 10 ms
+ = Store: ok (959 ms)
+Entry 686:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 732 ms
+ - I.Buf: 1414199
+ - Unpickle: 41 ms
+ - Entries: 114
+ - Pickle: 78 ms
+ - Buf: 1425707
+ - Store: 9 ms
+ = Store: ok (862 ms)
+Entry 687:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 425284
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436825
+ - Store: 3 ms
+ = Store: ok (35 ms)
+Entry 688:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:0:0
+ - Fetch: 1 ms
+ - I.Buf: 149333
+ - Unpickle: 1 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160831
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 689:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 1822 ms
+ - I.Buf: 379282
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390831
+ - Store: 3 ms
+ = Store: ok (1852 ms)
+Entry 690:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 778 ms
+ - I.Buf: 436863
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448387
+ - Store: 3 ms
+ = Store: ok (813 ms)
+Entry 691:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 5 ms
+ - I.Buf: 724273
+ - Unpickle: 20 ms
+ - Entries: 54
+ - Pickle: 34 ms
+ - Buf: 735766
+ - Store: 5 ms
+ = Store: ok (65 ms)
+Entry 692:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 1 ms
+ - I.Buf: 229808
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241327
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 693:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 199 ms
+ - I.Buf: 436841
+ - Unpickle: 10 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448352
+ - Store: 3 ms
+ = Store: ok (233 ms)
+Entry 694:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 840 ms
+ - I.Buf: 436825
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448342
+ - Store: 3 ms
+ = Store: ok (875 ms)
+Entry 695:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 205 ms
+ - I.Buf: 241343
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252844
+ - Store: 2 ms
+ = Store: ok (223 ms)
+Entry 696:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 207 ms
+ - I.Buf: 471319
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482832
+ - Store: 4 ms
+ = Store: ok (246 ms)
+Entry 697:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 410 ms
+ - I.Buf: 804761
+ - Unpickle: 22 ms
+ - Entries: 61
+ - Pickle: 38 ms
+ - Buf: 816291
+ - Store: 6 ms
+ = Store: ok (478 ms)
+Entry 698:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 206 ms
+ - I.Buf: 459782
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471296
+ - Store: 3 ms
+ = Store: ok (243 ms)
+Entry 699:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 206 ms
+ - I.Buf: 252819
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 10 ms
+ - Buf: 264300
+ - Store: 3 ms
+ = Store: ok (225 ms)
+Entry 700:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 2 ms
+ - I.Buf: 206832
+ - Unpickle: 3 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218346
+ - Store: 2 ms
+ = Store: ok (16 ms)
+Entry 701:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 529 ms
+ - I.Buf: 804741
+ - Unpickle: 23 ms
+ - Entries: 61
+ - Pickle: 39 ms
+ - Buf: 816258
+ - Store: 5 ms
+ = Store: ok (597 ms)
+Entry 702:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:2
+ - Fetch: 1 ms
+ - I.Buf: 206807
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218321
+ - Store: 1 ms
+ = Store: ok (16 ms)
+Entry 703:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 206 ms
+ - I.Buf: 333353
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344873
+ - Store: 2 ms
+ = Store: ok (232 ms)
+Entry 704:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 411 ms
+ - I.Buf: 712886
+ - Unpickle: 20 ms
+ - Entries: 53
+ - Pickle: 33 ms
+ - Buf: 724403
+ - Store: 4 ms
+ = Store: ok (470 ms)
+Entry 705:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 622 ms
+ - I.Buf: 1425707
+ - Unpickle: 45 ms
+ - Entries: 115
+ - Pickle: 80 ms
+ - Buf: 1437281
+ - Store: 9 ms
+ = Store: ok (759 ms)
+Entry 706:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 196 ms
+ - I.Buf: 448387
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459821
+ - Store: 4 ms
+ = Store: ok (231 ms)
+Entry 707:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 221 ms
+ - I.Buf: 724403
+ - Unpickle: 20 ms
+ - Entries: 54
+ - Pickle: 34 ms
+ - Buf: 735916
+ - Store: 5 ms
+ = Store: ok (281 ms)
+Entry 708:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 2 ms
+ - I.Buf: 229825
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241367
+ - Store: 2 ms
+ = Store: ok (18 ms)
+Entry 709:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 817 ms
+ - I.Buf: 1437281
+ - Unpickle: 42 ms
+ - Entries: 116
+ - Pickle: 79 ms
+ - Buf: 1448717
+ - Store: 9 ms
+ = Store: ok (950 ms)
+Entry 710:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 202 ms
+ - I.Buf: 356366
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367841
+ - Store: 3 ms
+ = Store: ok (229 ms)
+Entry 711:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 6 ms
+ - I.Buf: 735766
+ - Unpickle: 20 ms
+ - Entries: 55
+ - Pickle: 35 ms
+ - Buf: 747241
+ - Store: 5 ms
+ = Store: ok (67 ms)
+Entry 712:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 3 ms
+ - I.Buf: 390831
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402318
+ - Store: 3 ms
+ = Store: ok (33 ms)
+Entry 713:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 5 ms
+ - I.Buf: 735916
+ - Unpickle: 21 ms
+ - Entries: 55
+ - Pickle: 34 ms
+ - Buf: 747373
+ - Store: 9 ms
+ = Store: ok (71 ms)
+Entry 714:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 298793
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310290
+ - Store: 3 ms
+ = Store: ok (25 ms)
+Entry 715:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 205 ms
+ - I.Buf: 275820
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287283
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 716:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 312 ms
+ - I.Buf: 379374
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 16 ms
+ - Buf: 390876
+ - Store: 3 ms
+ = Store: ok (341 ms)
+Entry 717:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:0
+ - Fetch: 1 ms
+ - I.Buf: 149352
+ - Unpickle: 1 ms
+ - Entries: 4
+ - Pickle: 6 ms
+ - Buf: 160844
+ - Store: 1 ms
+ = Store: ok (10 ms)
+Entry 718:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:1
+ - Fetch: 1 ms
+ - I.Buf: 241348
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252817
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 719:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 622 ms
+ - I.Buf: 816291
+ - Unpickle: 22 ms
+ - Entries: 62
+ - Pickle: 38 ms
+ - Buf: 827744
+ - Store: 6 ms
+ = Store: ok (689 ms)
+Entry 720:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 205 ms
+ - I.Buf: 333307
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344853
+ - Store: 3 ms
+ = Store: ok (231 ms)
+Entry 721:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 413 ms
+ - I.Buf: 770308
+ - Unpickle: 24 ms
+ - Entries: 58
+ - Pickle: 36 ms
+ - Buf: 781848
+ - Store: 5 ms
+ = Store: ok (480 ms)
+Entry 722:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 2 ms
+ - I.Buf: 264335
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275872
+ - Store: 2 ms
+ = Store: ok (21 ms)
+Entry 723:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 1 ms
+ - I.Buf: 206852
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 8 ms
+ - Buf: 218389
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 724:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 211 ms
+ - I.Buf: 781848
+ - Unpickle: 21 ms
+ - Entries: 59
+ - Pickle: 37 ms
+ - Buf: 793286
+ - Store: 5 ms
+ = Store: ok (275 ms)
+Entry 725:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 3 ms
+ - I.Buf: 298822
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310363
+ - Store: 3 ms
+ = Store: ok (25 ms)
+Entry 726:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 196 ms
+ - I.Buf: 356369
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367887
+ - Store: 4 ms
+ = Store: ok (223 ms)
+Entry 727:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 2 ms
+ - I.Buf: 287354
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298817
+ - Store: 2 ms
+ = Store: ok (23 ms)
+Entry 728:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:0
+ - Fetch: 1 ms
+ - I.Buf: 160831
+ - Unpickle: 3 ms
+ - Entries: 5
+ - Pickle: 6 ms
+ - Buf: 172296
+ - Store: 2 ms
+ = Store: ok (12 ms)
+Entry 729:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 2 ms
+ - I.Buf: 321853
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 15 ms
+ - Buf: 333324
+ - Store: 2 ms
+ = Store: ok (26 ms)
+Entry 730:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 206 ms
+ - I.Buf: 827744
+ - Unpickle: 23 ms
+ - Entries: 63
+ - Pickle: 39 ms
+ - Buf: 839279
+ - Store: 5 ms
+ = Store: ok (275 ms)
+Entry 731:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 252857
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264358
+ - Store: 2 ms
+ = Store: ok (20 ms)
+Entry 732:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 3 ms
+ - I.Buf: 448267
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459759
+ - Store: 3 ms
+ = Store: ok (37 ms)
+Entry 733:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 205 ms
+ - I.Buf: 436846
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448365
+ - Store: 3 ms
+ = Store: ok (239 ms)
+Entry 734:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 616 ms
+ - I.Buf: 793286
+ - Unpickle: 21 ms
+ - Entries: 60
+ - Pickle: 37 ms
+ - Buf: 804763
+ - Store: 5 ms
+ = Store: ok (681 ms)
+Entry 735:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:2
+ - Fetch: 1 ms
+ - I.Buf: 137862
+ - Unpickle: 2 ms
+ - Entries: 3
+ - Pickle: 5 ms
+ - Buf: 149349
+ - Store: 2 ms
+ = Store: ok (10 ms)
+Entry 736:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 2 ms
+ - I.Buf: 241327
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252768
+ - Store: 2 ms
+ = Store: ok (19 ms)
+Entry 737:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 210 ms
+ - I.Buf: 678226
+ - Unpickle: 19 ms
+ - Entries: 50
+ - Pickle: 32 ms
+ - Buf: 689788
+ - Store: 4 ms
+ = Store: ok (266 ms)
+Entry 738:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:2:0
+ - Fetch: 194 ms
+ - I.Buf: 252857
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264365
+ - Store: 2 ms
+ = Store: ok (212 ms)
+Entry 739:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 140 ms
+ - I.Buf: 344831
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356370
+ - Store: 3 ms
+ = Store: ok (168 ms)
+Entry 740:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 2 ms
+ - I.Buf: 218352
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229836
+ - Store: 2 ms
+ = Store: ok (17 ms)
+Entry 741:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 1956 ms
+ - I.Buf: 252864
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264349
+ - Store: 2 ms
+ = Store: ok (1975 ms)
+Entry 742:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 3 ms
+ - I.Buf: 275872
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287347
+ - Store: 2 ms
+ = Store: ok (24 ms)
+Entry 743:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 4 ms
+ - I.Buf: 448342
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459794
+ - Store: 3 ms
+ = Store: ok (39 ms)
+Entry 744:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 1 ms
+ - I.Buf: 195377
+ - Unpickle: 4 ms
+ - Entries: 8
+ - Pickle: 8 ms
+ - Buf: 206836
+ - Store: 2 ms
+ = Store: ok (15 ms)
+Entry 745:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 203 ms
+ - I.Buf: 459821
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 20 ms
+ - Buf: 471314
+ - Store: 3 ms
+ = Store: ok (239 ms)
+Entry 746:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 204 ms
+ - I.Buf: 448365
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459824
+ - Store: 4 ms
+ = Store: ok (239 ms)
+Entry 747:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 206 ms
+ - I.Buf: 321865
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333354
+ - Store: 3 ms
+ = Store: ok (230 ms)
+Entry 748:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 204 ms
+ - I.Buf: 287283
+ - Unpickle: 7 ms
+ - Entries: 16
+ - Pickle: 12 ms
+ - Buf: 298770
+ - Store: 2 ms
+ = Store: ok (226 ms)
+Entry 749:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 965 ms
+ - I.Buf: 310363
+ - Unpickle: 10 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321858
+ - Store: 3 ms
+ = Store: ok (992 ms)
+Entry 750:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 1976 ms
+ - I.Buf: 1448717
+ - Unpickle: 43 ms
+ - Entries: 117
+ - Pickle: 81 ms
+ - Buf: 1460227
+ - Store: 10 ms
+ = Store: ok (2112 ms)
+Entry 751:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 1865 ms
+ - I.Buf: 321858
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333353
+ - Store: 3 ms
+ = Store: ok (1890 ms)
+Entry 752:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 2310 ms
+ - I.Buf: 804763
+ - Unpickle: 23 ms
+ - Entries: 61
+ - Pickle: 38 ms
+ - Buf: 816309
+ - Store: 39 ms
+ = Store: ok (2413 ms)
+Entry 753:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:2
+ - Fetch: 16 ms
+ - I.Buf: 149309
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 6 ms
+ - Buf: 160858
+ - Store: 10 ms
+ = Store: ok (34 ms)
+Entry 754:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 36 ms
+ - I.Buf: 298831
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310340
+ - Store: 36 ms
+ = Store: ok (92 ms)
+Entry 755:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 542 ms
+ - I.Buf: 747373
+ - Unpickle: 20 ms
+ - Entries: 56
+ - Pickle: 36 ms
+ - Buf: 758880
+ - Store: 28 ms
+ = Store: ok (627 ms)
+Entry 756:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:2:1
+ - Fetch: 35 ms
+ - I.Buf: 264349
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275864
+ - Store: 3 ms
+ = Store: ok (56 ms)
+Entry 757:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 38 ms
+ - I.Buf: 517377
+ - Unpickle: 14 ms
+ - Entries: 36
+ - Pickle: 24 ms
+ - Buf: 528877
+ - Store: 36 ms
+ = Store: ok (113 ms)
+Entry 758:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 35 ms
+ - I.Buf: 218346
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229876
+ - Store: 24 ms
+ = Store: ok (72 ms)
+Entry 759:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 239 ms
+ - I.Buf: 482859
+ - Unpickle: 13 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494355
+ - Store: 8 ms
+ = Store: ok (283 ms)
+Entry 760:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 240 ms
+ - I.Buf: 390822
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402355
+ - Store: 3 ms
+ = Store: ok (270 ms)
+Entry 761:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 258 ms
+ - I.Buf: 747241
+ - Unpickle: 21 ms
+ - Entries: 56
+ - Pickle: 36 ms
+ - Buf: 758768
+ - Store: 30 ms
+ = Store: ok (346 ms)
+Entry 762:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 37 ms
+ - I.Buf: 471314
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482847
+ - Store: 4 ms
+ = Store: ok (76 ms)
+Entry 763:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:0
+ - Fetch: 16 ms
+ - I.Buf: 149371
+ - Unpickle: 1 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160853
+ - Store: 11 ms
+ = Store: ok (36 ms)
+Entry 764:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 36 ms
+ - I.Buf: 367887
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 17 ms
+ - Buf: 379367
+ - Store: 29 ms
+ = Store: ok (92 ms)
+Entry 765:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 18 ms
+ - I.Buf: 218389
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 10 ms
+ - Buf: 229914
+ - Store: 5 ms
+ = Store: ok (37 ms)
+Entry 766:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 36 ms
+ - I.Buf: 390842
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402327
+ - Store: 28 ms
+ = Store: ok (92 ms)
+Entry 767:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:2
+ - Fetch: 34 ms
+ - I.Buf: 206790
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218320
+ - Store: 24 ms
+ = Store: ok (71 ms)
+Entry 768:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 73 ms
+ - I.Buf: 310290
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321796
+ - Store: 36 ms
+ = Store: ok (130 ms)
+Entry 769:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 230 ms
+ - I.Buf: 333353
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344824
+ - Store: 31 ms
+ = Store: ok (284 ms)
+Entry 770:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 36 ms
+ - I.Buf: 252852
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264354
+ - Store: 3 ms
+ = Store: ok (56 ms)
+Entry 771:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 37 ms
+ - I.Buf: 356370
+ - Unpickle: 9 ms
+ - Entries: 22
+ - Pickle: 15 ms
+ - Buf: 367860
+ - Store: 33 ms
+ = Store: ok (95 ms)
+Entry 772:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 36 ms
+ - I.Buf: 218325
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229831
+ - Store: 24 ms
+ = Store: ok (73 ms)
+Entry 773:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 55 ms
+ - I.Buf: 839279
+ - Unpickle: 29 ms
+ - Entries: 64
+ - Pickle: 40 ms
+ - Buf: 850793
+ - Store: 25 ms
+ = Store: ok (152 ms)
+Entry 774:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 816258
+ - Unpickle: 24 ms
+ - Entries: 62
+ - Pickle: 39 ms
+ - Buf: 827721
+ - Store: 30 ms
+ = Store: ok (133 ms)
+Entry 775:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 689788
+ - Unpickle: 19 ms
+ - Entries: 51
+ - Pickle: 33 ms
+ - Buf: 701307
+ - Store: 25 ms
+ = Store: ok (115 ms)
+Entry 776:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 36 ms
+ - I.Buf: 402327
+ - Unpickle: 9 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413806
+ - Store: 28 ms
+ = Store: ok (92 ms)
+Entry 777:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 18 ms
+ - I.Buf: 287347
+ - Unpickle: 6 ms
+ - Entries: 16
+ - Pickle: 13 ms
+ - Buf: 298779
+ - Store: 18 ms
+ = Store: ok (55 ms)
+Entry 778:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 56 ms
+ - I.Buf: 816309
+ - Unpickle: 24 ms
+ - Entries: 62
+ - Pickle: 40 ms
+ - Buf: 827754
+ - Store: 31 ms
+ = Store: ok (152 ms)
+Entry 779:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 59 ms
+ - I.Buf: 1460227
+ - Unpickle: 44 ms
+ - Entries: 118
+ - Pickle: 84 ms
+ - Buf: 1471740
+ - Store: 41 ms
+ = Store: ok (231 ms)
+Entry 780:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 35 ms
+ - I.Buf: 367841
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379340
+ - Store: 30 ms
+ = Store: ok (91 ms)
+Entry 781:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 36 ms
+ - I.Buf: 344824
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 16 ms
+ - Buf: 356393
+ - Store: 31 ms
+ = Store: ok (92 ms)
+Entry 782:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 36 ms
+ - I.Buf: 310314
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321825
+ - Store: 35 ms
+ = Store: ok (93 ms)
+Entry 783:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 36 ms
+ - I.Buf: 252844
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264361
+ - Store: 4 ms
+ = Store: ok (57 ms)
+Entry 784:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 44 ms
+ - I.Buf: 1471740
+ - Unpickle: 46 ms
+ - Entries: 119
+ - Pickle: 87 ms
+ - Buf: 1483262
+ - Store: 37 ms
+ = Store: ok (217 ms)
+Entry 785:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 35 ms
+ - I.Buf: 333354
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344831
+ - Store: 31 ms
+ = Store: ok (90 ms)
+Entry 786:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 439 ms
+ - I.Buf: 1483262
+ - Unpickle: 52 ms
+ - Entries: 120
+ - Pickle: 85 ms
+ - Buf: 1494658
+ - Store: 44 ms
+ = Store: ok (623 ms)
+Entry 787:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 36 ms
+ - I.Buf: 758768
+ - Unpickle: 22 ms
+ - Entries: 57
+ - Pickle: 36 ms
+ - Buf: 770255
+ - Store: 53 ms
+ = Store: ok (149 ms)
+Entry 788:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 52 ms
+ - I.Buf: 264354
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275898
+ - Store: 2 ms
+ = Store: ok (72 ms)
+Entry 789:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 62 ms
+ - I.Buf: 1494658
+ - Unpickle: 45 ms
+ - Entries: 121
+ - Pickle: 85 ms
+ - Buf: 1506236
+ - Store: 39 ms
+ = Store: ok (234 ms)
+Entry 790:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 37 ms
+ - I.Buf: 758880
+ - Unpickle: 21 ms
+ - Entries: 57
+ - Pickle: 36 ms
+ - Buf: 770381
+ - Store: 34 ms
+ = Store: ok (130 ms)
+Entry 791:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 38 ms
+ - I.Buf: 701307
+ - Unpickle: 19 ms
+ - Entries: 52
+ - Pickle: 33 ms
+ - Buf: 712758
+ - Store: 5 ms
+ = Store: ok (96 ms)
+Entry 792:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 56 ms
+ - I.Buf: 827721
+ - Unpickle: 24 ms
+ - Entries: 63
+ - Pickle: 40 ms
+ - Buf: 839239
+ - Store: 65 ms
+ = Store: ok (188 ms)
+Entry 793:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 53 ms
+ - I.Buf: 425273
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436811
+ - Store: 61 ms
+ = Store: ok (145 ms)
+Entry 794:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 827754
+ - Unpickle: 24 ms
+ - Entries: 63
+ - Pickle: 40 ms
+ - Buf: 839277
+ - Store: 29 ms
+ = Store: ok (133 ms)
+Entry 795:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:0
+ - Fetch: 35 ms
+ - I.Buf: 252829
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 12 ms
+ - Buf: 264347
+ - Store: 2 ms
+ = Store: ok (54 ms)
+Entry 796:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 20 ms
+ - I.Buf: 402355
+ - Unpickle: 9 ms
+ - Entries: 26
+ - Pickle: 19 ms
+ - Buf: 413834
+ - Store: 28 ms
+ = Store: ok (76 ms)
+Entry 797:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 37 ms
+ - I.Buf: 436868
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448360
+ - Store: 7 ms
+ = Store: ok (75 ms)
+Entry 798:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 36 ms
+ - I.Buf: 367860
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379307
+ - Store: 31 ms
+ = Store: ok (92 ms)
+Entry 799:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 35 ms
+ - I.Buf: 229836
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241327
+ - Store: 22 ms
+ = Store: ok (72 ms)
+Entry 800:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 237 ms
+ - I.Buf: 839239
+ - Unpickle: 29 ms
+ - Entries: 64
+ - Pickle: 41 ms
+ - Buf: 850725
+ - Store: 39 ms
+ = Store: ok (347 ms)
+Entry 801:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 35 ms
+ - I.Buf: 413774
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425308
+ - Store: 27 ms
+ = Store: ok (91 ms)
+Entry 802:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 36 ms
+ - I.Buf: 413806
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425339
+ - Store: 27 ms
+ = Store: ok (93 ms)
+Entry 803:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 36 ms
+ - I.Buf: 448360
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 21 ms
+ - Buf: 459858
+ - Store: 42 ms
+ = Store: ok (110 ms)
+Entry 804:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 58 ms
+ - I.Buf: 850793
+ - Unpickle: 25 ms
+ - Entries: 65
+ - Pickle: 41 ms
+ - Buf: 862308
+ - Store: 10 ms
+ = Store: ok (136 ms)
+Entry 805:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 16 ms
+ - I.Buf: 241367
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252824
+ - Store: 4 ms
+ = Store: ok (36 ms)
+Entry 806:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 26 ms
+ - I.Buf: 1506236
+ - Unpickle: 45 ms
+ - Entries: 122
+ - Pickle: 87 ms
+ - Buf: 1517727
+ - Store: 37 ms
+ = Store: ok (197 ms)
+Entry 807:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 35 ms
+ - I.Buf: 448352
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 21 ms
+ - Buf: 459794
+ - Store: 24 ms
+ = Store: ok (92 ms)
+Entry 808:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 37 ms
+ - I.Buf: 482847
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 21 ms
+ - Buf: 494347
+ - Store: 22 ms
+ = Store: ok (93 ms)
+Entry 809:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 39 ms
+ - I.Buf: 839277
+ - Unpickle: 24 ms
+ - Entries: 64
+ - Pickle: 43 ms
+ - Buf: 850788
+ - Store: 26 ms
+ = Store: ok (134 ms)
+Entry 810:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 36 ms
+ - I.Buf: 494355
+ - Unpickle: 12 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505798
+ - Store: 40 ms
+ = Store: ok (112 ms)
+Entry 811:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 712758
+ - Unpickle: 20 ms
+ - Entries: 53
+ - Pickle: 35 ms
+ - Buf: 724289
+ - Store: 38 ms
+ = Store: ok (131 ms)
+Entry 812:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 42 ms
+ - I.Buf: 1517727
+ - Unpickle: 53 ms
+ - Entries: 123
+ - Pickle: 89 ms
+ - Buf: 1529194
+ - Store: 27 ms
+ = Store: ok (214 ms)
+Entry 813:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 35 ms
+ - I.Buf: 390876
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402389
+ - Store: 28 ms
+ = Store: ok (90 ms)
+Entry 814:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:0
+ - Fetch: 36 ms
+ - I.Buf: 229896
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241349
+ - Store: 5 ms
+ = Store: ok (56 ms)
+Entry 815:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:0
+ - Fetch: 37 ms
+ - I.Buf: 356393
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367898
+ - Store: 13 ms
+ = Store: ok (74 ms)
+Entry 816:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:2
+ - Fetch: 18 ms
+ - I.Buf: 264361
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275850
+ - Store: 3 ms
+ = Store: ok (39 ms)
+Entry 817:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 62 ms
+ - I.Buf: 1529194
+ - Unpickle: 46 ms
+ - Entries: 124
+ - Pickle: 89 ms
+ - Buf: 1540701
+ - Store: 34 ms
+ = Store: ok (235 ms)
+Entry 818:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 36 ms
+ - I.Buf: 482832
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494352
+ - Store: 4 ms
+ = Store: ok (75 ms)
+Entry 819:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 71 ms
+ - I.Buf: 379340
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390830
+ - Store: 31 ms
+ = Store: ok (128 ms)
+Entry 820:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 35 ms
+ - I.Buf: 206836
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218333
+ - Store: 24 ms
+ = Store: ok (72 ms)
+Entry 821:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 40 ms
+ - I.Buf: 862308
+ - Unpickle: 25 ms
+ - Entries: 66
+ - Pickle: 43 ms
+ - Buf: 873758
+ - Store: 24 ms
+ = Store: ok (134 ms)
+Entry 822:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 18 ms
+ - I.Buf: 379307
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 18 ms
+ - Buf: 390815
+ - Store: 29 ms
+ = Store: ok (75 ms)
+Entry 823:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:0
+ - Fetch: 36 ms
+ - I.Buf: 298770
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310282
+ - Store: 35 ms
+ = Store: ok (92 ms)
+Entry 824:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 35 ms
+ - I.Buf: 218333
+ - Unpickle: 4 ms
+ - Entries: 10
+ - Pickle: 9 ms
+ - Buf: 229864
+ - Store: 6 ms
+ = Store: ok (55 ms)
+Entry 825:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 41 ms
+ - I.Buf: 436811
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448343
+ - Store: 25 ms
+ = Store: ok (98 ms)
+Entry 826:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:2
+ - Fetch: 36 ms
+ - I.Buf: 264313
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275844
+ - Store: 2 ms
+ = Store: ok (55 ms)
+Entry 827:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:2:1
+ - Fetch: 36 ms
+ - I.Buf: 379367
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 17 ms
+ - Buf: 390838
+ - Store: 12 ms
+ = Store: ok (75 ms)
+Entry 828:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 37 ms
+ - I.Buf: 448343
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459754
+ - Store: 58 ms
+ = Store: ok (127 ms)
+Entry 829:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 50 ms
+ - I.Buf: 298779
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310334
+ - Store: 8 ms
+ = Store: ok (79 ms)
+Entry 830:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 8 ms
+ - I.Buf: 873758
+ - Unpickle: 24 ms
+ - Entries: 67
+ - Pickle: 44 ms
+ - Buf: 885255
+ - Store: 8 ms
+ = Store: ok (86 ms)
+Entry 831:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:0
+ - Fetch: 2 ms
+ - I.Buf: 206828
+ - Unpickle: 4 ms
+ - Entries: 9
+ - Pickle: 9 ms
+ - Buf: 218351
+ - Store: 6 ms
+ = Store: ok (22 ms)
+Entry 832:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 3 ms
+ - I.Buf: 459824
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471356
+ - Store: 3 ms
+ = Store: ok (40 ms)
+Entry 833:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:0
+ - Fetch: 2 ms
+ - I.Buf: 310340
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321865
+ - Store: 43 ms
+ = Store: ok (67 ms)
+Entry 834:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 4 ms
+ - I.Buf: 609335
+ - Unpickle: 21 ms
+ - Entries: 44
+ - Pickle: 28 ms
+ - Buf: 620773
+ - Store: 7 ms
+ = Store: ok (61 ms)
+Entry 835:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:0
+ - Fetch: 38 ms
+ - I.Buf: 459794
+ - Unpickle: 11 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471299
+ - Store: 28 ms
+ = Store: ok (99 ms)
+Entry 836:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 22 ms
+ - I.Buf: 620773
+ - Unpickle: 17 ms
+ - Entries: 45
+ - Pickle: 29 ms
+ - Buf: 632273
+ - Store: 8 ms
+ = Store: ok (78 ms)
+Entry 837:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 35 ms
+ - I.Buf: 321796
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333269
+ - Store: 35 ms
+ = Store: ok (93 ms)
+Entry 838:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 36 ms
+ - I.Buf: 459759
+ - Unpickle: 11 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471261
+ - Store: 25 ms
+ = Store: ok (94 ms)
+Entry 839:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 20 ms
+ - I.Buf: 850788
+ - Unpickle: 24 ms
+ - Entries: 65
+ - Pickle: 41 ms
+ - Buf: 862298
+ - Store: 29 ms
+ = Store: ok (115 ms)
+Entry 840:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 57 ms
+ - I.Buf: 885255
+ - Unpickle: 25 ms
+ - Entries: 68
+ - Pickle: 43 ms
+ - Buf: 896749
+ - Store: 26 ms
+ = Store: ok (154 ms)
+Entry 841:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 73 ms
+ - I.Buf: 724289
+ - Unpickle: 19 ms
+ - Entries: 54
+ - Pickle: 35 ms
+ - Buf: 735814
+ - Store: 6 ms
+ = Store: ok (135 ms)
+Entry 842:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 850725
+ - Unpickle: 24 ms
+ - Entries: 65
+ - Pickle: 41 ms
+ - Buf: 862305
+ - Store: 28 ms
+ = Store: ok (132 ms)
+Entry 843:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 246 ms
+ - I.Buf: 1540701
+ - Unpickle: 47 ms
+ - Entries: 125
+ - Pickle: 93 ms
+ - Buf: 1552219
+ - Store: 37 ms
+ = Store: ok (425 ms)
+Entry 844:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 34 ms
+ - I.Buf: 471356
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482848
+ - Store: 23 ms
+ = Store: ok (91 ms)
+Entry 845:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 36 ms
+ - I.Buf: 298805
+ - Unpickle: 6 ms
+ - Entries: 17
+ - Pickle: 14 ms
+ - Buf: 310315
+ - Store: 35 ms
+ = Store: ok (92 ms)
+Entry 846:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 23 ms
+ - I.Buf: 862305
+ - Unpickle: 25 ms
+ - Entries: 66
+ - Pickle: 42 ms
+ - Buf: 873734
+ - Store: 8 ms
+ = Store: ok (99 ms)
+Entry 847:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 16 ms
+ - I.Buf: 252792
+ - Unpickle: 9 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264281
+ - Store: 35 ms
+ = Store: ok (73 ms)
+Entry 848:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 36 ms
+ - I.Buf: 344853
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356338
+ - Store: 32 ms
+ = Store: ok (92 ms)
+Entry 849:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 72 ms
+ - I.Buf: 333324
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 14 ms
+ - Buf: 344826
+ - Store: 33 ms
+ = Store: ok (128 ms)
+Entry 850:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 38 ms
+ - I.Buf: 632273
+ - Unpickle: 16 ms
+ - Entries: 46
+ - Pickle: 30 ms
+ - Buf: 643818
+ - Store: 27 ms
+ = Store: ok (113 ms)
+Entry 851:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 36 ms
+ - I.Buf: 241327
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 10 ms
+ - Buf: 252820
+ - Store: 22 ms
+ = Store: ok (73 ms)
+Entry 852:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 39 ms
+ - I.Buf: 896749
+ - Unpickle: 26 ms
+ - Entries: 69
+ - Pickle: 44 ms
+ - Buf: 908204
+ - Store: 24 ms
+ = Store: ok (135 ms)
+Entry 853:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 37 ms
+ - I.Buf: 908204
+ - Unpickle: 27 ms
+ - Entries: 70
+ - Pickle: 45 ms
+ - Buf: 919755
+ - Store: 39 ms
+ = Store: ok (150 ms)
+Entry 854:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 17 ms
+ - I.Buf: 344873
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356364
+ - Store: 32 ms
+ = Store: ok (72 ms)
+Entry 855:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:0:1
+ - Fetch: 34 ms
+ - I.Buf: 160833
+ - Unpickle: 3 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172331
+ - Store: 10 ms
+ = Store: ok (55 ms)
+Entry 856:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 21 ms
+ - I.Buf: 781812
+ - Unpickle: 22 ms
+ - Entries: 59
+ - Pickle: 37 ms
+ - Buf: 793281
+ - Store: 35 ms
+ = Store: ok (117 ms)
+Entry 857:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 36 ms
+ - I.Buf: 413834
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425335
+ - Store: 27 ms
+ = Store: ok (92 ms)
+Entry 858:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 35 ms
+ - I.Buf: 229831
+ - Unpickle: 5 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241392
+ - Store: 5 ms
+ = Store: ok (55 ms)
+Entry 859:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 21 ms
+ - I.Buf: 873734
+ - Unpickle: 25 ms
+ - Entries: 67
+ - Pickle: 42 ms
+ - Buf: 885287
+ - Store: 27 ms
+ = Store: ok (117 ms)
+Entry 860:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 38 ms
+ - I.Buf: 735814
+ - Unpickle: 20 ms
+ - Entries: 55
+ - Pickle: 35 ms
+ - Buf: 747237
+ - Store: 38 ms
+ = Store: ok (132 ms)
+Entry 861:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 54 ms
+ - I.Buf: 747237
+ - Unpickle: 21 ms
+ - Entries: 56
+ - Pickle: 37 ms
+ - Buf: 758772
+ - Store: 35 ms
+ = Store: ok (150 ms)
+Entry 862:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 35 ms
+ - I.Buf: 402318
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413776
+ - Store: 28 ms
+ = Store: ok (92 ms)
+Entry 863:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 36 ms
+ - I.Buf: 310315
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321830
+ - Store: 33 ms
+ = Store: ok (90 ms)
+Entry 864:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:2:2
+ - Fetch: 36 ms
+ - I.Buf: 275898
+ - Unpickle: 6 ms
+ - Entries: 15
+ - Pickle: 13 ms
+ - Buf: 287412
+ - Store: 37 ms
+ = Store: ok (92 ms)
+Entry 865:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 482848
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494343
+ - Store: 22 ms
+ = Store: ok (94 ms)
+Entry 866:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:0:1
+ - Fetch: 35 ms
+ - I.Buf: 379307
+ - Unpickle: 12 ms
+ - Entries: 24
+ - Pickle: 18 ms
+ - Buf: 390848
+ - Store: 26 ms
+ = Store: ok (91 ms)
+Entry 867:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 40 ms
+ - I.Buf: 885287
+ - Unpickle: 25 ms
+ - Entries: 68
+ - Pickle: 43 ms
+ - Buf: 896738
+ - Store: 26 ms
+ = Store: ok (135 ms)
+Entry 868:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 758772
+ - Unpickle: 21 ms
+ - Entries: 57
+ - Pickle: 36 ms
+ - Buf: 770275
+ - Store: 35 ms
+ = Store: ok (130 ms)
+Entry 869:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 36 ms
+ - I.Buf: 505798
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517339
+ - Store: 38 ms
+ = Store: ok (111 ms)
+Entry 870:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 36 ms
+ - I.Buf: 310334
+ - Unpickle: 7 ms
+ - Entries: 18
+ - Pickle: 14 ms
+ - Buf: 321882
+ - Store: 34 ms
+ = Store: ok (92 ms)
+Entry 871:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:2:2
+ - Fetch: 35 ms
+ - I.Buf: 149349
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160883
+ - Store: 28 ms
+ = Store: ok (72 ms)
+Entry 872:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 38 ms
+ - I.Buf: 459754
+ - Unpickle: 13 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471331
+ - Store: 24 ms
+ = Store: ok (96 ms)
+Entry 873:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 60 ms
+ - I.Buf: 517339
+ - Unpickle: 14 ms
+ - Entries: 36
+ - Pickle: 23 ms
+ - Buf: 528844
+ - Store: 39 ms
+ = Store: ok (136 ms)
+Entry 874:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 35 ms
+ - I.Buf: 264281
+ - Unpickle: 6 ms
+ - Entries: 14
+ - Pickle: 11 ms
+ - Buf: 275820
+ - Store: 2 ms
+ = Store: ok (55 ms)
+Entry 875:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:2
+ - Fetch: 36 ms
+ - I.Buf: 344831
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 16 ms
+ - Buf: 356314
+ - Store: 14 ms
+ = Store: ok (75 ms)
+Entry 876:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 56 ms
+ - I.Buf: 770255
+ - Unpickle: 22 ms
+ - Entries: 58
+ - Pickle: 37 ms
+ - Buf: 781774
+ - Store: 38 ms
+ = Store: ok (155 ms)
+Entry 877:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 37 ms
+ - I.Buf: 770381
+ - Unpickle: 21 ms
+ - Entries: 58
+ - Pickle: 36 ms
+ - Buf: 781891
+ - Store: 36 ms
+ = Store: ok (131 ms)
+Entry 878:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 39 ms
+ - I.Buf: 896738
+ - Unpickle: 26 ms
+ - Entries: 69
+ - Pickle: 43 ms
+ - Buf: 908239
+ - Store: 6 ms
+ = Store: ok (116 ms)
+Entry 879:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:0:0
+ - Fetch: 35 ms
+ - I.Buf: 241349
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252810
+ - Store: 3 ms
+ = Store: ok (55 ms)
+Entry 880:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:1
+ - Fetch: 18 ms
+ - I.Buf: 264300
+ - Unpickle: 5 ms
+ - Entries: 14
+ - Pickle: 12 ms
+ - Buf: 275787
+ - Store: 2 ms
+ = Store: ok (37 ms)
+Entry 881:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 40 ms
+ - I.Buf: 919755
+ - Unpickle: 26 ms
+ - Entries: 71
+ - Pickle: 45 ms
+ - Buf: 931250
+ - Store: 6 ms
+ = Store: ok (119 ms)
+Entry 882:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 37 ms
+ - I.Buf: 528844
+ - Unpickle: 14 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540297
+ - Store: 19 ms
+ = Store: ok (94 ms)
+Entry 883:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 53 ms
+ - I.Buf: 321830
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 15 ms
+ - Buf: 333287
+ - Store: 33 ms
+ = Store: ok (109 ms)
+Entry 884:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:2:2
+ - Fetch: 35 ms
+ - I.Buf: 160858
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172277
+ - Store: 10 ms
+ = Store: ok (54 ms)
+Entry 885:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 18 ms
+ - I.Buf: 241330
+ - Unpickle: 5 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252760
+ - Store: 4 ms
+ = Store: ok (38 ms)
+Entry 886:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 42 ms
+ - I.Buf: 1552219
+ - Unpickle: 51 ms
+ - Entries: 126
+ - Pickle: 96 ms
+ - Buf: 1563710
+ - Store: 42 ms
+ = Store: ok (234 ms)
+Entry 887:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:0
+ - Fetch: 15 ms
+ - I.Buf: 160844
+ - Unpickle: 2 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172373
+ - Store: 10 ms
+ = Store: ok (34 ms)
+Entry 888:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 20 ms
+ - I.Buf: 471296
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 21 ms
+ - Buf: 482761
+ - Store: 24 ms
+ = Store: ok (79 ms)
+Entry 889:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 37 ms
+ - I.Buf: 540297
+ - Unpickle: 15 ms
+ - Entries: 38
+ - Pickle: 25 ms
+ - Buf: 551809
+ - Store: 34 ms
+ = Store: ok (112 ms)
+Entry 890:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:0
+ - Fetch: 69 ms
+ - I.Buf: 275820
+ - Unpickle: 5 ms
+ - Entries: 15
+ - Pickle: 12 ms
+ - Buf: 287318
+ - Store: 37 ms
+ = Store: ok (125 ms)
+Entry 891:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 39 ms
+ - I.Buf: 793281
+ - Unpickle: 22 ms
+ - Entries: 60
+ - Pickle: 38 ms
+ - Buf: 804781
+ - Store: 33 ms
+ = Store: ok (134 ms)
+Entry 892:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 39 ms
+ - I.Buf: 931250
+ - Unpickle: 27 ms
+ - Entries: 72
+ - Pickle: 46 ms
+ - Buf: 942799
+ - Store: 38 ms
+ = Store: ok (152 ms)
+Entry 893:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 908239
+ - Unpickle: 25 ms
+ - Entries: 70
+ - Pickle: 45 ms
+ - Buf: 919724
+ - Store: 24 ms
+ = Store: ok (134 ms)
+Entry 894:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 36 ms
+ - I.Buf: 494347
+ - Unpickle: 12 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505860
+ - Store: 4 ms
+ = Store: ok (76 ms)
+Entry 895:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 37 ms
+ - I.Buf: 459794
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471348
+ - Store: 5 ms
+ = Store: ok (76 ms)
+Entry 896:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 37 ms
+ - I.Buf: 425335
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436835
+ - Store: 27 ms
+ = Store: ok (94 ms)
+Entry 897:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:2:0:1
+ - Fetch: 35 ms
+ - I.Buf: 344826
+ - Unpickle: 8 ms
+ - Entries: 21
+ - Pickle: 15 ms
+ - Buf: 356325
+ - Store: 32 ms
+ = Store: ok (91 ms)
+Entry 898:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 36 ms
+ - I.Buf: 298817
+ - Unpickle: 7 ms
+ - Entries: 17
+ - Pickle: 13 ms
+ - Buf: 310334
+ - Store: 34 ms
+ = Store: ok (90 ms)
+Entry 899:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 770275
+ - Unpickle: 22 ms
+ - Entries: 58
+ - Pickle: 37 ms
+ - Buf: 781757
+ - Store: 34 ms
+ = Store: ok (132 ms)
+Entry 900:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 38 ms
+ - I.Buf: 942799
+ - Unpickle: 33 ms
+ - Entries: 73
+ - Pickle: 46 ms
+ - Buf: 954220
+ - Store: 34 ms
+ = Store: ok (153 ms)
+Entry 901:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 38 ms
+ - I.Buf: 804781
+ - Unpickle: 22 ms
+ - Entries: 61
+ - Pickle: 39 ms
+ - Buf: 816289
+ - Store: 14 ms
+ = Store: ok (115 ms)
+Entry 902:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:2
+ - Fetch: 17 ms
+ - I.Buf: 229876
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 11 ms
+ - Buf: 241357
+ - Store: 4 ms
+ = Store: ok (36 ms)
+Entry 903:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:0:1:0
+ - Fetch: 35 ms
+ - I.Buf: 252760
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264267
+ - Store: 3 ms
+ = Store: ok (55 ms)
+Entry 904:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 39 ms
+ - I.Buf: 781774
+ - Unpickle: 22 ms
+ - Entries: 59
+ - Pickle: 37 ms
+ - Buf: 793242
+ - Store: 34 ms
+ = Store: ok (134 ms)
+Entry 905:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 19 ms
+ - I.Buf: 471348
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482873
+ - Store: 5 ms
+ = Store: ok (59 ms)
+Entry 906:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 55 ms
+ - I.Buf: 310334
+ - Unpickle: 6 ms
+ - Entries: 18
+ - Pickle: 13 ms
+ - Buf: 321815
+ - Store: 36 ms
+ = Store: ok (111 ms)
+Entry 907:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:0
+ - Fetch: 35 ms
+ - I.Buf: 149344
+ - Unpickle: 2 ms
+ - Entries: 4
+ - Pickle: 7 ms
+ - Buf: 160836
+ - Store: 29 ms
+ = Store: ok (73 ms)
+Entry 908:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:1
+ - Fetch: 56 ms
+ - I.Buf: 816289
+ - Unpickle: 23 ms
+ - Entries: 62
+ - Pickle: 40 ms
+ - Buf: 827777
+ - Store: 31 ms
+ = Store: ok (151 ms)
+Entry 909:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 36 ms
+ - I.Buf: 402389
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413872
+ - Store: 26 ms
+ = Store: ok (91 ms)
+Entry 910:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:2
+ - Fetch: 35 ms
+ - I.Buf: 229914
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241393
+ - Store: 22 ms
+ = Store: ok (73 ms)
+Entry 911:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 19 ms
+ - I.Buf: 425308
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436815
+ - Store: 8 ms
+ = Store: ok (58 ms)
+Entry 912:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 39 ms
+ - I.Buf: 781891
+ - Unpickle: 23 ms
+ - Entries: 59
+ - Pickle: 37 ms
+ - Buf: 793329
+ - Store: 33 ms
+ = Store: ok (134 ms)
+Entry 913:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 36 ms
+ - I.Buf: 482761
+ - Unpickle: 13 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494280
+ - Store: 4 ms
+ = Store: ok (76 ms)
+Entry 914:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:0:2
+ - Fetch: 35 ms
+ - I.Buf: 229864
+ - Unpickle: 4 ms
+ - Entries: 11
+ - Pickle: 10 ms
+ - Buf: 241418
+ - Store: 24 ms
+ = Store: ok (73 ms)
+Entry 915:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 38 ms
+ - I.Buf: 494280
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 22 ms
+ - Buf: 505790
+ - Store: 39 ms
+ = Store: ok (113 ms)
+Entry 916:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 39 ms
+ - I.Buf: 482873
+ - Unpickle: 12 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494349
+ - Store: 4 ms
+ = Store: ok (78 ms)
+Entry 917:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 17 ms
+ - I.Buf: 356338
+ - Unpickle: 8 ms
+ - Entries: 22
+ - Pickle: 17 ms
+ - Buf: 367849
+ - Store: 32 ms
+ = Store: ok (74 ms)
+Entry 918:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 61 ms
+ - I.Buf: 1563710
+ - Unpickle: 56 ms
+ - Entries: 127
+ - Pickle: 97 ms
+ - Buf: 1575122
+ - Store: 53 ms
+ = Store: ok (270 ms)
+Entry 919:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:2
+ - Fetch: 32 ms
+ - I.Buf: 252768
+ - Unpickle: 6 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264298
+ - Store: 3 ms
+ = Store: ok (52 ms)
+Entry 920:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 36 ms
+ - I.Buf: 413776
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425288
+ - Store: 28 ms
+ = Store: ok (93 ms)
+Entry 921:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 55 ms
+ - I.Buf: 425288
+ - Unpickle: 11 ms
+ - Entries: 28
+ - Pickle: 19 ms
+ - Buf: 436804
+ - Store: 27 ms
+ = Store: ok (113 ms)
+Entry 922:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:0
+ - Fetch: 36 ms
+ - I.Buf: 333287
+ - Unpickle: 8 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344796
+ - Store: 15 ms
+ = Store: ok (75 ms)
+Entry 923:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 41 ms
+ - I.Buf: 919724
+ - Unpickle: 26 ms
+ - Entries: 71
+ - Pickle: 45 ms
+ - Buf: 931288
+ - Store: 27 ms
+ = Store: ok (141 ms)
+Entry 924:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 36 ms
+ - I.Buf: 643818
+ - Unpickle: 17 ms
+ - Entries: 47
+ - Pickle: 30 ms
+ - Buf: 655324
+ - Store: 11 ms
+ = Store: ok (95 ms)
+Entry 925:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:1
+ - Fetch: 37 ms
+ - I.Buf: 321815
+ - Unpickle: 7 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333368
+ - Store: 33 ms
+ = Store: ok (92 ms)
+Entry 926:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 40 ms
+ - I.Buf: 781757
+ - Unpickle: 22 ms
+ - Entries: 59
+ - Pickle: 38 ms
+ - Buf: 793256
+ - Store: 33 ms
+ = Store: ok (135 ms)
+Entry 927:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:1:1
+ - Fetch: 35 ms
+ - I.Buf: 321882
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333282
+ - Store: 33 ms
+ = Store: ok (91 ms)
+Entry 928:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:1
+ - Fetch: 37 ms
+ - I.Buf: 436804
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 19 ms
+ - Buf: 448329
+ - Store: 8 ms
+ = Store: ok (76 ms)
+Entry 929:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 37 ms
+ - I.Buf: 494352
+ - Unpickle: 12 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505850
+ - Store: 3 ms
+ = Store: ok (76 ms)
+Entry 930:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:0:0
+ - Fetch: 36 ms
+ - I.Buf: 241392
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252803
+ - Store: 4 ms
+ = Store: ok (55 ms)
+Entry 931:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 91 ms
+ - I.Buf: 954220
+ - Unpickle: 27 ms
+ - Entries: 74
+ - Pickle: 51 ms
+ - Buf: 965754
+ - Store: 39 ms
+ = Store: ok (209 ms)
+Entry 932:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 862298
+ - Unpickle: 25 ms
+ - Entries: 66
+ - Pickle: 41 ms
+ - Buf: 873790
+ - Store: 28 ms
+ = Store: ok (134 ms)
+Entry 933:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 35 ms
+ - I.Buf: 390830
+ - Unpickle: 10 ms
+ - Entries: 25
+ - Pickle: 17 ms
+ - Buf: 402346
+ - Store: 29 ms
+ = Store: ok (91 ms)
+Entry 934:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 36 ms
+ - I.Buf: 402346
+ - Unpickle: 9 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413838
+ - Store: 29 ms
+ = Store: ok (92 ms)
+Entry 935:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 38 ms
+ - I.Buf: 551809
+ - Unpickle: 14 ms
+ - Entries: 39
+ - Pickle: 26 ms
+ - Buf: 563309
+ - Store: 34 ms
+ = Store: ok (113 ms)
+Entry 936:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:1:1
+ - Fetch: 37 ms
+ - I.Buf: 413872
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425375
+ - Store: 27 ms
+ = Store: ok (93 ms)
+Entry 937:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 36 ms
+ - I.Buf: 390815
+ - Unpickle: 13 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402305
+ - Store: 25 ms
+ = Store: ok (92 ms)
+Entry 938:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 241 ms
+ - I.Buf: 793256
+ - Unpickle: 23 ms
+ - Entries: 60
+ - Pickle: 38 ms
+ - Buf: 804749
+ - Store: 38 ms
+ = Store: ok (341 ms)
+Entry 939:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 42 ms
+ - I.Buf: 965754
+ - Unpickle: 30 ms
+ - Entries: 75
+ - Pickle: 51 ms
+ - Buf: 977251
+ - Store: 36 ms
+ = Store: ok (163 ms)
+Entry 940:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 40 ms
+ - I.Buf: 793242
+ - Unpickle: 23 ms
+ - Entries: 60
+ - Pickle: 41 ms
+ - Buf: 804726
+ - Store: 32 ms
+ = Store: ok (137 ms)
+Entry 941:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:0
+ - Fetch: 36 ms
+ - I.Buf: 459858
+ - Unpickle: 12 ms
+ - Entries: 31
+ - Pickle: 21 ms
+ - Buf: 471343
+ - Store: 7 ms
+ = Store: ok (76 ms)
+Entry 942:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:2:2
+ - Fetch: 36 ms
+ - I.Buf: 172371
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183833
+ - Store: 9 ms
+ = Store: ok (55 ms)
+Entry 943:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:2
+ - Fetch: 38 ms
+ - I.Buf: 505860
+ - Unpickle: 14 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517364
+ - Store: 36 ms
+ = Store: ok (112 ms)
+Entry 944:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 56 ms
+ - I.Buf: 793329
+ - Unpickle: 24 ms
+ - Entries: 60
+ - Pickle: 41 ms
+ - Buf: 804847
+ - Store: 14 ms
+ = Store: ok (136 ms)
+Entry 945:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 35 ms
+ - I.Buf: 402305
+ - Unpickle: 10 ms
+ - Entries: 26
+ - Pickle: 18 ms
+ - Buf: 413804
+ - Store: 27 ms
+ = Store: ok (91 ms)
+Entry 946:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:2:2
+ - Fetch: 36 ms
+ - I.Buf: 252820
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 11 ms
+ - Buf: 264327
+ - Store: 20 ms
+ = Store: ok (72 ms)
+Entry 947:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 36 ms
+ - I.Buf: 505850
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517321
+ - Store: 38 ms
+ = Store: ok (111 ms)
+Entry 948:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 38 ms
+ - I.Buf: 505790
+ - Unpickle: 14 ms
+ - Entries: 35
+ - Pickle: 24 ms
+ - Buf: 517291
+ - Store: 38 ms
+ = Store: ok (115 ms)
+Entry 949:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 38 ms
+ - I.Buf: 804726
+ - Unpickle: 22 ms
+ - Entries: 61
+ - Pickle: 39 ms
+ - Buf: 816276
+ - Store: 32 ms
+ = Store: ok (132 ms)
+Entry 950:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 234 ms
+ - I.Buf: 816276
+ - Unpickle: 25 ms
+ - Entries: 62
+ - Pickle: 39 ms
+ - Buf: 827710
+ - Store: 33 ms
+ = Store: ok (332 ms)
+Entry 951:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 34 ms
+ - I.Buf: 367849
+ - Unpickle: 9 ms
+ - Entries: 23
+ - Pickle: 16 ms
+ - Buf: 379318
+ - Store: 32 ms
+ = Store: ok (92 ms)
+Entry 952:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 53 ms
+ - I.Buf: 379318
+ - Unpickle: 9 ms
+ - Entries: 24
+ - Pickle: 16 ms
+ - Buf: 390833
+ - Store: 29 ms
+ = Store: ok (108 ms)
+Entry 953:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 37 ms
+ - I.Buf: 528877
+ - Unpickle: 18 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540335
+ - Store: 14 ms
+ = Store: ok (94 ms)
+Entry 954:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:2
+ - Fetch: 55 ms
+ - I.Buf: 413838
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 18 ms
+ - Buf: 425343
+ - Store: 27 ms
+ = Store: ok (111 ms)
+Entry 955:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:0:2
+ - Fetch: 35 ms
+ - I.Buf: 160870
+ - Unpickle: 3 ms
+ - Entries: 5
+ - Pickle: 7 ms
+ - Buf: 172349
+ - Store: 27 ms
+ = Store: ok (72 ms)
+Entry 956:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 58 ms
+ - I.Buf: 977251
+ - Unpickle: 29 ms
+ - Entries: 76
+ - Pickle: 49 ms
+ - Buf: 988758
+ - Store: 34 ms
+ = Store: ok (172 ms)
+Entry 957:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 36 ms
+ - I.Buf: 517291
+ - Unpickle: 14 ms
+ - Entries: 36
+ - Pickle: 24 ms
+ - Buf: 528788
+ - Store: 39 ms
+ = Store: ok (115 ms)
+Entry 958:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 37 ms
+ - I.Buf: 517321
+ - Unpickle: 15 ms
+ - Entries: 36
+ - Pickle: 26 ms
+ - Buf: 528820
+ - Store: 39 ms
+ = Store: ok (117 ms)
+Entry 959:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:2:1
+ - Fetch: 38 ms
+ - I.Buf: 252824
+ - Unpickle: 5 ms
+ - Entries: 13
+ - Pickle: 12 ms
+ - Buf: 264279
+ - Store: 4 ms
+ = Store: ok (59 ms)
+Entry 960:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:2:1:1
+ - Fetch: 39 ms
+ - I.Buf: 528788
+ - Unpickle: 14 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540226
+ - Store: 37 ms
+ = Store: ok (115 ms)
+Entry 961:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 37 ms
+ - I.Buf: 471331
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 21 ms
+ - Buf: 482801
+ - Store: 23 ms
+ = Store: ok (94 ms)
+Entry 962:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 42 ms
+ - I.Buf: 1575122
+ - Unpickle: 47 ms
+ - Entries: 128
+ - Pickle: 93 ms
+ - Buf: 1586664
+ - Store: 28 ms
+ = Store: ok (213 ms)
+Entry 963:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:1:0
+ - Fetch: 35 ms
+ - I.Buf: 425339
+ - Unpickle: 10 ms
+ - Entries: 28
+ - Pickle: 20 ms
+ - Buf: 436856
+ - Store: 26 ms
+ = Store: ok (91 ms)
+Entry 964:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 38 ms
+ - I.Buf: 528820
+ - Unpickle: 15 ms
+ - Entries: 37
+ - Pickle: 24 ms
+ - Buf: 540316
+ - Store: 36 ms
+ = Store: ok (113 ms)
+Entry 965:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 75 ms
+ - I.Buf: 655324
+ - Unpickle: 18 ms
+ - Entries: 48
+ - Pickle: 31 ms
+ - Buf: 666774
+ - Store: 8 ms
+ = Store: ok (135 ms)
+Entry 966:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 56 ms
+ - I.Buf: 804847
+ - Unpickle: 23 ms
+ - Entries: 61
+ - Pickle: 39 ms
+ - Buf: 816371
+ - Store: 33 ms
+ = Store: ok (152 ms)
+Entry 967:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:0:1
+ - Fetch: 35 ms
+ - I.Buf: 413804
+ - Unpickle: 10 ms
+ - Entries: 27
+ - Pickle: 19 ms
+ - Buf: 425287
+ - Store: 28 ms
+ = Store: ok (92 ms)
+Entry 968:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:2:1
+ - Fetch: 36 ms
+ - I.Buf: 471261
+ - Unpickle: 12 ms
+ - Entries: 32
+ - Pickle: 22 ms
+ - Buf: 482771
+ - Store: 4 ms
+ = Store: ok (75 ms)
+Entry 969:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 37 ms
+ - I.Buf: 482801
+ - Unpickle: 16 ms
+ - Entries: 33
+ - Pickle: 22 ms
+ - Buf: 494299
+ - Store: 35 ms
+ = Store: ok (111 ms)
+Entry 970:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:0:0:1
+ - Fetch: 35 ms
+ - I.Buf: 172331
+ - Unpickle: 2 ms
+ - Entries: 6
+ - Pickle: 8 ms
+ - Buf: 183881
+ - Store: 9 ms
+ = Store: ok (54 ms)
+Entry 971:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:0
+ - Fetch: 22 ms
+ - I.Buf: 988758
+ - Unpickle: 28 ms
+ - Entries: 77
+ - Pickle: 50 ms
+ - Buf: 1000251
+ - Store: 35 ms
+ = Store: ok (136 ms)
+Entry 972:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:1
+ - Fetch: 38 ms
+ - I.Buf: 931288
+ - Unpickle: 28 ms
+ - Entries: 72
+ - Pickle: 48 ms
+ - Buf: 942788
+ - Store: 37 ms
+ = Store: ok (153 ms)
+Entry 973:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:2
+ - Fetch: 36 ms
+ - I.Buf: 436815
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448346
+ - Store: 26 ms
+ = Store: ok (93 ms)
+Entry 974:
+ = Generate:  ok (2 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 43 ms
+ - I.Buf: 1586664
+ - Unpickle: 48 ms
+ - Entries: 129
+ - Pickle: 96 ms
+ - Buf: 1598179
+ - Store: 41 ms
+ = Store: ok (231 ms)
+Entry 975:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:1
+ - Fetch: 37 ms
+ - I.Buf: 563309
+ - Unpickle: 15 ms
+ - Entries: 40
+ - Pickle: 26 ms
+ - Buf: 574816
+ - Store: 34 ms
+ = Store: ok (113 ms)
+Entry 976:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:0:1
+ - Fetch: 20 ms
+ - I.Buf: 666774
+ - Unpickle: 18 ms
+ - Entries: 49
+ - Pickle: 32 ms
+ - Buf: 678290
+ - Store: 25 ms
+ = Store: ok (96 ms)
+Entry 977:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 313 ms
+ - I.Buf: 873790
+ - Unpickle: 26 ms
+ - Entries: 67
+ - Pickle: 46 ms
+ - Buf: 885269
+ - Store: 48 ms
+ = Store: ok (435 ms)
+Entry 978:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 37 ms
+ - I.Buf: 494343
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505834
+ - Store: 37 ms
+ = Store: ok (111 ms)
+Entry 979:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:0
+ - Fetch: 36 ms
+ - I.Buf: 390833
+ - Unpickle: 9 ms
+ - Entries: 25
+ - Pickle: 18 ms
+ - Buf: 402349
+ - Store: 29 ms
+ = Store: ok (93 ms)
+Entry 980:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:0
+ - Fetch: 555 ms
+ - I.Buf: 494299
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 23 ms
+ - Buf: 505811
+ - Store: 39 ms
+ = Store: ok (631 ms)
+Entry 981:
+ = Generate:  ok (2 ms)
+ - Key: 1:0:1:1:2
+ - Fetch: 35 ms
+ - I.Buf: 356364
+ - Unpickle: 9 ms
+ - Entries: 22
+ - Pickle: 16 ms
+ - Buf: 367909
+ - Store: 31 ms
+ = Store: ok (92 ms)
+Entry 982:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 39 ms
+ - I.Buf: 816371
+ - Unpickle: 28 ms
+ - Entries: 62
+ - Pickle: 39 ms
+ - Buf: 827821
+ - Store: 26 ms
+ = Store: ok (134 ms)
+Entry 983:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 44 ms
+ - I.Buf: 1598179
+ - Unpickle: 48 ms
+ - Entries: 130
+ - Pickle: 95 ms
+ - Buf: 1609611
+ - Store: 42 ms
+ = Store: ok (232 ms)
+Entry 984:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:0:1
+ - Fetch: 37 ms
+ - I.Buf: 540335
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 25 ms
+ - Buf: 551872
+ - Store: 34 ms
+ = Store: ok (111 ms)
+Entry 985:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:1
+ - Fetch: 62 ms
+ - I.Buf: 1609611
+ - Unpickle: 49 ms
+ - Entries: 131
+ - Pickle: 98 ms
+ - Buf: 1621140
+ - Store: 60 ms
+ = Store: ok (272 ms)
+Entry 986:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:1:2:0
+ - Fetch: 33 ms
+ - I.Buf: 241359
+ - Unpickle: 4 ms
+ - Entries: 12
+ - Pickle: 11 ms
+ - Buf: 252820
+ - Store: 4 ms
+ = Store: ok (52 ms)
+Entry 987:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:1:2
+ - Fetch: 58 ms
+ - I.Buf: 827821
+ - Unpickle: 24 ms
+ - Entries: 63
+ - Pickle: 41 ms
+ - Buf: 839364
+ - Store: 66 ms
+ = Store: ok (191 ms)
+Entry 988:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 36 ms
+ - I.Buf: 436835
+ - Unpickle: 11 ms
+ - Entries: 29
+ - Pickle: 20 ms
+ - Buf: 448373
+ - Store: 25 ms
+ = Store: ok (92 ms)
+Entry 989:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:2
+ - Fetch: 39 ms
+ - I.Buf: 540316
+ - Unpickle: 14 ms
+ - Entries: 38
+ - Pickle: 25 ms
+ - Buf: 551809
+ - Store: 35 ms
+ = Store: ok (115 ms)
+Entry 990:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:1:2:1
+ - Fetch: 1967 ms
+ - I.Buf: 827710
+ - Unpickle: 23 ms
+ - Entries: 63
+ - Pickle: 40 ms
+ - Buf: 839225
+ - Store: 31 ms
+ = Store: ok (2062 ms)
+Entry 991:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:1:1
+ - Fetch: 54 ms
+ - I.Buf: 505834
+ - Unpickle: 13 ms
+ - Entries: 35
+ - Pickle: 23 ms
+ - Buf: 517363
+ - Store: 37 ms
+ = Store: ok (128 ms)
+Entry 992:
+ = Generate:  ok (1 ms)
+ - Key: 1:0:0:0:2
+ - Fetch: 70 ms
+ - I.Buf: 172299
+ - Unpickle: 3 ms
+ - Entries: 6
+ - Pickle: 7 ms
+ - Buf: 183861
+ - Store: 9 ms
+ = Store: ok (89 ms)
+Entry 993:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:1
+ - Fetch: 58 ms
+ - I.Buf: 885269
+ - Unpickle: 31 ms
+ - Entries: 68
+ - Pickle: 45 ms
+ - Buf: 896762
+ - Store: 74 ms
+ = Store: ok (210 ms)
+Entry 994:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:2:2
+ - Fetch: 35 ms
+ - I.Buf: 321825
+ - Unpickle: 8 ms
+ - Entries: 19
+ - Pickle: 14 ms
+ - Buf: 333292
+ - Store: 35 ms
+ = Store: ok (92 ms)
+Entry 995:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 37 ms
+ - I.Buf: 448373
+ - Unpickle: 11 ms
+ - Entries: 30
+ - Pickle: 20 ms
+ - Buf: 459843
+ - Store: 8 ms
+ = Store: ok (76 ms)
+Entry 996:
+ = Generate:  ok (2 ms)
+ - Key: 1:2:2:0:1
+ - Fetch: 39 ms
+ - I.Buf: 333269
+ - Unpickle: 7 ms
+ - Entries: 20
+ - Pickle: 15 ms
+ - Buf: 344768
+ - Store: 32 ms
+ = Store: ok (94 ms)
+Entry 997:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:0:1:2
+ - Fetch: 20 ms
+ - I.Buf: 459843
+ - Unpickle: 11 ms
+ - Entries: 31
+ - Pickle: 22 ms
+ - Buf: 471330
+ - Store: 23 ms
+ = Store: ok (77 ms)
+Entry 998:
+ = Generate:  ok (1 ms)
+ - Key: 1:2:1:1:0
+ - Fetch: 37 ms
+ - I.Buf: 494349
+ - Unpickle: 13 ms
+ - Entries: 34
+ - Pickle: 22 ms
+ - Buf: 505846
+ - Store: 4 ms
+ = Store: ok (77 ms)
+Entry 999:
+ = Generate:  ok (1 ms)
+ - Key: 1:1:2:1:1
+ - Fetch: 76 ms
+ - I.Buf: 804749
+ - Unpickle: 23 ms
+ - Entries: 61
+ - Pickle: 39 ms
+ - Buf: 816284
+ - Store: 32 ms
+ = Store: ok (172 ms)
+******
+Setting : 8 - 6693 (Avg 321.00 ms)
+Generating : 1 - 3 (Avg 1.00 ms)

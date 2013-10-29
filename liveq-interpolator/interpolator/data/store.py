@@ -19,6 +19,8 @@
 
 import time
 import zlib
+import snappy
+import pylzma
 
 import numpy as np
 import cPickle as pickle
@@ -33,6 +35,22 @@ class HistogramStore:
 	"""
 	Histogram I/O class that uses the store class
 	"""
+
+	#: Compression method
+	#F_COMPRESS = pylzma.compress
+	#F_COMPRESS = zlib.compress
+	F_COMPRESS = snappy.compress
+	#@staticmethod
+	#def F_COMPRESS(data):
+	#	return data
+
+	#: Decompression method
+	#F_DECOMPRESS = pylzma.decompress
+	#F_DECOMPRESS = zlib.decompress
+	F_DECOMPRESS = snappy.decompress
+	#@staticmethod
+	#def F_DECOMPRESS(data):
+	#	return data
 
 	@staticmethod
 	def _pickle(lst):
@@ -96,7 +114,7 @@ class HistogramStore:
 			ans = np.concatenate((ans, c.tune.getValues(), c.data))
 
 		# Compress buffer
-		return zlib.compress( buffer(ans) )
+		return HistogramStore.F_COMPRESS( np.getbuffer(ans) )
 
 	@staticmethod
 	def _unpickle(dat):
@@ -109,7 +127,7 @@ class HistogramStore:
 			return []
 
 		# Decompress and create numpy array from buffer
-		dat = np.frombuffer( zlib.decompress(dat) )
+		dat = np.frombuffer( HistogramStore.F_DECOMPRESS(dat) )
 
 		# Extract metainfo, validating protocol
 		numProtocol = int(dat[0])
@@ -223,15 +241,18 @@ class HistogramStore:
 		# Iterate over items and create interpolation indices and data variables
 		datavalues = [ ]
 		indexvars = [ ]
-		for nb in data:
+		for hc in data:
 
 			# Fetch index cariables
-			datavalues.append(nb)
-			indexvars.append(nb.getValues())
+			datavalues.append(hc)
+			indexvars.append(hc.tune.getValues())
 
 		# Flip matrix of indexvars
 		indexvars = np.swapaxes( np.array(indexvars), 0, 1 )
+		#indexvars = np.array(indexvars)
+
+		print "Check: %i == %i" % (len(datavalues), len(indexvars[0]))
 
 		# Create and return interpolator
-		return Rdf( *indexvars, data=datavalues )
+		return Rbf( *indexvars, data=datavalues )
 

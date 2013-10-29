@@ -57,6 +57,7 @@ except ConfigException as e:
 handleSIGINT()
 
 #-------------
+
 tune_keys = [ "Main:numberOfEvents","Main:timesToShow","Main:timesAllowErrors",
 		      "Main:showChangedSettings","Main:showChangedParticleData","Next:numberShowEvent",
 		      "Random:setSeed","Random:seed","Beams:idA","Beams:idB","Beams:eCM","HardQCD:all",
@@ -100,6 +101,50 @@ def genObservables(number=50, bins=10):
 	hc.endUpdate()
 	return hc
 
+#-------------
+
+tune = genTune(1)
+#nb = HistogramStore.getNeighborhood(tune)
+
+#print "Neighborhood: %s" % repr(nb)
+
+t_before = int(round(time.time() * 1000))
+ip = HistogramStore.getInterpolator(tune)
+t_after = int(round(time.time() * 1000))
+
+print "Tune: %s" % tune
+print "Interpolator: %s" % repr(ip)
+
+print "Loading time: %i ms" % (t_after - t_before)
+
+t_before = int(round(time.time() * 1000))
+v = ip(*tune.getValues())
+t_after = int(round(time.time() * 1000))
+
+print "Interpolate time: %i ms" % (t_after - t_before)
+
+print "==================================="
+print "Num. Histograms: %i" % len(v)
+#for histo in v:
+#	print "------"
+#	print "Yv: %s" % str(histo.y)
+#	print "E+: %s" % str(histo.yErrPlus)
+#	print "E-: %s" % str(histo.yErrMinus)
+print "==================================="
+
+sys.exit(0)
+
+#-------------
+
+"""
+# Metrics
+genMin = 0
+genMax = 0
+genSum = 0
+setMin = 0
+setMax = 0
+setSum = 0
+
 # Populate database with random data
 for i in range(0,1000):
 
@@ -111,10 +156,38 @@ for i in range(0,1000):
 	tune = genTune(1)
 	data = genObservables()
 	t_after = int(round(time.time() * 1000))
-	print "ok (%i ms)" % (t_after - t_before)
+
+	diff = t_after - t_before
+	genSum += diff
+	if i == 0:
+		genMin = diff
+		genMax = diff
+	else:
+		if diff < genMin:
+			genMin = diff
+		if diff > genMax:
+			genMax = diff
+	print "ok (%i ms)" % diff
 
 	# Store
 	t_before = int(round(time.time() * 1000))
 	HistogramStore.append( tune, data )
 	t_after = int(round(time.time() * 1000))
-	print " = Store: ok (%i ms)" % (t_after - t_before)
+
+	diff = t_after - t_before
+	setSum += diff
+	if i == 0:
+		setMin = diff
+		setMax = diff
+	else:
+		if diff < setMin:
+			setMin = diff
+		if diff > setMax:
+			setMax = diff
+	print " = Store: ok (%i ms)" % diff
+
+# Print statistics
+print "******"
+print "Setting : %i - %i (Avg %.2f ms)" % (setMin, setMax, (setSum / 1000))
+print "Generating : %i - %i (Avg %.2f ms)" % (genMin, genMax, (genSum / 1000))
+"""
