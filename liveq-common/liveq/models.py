@@ -62,6 +62,15 @@ class User(BaseModel):
 	bindid = CharField(index=True, unique=True)
 
 
+class AgentGroup(BaseModel):
+	"""
+	Agent groups class
+	"""
+
+	#: Add an additional UUID lookup index
+	uuid = CharField(max_length=128, index=True, unique=True)
+
+
 class Agent(BaseModel):
 	"""
 	Agent instance class
@@ -83,15 +92,6 @@ class Agent(BaseModel):
 
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
-
-
-class AgentGroup(BaseModel):
-	"""
-	Agent groups class
-	"""
-
-	#: Add an additional UUID lookup index
-	uuid = CharField(max_length=128, index=True, unique=True)
 
 
 class AgentMetrics(BaseModel):
