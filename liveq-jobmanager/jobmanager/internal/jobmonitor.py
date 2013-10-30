@@ -17,8 +17,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from liveq.utils.fsm import FSM
+from liveq.utils.fsm import StoredFSM
 
-class JobState(FSM):
+class JobMonitor(StoredFSM):
 	"""
+	
 	"""
+
+	@staticmethod
+	def broadcast():
+		"""
+		"""
+		pass

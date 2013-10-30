@@ -146,7 +146,5 @@ class Job(BaseModel):
 	agent = ForeignKeyField(Agent)
 	#: The related lab instance
 	labinstance = ForeignKeyField(LabInstance)
-
-class JobOccupation(BaseModel):
 	
 

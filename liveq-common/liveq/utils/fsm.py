@@ -50,7 +50,7 @@ class StoredFSM:
 		Initialize StoredFSM.
 
 		Parameters:
-			id (string): The unique ID for this FSM
+			uid (string): The unique ID for this FSM
 
 		"""
 
@@ -58,24 +58,51 @@ class StoredFSM:
 		if StoreConfig.STORE == None:
 			raise ConfigException("Using StoreFSM class wit no initialized StoreConfig!")
 
-		# Allocate an ID if it's missing
+		# Allocate an ID if the parameter missing
 		if not uid:
 			uid = str(uuid.uuid4())
 
 		# Store the FSM id
-		self.uid = uid
+		self._fsmid = "fsm:%s" % uid
 
-		# Store the state information
-		self.state = { }
+		# Store the state handlers
+		self._state = None
+		self._context = { }
+		self._stateHandlers = { }
 
-		# Create a lock instance that allows multiple machines
-		self.lock = RedisLock( StoreConfig.STORE, uid )
+		# Create a lock instance that allows multiple machines to use the same FSM
+		self._lock = RedisLock( StoreConfig.STORE, self._fsmid )
 
 	def sync(self):
 		"""
 		Synchronize the local state and the state of the saved VM
 		"""
 
+	def _runstate(self):
+		"""
+		Run an FSM state
+		"""
+
+		# Acquire exclusive lock on the FSM
+		self._lock.acquire(True)
+
+		# Get context
+		self._context = StoredFSMController.getContext(self._fsmid)
+
+		# Load state handler
+		f = self._stateHandlers[self._state]
+
+		# Run function
+		try:
+			f(self._context)
+		except Exception as e:
+			pass
+
+		# Store context
+		StoredFSMController.setContext(self._fsmid, self._context)
+
+		# Release FSM
+		self._lock.release()
 
 class SimpleFSM:
 	"""
