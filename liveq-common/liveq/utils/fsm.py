@@ -20,20 +20,38 @@
 import uuid
 
 from liveq.config.store import StoreConfig
+from liveq.utils.redislock import RedisLock
+
+class StoredFSMController:
+	"""
+	This class controls the event dispatching to the :class:`class StoredFSM` classes
+	that reside in the FSM store.
+	"""
+
+	@staticmethod
+	def dispatch(uid, event, **kwargs):
+		"""
+		Dispatch an event to the specified FSM instance.
+		"""
+		pass
 
 class StoredFSM:
 	"""
-	A finite-state machine that is backed by an entry on the store.
+	A finite-state machine that is fully synchronized with an entry in the store.
 
-	.. note::
+	.. warning::
 		This class assumes that the component that uses it has already initialized a
 		:class:`StoreConfig` configuration.
 
 	"""
 
-	def __init__(self, id=None):
+	def __init__(self, uid=None):
 		"""
-		Initialize StoredFSM
+		Initialize StoredFSM.
+
+		Parameters:
+			id (string): The unique ID for this FSM
+
 		"""
 
 		# Make sure we have a StoreConfig initialized
@@ -41,15 +59,22 @@ class StoredFSM:
 			raise ConfigException("Using StoreFSM class wit no initialized StoreConfig!")
 
 		# Allocate an ID if it's missing
-		if not id:
-			id = str(uuid.uuid4())
+		if not uid:
+			uid = str(uuid.uuid4())
 
 		# Store the FSM id
-		self._id = id
+		self.uid = uid
 
 		# Store the state information
 		self.state = { }
-		
+
+		# Create a lock instance that allows multiple machines
+		self.lock = RedisLock( StoreConfig.STORE, uid )
+
+	def sync(self):
+		"""
+		Synchronize the local state and the state of the saved VM
+		"""
 
 
 class SimpleFSM:

@@ -18,12 +18,8 @@
 ################################################################
 
 import time
-import zlib
 import snappy
-import pylzma
-
 import numpy as np
-import cPickle as pickle
 
 from liveq.data.tune import Tune
 from liveq.data.histo import HistogramCollection
@@ -36,27 +32,41 @@ class HistogramStore:
 	Histogram I/O class that uses the store class
 	"""
 
-	#: Compression method
-	#F_COMPRESS = pylzma.compress
-	#F_COMPRESS = zlib.compress
+	#: ** Compression method **
+	#: So far Snappy seems to be the fastest and the most efficient compression
+	#: algorithm. 
 	F_COMPRESS = snappy.compress
-	#@staticmethod
-	#def F_COMPRESS(data):
-	#	return data
 
-	#: Decompression method
-	#F_DECOMPRESS = pylzma.decompress
-	#F_DECOMPRESS = zlib.decompress
+	#: ** Decompression method **
 	F_DECOMPRESS = snappy.decompress
-	#@staticmethod
-	#def F_DECOMPRESS(data):
-	#	return data
 
 	@staticmethod
 	def _pickle(lst):
 		"""
 		Converts a collection of HistogramCollections into a buffer
 		that can be stored in a key/value store
+
+		The "pickled" result is the buffered contents of a numpy float64 array
+		with a metadata header and the histogram data as body. The metadata header
+		has the following format:
+
+		+--------+------------------------------------------------+
+		| Offset | Description                                    |
+		+========+================================================+
+		|    0   | Protocol Version (Always 1).                   |
+		+--------+------------------------------------------------+
+		|    1   | Number of histogram collections in the buffer. |
+		+--------+------------------------------------------------+
+		|    2   | Number of histograms in each collection.       |
+		+--------+------------------------------------------------+
+		|    3   | Number of bins in each histogram.              |
+		+--------+------------------------------------------------+
+		|    4   | Number of histogram parameters in the tune.    |
+		+--------+------------------------------------------------+
+		|    5   | The index of the lab the tunes are associated. |
+		+--------+------------------------------------------------+
+		|   ...  | (Tune and data sections of every histogram)    |
+		+--------+------------------------------------------------+
 
 		Args:
 			o (array) : A set of HistogramCollections objects
@@ -132,7 +142,7 @@ class HistogramStore:
 		# Extract metainfo, validating protocol
 		numProtocol = int(dat[0])
 		if numProtocol != 1:
-			raise ValueError("Unsupported protocol id %i found in the input buffer" % numProtocol)
+			raise ValueError("Unsupported protocol version #%i found in the input buffer" % numProtocol)
 
 		# Extract the rest
 		numCollections = int(dat[1])

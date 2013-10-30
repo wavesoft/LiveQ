@@ -118,7 +118,13 @@ class JobManagerComponent(Component):
 		"""
 		Callback when we have a request for new job from the bus
 		"""
-		pass
+		
+		if not all(x in message for x in ('lab', 'parameters')):
+			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
+			return
+
+		lab = message['lab']
+
 
 	def onBusJobCancel(self, message):
 		"""

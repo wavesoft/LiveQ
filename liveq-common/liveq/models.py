@@ -42,7 +42,7 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, AgentMetrics, Agent, Lab ]:
+	for table in [ User, AgentGroup, AgentMetrics, Agent, Lab, LabInstance, Job ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -137,7 +137,7 @@ class LabInstance(BaseModel):
 	#: The user instantiated the lab
 	user = ForeignKeyField(User)
 
-class JobState(BaseModel):
+class Job(BaseModel):
 	"""
 	Jobs state table
 	"""
@@ -147,4 +147,6 @@ class JobState(BaseModel):
 	#: The related lab instance
 	labinstance = ForeignKeyField(LabInstance)
 
+class JobOccupation(BaseModel):
+	
 

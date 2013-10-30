@@ -81,6 +81,19 @@ class JobAgentManager:
 		except AgentGroup.DoesNotExist:
 			return AgentGroup.create(uuid=gid)
 
+	def getJob(self, jid):
+		"""
+		Return a Job record for the given job ID, and create it if
+		it's missing
+		"""
+
+		# Fetch or create job
+		try:
+			return AgentGroup.get(AgentGroup.uuid==gid)
+
+		except AgentGroup.DoesNotExist:
+			return AgentGroup.create(uuid=gid)
+
 	def updateHandshake(self, uid, attrib):
 		"""
 		This function is called when a handshake is received from the remote agent.

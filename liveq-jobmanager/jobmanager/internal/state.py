@@ -20,4 +20,5 @@
 from liveq.utils.fsm import FSM
 
 class JobState(FSM):
-	pass
+	"""
+	"""
