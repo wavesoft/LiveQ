@@ -84,7 +84,7 @@ class MyFSM(StoredFSM):
 
 
 # Get a new FSM instance
-#inst = MyFSM.get("kaboom32")
+inst = MyFSM.get("kaboom32")
 
 while True:
 

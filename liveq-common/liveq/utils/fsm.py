@@ -278,7 +278,7 @@ class StoredFSM:
 		"""
 
 		# Protect __dict__ variables
-		if name in __dict__:
+		if name in self.__dict__:
 			raise ValueError("Keyword %s is reserved for internal use" % name)
 
 		# Update dicts
@@ -310,7 +310,7 @@ class StoredFSM:
 		"""
 
 		# Protect __dict__ variables
-		if name in __dict__:
+		if name in self.__dict__:
 			raise ValueError("Keyword %s is reserved for internal use" % name)
 		
 		# Update dicts
@@ -477,6 +477,7 @@ class StoredFSM:
 			self._thaw(False)
 
 			# Start event and state switching loop
+			stateError = False
 			loopActive = True
 			numCycles = 0
 			while loopActive:
@@ -501,7 +502,10 @@ class StoredFSM:
 						self.logger.debug("Running STATE handler for %s" % self._state)
 						f()
 					except Exception as e:
-						self.logger.error("Error calling handler of state [%s]" % self._state)
+						self.logger.error("Error calling handler of state [%s]: %s:%s" % (self._state, e.__class__.__name__, str(e) ))
+
+						# Flag the state as failed
+						stateError = True
 
 					# Disable handler functions
 					self.__dict__['_inhandler'] = False
@@ -586,10 +590,17 @@ class StoredFSM:
 					self.logger.debug("Reached cycle limit")
 					loopActive = False
 
+			# Before freezing, if there was an error while handling the state,
+			# mark thhe _stateHandled as False. This will cause the state to try
+			# and repeat the same action next time
+			if stateError:
+				self.__dict__['_stateHandled'] = False
+
 			# Put us back to sleep
 			self._freeze(False)
 
 			# Release lock
+			self.logger.debug("Releasing lock")
 			self._lock.release()
 
 		# Create and start the thread

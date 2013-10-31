@@ -18,6 +18,8 @@
 ################################################################
 
 import datetime
+import json
+
 from peewee import *
 from liveq.config.database import DatabaseConfig
 
@@ -42,7 +44,7 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, AgentMetrics, Agent, Lab, LabInstance, Job ]:
+	for table in [ User, AgentGroup, Agent, AgentMetrics, Lab ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -126,25 +128,17 @@ class Lab(BaseModel):
 	#: The SVN Revision of the base tools
 	revision = IntegerField()
 
+	#: The non-tunable parameters for the job
+	fixedParameters = CharField()
 
-class LabInstance(BaseModel):
-	"""
-	Lab instance description
-	"""
+	def getParameters(self):
+		"""
+		Return the parsed parameters
+		"""
+		return json.loads(self.fixedParameters)
 
-	#: The related lab
-	lab = ForeignKeyField(Lab)
-	#: The user instantiated the lab
-	user = ForeignKeyField(User)
-
-class Job(BaseModel):
-	"""
-	Jobs state table
-	"""
-
-	#: The related agent
-	agent = ForeignKeyField(Agent)
-	#: The related lab instance
-	labinstance = ForeignKeyField(LabInstance)
-	
-
+	def setParameters(self, data):
+		"""
+		Update the fixed parameters
+		"""
+		self.fixedParameters = json.dumps(data)

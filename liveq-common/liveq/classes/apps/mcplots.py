@@ -36,7 +36,6 @@ import shlex, subprocess, threading
 
 from liveq.io.application import *
 from liveq.utils.FLAT import FLATParser
-from liveq.utils.hugedata import Hugedata
 
 from liveq.events import GlobalEvents
 from liveq.config.classes import AppConfigClass
@@ -112,7 +111,8 @@ class MCPlots(JobApplication):
 		rundict["jobdir"] = self.jobdir
 
 		# Prepare cmdline arguments
-		args = shlex.split( self.config.EXEC % rundict)
+		cmdline = self.config.EXEC % rundict
+		args = shlex.split( str(self.config.EXEC % rundict) )
 		self.logger.debug("Starting mcplots process '%s'" % args)
 
 		# Launch process in it's own process group
@@ -124,7 +124,7 @@ class MCPlots(JobApplication):
 		self.monitorThread.start()
 
 		# Let listeners know of the event
-		self.dispatchEvent("job_started")
+		self.trigger("job_started")
 
 		self.state = STATE_RUNNING
 
@@ -156,7 +156,7 @@ class MCPlots(JobApplication):
 		self.monitorThread.join()
 
 		# Dispatch the event to the listeners
-		self.dispatchEvent("job_aborted", -1)
+		self.trigger("job_aborted", -1)
 
 		# We are now officially killed
 		self.state = STATE_ABORTED
@@ -313,7 +313,7 @@ class MCPlots(JobApplication):
 						self.cleanup()
 
 						# Dispatch the event to the listeners
-						self.dispatchEvent("job_completed")
+						self.trigger("job_completed")
 
 					else:
 
@@ -324,7 +324,7 @@ class MCPlots(JobApplication):
 						self.cleanup()
 
 						# Dispatch the event to the listeners
-						self.dispatchEvent("job_aborted", res)
+						self.trigger("job_aborted", res)
 
 				# In any of these cases, exit the loop
 				break
@@ -338,7 +338,7 @@ class MCPlots(JobApplication):
 
 				# Let listeners know we have intermediate data available
 				if results:
-					self.dispatchEvent("job_data", False, Hugedata.jsCompress(results))
+					self.trigger("job_data", False, results)
 
 			# Runtime clock and CPU anti-hoging
 			time.sleep(1)

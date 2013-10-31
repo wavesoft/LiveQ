@@ -28,6 +28,8 @@ from liveq.component import Component
 from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.utils.fsm import SimpleFSM
 
+from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
+
 class AgentComponent(Component, SimpleFSM):
 	"""
 	Core agent
@@ -41,7 +43,7 @@ class AgentComponent(Component, SimpleFSM):
 		Initialize AgentComponent component
 		"""
 		Component.__init__(self)
-		FSM.__init__(self)
+		SimpleFSM.__init__(self)
 
 		# Setup logger
 		self.logger = logging.getLogger("agent")
@@ -50,6 +52,11 @@ class AgentComponent(Component, SimpleFSM):
 		# Open a communication channel with the server on the external bus
 		# (Currently that's the XMPP channel - but we prefer to be abstract)
 		self.serverChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
+
+		# The slots where job instances are placed
+		self.slots = [None] * int(Config.AGENT_SLOTS)
+		self.jobIndex = { }
+		self.runtimeConfig = { }
 
 		# TODO: Uhnack this
 		# This establishes a presence relationship with the given entity.
@@ -117,17 +124,174 @@ class AgentComponent(Component, SimpleFSM):
 		# follow the retry protocol from there
 		self.schedule(self.stateHandshake)
 
+
+	def _replyError(self, message):
+		"""
+		Shorthand function to reply with an error message
+		"""
+		self.logger.warn(message)
+		self.serverChannel.reply({
+				'result': 'error',
+				'error': message
+			})
+		return False
+
+
 	def onJobStart(self, message):
 		"""
 		Bus message arrived to start job
 		"""
-		pass
+		jid = None
+		config = None
+
+		# Get job ID and job configuration
+		try:
+			jid = message['jid']
+			config = message['config']
+
+		except KeyError as e:
+			return self._replyError("Could not find key %s in job_start message" % str(e))
+
+		# Find a free slot and allocate an application
+		k = 0
+		for v in self.slots:
+
+			# We found a free slot
+			if v == None:
+
+				self.logger.debug("Found free slot on #%i" % k)
+
+				# Instantiate a new app
+				jobapp = Config.APP_CONFIG.instance(self.runtimeConfig)
+
+				# Save some extra info on the jobapp
+				jobapp.slot = k
+				jobapp.jobid = jid
+
+				# Reserve slot & store on index
+				self.slots[k] = jobapp
+				self.jobIndex[jid] = jobapp
+
+				# Bind event handlers
+				jobapp.on("job_data", self.onAppJobData, app=jobapp)
+				jobapp.on("job_completed", self.onAppJobCompleted, app=jobapp)
+				jobapp.on("job_aborted", self.onAppJobAborted, app=jobapp)
+
+				# Start application
+				try:
+
+					# Set configuration and start job
+					jobapp.setConfig( config )
+					jobapp.start()
+
+				except JobConfigException as e:
+					del self.slots[k]
+					del self.jobIndex[jid]
+					return self._replyError("Configuration error: %s" % str(e))
+
+				except JobInternalException as e:
+					del self.slots[k]
+					del self.jobIndex[jid]
+					return self._replyError("Internal error: %s" % str(e))
+
+				except JobRuntimeException as e:
+					del self.slots[k]
+					del self.jobIndex[jid]
+					return self._replyError("Runtime error: %s" % str(e))
+
+				except Exception as e:
+					self.logger.error("Unexpected exception %s: %s", (e.__class__.__name__, str(e)))
+					del self.slots[k]
+					del self.jobIndex[jid]
+					return self._replyError("Unexpected error: %s" % str(e))
+
+				# Done
+				self.serverChannel.reply({
+						'result': 'ok'
+					})
+				return 
+
+			# Go to next key
+			k += 1
+
+		# We found no slot
+		return self._replyError("No free slots were found")
 
 	def onJobCancel(self, message):
 		"""
 		Bus message arrived to cancel a running job
 		"""
-		pass
+		jid = None
+
+		# Get job ID and job configuration
+		try:
+			jid = message['jid']
+		except KeyError as e:
+			return self._replyError("Could not find key %s in job_start message" % str(e))
+
+		# Check if we don't have such job
+		if not jid in self.jobIndex:
+			return self._replyError("Could a job with the given ID" % str(e))
+
+		# Fetch job entry
+		job = self.jobIndex[jid]
+
+		# Free slot
+		self.slots[job.slot] = None
+		del self.jobIndex[jid]
+
+		# Kill job
+		job.kill()
+
+		# Reply OK
+		self.serverChannel.reply({
+				'result': 'ok'
+			})
+
+	def onAppJobData(self, final, data, app=None):
+		"""
+		Callback from the application when the data are available
+		"""
+
+		# Forward message to the server channel
+		self.serverChannel.send('job_data', {
+				'jid': app.jobid,
+				'final': final,
+				'data': data
+			})
+
+	def onAppJobCompleted(self, app=None):
+		"""
+		Callback from the application when the job is completed successfully
+		"""
+
+		# Check if we were already cleaned-up
+		if app.jobid in self.jobIndex:
+
+			# Free slots and index entry
+			self.slots[app.slot] = None
+			del self.jobIndex[app.jobid]
+
+			# Forward the event to the server
+			self.serverChannel.send('job_completed', {
+					'jid': app.jobid,
+					'result': 0
+				})
+
+	def onAppJobAborted(self, res, app=None):
+
+		# Check if we were already cleaned-up
+		if app.jobid in self.jobIndex:
+
+			# Free slots and index entry
+			self.slots[app.slot] = None
+			del self.jobIndex[app.jobid]
+
+			# Forward the event to the server
+			self.serverChannel.send('job_completed', {
+					'jid': app.jobid,
+					'result': res
+				})
 
 	def step(self):
 		"""

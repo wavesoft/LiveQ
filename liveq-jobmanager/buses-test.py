@@ -27,6 +27,7 @@ import sys
 
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
+from liveq import handleSIGINT
 
 import ConfigParser
 from liveq.config import configexceptions
@@ -39,48 +40,80 @@ from liveq.config.externalbus import ExternalBusConfig
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, ExternalBusConfig):
+class Config(CoreConfig, InternalBusConfig):
 
 	"""
 	Update class variables by reading the config file
 	contents of the specified filename
 	"""
 	@staticmethod
-	def fromFile(files):
+	def fromFile(files, runtimeConfig):
 
 		# Read config file(s)
 		config = ConfigParser.SafeConfigParser()
 		config.read(files)
 
 		# Initialize subclasses
-		CoreConfig.fromConfig( config )
-		ExternalBusConfig.fromConfig( config )
+		CoreConfig.fromConfig( config, runtimeConfig )
+		InternalBusConfig.fromConfig( config , runtimeConfig )
 
 # Parse configuration
 try:
-	Config.fromFile("config/test.conf")
+	Config.fromFile("config/test.conf.local", { })
 except ConfigException as e:
 	print "Configuration error: %s" % str(e)
 	sys.exit(1)
 
-# Register CTRL+C Handler
-def signal_handler(signal, frame):
-	logging.info("** Caught signal. Shutting down **")
-	GlobalEvents.System.trigger('shutdown')
+# Register CTRL+C handler
+handleSIGINT()
+
+doneFlag = False
+
+def cb_data(msg):
+	print "*** DATA!!!"
+
+def cb_done(msg):
+	print "*** DONE (res=%i) :D" % msg['result']
+	doneFlag = True
+
+jobChannel = Config.IBUS.openChannel("jobs")
+responseChannel = Config.IBUS.openChannel("job-responses", serve=True)
+
+responseChannel.on('job_data', cb_data)
+responseChannel.on('job_completed', cb_done)
+
+ans = jobChannel.send('job_start', {
+		'lab': "3e63661c13854de7a9bdeed71be16bb9",
+		'group': 'c678c82dd5c74f00b95be0fb6174c01b',
+		'dataChannel': responseChannel.name,
+		'parameters': {
+
+			# Tune configuration
+			"tune": {
+				"TimeShower:alphaSvalue": 0.31
+			}
+
+		}
+	}, waitReply=True)
+
+if not ans:
+	print "**** ERROR: I/O Error"
 	sys.exit(0)
-signal.signal(signal.SIGINT, signal_handler)
 
-# Open a channel to the other endpoint
-logging.debug("**** OPPENING CHANNEL *****")
-print str(Config.EBUS)
+if ans['result'] == 'error':
+	print "**** ERROR: %s" % ans['error']
+	sys.exit(1)
 
-c = Config.EBUS.openChannel("jmliveq@t4t-xmpp.cern.ch/local")
-logging.debug("**** CHANNEL OPEN *****")
+print "*** STARTED: %s" % ans['jid']
 
-# Infinite loop
-while True:
+time.sleep(5)
 
-	# Send message every 10 seconds
-	time.sleep(10)
-	c.send("test", { "a": "message" })
+print "*** CANCELLING..."
+ans = jobChannel.send('job_cancel', {
+		'jid': ans['jid']
+	}, waitReply=True)
 
+print "*** RESULT: %r" % ans
+
+while not doneFlag:
+	time.sleep(1)

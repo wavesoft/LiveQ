@@ -19,6 +19,8 @@
 ################################################################
 
 #from ??? import LabDatabase
+import uuid
+
 from liveq.models import Lab
 from webserver.config import Config
 
@@ -37,7 +39,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         # Setup local variables
         self.lab = None
-        self.tuneid = None
+        self.jobid = None
 
 
     """
@@ -58,39 +60,44 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         # Reset local variables
         self.job = None
-        self.tuneid = None
+        self.jobid = None
 
         # Try to find a lab with the given ID
-        self.lab = Lab.select().where(Lab.id == labid)
+        self.lab = Lab.get(Lab.uuid == labid)
         if not self.lab:
             logging.error("Unable to locate lab with id '%s'" % labid)
             return
 
-        # Register on the bus
-        self.application.bus.registerSocket( self )
+        # Open required bus channels
+        self.jobChannel = Config.IBUS.openChannel("job")
+        self.dataChannel = Config.IBUS.openChannel("data-%s" % uuid.uuid4().hex, serve=True)
+
+        # Bind events
+        self.dataChannel.on('job_data', self.onBusData)
+        self.dataChannel.on('job_completed', self.onBusCompleted)
 
     """
     [Bus Event] Data available
     """
-    def bus_data(self, data):
+    def onBusData(self, data):
 
         # Forward event to the user socket
         self.write_message({
                 "action": "data",
-                "data": data.data,
-                "info": data.info
+                "data": data['data'],
+                "info": { }
             })
 
     """
     [Bus Event] Simulation completed
     """
-    def bus_completed(self, data):
+    def onBusCompleted(self, data):
 
         # Forward event to the user socket
         self.write_message({
                 "action": "completed",
-                "result": data.result,
-                "info": data.info
+                "result": data['result'],
+                "info": { }
             })
 
     """
@@ -100,13 +107,20 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         logging.info("Socket closed")
 
         # If we have a running tune, abort it
-        if self.tuneid:
+        if self.jobid:
 
-            # Broadcast the request to the LiveQ bus
-            self.application.bus.tune_abort( self.lab, self.tuneid )
+            # Ask job manager to abort the job
+            ans = self.jobChannel.send('job_abort', {
+                'jid': self.jobid
+            })
 
         # Unregister from the bus
-        self.application.bus.unregisterSocket( self )
+        self.dataChannel.off('job_data', self.onBusData)
+        self.dataChannel.off('job_completed', self.onBusCompleted)
+        self.dataChannel.close()
+        self.jobChannel.close()
+        self.jobChannel = None
+        self.dataChannel = None
 
     """
     Shorthand to respond with an error
@@ -145,31 +159,61 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Process actions
         if action == "tune_begin":
 
-            # If we are already running a tune (tuneid is defined), send
+            # If we are already running a tune (jobid is defined), send
             # an error. In principle the javascript user should take care
             # of stopping the request before
-            if self.tuneid:
+            if self.jobid:
                 return self.send_error("Trying to start a tune that is already running")
 
             # Make sure we have parameters when we start a tune
             if not 'parameters' in parsed:
                 return self.send_error("Missing 'parameters' parameter from request")
 
-            # Broadcast the request to the LiveQ bus and keep the tune ID
-            # as a reference for future actions
-            self.tuneid = self.application.bus.tune_begin( self.lab, parsed.parameters)
+            # TODO: First ask interpolator
+
+            # Ask job manager to schedule a new job
+            ans = self.jobChannel.send('job_start', {
+                'lab': self.lab.uuid,
+                'group': 'c678c82dd5c74f00b95be0fb6174c01b',
+                'dataChannel': self.dataChannel.name,
+                'parameters': {
+                    # Only the tune is interesting for the user
+                    "tune": parsed['parameters']
+                }
+            }, waitReply=True)
+
+            # Check for I/O failure on the bus
+            if not ans:
+                return self.send_error("Unable to contact the job manager")
+
+            # Check for error response
+            if ans['result'] == 'error':
+                return self.send_error("Unable to place a job request: %s" % ans['error'])
+
+            # The job started, save the tune job ID
+            self.jobid = ans['jid']
 
         elif action == "tune_abort":
 
             # If we don't have a running tune, raise an error
-            if not self.tuneid:
+            if not self.jobid:
                 return self.send_error("Trying to abort an already completed tune")
 
-            # Broadcast the request to the LiveQ bus
-            self.application.bus.tune_abort( self.lab, self.tuneid )
+            # Ask job manager to abort a job
+            ans = self.jobChannel.send('job_abort', {
+                'jid': self.jobid
+            }, waitReply=True)
+
+            # Check for I/O failure on the bus
+            if not ans:
+                return self.send_error("Unable to contact the job manager")
+
+            # Check for error response
+            if ans['result'] == 'error':
+                return self.send_error("Unable to abort job: %s" % ans['error'])
 
             # Clear tune ID
-            self.tuneid = None
+            self.jobid = None
 
         elif action == "configuration":
 

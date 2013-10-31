@@ -27,7 +27,7 @@ from liveq.io.bus import BusChannelException
 from liveq.component import Component
 from liveq.classes.bus.xmppmsg import XMPPBus
 
-from liveq.models import Agent, AgentGroup, AgentMetrics
+from liveq.models import *
 
 class JobAgentManager:
 	"""
@@ -53,7 +53,7 @@ class JobAgentManager:
 		except Agent.DoesNotExist:
 
 			# Return the new agent entry
-			return Agent.create(uuid=uid, group=self.GLOBAL_GROUP, metrics=metrics)
+			return Agent.create(uuid=uid, group=self.GLOBAL_GROUP)
 
 	def getAgentMetrics(self, agent):
 		"""
@@ -81,18 +81,47 @@ class JobAgentManager:
 		except AgentGroup.DoesNotExist:
 			return AgentGroup.create(uuid=gid)
 
-	def getJob(self, jid):
+	def getLabByUUID(self, lab):
 		"""
-		Return a Job record for the given job ID, and create it if
-		it's missing
+		Return a lab instance with the given lab UUID or None if it does not exist
 		"""
 
-		# Fetch or create job
 		try:
-			return AgentGroup.get(AgentGroup.uuid==gid)
+			return Lab.get( Lab.uuid == lab)
+		except Lab.DoesNotExist:
+			return None
 
-		except AgentGroup.DoesNotExist:
-			return AgentGroup.create(uuid=gid)
+	def getLabByID(self, lab):
+		"""
+		Return a lab instance with the given lab index or None if it does not exist
+		"""
+
+		try:
+			return Lab.get( Lab.id == lab)
+		except Lab.DoesNotExist:
+			return None
+
+	def getFreeAgent(self, group="public"):
+		"""
+		Return a job agent which is not doing anything and it belongs on the specified group
+		"""
+
+		# Get a group under this id
+		ginst = self.getGroup(group)
+
+		# Try to find something
+		try:
+			agent = Agent.get( (Agent.group == ginst) & (Agent.state == 1) )
+		except Agent.DoesNotExist:
+			# If we found nothing, return nothing
+			return None
+
+		# Mark the agent as busy
+		agent.state = 1
+		agent.save()
+
+		# Return agent
+		return agent
 
 	def updateHandshake(self, uid, attrib):
 		"""

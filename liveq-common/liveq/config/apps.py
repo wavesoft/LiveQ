@@ -33,11 +33,8 @@ class AppConfig(ComponentConfig):
 	#: The application package
 	APP_CLASS = ""
 
-	# The application configuration
+	#: The application configuration
 	APP_CONFIG = None
-
-	# The application instance
-	APP = None
 
 	@staticmethod
 	@configexceptions(section="app")
@@ -50,5 +47,4 @@ class AppConfig(ComponentConfig):
 		# Populate app classes
 		AppConfig.APP_CLASS = config.get("app", "class")
 		AppConfig.APP_CONFIG = AppConfigClass.fromClass( AppConfig.APP_CLASS, config._sections["app"] )
-		AppConfig.APP = AppConfig.APP_CONFIG.instance(runtimeConfig)
 

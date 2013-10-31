@@ -84,7 +84,7 @@ class RabbitMQChannel(BusChannel):
 	in the pika implementation.
 	"""
 	
-	def __init__(self, bus, name):
+	def __init__(self, bus, name, serve=None):
 		"""
 		Initialize the ZeroMQ Channel
 		"""
@@ -102,6 +102,11 @@ class RabbitMQChannel(BusChannel):
 		# Reply variables
 		self.replyQueue = None
 		self.replyID = None
+
+		# Check if we should serve this channel
+		if serve == None:
+			serve = name in bus.config.SERVE_QUEUES
+		self.serve = serve
 
 		# Register shutdown handler
 		GlobalEvents.System.on('shutdown', self.systemShutdown)
@@ -147,7 +152,7 @@ class RabbitMQChannel(BusChannel):
 
 				# If we are serving the specified queue, make us
 				# a consumer on it.
-				if self.qname in self.bus.config.SERVE_QUEUES:
+				if self.serve:
 					self.logger.info("Serving requests on rabbitMQ channel %s" % self.qname)
 
 					# Listen for events
@@ -160,9 +165,7 @@ class RabbitMQChannel(BusChannel):
 				while self.running:
 
 					# Process events
-					print "--- PROCESSING ---"
 					connection.process_data_events()
-					print "=== PROCESSED ===="
 
 					# If we have data to send, send them now
 					while not self.queue.empty():
@@ -171,7 +174,7 @@ class RabbitMQChannel(BusChannel):
 						msg = self.queue.get()
 
 						# If that's a reply, use the callbackQueue
-						self.logger.info("[%s] Sending %r" % (self.qname, msg['data']))
+						self.logger.debug("[%s] Sending %r" % (self.qname, msg['data']))
 						channel.basic_publish(exchange='',
 							  routing_key=msg['queue'],
 							  properties=pika.BasicProperties(
@@ -204,6 +207,14 @@ class RabbitMQChannel(BusChannel):
 		Handle shutdown
 		"""
 		
+		# Close the channel
+		self.close()
+
+	def close(self):
+		"""
+		Close the RabbitMQ channel
+		"""
+
 		# Mark as not running
 		self.running = False
 
@@ -211,7 +222,7 @@ class RabbitMQChannel(BusChannel):
 		"""
 		Callback function that receives responses from the callback queue
 		"""
-		self.logger.info("[%s] Response Received %r" % (self.qname, body))
+		self.logger.debug("[%s] Response Received %r" % (self.qname, body))
 
 		# Decode data
 		data = None
@@ -228,14 +239,14 @@ class RabbitMQChannel(BusChannel):
 			record = self.waitQueue[properties.correlation_id ]
 
 			# Update data and notify
-			record['data'] = data
+			record['data'] = data['data']
 			record['event'].set()
 
 	def onMessageArrived(self, ch, method, properties, body):
 		"""
 		Callback function that receives messages from input queue
 		"""
-		self.logger.info("[%s] Received %r" % (self.qname, body))
+		self.logger.debug("[%s] Received %r" % (self.qname, body))
 
 		# Decode data
 		data = None
@@ -350,8 +361,8 @@ class RabbitMQBus(Bus):
 		# Store config
 		self.config = config
 
-	def openChannel(self, name):
+	def openChannel(self, name, serve=None):
 		"""
 		Open ZeroMQ Channel
 		"""
-		return RabbitMQChannel(self, name)
+		return RabbitMQChannel(self, name, serve=serve)

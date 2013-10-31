@@ -157,11 +157,12 @@ def createMsg(message, compress=True, encrypt=False):
 
 	# Apply encryption if asked to
 	if encrypt:
+		#87676
 		pass
 
 	# Apply compression if asked to
 	if compress:
-		message = zlib.compress(message)
+		message = zlib.compress(message, 9)
 
 	# Prepare the flags
 	flags = 0
@@ -254,14 +255,8 @@ class XMPPUserChannel(BusChannel):
 		Shutdown channel
 		"""
 
-		# Release all threads waiting in queues
-		for k, waiting in self.waitQueue.iteritems():
-			# Update data and unlock event
-			waiting['data'] = None
-			waiting['event'].set()
-
-		# Enter lockdown
-		self.lockdown = True
+		# Close the channel
+		self.close()
 
 	def _handle(self, message):
 		"""
@@ -309,6 +304,23 @@ class XMPPUserChannel(BusChannel):
 
 		# Trigger the event
 		self.trigger(data['name'], data['data'])
+
+	def close(self):
+		"""
+		Close the XMLL channel
+		"""
+
+		# Release all threads waiting in queues
+		for k, waiting in self.waitQueue.iteritems():
+			# Update data and unlock event
+			waiting['data'] = None
+			waiting['event'].set()
+
+		# Enter lockdown
+		self.lockdown = True
+
+		# Unregister us from the bus
+		self.bus._closeChannel(self.name)
 
 	def reply(self, data):
 		"""
@@ -383,10 +395,10 @@ class XMPPBus(Bus, ClientXMPP):
 	# JID validation
 	JID_MATCH = re.compile(r"^(?:([^@/<>'\"]+)@)?([^@/<>'\"]+)(?:/([^<>'\"]*))?$")
 
-	"""
-	Initialize the XMPP adapter with the given config object
-	"""
 	def __init__(self,config):
+		"""
+		Initialize the XMPP adapter with the given config object
+		"""
 
 		# Setup superclasses
 		Bus.__init__(self)
@@ -421,10 +433,10 @@ class XMPPBus(Bus, ClientXMPP):
 		# Bind to the system shutdown callback
 		GlobalEvents.System.on('shutdown', self.systemShutdown)
 
-	"""
-	Callback when a user becomes available
-	"""
 	def onAvailable(self, event):
+		"""
+		Callback when a user becomes available
+		"""
 
 		# Get JID
 		jid = str(event['from'])
@@ -438,10 +450,10 @@ class XMPPBus(Bus, ClientXMPP):
 		if jid in self.channels:
 			self.channels[jid].trigger('open')
 
-	"""
-	Callback when a user becomes unavailable
-	"""
 	def onUnavailable(self, event):
+		"""
+		Callback when a user becomes unavailable
+		"""
 
 		# Get JID
 		jid = str(event['from'])
@@ -455,18 +467,18 @@ class XMPPBus(Bus, ClientXMPP):
 		if jid in self.channels:
 			self.channels[jid].trigger('close')
 
-	"""
-	Callback from the XMPP when connection is up
-	"""
 	def onConnected(self, event):
+		"""
+		Callback from the XMPP when connection is up
+		"""
 
 		# Update state
 		self.connected = True
 
-	"""
-	Callback from the XMPP when connection is down
-	"""
 	def onDisconnected(self, event):
+		"""
+		Callback from the XMPP when connection is down
+		"""
 
 		# Update state
 		self.connected = False
@@ -489,10 +501,10 @@ class XMPPBus(Bus, ClientXMPP):
 			self.reconnect()
 			self.disconnecting = False
 
-	"""
-	Handler for the system-wide shutdown event
-	"""
 	def systemShutdown(self):
+		"""
+		Handler for the system-wide shutdown event
+		"""
 
 		# Mark us as under disconnection
 		self.disconnecting = True
@@ -508,20 +520,20 @@ class XMPPBus(Bus, ClientXMPP):
 		# Join thread
 		self.mainThread.join()
 
-	"""
-	Session management
-	"""
 	def onSessionStart(self, event):
+		"""
+		Session management
+		"""
 
 		# Update presence and get roster
 		self.send_presence()
 		self.get_roster()
 
-	"""
-	Handler for incoming IQ messages, to be routed
-	to the appropriate user channel
-	"""
 	def onDataMessage(self, iq):
+		"""
+		Handler for incoming IQ messages, to be routed
+		to the appropriate user channel
+		"""
 
 		# Get JID
 		jid = iq['from']
@@ -548,10 +560,10 @@ class XMPPBus(Bus, ClientXMPP):
 		channel = self.channels[jid]
 		channel._handle(iq)
 
-	"""
-	Message I/O
-	"""
 	def onMessage(self, msg):
+		"""
+		Message I/O
+		"""
 
 		# Normal messages are non-chat messages
 		# arrived for message exchange
@@ -609,10 +621,10 @@ class XMPPBus(Bus, ClientXMPP):
 		if msg['type'] in ('chat', 'normal'):
 			msg.reply("Thank you for your interest, but I am a rude bot not answering to casual chatter").send()
 
-	"""
-	Open an XMPP Channel
-	"""
 	def openChannel(self, name):
+		"""
+		Open an XMPP Channel
+		"""
 
 		# Validate channel format
 		if not XMPPBus.JID_MATCH.match(name):
@@ -626,3 +638,12 @@ class XMPPBus(Bus, ClientXMPP):
 		return self.channels[name]
 
 
+	def _closeChannel(self, name):
+		"""
+		Called by the channel's close() function in order to release
+		the resources
+		"""
+
+		# Delete channel from our list
+		if name in self.channels:
+			del self.channels[name]

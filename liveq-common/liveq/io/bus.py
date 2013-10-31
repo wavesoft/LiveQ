@@ -65,7 +65,13 @@ class BusChannel(EventDispatcher):
 		Reply to the last message received
 		"""
 		raise NotImplementedError("The BusChannel did not implement the reply() function")
-		
+	
+	def close(self):
+		"""
+		Close the specified channel
+		"""
+		raise NotImplementedError("The BusChannel did not implement the close() function")
+
 class Bus(EventDispatcher):
 	"""
 	A template class that should be inherited by the Bus driver

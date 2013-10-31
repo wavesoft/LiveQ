@@ -33,6 +33,7 @@ import uuid
 import os
 import atexit
 import thread
+import logging
 
 from threading import Lock
 
@@ -46,6 +47,7 @@ def remotelockExitCleanup():
 
 	# Start unlocking
 	for e in RemoteLock.REAP_LIST:
+		logging.debug("Releasing lock '%s' due to shutdown" % e.lockKey)
 		e.release()
 
 	# Empty list

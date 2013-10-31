@@ -17,22 +17,52 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+# ----------
 import sys
 sys.path.append("../liveq-common")
+# ----------
+
+import logging
+import time
+import signal
+import sys
+import uuid
+import json
 
 from jobmanager.config import Config
+from jobmanager.component import JobManagerComponent
+
+from liveq import handleSIGINT
+from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 from liveq.models import *
 
-# Parse configuration
+# Prepare runtime configuration
+runtimeConfig = { }
+
+# Load configuration
 try:
-	Config.fromFile("config/base.conf")
+	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
 except ConfigException as e:
-	print "Configuration error: %s" % str(e)
+	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
 
-User.create_table()
-AgentGroup.create_table()
-AgentMetrics.create_table()
-Agent.create_table()
-Lab.create_table()
+# Prepare fixed parameters
+parameters = {
+	"beam": "ee", 
+	"process": "zhad", 
+	"energy": 91.2, 
+	"params": "-",
+	"specific": "-",
+	"generator": "pythia8",
+	"version": "8.175",
+	"events": 10000,
+	"seed": 123123
+}
+
+# Create a default lab
+lab = Lab()
+lab.uuid = uuid.uuid4().hex
+lab.revision = 1652
+lab.fixedParameters = json.dumps(parameters)
+lab.save()

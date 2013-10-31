@@ -22,6 +22,7 @@ import os.path
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.externalbus import ExternalBusConfig
+from liveq.config.apps import AppConfig
 
 """
 Local configuration for the agent
@@ -42,7 +43,7 @@ class AgentConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, ExternalBusConfig, StaticConfig, AgentConfig):
+class Config(CoreConfig, ExternalBusConfig, StaticConfig, AppConfig, AgentConfig,):
 
 	"""
 	Update class variables by reading the config file
@@ -59,4 +60,5 @@ class Config(CoreConfig, ExternalBusConfig, StaticConfig, AgentConfig):
 		StaticConfig.initialize( os.path.dirname(confFile) + "/static.conf.local" )
 		CoreConfig.fromConfig( config, runtimeConfig )
 		ExternalBusConfig.fromConfig( config, runtimeConfig )
+		AppConfig.fromConfig( config, runtimeConfig )
 		AgentConfig.fromConfig( config, runtimeConfig )

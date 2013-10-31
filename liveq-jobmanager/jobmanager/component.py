@@ -20,6 +20,7 @@
 import logging
 import time
 import datetime
+import uuid
 
 from jobmanager.config import Config
 from jobmanager.internal.agentmanager import JobAgentManager
@@ -27,6 +28,7 @@ from jobmanager.internal.agentmanager import JobAgentManager
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 from liveq.classes.bus.xmppmsg import XMPPBus
+from liveq.utils import deepupdate
 
 from liveq.models import Agent, AgentGroup, AgentMetrics
 
@@ -58,35 +60,75 @@ class JobManagerComponent(Component):
 
 		# Register callbacks from the internal message bus, such as
 		# job creation and abortion
-		Config.IBUS.on('job_start', self.onBusJobStart)
-		Config.IBUS.on('job_cancel', self.onBusJobCancel)
-		Config.IBUS.on('job_restart', self.onBusJobRestart)
+		self.jobChannel = Config.IBUS.openChannel("jobs")
+		self.jobChannel.on('job_start', self.onBusJobStart)
+		self.jobChannel.on('job_cancel', self.onBusJobCancel)
 
 		# Channel mapping
 		self.channels = { }
 
+		#####################################################################
+		# ---- BEGIN HACK ----
+
+		# A list of jobs that I manage
+		self.activeJobs = {}
+
+		# ----- END HACK ----
+		#####################################################################
+
+
 		# Agent monitor
 		self.manager = JobAgentManager()
 
-	def onChannelCreation(self, channel):
+	def _setupChannelCallbacks(self, channel):
 		"""
-		Callback when a channel is up
+		Bind the appropriate callbacks to the given channel
 		"""
-		self.logger.warn("[%s] Channel created" % channel.name)
-
-		# Store on local map
-		self.channels[channel.name] = channel
 
 		# Handle bus messages and evnets
 		channel.on('open', self.onAgentOnline, channel=channel)
 		channel.on('close', self.onAgentOffline, channel=channel)
 		channel.on('handshake', self.onAgentHandshake, channel=channel)
 
+		channel.on('job_data', self.onAgentJobData, channel=channel)
+		channel.on('job_completed', self.onAgentJobCompleted, channel=channel)
+
+	def getChannel(self, agentID):
+		"""
+		Return the channel from registry or open a new one if needed
+		"""
+
+		# Check for channel in the registry
+		if agentID in self.channels:
+			return self.channels[agentID]
+
+		# Create new one
+		channel = Config.EBUS.openChannel(agentID)
+		self.channels[agentID] = channel
+
+		# Setup callbacks
+		self._setupChannelCallbacks(channel)
+
+		# Return instance
+		return channel
+
+	def onChannelCreation(self, channel):
+		"""
+		Callback when a channel is up
+		"""
+		self.logger.info("[%s] Channel created" % channel.name)
+
+		# Store on local map
+		self.channels[channel.name] = channel
+
+		# Setup callbacks
+		self._setupChannelCallbacks(channel)
+
 	def onAgentOnline(self, channel=None):
 		"""
 		Callback when an agent becomes available
 		"""
-		self.logger.warn("[%s] Channel is open" % channel.name)
+		self.logger.info("[%s] Channel is open" % channel.name)
 
 		# Turn agent on
 		self.manager.updatePresence( channel.name, 1 )
@@ -95,7 +137,7 @@ class JobManagerComponent(Component):
 		"""
 		Callback when an agent becomes unavailable
 		"""
-		self.logger.warn("[%s] Channel is closed" % channel.name)
+		self.logger.info("[%s] Channel is closed" % channel.name)
 
 		# Turn agent off
 		self.manager.updatePresence( channel.name, 0 )
@@ -104,7 +146,7 @@ class JobManagerComponent(Component):
 		"""
 		Callback when a handshake arrives in the bus
 		"""
-		self.logger.warn("[%s] Handshaking" % channel.name)
+		self.logger.info("[%s] Handshaking" % channel.name)
 
 		# Let manager know that we got a handshake
 		self.manager.updateHandshake( channel.name, message )
@@ -112,29 +154,174 @@ class JobManagerComponent(Component):
 		# Reply with some data
 		channel.reply({ 'some': 'data' })
 
+	def onAgentJobData(self, data, channel=None):
+		"""
+		Callback when we receive data from a job agent
+		"""
+		self.logger.info("[%s] Got data" % channel.name)
+
+		#####################################################################
+		# ---- BEGIN HACK ----
+
+		# Extract job ID from message
+		jid = data['jid']
+
+		# Forward the message to the internal bus as-is
+		if jid in self.activeJobs:
+			job = self.activeJobs[jid]
+
+			# Forward message on the internal bus as-is
+			job['replyTo'].send("job_data", data)
+
+		# ----- END HACK ----
+		#####################################################################
+
+	def onAgentJobCompleted(self, data, channel=None):
+		"""
+		Callback when the job in the specified agent is completed
+		"""
+		self.logger.info("[%s] Job completed" % channel.name)
+
+		#####################################################################
+		# ---- BEGIN HACK ----
+
+		# Extract job ID from message
+		jid = data['jid']
+
+		# Forward the message to the internal bus as-is
+		if jid in self.activeJobs:
+			job = self.activeJobs[jid]
+
+			# Forward message on the internal bus as-is
+			job['replyTo'].send("job_completed", data)
+
+			# Close data channel and delete job from registry
+			job['replyTo'].close()
+			del self.activeJobs[jid]
+
+		# ----- END HACK ----
+		#####################################################################
+
 	def onBusJobStart(self, message):
 		"""
 		Callback when we have a request for new job from the bus
 		"""
 		
-		if not all(x in message for x in ('lab', 'parameters')):
+		if not all(x in message for x in ('lab', 'parameters', 'group')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
 			return
 
-		lab = message['lab']
+		#####################################################################
+		# ---- BEGIN HACK ----
 
+		# Fetch the lab ID and the user parameters
+		lab = message['lab']
+		parameters = message['parameters']
+		group = message['group']
+		dataChannel = message['dataChannel']
+
+		# Create new Job ID
+		jid = uuid.uuid4().hex
+
+		# Find a free agent
+		agent = self.manager.getFreeAgent(group)
+
+		# Check if we could not find a free agent
+		if not agent:
+			self.logger.error("No agents were found on group #%s" % group)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "No agents were found on group #%s" % group
+				})
+			return
+
+		# Fetch lab with the given UUID
+		labInst = self.manager.getLabByUUID(lab)
+		if not labInst:
+			self.logger.error("Could not find lab #%s" % lab)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "Could not find lab #%s" % lab
+				})
+			return
+
+		# Deep merge lab default parameters and user's parameters
+		mergedParameters = deepupdate( parameters, labInst.getParameters() )
+
+		# Open/Retrieve a channel with the specified agent
+		agentChannel = self.getChannel(agent.uuid)
+
+		# Kindly ask to start a job
+		ans = agentChannel.send('job_start', {
+				'jid': jid,
+				'config': mergedParameters
+			}, waitReply=True)
+
+		# Check for timeout
+		if not ans:
+			self.logger.error("Timed out while waiting for response from agent #%s" % agent.uuid)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'No valid agents were found'
+				})
+			return
+
+		# Check for erroreus answer
+		if ans['result'] != 'ok':
+			self.logger.error("Got error response from agent #%s: %s" % (agent.uuid, ans['error']))
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "Remote error: %s" % ans['error']
+				})
+			return
+
+		# Open a channel to reply to
+		self.reply_to = Config.IBUS.openChannel(dataChannel)
+
+		# Store job info
+		self.activeJobs[jid] = {
+				'agents': [ agent.uuid ],
+				'replyTo': self.reply_to
+			}
+
+		# Reply status
+		self.jobChannel.reply({
+				'jid': jid,
+				'result': 'scheduled'
+			})
+
+		# ----- END HACK ----
+		#####################################################################
 
 	def onBusJobCancel(self, message):
 		"""
 		Callback when we have a request for new job from the bus
 		"""
-		pass
 
-	def onBusJobRestart(self, message):
-		"""
-		Callback when we have a request for new job from the bus
-		"""
-		pass
+		#####################################################################
+		# ---- BEGIN HACK ----
+
+		# Fetch JID from request
+		jid = message['jid']
+
+		# Check if we are managing this jid
+		if jid in self.activeJobs:
+			job = self.activeJobs[jid]
+
+			# Send cancellation to all job agents
+			for agent in job['agents']:
+				agentChannel = self.getChannel(agent)
+				agentChannel.send('job_cancel', {
+						'jid': jid
+					})
+
+		# Reply status
+		self.jobChannel.reply({
+				'result': 'ok'
+			})
+
+		# ----- END HACK ----
+		#####################################################################
 
 	def run(self):
 		"""
