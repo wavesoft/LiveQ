@@ -21,10 +21,27 @@ from liveq.utils.fsm import StoredFSM
 
 class JobMonitor(StoredFSM):
 	"""
-	
+	This class controls the job of the given ID
 	"""
 
+	#: The database instances
+	INSTANCES = { }
+
 	@staticmethod
+	def getInstance(jid):
+		"""
+		Return the JobMonitor instance for the given ID.
+		If the ID does not exist, create a new one and store it in the database.
+		"""
+
+		# If we have instance, get it from store
+		if jid in JobMonitor.INSTANCES:
+			return JobMonitor.INSTANCES[jid]
+
+		# We don't have an instance, create a new one
+		instance = JobMonitor(jid)
+		
+
 	def broadcast():
 		"""
 		"""

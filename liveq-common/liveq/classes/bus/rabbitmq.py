@@ -48,7 +48,6 @@ class Config(BusConfigClass):
 		"""
 		Populate the ZeroMQ Bus configuration
 		"""
-
 		#: The server to connect to
 		self.SERVER = config['server']
 
