@@ -220,6 +220,7 @@ class StoredFSM:
 		self.__dict__['_routing'] = { }
 		self.__dict__['_stateHandlers'] = { }
 		self.__dict__['_eventHandlers'] = { }
+		self.__dict__['_static'] = { }
 
 		# Setup interlocks
 		self.__dict__['_inhandler'] = False
@@ -270,21 +271,53 @@ class StoredFSM:
 
 	def __setattr__(self, name, value):
 		"""
-		Write all the variables to the _context dict instead of the classe's __dict__
+		Write all the variables to the ``_context`` dict instead of the classe's __dict__.
+
+		All variables that start with underscore are placed on the ``_static`` dictionary that is not
+		frozen nor thawed.
 		"""
-		self._context[name] = value
+
+		# Protect __dict__ variables
+		if name in __dict__:
+			raise ValueError("Keyword %s is reserved for internal use" % name)
+
+		# Update dicts
+		if name[0] == '_':
+			self._static[name] = value
+		else:
+			self._context[name] = value
 
 	def __getattr__(self, name):
 		"""
-		Read all the variables from the _context dict instead of the classe's __dict__
+		Read all the variables from the ``_context`` dict instead of the classe's __dict__
+
+		All variables that start with underscore are read from the ``_static`` dictionary that is not
+		frozen nor thawed.
 		"""
-		return self._context[name]
+
+		# Fetch from appropriate dict
+		if name[0] == '_':
+			return self._static[name]
+		else:
+			return self._context[name]
 
 	def __delattr__(self, name):
 		"""
-		Delete variables from the _context dict instead of the classe's __dict__
+		Delete variables from the ``_context`` dict instead of the classe's __dict__
+
+		All variables that start with underscore are deleted from the ``_static`` dictionary that is not
+		frozen nor thawed.
 		"""
-		del self._context[name]
+
+		# Protect __dict__ variables
+		if name in __dict__:
+			raise ValueError("Keyword %s is reserved for internal use" % name)
+		
+		# Update dicts
+		if name[0] == '_':
+			del self._static[name]
+		else:
+			del self._context[name]
 
 	def free(self):
 		"""
@@ -350,6 +383,13 @@ class StoredFSM:
 		# Reset handled state
 		self.__dict__['_stateHandled'] = False
 
+	def beforeFreeze(self):
+		"""
+		Overridable function that the subclassing entity can use in order
+		to perform cleanups before freeze
+		"""
+		pass
+
 	def _freeze(self, sync=True):
 		"""
 		Store the FSM context in the store
@@ -359,6 +399,9 @@ class StoredFSM:
 		# Acquire exlusive lock
 		if sync:
 			self._lock.acquire(True)
+
+		# Call custom functions
+		self.beforeFreeze()
 
 		# Pickle dictionary
 		pContext = pickle.dumps({
@@ -373,6 +416,13 @@ class StoredFSM:
 		# Release exlusive lock
 		if sync:
 			self._lock.release()
+
+	def afterThaw(self):
+		"""
+		Overridable function that the subclassing entity can use in order
+		to perform initializations after thawing
+		"""
+		pass
 
 	def _thaw(self, sync=True):
 		"""
@@ -393,6 +443,9 @@ class StoredFSM:
 			self.__dict__['_context'] = dat['context']
 			self.__dict__['_state'] = dat['state']
 			self.__dict__['_stateHandled'] = dat['stateHandled']
+
+		# Call custom functions
+		self.afterThaw()
 
 		# Release exlusive lock
 		if sync:

@@ -38,6 +38,12 @@ class JobMonitor(StoredFSM):
 
 	"""
 
+	def afterThaw(self):
+		"""
+		(Overrided) Establish connections to resources that are not available otherwise
+		"""
+		pass
+
 	@state_handler("init")
 	def stateInit(self):
 		"""
@@ -52,6 +58,7 @@ class JobMonitor(StoredFSM):
 		"""
 		Calculate the resources required for running this job
 		"""
+		pass
 
 	@event_handler("jobData")
 	def eventDataArrived(self):
