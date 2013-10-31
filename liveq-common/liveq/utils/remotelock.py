@@ -2,7 +2,7 @@
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
 # 
-# This program is free software; you can redistribute it and/or
+# This program is free software; you can remotetribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
@@ -26,22 +26,22 @@ from threading import Lock
 
 # Register cleanup
 @atexit.register
-def redislockExitCleanup():
+def remotelockExitCleanup():
 
 	# If there is nothing to reap, exit
-	if not RedisLock.REAP_LIST:
+	if not RemoteLock.REAP_LIST:
 		return
 
 	# Start unlocking
-	for e in RedisLock.REAP_LIST:
+	for e in RemoteLock.REAP_LIST:
 		e.release()
 
 	# Empty list
-	RedisLock.REAP_LIST = []
+	RemoteLock.REAP_LIST = []
 
-class RedisLock:
+class RemoteLock:
 	"""
-	This class provides locking functionality through a REDIS interface.
+	This class provides locking functionality through a Remote interface.
 	"""
 
 	#: A list of locked object to be released upon unexpected termination
@@ -49,10 +49,10 @@ class RedisLock:
 
 	def __init__(self, instance, key):
 		"""
-		Initialize RedisLock
+		Initialize RemoteLock
 
 		Parametes:
-			instance (instance) : A store instance that proides the .blpop(), .lpop(), .rpush(), and .llen() functions.
+			instance (instance) : A store instance that proides the .get(), .set(), .blpop(), .lpop(), .rpush(), and .llen() functions.
 			key (string)		: The key name to use for locking purposes
 		"""
 		self.lockInstance = instance
@@ -108,7 +108,7 @@ class RedisLock:
 		self.lockInterThread.acquire(False)
 
 		# Add us on the reap list so we get released even if we crash
-		RedisLock.REAP_LIST.append(self)
+		RemoteLock.REAP_LIST.append(self)
 
 		# Return true
 		return True
@@ -129,7 +129,7 @@ class RedisLock:
 			raise thread.error("release unlocked lock")
 
 		# Remove us from the reap list
-		RedisLock.REAP_LIST.remove(self)
+		RemoteLock.REAP_LIST.remove(self)
 		
 		# Get the number of observers in the lock queue
 		numObservers = self.lockInstance.llen( "%s:observers" % self.lockKey )
@@ -152,9 +152,9 @@ class RedisLock:
 		self.lockInterThread.release()
 
 """
-import redis
-r = redis.StrictRedis(host="127.0.0.1", port=6379, db=0)
-from liveq.utils.redislock import RedisLock
-l = RedisLock(r,"test")
+import remote
+r = remote.StrictRemote(host="127.0.0.1", port=6379, db=0)
+from liveq.utils.remotelock import RemoteLock
+l = RemoteLock(r,"test")
 
 """
