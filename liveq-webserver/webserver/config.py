@@ -22,6 +22,7 @@ import os.path
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.internalbus import InternalBusConfig
+from liveq.config.database import DatabaseConfig
 
 """
 Local configuration for the agent
@@ -37,7 +38,7 @@ class WebserverConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, InternalBusConfig, WebserverConfig):
+class Config(CoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -53,4 +54,5 @@ class Config(CoreConfig, InternalBusConfig, WebserverConfig):
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
+		DatabaseConfig.fromConfig( config, runtimeConfig )
 		WebserverConfig.fromConfig( config, runtimeConfig )

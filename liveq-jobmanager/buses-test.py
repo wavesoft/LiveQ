@@ -27,7 +27,7 @@ import sys
 
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
-from liveq import handleSIGINT
+from liveq import handleSIGINT, exit
 
 import ConfigParser
 from liveq.config import configexceptions
@@ -106,14 +106,17 @@ if ans['result'] == 'error':
 
 print "*** STARTED: %s" % ans['jid']
 
-time.sleep(5)
+#time.sleep(5)
 
-print "*** CANCELLING..."
-ans = jobChannel.send('job_cancel', {
-		'jid': ans['jid']
-	}, waitReply=True)
+#print "*** CANCELLING..."
+#ans = jobChannel.send('job_cancel', {
+#		'jid': ans['jid']
+#	}, waitReply=True)
 
 print "*** RESULT: %r" % ans
 
 while not doneFlag:
 	time.sleep(1)
+
+# Exit
+exit(0)

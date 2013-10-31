@@ -10,7 +10,7 @@
 	 * In principle, a 'lab' is where the user tunes parameters upon.
 	 *
 	 */
-	var MCPlotsLab = function( id ) {
+	var MCPlotsLab = window.MCPlotsLab = function( id ) {
 
 		// Reset local variables
 		this.tuning = false;
@@ -28,10 +28,6 @@
 				console.error("Invalid response arrived from the lab socket: Missing 'action' parameter");
 				return;
 			}
-			if (data.data == undefined) {
-				console.error("Invalid response arrived from the lab socket: Missing 'data' parameter");
-				return;
-			}
 
 			// Handle actions
 			if (data.action == "data") {
@@ -39,6 +35,10 @@
 				$(this).trigger('updateData', data.data, this.reference, data.info );
 
 			} else if (data.action == "completed") {
+
+				// We are not tuning any more
+				this.tuning = false;
+
 				// We have completed a previously initiated tune
 				$(this).trigger('updateCompleted', data.result, data.info );
 
@@ -46,9 +46,9 @@
 				// Iterate over histograms and build the reference histogram map
 				this.reference = [ ];
 				this.histograms = [ ];
-				for (var i=0; i<data.data.histograms.length; i++) {
-					this.histograms.push( data.data.histograms[i].histogram );
-					this.reference.push( data.data.histograms[i].reference );
+				for (var i=0; i<data.histograms.length; i++) {
+					this.histograms.push( data.histograms[i].histogram );
+					this.reference.push( data.histograms[i].reference );
 				}
 
 				// Let the listeners know that we are now ready
@@ -66,14 +66,22 @@
 		// When the socket is connected, request the lab configuration data.
 		// These data include the histogram number, their labels and their reference data.
 		// In addition, it contains metainformation about their layout.
-		this.socket.open = (function() {
-			updater.socket.send(JSON.stringify({
+		this.socket.onopen = (function() {
+			console.log("Connection open")
+			this.socket.send(JSON.stringify({
 				"action": "configuration"
 			}));
 		}).bind(this);
 
-		// Start the websocket
-		this.socket.start();
+		// If for any reason the socket is closed, retry connection
+		this.socket.onclose = (function() {
+			console.log("Connection closed")
+		}).bind(this);
+
+		// Handle socket errors
+		this.socket.onerror = (function(ws, error) {
+			console.log("Socket error: ", error)
+		}).bind(this);
 
 	}
 
@@ -85,9 +93,9 @@
 		// If we are already tuning, let the server know that we changed our mind
 		if (this.tuning) {
 
-			// Abort tune on server
-			updater.socket.send(JSON.stringify({
-				"action": "tune_abort"
+			// Cancel tune on server
+			this.socket.send(JSON.stringify({
+				"action": "tune_cancel"
 			}));
 
 			// Let UI know that we completed the tune
@@ -102,7 +110,7 @@
 		$(this).trigger('updateBegin');
 
 		// Start tune on the server
-		updater.socket.send(JSON.stringify({
+		this.socket.send(JSON.stringify({
 			"action": "tune_begin",
 			"parameters": parameters
 		}));

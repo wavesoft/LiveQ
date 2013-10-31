@@ -40,3 +40,16 @@ def handleSIGINT():
 
 	# Register sigint handler
 	signal.signal(signal.SIGINT, signal_handler)
+
+def exit(code):
+	"""
+	Internal function to gracefully exit.
+
+	This function signals the system-wide shutdown event before attempting to exit.
+	"""
+
+	# Send shutdown event
+	GlobalEvents.System.trigger('shutdown')
+
+	# Exit
+	os.exit(code)

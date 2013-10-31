@@ -23,6 +23,7 @@ import sys
 sys.path.append("../liveq-common")
 # ----------
 
+import threading
 import logging
 import time
 import signal
@@ -48,11 +49,22 @@ except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
 
+# Hook CTRL+C
+handleSIGINT()
+
 # Setup port defaults
 define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
 
-# Parse cmdline and start Tornado Server
-tornado.options.parse_command_line()
-app = MCPlotsServer()
-app.listen(options.port)
-tornado.ioloop.IOLoop.instance().start()
+def main():
+
+	# Parse cmdline and start Tornado Server
+	tornado.options.parse_command_line()
+	app = MCPlotsServer()
+	app.listen(options.port)
+	tornado.ioloop.IOLoop.instance().start()
+
+t = threading.Thread(target=main)
+t.start()
+
+while True:
+	time.sleep(1)

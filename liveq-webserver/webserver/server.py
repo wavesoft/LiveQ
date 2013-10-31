@@ -29,81 +29,10 @@ from webserver.labsocket import LabSocketHandler
 from webserver.config import Config
 
 """
-LiveQ Bus connector
-"""
-class ServerBus():
-
-	"""
-	Setup server bus by binding on the expected
-	incoming bus messages
-	"""
-	def __init__(self):
-
-		# Open the data channel on the internal bus
-		#self.dataChannel = Config.IBUS.openChannel("data")
-
-		# Open the job request channel on the internal bus
-		#self.jobChannel = Config.IBUS.openChannel("job")
-
-		# Open the interpolation channel on the internal bus
-		#self.interpolateChannel = Config.IBUS.openChannel("interpolate")
-		pass
-
-	"""
-	The user requested a tune with the given parameter set
-
-	This function returns a inuqie tune ID that can be used to manage
-	the started tune at a later time.
-	"""
-	def tune_begin(self, lab, parameters):
-
-		# Try to contact the tune server 
-		ans = self.request("tune_get", "tune_get_data", { "parameters": parameters, "lab": lab.id })
-
-		# Try to contact interpolator
-		result = self.interpolateChannel.send("interpolate", {
-				"parameters": parameters,
-				"lab": lab.id
-			}, waitReply=True)
-
-		# Check for errors
-		if not ans:
-
-			# We don't have a results database on the LiveQ bus
-			# perform dry-run by contacting directly the job manager
-			pass
-
-	
-	"""
-	The user aborted a tune running on the given lab
-	"""
-	def tune_begin(self, lab, tuneid):
-		pass
-
-	"""
-	Register a labSocket on the message bus
-	"""
-	def unregisterSocket(self, socket):
-		pass
-
-	"""
-	Unregister a labSocket from the message bus
-	"""
-	def registerSocket(self, socket):
-		pass
-
-	def zmq_tuneData(self, data):
-		pass
-
-"""
 Tornado Application class of the LiveQ Server
 """
 class MCPlotsServer(tornado.web.Application):
 	def __init__(self):
-
-		# Create a global instance of the internal
-		# message bus handler
-		self.bus = ServerBus()
 
 		# Setup handlers
 		handlers = [
@@ -111,11 +40,14 @@ class MCPlotsServer(tornado.web.Application):
 			(r"/labsocket/(.*)", LabSocketHandler),
 		]
 
+		# Get root dir of files
+		filesDir = os.path.dirname(os.path.dirname(__file__))
+
 		# Setup tornado settings
 		settings = dict(
 			cookie_secret="ckjbe3n3809713g7baf13n8vapjtd64xfkjgd",
-			template_path=os.path.join(os.path.dirname(__file__), "templates"),
-			static_path=os.path.join(os.path.dirname(__file__), "static"),
+			template_path=os.path.join(filesDir, "templates"),
+			static_path=os.path.join(filesDir, "static"),
 			xsrf_cookies=True,
 		)
 

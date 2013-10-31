@@ -20,6 +20,7 @@
 
 #from ??? import LabDatabase
 import uuid
+import logging
 
 from liveq.models import Lab
 from webserver.config import Config
@@ -69,7 +70,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             return
 
         # Open required bus channels
-        self.jobChannel = Config.IBUS.openChannel("job")
+        self.jobChannel = Config.IBUS.openChannel("jobs")
         self.dataChannel = Config.IBUS.openChannel("data-%s" % uuid.uuid4().hex, serve=True)
 
         # Bind events
@@ -80,6 +81,8 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     [Bus Event] Data available
     """
     def onBusData(self, data):
+
+        logger.log("Got DATA!")
 
         # Forward event to the user socket
         self.write_message({
@@ -106,11 +109,11 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         logging.info("Socket closed")
 
-        # If we have a running tune, abort it
+        # If we have a running tune, cancel it
         if self.jobid:
 
-            # Ask job manager to abort the job
-            ans = self.jobChannel.send('job_abort', {
+            # Ask job manager to cancel the job
+            ans = self.jobChannel.send('job_cancel', {
                 'jid': self.jobid
             })
 
@@ -135,7 +138,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message(msg)
 
         # Also log the error
-        logging.warn("Trying to start a tune that is already running")
+        logging.warn(error)
 
     """
     Message arrived
@@ -180,7 +183,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     # Only the tune is interesting for the user
                     "tune": parsed['parameters']
                 }
-            }, waitReply=True)
+            }, waitReply=True, timeout=5)
 
             # Check for I/O failure on the bus
             if not ans:
@@ -193,14 +196,14 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # The job started, save the tune job ID
             self.jobid = ans['jid']
 
-        elif action == "tune_abort":
+        elif action == "tune_cancel":
 
             # If we don't have a running tune, raise an error
             if not self.jobid:
-                return self.send_error("Trying to abort an already completed tune")
+                return self.send_error("Trying to cancel an already completed tune")
 
-            # Ask job manager to abort a job
-            ans = self.jobChannel.send('job_abort', {
+            # Ask job manager to cancel a job
+            ans = self.jobChannel.send('job_cancel', {
                 'jid': self.jobid
             }, waitReply=True)
 
@@ -210,7 +213,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Check for error response
             if ans['result'] == 'error':
-                return self.send_error("Unable to abort job: %s" % ans['error'])
+                return self.send_error("Unable to cancel job: %s" % ans['error'])
 
             # Clear tune ID
             self.jobid = None
