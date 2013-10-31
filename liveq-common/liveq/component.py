@@ -75,7 +75,13 @@ class Component:
 
 		# Define a main thread function
 		def thread_main():
-			cls().run()
+
+			# Create singleton
+			if not 'INSTANCE' in cls.__dict__:
+				cls.INSTANCE = cls()
+
+			# Run
+			cls.INSTANCE.run()
 
 		# Start and wait for thread to exit
 		# (join also blocks signals)
@@ -91,4 +97,10 @@ class Component:
 		"""
 		Start the application in the same thread
 		"""
-		cls().run()
+
+		# Create singleton
+		if not 'INSTANCE' in cls.__dict__:
+			cls.INSTANCE = cls()
+
+		# Run
+		cls.INSTANCE.run()

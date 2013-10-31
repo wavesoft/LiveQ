@@ -110,9 +110,7 @@ class JobManagerComponent(Component):
 		self.manager.updateHandshake( channel.name, message )
 
 		# Reply with some data
-		channel.reply({
-				'some': 'data'
-			})
+		channel.reply({ 'some': 'data' })
 
 	def onBusJobStart(self, message):
 		"""

@@ -286,7 +286,7 @@ class StoredFSM:
 		"""
 		del self._context[name]
 
-	def release(self):
+	def free(self):
 		"""
 		Delete all the entries on the database store
 		"""
@@ -400,7 +400,12 @@ class StoredFSM:
 
 	def _runloop(self, cycles=0):
 		"""
-		Run an FSM state
+		The main loop that runs the required FSM actions.
+
+		This function spawns an internal thread that manages all the states in real-time.
+		The thread will exit when there are no transitions in stack. 
+
+		The loop can be woke up again with an event.
 		"""
 		self.logger.debug("Entering FSM loop")
 

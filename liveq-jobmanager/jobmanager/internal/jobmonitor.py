@@ -17,32 +17,65 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-from liveq.utils.fsm import StoredFSM
+from jobmanager.component import JobManagerComponent
+
+from liveq.utils.fsm import StoredFSM, state_handler, event_handler
+from liveq.models import Agent, AgentGroup, LabInstance
 
 class JobMonitor(StoredFSM):
 	"""
-	This class controls the job of the given ID
+	This Finite-State Machine class implements all the required
+	functionality for keeping the state and managing jobs distributed
+	on the volunteer's computers.
+
+	.. note::
+		Due to the stateless assumptions of the StoredFSM, we are not allowed to keep a reference
+		to the channel that is used for communication with the agent.
+
+		Therefore we are sending data using the forward() function of the JobManagerComponent that 
+		can be accessed via the global singleton ``JobManagerComponent.INSTANCE``, and we are receiving
+		data from the users via events.
+
 	"""
 
-	#: The database instances
-	INSTANCES = { }
-
-	@staticmethod
-	def getInstance(jid):
+	@state_handler("init")
+	def stateInit(self):
 		"""
-		Return the JobMonitor instance for the given ID.
-		If the ID does not exist, create a new one and store it in the database.
+		Handler of the entry state
 		"""
-
-		# If we have instance, get it from store
-		if jid in JobMonitor.INSTANCES:
-			return JobMonitor.INSTANCES[jid]
-
-		# We don't have an instance, create a new one
-		instance = JobMonitor(jid)
 		
+		# Go to calculate resources
+		self.goto("calc_resources")
 
-	def broadcast():
+	@state_handler("calc_resources")
+	def stateCalcResources(self):
 		"""
+		Calculate the resources required for running this job
+		"""
+
+	@event_handler("jobData")
+	def eventDataArrived(self):
+		"""
+		Handler of the event ``jobData``.
+
+		This event is broadcasted when data arrive that concern this job.
+		"""
+		pass
+
+	@event_handler("jobCompleted")
+	def eventDataArrived(self):
+		"""
+		Handler of the event ``jobCompleted``.
+
+		This event is broadcasted when the agent has completed the job.
+		"""
+		pass
+
+	@event_handler("jobError")
+	def eventDataArrived(self):
+		"""
+		Handler of the event ``jobError``.
+
+		This event is broadcasted when the agent failed to execute a job.
 		"""
 		pass
