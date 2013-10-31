@@ -250,13 +250,13 @@ class XMPPUserChannel(BusChannel):
 			waiting['data'] = None
 			waiting['event'].set()
 
-	def _shutdown(self):
+	def _shutdown(self, unregister=True):
 		"""
 		Shutdown channel
 		"""
 
 		# Close the channel
-		self.close()
+		self.close(unregister)
 
 	def _handle(self, message):
 		"""
@@ -305,7 +305,7 @@ class XMPPUserChannel(BusChannel):
 		# Trigger the event
 		self.trigger(data['name'], data['data'])
 
-	def close(self):
+	def close(self, unregister=True):
 		"""
 		Close the XMLL channel
 		"""
@@ -319,8 +319,11 @@ class XMPPUserChannel(BusChannel):
 		# Enter lockdown
 		self.lockdown = True
 
-		# Unregister us from the bus
-		self.bus._closeChannel(self.name)
+		# Unregister us from the bus if we are told to do so
+		# (We chose not to unregister if we were closed by the
+		#  XMPPBus during shutdown)
+		if unregister:
+			self.bus._closeChannel(self.name)
 
 	def reply(self, data):
 		"""
@@ -511,7 +514,7 @@ class XMPPBus(Bus, ClientXMPP):
 
 		# Shutdown / release wait locks on all of our children
 		for jid, channel in self.channels.iteritems():
-			channel._shutdown()
+			channel._shutdown(False)
 
 		# Disconnect if we are already connected
 		if self.connected:

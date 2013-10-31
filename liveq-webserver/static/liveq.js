@@ -42,7 +42,7 @@
 				// We have completed a previously initiated tune
 				$(this).trigger('updateCompleted', data.result, data.info );
 
-			} else if (data.action = "configuration") {
+			} else if (data.action == "configuration") {
 				// Iterate over histograms and build the reference histogram map
 				this.reference = [ ];
 				this.histograms = [ ];
@@ -54,8 +54,11 @@
 				// Let the listeners know that we are now ready
 				$(this).trigger('ready', this.histograms, this.reference, data.layout);
 
-			} else if (data.action = "error") {
+			} else if (data.action == "error") {
 				// We had an error.
+
+				// Log error
+				console.error("MCPlotsLab Error: ", data.error)
 
 				// Forwrard it to our listeners
 				$(this).trigger('error', data.error);
@@ -68,9 +71,14 @@
 		// In addition, it contains metainformation about their layout.
 		this.socket.onopen = (function() {
 			console.log("Connection open")
-			this.socket.send(JSON.stringify({
-				"action": "configuration"
-			}));
+
+			// After we are open, send asynchronously the configuration
+			// request
+			setTimeout((function() {
+				this.socket.send(JSON.stringify({
+					"action": "configuration"
+				}));
+			}).bind(this), 100);
 		}).bind(this);
 
 		// If for any reason the socket is closed, retry connection
