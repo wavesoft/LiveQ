@@ -199,6 +199,11 @@ class JobManagerComponent(Component):
 			job['replyTo'].close()
 			del self.activeJobs[jid]
 
+			# Release agents
+			for agent in job['agents']:
+				self.manager.releaseAgent( agent.id )
+
+
 		# ----- END HACK ----
 		#####################################################################
 
@@ -224,14 +229,14 @@ class JobManagerComponent(Component):
 		jid = uuid.uuid4().hex
 
 		# Find a free agent
-		agent = self.manager.getFreeAgent(group)
+		agent = self.manager.acquireFreeAgent(group)
 
 		# Check if we could not find a free agent
 		if not agent:
-			self.logger.error("No agents were found on group #%s" % group)
+			self.logger.error("No free agents were found on group #%s" % group)
 			self.jobChannel.reply({
 					'result': 'error',
-					'error': "No agents were found on group #%s" % group
+					'error': "No free agents were found on group #%s" % group
 				})
 			return
 
@@ -307,7 +312,7 @@ class JobManagerComponent(Component):
 
 		# Store job info
 		self.activeJobs[jid] = {
-				'agents': [ agent.uuid ],
+				'agents': [ agent ],
 				'replyTo': self.reply_to
 			}
 
@@ -337,10 +342,16 @@ class JobManagerComponent(Component):
 
 			# Send cancellation to all job agents
 			for agent in job['agents']:
-				agentChannel = self.getChannel(agent)
-				agentChannel.send('job_cancel', {
+
+				# Cancel job on the agent
+				agentChannel = self.getChannel(agent.uuid)
+				ans = agentChannel.send('job_cancel', {
 						'jid': jid
 					})
+
+				# Free agent
+				# TODO: Not optimal: The agent might not really be free!
+				self.manager.releaseAgent( agent.id )
 
 		# Reply status
 		self.jobChannel.reply({

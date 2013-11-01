@@ -260,6 +260,18 @@ class MCPlots(JobApplication):
 			self.logger.debug("Cleaning-up job directory %s" % self.jobdir)
 			os.system("rm -rf '%s'" % self.jobdir)
 
+	def getState(self):
+		"""
+		Helper function to read the status.flag
+		"""
+
+		# Read state flag
+		state = "unknown"
+		with file( "%s/status.flag" % self.jobdir ) as f:
+    		state = f.read()
+
+    	return state
+
 	def readIntermediateHistograms(self):
 		"""
 		Helper function to read the histograms from the dump folder
@@ -384,12 +396,15 @@ class MCPlots(JobApplication):
 			# and dispatch the update event to the targets
 			if not runtime % self.config.UPDATE_INTERVAL:
 
-				# Fetch itermediate results from the job
-				results = self.readIntermediateHistograms()
+				# Get intermediate histograms only when running
+				if self.getState() == "running":
 
-				# Let listeners know we have intermediate data available
-				if results:
-					self.trigger("job_data", False, results)
+					# Fetch itermediate results from the job
+					results = self.readIntermediateHistograms()
+
+					# Let listeners know we have intermediate data available
+					if results:
+						self.trigger("job_data", False, results)
 
 			# Runtime clock and CPU anti-hoging
 			time.sleep(1)

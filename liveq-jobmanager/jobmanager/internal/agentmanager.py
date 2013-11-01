@@ -101,7 +101,7 @@ class JobAgentManager:
 		except Lab.DoesNotExist:
 			return None
 
-	def getFreeAgent(self, group="public"):
+	def acquireFreeAgent(self, group="public"):
 		"""
 		Return a job agent which is not doing anything and it belongs on the specified group
 		"""
@@ -117,11 +117,39 @@ class JobAgentManager:
 			return None
 
 		# Mark the agent as busy
-		agent.state = 1
+		agent.state = 2
 		agent.save()
+
+		logging.info("Acquired agent %s of group %s" % (agent.uuid, group))
 
 		# Return agent
 		return agent
+
+	def releaseAgent(self, agent):
+		"""
+		Release the specified agent, previously acquired with acquireFreeAgent
+		"""
+
+		# Try to resolve object if a number or a string is specified
+		# isntead of an agent object reference
+		if type(agent) == int:
+			agent = Agent.get( Agent.id == agent )
+		elif type(agent) == str:
+			agent = Agent.get( Agent.uuid == agent )
+		else:
+			agent = Agent.get( Agent.id == agent.id )
+
+		# If the agent is not dead, mark it free
+		if agent.state > 0:
+
+			# Mark the agent as free
+			agent.state = 1
+			agent.save()
+
+			# Release agent
+			logging.info("Released agent %s of group %s" % (agent.uuid, agent.group.uuid))
+
+
 
 	def updateHandshake(self, uid, attrib):
 		"""
@@ -182,27 +210,3 @@ class JobAgentManager:
 		# Save entry
 		agentEntry.save()
 
-
-	def newJobPlan(self, group="public"):
-		"""
-		This function allocates a new job entry, checks the status of the 
-		agents on the given group and returns a plan description for the
-		actions to be taken.
-
-		Arguments:
-			group (string)	: The ID of the agent group to use
-
-		Returns:
-			A dict in the following format:
-
-				{
-					"id": ".. id ..",		# The new job ID
-					"cancel": [ "id", .. ]	# The agents to cancel
-				}
-		"""
-
-		# Get the agents in that group that are at least connected
-		group = self.getGroup(group)
-		query = Agent.query().where( Agent.group == group )
-
-		# 
