@@ -93,7 +93,7 @@
 			// Check for errors
 			if (self.tuning) {
 				// Let UI know that we completed the tune
-				$(this).trigger('updateCompleted', 0, { "reason": "Tune aborted due to error: " + error });
+				$(this).trigger('updateCompleted', -3, { "reason": "Tune aborted due to error: " + error });
 			}
 
 		}).bind(this);
@@ -114,7 +114,7 @@
 			}));
 
 			// Let UI know that we completed the tune
-			$(this).trigger('updateCompleted', 0, { "reason": "Tune restarted" });
+			$(this).trigger('updateCompleted', -1, { "reason": "Tune restarted" });
 
 		}
 
@@ -133,7 +133,27 @@
 
 	}
 
+	/**
+	 * Parameters to send to the remote endpoint
+	 */
+	MCPlotsLab.prototype.abort = function(parameters) {
 
+		// Abort only if we are tuning
+		if (this.tuning) {
+
+			// Cancel tune on server
+			this.socket.send(JSON.stringify({
+				"action": "tune_cancel"
+			}));
+
+			// Let UI know that we completed the tune
+			$(this).trigger('updateCompleted', -2, { "reason": "Tune aborted" });
+
+			// Turn off tuning
+			this.tuning = false;
+		}
+
+	};
 
 
 })();

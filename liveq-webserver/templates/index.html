@@ -10,7 +10,7 @@
 
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap-theme.min.css">
-		<link rel="stylesheet" href="{{ static_url("style.css") }}">
+		<link rel="stylesheet" href="static/style.css">
 
 	    <!--[if lt IE 9]>
 	      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -23,11 +23,6 @@
 	    <div class="navbar navbar-inverse navbar-fixed-top">
 	      <div class="container">
 	        <div class="navbar-header">
-	          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	            <span class="icon-bar"></span>
-	          </button>
 	          <a class="navbar-brand" href="#">LiveQ Framework</a>
 	        </div>
 	        
@@ -44,11 +39,16 @@
 	    </div><!-- /.container -->
 
 
-
 		<!-- Scripts on the end -->		
 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="{{ static_url("liveq.js") }}"></script>
+		<script type="text/javascript" src="static/liveq.js"></script>
+		<script type="text/javascript">
+		var lab = new MCPlotsLab("3e63661c13854de7a9bdeed71be16bb9");
+		$(lab).on('updateData', function(a,b){ window.console.log("*** DATA: ",a,b) });
+		$(lab).on('updateBegin', function() { console.log("-- BEGIN --"); });
+		$(lab).on('updateCompleted', function(a,b) { console.log("-- COMPLETED (", b,") --"); });
+		</script>
 	</body>
 </html>

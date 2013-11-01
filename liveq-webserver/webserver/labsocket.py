@@ -72,6 +72,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             return self.send_error("Unable to find a lab with the given ID")
 
         # Open required bus channels
+        self.ipolChannel = Config.IBUS.openChannel("interpolate")
         self.jobChannel = Config.IBUS.openChannel("jobs")
         self.dataChannel = Config.IBUS.openChannel("data-%s" % uuid.uuid4().hex, serve=True)
 
@@ -167,27 +168,67 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Process actions
         if action == "tune_begin":
 
-            # If we are already running a tune (jobid is defined), send
-            # an error. In principle the javascript user should take care
-            # of stopping the request before
-            if self.jobid:
-                return self.send_error("Trying to start a tune that is already running")
-
             # Make sure we have parameters when we start a tune
             if not 'parameters' in parsed:
                 return self.send_error("Missing 'parameters' parameter from request")
 
-            # TODO: First ask interpolator
+            # If we are already running a tune (jobid is defined), cancel and restart
+            if self.jobid:
+   
+                # Ask job manager to cancel a job
+                ans = self.jobChannel.send('job_cancel', {
+                    'jid': self.jobid
+                }, waitReply=True)
+
+                # Check for I/O failure on the bus
+                if not ans:
+                    return self.send_error("Unable to contact the job manager")
+
+                # Check for error response
+                if ans['result'] == 'error':
+                    return self.send_error("Unable to cancel previously running job: %s" % ans['error'])
+
+            # First ask interpolator
+            ans = self.ipolChannel.send("interpolate", {            
+                    'lab': self.lab.uuid,
+                    'parameters': parsed['parameters']
+                }, waitReply=True, timeout=5)
+
+            # Check response
+            if not ans:
+                logging.warn("Could not contact interpolator")
+
+            else:
+
+                # Reply with interpolation data
+                self.write_message({
+                        "action": "data",
+                        "data": ans['data'],
+                        "info": { "interpolation": 1 }
+                    })
+
+                # Check if we found excact match
+                if ans['excact']:
+
+                    # Return data and abort further actions
+                    self.write_message({
+                            "action": "completed",
+                            "result": 0,
+                            "info": { "interpolation": 1 }
+                        })
+
+                    # Don't store any jobID
+                    self.jobid = None
+
+                    # And exit
+                    return
 
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
                 'lab': self.lab.uuid,
                 'group': 'c678c82dd5c74f00b95be0fb6174c01b',
                 'dataChannel': self.dataChannel.name,
-                'parameters': {
-                    # Only the tune is interesting for the user
-                    "tune": parsed['parameters']
-                }
+                'parameters': parsed['parameters']
             }, waitReply=True, timeout=5)
 
             # Check for I/O failure on the bus
