@@ -104,6 +104,9 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 "info": { }
             })
 
+        # Reset tune
+        self.jobid = None
+
     """
     Close socket
     """
