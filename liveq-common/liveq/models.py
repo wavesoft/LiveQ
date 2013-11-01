@@ -125,11 +125,26 @@ class Lab(BaseModel):
 	#: annonymization of the Lab IDs
 	uuid = CharField(max_length=128, index=True, unique=True)
 
-	#: The SVN Revision of the base tools
-	revision = IntegerField()
+	#: The repository tag/version to checkout
+	repoTag = CharField()
+
+	#: The repository base that contains the software
+	repoURL = CharField()
+
+	#: The repository type that will be used
+	repoType = CharField(max_length=12, default="svn")
 
 	#: The non-tunable parameters for the job
 	fixedParameters = CharField()
+
+	#: The parameters the user can send
+	tunableParameters = CharField()
+
+	#: The observed histograms
+	histograms = CharField()
+
+	#: The type of the histograms
+	histogramType = CharField(max_length=12, default="FLAT")
 
 	def getParameters(self):
 		"""
@@ -142,3 +157,27 @@ class Lab(BaseModel):
 		Update the fixed parameters
 		"""
 		self.fixedParameters = json.dumps(data)
+
+	def getTunables(self):
+		"""
+		Return the configuration for the tunable parameters
+		"""
+		return json.loads(self.tunableParameters)
+
+	def setTunables(self, data):
+		"""
+		Update the configuration for the tunable parameters
+		"""
+		self.tunableParameters = json.dumps(data)
+
+	def getHistograms(self):
+		"""
+		Return the names of the histograms to send to the user
+		"""
+		return str(self.histograms).split(",")
+
+	def setHistograms(self, data):
+		"""
+		Set the names of the histograms to send to the user
+		"""
+		self.histograms = ",".join(data)

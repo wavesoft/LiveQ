@@ -32,7 +32,7 @@ import json
 from jobmanager.config import Config
 from jobmanager.component import JobManagerComponent
 
-from liveq import handleSIGINT
+from liveq import handleSIGINT, exit
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 from liveq.models import *
@@ -48,7 +48,7 @@ except ConfigException as e:
 	sys.exit(1)
 
 # Prepare fixed parameters
-parameters = {
+fxParameters = {
 	"beam": "ee", 
 	"process": "zhad", 
 	"energy": 91.2, 
@@ -60,9 +60,30 @@ parameters = {
 	"seed": 123123
 }
 
+# Prepare the tunable parameters
+tnParameters = {
+	"TimeShower:alphaSvalue": {
+		"min": 0.01,
+		"max": 1,
+		"dec": 2,
+		"type": "slider"
+	}
+}
+
+# Prepare the histogram names
+hNames = [
+	'SLD_2002_S4869273_d01-x01-y01',
+	'OPAL_2004_S6132243_d19-x01-y01'
+]
+
 # Create a default lab
 lab = Lab()
-lab.uuid = uuid.uuid4().hex
-lab.revision = 1652
-lab.fixedParameters = json.dumps(parameters)
+lab.uuid = '3e63661c13854de7a9bdeed71be16bb9'
+lab.repoTag = "1677"
+lab.repoURL = "http://svn.cern.ch/guest/mcplots/trunk/scripts/mcprod"
+lab.setParameters(fxParameters)
+lab.setTunables(tnParameters)
+lab.setHistograms(hNames)
 lab.save()
+
+exit(0)

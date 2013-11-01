@@ -74,6 +74,7 @@ class MCPlots(JobApplication):
 		JobApplication.__init__(self, config)
 		self.config = config 
 		self.jobconfig = { }
+		self.workdir = config.WORKDIR
 		self.tunename = ""
 		self.tunefile = ""
 		self.monitorThread = None
@@ -116,7 +117,7 @@ class MCPlots(JobApplication):
 		self.logger.debug("Starting mcplots process '%s'" % args)
 
 		# Launch process in it's own process group
-		self.process = subprocess.Popen(args, cwd=self.config.WORKDIR, preexec_fn=os.setpgrp)
+		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp)
 		self.logger.debug("Process started with PID=%i" % self.process.pid)
 
 		# Start a monitor thread
@@ -176,14 +177,63 @@ class MCPlots(JobApplication):
 
 		# Store and validate job config
 		self.jobconfig = config
-		for cparm in ("beam","process","energy","params","specific","generator","version","tune","events","seed"):
+		for cparm in ("beam","process","energy","params","specific","generator","version","tune","events","seed","repoType",
+						"repoTag","repoURL","histograms"):
 			if not cparm in config:
 				raise JobConfigException("Parameter '%s' is missing from the job config" % cparm)
 		if type(config["tune"]) != dict:
 			raise JobConfigException("Parameter 'tune' has an incompatible format")
+		if type(config["histograms"]) != list:
+			raise JobConfigException("Parameter 'histograms' has an incompatible format")
+
+		# Create/Check-out the appropriate software
+		swDir = os.path.join( self.config.WORKDIR, self.jobconfig['repoTag'] )
+		if not os.path.isdir( swDir ):
+
+			# Make directory
+			os.makedirs(swDir)
+
+			# Build command-line based on repository type
+			args = [ ]
+			if self.jobconfig['repoType'] == 'svn':
+
+				# Run SVN Export
+				args = [ "svn", "export", "--force", "-r", self.jobconfig['repoTag'], self.jobconfig['repoURL'],'.' ]
+				p = subprocess.Popen(args, cwd=swDir)
+				p.wait()
+
+				# Check for success
+				if p.returncode != 0:
+					raise JobRuntimeException("Unable to export SVN tag %s from %s" % (self.jobconfig['repoTag'], self.jobconfig['repoURL']))
+
+			elif self.jobconfig['repoType'] == 'git':
+
+				# Run GIT clone
+				args = [ "git", "clone", self.jobconfig['repoURL'], '.' ]
+				p = subprocess.Popen(args, cwd=swDir)
+				p.wait()
+
+				# Check for success
+				if p.returncode != 0:
+					raise JobRuntimeException("Unable to clone GIT repository %s" % self.jobconfig['repoURL'])
+
+				# Run GIT checkout
+				args = [ "git", "checkout", self.jobconfig['repoTag'] ]
+				p = subprocess.Popen(args, cwd=swDir)
+				p.wait()
+
+				# Check for success
+				if p.returncode != 0:
+					raise JobRuntimeException("Unable to clone GIT repository %s" % self.jobconfig['repoURL'])
+
+			else:
+				raise JobInternalException("Unknown repository type '%s'" % self.jobconfig['repoType'])
+
+		# Update workdir
+		self.workdir = swDir
 
 		# Find tune filename
-		self.tunefile = "%s/configuration/%s-%s.tune" % ( self.config.WORKDIR, config['generator'], self.config.TUNE  )
+		self.tunefile = "%s/configuration/%s-%s.tune" % ( swDir, config['generator'], self.config.TUNE  )
 
 		# Update tune file
 		self.logger.debug("Updating tune file '%s'" % self.tunefile)
@@ -205,11 +255,6 @@ class MCPlots(JobApplication):
 		Helper to cleanup current job files
 		"""
 
-		# Clean temp dir (with caution)
-		if len(self.config.WORKDIR) > 1:
-			self.logger.debug("Cleaning-up temp directory %s/tmp" % self.config.WORKDIR)
-			os.system("rm -rf '%s/tmp'" % self.config.WORKDIR)
-
 		# Clean job dir (with caution)
 		if len(self.jobdir) > 1:
 			self.logger.debug("Cleaning-up job directory %s" % self.jobdir)
@@ -226,6 +271,12 @@ class MCPlots(JobApplication):
 		# Find histograms in the dump directory of the job
 		for histogram in glob.glob("%s/dump/*.dat" % self.jobdir):
 			self.logger.debug("Loading flat file %s" % histogram)
+
+			# Skip histograms that are not in the job description
+			histoName = os.path.basename(histogram)[:-4]
+			if (len(self.jobconfig['histograms']) > 0) and not (histoName in self.jobconfig['histograms']):
+				self.logger.debug("Skipping due to job configuration")
+				continue
 
 			# Read histogram data
 			histo = FLATParser.parse( histogram )

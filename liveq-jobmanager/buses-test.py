@@ -87,22 +87,17 @@ ans = jobChannel.send('job_start', {
 		'group': 'c678c82dd5c74f00b95be0fb6174c01b',
 		'dataChannel': responseChannel.name,
 		'parameters': {
-
-			# Tune configuration
-			"tune": {
-				"TimeShower:alphaSvalue": 0.31
-			}
-
+			"TimeShower:alphaSvalue": 0.31
 		}
 	}, waitReply=True)
 
 if not ans:
 	print "**** ERROR: I/O Error"
-	sys.exit(0)
+	exit(1)
 
 if ans['result'] == 'error':
 	print "**** ERROR: %s" % ans['error']
-	sys.exit(1)
+	exit(1)
 
 print "*** STARTED: %s" % ans['jid']
 

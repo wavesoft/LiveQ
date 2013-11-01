@@ -245,9 +245,36 @@ class JobManagerComponent(Component):
 				})
 			return
 
-		# Deep merge lab default parameters and user's parameters
-		mergedParameters = deepupdate( parameters, labInst.getParameters() )
+		# Process user's parameters
+		userParameters = { }
+		tunables = labInst.getTunables()
+		for k,parm in tunables.iteritems():
 
+			# Get user parameter
+			if k in parameters:
+
+				# Convert to numbers
+				vValue = float(parameters[k])
+				vMax = float(parm['max'])
+				vMin = float(parm['min'])
+				vDecimals = int(parm['dec'])
+
+				# Wrap value betwen min and max
+				vValue = max( min( vMax, vValue ), vMin )
+
+				# Convert to a number with the specified precision
+				# and store it on the user parameters
+				userParameters[k] = ("%." + str(vDecimals) + "f") % vValue
+
+		# Deep merge lab default parameters and user's parameters
+		mergedParameters = deepupdate( { "tune": userParameters } , labInst.getParameters() )
+
+		# Put more lab information in the parameters
+		mergedParameters['repoTag'] = labInst.repoTag
+		mergedParameters['repoType'] = labInst.repoType
+		mergedParameters['repoURL'] = labInst.repoURL
+		mergedParameters['histograms'] = labInst.getHistograms()
+		
 		# Open/Retrieve a channel with the specified agent
 		agentChannel = self.getChannel(agent.uuid)
 

@@ -52,4 +52,4 @@ def exit(code):
 	GlobalEvents.System.trigger('shutdown')
 
 	# Exit
-	os.exit(code)
+	sys.exit(code)
