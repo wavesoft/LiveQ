@@ -83,8 +83,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     [Bus Event] Data available
     """
     def onBusData(self, data):
-
-        logger.log("Got DATA!")
+        logging.debug("Got DATA!")
 
         # Forward event to the user socket
         self.write_message({

@@ -89,6 +89,13 @@
 		// Handle socket errors
 		this.socket.onerror = (function(ws, error) {
 			console.log("Socket error: ", error)
+
+			// Check for errors
+			if (self.tuning) {
+				// Let UI know that we completed the tune
+				$(this).trigger('updateCompleted', 0, { "reason": "Tune aborted due to error: " + error });
+			}
+
 		}).bind(this);
 
 	}
