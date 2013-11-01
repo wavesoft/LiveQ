@@ -23,6 +23,7 @@ from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
+from liveq.models import createBaseTables
 
 """
 Local configuration for the agent
@@ -56,3 +57,6 @@ class Config(CoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig):
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		WebserverConfig.fromConfig( config, runtimeConfig )
+
+		# Ensure base tables exist
+		createBaseTables()

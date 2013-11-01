@@ -62,12 +62,14 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Reset local variables
         self.job = None
         self.jobid = None
+        self.dataChannel = None
 
         # Try to find a lab with the given ID
-        self.lab = Lab.get(Lab.uuid == labid)
-        if not self.lab:
+        try:
+            self.lab = Lab.get(Lab.uuid == labid)
+        except Lab.DoesNotExist:
             logging.error("Unable to locate lab with id '%s'" % labid)
-            return
+            return self.send_error("Unable to find a lab with the given ID")
 
         # Open required bus channels
         self.jobChannel = Config.IBUS.openChannel("jobs")
@@ -118,12 +120,13 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             })
 
         # Unregister from the bus
-        self.dataChannel.off('job_data', self.onBusData)
-        self.dataChannel.off('job_completed', self.onBusCompleted)
-        self.dataChannel.close()
-        self.jobChannel.close()
-        self.jobChannel = None
-        self.dataChannel = None
+        if self.dataChannel:
+            self.dataChannel.off('job_data', self.onBusData)
+            self.dataChannel.off('job_completed', self.onBusCompleted)
+            self.dataChannel.close()
+            self.jobChannel.close()
+            self.jobChannel = None
+            self.dataChannel = None
 
     """
     Shorthand to respond with an error
