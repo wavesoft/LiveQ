@@ -16,7 +16,7 @@
 		this.tuning = false;
 
 		// Setup websocket
-		var url = "ws://" + location.host + "/labsocket/" + id;
+		var url = "ws://" + location.host + "/vas/labsocket/" + id;
 		this.socket = new WebSocket(url);
 
 		// Setup event listener on the socket
@@ -43,6 +43,7 @@
 				$(this).trigger('updateCompleted', data.result, data.info );
 
 			} else if (data.action == "configuration") {
+				
 				// Iterate over histograms and build the reference histogram map
 				this.reference = [ ];
 				this.histograms = [ ];

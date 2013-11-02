@@ -36,7 +36,7 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			(r"/vas/", MainHandler),
+			(r"/vas/?", MainHandler),
 			(r"/vas/labsocket/(.*)", LabSocketHandler),
 		]
 
