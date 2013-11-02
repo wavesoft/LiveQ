@@ -10,7 +10,7 @@
 
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap-theme.min.css">
-		<link rel="stylesheet" href="static/style.css">
+		<link rel="stylesheet" href="{{ static_url("style.css") }}">
 
 	    <!--[if lt IE 9]>
 	      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -43,7 +43,7 @@
 		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="static/liveq.js"></script>
+		<script type="text/javascript" src="{{ static_url("liveq.js") }}"></script>
 		<script type="text/javascript">
 		var lab = new MCPlotsLab("3e63661c13854de7a9bdeed71be16bb9");
 		$(lab).on('updateData', function(a,b){ window.console.log("*** DATA: ",a,b) });
