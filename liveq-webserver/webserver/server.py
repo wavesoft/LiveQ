@@ -48,7 +48,7 @@ class MCPlotsServer(tornado.web.Application):
 			cookie_secret="ckjbe3n3809713g7baf13n8vapjtd64xfkjgd",
 			template_path=os.path.join(filesDir, "templates"),
 			static_path=os.path.join(filesDir, "static"),
-			static_url="/vas/static",
+			static_url_prefix="/vas/static",
 			xsrf_cookies=True,
 		)
 
