@@ -38,6 +38,7 @@ nosetests.xml
 # Local files
 *.local
 liveq-jobmanager/db.sqlite3
+liveq-common/ref-data
 
 *.sqlite3
 

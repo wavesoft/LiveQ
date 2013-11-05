@@ -8,7 +8,7 @@ body {
 }
 
 .onoffswitch {
-    position: relative; width: 70px;
+    position: relative; width: 75px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
 }
 
@@ -18,7 +18,7 @@ body {
 
 .onoffswitch-label {
     display: block; overflow: hidden; cursor: pointer;
-    border: 2px solid #999999; border-radius: 9px;
+    border: 2px solid #999999; border-radius: 8px;
 }
 
 .onoffswitch-inner {
@@ -29,7 +29,7 @@ body {
 
 .onoffswitch-inner:before, .onoffswitch-inner:after {
     float: left; width: 50%; height: 21px; padding: 0; line-height: 21px;
-    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    font-size: 12px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
 }
 
@@ -42,15 +42,15 @@ body {
 .onoffswitch-inner:after {
     content: "OFF";
     padding-right: 10px;
-    background-color: #EEEEEE; color: #999999;
+    background-color: #FFFFFF; color: #999999;
     text-align: right;
 }
 
 .onoffswitch-switch {
-    width: 15px; margin: 3px;
+    width: 11px; margin: 5px;
     background: #FFFFFF;
-    border: 2px solid #999999; border-radius: 9px;
-    position: absolute; top: 0; bottom: 0; right: 45px;
+    border: 2px solid #999999; border-radius: 8px;
+    position: absolute; top: 0; bottom: 0; right: 50px;
     -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
     -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
 }
