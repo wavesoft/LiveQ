@@ -143,7 +143,7 @@
 		var lab = new MCPlotsLab(id);
 
 		$(lab).on('updateData', function(e,data,info){ 
-			console.log("*** DATA: ",a,b);
+			console.log("*** DATA: ",data,info);
 		});
 
 		$(lab).on('updateBegin', function(e) { 
@@ -151,7 +151,7 @@
 		});
 
 		$(lab).on('updateCompleted', function(e,result, info) { 
-			console.log("-- COMPLETED (", b,") --"); 
+			console.log("-- COMPLETED (result=", result,") --"); 
 		});
 
 		$(lab).on('ready', function(e, histo, reference, layout) {
