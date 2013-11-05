@@ -134,6 +134,7 @@
 
 	}
 
+
 	/**
 	 * Start/Switch lab
 	 */
@@ -154,11 +155,11 @@
 		});
 
 		$(lab).on('ready', function(e, histo, reference, layout) {
-
+			console.log("== LAB Config Arrived ===")
 		});
 
 		$(lab).on('error', function(e, message) {
-
+			console.error(message);
 		});
 
 	};
