@@ -162,6 +162,8 @@
 			console.error(message);
 		});
 
+		self.lab = lab;
+
 	};
 
 	var initUI = glob.initUI = function() {
