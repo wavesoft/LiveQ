@@ -162,7 +162,7 @@
 			console.error(message);
 		});
 
-		self.lab = lab;
+		return lab;
 
 	};
 
