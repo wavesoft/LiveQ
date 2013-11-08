@@ -17,11 +17,87 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
+import time
+import datetime
+import uuid
+import random
 import numpy as np
-from scipy.interpolate import Rbf
 
-class Interpolator:
+from interpolator.config import Config
+from interpolator.data.store import HistogramStore
 
-	def __init__(self, store):
-		pass
+from liveq.data.histo import Histogram, HistogramCollection
+from liveq.data.tune import Tune
 
+class JobManagerComponent(Component):
+	"""
+	Core jobmanager
+	"""
+
+	def __init__(self):
+		"""
+		Setup interpolator
+		"""
+		Component.__init__(self)
+
+		# Open the interpolator
+		self.ipolChannel = Config.IBUS.openChannel("interpolate")
+
+		# Bind events
+		self.ipolChannel.on('interpolate', self.onInterpolateRequest)
+		self.ipolChannel.on('results', self.onInterpolateResults)
+
+	def onInterpolateRequest(self, data):
+		"""
+		A request in the interpolator bus to get an estimate
+		"""
+		
+		# Ensure we have required parameters in the data
+		if not all([ x in data for x in ('lab', 'config')]):
+			return {
+				'result': 'error',
+				'error': "Missing parameters in the request"
+			}
+
+		# Generate a tune object
+		tune = Tune(data['config'], labid=data['lab'])
+
+		# Get an interpolator for this region
+		ipol = HistogramStore.getInterpolator(tune)
+
+		# Run interpolation and get histogram collection
+		histograms = ipol(*tune.getValues())
+
+		# Return a packed histogram collection
+		self.ipolChannel.reply({
+				'result': 'ok',
+				'data': histograms.pack()
+			})
+
+
+	def onInterpolateResults(self, data):
+		"""
+		An incoming request to update interpolation dataset
+		"""
+		
+		# Ensure we have required parameters in the data
+		if not all([ x in data for x in ('lab', 'config', 'data')]):
+			return {
+				'result': 'error',
+				'error': "Missing parameters in the request"
+			}
+
+		# Generate a tune object
+		tune = Tune(data['config'], labid=data['lab'])
+
+		# Unpack a collection of histograms from the data
+		histos = HistogramCollection.unpack(data['data'])
+
+		# Append data on the histogram store
+		HistogramStore.append( tune, histos )
+
+		# Return success response
+		self.ipolChannel.reply({
+				'result': 'ok',
+				})

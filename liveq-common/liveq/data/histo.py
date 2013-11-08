@@ -52,6 +52,22 @@ class HistogramCollection:
 		if data != None:
 			self.set(data, bins)
 
+	@staticmethod
+	def unpack(packedData):
+		"""
+		Return a new populated HistogramCollection by unpacking
+		the specified packed data.
+		"""
+		
+		# Convert buffer to array
+		arr = numpy.fromBuffer( packedData )
+
+		# Create new instance
+		return HistogramCollection(
+				bins=int(arr[0]),
+				data=arr[1:]
+			)
+
 	def set(self, data, bins=10):
 		"""
 		Set a new data set and create histogram objects
@@ -161,6 +177,17 @@ class HistogramCollection:
 			i+=l
 			histo['ref'].yErrMinus = self.data[i:i+l]
 
+	def pack(self):
+		"""
+		Pack the contents of the histogram (faster than pickling)
+		"""
+		
+		# Prefix the number of bins in the array
+		arr = numpy.concatenate(( [ self.bins ], self.data ))
+
+		# Return bufer
+		np.getbuffer(arr)
+
 	def __getitem__(self, index):
 		"""
 		Return the histogram object on the given index
@@ -178,6 +205,7 @@ class HistogramCollection:
 		Return the number of histograms
 		"""
 		return self.historefs.__len__()
+
 
 class Histogram:
 	"""
@@ -295,6 +323,8 @@ class Histogram:
 		"""
 		Calculate the chi-squared between the current histogram
 		and the given (reference) histogram in the specifeid uncertainty.
+
+		TODO: Parallellize on numpy
 		"""
 
 		# Validate binsize
@@ -439,6 +469,10 @@ class Histogram:
 				sPath = dpSet.attrib['path']
 				sTitle = dpSet.attrib['title']
 
+				# Chomp path
+				if sPath[-1] == '/':
+					sPath = sPath[:-1]
+
 				# Look for set name
 				if (setName == None) or (setName == sName):
 					print "Importing %s" % sName
@@ -523,6 +557,10 @@ class Histogram:
 				sDim = dpSet.attrib['dimension']
 				sPath = dpSet.attrib['path']
 				sTitle = dpSet.attrib['title']
+
+				# Chomp path
+				if sPath[-1] == '/':
+					sPath = sPath[:-1]
 
 				print "Importing %s" % sName
 			
