@@ -18,6 +18,8 @@
 ################################################################
 
 import logging
+
+from math import *
 from liveq.config import ComponentClassConfig, configexceptions
 
 class TuneAddressingConfig(ComponentClassConfig):
@@ -35,6 +37,25 @@ class TuneAddressingConfig(ComponentClassConfig):
 	#: The default tune for the tune rounding
 	TUNE_DEFAULT_ROUND = 1.0
 
+	#: Tune parameter normalizer
+	TUNE_NORMALIZER = { }
+
+	@staticmethod
+	def normalizeParameter(name, value):
+		"""
+		Normalize the specified parameter according to the
+		configuration.
+		"""
+
+		# If there is no normalized in TUNE_NORMALIZER, use
+		# the default pass-through
+		if not name in TuneAddressingConfig.TUNE_NORMALIZER:
+			return value
+
+		# Otherwise, use the mapping function
+		norm = TuneAddressingConfig.TUNE_NORMALIZER[name]
+		return norm(value)
+
 	@staticmethod
 	@configexceptions(section="parameter-index")
 	def fromConfig(config, runtimeConfig):
@@ -43,9 +64,29 @@ class TuneAddressingConfig(ComponentClassConfig):
 		contents of the specified config object
 		"""
 
-		# Setup keys
+		# Reset maps
 		TuneAddressingConfig.TUNE_CONFIG = { }
+		TuneAddressingConfig.TUNE_NORMALIZER = { }
 
+		# Get normalizing functions
+		if "parameter-normalizers" in config._sections:
+			normalizers = config._sections["parameter-normalizers"]
+
+			# Populate classes
+			for k,v in normalizers.iteritems():
+
+				# Replace '/' with ':'
+				k = k.replace('/', ':')
+
+				try:
+					# Compile and store normalizer function
+					TuneAddressingConfig.TUNE_NORMALIZER[k] = eval("lambda x: %s" % v)
+
+				except:
+					# Catch compilation exceptions
+					logging.warn("Unable to compile expression '%s' for '%s' normalizer!" % (v,k))
+					continue
+		
 		# Get default variables
 		config = config._sections["parameter-index"]
 		if "round-default" in config:

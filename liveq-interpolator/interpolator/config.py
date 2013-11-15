@@ -34,15 +34,10 @@ class InterpolatorConfig:
 	def fromConfig(config, runtimeConfig):
 		pass
 
-<<<<<<< HEAD
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
 class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig, TuneAddressingConfig):
-
-=======
-class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig):
->>>>>>> Working on job manager
 	"""
 	Create a configuration for the INTERPOLATOR based on the core config
 	"""
