@@ -213,7 +213,7 @@ class Rbf(object):
 
 			# Make di array and swap axes
 			# TODO: Try to skip python loop (use only numpy)
-			self.di = swapaxes(array( [h.dataCoeff for h in dataCoeff] ), 0, 1)
+			self.di = swapaxes(array( [h.dataCoeff for h in data] ), 0, 1)
 
 			if not all([x.size == len(data) for x in self.xi]):
 					raise ValueError("All arrays must be equal length.")

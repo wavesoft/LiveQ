@@ -17,6 +17,8 @@ from liveq.data.tune import Tune
 
 from interpolator.data.store import HistogramStore
 from interpolator.config import Config
+from interpolator.scipy.interpolate import Rbf
+
 from liveq.exceptions import ConfigException
 
 # Load configuration
@@ -172,6 +174,46 @@ def plot_histos(histos, yscale='log'):
 	# Display plot
 	plt.show()
 
+def getInterpolator(collections, function='linear'):
+
+	# Iterate over items and create interpolation indices and data variables
+	datavalues = [ ]
+	indexvars = [ ]
+	for hc in collections:
+
+		# Fetch index cariables
+		datavalues.append(hc)
+		indexvars.append(hc.tune.getValues())
+
+	# Flip matrix of indexvars
+	indexvars = np.swapaxes( np.array(indexvars), 0, 1 )
+
+	# Nothing available
+	if len(indexvars) == 0:
+		return None
+
+	# Create and return interpolator
+	return Rbf( *indexvars, data=datavalues, function=function )
+
+def avgChi2(c1, c2):
+
+	if len(c1) != len(c2):
+		raise ValueError("The two collections don't have the same number of histograms")
+
+	vsum = 0
+	for i in range(0,len(c1)):
+
+		# Get instances
+		h1 = c1[i]
+		h2 = c2[i]
+
+		# Chalculate CHI2 between those two
+		v = h1.chi2ToReference(h2)
+		vsum += v
+
+	# Return value
+	return (vsum / len(c1))
+
 ##############################################################################################################
 ##############################################################################################################
 ####
@@ -206,6 +248,24 @@ t_after = int(round(time.time() * 1000))
 print " - Unpickling: %i ms" % (t_after - t_before)
 
 print "Check : %r" % all([c[i].equal(c2[i]) for i in range(0, len(c))])
+
+t_before = int(round(time.time() * 1000))
+ipol = getInterpolator( c )
+t_after = int(round(time.time() * 1000))
+print " - Building interpolator: %i ms" % (t_after - t_before)
+
+samples = build_tunes(5)
+for s in samples:
+
+	t_before = int(round(time.time() * 1000))
+	vIpol = ipol.interpolate( s.getValues(), c[0].dataMeta )
+	t_after = int(round(time.time() * 1000))
+	print " - Interpolating: %i ms" % (t_after - t_before)
+
+	vReal = build_histos( s )
+
+	plot_histos([ [vIpol[0], vReal[0]], [vIpol[1], vReal[1]], [vIpol[2], vReal[2]], [vIpol[3], vReal[3]] ])
+
 
 """
 h1 = Histogram.fromFLAT('C:\\Users\\icharala\\Local\\Shared\\ref-data\\pythia-8-default.dat')
