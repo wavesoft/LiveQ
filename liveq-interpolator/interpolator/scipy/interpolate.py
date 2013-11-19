@@ -113,7 +113,7 @@ class Rbf(object):
 	"""
 
 	DATA_SINGLE = 1
-	DATA_HISTOGRAM = 2
+	DATA_HISTOSET = 2
 
 	def _euclidean_norm(self, x1, x2):
 		return sqrt(((x1 - x2)**2).sum(axis=0))
@@ -208,12 +208,12 @@ class Rbf(object):
 		if data[0].__class__ is HistogramCollection:
 
 			# Set interpolation mode
-			self.ipolmode = Rbf.DATA_HISTOGRAM
-			self._histobins = data[0].bins
+			self.ipolmode = Rbf.DATA_HISTOSET
+			self._histometa = data[0].dataMeta
 
 			# Make di array and swap axes
 			# TODO: Try to skip python loop (use only numpy)
-			self.di = swapaxes(array( [h.data for h in data] ), 0, 1)
+			self.di = swapaxes(array( [h.dataCoeff for h in dataCoeff] ), 0, 1)
 
 			if not all([x.size == len(data) for x in self.xi]):
 					raise ValueError("All arrays must be equal length.")
@@ -262,6 +262,29 @@ class Rbf(object):
 		x2 = x2[..., newaxis, :]
 		return self.norm(x1, x2)
 
+	def interpolate(self, args, dataMeta=None):
+		args = [asarray(x) for x in args]
+		if not all([x.shape == y.shape for x in args for y in args]):
+			raise ValueError("Array lengths must be equal")
+		shp = args[0].shape
+		self.xa = asarray([a.flatten() for a in args], dtype=float_)
+		r = self._call_norm(self.xa, self.xi)
+
+		if self.ipolmode == Rbf.DATA_SINGLE:
+			# Single interpolation
+			return dot(self._function(r), self.nodes).reshape(shp)
+
+		elif self.ipolmode == Rbf.DATA_HISTOSET:
+			# Histogram interpolation and re-generation
+			ans = zeros( len(self.nodes) )
+			i = 0
+			for node in self.nodes:
+				ans[i] = dot(self._function(r), node).reshape(shp)
+				i += 1
+
+			# Create and return a new histogram object
+			return HistogramCollection(dataCoeff=ans, dataMeta=dataMeta)
+
 	def __call__(self, *args):
 		args = [asarray(x) for x in args]
 		if not all([x.shape == y.shape for x in args for y in args]):
@@ -274,7 +297,7 @@ class Rbf(object):
 			# Single interpolation
 			return dot(self._function(r), self.nodes).reshape(shp)
 
-		elif self.ipolmode == Rbf.DATA_HISTOGRAM:
+		elif self.ipolmode == Rbf.DATA_HISTOSET:
 			# Histogram interpolation and re-generation
 			ans = zeros( len(self.nodes) )
 			i = 0
@@ -283,4 +306,4 @@ class Rbf(object):
 				i += 1
 
 			# Create and return a new histogram object
-			return HistogramCollection(data=ans, bins=self._histobins)
+			return HistogramCollection(dataCoeff=ans, dataMeta=self._histometa)

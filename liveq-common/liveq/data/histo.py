@@ -23,132 +23,89 @@ import xml.etree.cElementTree as eTree
 
 from liveq.utils.FLAT import FLATParser
 
-class HistogramCollection:
+class HistogramCollection(list):
 	"""
-	A collection of histograms that can be optimally
-	interpolated.
+	A collection of histograms that can be optimally interpolated
+	together.
 	"""
 
-	def __init__(self, data=None, bins=10, tune=None):
+	def __init__(self, dataCoeff=None, dataMeta=None, tune=None):
 		"""
 		Initialize the histogram collection
 		"""
 
-		#: Histogram objects
-		self.historefs = []
-		#: Histogram indexing info
-		self.histoinfo = []
-		#: Histogram data
-		self.data = numpy.array([])
-		#: Number of bins in our histograms
-		self.bins = None
-		#: Optional tune this collection is bound with
+		# Initialize histogram
+		list.__init__(self)
+
+		#: Histogram coefficients
+		self.dataCoeff = dataCoeff
+
+		#: Histogram metadata
+		self.dataMeta = dataMeta
+
+		# If we have coefficients and metadata, run the set function
+		if dataCoeff != None and dataMeta != None:
+			self.set(dataCoeff, dataMeta)
+
+		#: Tune index
 		self.tune = tune
 
-		# Local variables
+		# Mark us as not in update
 		self.updating = False
 
-		# If we have data and bins, call set()
-		if data != None:
-			self.set(data, bins)
+		# Intermediate array to store histograms that will
+		# be completed upon endUpdate
+		self._limboHistos = [ ]
 
-	@staticmethod
-	def unpack(packedData):
-		"""
-		Return a new populated HistogramCollection by unpacking
-		the specified packed data.
-		"""
-		
-		# Convert buffer to array
-		arr = numpy.fromBuffer( packedData )
 
-		# Create new instance
-		return HistogramCollection(
-				bins=int(arr[0]),
-				data=arr[1:]
-			)
-
-	def set(self, data, bins=10):
+	def set(self, dataCoeff, dataMeta):
 		"""
-		Set a new data set and create histogram objects
-		by cloning the specified histogram class as reference.
+		Re-generate histograms based on coefficients and histogram metadata
+		TODO: Optimize
 		"""
 
-		# Replace objects
-		self.data = data
-		self.bins = bins
-		self.historefs = []
-		self.histoinfo = []
+		# Validate
+		if type(dataCoeff) != list and type(dataCoeff) != numpy.ndarray:
+			raise ValueError("The dataCoeff parameter is not a list!")
+		if type(dataMeta) != list:
+			raise ValueError("The dataMeta parameter is not a list!")
 
-		# Create linked histograms
-		i = 0
-		while i < len(self.data):
+		# Reset list
+		del self[:]
 
-			# Create histogram
-			histo = Histogram(bins=bins)
+		# Update local reference
+		self.dataCoeff = dataCoeff
+		self.dataMeta = dataMeta
 
-			# Store references
-			self.historefs.append(histo)
-			self.histoinfo.append({
-					'ref': histo,
-					'index': i,
-					'len': bins
-				})
+		# Calculate coefficient slice width
+		w = len(dataCoeff) / len(dataMeta)
 
-			# Link data
-			histo.y = self.data[i:i+bins]
-			i += bins
-			histo.yErrPlus = self.data[i:i+bins]
-			i += bins
-			histo.yErrMinus = self.data[i:i+bins]
-			i += bins
+		# Rebuild histograms
+		ofs=0
+		for meta in dataMeta:
+
+			# Fetch coefficient slice and forward to next
+			coeff = dataCoeff[ofs:ofs+w]
+			ofs += w
+
+			# Create and store histogram
+			list.append(self, Histogram.fromFit( coeff, meta) )
 
 
-	def append(self, histogram):
+	def beginUpdate(self, fnMetaValidate=None):
 		"""
-		Add a histogram in the collection
-		"""
-
-		# Sanity checks
-		if not self.updating:
-			raise RuntimeError("Please call beginUpdate() before changing the HistogramCollection!")
-
-		# Make sure all the bins are the same
-		if self.bins == None:
-			self.bins = histogram.bins
-		elif self.bins != histogram.bins:
-			raise TypeError("All histograms must have the same number of bins!")
-
-		# Get some addressing info
-		aIndex = len(self.data)
-		aLen = len(histogram.y)
-
-		# Store histogram reference
-		self.historefs.append(histogram)
-
-		# (We keep histogram reference once
-		#  again for optimization purposes on the
-		#  item iterator)
-		self.histoinfo.append({
-				'ref': histogram,
-				'index': aIndex,
-				'len': aLen 
-			})
-
-		# Merge data all together
-		self.data = numpy.concatenate(
-				(self.data,
-				histogram.y,
-				histogram.yErrPlus,
-				histogram.yErrMinus)
-			)
-
-	def beginUpdate(self):
-		"""
+		Flush contents and start updating histogram store
 		"""
 		# Sanity checks
 		if self.updating:
 			raise RuntimeError("Please call beginUpdate() only once!")
+
+		# Reset
+		self.dataCoeff = [ ]
+		self.dataMeta = [ ]
+
+		# Reset list
+		del self[:]
 
 		# Mark us as under update
 		self.updating = True
@@ -161,50 +118,60 @@ class HistogramCollection:
 		# Sanity checks
 		if not self.updating:
 			raise RuntimeError("Please call beginUpdate() before changing the HistogramCollection!")
+	
+		# Prepare dataCoeff array
+		dataCoeff = [ ]
 
-		# Make histogram values references
-		# to the data
-		for histo in self.histoinfo:
+		# Sort histograms by name
+		self._limboHistos.sort(key=lambda histo: histo.name)
 
-			# Get histogram index & length
-			i = histo['index']
-			l = histo['len']
+		# Process histograms in limbo
+		for histogram in self._limboHistos:
 
-			# Extract references from data
-			histo['ref'].y = self.data[i:i+l]
-			i+=l
-			histo['ref'].yErrPlus = self.data[i:i+l]
-			i+=l
-			histo['ref'].yErrMinus = self.data[i:i+l]
+			# Append histogram instance on refs
+			list.append(self, histogram)
 
-	def pack(self):
-		"""
-		Pack the contents of the histogram (faster than pickling)
-		"""
-		
-		# Prefix the number of bins in the array
-		arr = numpy.concatenate(( [ self.bins ], self.data ))
+			# Append histogram coefficients on data coefficients
+			coeff, meta = histogram.polyFit()
+			dataCoeff.append( coeff )
+			self.dataMeta.append( meta )
 
-		# Return bufer
-		np.getbuffer(arr)
+		# Convert to coefficients to numpy array
+		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 ).flatten()
 
-	def __getitem__(self, index):
+	def append(self, histogram):
 		"""
-		Return the histogram object on the given index
+		Append a histogram 
 		"""
-		return self.historefs.__getitem__(index)
 
-	def __iter__(self):
-		"""
-		Return the iterator in the histogram references
-		"""
-		return self.historefs.__iter__()
+		# Sanity checks
+		if not self.updating:
+			raise RuntimeError("Please call beginUpdate() before changing the HistogramCollection!")
 
-	def __len__(self):
+		# Store histogram in libmo
+		self._limboHistos.append(histogram)
+
+	def equal(self, collection):
 		"""
-		Return the number of histograms
+		Check if the collections is equal to the one specified
 		"""
-		return self.historefs.__len__()
+
+		# Ensure tunes are the same
+		if (collection.tune != None) and (self.tune != None):
+			if not collection.tune.equal( self.tune ):
+				print "!!! Collection tunes not equal"
+				return False
+
+		# Make sure histos are the same
+		for i in range(0,len(self)):
+			# If we are not the same return false
+			if not collection[i].equal( self[i] ):
+				print "!!! Histogram %i in collection not matching" % i
+				return False
+
+		# Return histograms
+		return True
+
 
 
 class Histogram:
@@ -214,14 +181,15 @@ class Histogram:
 	and with the same width.
 	"""
 	
-	def __init__(self, name="", bins=10, y=None, yErrPlus=None, yErrMinus=None, x=None, xErrPlus=None, xErrMinus=None):
+	def __init__(self, name="", bins=10, y=None, yErrPlus=None, yErrMinus=None, x=None, xErrPlus=None, xErrMinus=None, meta={}):
 		"""
 		Basic histogram representation
 		"""
 
-		# Store bin info
+		# Store histogram info
 		self.bins = bins
 		self.name = name
+		self.meta = meta
 
 		# Initialize bin values
 		if y == None:
@@ -264,60 +232,101 @@ class Histogram:
 				xErrMinus=numpy.copy(self.xErrMinus)
 			)
 
-	def isNormalized(self):
+	def isNormalized(self, tollerance=0.1):
 		"""
 		Check if the specified histogram is normalized.
 		"""
 
-		# Check if the sum is "close to" 1
-		tot = numpy.sum(self.y)
+		# Calculate the trapez sum
+		tot = self.area()
 
-		# Return
-		return (tot >= 0.9999) and (tot <= 1.00001)
+		# Check if the value is very close to one
+		return (tot >= (1.0-tollerance)) and (tot <= (1.0+tollerance))
 
-
-	def normalize(self, copy=True):
+	def equal(self, histogram, tollerance=0.2):
 		"""
-		Normalize the y-values so they sum to 1.
+		Check if the histogram is equal to specified
 		"""
-		# NOTE: I have no idea what I am doing
-		# TODO: Read about this
 
-		# Calculate current sum
-		tot = numpy.sum(self.y)
+		# On zero tollerance compare each bin
+		if tollerance == 0:
+
+			if not numpy.all( self.x == histogram.x ):
+				print "!!! Histogram X mismatch"
+				return False
+			if not numpy.all( self.y == histogram.y ):
+				print "{{{ Chi2 = %f }}}" % self.chi2ToReference( histogram )
+				print "!!! Histogram Y mismatch"
+				return False
+			if not numpy.all( self.xErrPlus == histogram.xErrPlus ):
+				print "!!! Histogram xErrPlus mismatch"
+				return False
+			if not numpy.all( self.xErrMinus == histogram.xErrMinus ):
+				print "!!! Histogram xErrMinus mismatch"
+				return False
+			if not numpy.all( self.yErrPlus == histogram.yErrPlus ):
+				print "!!! Histogram yErrPlus mismatch"
+				return False
+			if not numpy.all( self.yErrMinus == histogram.yErrMinus ):
+				print "!!! Histogram yErrMinus mismatch"
+				return False
+			if self.bins != histogram.bins:
+				print "!!! Histogram bins mismatch"
+				return False
+
+		# Otherwise require a very small chi
+		else:
+
+			if (self.chi2ToReference(histogram) < tollerance):
+				return True
+			else:
+				print "!!! Chi2 = %f > Tollerance = %f" % ( self.chi2ToReference( histogram ), tollerance )
+				return False
+
+
+		return True
+
+	def normalize(self, copy=True, tollerance=0.1):
+		"""
+		Normalize the y-values so the area of the histogram is 1.0
+		"""
+
+		# Create copy if needed
+		ref = self
+		if copy:
+			ref = self.copy()
+
+		# Calculate the trapez sum
+		tot = ref.area() 
+
+		# If we are normalized, exit
+		if (tot >= (1.0-tollerance)) and (tot <= (1.0+tollerance)):
+			return ref
 
 		# Calculate scale (also equal to y-Values)
-		self.y = self.y / tot
+		ref.y = ref.y / tot
 
 		# Update errors
-		self.yErrMinus *= self.y
-		self.yErrPlus *= self.y
+		ref.yErrMinus /= tot
+		ref.yErrPlus /= tot
 
-	def sumArea(self):
+		# Return histogram
+		return ref
+
+	def area(self):
 		"""
-		Return the summarized area of the histogram
+		Rreturn the trapezoidal numerical integration of the histogram.
+		(Very close to the area of the histogram)
 		"""
-		
-		# Get bin's xerr
-		binW = (self.xErrMinus + self.xErrPlus)/2
 
-		# Calc bin areas
-		binArea = (binW * self.y)
-
-		# Return sum
-		return numpy.sum(binArea)
+		# Integrate along the given axis using the composite trapezoidal rule,
+		# using spacing the xError size
+		return numpy.trapz( self.y, self.x )
 
 	@staticmethod
 	def merge(self, *args):
 		"""
 		Merge the statistics with the specified histogram.
-		"""
-		pass
-
-	def pack(self):
-		"""
-		Return a packed representation of the histogram that
-		can be unpacked from the javascript client.
 		"""
 		pass
 
@@ -386,17 +395,65 @@ class Histogram:
 		return Chi2/N
 
 	"""
-	Return the fitting coefficients that can represent this histogram 
-	in an abstract way.
+	Return the polynomial fitting coefficients that can represent this histogram.
+	Optionally it returns the metadata required to re-construct the histogram using Histogram.fromFit()
+	function.
 	"""
-	def fit(self, degree=2):
-		pass
+	def polyFit(self, deg=4, meta=True):
+
+		# Coefficents for the plot
+		coeff = numpy.polyfit( self.x, self.y, deg )
+		coeffPlus = numpy.polyfit( self.x, self.y+self.yErrPlus, deg )
+		coeffMinus = numpy.polyfit( self.x, self.y-self.yErrMinus, deg )
+
+		# Calculate the combined coefficients
+		combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
+
+		# If we don't have metadata, return
+		if not meta:
+			return combCoeff
+
+		# Prepare metadata
+		meta = {
+			'x': [ self.x, self.xErrMinus, self.xErrPlus ],
+			'bins': self.bins,
+			'meta': self.meta
+		}
+
+		# Return coefficients and metadata
+		return (combCoeff, meta)
 
 	"""
-	Re-create the histogram from the coefficients specified
+	Re-create the histogram from the coefficients and metadata specified
 	"""
-	def fromFit(self, coeff, degree=2):
-		pass
+	@staticmethod
+	def fromFit(coeff, meta):
+
+		# Extract metadata
+		x = meta['x'][0]
+		xErrMinus = meta['x'][1]
+		xErrPlus = meta['x'][2]
+
+		# Calculate the size of the coefficients array
+		cl = len(coeff) / 3
+
+		# Re-create bin values from fitted data
+		y = numpy.polyval( coeff[0:cl], x )
+		yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
+		yErrPlus = numpy.polyval( coeff[cl*2:cl*3], x )
+
+		# Return histogram instance
+		return Histogram(
+			bins=meta['bins'],
+			x=x,
+			xErrMinus=xErrMinus,
+			xErrPlus=xErrPlus,
+			y=y,
+			yErrMinus=y-yErrMinus,
+			yErrPlus=yErrPlus-y,
+			meta=meta['meta']
+			)
+
 
 	@staticmethod
 	def fromFLAT(filename):
@@ -413,9 +470,13 @@ class Histogram:
 
 		# Get some metrics
 		vBins = data['HISTOGRAM']['v']
-
 		numBins = len(vBins)
 		numValues = len(vBins[0])
+
+		# Get metadata
+		vMeta = { }
+		if 'METADATA' in data:
+			vMeta = data['METADATA']['d']
 
 		# Convert values into a flat 2D numpy array
 		values = numpy.array(vBins, dtype=numpy.float64).flatten()
@@ -435,10 +496,11 @@ class Histogram:
 					xErrPlus=values[2::6]-values[1::6],
 					y=values[3::6],
 					yErrMinus=values[4::6],
-					yErrPlus=values[5::6]
+					yErrPlus=values[5::6],
+					meta=vMeta
 				)
 
-		elif numValues == 6:
+		elif numValues == 5:
 			# Calculate xMid
 			xMid = (values[::5] + values[1::5]) / 2.0
 
@@ -451,7 +513,8 @@ class Histogram:
 					xErrPlus=values[1::5]-xMid,
 					y=values[2::5],
 					yErrMinus=values[3::5],
-					yErrPlus=values[4::5]
+					yErrPlus=values[4::5],
+					meta=vMeta
 				)
 
 
@@ -536,7 +599,7 @@ class Histogram:
 				y=numpy.array(y),
 				yErrMinus=numpy.array(yErrMinus),
 				yErrPlus=numpy.array(yErrPlus),
-				x=numpy.array(y),
+				x=numpy.array(x),
 				xErrMinus=numpy.array(xErrMinus),
 				xErrPlus=numpy.array(xErrPlus)
 			)

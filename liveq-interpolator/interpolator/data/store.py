@@ -20,6 +20,7 @@
 import time
 import snappy
 import numpy as np
+import cPickle as pickle
 
 from liveq.data.tune import Tune
 from liveq.data.histo import HistogramCollection
@@ -41,142 +42,142 @@ class HistogramStore:
 	F_DECOMPRESS = snappy.decompress
 
 	@staticmethod
-	def _pickle(lst):
+	def _pickle(collections, validate=False):
 		"""
-		Converts a collection of HistogramCollections into a buffer
-		that can be stored in a key/value store
-
-		The "pickled" result is the buffered contents of a numpy float64 array
-		with a metadata header and the histogram data as body. The metadata header
-		has the following format:
-
-		+--------+------------------------------------------------+
-		| Offset | Description                                    |
-		+========+================================================+
-		|    0   | Protocol Version (Always 1).                   |
-		+--------+------------------------------------------------+
-		|    1   | Number of histogram collections in the buffer. |
-		+--------+------------------------------------------------+
-		|    2   | Number of histograms in each collection.       |
-		+--------+------------------------------------------------+
-		|    3   | Number of bins in each histogram.              |
-		+--------+------------------------------------------------+
-		|    4   | Number of histogram parameters in the tune.    |
-		+--------+------------------------------------------------+
-		|    5   | The index of the lab the tunes are associated. |
-		+--------+------------------------------------------------+
-		|   ...  | (Tune and data sections of every histogram)    |
-		+--------+------------------------------------------------+
-
-		Args:
-			o (array) : A set of HistogramCollections objects
-
-		Returns:
-			A data chunk that can be converted back to the same input
-			using the :func:`_unpickle` function.
-
+		Converts a collection of HistogramCollections into two buffers
+		that can be stored in a key/value store.
 		"""
 
-		# If we have nothing as input, return nothing as output
-		if not lst:
-			return ""
+		# Prepare response buffers
+		valueData = np.array([], dtype=np.float64)
+		iHistoMeta = []
 
-		# Basic sanitization
-		if not lst[0].tune:
-			raise ValueError("All histogram collections must have a tune configuration assigned!")
+		# Prepare meta info
+		iLabID = None
+		iNumTunes =  None
+		iNumCoeff =  None
+		iNumCollections = len(collections)
 
-		# Get the number of bins of the histogram and the number of parameters in the tune
-		numHistos = len(lst[0])
-		numBins = lst[0].bins
-		numParams = len(lst[0].tune)
-		tuneLab = lst[0].tune.labid
+		# Start processing histogram collections
+		for c in collections:
 
-		# [Convert all the data into a one-dimentional float64 numpy array]
-
-		# Start by creating the meta-info
-		meta = np.array([
-				1,			# First parameter	: The protocol version
-				len(lst),	# Second parameter 	: The number of histogram collections
-				numHistos,	# Third parameter   : The number of histograms in each hollection
-				numBins,	# Third parameter 	: The number of bins in the histograms
-				numParams,	# Fourth parameter  : The number of tune parameters
-				tuneLab		# Fifth parameter 	: The lab ID associated with this tune
-
-			], dtype=np.float64)
-
-		# Then start concatenating the data
-		ans = meta
-		for c in lst:
-
-			# Validate histogram collection
-			if len(c) != numHistos:
-				raise ValueError("All histogram collections must have the same number of histograms!")
-			if c.bins != numBins:
-				raise ValueError("All histogram collections must have the same number of bins!")
+			# Require a tune in all collections
 			if not c.tune:
 				raise ValueError("All histogram collections must have a tune configuration assigned!")
-			if len(c.tune) != numParams:
-				raise ValueError("All histogram collections must have the same number of tunable parameters!")
-			if c.tune.labid != tuneLab:
-				raise ValueError("All tunable parameters must belong to the same lab!")
 
-			# Merge tune values and histogram collection data
-			ans = np.concatenate((ans, c.tune.getValues(), c.data))
+			# Require the same lab in all tunes
+			if not iLabID:
+				iLabID = c.tune.labid
+			else:
+				if c.tune.labid != iLabID:
+					raise ValueError("All histogram tunes must belong to the same lab!")
 
-		# Compress buffer
-		return HistogramStore.F_COMPRESS( np.getbuffer(ans) )
+			# Get tune info
+			sTune = c.tune.getValues()
+
+			# Require the same number of parameters in all tunes
+			if not iNumTunes:
+				iNumTunes = len(sTune)
+			else:
+				if len(sTune) != iNumTunes:
+					raise ValueError("All histogram tunes must have the same number of tunable parameters!")
+
+			# Require the same number of coefficients in the histogram collections
+			if not iNumCoeff:
+				iNumCoeff = len(c.dataCoeff)
+			else:
+				if len(c.dataCoeff) != iNumCoeff:
+					raise ValueError("All histogram collections must have the same number of coefficients!")
+
+			# Store metadata
+			if not iHistoMeta:
+				iHistoMeta = c.dataMeta
+			else:
+
+				# Metadata are the same in principle in all nodes, however
+				# with a cost of more computing power we can do some validation
+				if validate:
+					i = 0
+					for md in c.dataMeta:
+
+						# Get current data
+						rd = iHistoMeta[i]
+
+						# Validate
+						# TODO: Not needed for the first draft, implement this
+
+						# Go to next
+						i += 1
+
+			# Collect tune and coefficients
+			valueData = np.concatenate([
+					valueData,
+					sTune,
+					c.dataCoeff
+				])
+
+
+		# Pack value buffer
+		valueData = HistogramStore.F_COMPRESS( np.getbuffer( valueData ) )
+
+		# Pack metadata
+		metaData = HistogramStore.F_COMPRESS( pickle.dumps( {
+				'lab' : iLabID,
+				'numTunes' : iNumTunes,
+				'numCoeff' : iNumCoeff,
+				'numCollections' : iNumCollections,
+				'meta' : iHistoMeta
+			} ) )
+
+		# Return the value/meta tuple
+		return (valueData, metaData)
 
 	@staticmethod
-	def _unpickle(dat):
+	def _unpickle( valueData, metaData ):
 		"""
-		TODO: Optimize performance
+		Unpack the values and metadata from the specified set of packed data
+		into a list of HistogramCollections.
 		"""
 
-		# If we have nothing as input, return empty array
-		if not dat:
-			return []
+		# Unpack value buffer
+		values = np.frombuffer( HistogramStore.F_DECOMPRESS( valueData ) )
 
-		# Decompress and create numpy array from buffer
-		dat = np.frombuffer( HistogramStore.F_DECOMPRESS(dat) )
+		# Unpack metadata
+		metaData = pickle.loads( HistogramStore.F_DECOMPRESS( metaData ) )
 
-		# Extract metainfo, validating protocol
-		numProtocol = int(dat[0])
-		if numProtocol != 1:
-			raise ValueError("Unsupported protocol version #%i found in the input buffer" % numProtocol)
+		# Prepare the response array
+		ans = [ ]
 
-		# Extract the rest
-		numCollections = int(dat[1])
-		numHistos = int(dat[2])
-		numBins = int(dat[3])
-		numParams = int(dat[4])
-		tuneLab = int(dat[5])
+		# Extract useful info
+		iLabID = metaData['lab']
+		iNumTunes =  metaData['numTunes']
+		iNumCoeff =  metaData['numCoeff']
+		iHistoMeta =  metaData['meta']
+		iNumCollections = metaData['numCollections']
 
-		# Calculate the size of each histogram collection
-		szHistogram = numBins*3 * numHistos
+		# Start processing histograms
+		ofs = 0
+		for i in range(0,iNumCollections):
 
-		# Start creating collections
-		idx = 5
-		ans = []
-		for i in range(0,numCollections):
+			# Slice tune data
+			sTune = values[ ofs : ofs + iNumTunes ]
+			ofs += iNumTunes
 
-			# Get a reference to the tune parameters
-			refTune = dat[idx:idx+numParams]
-			idx += numParams
+			# Slice coefficients
+			sCoeff = values[ ofs : ofs + iNumCoeff ]
+			ofs += iNumCoeff
 
-			# Get a reference to the data
-			refData = dat[idx:idx+szHistogram]
-			idx += szHistogram
+			# Create and collect histogram collection
+			ans.append(HistogramCollection(
+				dataCoeff=sCoeff, 
+				dataMeta=iHistoMeta, 
+				tune=Tune.fromLabData(
+						iLabID, sTune
+					)
+				)
+			)
 
-			# Create histogram collection
-			c = HistogramCollection(data=refData, bins=numBins)
-
-			# Create tune instance
-			c.tune = Tune.fromLabData(tuneLab, refTune)
-
-			# Store to response
-			ans.append(c)
-
-		# Return response
+		# Return collection
 		return ans
 
 	@staticmethod
@@ -214,13 +215,14 @@ class HistogramStore:
 
 		# Put neighbors back to the neighborhood store
 		t_before = int(round(time.time() * 1000))
-		buf = HistogramStore._pickle(neighbors)
+		vBuf, mBuf = HistogramStore._pickle(neighbors)
 		t_after = int(round(time.time() * 1000))
 		print " - Pickle: %i ms" % (t_after - t_before)
 
-		print " - Buf: %i" % len(buf)
+		print " - Buf: %i" % len(vBuf)
 		t_before = int(round(time.time() * 1000))
-		Config.STORE.set("tune-" + nid, buf )
+		Config.STORE.set("tune-%s:v" % nid, vBuf )
+		Config.STORE.set("tune-%s:m" % nid, mBuf )
 		t_after = int(round(time.time() * 1000))
 		print " - Store: %i ms" % (t_after - t_before)
 

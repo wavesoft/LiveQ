@@ -71,6 +71,23 @@ class Tune(dict):
 		# Return tune
 		return tune
 
+	def equal(self, tune):
+		"""
+		Check if this tune is equal to another
+		"""
+
+		# Ensure tune
+		if self.labid != tune.labid:
+			print "!!! Tune lab mismatch"
+			return False
+
+		# Ensure values are the same
+		myVar = self.getValues()
+		tuVar = tune.getValues()
+
+		# Compare
+		return np.all( myVar == tuVar )
+
 	def getNeighborhoodID(self, labid=None):
 		"""
 		Generate a unique ID for the specified tune set that can be used

@@ -8,6 +8,8 @@ sys.path.append("../liveq-common")
 import time
 import math
 import numpy as np
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 from random import random
 
 from liveq.data.histo import HistogramCollection, Histogram
@@ -24,29 +26,38 @@ except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
 
+
+##############################################################################################################
+##############################################################################################################
+####
+#### Tool Functions
+####
+##############################################################################################################
+##############################################################################################################
+
 # Pre-populate tune data for given lab
 Tune.LAB_TUNE_KEYS[45] = [ 'a','b','c','d','e','f' ]
 
-#: A function to generate histograms
+#: The base mathematical function for creation and difference
 def histo_function(tune, attenuator, differentiator, vrange=100, voffset=0.5):
 	return (abs(attenuator * (
 			(
 				math.sin( tune['a'] * 0.1 + 4.3 ) +
 				math.sin( tune['b'] * 1.5 + 2.612 ) +
 				math.sin( tune['c'] * 7.2 + 0.451 )
-			) * math.cos( differentiator ) +
+			) * math.cos( differentiator / 0.3 ) +
 			(
 				math.sin( tune['d'] * 4.3 + 12.6 ) +		
 				math.sin( tune['e'] * 10.6 + 61.0 ) +
 				math.sin( tune['f'] * 6.5 + 21.3 )
-			) * math.sin( differentiator ) +
-			math.sin( math.cos(differentiator) + differentiator )
+			) * math.sin( differentiator / 0.3 ) +
+			math.sin( math.cos(differentiator) + differentiator * 10.3 )
 		) / 3.0)) * vrange + voffset
 
 #: Generate a set of histograms for the given tune
-def build_histos(tune, numHistos=10, numBins=10):
+def build_histos(tune, numHistos=10, numBins=10, yErrMinus=0.05, yErrPlus=0.05, xErrMinus=0.05, xErrPlus=0.05):
 	
-	ans = HistogramCollection(bins=numBins)
+	ans = HistogramCollection(tune=tune)
 	ans.beginUpdate()
 	
 	for i in range(0,numHistos):
@@ -74,11 +85,11 @@ def build_histos(tune, numHistos=10, numBins=10):
 		histo = Histogram( 
 					bins=numBins,
 					y=binvalues, 
-					yErrPlus=np.repeat(0.0001, numBins),
-					yErrMinus=np.repeat(0.0001, numBins),
+					yErrPlus=np.repeat(yErrPlus, numBins),
+					yErrMinus=np.repeat(yErrMinus, numBins),
 					x=binpos,
-					xErrPlus=np.repeat(0.0001, numBins),
-					xErrMinus=np.repeat(0.0001, numBins),
+					xErrPlus=np.repeat(xErrPlus, numBins),
+					xErrMinus=np.repeat(xErrMinus, numBins),
 				)
 
 		# Normalize
@@ -100,41 +111,124 @@ def build_tunes(num, vmin=0.0, vmax=1.0, vnames=[ 'a','b','c','d','e','f' ]):
 		ans.append( Tune(tunevalues, labid=45) )
 	return ans
 
+def plot_histos(histos, yscale='log'):
+
+	# Calculate the column sizes for subplots
+	whsize = int(math.ceil(math.sqrt(len(histos))))
+	fig, axs = plt.subplots(nrows=whsize, ncols=whsize, sharex=False)
+	axx = 0
+	axy = 0
+
+	# Color map
+	ci = 0
+	colors = [ 'b','g','r', 'c', 'm', 'y', 'k' ] 
+
+	# If we got a histogramcollection get historefs
+	if histos.__class__ is HistogramCollection:
+		histos = histos.historefs
+
+	# Prepare plots
+	for histGroup in histos:
+
+		# Pick subplot and go to next one
+		if whsize > 1:
+			ax = axs[axy, axx]
+			axx += 1
+			if axx >= whsize:
+				axx = 0
+				axy += 1
+		else:
+			ax = axs
+
+		# Set scale
+		ax.set_yscale(yscale)
+
+		# If we got a histogramcollection get historefs
+		if histGroup.__class__ is HistogramCollection:
+			histGroup = histGroup.historefs
+
+		# Make it a list if it's not
+		if type(histGroup) != list:
+			histGroup = [histGroup]
+
+		# Make plots
+		ci = 0
+		for h in histGroup:
+
+			# Pick color for the plot
+			col = colors[ci]
+			ci += 1
+			if ci >= len(colors):
+				ci = 0
+
+			# Plot just the basic plot with the specified color
+			ax.errorbar( 
+				h.x, h.y, 
+				yerr=[h.yErrMinus, h.yErrPlus], xerr=[h.xErrMinus, h.xErrPlus],
+				color=col,
+				label=h.name
+				 )
+
+	# Display plot
+	plt.show()
+
+##############################################################################################################
+##############################################################################################################
+####
+#### Test code
+####
+##############################################################################################################
+##############################################################################################################
+
+c = []
+
+t_before = int(round(time.time() * 1000))
+t = build_tunes(100)
+t_after = int(round(time.time() * 1000))
+print " - Tune building: %i ms" % (t_after - t_before)
+
+t_before = int(round(time.time() * 1000))
+for tune in t:
+	c.append(build_histos(tune))
+t_after = int(round(time.time() * 1000))
+print " - Histo building: %i ms" % (t_after - t_before)
+
+t_before = int(round(time.time() * 1000))
+v,d = HistogramStore._pickle( c )
+t_after = int(round(time.time() * 1000))
+print " - Pickling: %i ms" % (t_after - t_before)
+
+print "Lens: %i, %i" % (len(v), len(d))
+
+t_before = int(round(time.time() * 1000))
+c2 = HistogramStore._unpickle( v, d)
+t_after = int(round(time.time() * 1000))
+print " - Unpickling: %i ms" % (t_after - t_before)
+
+print "Check : %r" % all([c[i].equal(c2[i]) for i in range(0, len(c))])
+
+"""
+h1 = Histogram.fromFLAT('C:\\Users\\icharala\\Local\\Shared\\ref-data\\pythia-8-default.dat')
+h2 = Histogram.fromFLAT('C:\\Users\\icharala\\Local\\Shared\\ref-data\\ALEPH_1996_S3486095.dat')
+
+kParts = h1.name.split("/")
+
+hRef = Histogram.fromAIDA("C:\\Users\\icharala\\Local\\Shared\\ref-data\\data\\%s.aida" % kParts[1], kParts[2])
+
+print "---[ %s ]----------" % hRef.name
+print hRef.isNormalized()
+
+print "---[ %s ]----------" % h2.name
+print h2.isNormalized()
+
+print "---[ %s ]----------" % h1.name
+print "nEvts=%s" % h1.meta['nevts']
+print h1.isNormalized()
+"""
+
+
+"""
 # ######## START FEEDING THE INTERPOLATOR #################
-
-class CSVFile:
-
-	"""
-	Create a CSV file
-	"""
-	def __init__(self, filename):
-		self.f = open(filename, "w")
-
-	"""
-	Dump a histogram on the CSV file
-	"""
-	def dumpHistograms(self, histos, titles, header="Histograms"):
-
-		# Write overall header
-		self.f.write(",\n")
-		self.f.write(",%s\n" % header)
-
-		# Write header
-		csv_line = ""
-		for k in histos[0].x:
-			csv_line += ",%s" % str(k)
-		self.f.write("%s\n" % csv_line)
-
-		# Write histogram values
-		i = 0
-		for title in titles:
-			csv_line = "%s" % title
-			for k in histos[i].y:
-				csv_line += ",%s" % str(k)
-			i += 1
-			self.f.write("%s\n" % csv_line)
-
-
 
 ipol = False
 
@@ -230,6 +324,9 @@ else:
 	with open('out.csv', 'w') as f:
 		for line in csv:
 			f.write(line + "\r")
+
+
+"""
 
 
 """
