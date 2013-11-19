@@ -132,7 +132,7 @@ class HistogramCollection:
 		self.histoinfo.append({
 				'ref': histogram,
 				'index': aIndex,
-				'len': aLen * 3
+				'len': aLen 
 			})
 
 		# Merge data all together
@@ -312,12 +312,14 @@ class Histogram:
 		"""
 		Merge the statistics with the specified histogram.
 		"""
+		pass
 
 	def pack(self):
 		"""
 		Return a packed representation of the histogram that
 		can be unpacked from the javascript client.
 		"""
+		pass
 
 	def chi2ToReference(self, refHisto, uncertainty=0.05):
 		"""
@@ -382,6 +384,19 @@ class Histogram:
 			raise ValueError("No bins to compare!")
 
 		return Chi2/N
+
+	"""
+	Return the fitting coefficients that can represent this histogram 
+	in an abstract way.
+	"""
+	def fit(self, degree=2):
+		pass
+
+	"""
+	Re-create the histogram from the coefficients specified
+	"""
+	def fromFit(self, coeff, degree=2):
+		pass
 
 	@staticmethod
 	def fromFLAT(filename):

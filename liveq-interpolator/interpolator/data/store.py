@@ -237,7 +237,7 @@ class HistogramStore:
 		return HistogramStore._unpickle( Config.STORE.get("tune-" + nid) )
 
 	@staticmethod
-	def getInterpolator(tune):
+	def getInterpolator(tune, function='linear'):
 		"""
 		Return an initialized interpolator instance with the required
 		data from the appropriate neighborhoods.
@@ -259,10 +259,15 @@ class HistogramStore:
 
 		# Flip matrix of indexvars
 		indexvars = np.swapaxes( np.array(indexvars), 0, 1 )
+
+		# Nothing available
+		if len(indexvars) == 0:
+			return None
+
 		#indexvars = np.array(indexvars)
 
-		print "Check: %i == %i" % (len(datavalues), len(indexvars[0]))
+		#print "Check: %i == %i" % (len(datavalues), len(indexvars[0]))
 
 		# Create and return interpolator
-		return Rbf( *indexvars, data=datavalues )
+		return Rbf( *indexvars, data=datavalues, function=function )
 
