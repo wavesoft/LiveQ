@@ -268,9 +268,9 @@ class MCPlots(JobApplication):
 		# Read state flag
 		state = "unknown"
 		with file( "%s/status.flag" % self.jobdir ) as f:
-    		state = f.read()
+			state = f.read()
 
-    	return state
+		return state
 
 	def readIntermediateHistograms(self):
 		"""

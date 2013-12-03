@@ -38,7 +38,7 @@ except ConfigException as e:
 ##############################################################################################################
 
 # Pre-populate tune data for given lab
-Tune.LAB_TUNE_KEYS[45] = [ 'a','b','c','d','e','f' ]
+Tune.LAB_TUNE_KEYS[45] = [ 'a','b','c'] #,'d','e','f' ]
 
 #: The base mathematical function for creation and difference
 def histo_function(tune, attenuator, differentiator, vrange=100, voffset=0.5):
@@ -222,6 +222,52 @@ def avgChi2(c1, c2):
 ##############################################################################################################
 ##############################################################################################################
 
+num = 50
+fv = 1.0
+maxVal = 3.14
+
+@np.vectorize
+def run_fn(x,y):
+	#return (1.0/math.sqrt(1.0 + x**2 + y**2)) - (4 * x ** 2 * y * math.e ** math.sqrt(x**2 + y ** 2))
+	return np.sin(0.01*math.log(x+maxVal+.01)*fv) * np.sin(y/fv)
+
+@np.vectorize
+def run_ipol(a,b,p):
+	return p(a,b)
+
+delta = 0.025
+x = np.arange(-maxVal, maxVal, delta)
+y = np.arange(-maxVal, maxVal, delta)
+X, Y = np.meshgrid(x, y)
+
+# Run function for the given grid data
+Z1 = run_fn(X.flatten(), Y.flatten()).reshape(X.shape)
+
+# Populate scattered grid
+v_index = np.random.random([2,num]) * maxVal * 2 - maxVal
+v_data = run_fn(v_index[0], v_index[1])
+
+# Create interpolator and build interpolator grid
+ipol = Rbf(*v_index, data=v_data, function='multiquadric')
+Z2 = run_ipol(X.flatten(), Y.flatten(), ipol).reshape(X.shape)
+
+# Begin figure
+plt.figure()
+
+# Plot the reference contour
+CS = plt.contour(X, Y, Z1, colors='k')
+plt.clabel(CS, inline=1, fontsize=10)
+
+# Plot the interpolator contour
+CS2 = plt.contour(X, Y, Z2, colors='b')
+plt.clabel(CS2, inline=1, fontsize=10)
+plt.scatter(v_index[0], v_index[1], marker='o', c='b', alpha=0.5)
+
+plt.title("RBF %s interpolation, %i samples" % (ipol.function, num))
+plt.show()
+
+
+"""
 c = []
 
 t_before = int(round(time.time() * 1000))
@@ -240,7 +286,7 @@ v,d = HistogramStore._pickle( c )
 t_after = int(round(time.time() * 1000))
 print " - Pickling: %i ms" % (t_after - t_before)
 
-print "Lens: %i, %i" % (len(v), len(d))
+print "Lengths: %i, %i" % (len(v), len(d))
 
 t_before = int(round(time.time() * 1000))
 c2 = HistogramStore._unpickle( v, d)
@@ -266,6 +312,7 @@ for s in samples:
 
 	plot_histos([ [vIpol[0], vReal[0]], [vIpol[1], vReal[1]], [vIpol[2], vReal[2]], [vIpol[3], vReal[3]] ])
 
+"""
 
 """
 h1 = Histogram.fromFLAT('C:\\Users\\icharala\\Local\\Shared\\ref-data\\pythia-8-default.dat')

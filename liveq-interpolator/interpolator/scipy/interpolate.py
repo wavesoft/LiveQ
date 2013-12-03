@@ -193,9 +193,9 @@ class Rbf(object):
 	def __init__(self, *args, **kwargs):
 
 		# Pop data entry
-		data = kwargs.pop('data')
-		if not data:
+		if not'data' in kwargs:
 			raise ValueError("data= kwargument was not specified!")
+		data = kwargs.pop('data')
 
 		# Process arguments
 		self.xi = asarray([asarray(a, dtype=float_).flatten()
@@ -295,6 +295,11 @@ class Rbf(object):
 
 		if self.ipolmode == Rbf.DATA_SINGLE:
 			# Single interpolation
+			val = dot(self._function(r), self.nodes)
+			#print(self._function(r))
+			#print(self.nodes)
+			#raise ValueError("E")
+			#return val.reshape(shp)
 			return dot(self._function(r), self.nodes).reshape(shp)
 
 		elif self.ipolmode == Rbf.DATA_HISTOSET:
