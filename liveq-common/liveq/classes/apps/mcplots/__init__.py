@@ -39,7 +39,7 @@ from liveq.utils.FLAT import FLATParser
 
 from liveq.events import GlobalEvents
 from liveq.config.classes import AppConfigClass
-from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
+from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException, ConfigException
 
 class Config(AppConfigClass):
 	"""
