@@ -429,7 +429,7 @@ class Histogram:
 	@staticmethod
 	def fromFit(coeff, meta):
 
-		# Extract metadata
+		# Extract x-values from metadata
 		x = meta['x'][0]
 		xErrMinus = meta['x'][1]
 		xErrPlus = meta['x'][2]
@@ -449,8 +449,8 @@ class Histogram:
 			xErrMinus=xErrMinus,
 			xErrPlus=xErrPlus,
 			y=y,
-			yErrMinus=y-yErrMinus,
-			yErrPlus=yErrPlus-y,
+			yErrMinus=yErrMinus-y,
+			yErrPlus=y-yErrPlus,
 			meta=meta['meta']
 			)
 
