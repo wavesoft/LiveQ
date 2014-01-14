@@ -30,7 +30,7 @@ from agent.config import Config
 from agent.component import AgentComponent
 
 from liveq.exceptions import ConfigException
-from liveq import handleSIGINT
+from liveq import handleSIGINT, exit
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -40,7 +40,7 @@ try:
 	Config.fromFile( "config/agent.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
+	exit(1)
 
 # Hook sigint -> Shutdown
 handleSIGINT()

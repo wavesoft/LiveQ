@@ -36,3 +36,5 @@ liveq-common/ref-data
 .DS_Store
 
 *.log
+
+local-environment.sh

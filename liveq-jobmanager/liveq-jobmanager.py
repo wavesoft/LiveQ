@@ -31,7 +31,7 @@ import sys
 from jobmanager.config import Config
 from jobmanager.component import JobManagerComponent
 
-from liveq import handleSIGINT
+from liveq import handleSIGINT, exit
 from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 
@@ -43,7 +43,7 @@ try:
 	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
+	exit(1)
 
 # Hook sigint -> Shutdown
 handleSIGINT()
