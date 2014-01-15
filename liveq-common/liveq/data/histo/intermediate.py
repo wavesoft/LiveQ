@@ -200,20 +200,31 @@ class IntermediateHistogram:
 		if 'crosssection' in meta:
 			self.crosssection = float(meta['crosssection'])
 
-		# Import values from the constructor
+		# Import values from the constructor or use defaults
 		self.xlow=xlow
+		if (xlow == None):
+			self.xlow = numpy.zeros(self.bins)
 		self.xfocus=xfocus
+		if (xfocus == None):
+			self.xfocus = numpy.zeros(self.bins)
 		self.xhigh=xhigh
+		if (xhigh == None):
+			self.xhigh = numpy.zeros(self.bins)
 		self.Entries=Entries
+		if (Entries == None):
+			self.Entries = numpy.zeros(self.bins)
 		self.SumW=SumW
+		if (SumW == None):
+			self.SumW = numpy.zeros(self.bins)
 		self.SumW2=SumW2
+		if (SumW2 == None):
+			self.SumW2 = numpy.zeros(self.bins)
 		self.SumXW=SumXW
+		if (SumXW == None):
+			self.SumXW = numpy.zeros(self.bins)
 		self.SumX2W=SumX2W
-
-		# Reset bin values if we have
-		# at least one missing parameter
-		if (xlow == None) or (xfocus == None) or (xhigh == None) or (Entries == None) or (SumW == None) or (SumW2 == None) or (SumXW == None) or (SumX2W == None):
-			self.clear()
+		if (SumX2W == None):
+			self.SumX2W = numpy.zeros(self.bins)
 
 	def clear(self):
 		"""
@@ -240,17 +251,45 @@ class IntermediateHistogram:
 		"""
 		Return true if we are equal to h
 		"""
-		# Compare all fields
-		return (
-			numpy.all(self.xlow == h.xlow) and 
-			numpy.all(self.xfocus == h.xfocus) and
-			numpy.all(self.xhigh == h.xhigh) and
-			numpy.all(self.Entries == h.Entries) and
-			numpy.all(self.SumW == h.SumW) and
-			numpy.all(self.SumW2 == h.SumW2) and
-			numpy.all(self.SumXW == h.SumXW) and
-			numpy.all(self.SumX2W == h.SumX2W)
-		)
+
+		TOLLERANCE = 1e-5
+
+		v = numpy.abs( self.xlow - h.xlow )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! xlow mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.xfocus - h.xfocus )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! xfocus mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.xhigh - h.xhigh )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! xhigh mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.Entries - h.Entries )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! Entries mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.SumW - h.SumW )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! SumW2 mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.SumW2 - h.SumW2 )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! SumXW mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.SumXW - h.SumXW )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! SumX2W mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+		v = numpy.abs( self.SumX2W - h.SumX2W )
+		if numpy.any(v > TOLLERANCE):
+			logging.warn(" ! SumX2W mismatch: %f/%f" % ( numpy.min(v), numpy.max(v) ))
+			return False
+
+		# All parameters passed the tollerance check
+		return True
+
 
 	def width(self):
 		"""

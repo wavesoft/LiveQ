@@ -107,9 +107,18 @@ def intermediateMerge(histograms):
 	vMeta['nevts'] = nevts
 	vMeta['crosssection'] = xs
 
-	# Summ histograms into another intermediate histogram
+	# Prepare response histogram
+	dst = IntermediateHistogram(
+		bins=numBins, 
+		name=name, 
+		meta=vMeta, 
+		xlow=histograms[0].xlow,
+		xfocus=histograms[0].xfocus,
+		xhigh=histograms[0].xhigh
+	)
+
+	# Summ histograms
 	i = 0
-	dst = IntermediateHistogram(bins=numBins, name=name, meta=vMeta)
 	for histo in histograms:
 
 		# Get weight
