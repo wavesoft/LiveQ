@@ -473,7 +473,7 @@ class Histogram:
 		numBins = len(vBins)
 		numValues = len(vBins[0])
 
-		# Get metadata
+		# Get metadata dictionary
 		vMeta = { }
 		if 'METADATA' in data:
 			vMeta = data['METADATA']['d']

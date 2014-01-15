@@ -30,7 +30,7 @@ from interpolator.data.store import HistogramStore
 from liveq.data.histo import Histogram, HistogramCollection
 from liveq.data.tune import Tune
 
-class JobManagerComponent(Component):
+class InterpolatorComponent(Component):
 	"""
 	Core jobmanager
 	"""

@@ -17,28 +17,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
-import numpy
-import xml.etree.cElementTree as eTree
-
-from liveq.utils.FLAT import FLATParser
-
-class HistoSum():
+class MergeException(Exception):
 	"""
-	A class that helps merging the data from multiple histograms
+	An error has occured while merging histograms
 	"""
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 
-	def __init__(self):
-		"""
-		Initialize the stores
-		"""
-		pass
-
-	def merge(self, histograms):
-		"""
-		Merge the given list of histograms and return
-		the resulting Histogram
-		"""
-		pass
-
+class IncompatibleMergeException(MergeException):
+	"""
+	The histograms provided for merging were not compatible between them
+	"""
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 

@@ -29,7 +29,7 @@ import signal
 import sys
 
 from interpolator.config import Config
-#from jobmanager.component import JobManagerComponent
+#from jobmanager.component import InterpolatorComponent
 
 from liveq import handleSIGINT
 from liveq.events import GlobalEvents
