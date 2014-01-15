@@ -59,14 +59,14 @@ class AgentComponent(Component, SimpleFSM):
 		self.runtimeConfig = { }
 
 		# TODO: Uhnack this
-		# This establishes a presence relationship with the given entity.
+		# This establishes a presence relationship with the server entity.
 		if isinstance(Config.EBUS, XMPPBus):
 			self.logger.debug("Subscribing %s to my roster" % Config.SERVER_CHANNEL)
 			Config.EBUS.send_presence(pto=Config.SERVER_CHANNEL, ptype='subscribe')
 
 		# Bind incoming message handlers
-		self.serverChannel.on('job_start', self.onJobStart)
-		self.serverChannel.on('job_cancel', self.onJobCancel)
+		self.serverChannel.on('job_start', self.cmdJobStart)
+		self.serverChannel.on('job_cancel', self.cmdJobCancel)
 		self.serverChannel.on('close', self.onDisconnect)
 
 		# Start with the handshake
@@ -137,7 +137,7 @@ class AgentComponent(Component, SimpleFSM):
 		return False
 
 
-	def onJobStart(self, message):
+	def cmdJobStart(self, message):
 		"""
 		Bus message arrived to start job
 		"""
@@ -217,7 +217,7 @@ class AgentComponent(Component, SimpleFSM):
 		# We found no slot
 		return self._replyError("No free slots were found")
 
-	def onJobCancel(self, message):
+	def cmdJobCancel(self, message):
 		"""
 		Bus message arrived to cancel a running job
 		"""

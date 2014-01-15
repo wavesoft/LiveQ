@@ -27,6 +27,7 @@ This application starts an MCPlots simulation based on the lab configuration and
 tune values specified by the user and sends in real-time histograms to the user.
 """
 
+import os
 import glob
 import tempfile
 import time
@@ -40,6 +41,8 @@ from liveq.utils.FLAT import FLATParser
 from liveq.events import GlobalEvents
 from liveq.config.classes import AppConfigClass
 from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException, ConfigException
+
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
 
 class Config(AppConfigClass):
 	"""
@@ -109,15 +112,18 @@ class MCPlots(JobApplication):
 		# Prepare macros for the cmdline
 		rundict = copy.deepcopy(self.jobconfig)
 		rundict["tune"] = self.config.TUNE
-		rundict["jobdir"] = self.jobdir
 
 		# Prepare cmdline arguments
 		cmdline = self.config.EXEC % rundict
 		args = shlex.split( str(self.config.EXEC % rundict) )
 		self.logger.debug("Starting mcplots process '%s'" % args)
 
+		# Prepare environment
+		envDict = dict(os.environ)
+		envDict['LIVEQ_JOBDIR'] = self.jobdir
+
 		# Launch process in it's own process group
-		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp)
+		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict)
 		self.logger.debug("Process started with PID=%i" % self.process.pid)
 
 		# Start a monitor thread
@@ -277,58 +283,11 @@ class MCPlots(JobApplication):
 		Helper function to read the histograms from the dump folder
 		"""
 
-		# Collective results
-		histograms = { }
+		# Collect intermediate data
+		ih = IntermediateHistogramCollection.fromDirectory( "%s/dump" % self.jobdir )
 
-		# Find histograms in the dump directory of the job
-		for histogram in glob.glob("%s/dump/*.dat" % self.jobdir):
-			self.logger.debug("Loading flat file %s" % histogram)
-
-			# Skip histograms that are not in the job description
-			histoName = os.path.basename(histogram)[:-4]
-			if (len(self.jobconfig['histograms']) > 0) and not (histoName in self.jobconfig['histograms']):
-				self.logger.debug("Skipping due to job configuration")
-				continue
-
-			# Read histogram data
-			histo = FLATParser.parse( histogram )
-			if not 'METADATA' in histo:
-				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
-				continue
-			if not 'HISTOGRAM' in histo:
-				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
-				continue
-			if not 'HISTOSTATS' in histo:
-				self.logger.warn("Missing METADATA section in FLAT file %s" % histogram)
-				continue
-
-			# Prepare data to store on the collective dict
-			meta = histo['METADATA']['d']
-			if not meta:
-				self.logger.warn("Missing METADATA dict in file %s" % histogram)
-				continue
-			h_data = histo['HISTOGRAM']['v']
-			if not h_data:
-				self.logger.warn("Missing HISTOGRAM values in file %s" % histogram)
-				continue
-			h_stat = histo['HISTOSTATS']['v']
-			if not h_stat:
-				self.logger.warn("Missing HISTOSTATS values in file %s" % histogram)
-				continue
-			h_name = histo['HISTOGRAM']['d']['AidaPath']
-			if not h_stat:
-				self.logger.warn("Missing AidaPath in HISTOGRAM section in file %s" % histogram)
-				continue
-
-			# Store entry on the collective histograms
-			histograms[h_name] = {
-				'meta': dict((k, meta[k]) for k in ('crosssection',)),
-				'histo': h_data,
-				'stats': h_stat
-			}
-
-		# Return the collective results
-		return histograms
+		# Pack and return the object
+		return ih.pack()
 
 	def collectAndSubmitOutput(self):
 		"""
