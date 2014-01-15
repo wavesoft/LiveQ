@@ -607,6 +607,8 @@ class StoredFSM:
 		thread = threading.Thread(target=loopThread)
 		thread.start()
 
+
+
 class SimpleFSM:
 	"""
 	A (very) Simple Finite-State-Machine implementation.

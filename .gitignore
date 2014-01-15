@@ -38,3 +38,5 @@ liveq-common/ref-data
 *.log
 
 local-environment.sh
+
+dump.rdb

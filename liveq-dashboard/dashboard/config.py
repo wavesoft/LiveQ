@@ -22,8 +22,6 @@ import os.path
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.internalbus import InternalBusConfig
-from liveq.config.database import DatabaseConfig
-from liveq.models import createBaseTables
 
 """
 Local configuration for the agent
@@ -34,12 +32,13 @@ class DashboardConfig:
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
-		DashboardConfig.SERVER_PORT = config.get("webserver", "port")
+		DashboardConfig.SERVER_PORT = config.get("dashboard", "port")
+		DashboardConfig.BASE_URL = config.get("dashboard", "base_url")
 
 """
 Create a configuration for the DASHBOARD SERVER based on the core config
 """
-class Config(CoreConfig, InternalBusConfig, DashboardConfig, DatabaseConfig):
+class Config(CoreConfig, InternalBusConfig, DashboardConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -55,8 +54,4 @@ class Config(CoreConfig, InternalBusConfig, DashboardConfig, DatabaseConfig):
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
-		DatabaseConfig.fromConfig( config, runtimeConfig )
 		DashboardConfig.fromConfig( config, runtimeConfig )
-
-		# Ensure base tables exist
-		createBaseTables()

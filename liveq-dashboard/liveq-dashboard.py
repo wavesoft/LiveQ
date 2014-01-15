@@ -36,7 +36,7 @@ import tornado.options
 import tornado.ioloop
 from tornado.options import define, options
 
-from liveq import handleSIGINT
+from liveq import handleSIGINT, exit
 from liveq.exceptions import ConfigException
 
 # Prepare runtime configuration
@@ -47,7 +47,7 @@ try:
 	Config.fromFile( "config/dashboard.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
+	exit(1)
 
 # Hook CTRL+C
 handleSIGINT()
@@ -64,6 +64,7 @@ def main():
 	tornado.ioloop.IOLoop.instance().start()
 
 t = threading.Thread(target=main)
+logging.info("Starting dashboard server on port %s" % options.port)
 t.start()
 
 while True:

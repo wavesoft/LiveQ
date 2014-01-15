@@ -25,8 +25,8 @@ import tornado.websocket
 import os.path
 import uuid
 
-from webserver.dashboardsocket import DashboardSocket
-from webserver.config import Config
+from dashboard.dashboardsocket import DashboardSocket
+from dashboard.config import Config
 
 """
 Tornado Application class of the LiveQ Server
@@ -36,8 +36,8 @@ class DashboardServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			(r"/dashboard/?", MainHandler),
-			(r"/dashboard/socket/(.*)", DashboardSocket),
+			(r"%s/?" % Config.BASE_URL, MainHandler),
+			(r"%s/socket" % Config.BASE_URL, DashboardSocket),
 		]
 
 		# Get root dir of files

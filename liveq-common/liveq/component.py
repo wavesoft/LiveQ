@@ -23,7 +23,7 @@ import Queue
 import logging
 
 from liveq.events import GlobalEvents
-
+from liveq import exit
 
 class Component:
 	"""
@@ -81,7 +81,12 @@ class Component:
 				cls.INSTANCE = cls()
 
 			# Run
-			cls.INSTANCE.run()
+			try:
+				cls.INSTANCE.run()
+			except Exception as e:
+				logging.error("Main thread exited with exception %s: %s" % ( e.__class__.__name__, str(e) ))
+				exit(128)
+
 
 		# Start and wait for thread to exit
 		# (join also blocks signals)
