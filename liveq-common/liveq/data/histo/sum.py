@@ -21,7 +21,7 @@ import logging
 import numpy
 
 from liveq.data.histo import Histogram
-from liveq.data.histo.intermediate import IntermediateHistogram
+from liveq.data.histo.intermediate import IntermediateHistogram, IntermediateHistogramCollection
 from liveq.data.histo.exceptions import IncompatibleMergeException
 
 def isHistogramCompatible(histoA, histoB):
@@ -57,14 +57,14 @@ def intermediateMerge(histograms):
 
 	# Prepare final histogram metadata
 	vMeta = dict(histograms[0].meta)
-	vMeta['seed'] = str(vMeta['seed'])
+	#vMeta['seed'] = str(vMeta['seed'])
 
 	# Prepare values for first pass
 	i = 0
 	nevts = 0
-	nevts_vec = numpy.zeros(numBins)
-	ffill_vec = numpy.zeros(numBins)
-	xs_vec = numpy.zeros(numBins)
+	nevts_vec = numpy.zeros(len(histograms))
+	ffill_vec = numpy.zeros(len(histograms))
+	xs_vec = numpy.zeros(len(histograms))
 
 	# Collect METADATA for weights and summed histo METADATA
 	for histo in histograms:
@@ -77,7 +77,7 @@ def intermediateMerge(histograms):
 				raise IncompatibleMergeException("One or more histograms provided are not compatible between them")
 
 			# Take this oportunity to update the seed meta field
-			vMeta['seed'] += " %s" % histo.meta['seed']
+			#vMeta['seed'] += " %s" % histo.meta['seed']
 
 		# Sum total number of events
 		nevts += histo.nevts
@@ -127,3 +127,30 @@ def intermediateMerge(histograms):
 
 	# Return meta histogram
 	return dst
+
+def intermediateCollectionMerge(collections):
+	"""
+	Merge the given list of IntermediateHistogramCollection and return the 
+	resulting IntermediateHistogramCollection that can be further merged again.
+	"""
+
+	# Create a response collection
+	ans = IntermediateHistogramCollection()
+
+	# Start merging using first collection in the list as reference
+	for k,v in collections[0].iteritems():
+
+		# Collect the histogram from other collections
+		histos = [v]
+		for c in collections[1:]:
+			if not k in c:
+				raise ValueError("Could not find histogram %s in specified collection for merging" % k)
+			else:
+				histos.append(c[k])
+
+		# Append answer
+		ans.append( intermediateMerge(histos) )
+
+	# Return answer
+	return ans
+

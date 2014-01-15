@@ -17,11 +17,165 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import json
 import logging
+import struct
 import numpy
+import glob
+
+import bz2
+import pylzma
+import liveq.utils.ascii85 as ascii85
 
 from liveq.utils.FLAT import FLATParser
 from liveq.data.histo import Histogram
+
+class IntermediateHistogramCollection(dict):
+	"""
+	A class that provides a unified interface access to the generated histograms
+	"""
+
+	# Overridable default compression function for packing
+	F_COMPRESS = pylzma.compress
+	F_DECOMPRESS = pylzma.decompress
+
+	def append(self, ihisto):
+		"""
+		Append an object in the collection and map them with their name
+		"""
+
+		# Store histogram by it's name
+		self[ihisto.name] = ihisto
+
+	@staticmethod
+	def fromDirectory(baseDir):
+		"""
+		Create an IntermediateHistogramCollection from the contents of the specified directory.
+		"""
+
+		# Find FLAT files
+		flatFiles = glob.glob("%s/*.dat" % baseDir)
+
+		# Prepare collection
+		ans = IntermediateHistogramCollection()
+		for ffile in flatFiles:
+
+			# Try to loag the given histogram
+			histo = IntermediateHistogram.fromFLAT( ffile )
+
+			# Report errors
+			if histo == None:
+				logging.error("Unable to load intermediate histogram from %s" % ffile)
+			else:
+				ans[histo.name] = histo
+
+		# Return collection
+		return ans
+
+	@staticmethod
+	def fromPack(data):
+		"""
+		The reverse function of pack() that reads the packed data 
+		and re-creates the IntermediateHistogramCollection object
+		"""
+		
+		# Decode and decompress
+		buf = IntermediateHistogramCollection.F_DECOMPRESS( ascii85.b85decode( data ) )
+
+		# Get version and histogram count
+		(ver, numHistos) = struct.unpack("!BI", buf[:5])
+
+		# Validate protocol version
+		if ver != 1:
+			raise ValueError("The protocol version %i is not supported for unpacking IntermediateHistogramCollection" % version)
+
+		# Start parsing histograms
+		p = 5
+		ans = IntermediateHistogramCollection()
+		for i in range(numHistos):
+
+			# Read histogram header
+			(hBins, hNevts, hXS, hNameLen) = struct.unpack("!ILdB", buf[p:p+17])
+			p += 17
+
+			# Read histogram name
+			hName = buf[p:p+hNameLen]
+			p += hNameLen
+
+			# Read the numpy buffers
+			npBufferLen = 8 * 8 * hBins
+			npBuffer = numpy.frombuffer( buf[p:p+npBufferLen], dtype=numpy.float64 )
+			p += npBufferLen
+
+			# Create histogram
+			ans[hName] = IntermediateHistogram(
+					name=hName,
+					bins=hBins,
+					meta={
+						'nevts': hNevts,
+						'crosssection': hXS
+					},
+					xlow=npBuffer[:hBins],
+					xfocus=npBuffer[hBins:hBins*2],
+					xhigh=npBuffer[hBins*2:hBins*3],
+					Entries=npBuffer[hBins*3:hBins*4],
+					SumW=npBuffer[hBins*4:hBins*5],
+					SumW2=npBuffer[hBins*5:hBins*6],
+					SumXW=npBuffer[hBins*6:hBins*7],
+					SumX2W=npBuffer[hBins*7:],
+				)
+
+		# Return answer
+		return ans
+
+	def pack(self):
+		"""
+		Generate a packed version of the data that can be streamed
+		over network.
+
+		Buffer format:
+
+		/ Header
+		+--------+-------------------------------------------+
+		|  uchar | Protocol version (current: 1)             |
+		|  uint  | Number of histograms in the file          |
+		+--------+-------------------------------------------+
+		/ Histogram
+		+--------+-------------------------------------------+
+		|  uint  | Number of bins in histogram               |
+		|  ulong | The number of events in the histogram     |
+		| double | The crosssection of the histogram         |
+		|  uchar | Length of histogram name                  |
+		|  char* | The histogram name                        |
+		|   ..   | 8x bin-sized float64 numpy buffers        |
+		+--------+-------------------------------------------+
+		"""
+		
+		# Prepare buffer
+		buf = struct.pack("!BI", 1, len(self))
+
+		# Start packing data
+		for histo in self.values():
+
+			# Put histogram header
+			buf += struct.pack("!ILdB", 
+					histo.bins,
+					histo.nevts,
+					histo.crosssection,
+					len(histo.name)
+				)
+			buf += histo.name
+
+			# Put histogram data
+			npbuf = numpy.concatenate([
+					histo.xlow, histo.xfocus, histo.xhigh,
+					histo.Entries, histo.SumW, histo.SumW2,
+					histo.SumXW, histo.SumX2W
+				])
+			buf += str( numpy.getbuffer( npbuf ) )
+
+		# Compress & encode
+		return ascii85.b85encode( IntermediateHistogramCollection.F_COMPRESS( buf ) )
 
 class IntermediateHistogram:
 	"""
@@ -81,6 +235,22 @@ class IntermediateHistogram:
 		self.SumYW = numpy.zeros(self.bins)
 		self.SumY2W = numpy.zeros(self.bins)
 		self.SumY2W2 = numpy.zeros(self.bins)
+
+	def equals(self, h):
+		"""
+		Return true if we are equal to h
+		"""
+		# Compare all fields
+		return (
+			numpy.all(self.xlow == h.xlow) and 
+			numpy.all(self.xfocus == h.xfocus) and
+			numpy.all(self.xhigh == h.xhigh) and
+			numpy.all(self.Entries == h.Entries) and
+			numpy.all(self.SumW == h.SumW) and
+			numpy.all(self.SumW2 == h.SumW2) and
+			numpy.all(self.SumXW == h.SumXW) and
+			numpy.all(self.SumX2W == h.SumX2W)
+		)
 
 	def width(self):
 		"""
