@@ -34,7 +34,7 @@ class JobMonitor(StoredFSM):
 
 		Therefore we are sending data using the forward() function of the JobManagerComponent that 
 		can be accessed via the global singleton ``JobManagerComponent.INSTANCE``, and we are receiving
-		data from the users via events.
+		data from the agents via events.
 
 	"""
 
@@ -42,7 +42,8 @@ class JobMonitor(StoredFSM):
 		"""
 		(Overrided) Establish connections to resources that are not available otherwise
 		"""
-		pass
+		
+		JobManagerComponent.INSTANCE.
 
 	@state_handler("init")
 	def stateInit(self):

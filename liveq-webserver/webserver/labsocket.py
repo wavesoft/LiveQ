@@ -122,11 +122,18 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 'jid': self.jobid
             })
 
+            # Clear job ID
+            self.jobid = None
+
         # Unregister from the bus
         if self.dataChannel:
+
+            # Disconnect and release data channel
             self.dataChannel.off('job_data', self.onBusData)
             self.dataChannel.off('job_completed', self.onBusCompleted)
             self.dataChannel.close()
+
+            # Disconnect and release job channel
             self.jobChannel.close()
             self.jobChannel = None
             self.dataChannel = None
@@ -261,7 +268,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             if ans['result'] == 'error':
                 return self.send_error("Unable to cancel job: %s" % ans['error'])
 
-            # Clear tune ID
+            # Clear job ID
             self.jobid = None
 
         elif action == "configuration":

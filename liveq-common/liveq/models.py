@@ -72,7 +72,6 @@ class AgentGroup(BaseModel):
 	#: Add an additional UUID lookup index
 	uuid = CharField(max_length=128, index=True, unique=True)
 
-
 class Agent(BaseModel):
 	"""
 	Agent instance class
@@ -94,6 +93,8 @@ class Agent(BaseModel):
 
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
+	#: The job currently running on the agent
+	activeJob = CharField(default="")
 
 
 class AgentMetrics(BaseModel):

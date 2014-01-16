@@ -195,6 +195,7 @@ class JobAgentManager:
 		This is called periodically to disable agents that were 
 		idle for too long
 		"""
+		pass
 
 	def updatePresence(self, uid, state=1):
 		"""
