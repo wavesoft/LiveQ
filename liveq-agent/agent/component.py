@@ -185,23 +185,23 @@ class AgentComponent(Component, SimpleFSM):
 					jobapp.start()
 
 				except JobConfigException as e:
-					del self.slots[k]
+					self.slots[k] = None
 					del self.jobIndex[jid]
 					return self._replyError("Configuration error: %s" % str(e))
 
 				except JobInternalException as e:
-					del self.slots[k]
+					self.slots[k] = None
 					del self.jobIndex[jid]
 					return self._replyError("Internal error: %s" % str(e))
 
 				except JobRuntimeException as e:
-					del self.slots[k]
+					self.slots[k] = None
 					del self.jobIndex[jid]
 					return self._replyError("Runtime error: %s" % str(e))
 
 				except Exception as e:
 					self.logger.error("Unexpected exception %s: %s", (e.__class__.__name__, str(e)))
-					del self.slots[k]
+					self.slots[k] = None
 					del self.jobIndex[jid]
 					return self._replyError("Unexpected error: %s" % str(e))
 
