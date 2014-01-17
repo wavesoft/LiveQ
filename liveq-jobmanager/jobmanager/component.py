@@ -355,8 +355,12 @@ class JobManagerComponent(Component):
 		Callback when we have a request for new job from the bus
 		"""
 
-		if not all(x in message for x in ( 'jid' )):
+		if not 'jid' in message:
 			self.logger.warn("Missing parameters on 'job_cancel' message on IBUS!")
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'Missing parameters on \'job_cancel\' message!'
+				})
 			return
 
 		# Fetch JID from request

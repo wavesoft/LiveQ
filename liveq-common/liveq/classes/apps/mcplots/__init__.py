@@ -275,8 +275,9 @@ class MCPlots(JobApplication):
 		state = "unknown"
 		try:
 			with file( "%s/status.flag" % self.jobdir ) as f:
-				state = f.read()
-		except e:
+				lines = f.read().splitlines()
+				stat = lines[0]
+		except:
 			pass
 
 		return state
