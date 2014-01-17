@@ -349,8 +349,15 @@ class MCPlots(JobApplication):
 						# Job is completed, do cleanup
 						self.cleanup()
 
+						# Fetch final results from the job
+						results = self.collectFinalHistograms()
+
+						# Let listeners know we have intermediate data available
+						if results:
+							self.trigger("job_data", True, results)
+
 						# Dispatch the event to the listeners
-						self.trigger("job_completed", self.collectFinalHistograms() )
+						self.trigger("job_completed")
 
 					else:
 

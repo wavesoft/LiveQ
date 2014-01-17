@@ -239,6 +239,19 @@ def handleLoss( agent ):
 	agent.save()
 
 
+def markForJob(agents, job_id):
+	"""
+	Mark the array of agents in the list as being under the given job_id control
+	"""
+
+	# Just loop, update and save
+	for agent in agents:
+		agent.activeJob = job_id
+		agent.save()
+
+	# Return again the agents array
+	return agents
+
 def process():
 	"""
 	Check if we have to process pending items in the scheduler.
@@ -290,7 +303,7 @@ def process():
 
 		# Release lock and return resultset
 		res.release()
-		return (job, [], slots)
+		return (job, [], markForJob(slots, job.id))
 
 	# Nope, check if we can also dispose some
 	d_slots = res.getDisposable( totalSlots - usedSlots )
@@ -310,7 +323,7 @@ def process():
 
 	# Release and return resultset
 	res.release()
-	return (job, d_slots, slots)
+	return (job, d_slots, markForJob(slots, job.id))
 
 
 ##############################################################
