@@ -20,7 +20,10 @@
 import jobmanager.io.agents as agents
 import jobmanager.io.jobs as jobs
 
+from jobmanager.config import Config
+
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
+from liveq.utils.remotelock import RemoteLock
 from liveq.models import Agent, AgentGroup
 
 class GroupResources:
@@ -59,8 +62,8 @@ class GroupResources:
 		self.used = self.total - self.free
 		self.individual = values.individual
 
-		# Calculate the active fair-share
-		self.fairShare = int(round( self.total / self.individual ))
+		# Calculate the fair-share for the next request
+		self.fairShare = max( int(round( float(self.total) / (self.individual + 1) )), 1 )
 
 	def release(self):
 		"""
@@ -68,6 +71,17 @@ class GroupResources:
 		"""
 		if self.semaphore != None:
 			self.semaphore.release()
+
+	def fitsAnother():
+		"""
+		Return TRUE if it's possible to squeeze another job
+		"""
+
+		# Return false only when the system is saturated
+		if self.individual >= self.total:
+			return False
+		else:
+			return True
 
 	def getFree(self, count):
 		"""
@@ -99,11 +113,8 @@ class GroupResources:
 			  % (1)
 			)
 
-		# Calculate the fair-share for an extra job
-		fairShare = max( int(round( float(self.total) / (self.individual + 1) )), 1 )
-
 		# Calculate the trimdown to the existing services
-		trimdown = max( int(round( float(fairShare) / self.individual )), 1 )
+		trimdown = max( int(round( float(self.fairShare) / self.individual )), 1 )
 
 		# Start trimming until we reach quota
 		ans = []
@@ -152,7 +163,7 @@ def measureResources(group, lock=False):
 	semaphore = None
 	if lock:
 		# Lock on group scope, allowing other groups to function in parallel
-		semaphore = RemoteLock(Config.STORE, "scheduler:lock-grp%s" % group)
+		semaphore = RemoteLock(Config.STORE, "scheduler:reslck-grp%s" % group)
 		semaphore.acquire(True)
 
 	# Then create and return a GroupUsage instance
@@ -160,14 +171,22 @@ def measureResources(group, lock=False):
 
 def popQueuedJob():
 	"""
-	Pop a job from the queue
+	Remove the last entry form queue (after a successful peek)
+	"""
+
+	# Remove the last entry
+	Config.STORE.rpop( "scheduler:queue" )
+
+def peekQueueJob():
+	"""
+	Peek the next item without removing it
 	"""
 
 	# Loop until successful
 	while True:
 
 		# First, pop a job from store
-		job_id = Config.STORE.rpop( "scheduler:queue" )
+		job_id = Config.STORE.lrange( "scheduler:queue", -1, -1 )
 
 		# If no jobs are left, exit
 		if not job_id:
@@ -178,10 +197,95 @@ def popQueuedJob():
 
 		# If the job was not resolved, try next
 		if not job:
+			# Remove the faulty entry
+			Config.STORE.rpop( "scheduler:queue" )
 			continue
 
 		# Otherwise we do have an instance in place
 		return job
+
+def handleLoss( agent ):
+	"""
+	Handle the fact that we lost the given agent unexpecidly
+	"""
+
+	# Check if that was the last agent handling this job
+	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == agent.activeJob) ).execute().next()
+
+	# Check if we were left with nothing
+	if values.count == 0:
+
+		# Re-place job on queue with highest priority
+		Config.STORE.rpush( "scheduler:queue", agent.activeJob )
+
+	# Remove the job binding
+	agent.activeJob = ""
+	agent.save()
+
+
+def process():
+	"""
+	Check if we have to process pending items in the scheduler.
+
+	This function will do the appropriate reservations, but it will not invoke anything
+	to the agents. It will simply return an tuple with the information required by the
+	jobmanager to launch the job.
+
+	In detail, the tuple has the following format:
+
+		( <job instance>, <agent instances to cancel>, <agent instances to launch> )
+
+	The job manager should first cancel the jobs and then launch on the free instances.
+	If there was nothing to process, the function will return a tuple of tree Nones
+	"""
+
+	# Peek item on the right side
+	job = peekQueueJob()
+
+	# Check if there is nothing to process
+	if job == None:
+		return (None,None,None)
+
+	# Fetch resource info for the group the job will be started into
+	res = measureResources( job.group, lock=True )
+
+	# Check if there is absolutely no free space
+	if not res.fitsAnother():
+		res.release()
+		return (None,None,None)
+
+	# Prepare some metrics
+	totalSlots = res.fairShare
+	usedSlots = 0
+
+	# Try to occupy free slots
+	slots = res.getFree( totalSlots )
+	usedSlots += len( slots )
+
+	# Check if we satisfied the job requirements
+	if usedSlots >= totalSlots:
+
+		# Successful handling of the job. Pop it
+		popQueuedJob()
+
+		# Release lock and return resultset
+		res.release()
+		return (job, [], slots)
+
+	# Nope, check if we can also dispose some
+	d_slots = res.getDisposable( totalSlots - usedSlots )
+	if not d_slots:
+		# Could not find any free slot
+		res.release()
+		return (None,None,None)
+
+	# Store it to slots
+	slots += d_slots
+
+	# Release and return resultset
+	res.release()
+	return (job, d_slots, slots)
+
 
 ##############################################################
 # ------------------------------------------------------------
@@ -200,6 +304,9 @@ def markOffline( agent_id ):
 	# Mark it as offline
 	agent.state = 0
 	agent.save()
+
+	# Handle the loss
+	handleLoss( agent )
 
 def markOnline( agent_id ):
 	"""
@@ -223,7 +330,7 @@ def releaseFromJob( agent_id, job ):
 	agent = agents.getAgent(agent_id)
 
 	# Remove the job binding
-	agent.job = None
+	agent.activeJob = ""
 	agent.save()
 
 def requestJob( job ):

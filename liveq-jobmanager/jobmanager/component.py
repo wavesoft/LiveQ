@@ -123,10 +123,42 @@ class JobManagerComponent(Component):
 		"""
 
 		# Handle the next step in the scheduler
-		scheduler.step()
+		(job, a_cancel, a_start) = scheduler.process()
+		if job:
+
+			# First, cancel the job on the given a_cancel agents
+			for agent in a_cancel:
+
+				# Get channel and send cancellations (synchronous)
+				agentChannel = self.getAgentChannel( agent.uuid )
+				ans = agentChannel.send('job_cancel', {
+						'jid': job.id
+					}, waitReply=True)
+
+				# Log results
+				if ans['result'] == "ok":
+					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
+				else:
+					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
+
+			# Then, start the job on a_start
+			for agent in a_start:
+
+				# Get channel and send start (synchronous)
+				agentChannel = self.getAgentChannel( agent.uuid )
+				ans = agentChannel.send('job_start', {
+						'jid': job.id,
+						'config': job.parameters
+					}, waitReply=True)
+
+				# Log results
+				if ans['result'] == "ok":
+					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
+				else:
+					self.logger.warn("Cannot start job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
 		# Delay a bit
-		time.sleep(1)
+		time.sleep(5)
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
