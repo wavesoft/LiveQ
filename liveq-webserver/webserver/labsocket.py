@@ -23,6 +23,7 @@ import uuid
 import logging
 
 from liveq.models import Lab
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from webserver.config import Config
 
 import tornado.websocket
@@ -86,10 +87,16 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     def onBusData(self, data):
         logging.debug("Got DATA!")
 
+        # Create a histogram collection from the data buffer
+        histos = IntermediateHistogramCollection.fromPack( data['data'] )
+
+        # Keep only the subset we are interested in
+        histos = histos.subset( self.lab.getHistograms() )
+
         # Forward event to the user socket
         self.write_message({
                 "action": "data",
-                "data": data['data'],
+                "data": histos.pack(),
                 "info": { }
             })
 

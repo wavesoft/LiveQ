@@ -212,6 +212,24 @@ class IntermediateHistogramCollection(dict):
 		# Compress & encode
 		return base64.b64encode( IntermediateHistogramCollection.F_COMPRESS( buf ) )
 
+	def subset(self, names):
+		"""
+		Create a subset of the given histogram collection, keeping only the histograms that
+		match the names in the array provided
+		"""
+
+		# Create new, empty collection
+		ans = IntermediateHistogramCollection(state=self.state)
+
+		# Start copying the histograms we want
+		for n in names:
+			if n in self:
+				ans[n] = self[n]
+
+		# Return answer
+		return ans
+
+
 class IntermediateHistogram:
 	"""
 	A histogram class that contains additional statistical information used for merging

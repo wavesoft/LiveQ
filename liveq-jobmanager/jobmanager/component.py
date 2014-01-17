@@ -393,6 +393,9 @@ class JobManagerComponent(Component):
 				else:
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
+		# And then cleanup job
+		job.release()
+
 		# Reply status
 		self.jobChannel.reply({
 				'result': 'ok'
