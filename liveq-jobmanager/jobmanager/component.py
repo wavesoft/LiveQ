@@ -205,7 +205,7 @@ class JobManagerComponent(Component):
 		self.manager.updateHandshake( channel.name, message )
 
 		# If the agent has free slots, reset it's job status
-		if message['free_slots'] > 1:
+		if message['free_slots'] > 0:
 			agent = getAgent(channel.name)
 			if agent:
 				agent.activeJob = ""
