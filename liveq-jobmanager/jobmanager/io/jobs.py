@@ -125,7 +125,7 @@ class Job:
 		# Merge and return histograms
 		return intermediateCollectionMerge( histos.values() )
 
-	def getHistograms(Self):
+	def getHistograms(self):
 		"""
 		Get and merge all the histograms in the stack
 		"""
