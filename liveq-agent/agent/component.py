@@ -253,6 +253,8 @@ class AgentComponent(Component, SimpleFSM):
 		Callback from the application when the data are available
 		"""
 
+		self.logger.info("Sending job data for job %s" % app.jobid)
+
 		# Forward message to the server channel
 		self.serverChannel.send('job_data', {
 				'jid': app.jobid,

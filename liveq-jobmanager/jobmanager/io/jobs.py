@@ -23,6 +23,7 @@ import cPickle as pickle
 
 from jobmanager.config import Config
 
+from liveq.utils import deepupdate
 from liveq.models import Agent, Lab
 from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
@@ -60,7 +61,7 @@ class Job:
 
 		# Synchronize metadata with the store
 		if not buf:
-			Config.STORE.set("job-%s:meta", pickle.dumps(self.store_meta))
+			Config.STORE.set("job-%s:meta" % self.id, pickle.dumps(self.store_meta))
 		else:
 			self.store_meta = pickle.loads(buf)
 
@@ -70,9 +71,9 @@ class Job:
 		self.parameters = parameters
 		self.lab = lab
 		if not group:
-			group = self.store_meta['group']
+			self.group = self.store_meta['group']
 		if not parameters:
-			parameters = self.store_meta['parameters']
+			self.parameters = self.store_meta['parameters']
 		if not lab:
 			lab_id = self.store_meta['lab_id']
 
@@ -84,11 +85,20 @@ class Job:
 
 		# Try to open channel
 		if not dataChannel:
-			dataChannel = store_meta['dataChannel']
+			dataChannel = self.store_meta['dataChannel']
 		if dataChannel:
 			self.channel = Config.IBUS.openChannel(dataChannel)
 		else:
 			self.channel = None
+
+	def __del__(self):
+		"""
+		Disconnect from channel when closing
+		"""
+		
+		# Disconnect channel when we are destructed
+		if self.channel:
+			self.channel.close()
 
 	def updateHistograms(self, agent_id, data):
 		"""
@@ -180,7 +190,7 @@ def createJob( lab, parameters, group, dataChannel ):
 	try:
 		labInst = Lab.get( Lab.uuid == lab)
 	except Lab.DoesNotExist:
-		self.logger.warn("Could not find lab #%s" % lab)
+		logging.warn("Could not find lab #%s" % lab)
 		return
 
 	# Process user's parameters (tunes)

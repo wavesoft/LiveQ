@@ -233,7 +233,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
                 'lab': self.lab.uuid,
-                'group': 'c678c82dd5c74f00b95be0fb6174c01b',
+                'group': 'global',
                 'dataChannel': self.dataChannel.name,
                 'parameters': parsed['parameters']
             }, waitReply=True, timeout=5)

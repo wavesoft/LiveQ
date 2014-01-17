@@ -17,14 +17,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import sys
+
+import logging
 import jobmanager.io.agents as agents
 import jobmanager.io.jobs as jobs
 
 from jobmanager.config import Config
+from peewee import fn
 
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
 from liveq.utils.remotelock import RemoteLock
 from liveq.models import Agent, AgentGroup
+
+logger = logging.getLogger("scheduler")
 
 class GroupResources:
 	"""
@@ -40,10 +46,10 @@ class GroupResources:
 
 		# Keep references
 		self.semaphore = semaphore
-		self.group = group
 
-		# Get the group id
-		gid = self.gid = group.id
+		# Get group reference
+		self.group = AgentGroup.get(uuid=group)
+		self.gid = self.group.id
 
 		# A bit more advanced query for fetching metrics
 		values = Agent.raw(
@@ -51,9 +57,9 @@ class GroupResources:
 			  TOT.total, FREE.free, IND.individual \
 			FROM \
 			  ( SELECT COUNT(id) AS total FROM `agent` WHERE `state` = 1 AND `group_id` = %i ) AS TOT,\
-			  ( SELECT COUNT(id) AS free FROM `agent` WHERE `activeJob` = '' AND `state` = 1 AND `group_id` = %i) AS FREE,\
-			  ( SELECT COUNT(DISTINCT activeJob) AS individual FROM `agent` WHERE `state` = 1 AND `group_id` = %i) AS IND" 
-			  % (gid,gid,gid)
+			  ( SELECT COUNT(id) AS free FROM `agent` WHERE `activeJob` = '' AND `state` = 1 AND `group_id` = %i ) AS FREE,\
+			  ( SELECT COUNT(DISTINCT activeJob) AS individual FROM `agent` WHERE `state` = 1 AND `group_id` = %i ) AS IND" 
+			  % (self.gid,self.gid,self.gid)
 			).execute().next()
 
 		# Store metrics
@@ -61,6 +67,8 @@ class GroupResources:
 		self.free = values.free
 		self.used = self.total - self.free
 		self.individual = values.individual
+
+		logger.info("Metrics %s { total=%i, free=%i, used=%i, individual=%i }" % (group, self.total, self.free, self.used, self.individual))
 
 		# Calculate the fair-share for the next request
 		self.fairShare = max( int(round( float(self.total) / (self.individual + 1) )), 1 )
@@ -72,10 +80,14 @@ class GroupResources:
 		if self.semaphore != None:
 			self.semaphore.release()
 
-	def fitsAnother():
+	def fitsAnother(self):
 		"""
 		Return TRUE if it's possible to squeeze another job
 		"""
+
+		# If we have free, it can fit
+		if self.free > 0:
+			return True
 
 		# Return false only when the system is saturated
 		if self.individual >= self.total:
@@ -110,7 +122,7 @@ class GroupResources:
 			  (SELECT COUNT(id) AS njobs, activeJob AS job FROM `agent` WHERE `group_id` = %i GROUP BY job) T \
 			 WHERE \
 			  T.njobs > 1"
-			  % (1)
+			  % self.gid
 			)
 
 		# Calculate the trimdown to the existing services
@@ -192,12 +204,16 @@ def peekQueueJob():
 		if not job_id:
 			return None
 
+		# Fetch item from list
+		job_id = job_id[0]
+
 		# Try to fetch the job entry
 		job = jobs.getJob( job_id )
 
 		# If the job was not resolved, try next
 		if not job:
 			# Remove the faulty entry
+			logger.warn("Could not load job %s. Removing from group" % job_id)
 			Config.STORE.rpop( "scheduler:queue" )
 			continue
 
@@ -241,12 +257,14 @@ def process():
 
 	# Peek item on the right side
 	job = peekQueueJob()
+	logger.info("Peeked job %r from queue" % job)
 
 	# Check if there is nothing to process
 	if job == None:
 		return (None,None,None)
 
 	# Fetch resource info for the group the job will be started into
+	logger.info("Measuring resoures for group %s" % job.group)
 	res = measureResources( job.group, lock=True )
 
 	# Check if there is absolutely no free space
@@ -262,10 +280,13 @@ def process():
 	slots = res.getFree( totalSlots )
 	usedSlots += len( slots )
 
+	logger.info("Found %i free slots on group %s" % ( usedSlots, job.group ))
+
 	# Check if we satisfied the job requirements
 	if usedSlots >= totalSlots:
 
 		# Successful handling of the job. Pop it
+		logger.info("Job %s processed. Removing from group" % job.id)
 		popQueuedJob()
 
 		# Release lock and return resultset
@@ -282,6 +303,12 @@ def process():
 	# Store it to slots
 	slots += d_slots
 
+	logger.info("Found %i extra slots on by dispose %s" % ( usedSlots, job.group ))
+
+	# Successful handling of the job. Pop it
+	logger.info("Job %s processed. Removing from group" % job.id)
+	popQueuedJob()
+
 	# Release and return resultset
 	res.release()
 	return (job, d_slots, slots)
@@ -297,6 +324,7 @@ def markOffline( agent_id ):
 	"""
 	Mark the specified agent as Offline
 	"""
+	logger.info("Agent %s is marked offline" % agent_id)
 
 	# Get the agent record that matches the given ID
 	agent = agents.getAgent(agent_id)
@@ -312,6 +340,7 @@ def markOnline( agent_id ):
 	"""
 	Mark the specified agent as Offline
 	"""
+	logger.info("Agent %s is marked online" % agent_id)
 
 	# Get the agent record that matches the given ID
 	agent = agents.getAgent(agent_id)
@@ -325,6 +354,7 @@ def releaseFromJob( agent_id, job ):
 	Release the specified agent from the given job. The job parameter
 	is an instance of the job descriptor.
 	"""
+	logger.info("Agent %s release from job %s" % (agent_id, job.id))
 
 	# Get the agent record that matches the given ID
 	agent = agents.getAgent(agent_id)
@@ -340,7 +370,9 @@ def requestJob( job ):
 	"""
 	
 	# Place job on queue
+	logger.info("Placing job %s on queue" % job.id)
 	Config.STORE.lpush( "scheduler:queue", job.id )
+	return True
 
 def releaseJob( job ):
 	"""
@@ -349,6 +381,7 @@ def releaseJob( job ):
 	"""
 	
 	# Clear the record on the agents that have active jobs
+	logger.info("Releasing job %s" % job.id)
 	numUpdated = Agent.update( activeJob="" ).where( Agent.activeJob == job.id ).execute()
 
 def abortJob( job ):
@@ -360,6 +393,7 @@ def abortJob( job ):
 	res = measureResources( job.group )
 
 	# Fetch agent instances that are working on the given job
+	logger.info("Aborting job %s" % job.id)
 	q = Agent.select().where( (Agent.activeJob == job.id ) & (Agent.state == 1) )
 	agents = q[:]
 

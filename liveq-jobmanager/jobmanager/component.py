@@ -31,7 +31,6 @@ from jobmanager.internal.agentmanager import JobAgentManager
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 from liveq.classes.bus.xmppmsg import XMPPBus
-from liveq.utils import deepupdate
 
 from liveq.models import Agent, AgentGroup, AgentMetrics
 
@@ -49,7 +48,7 @@ class JobManagerComponent(Component):
 		Component.__init__(self)
 
 		# Setup logger
-		self.logger = logging.getLogger("agent")
+		self.logger = logging.getLogger("job-manager")
 		self.logger.info("JobManager component started")
 
 		# TODO: Uhnack this
@@ -313,9 +312,15 @@ class JobManagerComponent(Component):
 		"""
 		Callback when we have a request for new job from the bus
 		"""
-		
+
+		self.logger.info("Got job request in IBUS")
+
 		if not all(x in message for x in ('lab', 'parameters', 'group', 'dataChannel')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'Missing parameters on \'job_start\' message on IBUS'
+				})
 			return
 
 		# Fetch the lab ID and the user parameters
@@ -329,26 +334,20 @@ class JobManagerComponent(Component):
 		if not job:
 			# Reply failure
 			self.jobChannel.reply({
-					'jid': jid,
 					'result': 'error',
 					'error': 'Unable to process the job request'
 				})
 			return
 
 		# Place our job inquiry in scheduler and check for response
-		if scheduler.requestJob( job ):
-			# Reply success
-			self.jobChannel.reply({
-					'jid': jid,
-					'result': 'scheduled'
-				})
-		else:
-			# Reply failure
-			self.jobChannel.reply({
-					'jid': jid,
-					'result': 'error',
-					'error': 'Unable to schedule the job request'
-				})
+		self.logger.info("Requesting job #%s on scheduler" % job.id)
+		scheduler.requestJob( job )
+
+		# Reply success
+		self.jobChannel.reply({
+				'jid': job.id,
+				'result': 'scheduled'
+			})
 
 
 	def onBusJobCancel(self, message):
@@ -362,6 +361,7 @@ class JobManagerComponent(Component):
 
 		# Fetch JID from request
 		jid = message['jid']
+		self.logger.info("Requesting abort of job #%s" % jid)
 
 		# Fetch job class
 		job = jobs.getJob(jid)
@@ -374,7 +374,7 @@ class JobManagerComponent(Component):
 			return
 
 		# Abort job on scheduler and return the agents that were used
-		a_cancel = scheduler.abortJob( job ):
+		a_cancel = scheduler.abortJob( job )
 		if a_cancel:
 			for agent in a_cancel:
 
