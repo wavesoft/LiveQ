@@ -25,6 +25,7 @@ from jobmanager.config import Config
 
 from liveq.models import Agent, Lab
 from liveq.data.histo.sum import intermediateCollectionMerge
+from liveq.utils.remotelock import RemoteLock
 
 class Job:
 	"""
@@ -161,6 +162,12 @@ class Job:
 
 		# Close channel
 		self.channel.close()
+
+##############################################################
+# ------------------------------------------------------------
+#  INTERFACE FUNCTIONS
+# ------------------------------------------------------------
+##############################################################
 
 def createJob( lab, parameters, group, dataChannel ):
 	"""

@@ -19,7 +19,6 @@
 
 import time
 import logging
-import time
 
 from jobmanager.config import Config
 

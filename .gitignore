@@ -31,6 +31,9 @@ nosetests.xml
 liveq-jobmanager/db.sqlite3
 liveq-common/ref-data
 
+# Test files
+*test.py
+
 *.sqlite3
 
 .DS_Store

@@ -17,8 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
 import time
+import logging
 import datetime
 
 import jobmanager.io.jobs as jobs
@@ -117,13 +117,16 @@ class JobManagerComponent(Component):
 		# Return instance
 		return channel
 
-	def run(self):
+	def step(self):
 		"""
-		Entry point
+		Internal component loop
 		"""
 
-		# Run the component
-		Component.run(self)
+		# Handle the next step in the scheduler
+		scheduler.step()
+
+		# Delay a bit
+		time.sleep(1)
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -268,7 +271,7 @@ class JobManagerComponent(Component):
 				})
 
 			# Cleanup job from scheduler
-			job.releaseJob( job )
+			scheduler.releaseJob( job )
 
 			# And then cleanup job
 			job.release()
@@ -430,6 +433,31 @@ class JobManagerComponent(Component):
 		"""
 		Callback when we have a request for new job from the bus
 		"""
+
+		if not all(x in message for x in ( 'jid' )):
+			self.logger.warn("Missing parameters on 'job_cancel' message on IBUS!")
+			return
+
+		# Fetch JID from request
+		jid = message['jid']
+
+		# Fetch job class
+		job = jobs.getJob(jid)
+		if not job:
+			self.logger.warn("[IBUS] The job %s does not exist" % jid)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "The job %s does not exist" % jid
+				})
+			return
+
+		# Abort job on scheduler
+		scheduler.requestJob( job ):
+
+		# Reply status
+		self.jobChannel.reply({
+				'result': 'ok'
+			})
 
 		#####################################################################
 		# ---- BEGIN HACK ----
