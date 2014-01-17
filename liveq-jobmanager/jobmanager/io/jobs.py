@@ -28,6 +28,8 @@ from liveq.models import Agent, Lab
 from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
 
+JOB_CHANNELS = { }
+
 class Job:
 	"""
 	Store interface with the job management
@@ -67,6 +69,7 @@ class Job:
 
 		# Populate static variables and fetch them
 		# from store if missing
+		self.dataChannel = dataChannel
 		self.group = group
 		self.parameters = parameters
 		self.lab = lab
@@ -87,18 +90,17 @@ class Job:
 		if not dataChannel:
 			dataChannel = self.store_meta['dataChannel']
 		if dataChannel:
-			self.channel = Config.IBUS.openChannel(dataChannel)
+
+			# Open IBUS channel and keep it on JOB_CHANNELS
+			if not dataChannel in JOB_CHANNELS:
+				JOB_CHANNELS[dataChannel] = Config.IBUS.openChannel(dataChannel)
+
+			# Fetch job channel
+			self.channel = JOB_CHANNELS[dataChannel]
+			self.dataChannel = dataChannel
+
 		else:
 			self.channel = None
-
-	def __del__(self):
-		"""
-		Disconnect from channel when closing
-		"""
-		
-		# Disconnect channel when we are destructed
-		if self.channel:
-			self.channel.close()
 
 	def updateHistograms(self, agent_id, data):
 		"""
@@ -122,6 +124,23 @@ class Job:
 
 		# Merge and return histograms
 		return intermediateCollectionMerge( histos.values() )
+
+	def getHistograms(Self):
+		"""
+		Get and merge all the histograms in the stack
+		"""
+
+		# Prepare histograms dict
+		histos = { }
+
+		# Fetch histogram buffer from store
+		buf = Config.STORE.get("job-%s:histo" % self.id)
+		if buf:
+			histos = pickle.loads(buf)
+
+		# Merge and return histograms
+		return intermediateCollectionMerge( histos.values() )
+
 
 	def getMeta(self, name):
 		"""
@@ -172,6 +191,7 @@ class Job:
 
 		# Close channel
 		self.channel.close()
+		del JOB_CHANNELS[self.dataChannel]
 
 ##############################################################
 # ------------------------------------------------------------

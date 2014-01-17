@@ -257,7 +257,6 @@ def process():
 
 	# Peek item on the right side
 	job = peekQueueJob()
-	logger.info("Peeked job %r from queue" % job)
 
 	# Check if there is nothing to process
 	if job == None:

@@ -109,6 +109,11 @@ class MCPlots(JobApplication):
 		if not self.jobdir:
 			raise JobRuntimeException("Unable to create temporary directory")
 
+		# Create a new temporary directory for the job output
+		self.datdir = tempfile.mkdtemp()
+		if not self.datdir:
+			raise JobRuntimeException("Unable to create data directory")
+
 		# Prepare macros for the cmdline
 		rundict = copy.deepcopy(self.jobconfig)
 		rundict["tune"] = self.config.TUNE
@@ -121,6 +126,7 @@ class MCPlots(JobApplication):
 		# Prepare environment
 		envDict = dict(os.environ)
 		envDict['LIVEQ_JOBDIR'] = self.jobdir
+		envDict['LIVEQ_DATDIR'] = self.datdir
 
 		# Launch process in it's own process group
 		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict)
@@ -288,16 +294,21 @@ class MCPlots(JobApplication):
 		"""
 
 		# Collect intermediate data
-		ih = IntermediateHistogramCollection.fromDirectory( "%s/dump" % self.jobdir )
+		ih = IntermediateHistogramCollection.fromDirectory( "%s/dump" % self.jobdir, state=1 )
 
 		# Pack and return the object
 		return ih.pack()
 
-	def collectAndSubmitOutput(self):
+	def collectFinalHistograms(self):
 		"""
-		Helper function to collect and submit the real (not intermediate) output
+		Helper function to collect and return the real (not intermediate) output
 		"""
-		pass
+
+		# Collect intermediate data
+		ih = IntermediateHistogramCollection.fromDirectory( self.datdir, recursive=True, state=2 )
+
+		# Pack and return the object
+		return ih.pack()
 
 	def monitor(self):
 		"""
@@ -339,7 +350,7 @@ class MCPlots(JobApplication):
 						self.cleanup()
 
 						# Dispatch the event to the listeners
-						self.trigger("job_completed")
+						self.trigger("job_completed", self.collectFinalHistograms() )
 
 					else:
 

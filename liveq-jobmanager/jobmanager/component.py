@@ -269,9 +269,8 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
 			return
 
-		# Merge histograms with other histograms of the same job
-		# and return resulting histogram collection
-		sumHistos = job.updateHistograms( channel.name, agentHistos )
+		# Get the merged histograms from the job store
+		sumHistos = job.getHistograms()
 		if sumHistos == None:
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			return
