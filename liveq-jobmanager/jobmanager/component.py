@@ -21,6 +21,7 @@ import logging
 import time
 import datetime
 import uuid
+import cPickle as pickle
 
 from jobmanager.config import Config
 from jobmanager.internal.agentmanager import JobAgentManager
@@ -31,6 +32,9 @@ from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.utils import deepupdate
 
 from liveq.models import Agent, AgentGroup, AgentMetrics
+
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.sum import intermediateCollectionMerge
 
 class JobManagerComponent(Component):
 	"""
@@ -93,9 +97,9 @@ class JobManagerComponent(Component):
 		channel.on('job_data', self.onAgentJobData, channel=channel)
 		channel.on('job_completed', self.onAgentJobCompleted, channel=channel)
 
-	def getChannel(self, agentID):
+	def getAgentChannel(self, agentID):
 		"""
-		Return the channel from registry or open a new one if needed
+		Return the channel from registry or open a new one if needed.
 		"""
 
 		# Check for channel in the registry
@@ -160,13 +164,31 @@ class JobManagerComponent(Component):
 		"""
 		self.logger.info("[%s] Got data" % channel.name)
 
-		#####################################################################
-		# ---- BEGIN HACK ----
-
 		# Extract job ID from message
 		jid = data['jid']
 
-		# Forward the message to the internal bus as-is
+		# Get the job info from store
+		job_data = Config.STORE.get("jobdata-%s" % jid)
+		if not job_data:
+			self.logger.warn("[%s] Could not find job state in store for job %s" % (channel.name, jid))
+			return
+
+		# Get the intermediate histograms from the buffer
+		histos = IntermediateHistogramCollection.fromPack( data['data'] )
+		if not histos:
+			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
+			return
+
+		# Unpickle buffer
+		job_data = pickle.loads( job_data )
+
+		# Store/Update histogram collection for this agent
+		job_data[channel.name] = histos
+
+		# Merge histogram collections
+		histos = intermediateCollectionMerge( job_data.values() )
+
+		# Pack hstogram and send it to the internal bus
 		if jid in self.activeJobs:
 			job = self.activeJobs[jid]
 
@@ -212,12 +234,9 @@ class JobManagerComponent(Component):
 		Callback when we have a request for new job from the bus
 		"""
 		
-		if not all(x in message for x in ('lab', 'parameters', 'group')):
+		if not all(x in message for x in ('lab', 'parameters', 'group', 'dataChannel')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
 			return
-
-		#####################################################################
-		# ---- BEGIN HACK ----
 
 		# Fetch the lab ID and the user parameters
 		lab = message['lab']
@@ -227,6 +246,9 @@ class JobManagerComponent(Component):
 
 		# Create new Job ID
 		jid = uuid.uuid4().hex
+
+		#####################################################################
+		# ---- BEGIN HACK ----
 
 		# Find a free agent
 		agent = self.manager.acquireFreeAgent(group)
@@ -281,7 +303,7 @@ class JobManagerComponent(Component):
 		mergedParameters['histograms'] = labInst.getHistograms()
 		
 		# Open/Retrieve a channel with the specified agent
-		agentChannel = self.getChannel(agent.uuid)
+		agentChannel = self.getAgentChannel(agent.uuid)
 
 		# Kindly ask to start a job
 		ans = agentChannel.send('job_start', {
@@ -344,7 +366,7 @@ class JobManagerComponent(Component):
 			for agent in job['agents']:
 
 				# Cancel job on the agent
-				agentChannel = self.getChannel(agent.uuid)
+				agentChannel = self.getAgentChannel(agent.uuid)
 				ans = agentChannel.send('job_cancel', {
 						'jid': jid
 					})

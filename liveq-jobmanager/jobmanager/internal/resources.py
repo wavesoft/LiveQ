@@ -55,9 +55,10 @@ class GroupUsage:
 		"""
 		pass
 
-	def trimAgents(self, toMax):
+	def trimAgents(self, perGroup, toMax):
 		"""
-		Trim excess slots of every agent until 
+		Trim `perGroup` agents from every group until we have `toMax`
+		agents free.
 		"""
 
 	def release(self):
@@ -103,7 +104,9 @@ class GroupManager:
 		Reserve up to ``max`` agents from the specified ``group``. This function will automatically
 		rescale the agents on the specified group.
 
-		This function returns the UUID of the agents where the job should be started
+		This function returns a tuple of two arrays. The first array contains the uuids
+		of the agents that should be stopped and the second one contains the uuids of the
+		agents that should be used for the new job.
 		"""
 		
 		# Get the usage of the group
@@ -112,7 +115,7 @@ class GroupManager:
 		# Don't do anything if such job already exists
 		if usabe.containsJob( jobid ):
 			self.logger.warn("Job with ID %s already exists in group %s" % (jobid, group))
-			usage.release
+			usage.release()
 			return None
 
 		# 1) Check if we can freely reserve 'max' entries
@@ -123,7 +126,7 @@ class GroupManager:
 
 			# Release and return agent IDs
 			usage.release()
-			return agents
+			return ([], agents)
 
 		# 2) We will need to kick out running agents in order to
 		#    get some free space.
@@ -133,13 +136,23 @@ class GroupManager:
 			# even after we proceed
 			if usage.total - usage.individual < minAgents:
 				# We can't do anything even if we let 1 agent per slot
+				self.logger.warn("There is no free space avaiable for allocation new job")
 				usage.release()
 				return None
 
 			# Calculate the new 'fair' share of slots 
 			# that each job should have.
-			newSlots = usage.total / (usage.individual+1)
+			fairShare = int(round(usage.total / (usage.individual+1)))
+
+			# Calculate the trimdown to the existing services
+			trimdown = max( int(round(fairShare / usage.individual)), 1 )
 
 			# Get the IDs of the job agents that should be stopped
-			dropAgents = usage.trimAgents(newSlots)
-			
+			dropAgents = usage.trimAgents( trimdown, fairShare )
+
+			# Get the IDs of the free slots
+			agents = usage.acquireFree(fairShare)
+
+			# Release and return the agent ids
+			usage.release()
+			return (dropAgents, agents)

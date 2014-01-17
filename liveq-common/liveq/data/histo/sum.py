@@ -143,6 +143,10 @@ def intermediateCollectionMerge(collections):
 	resulting IntermediateHistogramCollection that can be further merged again.
 	"""
 
+	# If the collections list contains only 1 histogram, return it as-is
+	if len(collections) == 1:
+		return collections[0]
+
 	# Create a response collection
 	ans = IntermediateHistogramCollection()
 
