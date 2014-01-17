@@ -305,7 +305,7 @@ def markOffline( agent_id ):
 	agent.state = 0
 	agent.save()
 
-	# Handle the loss
+	# Handle the loss (and unlink from job)
 	handleLoss( agent )
 
 def markOnline( agent_id ):
@@ -347,4 +347,25 @@ def releaseJob( job ):
 	Free the resources in use by the specified job. The job parameter
 	is an instance of the job descriptor.
 	"""
-	pass
+	
+	# Clear the record on the agents that have active jobs
+	numUpdated = Agent.update( activeJob="" ).where( Agent.activeJob == job.id ).execute()
+
+def abortJob( job ):
+	"""
+	Return the IDs of the agents working on this job and then releaseJob
+	"""
+
+	# Firstly, lock the group
+	res = measureResources( job.group )
+
+	# Fetch agent instances that are working on the given job
+	q = Agent.select().where( (Agent.activeJob == job.id ) & (Agent.state == 1) )
+	agents = q[:]
+
+	# Release job
+	releaseJob( job )
+
+	# Return the agents and release group
+	res.release()
+	return agents

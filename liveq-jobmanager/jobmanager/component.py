@@ -72,16 +72,6 @@ class JobManagerComponent(Component):
 		# Channel mapping
 		self.channels = { }
 
-		#####################################################################
-		# ---- BEGIN HACK ----
-
-		# A list of jobs that I manage
-		self.activeJobs = {}
-
-		# ----- END HACK ----
-		#####################################################################
-
-
 		# Agent monitor
 		self.manager = JobAgentManager()
 
@@ -361,106 +351,6 @@ class JobManagerComponent(Component):
 				})
 
 
-		#####################################################################
-		# ---- BEGIN HACK ----
-
-		# Find a free agent
-		agent = self.manager.acquireFreeAgent(group)
-
-		# Check if we could not find a free agent
-		if not agent:
-			self.logger.error("No free agents were found on group #%s" % group)
-			self.jobChannel.reply({
-					'result': 'error',
-					'error': "No free agents were found on group #%s" % group
-				})
-			return
-
-		# Fetch lab with the given UUID
-		labInst = self.manager.getLabByUUID(lab)
-		if not labInst:
-			self.logger.error("Could not find lab #%s" % lab)
-			self.jobChannel.reply({
-					'result': 'error',
-					'error': "Could not find lab #%s" % lab
-				})
-			return
-
-		# Process user's parameters
-		userParameters = { }
-		tunables = labInst.getTunables()
-		for k,parm in tunables.iteritems():
-
-			# Get user parameter
-			if k in parameters:
-
-				# Convert to numbers
-				vValue = float(parameters[k])
-				vMax = float(parm['max'])
-				vMin = float(parm['min'])
-				vDecimals = int(parm['dec'])
-
-				# Wrap value betwen min and max
-				vValue = max( min( vMax, vValue ), vMin )
-
-				# Convert to a number with the specified precision
-				# and store it on the user parameters
-				userParameters[k] = ("%." + str(vDecimals) + "f") % vValue
-
-		# Deep merge lab default parameters and user's parameters
-		mergedParameters = deepupdate( { "tune": userParameters } , labInst.getParameters() )
-
-		# Put more lab information in the parameters
-		mergedParameters['repoTag'] = labInst.repoTag
-		mergedParameters['repoType'] = labInst.repoType
-		mergedParameters['repoURL'] = labInst.repoURL
-		mergedParameters['histograms'] = labInst.getHistograms()
-		
-		# Open/Retrieve a channel with the specified agent
-		agentChannel = self.getAgentChannel(agent.uuid)
-
-		# Kindly ask to start a job
-		ans = agentChannel.send('job_start', {
-				'jid': jid,
-				'config': mergedParameters
-			}, waitReply=True)
-
-		# Check for timeout
-		if not ans:
-			self.logger.error("Timed out while waiting for response from agent #%s" % agent.uuid)
-			self.jobChannel.reply({
-					'result': 'error',
-					'error': 'No valid agents were found'
-				})
-			return
-
-		# Check for erroreus answer
-		if ans['result'] != 'ok':
-			self.logger.error("Got error response from agent #%s: %s" % (agent.uuid, ans['error']))
-			self.jobChannel.reply({
-					'result': 'error',
-					'error': "Remote error: %s" % ans['error']
-				})
-			return
-
-		# Open a channel to reply to
-		self.reply_to = Config.IBUS.openChannel(dataChannel)
-
-		# Store job info
-		self.activeJobs[jid] = {
-				'agents': [ agent ],
-				'replyTo': self.reply_to
-			}
-
-		# Reply status
-		self.jobChannel.reply({
-				'jid': jid,
-				'result': 'scheduled'
-			})
-
-		# ----- END HACK ----
-		#####################################################################
-
 	def onBusJobCancel(self, message):
 		"""
 		Callback when we have a request for new job from the bus
@@ -483,42 +373,24 @@ class JobManagerComponent(Component):
 				})
 			return
 
-		# Abort job on scheduler
-		scheduler.requestJob( job ):
+		# Abort job on scheduler and return the agents that were used
+		a_cancel = scheduler.abortJob( job ):
+		if a_cancel:
+			for agent in a_cancel:
 
-		# Reply status
-		self.jobChannel.reply({
-				'result': 'ok'
-			})
-
-		#####################################################################
-		# ---- BEGIN HACK ----
-
-		# Fetch JID from request
-		jid = message['jid']
-
-		# Check if we are managing this jid
-		if jid in self.activeJobs:
-			job = self.activeJobs[jid]
-
-			# Send cancellation to all job agents
-			for agent in job['agents']:
-
-				# Cancel job on the agent
-				agentChannel = self.getAgentChannel(agent.uuid)
+				# Get channel and send cancellations (synchronous)
+				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_cancel', {
 						'jid': jid
-					})
+					}, waitReply=True)
 
-				# Free agent
-				# TODO: Not optimal: The agent might not really be free!
-				self.manager.releaseAgent( agent.id )
+				# Log results
+				if ans['result'] == "ok":
+					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
+				else:
+					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
 		# Reply status
 		self.jobChannel.reply({
 				'result': 'ok'
 			})
-
-		# ----- END HACK ----
-		#####################################################################
-
