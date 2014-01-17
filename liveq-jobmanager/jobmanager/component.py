@@ -199,10 +199,17 @@ class JobManagerComponent(Component):
 		"""
 		Callback when a handshake arrives in the bus
 		"""
-		self.logger.info("[%s] Handshaking" % channel.name)
+		self.logger.info("[%s] Agent version %s shake hands" % (channel.name, message['version']))
 
 		# Let manager know that we got a handshake
 		self.manager.updateHandshake( channel.name, message )
+
+		# If the agent has free slots, reset it's job status
+		if message['free_slots'] > 1:
+			agent = getAgent(channel.name)
+			if agent:
+				agent.activeJob = ""
+				agent.save()
 
 		# Reply with some data
 		channel.reply({ 'status': 'ok' })
@@ -263,15 +270,9 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			return
 
-		# Get the intermediate histograms from the agent buffer
-		agentHistos = IntermediateHistogramCollection.fromPack( data['data'] )
-		if not agentHistos:
-			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
-			return
-
 		# Get the merged histograms from the job store
-		sumHistos = job.getHistograms()
-		if sumHistos == None:
+		histos = job.getHistograms()
+		if histos == None:
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			return
 
@@ -281,7 +282,7 @@ class JobManagerComponent(Component):
 
 		# If all jobs are completed, forward the job_completed event,
 		# otherwise fire the job_data event.
-		if sumHistos.state == 2:
+		if histos.state == 2:
 
 			# If ALL histograms have state=2 (completed), it means that the
 			# job is indeed completed. Reply to the job channel the final job data

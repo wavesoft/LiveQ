@@ -79,11 +79,18 @@ class AgentComponent(Component, SimpleFSM):
 		self.logger.debug("Entering state: HANDSHAKE")
 		try:
 
+			# Count what's the slot usage
+			free_slots = 0
+			for v in self.slots:
+				if not v:
+					free_slots += 1
+
 			# Send handshake message to the bus and retrive
 			# initial acknowledgement
 			ans = self.serverChannel.send('handshake', {
 					'version': AgentComponent.VERSION,
 					'slots': Config.AGENT_SLOTS,
+					'free_slots': free_slots,
 					'group': Config.AGENT_GROUP
 				}, waitReply=True)
 
