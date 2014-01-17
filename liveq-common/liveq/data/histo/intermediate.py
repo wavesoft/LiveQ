@@ -26,7 +26,7 @@ import glob
 
 import bz2
 import pylzma
-import liveq.utils.ascii85 as ascii85
+import base64
 
 from liveq.utils.FLAT import FLATParser
 from liveq.data.histo import Histogram
@@ -111,7 +111,7 @@ class IntermediateHistogramCollection(dict):
 		"""
 		
 		# Decode and decompress
-		buf = IntermediateHistogramCollection.F_DECOMPRESS( ascii85.b85decode( data ) )
+		buf = IntermediateHistogramCollection.F_DECOMPRESS( base64.b64decode( data ) )
 
 		# Get version, histogram count and state
 		(ver, numHistos, state) = struct.unpack("!BIB", buf[:6])
@@ -210,7 +210,7 @@ class IntermediateHistogramCollection(dict):
 			buf += str( numpy.getbuffer( npbuf ) )
 
 		# Compress & encode
-		return ascii85.b85encode( IntermediateHistogramCollection.F_COMPRESS( buf ) )
+		return base64.b64encode( IntermediateHistogramCollection.F_COMPRESS( buf ) )
 
 class IntermediateHistogram:
 	"""
