@@ -17,9 +17,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import time
 import logging
 import time
-import datetime
 
 from jobmanager.config import Config
 
@@ -178,7 +178,7 @@ class JobAgentManager:
 		agentEntry = self.getAgent(uid)
 
 		# Update fields
-		agentEntry.lastSeen = datetime.datetime.now()
+		agentEntry.lastActivity = time.time()
 		agentEntry.group = groupEntry
 		agentEntry.slots = slots
 		agentEntry.features = features
@@ -206,8 +206,28 @@ class JobAgentManager:
 
 		# Switch state and last time seen
 		agentEntry.state = state
-		agentEntry.lastSeen = datetime.datetime.now()
+		agentEntry.lastActivity = time.time()
 
 		# Save entry
 		agentEntry.save()
 
+	def updateActivity(self, uid):
+		"""
+		Update the agent activity timestamp to avoid expiry
+		"""
+
+		# Get agent by UID		
+		agentEntry = self.getAgent(uid)
+
+		# Update activity
+		agentEntry.lastActivity = time.time()
+		agentEntry.save()
+
+	def offlineTimedOut(self, timeout=60):
+		"""
+		Turn offline agents that haven't sent any activity for
+		more than the timeout specified (in seconds)
+		"""
+
+		# Disconnect agents that are idle for more than `timeout`
+		Agent.update( state = 0 ).where( lastActivity < (time.time() - timeout) )

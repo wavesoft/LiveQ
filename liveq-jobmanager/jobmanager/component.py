@@ -20,8 +20,10 @@
 import logging
 import time
 import datetime
-import uuid
-import cPickle as pickle
+
+import jobmanager.io.jobs as jobs
+import jobmanager.io.scheduler as scheduler
+import jobmanager.io.agents as agents
 
 from jobmanager.config import Config
 from jobmanager.internal.agentmanager import JobAgentManager
@@ -34,7 +36,6 @@ from liveq.utils import deepupdate
 from liveq.models import Agent, AgentGroup, AgentMetrics
 
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
-from liveq.data.histo.sum import intermediateCollectionMerge
 
 class JobManagerComponent(Component):
 	"""
@@ -116,6 +117,24 @@ class JobManagerComponent(Component):
 		# Return instance
 		return channel
 
+	def run(self):
+		"""
+		Entry point
+		"""
+
+		# Run the component
+		Component.run(self)
+
+	####################################################################################
+	# --------------------------------------------------------------------------------
+	#                                CALLBACK HANDLERS
+	# --------------------------------------------------------------------------------
+	####################################################################################
+
+	# =========================
+	# Job Agent Callbacks
+	# =========================
+
 	def onChannelCreation(self, channel):
 		"""
 		Callback when a channel is up
@@ -137,6 +156,9 @@ class JobManagerComponent(Component):
 		# Turn agent on
 		self.manager.updatePresence( channel.name, 1 )
 
+		# Notify scheduler that the agent is online
+		scheduler.markOnline( channel.name )
+
 	def onAgentOffline(self, channel=None):
 		"""
 		Callback when an agent becomes unavailable
@@ -145,6 +167,9 @@ class JobManagerComponent(Component):
 
 		# Turn agent off
 		self.manager.updatePresence( channel.name, 0 )
+
+		# Notify scheduler that the agent is offline
+		scheduler.markOffline( channel.name )
 
 	def onAgentHandshake(self, message, channel=None):
 		"""
@@ -156,7 +181,7 @@ class JobManagerComponent(Component):
 		self.manager.updateHandshake( channel.name, message )
 
 		# Reply with some data
-		channel.reply({ 'some': 'data' })
+		channel.reply({ 'status': 'ok' })
 
 	def onAgentJobData(self, data, channel=None):
 		"""
@@ -164,39 +189,37 @@ class JobManagerComponent(Component):
 		"""
 		self.logger.info("[%s] Got data" % channel.name)
 
-		# Extract job ID from message
+		# Extract and validate job ID from message
 		jid = data['jid']
-
-		# Get the job info from store
-		job_data = Config.STORE.get("jobdata-%s" % jid)
-		if not job_data:
-			self.logger.warn("[%s] Could not find job state in store for job %s" % (channel.name, jid))
+		if not jid:
+			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
 			return
 
-		# Get the intermediate histograms from the buffer
-		histos = IntermediateHistogramCollection.fromPack( data['data'] )
-		if not histos:
+		# Fetch job class
+		job = jobs.getJob(jid)
+		if not job:
+			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
+			return
+
+		# Get the intermediate histograms from the agent buffer
+		agentHistos = IntermediateHistogramCollection.fromPack( data['data'] )
+		if not agentHistos:
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
 			return
 
-		# Unpickle buffer
-		job_data = pickle.loads( job_data )
+		# Merge histograms with other histograms of the same job
+		# and return resulting histogram collection
+		sumHistos = job.updateHistograms( channel.name, agentHistos )
+		if sumHistos == None:
+			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+			return
 
-		# Store/Update histogram collection for this agent
-		job_data[channel.name] = histos
-
-		# Merge histogram collections
-		histos = intermediateCollectionMerge( job_data.values() )
-
-		# Pack hstogram and send it to the internal bus
-		if jid in self.activeJobs:
-			job = self.activeJobs[jid]
-
-			# Forward message on the internal bus as-is
-			job['replyTo'].send("job_data", data)
-
-		# ----- END HACK ----
-		#####################################################################
+		# Re-pack histogram collection and send to the
+		# internal bus for further processing
+		job.channel.send("job_data", {
+				'jid': jid,
+				'data': sumHistos.pack()
+			})
 
 	def onAgentJobCompleted(self, data, channel=None):
 		"""
@@ -204,30 +227,62 @@ class JobManagerComponent(Component):
 		"""
 		self.logger.info("[%s] Job completed" % channel.name)
 
-		#####################################################################
-		# ---- BEGIN HACK ----
-
-		# Extract job ID from message
+		# Extract and validate job ID from message
 		jid = data['jid']
+		if not jid:
+			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
+			return
 
-		# Forward the message to the internal bus as-is
-		if jid in self.activeJobs:
-			job = self.activeJobs[jid]
+		# Fetch job class
+		job = jobs.getJob(jid)
+		if not job:
+			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
+			return
 
-			# Forward message on the internal bus as-is
-			job['replyTo'].send("job_completed", data)
+		# Get the intermediate histograms from the agent buffer
+		agentHistos = IntermediateHistogramCollection.fromPack( data['data'] )
+		if not agentHistos:
+			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
+			return
 
-			# Close data channel and delete job from registry
-			job['replyTo'].close()
-			del self.activeJobs[jid]
+		# Merge histograms with other histograms of the same job
+		# and return resulting histogram collection
+		sumHistos = job.updateHistograms( channel.name, agentHistos )
+		if sumHistos == None:
+			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+			return
 
-			# Release agents
-			for agent in job['agents']:
-				self.manager.releaseAgent( agent.id )
+		# Free this agent from the given job, allowing
+		# scheduler logic to process the free resource
+		scheduler.releaseFromJob( channel.name, job )
+
+		# If all jobs are completed, forward the job_completed event,
+		# otherwise fire the job_data event.
+		if sumHistos.state == 2:
+
+			# If ALL histograms have state=2 (completed), it means that the
+			# job is indeed completed. Reply to the job channel the final job data
+			job.channel.send("job_completed", {
+					'jid': jid,
+					'data': histos.pack()
+				})
+
+			# Cleanup job from scheduler
+			job.releaseJob( job )
+
+			# And then cleanup job
+			job.release()
+
+		else:
+			job.channel.send("job_data", {
+					'jid': jid,
+					'data': histos.pack()
+				})
 
 
-		# ----- END HACK ----
-		#####################################################################
+	# =========================
+	# Internal Bus Callbacks
+	# =========================
 
 	def onBusJobStart(self, message):
 		"""
@@ -242,10 +297,34 @@ class JobManagerComponent(Component):
 		lab = message['lab']
 		parameters = message['parameters']
 		group = message['group']
-		dataChannel = message['dataChannel']
+		dataChannel = message['dataChannel'] # << The channel name in IBUS where we should dump the data
 
-		# Create new Job ID
-		jid = uuid.uuid4().hex
+		# Create a new job descriptor
+		job = jobs.createJob( lab, parameters, group, dataChannel )
+		if not job:
+			# Reply failure
+			self.jobChannel.reply({
+					'jid': jid,
+					'result': 'error',
+					'error': 'Unable to process the job request'
+				})
+			return
+
+		# Place our job inquiry in scheduler and check for response
+		if scheduler.requestJob( job ):
+			# Reply success
+			self.jobChannel.reply({
+					'jid': jid,
+					'result': 'scheduled'
+				})
+		else:
+			# Reply failure
+			self.jobChannel.reply({
+					'jid': jid,
+					'result': 'error',
+					'error': 'Unable to schedule the job request'
+				})
+
 
 		#####################################################################
 		# ---- BEGIN HACK ----
@@ -383,10 +462,3 @@ class JobManagerComponent(Component):
 		# ----- END HACK ----
 		#####################################################################
 
-	def run(self):
-		"""
-		Entry point
-		"""
-
-		# Run the component
-		Component.run(self)

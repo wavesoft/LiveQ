@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import os
 import json
 import logging
 import struct
@@ -39,6 +40,15 @@ class IntermediateHistogramCollection(dict):
 	F_COMPRESS = pylzma.compress
 	F_DECOMPRESS = pylzma.decompress
 
+	def __init__(self, state=0):
+		"""
+		Initialize the IntermediateHistogramCollection
+		"""
+		# Initialize parent class
+		dict.__init__(self)
+		# Set state
+		self.state = state
+
 	def append(self, ihisto):
 		"""
 		Append an object in the collection and map them with their name
@@ -48,13 +58,31 @@ class IntermediateHistogramCollection(dict):
 		self[ihisto.name] = ihisto
 
 	@staticmethod
-	def fromDirectory(baseDir):
+	def fromDirectory(baseDir, state=1, recursive=False):
 		"""
 		Create an IntermediateHistogramCollection from the contents of the specified directory.
+		The optional parameter 'state' is used by the user and is preserved by the packing function.
 		"""
 
 		# Find FLAT files
-		flatFiles = glob.glob("%s/*.dat" % baseDir)
+		if recursive:
+
+			# Prepare response
+			flatFiles = []
+
+			# Recursively walk base dir and collect only the .dat files
+			# that also have a .params file. Everything else is reference
+			# data or junk
+			for root, dirs, files in os.walk(baseDir):
+			    for f in files:
+			    	if f.endswith(".dat"):
+			    		if ("%s.params" % f[:-4]) in files:
+			    			flatFiles.append( os.path.join( root, f ) )
+			
+		else:
+
+			# Otherwise, run a flat glob
+			flatFiles = glob.glob("%s/*.dat" % baseDir)
 
 		# Prepare collection
 		ans = IntermediateHistogramCollection()
@@ -69,6 +97,9 @@ class IntermediateHistogramCollection(dict):
 			else:
 				ans[histo.name] = histo
 
+		# Store state
+		ans.state = state
+
 		# Return collection
 		return ans
 
@@ -82,15 +113,15 @@ class IntermediateHistogramCollection(dict):
 		# Decode and decompress
 		buf = IntermediateHistogramCollection.F_DECOMPRESS( ascii85.b85decode( data ) )
 
-		# Get version and histogram count
-		(ver, numHistos) = struct.unpack("!BI", buf[:5])
+		# Get version, histogram count and state
+		(ver, numHistos, state) = struct.unpack("!BIB", buf[:6])
+		p = 6
 
 		# Validate protocol version
 		if ver != 1:
 			raise ValueError("The protocol version %i is not supported for unpacking IntermediateHistogramCollection" % version)
 
 		# Start parsing histograms
-		p = 5
 		ans = IntermediateHistogramCollection()
 		for i in range(numHistos):
 
@@ -125,6 +156,9 @@ class IntermediateHistogramCollection(dict):
 					SumX2W=npBuffer[hBins*7:],
 				)
 
+		# Store state
+		ans.state = state
+
 		# Return answer
 		return ans
 
@@ -139,6 +173,7 @@ class IntermediateHistogramCollection(dict):
 		+--------+-------------------------------------------+
 		|  uchar | Protocol version (current: 1)             |
 		|  uint  | Number of histograms in the file          |
+		|  uchar | The collection state (user-defined)       |
 		+--------+-------------------------------------------+
 		/ Histogram
 		+--------+-------------------------------------------+
@@ -152,7 +187,7 @@ class IntermediateHistogramCollection(dict):
 		"""
 		
 		# Prepare buffer
-		buf = struct.pack("!BI", 1, len(self))
+		buf = struct.pack("!BIB", 1, len(self), self.state)
 
 		# Start packing data
 		for histo in self.values():

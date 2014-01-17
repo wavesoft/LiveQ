@@ -18,7 +18,11 @@
 ################################################################
 
 import logging
+
+from peewee import fn
+
 from liveq.utils.remotelock import RemoteLock
+from liveq.models import Agent
 
 class GroupUsage:
 	"""

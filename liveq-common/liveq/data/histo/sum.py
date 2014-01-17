@@ -150,19 +150,33 @@ def intermediateCollectionMerge(collections):
 	# Create a response collection
 	ans = IntermediateHistogramCollection()
 
+	# Keep track of the final state
+	state = collections[0].state
+
 	# Start merging using first collection in the list as reference
 	for k,v in collections[0].iteritems():
 
 		# Collect the histogram from other collections
 		histos = [v]
 		for c in collections[1:]:
+
+			# Get repective histogram from the other collections
 			if not k in c:
 				raise ValueError("Could not find histogram %s in specified collection for merging" % k)
 			else:
 				histos.append(c[k])
 
+			# And also check if this state is not the same with the rest
+			if state != c.state:
+				# (No state is None, so upon setting this variable to None
+				#  it's going to keep it's value throughout the loop)
+				state = None
+
 		# Append answer
 		ans.append( intermediateMerge(histos) )
+
+	# Update state
+	ans.state = state
 
 	# Return answer
 	return ans

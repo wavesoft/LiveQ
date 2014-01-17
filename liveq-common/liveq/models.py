@@ -44,7 +44,7 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, Agent, AgentMetrics, Lab ]:
+	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -80,8 +80,8 @@ class Agent(BaseModel):
 	#: Add an additional UUID lookup index
 	uuid = CharField(max_length=128, index=True, unique=True)
 
-	#: When was the agent last seen active?
-	lastSeen = DateTimeField(default=datetime.datetime.now)
+	#: The timestamp of the last activity of the agent
+	lastActivity = IntegerField(default=0)
 	#: The feature string responded by the entity at discovery
 	features = CharField(default="")
 	#: The version of the remote agent
@@ -95,6 +95,18 @@ class Agent(BaseModel):
 	group = ForeignKeyField(AgentGroup, related_name='groups')
 	#: The job currently running on the agent
 	activeJob = CharField(default="")
+
+class AgentJobs(BaseModel):
+	"""
+	Agent/Job/Group binding for addressing 
+	"""
+
+	#: The related agent
+	agent = ForeignKeyField(Agent)
+	#: The related group
+	group = ForeignKeyField(AgentGroup)
+	#: Job ID
+	jobid = CharField(default="")
 
 
 class AgentMetrics(BaseModel):
