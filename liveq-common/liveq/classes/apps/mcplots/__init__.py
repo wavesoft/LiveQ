@@ -273,8 +273,11 @@ class MCPlots(JobApplication):
 
 		# Read state flag
 		state = "unknown"
-		with file( "%s/status.flag" % self.jobdir ) as f:
-			state = f.read()
+		try:
+			with file( "%s/status.flag" % self.jobdir ) as f:
+				state = f.read()
+		except e:
+			pass
 
 		return state
 
