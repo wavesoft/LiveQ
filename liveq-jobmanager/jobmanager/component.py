@@ -288,6 +288,7 @@ class JobManagerComponent(Component):
 			# job is indeed completed. Reply to the job channel the final job data
 			job.channel.send("job_completed", {
 					'jid': jid,
+					'result': 0,
 					'data': histos.pack()
 				})
 
