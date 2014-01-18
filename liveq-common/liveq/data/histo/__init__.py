@@ -89,7 +89,7 @@ class HistogramCollection(list):
 			ofs += w
 
 			# Create and store histogram
-			list.append(self, Histogram.fromFit( coeff, meta) )
+			list.append(self, Histogram.fromFit( coeff, meta ) )
 
 
 	def beginUpdate(self, fnMetaValidate=None):

@@ -68,6 +68,9 @@ class JobManagerComponent(Component):
 		self.jobChannel.on('job_start', self.onBusJobStart)
 		self.jobChannel.on('job_cancel', self.onBusJobCancel)
 
+		# Open the interpolator channel were we are dumping the final results
+		self.ipolChannel = Config.IBUS.openChannel("interpolate")
+
 		# Channel mapping
 		self.channels = { }
 
@@ -284,11 +287,22 @@ class JobManagerComponent(Component):
 		# otherwise fire the job_data event.
 		if histos.state == 2:
 
+			# Pack data once
+			histoPack = histos.pack()
+
 			# If ALL histograms have state=2 (completed), it means that the
 			# job is indeed completed. Reply to the job channel the final job data
 			job.channel.send("job_completed", {
 					'jid': jid,
-					'data': histos.pack()
+					'result': 0,
+					'data': histoPack
+				})
+
+			# Send the resulting data to the interpolation database
+			self.ipolChannel.send("results", {
+					'lab': job.lab.uuid,
+					'config': job.parameters['tune'],
+					'data': histoPack
 				})
 
 			# Cleanup job from scheduler

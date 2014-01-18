@@ -27,6 +27,7 @@ import numpy as np
 from interpolator.config import Config
 from interpolator.data.store import HistogramStore
 
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo import Histogram, HistogramCollection
 from liveq.data.tune import Tune
 
@@ -91,8 +92,11 @@ class InterpolatorComponent(Component):
 		# Generate a tune object
 		tune = Tune(data['config'], labid=data['lab'])
 
-		# Unpack a collection of histograms from the data
-		histos = HistogramCollection.unpack(data['data'])
+		# Unpack the intermediate histogram collection
+		histos = IntermediateHistogramCollection.fromPack(data['data'])
+
+		# Convert intermediate histograms to a HistogramCollection object
+		histos = histos.toHistogramCollection( tune )
 
 		# Append data on the histogram store
 		HistogramStore.append( tune, histos )

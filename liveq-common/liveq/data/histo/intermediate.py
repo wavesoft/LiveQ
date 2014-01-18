@@ -71,8 +71,8 @@ class IntermediateHistogramCollection(dict):
 			flatFiles = []
 
 			# Recursively walk base dir and collect only the .dat files
-			# that also have a .params file. Everything else is reference
-			# data or junk
+			# that also have a .params file (theoretical data). Everything 
+			# else is reference data or parameters.
 			for root, dirs, files in os.walk(baseDir):
 			    for f in files:
 			    	if f.endswith(".dat"):
@@ -227,6 +227,24 @@ class IntermediateHistogramCollection(dict):
 				ans[n] = self[n]
 
 		# Return answer
+		return ans
+
+	def toHistogramCollection(self, tune):
+		"""
+		Convert the intermediate histogram into a collection of final histograms
+		"""
+
+		# Create histogram collection with the given tune
+		# as tune reference.
+		ans = HistogramCollection( tune=tune )
+		ans.beginUpdate()
+
+		# Pile-up the histograms
+		for k,hist in self.iteritems():
+			ans.append( hist.toHistogram() )
+
+		# Finalize and return
+		ans.endUpdate()
 		return ans
 
 
