@@ -17,17 +17,59 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+class HistoDescriptionLab:
+	"""
+	A HistoDescriptionLab class encapsulates a HistoDescription and provides
+	the defaults for identifying collisions on histogram names
+	"""
+
+	def __init__(self, description, lab):
+		"""
+		Initialize
+		"""
+
+		# Keep reference
+		self.description = description
+
+		# Fetch parameters from the lab
+		processParameters = lab.getParameters()
+
+		# Extract parameter information used for resolving
+		# collisions in histogram names
+		self.beam=""
+		if 'beam' in processParameters:
+			self.beam = processParameters['beam']
+		self.process=""
+		if 'process' in processParameters:
+			self.process = processParameters['process']
+		self.energy=""
+		if 'energy' in processParameters:
+			self.energy = processParameters['energy']
+		self.params=""
+		if 'params' in processParameters:
+			self.params = processParameters['params']
+
+	def getStatic(self):
+		"""
+		Return the static configuration required by the interface for rendering correctly
+		the histogram responses.
+		"""
+		pass
+
+	def getHistogram(self, name):
+		"""
+		Describe the specified histogram
+		"""
+		pass
+
+
 class HistoDescription:
 	"""
 	This class provides a human representation for the histogram
 	"""
 
-	def __init__(self):
+	def __init__(self, descriptionFile):
 		"""
-		"""
-		pass
-
-	def describe(self, histogram):
-		"""
+		Load the histogram descriptions from the given JSON description file
 		"""
 		pass

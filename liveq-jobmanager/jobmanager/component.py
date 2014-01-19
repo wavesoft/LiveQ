@@ -209,7 +209,7 @@ class JobManagerComponent(Component):
 
 		# If the agent has free slots, reset it's job status
 		if message['free_slots'] > 0:
-			agent = getAgent(channel.name)
+			agent = agents.getAgent(channel.name)
 			if agent:
 				agent.activeJob = ""
 				agent.save()
@@ -395,6 +395,10 @@ class JobManagerComponent(Component):
 		a_cancel = scheduler.abortJob( job )
 		if a_cancel:
 			for agent in a_cancel:
+
+				# Skip invalid entries
+				if not agent:
+					continue
 
 				# Get channel and send cancellations (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )

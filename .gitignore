@@ -33,6 +33,7 @@ liveq-common/ref-data
 
 # Test files
 *test.py
+tools/tex-images*
 
 *.sqlite3
 

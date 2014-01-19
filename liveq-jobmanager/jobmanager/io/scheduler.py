@@ -58,7 +58,7 @@ class GroupResources:
 			FROM \
 			  ( SELECT COUNT(id) AS total FROM `agent` WHERE `state` = 1 AND `group_id` = %i ) AS TOT,\
 			  ( SELECT COUNT(id) AS free FROM `agent` WHERE `activeJob` = '' AND `state` = 1 AND `group_id` = %i ) AS FREE,\
-			  ( SELECT COUNT(DISTINCT activeJob) AS individual FROM `agent` WHERE `state` = 1 AND `group_id` = %i ) AS IND" 
+			  ( SELECT COUNT(DISTINCT activeJob) AS individual FROM `agent` WHERE `state` = 1 AND `group_id` = %i AND `activeJob` != '') AS IND" 
 			  % (self.gid,self.gid,self.gid)
 			).execute().next()
 

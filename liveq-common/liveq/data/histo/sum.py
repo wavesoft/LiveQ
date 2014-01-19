@@ -51,6 +51,10 @@ def intermediateMerge(histograms):
 	if not type(histograms) is list:
 		return None
 
+	# If it's only 1 histogram, return it as-is
+	if len(histograms) == 1:
+		return histograms[0]
+
 	# Calculate metrics
 	numBins = histograms[0].bins
 	name = histograms[0].name
@@ -162,7 +166,7 @@ def intermediateCollectionMerge(collections):
 
 			# Get repective histogram from the other collections
 			if not k in c:
-				raise ValueError("Could not find histogram %s in specified collection for merging" % k)
+				logging.warn("Could not find histogram %s in specified collection for merging" % k)
 			else:
 				histos.append(c[k])
 
