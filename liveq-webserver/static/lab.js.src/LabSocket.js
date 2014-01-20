@@ -20,6 +20,9 @@ LiveQ.LabSocket = function( id ) {
 	this.url = "ws://" + location.host + "/vas/labsocket/" + id;
 	this.setupSocket();
 
+	// Flags to mark an active simulation
+	this.running = false;
+
 }
 
 /**
@@ -108,6 +111,26 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
  */
 LiveQ.LabSocket.prototype.handleActionFrame = function( action, data ) {
 
+	if (action == "status") {  /* Status message */
+		console.log(data['message']);
+
+	} else if (action == "error") { /* Error message */
+		console.error("I/O Error:",data['message']);
+
+	} else if (action == "sim_completed") { /* Job completed */
+		console.log("Job completed");
+
+		// Simulation is completed
+		this.running = false;
+
+	} else if (action == "sim_failed") { /* Simulation failed */
+		console.error("Simulation error:", data['message']);
+
+		// Simulation is completed
+		this.running = false;
+
+	}
+
 };
 
 /**
@@ -135,7 +158,7 @@ LiveQ.LabSocket.prototype.handleDataFrame = function( action, reader ) {
 /**
  * Send a command to the socket
  * @param {string} action - The name of the action to invoke on the server
- * @param {object} parameters - An object with contains the data to send to the socket
+ * @param {object} parameters - An object with the data to send to the socket
  */
 LiveQ.LabSocket.prototype.send = function(action, parameters) {
 
@@ -147,5 +170,34 @@ LiveQ.LabSocket.prototype.send = function(action, parameters) {
 		"action": action,
 		"param": param
 	}));
+
+}
+
+/**
+ * Send a tune and begin simulation
+ *
+ * @param {object} parameters - An object with the tunable parameter names and their values
+ *
+ */
+LiveQ.LabSocket.prototype.beginSimulation = function(parameters) {
+
+	// Begin simulation with the given parameters
+	this.send("sim_start", parameters);
+
+	// Mark simulation as active
+	this.running = true;
+
+}
+
+/**
+ * Abort a previously running simulation
+ */
+LiveQ.LabSocket.prototype.abortSimulation = function(action) {
+
+	// Begin simulation with the given parameters
+	this.send("sim_abort");
+
+	// Mark simulation as inactive
+	this.running = false;
 
 }

@@ -35,12 +35,11 @@ liveq-common/ref-data
 *test.py
 tools/tex-images*
 
+# Temporary documentation
+liveq-webserver/static/lab.js.src/out
+
 *.sqlite3
-
 .DS_Store
-
 *.log
-
 local-environment.sh
-
 dump.rdb

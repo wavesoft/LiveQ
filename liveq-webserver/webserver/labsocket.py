@@ -42,6 +42,9 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.lab = None
         self.jobid = None
 
+        # Open logger
+        self.logger = logging.getLogger("LabSocket")
+
     ####################################################################################
     # --------------------------------------------------------------------------------
     #                             WEBSOCKET IMPLMEMENTATION
@@ -62,7 +65,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         specified labID and then register on the message bus in order to receive
         the messages regarding this lab.
         """
-        logging.info( "Lab socket '%s' requested" % labid )
+        self.logger.info( "Lab socket '%s' requested" % labid )
 
         # Reset local variables
         self.job = None
@@ -73,7 +76,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         try:
             self.lab = Lab.get(Lab.uuid == labid)
         except Lab.DoesNotExist:
-            logging.error("Unable to locate lab with id '%s'" % labid)
+            self.logger.error("Unable to locate lab with id '%s'" % labid)
             return self.sendError("Unable to find a lab with the given ID")
 
         # Open required bus channels
@@ -89,7 +92,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         """
         Socket closed
         """
-        logging.info("Socket closed")
+        self.logger.info("Socket closed")
 
         # If we have a running tune, cancel it
         if self.jobid:
@@ -125,7 +128,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             return self.sendError("Unable to find a lab with the given ID")
 
         # Process input parameters
-        logging.info("got message %r", message)
+        self.logger.info("got message %r", message)
         parsed = tornado.escape.json_decode(message)
 
         # Check for valid message
@@ -151,7 +154,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     [Bus Event] Data available
     """
     def onBusData(self, data):
-        logging.debug("Got DATA!")
+        self.logger.debug("Got DATA!")
 
         # Create a histogram collection from the data buffer
         histos = IntermediateHistogramCollection.fromPack( data['data'] )
@@ -220,7 +223,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             })
 
         # And log the error
-        logging.warn(error)
+        self.logger.warn(error)
 
     def sendStatus(self, message):
         """
@@ -272,7 +275,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         """
 
         # Process actions
-        if action == "tune_begin":
+        if action == "sim_start":
 
             # If we are already running a tune (jobid is defined), cancel and restart
             self.abortJob()
@@ -291,7 +294,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
                 # Send status
                 self.sendStatus("Could not contact interpolator")
-                logging.warn("Could not contact interpolator")
+                self.logger.warn("Could not contact interpolator")
 
             else:
 
@@ -346,7 +349,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # The job started, save the tune job ID
             self.jobid = ans['jid']
 
-        elif action == "tune_cancel":
+        elif action == "sim_abort":
 
             # If we don't have a running tune, don't do anything
             if not self.jobid:
@@ -354,6 +357,12 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Abort job
             self.abortJob()
+
+        elif action == "handshake":
+
+            # We have a handshake with the agent.
+            # Fetch configuration and send configuration frame
+            self.log
 
         else:
 
