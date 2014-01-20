@@ -175,7 +175,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         # Pack them
         histoBuffers = []
-        for h in histos:
+        for k, h in histos.iteritems():
             # Pack buffers
             histoBuffers.append( js.packHistogram(h.toHistogram()) )
 
@@ -226,7 +226,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Send text frame to websocket
         self.write_message({
                 "action": action,
-                "param": data
+                "param": param
             })
 
     def sendError(self, error):

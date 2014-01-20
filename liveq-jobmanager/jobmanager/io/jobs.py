@@ -193,6 +193,16 @@ class Job:
 		self.channel.close()
 		del JOB_CHANNELS[self.dataChannel]
 
+	def sendStatus(self, message):
+		"""
+		Send a status message to the job recepient
+		"""
+
+		# Send status message
+		self.channel.send("status", {
+				"message": message
+			})
+
 ##############################################################
 # ------------------------------------------------------------
 #  INTERFACE FUNCTIONS

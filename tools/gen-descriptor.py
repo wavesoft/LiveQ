@@ -340,8 +340,7 @@ for name in hkeys:
 		# Collect reference data
 		refDst = ""
 		if meta['ref']:
-			refDst = os.path.basename( meta['ref'] )
-			dst = "%s/ref/%s" % (out_dir, refDst)
+			dst = "%s/ref/%s.dat" % (out_dir, histoTeXName)
 			if not os.path.isfile(dst):
 				shutil.copyfile( meta['ref'], dst )
 

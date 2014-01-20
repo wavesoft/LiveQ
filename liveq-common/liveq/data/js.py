@@ -81,9 +81,7 @@ def packHistogram(histo):
 	buf += struct.pack("<IBBBB", histo.bins, 0,0,0,0 )
 
 	# Combine all numpy buffers
-	tp = np.array([], dtype=np.float64)
 	npBuf = np.concatenate([
-			tp, # This blank array will be used for type reference
 			histo.y, histo.yErrPlus, histo.yErrMinus,
 			histo.x, histo.xErrPlus, histo.xErrMinus
 		])

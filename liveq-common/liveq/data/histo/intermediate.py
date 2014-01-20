@@ -388,7 +388,8 @@ class IntermediateHistogram:
 		Convert the intermediate histogram into a histogram
 		"""
 
-		xval = (self.xlow+self.xhigh)/2,
+		xval = self.xlow + self.xhigh
+		xval /= 2.0
 
 		return Histogram(
 				name=self.name,
@@ -397,8 +398,8 @@ class IntermediateHistogram:
 
 				# X Values
 				x=xval,
-				xErrMinus=xval-self.xlow,
-				xErrPlus=self.xhigh-xval,
+				xErrMinus=(xval-self.xlow).flatten(),
+				xErrPlus=(self.xhigh-xval).flatten(),
 
 				# Y Values
 				y=self.height(),
