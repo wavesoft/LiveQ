@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>D3 Histogram Test</title>
+		<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({
+			showProcessingMessages: false,
+			jax: ["input/TeX","output/SVG"],
+			tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+		});
+		</script>
+		<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="histogram.js"></script>
+		<script>
+
+		function getSVGGraphicsFor(tex) {
+
+			// Create object for hosting the mathml expressions
+			var e = document.createElement('div');
+			e.innerHTML = tex;
+
+			// Typeset contents of tex
+			MathJax.Hub.Typeset(e);
+
+			// Try to lookup the SVG tag
+			var elms = e.getElementsByTagName('svg');
+			if (elms.length == 0) {
+				console.warn("Unable to typeset LaTeX expression:" + tex);
+				return null;
+			}
+
+			// Get first child from SVG (it's a <g> object)
+			return elms[0].firstChild;
+
+		}
+
+		function boo() {
+
+			var docSVG = document.getElementById('bah'),
+				g = getSVGGraphicsFor('$1/\sigma \; \mathrm{d}\sigma/\mathrm{d}\ln(y_{12})$ ');
+
+			window.g = g;
+			docSVG.appendChild(g);
+
+		}
+		</script>
+	</head>
+	<body>
+		Hello \(E=mc^2\) world!
+		<div class="MathJax_SVG">
+			<svg height="50" width="500" id="bah">
+			  <text x="0" y="15" fill="red">I love SVG!</text>
+			</svg>
+		</div>
+
+	</body>
+</html>

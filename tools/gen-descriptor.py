@@ -18,16 +18,89 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+#
+# TODO: Rerwite this in order to use the yoda files that come with rivet, instead of the /dat folder
+#       of MCPlots
+#
+
+import shutil
 import os
 import ConfigParser
 import json
 import re
+import glob
 
 # Precompiled regular expressions
 RE_SPACESPLIT = re.compile( r"[ \t]+" )
 RE_COMMASPLIT = re.compile( r"\s*,\s*")
 RE_MENUSPLIT = re.compile( r"\s*\!\s*" )
 RE_EMPTYLINE = re.compile(r"^\s*$")
+RE_WHITESPACE = re.compile(r"\s+")
+
+def parseFLAT(filename):
+	"""
+	Function to read a FLAT file into python structures
+	"""
+	sections = {}
+	section = None
+	activesection = None
+
+	# Very simple FLAT file reader
+	with open(filename, 'r') as f:
+
+		# Read and chomb end-of-lie
+		while True:
+
+			# Read next line and chomp \n
+			line = f.readline()
+			if not line:
+				break
+			line = line[:-1]
+
+			# Process lines
+			if not line:
+				# Empty line
+				pass
+
+			elif line.startswith("# BEGIN "):
+
+				# Ignore labels found some times in AIDA files
+				dat = line.split(" ")
+				section = dat[2]
+				sectiontype = 0
+
+				# Allocate section record
+				activesection = { "d": { }, "v": [ ] }
+
+			elif line.startswith("# END ") and (section != None):
+				# Section end
+				sections[section] = activesection
+				section = None
+
+			elif line.startswith("#") or line.startswith(";"):
+				# Comment
+				pass
+
+			elif section:
+				# Data inside section
+
+				# Try to split
+				data = line.split("=",1)
+
+				# Could not split : They are histogram data
+				if len(data) == 1:
+
+					# Split data values
+					data = RE_WHITESPACE.split(line)
+					activesection['v'].append(data)
+
+				else:
+
+					# Store value
+					activesection['d'][data[0]] = data[1]
+
+	# Return sections
+	return sections
 
 # TLatex to LaTeX macros 
 GREEK_TEX = ('alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta', 'iota', 'kappa', 'lambda', 'mu',
@@ -75,9 +148,6 @@ def loadRivetHistograms(confFile):
 	# Prepare histogram-name based indexed response
 	ans = { }
 
-	# Get the names of the observables that we collected while processing the file
-	observables = [ ]
-
 	# Read line-by line and split components
 	with open( confFile ,"r" ) as f:
 		for line in f:
@@ -105,53 +175,204 @@ def loadRivetHistograms(confFile):
 			observable = parts[5]
 			cuts = parts[6]
 
-			# Store everything under that name & Energy
-			if not name in ans:
-				ans[name] = {}
-			if not energy in ans[name]:
-				ans[name][energy] = {}
-			if not beam in ans[name][energy]:
-				ans[name][energy][beam] = {}
-			if not process in ans[name][energy][beam]:
-				ans[name][energy][beam][process] = {}
+			# Store the observable record only if observable is not "-"
+			if observable != "-":
 
-			# Collect observables
-			if not observable in observables:
-				observables.append(observable)
+				# Ensure histogram entry exists
+				if not name in ans:
+					ans[name] = [ ]
 
-			# Place objecect
-			ans[name][energy][beam][process][params] = parts[5:]
+				# Store the observable this histogram provides
+				ans[name].append( [observable, beam, process, energy, params, cuts] )
+
 
 	# Return answer
-	return (ans, observables)
+	return ans
 
-(histos, obs) = loadRivetHistograms( "/Users/icharala/Develop/mcplots/trunk/scripts/mcprod/configuration/rivet-histograms.map" )
-mcplots = loadMCPlots( "/Users/icharala/Develop/mcplots/trunk/www/mcplots.conf" )
+def analyzeDAT(baseDir):
+	"""
+	Load all the FLAT files from the given directory and populate the histogram fields
+	according to their information.
+	"""
 
+	# Prepare response
+	ans = { }
+	ref = { }
 
-for o in obs:
+	# Prepare files array
+	flatFiles = []
+	refFiles = []
 
-	# Skip missing observables
-	if o == "-":
-		continue
+	# Recursively walk base dir and collect only the .dat files
+	# that also have a .params file (theoretical data). Everything 
+	# else is reference data or parameters.
+	for root, dirs, files in os.walk(baseDir):
+	    for f in files:
+	    	if f.endswith(".dat"):
+	    		if ("%s.params" % f[:-4]) in files:
+	    			# If it has a params file, it's a simulation file
+	    			flatFiles.append( os.path.join( root, f ) )
+	    		else:
+	    			# If it has no .params file, it's a reference file
+	    			refFiles.append( os.path.join( root, f ) )
+	
+	# Parse reference files
+	for rf in refFiles:
 
-	# Get LaTeX representation of the observable
-	a_observable = mcplots['abbreviations'][o]
-	png = "%s/%s.png" % ( "tex-images", o )
+		# Read the file
+		fdata = parseFLAT(rf)
+		try:
+
+			# Read the histogram name
+			hname = fdata['HISTOGRAM']['d']['AidaPath']
+
+			# Ensure it's a REF file
+			if not hname.startswith("/REF"):
+				continue
+
+			# Map histogram path to filename
+			ref[hname[4:]] = rf
+
+		except KeyError as e:
+			print "!!! Could not load FLAT file %s: Missing section %s" % (ff, str(e))
+
+	# Fetch the FLAT files
+	for ff in flatFiles:
+
+		# Read the file
+		fdata = parseFLAT(ff)
+		try:
+
+			# Read the histogram name
+			hname = fdata['HISTOGRAM']['d']['AidaPath']
+
+			# Get plot metainfo
+			plotMeta = fdata['PLOT']['d']
+			plotTitle = plotMeta['Title']
+			plotXLabel = plotMeta['XLabel']
+			plotYLabel = plotMeta['YLabel']
+
+			# Check for collisions
+			if hname in ans:
+				print ">>> COLLISION <<<"
+
+			# Locate reference histogram
+			refFile = None
+			if hname in ref:
+				refFile = ref[hname]
+
+			# Store metainfo under histogram name
+			ans[hname] = {
+				'title': plotTitle,
+				'xlabel': plotXLabel,
+				'ylabel': plotYLabel,
+				'ref': refFile
+			}
+
+		except KeyError as e:
+			print "!!! Could not load FLAT file %s: Missing section %s" % (ff, str(e))
+
+	# Return the metainfo obtained from FLAT files
+	return ans
+
+def renderTEX(TeX, image, overwrite=False):
+	"""
+	Render the given TEX equation to the given image
+	"""
+
+	# Check if file exists
+	if os.path.isfile(image) and not overwrite:
+		return
 
 	# Convert spaces
-	TeX = a_observable[2]
 	TeX = TeX.replace( " ", "\\: " )
 
-	# Get TeX representation
+	# Convert ROOT Macros
 	for w in GREEK_TEX:
 		TeX = TeX.replace("#%s" % w, "\\%s " % w)
 		TeX = TeX.replace("#%s%s" % (w[0].upper(), w[1:]), "\\%s%s " % (w[0].upper(), w[1:]))
 
-	print "[%s] : %s" % ( o, TeX )
+	# Render image
 	os.system("./tex2png.sh '%s' '%s'" % ( 
-			TeX.replace("'", "'\\''"), png.replace("'", "'\\''") 
+			TeX.replace("'", "'\\''"), image.replace("'", "'\\''")
 			))
 
-# Process histograms
-#print json.dumps(histos, sort_keys=True, indent=2, separators=(',', ': '))
+
+histos = loadRivetHistograms( "/Users/icharala/Develop/mcplots/trunk/scripts/mcprod/configuration/rivet-histograms.map" )
+mcplots = loadMCPlots( "/Users/icharala/Develop/mcplots/trunk/www/mcplots.conf" )
+flatinfo = analyzeDAT( "/Users/icharala/Develop/LiveQ/tools/dat.local" )
+out_dir = "ref.local"
+
+# Get histogram keys
+hkeys = histos.keys()
+
+# Start processing histograms
+for name in hkeys:
+
+	# Check if such histogram was found
+	print "- %s: " % name,
+
+	# Fetch metainfo from flat
+	if not name in flatinfo:
+		del histos[name]
+		print "No FLAT info"
+		continue
+	meta = flatinfo[name]
+
+	# Get the observable name
+	idx = 0
+	hasSomething = False
+	observables = histos[name]
+	for observable in observables:
+		obsname = observable[0]
+		print "(%s: " % obsname,
+
+		# Fetch abbreviation description from MCPlots config
+		if not obsname in mcplots['abbreviations']:
+			print "No abbreviation found"
+			continue
+		abbrInfo = mcplots['abbreviations'][obsname]
+
+		# Prepare TeX images for this histogram
+		histoTeXName = name[1:].replace("/", "_")
+		histoTeXBase = "%s/tex/%s" % (out_dir, histoTeXName)
+
+		# Collect reference data
+		refDst = ""
+		if meta['ref']:
+			refDst = os.path.basename( meta['ref'] )
+			dst = "%s/ref/%s" % (out_dir, refDst)
+			if not os.path.isfile(dst):
+				shutil.copyfile( meta['ref'], dst )
+
+		# Render title, x-label and y-label to images
+		print "TeX Title...",
+		renderTEX( "{\\large %s}" % meta['title'], "%s.png" % histoTeXBase)
+		print "TeX XLabel...",
+		renderTEX( meta['xlabel'], "%s-x.png" % histoTeXBase )
+		print "TeX YLablel...",
+		renderTEX( meta['ylabel'], "%s-y.png" % histoTeXBase )
+
+		# Put histogrm title and texBase name under this observable
+		histos[name][idx] += [
+				abbrInfo[0], # Group name
+				abbrInfo[1], # HTML Name
+				refDst, 	 # Reference histogram
+				histoTeXName # LaTeX image base ID
+			]
+
+		hasSomething = True
+		idx += 1
+		print ")",
+
+	# If we didn't have an observable, remove this from registry
+	if not hasSomething:
+		del histos[name]
+
+
+	print " ok"
+
+# Now we have all the extra info, dump description to file
+with open("%s/description.json" % out_dir, "w") as f:
+	f.write(json.dumps(histos, sort_keys=True, indent=2, separators=(',', ': ')))
+

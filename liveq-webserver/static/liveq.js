@@ -21,50 +21,69 @@
 
 		// Setup event listener on the socket
 		this.socket.onmessage = (function(event) {
-			var data = JSON.parse(event.data);
 
-			// Validate input
-			if (data.action == undefined) {
-				console.error("Invalid response arrived from the lab socket: Missing 'action' parameter");
-				return;
-			}
+			// Check what kind of data we received
+			if (event.data instanceof Blob) {
+				// We have binary data
 
-			// Handle actions
-			if (data.action == "data") {
-				// We have data from a previously initiated tune
-				$(this).trigger('updateData', data.data, this.reference, data.info );
+				var blobReader = new FileReader();
+				blobReader.onload = function() {
+				    window.buf = this.result;
+				    console.log("Got binary data");
 
-			} else if (data.action == "completed") {
+				};
+				blobReader.readAsArrayBuffer(event.data);
 
-				// We are not tuning any more
-				this.tuning = false;
+			} else {
+				// We have JSON data
 
-				// We have completed a previously initiated tune
-				$(this).trigger('updateCompleted', data.result, data.info );
+				var data = JSON.parse(event.data);
 
-			} else if (data.action == "configuration") {
-				
-				// Iterate over histograms and build the reference histogram map
-				this.reference = [ ];
-				this.histograms = [ ];
-				for (var i=0; i<data.histograms.length; i++) {
-					this.histograms.push( data.histograms[i].histogram );
-					this.reference.push( data.histograms[i].reference );
+				// Validate input
+				if (data.action == undefined) {
+					console.error("Invalid response arrived from the lab socket: Missing 'action' parameter");
+					return;
 				}
 
-				// Let the listeners know that we are now ready
-				$(this).trigger('ready', this.histograms, this.reference, data.layout);
+				// Handle actions
+				if (data.action == "data") {
+					// We have data from a previously initiated tune
+					$(this).trigger('updateData', data.data, this.reference, data.info );
 
-			} else if (data.action == "error") {
-				// We had an error.
+				} else if (data.action == "completed") {
 
-				// Log error
-				console.error("MCPlotsLab Error: ", data.error)
+					// We are not tuning any more
+					this.tuning = false;
 
-				// Forwrard it to our listeners
-				$(this).trigger('error', data.error);
+					// We have completed a previously initiated tune
+					$(this).trigger('updateCompleted', data.result, data.info );
+
+				} else if (data.action == "configuration") {
+					
+					// Iterate over histograms and build the reference histogram map
+					this.reference = [ ];
+					this.histograms = [ ];
+					for (var i=0; i<data.histograms.length; i++) {
+						this.histograms.push( data.histograms[i].histogram );
+						this.reference.push( data.histograms[i].reference );
+					}
+
+					// Let the listeners know that we are now ready
+					$(this).trigger('ready', this.histograms, this.reference, data.layout);
+
+				} else if (data.action == "error") {
+					// We had an error.
+
+					// Log error
+					console.error("MCPlotsLab Error: ", data.error)
+
+					// Forwrard it to our listeners
+					$(this).trigger('error', data.error);
+
+				}
 
 			}
+
 		}).bind(this);
 
 		// When the socket is connected, request the lab configuration data.

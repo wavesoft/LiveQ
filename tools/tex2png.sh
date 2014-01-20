@@ -13,13 +13,13 @@ if [ -z "$2" ]; then
 fi
 
 cat <<EOF > temp-formula.tex
-%%% \nonstopmode
+\nonstopmode
 \documentclass[border=1pt]{standalone}
 \usepackage{amsmath}
 \usepackage{varwidth}
 \begin{document}
 \begin{varwidth}{\linewidth}
-\[ ${TEX_STRING} \]
+${TEX_STRING}
 \end{varwidth}
 \end{document}
 EOF
@@ -32,7 +32,9 @@ if [ $? -ne 0 ]; then
 fi
 
 # And then to image
-convert -density 300 -resize 500x20 -quality 90 temp-formula.pdf ${TEX_IMAGE}
+#convert -density 400 temp-formula.pdf -resize 1000x${TEX_HEIGHT} ${TEX_IMAGE}
+#convert -trim temp-formula.pdf -sharpen 0x1.0 ${TEX_IMAGE}
+convert -trim -density 115 temp-formula.pdf -sharpen 0x1 ${TEX_IMAGE}
 
 # Cleanup
 rm temp-formula.*

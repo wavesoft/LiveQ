@@ -296,16 +296,24 @@ class MCPlots(JobApplication):
 		# Collect intermediate data
 		ih = IntermediateHistogramCollection.fromDirectory( "%s/dump" % self.jobdir, state=1 )
 
+		# If we are empty, return empty string
+		if len(ih) == 0:
+			return ""
+
 		# Pack and return the object
 		return ih.pack()
 
-	def collectFinalHistograms(self):
+	def readFinalHistograms(self):
 		"""
 		Helper function to collect and return the real (not intermediate) output
 		"""
 
 		# Collect intermediate data
 		ih = IntermediateHistogramCollection.fromDirectory( self.datdir, recursive=True, state=2 )
+
+		# If we are empty, return empty string
+		if len(ih) == 0:
+			return ""
 
 		# Pack and return the object
 		return ih.pack()
@@ -344,7 +352,7 @@ class MCPlots(JobApplication):
 						self.state = STATE_COMPLETED
 
 						# Collect and submit job output
-						results = self.collectFinalHistograms()
+						results = self.readFinalHistograms()
 						if results:
 							self.trigger("job_data", True, results)
 
@@ -375,10 +383,9 @@ class MCPlots(JobApplication):
 				# Get intermediate histograms only when running
 				if self.getState() == "running":
 
-					# Fetch itermediate results from the job
+					# Fetch itermediate results from the job and send
+					# them to listeners
 					results = self.readIntermediateHistograms()
-
-					# Let listeners know we have intermediate data available
 					if results:
 						self.trigger("job_data", False, results)
 

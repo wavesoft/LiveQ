@@ -1,0 +1,26 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": [
+            "README.md",
+            "LiveQ.js",
+            "BufferReader.js",
+            "LabSocket.js",
+            "HistogramData.js",
+            "ReferenceData.js",
+            "HistogramReader.js"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": false
+    }
+}
+

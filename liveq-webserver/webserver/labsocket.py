@@ -294,6 +294,11 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     "layout": { }
                 })
 
+        elif action == "bintest":
+
+            # Binary test
+            self.write_message("\x01buffer", binary=True)
+
         else:
 
             # Unknown request
