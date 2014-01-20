@@ -23,6 +23,8 @@ import uuid
 import logging
 
 import liveq.data.js as js
+import liveq.data.histo.io as io
+
 from liveq.models import Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 
@@ -160,7 +162,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     [Bus Event] Data available
     """
     def onBusData(self, data):
-        self.logger.debug("Got DATA!")
+
+        # If we have no job, ignore
+        if not self.jobid:
+            return
 
         # Create a histogram collection from the data buffer
         histos = IntermediateHistogramCollection.fromPack( data['data'] )
@@ -168,24 +173,29 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Keep only the subset we are interested in
         histos = histos.subset( self.lab.getHistograms() )
 
-        # Forward event to the user socket
-        self.write_message({
-                "action": "data",
-                "data": histos.pack(),
-                "info": { }
-            })
+        # Pack them
+        histoBuffers = []
+        for h in histos:
+            # Pack buffers
+            histoBuffers.append( js.packHistogram(h.toHistogram()) )
+
+        # Compile buffer and send
+        self.sendBuffer( 0x02, 
+                struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+            )
+
 
     """
     [Bus Event] Simulation completed
     """
     def onBusCompleted(self, data):
 
+        # If we have no job, ignore
+        if not self.jobid:
+            return
+
         # Forward event to the user socket
-        self.write_message({
-                "action": "completed",
-                "result": data['result'],
-                "info": { }
-            })
+        self.sendAction( "sim_completed", { 'result': data['result'] } )
 
         # Reset tune
         self.jobid = None
@@ -296,7 +306,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # First ask interpolator
             ans = self.ipolChannel.send("interpolate", {            
                     'lab': self.lab.uuid,
-                    'parameters': parsed['parameters']
+                    'parameters': param
                 }, waitReply=True, timeout=5)
 
             # Check response
@@ -311,22 +321,25 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 # Send status
                 self.sendStatus("Processing interpolation")
 
-                # Reply with interpolation data
-                self.write_message({
-                        "action": "data",
-                        "data": ans['data'],
-                        "info": { "interpolation": 1 }
-                    })
+                # Fetch HistogramCollection from data
+                histos = io.unpackHistogramCollection( ans['data'] )
+
+                # Pack histograms
+                histoBuffers = []
+                for h in histos:
+                    # Pack buffers
+                    histoBuffers.append( js.packHistogram(h.toHistogram()) )
+
+                # Compile buffer and send
+                self.sendBuffer( 0x02, 
+                        struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                    )
 
                 # Check if we found excact match
-                if ans['excact']:
+                if ans['exact']:
 
-                    # Return data and abort further actions
-                    self.write_message({
-                            "action": "completed",
-                            "result": 0,
-                            "info": { "interpolation": 1 }
-                        })
+                    # Let interface know that this is the real answer
+                    self.sendAction( "sim_completed", { 'result': data['result'] } )
 
                     # Don't store any jobID
                     self.jobid = None
@@ -342,7 +355,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 'lab': self.lab.uuid,
                 'group': 'global',
                 'dataChannel': self.dataChannel.name,
-                'parameters': parsed['parameters']
+                'parameters': param
             }, waitReply=True, timeout=5)
 
             # Check for I/O failure on the bus

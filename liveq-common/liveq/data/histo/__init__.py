@@ -18,161 +18,11 @@
 ################################################################
 
 import logging
+import struct
 import numpy
 import xml.etree.cElementTree as eTree
 
 from liveq.utils.FLAT import FLATParser
-
-class HistogramCollection(list):
-	"""
-	A collection of histograms that can be optimally interpolated
-	together.
-	"""
-
-	def __init__(self, dataCoeff=None, dataMeta=None, tune=None):
-		"""
-		Initialize the histogram collection
-		"""
-
-		# Initialize histogram
-		list.__init__(self)
-
-		#: Histogram coefficients
-		self.dataCoeff = dataCoeff
-
-		#: Histogram metadata
-		self.dataMeta = dataMeta
-
-		# If we have coefficients and metadata, run the set function
-		if dataCoeff != None and dataMeta != None:
-			self.set(dataCoeff, dataMeta)
-
-		#: Tune index
-		self.tune = tune
-
-		# Mark us as not in update
-		self.updating = False
-
-		# Intermediate array to store histograms that will
-		# be completed upon endUpdate
-		self._limboHistos = [ ]
-
-
-	def set(self, dataCoeff, dataMeta):
-		"""
-		Re-generate histograms based on coefficients and histogram metadata
-		TODO: Optimize
-		"""
-
-		# Validate
-		if type(dataCoeff) != list and type(dataCoeff) != numpy.ndarray:
-			raise ValueError("The dataCoeff parameter is not a list!")
-		if type(dataMeta) != list:
-			raise ValueError("The dataMeta parameter is not a list!")
-
-		# Reset list
-		del self[:]
-
-		# Update local reference
-		self.dataCoeff = dataCoeff
-		self.dataMeta = dataMeta
-
-		# Calculate coefficient slice width
-		w = len(dataCoeff) / len(dataMeta)
-
-		# Rebuild histograms
-		ofs=0
-		for meta in dataMeta:
-
-			# Fetch coefficient slice and forward to next
-			coeff = dataCoeff[ofs:ofs+w]
-			ofs += w
-
-			# Create and store histogram
-			list.append(self, Histogram.fromFit( coeff, meta ) )
-
-
-	def beginUpdate(self, fnMetaValidate=None):
-		"""
-		Flush contents and start updating histogram store
-		"""
-		# Sanity checks
-		if self.updating:
-			raise RuntimeError("Please call beginUpdate() only once!")
-
-		# Reset
-		self.dataCoeff = [ ]
-		self.dataMeta = [ ]
-
-		# Reset list
-		del self[:]
-
-		# Mark us as under update
-		self.updating = True
-
-	def endUpdate(self):
-		"""
-		Bind histogram values 
-		"""
-
-		# Sanity checks
-		if not self.updating:
-			raise RuntimeError("Please call beginUpdate() before changing the HistogramCollection!")
-	
-		# Prepare dataCoeff array
-		dataCoeff = [ ]
-
-		# Sort histograms by name
-		self._limboHistos.sort(key=lambda histo: histo.name)
-
-		# Process histograms in limbo
-		for histogram in self._limboHistos:
-
-			# Append histogram instance on refs
-			list.append(self, histogram)
-
-			# Append histogram coefficients on data coefficients
-			coeff, meta = histogram.polyFit()
-			dataCoeff.append( coeff )
-			self.dataMeta.append( meta )
-
-		# Convert to coefficients to numpy array
-		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 ).flatten()
-
-	def append(self, histogram):
-		"""
-		Append a histogram 
-		"""
-
-		# Sanity checks
-		if not self.updating:
-			raise RuntimeError("Please call beginUpdate() before changing the HistogramCollection!")
-
-		# Store histogram in libmo
-		self._limboHistos.append(histogram)
-
-	def equal(self, collection):
-		"""
-		Check if the collections is equal to the one specified
-		"""
-
-		# Ensure tunes are the same
-		if (collection.tune != None) and (self.tune != None):
-			if not collection.tune.equal( self.tune ):
-				print "!!! Collection tunes not equal"
-				return False
-
-		# Make sure histos are the same
-		for i in range(0,len(self)):
-			# If we are not the same return false
-			if not collection[i].equal( self[i] ):
-				print "!!! Histogram %i in collection not matching" % i
-				return False
-
-		# Return histograms
-		return True
-
-
 
 class Histogram:
 	"""
@@ -322,13 +172,6 @@ class Histogram:
 		# Integrate along the given axis using the composite trapezoidal rule,
 		# using spacing the xError size
 		return numpy.trapz( self.y, self.x )
-
-	@staticmethod
-	def merge(self, *args):
-		"""
-		Merge the statistics with the specified histogram.
-		"""
-		pass
 
 	def chi2ToReference(self, refHisto, uncertainty=0.05):
 		"""

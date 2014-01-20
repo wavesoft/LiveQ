@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,35 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# ----------
-import sys
-sys.path.append("../liveq-common")
-# ----------
+import cPickle as pickle
+import pylzma
+import base64
 
-import logging
-import time
-import signal
-import sys
-
-from interpolator.config import Config
-from interpolator.component import InterpolatorComponent
-
-from liveq import handleSIGINT, exit
-from liveq.events import GlobalEvents
-from liveq.exceptions import ConfigException
-
-# Prepare runtime configuration
-runtimeConfig = { }
-
-# Load configuration
-try:
-	Config.fromFile( "config/interpolator.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	exit(1)
-
-# Hook sigint -> Shutdown
-handleSIGINT()
-
-# Start interpolator manager
-InterpolatorComponent.runThreaded()
+class HistogramCollection(list):
+	"""
+	A collection of histograms that can be packed and restored
+	from a stream
+	"""
+	pass

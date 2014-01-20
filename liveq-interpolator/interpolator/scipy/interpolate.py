@@ -52,7 +52,8 @@ from numpy import linalg
 from interpolator.scipy.lib.six import callable, get_method_function, \
 	 get_function_code
 
-from liveq.data.histo import HistogramCollection, Histogram
+from liveq.data.histo.interpolate import InterpolatableCollection
+from liveq.data.histo import Histogram
 
 __all__ = ['Rbf']
 
@@ -202,10 +203,10 @@ class Rbf(object):
 						   for a in args])
 		self.N = self.xi.shape[-1]
 
-		# Check if the user specified an array of HistogramCollection
+		# Check if the user specified an array of InterpolatableCollection
 		# as an interpolating value. In that case perform interpolation
 		# in multiple levels
-		if data[0].__class__ is HistogramCollection:
+		if data[0].__class__ is InterpolatableCollection:
 
 			# Set interpolation mode
 			self.ipolmode = Rbf.DATA_HISTOSET
@@ -283,7 +284,7 @@ class Rbf(object):
 				i += 1
 
 			# Create and return a new histogram object
-			return HistogramCollection(dataCoeff=ans, dataMeta=dataMeta)
+			return InterpolatableCollection(dataCoeff=ans, dataMeta=dataMeta)
 
 	def __call__(self, *args):
 		args = [asarray(x) for x in args]
@@ -311,4 +312,4 @@ class Rbf(object):
 				i += 1
 
 			# Create and return a new histogram object
-			return HistogramCollection(dataCoeff=ans, dataMeta=self._histometa)
+			return InterpolatableCollection(dataCoeff=ans, dataMeta=self._histometa)

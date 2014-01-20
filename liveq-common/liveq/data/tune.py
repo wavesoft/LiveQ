@@ -17,7 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
 import numpy as np
+
+from liveq.models import Lab
 from liveq.config.tuneaddressing import TuneAddressingConfig
 
 class Tune(dict):
@@ -42,14 +45,17 @@ class Tune(dict):
 
 		else:
 
-			# Otherwise, generate them
-			# TODO: Actually implement this
-			keys = []
-			i = 0
-			for v in data:
-				keys.append(chr(65 + i))
-				i += 1
+			# Fetch lab 
+			lab = None
+			try:
+				lab = Lab.get(Lab.uuid == labid)
+			except Lab.DoesNotExist:
+				logging.error("Unable to locate lab with id '%s' in fromLabData" % labid)
+				return
 
+			# Fetch lab tunable parameters	
+			keys = lab.getTunables()
+			
 			# Sort keys
 			ksorted = sorted(keys)
 

@@ -24,11 +24,15 @@ import uuid
 import random
 import numpy as np
 
+from liveq.component import Component
+
 from interpolator.config import Config
 from interpolator.data.store import HistogramStore
 
+import liveq.data.histo.io as io
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
-from liveq.data.histo import Histogram, HistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
+from liveq.data.histo import Histogram
 from liveq.data.tune import Tune
 
 class InterpolatorComponent(Component):
@@ -67,13 +71,14 @@ class InterpolatorComponent(Component):
 		# Get an interpolator for this region
 		ipol = HistogramStore.getInterpolator(tune)
 
-		# Run interpolation and get histogram collection
+		# Run interpolation and get an InterpolatableCollection collection
 		histograms = ipol(*tune.getValues())
 
 		# Return a packed histogram collection
 		self.ipolChannel.reply({
 				'result': 'ok',
-				'data': histograms.pack()
+				'exact': 0,
+				'data': io.packHistogramCollection( histograms )
 			})
 
 
@@ -95,8 +100,8 @@ class InterpolatorComponent(Component):
 		# Unpack the intermediate histogram collection
 		histos = IntermediateHistogramCollection.fromPack(data['data'])
 
-		# Convert intermediate histograms to a HistogramCollection object
-		histos = histos.toHistogramCollection( tune )
+		# Convert intermediate histograms to a InterpolatableCollection object
+		histos = histos.toInterpolatableCollection( tune )
 
 		# Append data on the histogram store
 		HistogramStore.append( tune, histos )

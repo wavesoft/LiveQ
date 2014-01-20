@@ -23,7 +23,7 @@ import numpy as np
 import cPickle as pickle
 
 from liveq.data.tune import Tune
-from liveq.data.histo import HistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
 
 from interpolator.config import Config
 from interpolator.scipy.interpolate import Rbf
@@ -44,7 +44,7 @@ class HistogramStore:
 	@staticmethod
 	def _pickle(collections, validate=False):
 		"""
-		Converts a collection of HistogramCollections into two buffers
+		Converts a collection of InterpolatableCollection into two buffers
 		that can be stored in a key/value store.
 		"""
 
@@ -136,7 +136,7 @@ class HistogramStore:
 	def _unpickle( valueData, metaData ):
 		"""
 		Unpack the values and metadata from the specified set of packed data
-		into a list of HistogramCollections.
+		into a list of InterpolatableCollections.
 		"""
 
 		# Unpack value buffer
@@ -168,7 +168,7 @@ class HistogramStore:
 			ofs += iNumCoeff
 
 			# Create and collect histogram collection
-			ans.append(HistogramCollection(
+			ans.append(InterpolatableCollection(
 				dataCoeff=sCoeff, 
 				dataMeta=iHistoMeta, 
 				tune=Tune.fromLabData(

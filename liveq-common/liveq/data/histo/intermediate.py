@@ -30,10 +30,11 @@ import base64
 
 from liveq.utils.FLAT import FLATParser
 from liveq.data.histo import Histogram
+from liveq.data.histo.interpolate import InterpolatableCollection
 
 class IntermediateHistogramCollection(dict):
 	"""
-	A class that provides a unified interface access to the generated histograms
+	A class that provides a unified interface access to the generated histograms.
 	"""
 
 	# Overridable default compression function for packing
@@ -114,7 +115,7 @@ class IntermediateHistogramCollection(dict):
 		buf = IntermediateHistogramCollection.F_DECOMPRESS( base64.b64decode( data ) )
 
 		# Get version, histogram count and state
-		(ver, numHistos, state) = struct.unpack("!BIB", buf[:6])
+		(ver, numHistos, state) = struct.unpack("<BIB", buf[:6])
 		p = 6
 
 		# Validate protocol version
@@ -126,7 +127,7 @@ class IntermediateHistogramCollection(dict):
 		for i in range(numHistos):
 
 			# Read histogram header
-			(hBins, hNevts, hXS, hNameLen) = struct.unpack("!ILdB", buf[p:p+17])
+			(hBins, hNevts, hXS, hNameLen) = struct.unpack("<ILdB", buf[p:p+17])
 			p += 17
 
 			# Read histogram name
@@ -184,16 +185,18 @@ class IntermediateHistogramCollection(dict):
 		|  char* | The histogram name                        |
 		|   ..   | 8x bin-sized float64 numpy buffers        |
 		+--------+-------------------------------------------+
+
+		/!\ Note: This buffer is NOT 64-bit aligned!
 		"""
 		
 		# Prepare buffer
-		buf = struct.pack("!BIB", 1, len(self), self.state)
+		buf = struct.pack("<BIB", 1, len(self), self.state)
 
 		# Start packing data
 		for histo in self.values():
 
 			# Put histogram header
-			buf += struct.pack("!ILdB", 
+			buf += struct.pack("<ILdB", 
 					histo.bins,
 					histo.nevts,
 					histo.crosssection,
@@ -229,14 +232,14 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
-	def toHistogramCollection(self, tune):
+	def toInterpolatableCollection(self, tune):
 		"""
-		Convert the intermediate histogram into a collection of final histograms
+		Convert the intermediate histogram into a collection that can be interpolated
 		"""
 
 		# Create histogram collection with the given tune
 		# as tune reference.
-		ans = HistogramCollection( tune=tune )
+		ans = InterpolatableCollection( tune=tune )
 		ans.beginUpdate()
 
 		# Pile-up the histograms
