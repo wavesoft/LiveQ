@@ -46,6 +46,9 @@ class InterpolatorComponent(Component):
 		"""
 		Component.__init__(self)
 
+		# Setup logger
+		self.logger = logging.getLogger("interpolator")
+
 		# Open the interpolator
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 
@@ -59,14 +62,18 @@ class InterpolatorComponent(Component):
 		"""
 		
 		# Ensure we have required parameters in the data
-		if not all([ x in data for x in ('lab', 'config')]):
+		if not all([ x in data for x in ('lab', 'parameters')]):
+			self.logger.warn("Missing parameters in the interpolationrequest")
 			return {
 				'result': 'error',
 				'error': "Missing parameters in the request"
 			}
 
+		# Log
+		self.logger.info("Interpolating for lab %s: %s" % (data['lab'], data['parameters']))
+
 		# Generate a tune object
-		tune = Tune(data['config'], labid=data['lab'])
+		tune = Tune(data['parameters'], labid=data['lab'])
 
 		# Get an interpolator for this region
 		ipol = HistogramStore.getInterpolator(tune)

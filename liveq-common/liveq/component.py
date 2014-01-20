@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import traceback
 import threading
 import time
 import Queue
@@ -84,6 +85,7 @@ class Component:
 			try:
 				cls.INSTANCE.run()
 			except Exception as e:
+				traceback.print_exc()
 				logging.error("Main thread exited with exception %s: %s" % ( e.__class__.__name__, str(e) ))
 				exit(128)
 

@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import traceback
 import logging
 import signal
 import sys
@@ -94,6 +95,7 @@ class EventDispatcher:
 				handler[0](*args, **handler[1])
 			except Exception as e:
 				logging.error("Exception while dispatching event %s to handler %s: %s" % (event, str(handler), str(e)))
+				traceback.print_exc()
 
 				# Re-throw exception if we are running unsafe
 				if not self.safeEvents:
