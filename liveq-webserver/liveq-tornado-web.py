@@ -64,6 +64,7 @@ def main():
 	tornado.ioloop.IOLoop.instance().start()
 
 t = threading.Thread(target=main)
+logging.info("Starting weberver on port %s" % options.port)
 t.start()
 
 while True:

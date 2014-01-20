@@ -17,8 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
 import struct
 import numpy as np
+import base64
 
 from liveq.data.histo import Histogram
 
@@ -38,15 +40,21 @@ def packString(string, pad=8):
 	# Return buffer
 	return buf
 
-def packFile(fname, pad=8):
+def packFile(fname, pad=8, missing=""):
 	"""
 	Return the contents of the given file, padded to the specified length
 	"""
 
 	# Read file buffer
 	buf = ""
-	with open(fname, "rb") as f:
-		buf = f.read()
+	try:
+		# Try to read file
+		with open(fname, "rb") as f:
+			buf = f.read()
+	except IOError as e:
+		logging.warn("Error while packing file %s! Using placeholder" % fname)
+		# File not exist, replace with missing buffer
+		buf = missing
 
 	# Prefix length
 	buf = struct.pack("<I", len(buf)) + buf
@@ -86,25 +94,30 @@ def packHistogram(histo):
 	# Return buffer
 	return buf
 
-def packDescription(id, desc, path="/Users/icharala/Develop/LiveQ/tools/ref.local"):
+def packDescription(desc):
 	"""
-	Pack a histogram description
+	Pack a histogram description, as obtained from HistoDescriptionLab.describeHistogram
 	"""
 
 	# Pack histogram ID
-	buf = packString(id)
+	buf = packString( desc['id'] )
 
 	# Pack histogram name
-	buf += packString( desc[7] )
+	buf += packString( desc['title'] )
+
+	# Pack observable description
+	buf += packString( desc['observable'] )
+
+	# Pack group name
+	buf += packString( desc['group'] )
 
 	# Pack Title,X,Y pngs
-	buf += packFile( "%s/tex/%s.png" % (path, desc[9]) )
-	buf += packFile( "%s/tex/%s-x.png" % (path, desc[9]) )
-	buf += packFile( "%s/tex/%s-y.png" % (path, desc[9]) )
+	buf += packFile( desc['files']['title'] )
+	buf += packFile( desc['files']['xlabel'] )
+	buf += packFile( desc['files']['ylabel'] )
 
 	# Pack reference histogram
-	refFile = "%s/ref/%s" % (path, desc[8])
-	refHisto = Histogram.fromFLAT( refFile )
+	refHisto = Histogram.fromFLAT( desc['files']['ref'] )
 	buf += packHistogram( refHisto )
 
 	# Return buffer

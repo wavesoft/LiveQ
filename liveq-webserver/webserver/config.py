@@ -19,10 +19,12 @@
 
 import ConfigParser
 import os.path
+
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
+from liveq.data.histo.description import HistoDescription
 from liveq.models import createBaseTables
 
 """
@@ -31,10 +33,16 @@ Local configuration for the agent
 class WebserverConfig:
 
 	SERVER_PORT = 8080
+	HISTODESC_PATH = ""
+	HISTODESC = None
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
+		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
+
+		# Create a histogram description from the reference data path
+		WebserverConfig.HISTODESC = HistoDescription( WebserverConfig.HISTODESC_PATH )
 
 """
 Create a configuration for the JOB MANAGER based on the core config

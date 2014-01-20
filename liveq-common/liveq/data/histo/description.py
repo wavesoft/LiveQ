@@ -17,6 +17,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import json
+import logging
+
 class HistoDescriptionLab:
 	"""
 	A HistoDescriptionLab class encapsulates a HistoDescription and provides
@@ -25,7 +28,7 @@ class HistoDescriptionLab:
 
 	def __init__(self, description, lab):
 		"""
-		Initialize
+		Initialize a HistoDescriptionLab
 		"""
 
 		# Keep reference
@@ -45,31 +48,95 @@ class HistoDescriptionLab:
 		self.energy=""
 		if 'energy' in processParameters:
 			self.energy = processParameters['energy']
-		self.params=""
+		self.params="-"
 		if 'params' in processParameters:
 			self.params = processParameters['params']
+		self.specific = "-"
+		if 'specific' in processParameters:
+			self.specific = processParameters['specific']
 
-	def getStatic(self):
-		"""
-		Return the static configuration required by the interface for rendering correctly
-		the histogram responses.
-		"""
-		pass
-
-	def getHistogram(self, name):
+	def describeHistogram(self, id):
 		"""
 		Describe the specified histogram
 		"""
-		pass
+
+		# Try to lookup the histogram from database
+		if not id in self.description.histodesc:
+			return None
+
+      	# Fetch histogram description
+		hdesc = self.description.histodesc[id]
+		desc = None
+
+		# Try to find the appropripate description
+		for h in hdesc:
+
+			# Require match on the following fields:
+			if h[1] != self.beam:
+				continue
+			if h[2] != self.process:
+				continue
+			if str(h[3]) != str(self.energy):
+				continue
+			if h[4] != self.params:
+				continue
+
+			# Found
+			desc = h
+			break
+
+		# Check if we could not match an appropriate description
+		if not desc:
+			return None
+
+		# Return description
+		return {
+				'id': id,
+				'title': str(desc[7]),
+				'observable': str(desc[0]),
+				'group': str(desc[6]),
+				'cuts': str(desc[5]),
+
+				# Related files with these information
+				'files': {
+					'ref': "%s/ref/%s" % (self.description.basedir, str(desc[8])),
+					'title': "%s/tex/%s.png" % (self.description.basedir, str(desc[9])),
+					'xlabel': "%s/tex/%s-x.png" % (self.description.basedir, str(desc[9])),
+					'ylabel': "%s/tex/%s-y.png" % (self.description.basedir, str(desc[9]))
+				}
+			}
 
 
 class HistoDescription:
 	"""
-	This class provides a human representation for the histogram
+	This class provides an interface for accessing histogram descrition information
 	"""
 
-	def __init__(self, descriptionFile):
+	def __init__(self, descriptionPath):
 		"""
-		Load the histogram descriptions from the given JSON description file
+		The constructor will initialize the HistoDescription class by loading the `description.json`
+		file from the path specified.
 		"""
-		pass
+		
+		# Keep a reference of the base dir
+		self.basedir = descriptionPath
+
+		# Prepare the description structure
+		self.histodesc = { }
+
+		# Load json data
+		logging.info("Loading histogram descriptions from %s/description.json" % self.basedir)
+		with open( "%s/description.json" % self.basedir, "r") as f:
+			# Load entire file in memory
+			buf = f.read()
+			# Parse JSON
+			self.histodesc = json.loads(buf)
+
+
+	def forLab(self, lab):
+		"""
+		Get configuration class for the given lab (instance)
+		"""
+
+		# Open description for the given lab
+		return HistoDescriptionLab( self, lab )

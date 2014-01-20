@@ -18,11 +18,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import struct
 import uuid
 import logging
 
+import liveq.data.js as js
 from liveq.models import Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
+
 from webserver.config import Config
 
 import tornado.websocket
@@ -78,6 +81,9 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         except Lab.DoesNotExist:
             self.logger.error("Unable to locate lab with id '%s'" % labid)
             return self.sendError("Unable to find a lab with the given ID")
+
+        # Create a histogram description instance for this lab
+        self.histodesc = Config.HISTODESC.forLab( self.lab )
 
         # Open required bus channels
         self.ipolChannel = Config.IBUS.openChannel("interpolate")
@@ -190,13 +196,17 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     # --------------------------------------------------------------------------------
     ####################################################################################
 
-    def sendBuffer(self, frameID, buffer):
+    def sendBuffer(self, frameID, data):
         """
-        Send a binary buffer to the websocket
+        Send a binary data to the websocket
         """
 
         # Send a binary frame to WebSocket
-        self.write_message( chr(frameID) + data, binary=True)
+        self.write_message( 
+            # Header MUST be 64-bit aligned
+            struct.pack("<II", frameID, 0)+data, 
+            binary=True
+        )
 
     def sendAction(self, action, param={}):
         """
@@ -218,7 +228,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.write_message({
                 "action": "error",
                 "param": {
-                    "error": error
+                    "message": error
                 }
             })
 
@@ -360,9 +370,33 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         elif action == "handshake":
 
+            # Get client API version
+            self.cversion = "0.1a"
+            if 'version' in param:
+                self.cversion = param['version']
+
             # We have a handshake with the agent.
             # Fetch configuration and send configuration frame
-            self.log
+            self.logger.info("Handshake with client API v%s" % self.cversion)
+
+            # Fetch descriptions for the histograms
+            histo_ids = self.lab.getHistograms()
+            histoBuffers = []
+            for hid in histo_ids:
+
+                # Fetch description record
+                descRecord = self.histodesc.describeHistogram( hid )
+                if not descRecord:
+                    self.sendError("Could not find description for histogram %s" % hid)
+                    return
+
+                # Compile to buffer and store on histoBuffers array
+                histoBuffers.append( js.packDescription(descRecord) )
+
+            # Compile buffer and send
+            self.sendBuffer( 0x01, 
+                    struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                )
 
         else:
 

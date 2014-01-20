@@ -120,7 +120,7 @@ LiveQ.HistogramReader.prototype.offHistogramRemoved = function( cb ) {
  * 
  * @param {LiveQ.BufferReader} reader - The incoming configuration frame reader from the WebSocket.
  */
-LiveQ.HistogramReader.prototype.handleConfigFrame = function( reader ) {
+LiveQ.HistogramReader.prototype.handleConfigFrame = function( configReader ) {
 
 	// Fire histogram removal callbacks
 	for(var histoID in this.data){
@@ -142,8 +142,8 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( reader ) {
 	this.data = { };
 
 	// Read the configuration header data
-	var numHistos = configReader.getUint16(),
-		reserved = configReader.getUint16();
+	var numHistos = configReader.getUint32(),
+		reserved = configReader.getUint32();
 
 	// Read histograms
 	for (var i=0; i<numHistos; i++) {
@@ -177,8 +177,8 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( reader ) {
 LiveQ.HistogramReader.prototype.handleFrame = function( reader ) {
 
 	// Read the frame header
-	var numHistos = reader.getUint16(),
-		reserved = reader.getUint16();
+	var numHistos = reader.getUint32(),
+		reserved = reader.getUint32();
 
 	// Read histograms
 	for (var i=0; i<numHistos; i++) {

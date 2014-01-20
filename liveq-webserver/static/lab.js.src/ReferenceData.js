@@ -27,6 +27,18 @@ LiveQ.ReferenceData = function( ) {
 	this.name = "";
 
 	/**
+	 * The name of the observable of the histogram.
+	 * @member {string}
+	 */
+	this.observable = "";
+
+	/**
+	 * The name of the group this histogram belongs to.
+	 * @member {string}
+	 */
+	this.group = "";
+
+	/**
 	 * The data: url that contains the image of the title (with the rendered LaTeX).
 	 * @member {string}
 	 */
@@ -63,9 +75,12 @@ LiveQ.ReferenceData.fromReader = function( reader ) {
 
 	// Read histogram id
 	hc.id = reader.getString();
-
 	// Read histogram name
 	hc.name = reader.getString();
+	// Read histogram observable
+	hc.observable = reader.getString();
+	// Read histogram group
+	hc.group = reader.getString();
 
 	// Get PNG for title
 	hc.imgTitle = reader.getData('image/png');

@@ -70,16 +70,16 @@ LiveQ.HistogramData = function( bins, id ) {
 	if (this.bins > 0) {
 
 		// Allocate new blank buffer
-		var buf = new ArrayBuffer( 6 * this.bins );
+		var buf = new ArrayBuffer( 6 * this.bins * 8 );
 
 		// Fetch 6 views from it
 		ofs = 0;
-		this.y = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
-		this.yErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
-		this.yErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
-		this.x = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
-		this.xErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
-		this.xErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins;
+		this.y = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		this.yErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		this.yErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		this.x = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		this.xErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		this.xErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
 
 	}
 

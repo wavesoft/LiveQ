@@ -51,8 +51,11 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 
 				// Encapsuate ArrayBuffer in a BufferReader class
 				var reader = new LiveQ.BufferReader(this.result);
-				// Read the frame ID
-				var frameID = reader.getUint8();
+
+				// Read the frame header (64 bit)
+				var frameID = reader.getUint32(),
+					reserved = reader.getUint32();
+
 				// Handle data frame
 				self.handleDataFrame( frameID, reader );
 
