@@ -66,11 +66,11 @@ def packHistogram(histo):
 	Note: This function ensure 64-bit alignment of the data.
 	"""
 
-	# Start with histogram header (8 bytes)
-	buf = struct.pack("<IBBBB", histo.bins, 0,0,0,0 )
+	# Start with histogram name
+	buf = packString( histo.name )
 
-	# Continue with histogram name
-	buf += packString( histo.name )
+	# Continue with histogram header (8 bytes)
+	buf += struct.pack("<IBBBB", histo.bins, 0,0,0,0 )
 
 	# Combine all numpy buffers
 	tp = np.array([], dtype=np.float64)

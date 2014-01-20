@@ -12,11 +12,13 @@
  *
  */
 LiveQ.LabSocket = function( id ) {
-	var self = this;
+
+	// Prepare histogram reader
+	this.histograms = new LiveQ.HistogramReader();
 
 	// Open websocket
-	self.url = "ws://" + location.host + "/vas/labsocket/" + id;
-	self.setupSocket( self.url );
+	this.url = "ws://" + location.host + "/vas/labsocket/" + id;
+	this.setupSocket();
 
 }
 
@@ -28,7 +30,7 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 	var self = this;
 
 	// Create new WebSocket to the given url
-	this.socket = new WebSocket(url);
+	this.socket = new WebSocket(this.url);
 
 	// -----------------------------------------------------------
 	// Bind a listener to the incoming WebSocket Data
@@ -62,7 +64,7 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 			// Convert data to JSON
 			var data = JSON.parse(event.data);
 			// Extract parameters
-			var param = data['parameters'] || { };
+			var param = data['param'] || { };
 			// Handle action
 			self.handleActionFrame( data['action'], param );
 
@@ -115,6 +117,18 @@ LiveQ.LabSocket.prototype.handleActionFrame = function( action, data ) {
  * @param {BufferReader} reader - The BufferReader object that will be used for reading the data
  */
 LiveQ.LabSocket.prototype.handleDataFrame = function( action, reader ) {
+
+	if (action == 0x01) { /* Configuration Frame */
+
+		// Handle configuration frame
+		this.histograms.handleConfigFrame( reader );
+
+	} else if (action == 0x02) { /* Histogram Data Frame */
+
+		// Handle histogram data frame
+		this.histograms.handleFrame( reader );
+
+	}
 
 };
 

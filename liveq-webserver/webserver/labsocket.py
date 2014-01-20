@@ -18,7 +18,6 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-#from ??? import LabDatabase
 import uuid
 import logging
 
@@ -43,21 +42,26 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.lab = None
         self.jobid = None
 
+    ####################################################################################
+    # --------------------------------------------------------------------------------
+    #                             WEBSOCKET IMPLMEMENTATION
+    # --------------------------------------------------------------------------------
+    ####################################################################################
 
-    """
-    Hack for iOS 5.0 Safari
-    """
     def allow_draft76(self):
+        """
+        Hack for iOS 5.0 Safari
+        """
         return True
 
-    """
-    Open socket
-
-    After oppening the socket, we will try to find a lab tha matches the
-    specified labID and then register on the message bus in order to receive
-    the messages regarding this lab.
-    """
     def open(self, labid):
+        """
+        Open socket
+
+        After oppening the socket, we will try to find a lab tha matches the
+        specified labID and then register on the message bus in order to receive
+        the messages regarding this lab.
+        """
         logging.info( "Lab socket '%s' requested" % labid )
 
         # Reset local variables
@@ -70,7 +74,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             self.lab = Lab.get(Lab.uuid == labid)
         except Lab.DoesNotExist:
             logging.error("Unable to locate lab with id '%s'" % labid)
-            return self.send_error("Unable to find a lab with the given ID")
+            return self.sendError("Unable to find a lab with the given ID")
 
         # Open required bus channels
         self.ipolChannel = Config.IBUS.openChannel("interpolate")
@@ -80,6 +84,68 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Bind events
         self.dataChannel.on('job_data', self.onBusData)
         self.dataChannel.on('job_completed', self.onBusCompleted)
+
+    def on_close(self):
+        """
+        Socket closed
+        """
+        logging.info("Socket closed")
+
+        # If we have a running tune, cancel it
+        if self.jobid:
+
+            # Ask job manager to cancel the job
+            ans = self.jobChannel.send('job_cancel', {
+                'jid': self.jobid
+            })
+
+            # Clear job ID
+            self.jobid = None
+
+        # Unregister from the bus
+        if self.dataChannel:
+
+            # Disconnect and release data channel
+            self.dataChannel.off('job_data', self.onBusData)
+            self.dataChannel.off('job_completed', self.onBusCompleted)
+            self.dataChannel.close()
+
+            # Disconnect and release job channel
+            self.jobChannel.close()
+            self.jobChannel = None
+            self.dataChannel = None
+
+    def on_message(self, message):
+        """
+        Message arrived on the socket
+        """
+
+        # If socket is in invalid state, always respond with an error
+        if not self.lab:
+            return self.sendError("Unable to find a lab with the given ID")
+
+        # Process input parameters
+        logging.info("got message %r", message)
+        parsed = tornado.escape.json_decode(message)
+
+        # Check for valid message
+        if not 'action' in parsed:
+            return self.sendError("Missing 'action' parameter from request")
+        action = parsed['action']
+
+        # Check for parameters
+        param = { }
+        if 'param' in parsed:
+            param = parsed['param']
+
+        # Handle action
+        self.handleAction( action, param )
+
+    ####################################################################################
+    # --------------------------------------------------------------------------------
+    #                                BUS CALLBACK HANDLERS
+    # --------------------------------------------------------------------------------
+    ####################################################################################
 
     """
     [Bus Event] Data available
@@ -115,92 +181,104 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Reset tune
         self.jobid = None
 
-    """
-    Close socket
-    """
-    def on_close(self):
-        logging.info("Socket closed")
+    ####################################################################################
+    # --------------------------------------------------------------------------------
+    #                                 HELPER FUNCTIONS
+    # --------------------------------------------------------------------------------
+    ####################################################################################
 
-        # If we have a running tune, cancel it
-        if self.jobid:
+    def sendBuffer(self, frameID, buffer):
+        """
+        Send a binary buffer to the websocket
+        """
 
-            # Ask job manager to cancel the job
-            ans = self.jobChannel.send('job_cancel', {
-                'jid': self.jobid
+        # Send a binary frame to WebSocket
+        self.write_message( chr(frameID) + data, binary=True)
+
+    def sendAction(self, action, param={}):
+        """
+        Send a named action, with an optional data dictionary
+        """
+
+        # Send text frame to websocket
+        self.write_message({
+                "action": action,
+                "param": data
             })
 
-            # Clear job ID
-            self.jobid = None
-
-        # Unregister from the bus
-        if self.dataChannel:
-
-            # Disconnect and release data channel
-            self.dataChannel.off('job_data', self.onBusData)
-            self.dataChannel.off('job_completed', self.onBusCompleted)
-            self.dataChannel.close()
-
-            # Disconnect and release job channel
-            self.jobChannel.close()
-            self.jobChannel = None
-            self.dataChannel = None
-
-    """
-    Shorthand to respond with an error
-    """
-    def send_error(self, error):
+    def sendError(self, error):
+        """
+        Shorthand to respond with an error
+        """
 
         # Send the error message
-        msg = {
-            "action": "error",
-            "error": error
-        }
-        self.write_message(msg)
+        self.write_message({
+                "action": "error",
+                "param": {
+                    "error": error
+                }
+            })
 
-        # Also log the error
+        # And log the error
         logging.warn(error)
 
-    """
-    Message arrived
-    """
-    def on_message(self, message):
+    def sendStatus(self, message):
+        """
+        Send a status message to the interface
+        """
 
-        # If socket is in invalid state, always respond with an error
-        if not self.lab:
-            return self.send_error("Unable to find a lab with the given ID")
+        # Send the status message
+        self.write_message({
+                "action": "status",
+                "param": {
+                    "message": message
+                }
+            })
 
-        # Process input parameters
-        logging.info("got message %r", message)
-        parsed = tornado.escape.json_decode(message)
+    def abortJob(self):
+        """
+        Abort a previously running job
+        """
 
-        # Check for valid message
-        if not 'action' in parsed:
-            return self.send_error("Missing 'action' parameter from request")
-        action = parsed['action']
+        # Make sure we have a job
+        if not self.jobid:
+            return
 
+        # Send status
+        self.sendStatus("Aborting previous job")
+
+        # Ask job manager to cancel a job
+        ans = self.jobChannel.send('job_cancel', {
+            'jid': self.jobid
+        }, waitReply=True)
+
+        # Check for I/O failure on the bus
+        if not ans:
+            return self.sendError("Unable to contact the job manager")
+
+        # Check for error response
+        if ans['result'] == 'error':
+            return self.sendError("Unable to cancel job: %s" % ans['error'])
+
+        # Send status
+        self.sendStatus("Job aborted")
+
+        # Clear job ID
+        self.jobid = None
+
+    def handleAction(self, action, param):
+        """
+        Handle the specified incoming action from the javascript interface
+        """
 
         # Process actions
         if action == "tune_begin":
 
-            # Make sure we have parameters when we start a tune
-            if not 'parameters' in parsed:
-                return self.send_error("Missing 'parameters' parameter from request")
-
             # If we are already running a tune (jobid is defined), cancel and restart
-            if self.jobid:
-   
-                # Ask job manager to cancel a job
-                ans = self.jobChannel.send('job_cancel', {
-                    'jid': self.jobid
-                }, waitReply=True)
+            self.abortJob()
 
-                # Check for I/O failure on the bus
-                if not ans:
-                    return self.send_error("Unable to contact the job manager")
-
-                # Check for error response
-                if ans['result'] == 'error':
-                    return self.send_error("Unable to cancel previously running job: %s" % ans['error'])
+            # Send status
+            self.sendStatus("Contacting interpolator")
 
             # First ask interpolator
             ans = self.ipolChannel.send("interpolate", {            
@@ -210,9 +288,15 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Check response
             if not ans:
+
+                # Send status
+                self.sendStatus("Could not contact interpolator")
                 logging.warn("Could not contact interpolator")
 
             else:
+
+                # Send status
+                self.sendStatus("Processing interpolation")
 
                 # Reply with interpolation data
                 self.write_message({
@@ -237,6 +321,9 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     # And exit
                     return
 
+            # Send status
+            self.sendStatus("Contacting job manager")
+
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
                 'lab': self.lab.uuid,
@@ -247,61 +334,28 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Check for I/O failure on the bus
             if not ans:
-                return self.send_error("Unable to contact the job manager")
+                return self.sendError("Unable to contact the job manager")
 
             # Check for error response
             if ans['result'] == 'error':
-                return self.send_error("Unable to place a job request: %s" % ans['error'])
+                return self.sendError("Unable to place a job request: %s" % ans['error'])
+
+            # Send status
+            self.sendStatus("Job #%s started" % ans['jid'])
 
             # The job started, save the tune job ID
             self.jobid = ans['jid']
 
         elif action == "tune_cancel":
 
-            # If we don't have a running tune, raise an error
+            # If we don't have a running tune, don't do anything
             if not self.jobid:
-                return self.send_error("Trying to cancel an already completed tune")
+                return
 
-            # Ask job manager to cancel a job
-            ans = self.jobChannel.send('job_cancel', {
-                'jid': self.jobid
-            }, waitReply=True)
-
-            # Check for I/O failure on the bus
-            if not ans:
-                return self.send_error("Unable to contact the job manager")
-
-            # Check for error response
-            if ans['result'] == 'error':
-                return self.send_error("Unable to cancel job: %s" % ans['error'])
-
-            # Clear job ID
-            self.jobid = None
-
-        elif action == "configuration":
-
-            # Dummy message handler
-            self.write_message({
-                    "action": "configuration",
-                    "histograms": [
-                        {
-                            "histogram": {
-                                "name": "Test"
-                            },
-                            "reference": [ ]
-                        }
-                    ],
-                    "layout": { }
-                })
-
-        elif action == "bintest":
-
-            # Binary test
-            self.write_message("\x01buffer", binary=True)
+            # Abort job
+            self.abortJob()
 
         else:
 
             # Unknown request
-            self.send_error("Unknown action '%s' specified" % action )
-
-
+            self.sendError("Unknown action '%s' requested" % action )
