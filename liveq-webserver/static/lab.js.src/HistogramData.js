@@ -46,7 +46,7 @@ LiveQ.HistogramData = function( bins, id ) {
 		// Fetch bin-views of 6 floats each
 		var ofs = 0;
 		for (var i=0; i<this.bins; i++) {
-			this.values.push( Float64Array( buf, ofs, 48 ) ); // (6 values) * (8 bytes)
+			this.values.push( new Float64Array( buf, ofs, 48 ) ); // (6 values) * (8 bytes)
 			ofs += 48;
 		}
 
