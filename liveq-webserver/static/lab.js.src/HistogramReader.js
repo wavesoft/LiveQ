@@ -158,7 +158,7 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( configReader ) {
 
 		// Fire histogram added callbacks
 		for (var i=0; i<this._onHistogramAdded.length; i++) {
-			this._onHistogramAdded[i]( histo, this.reference[histoID] );
+			this._onHistogramAdded[i]( histo, this.reference[histo.id] );
 		}
 
 	}
