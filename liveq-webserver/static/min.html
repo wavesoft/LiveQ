@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<title>Minimal test</title>
-		<script type="text/javascript" src="lib.local/d3.v3.min.js"></script>
+		<script type="text/javascript" src="lib/d3.v3.min.js"></script>
 		<script type="text/javascript" src="lab.js.src/LiveQ.js"></script>
 		<script type="text/javascript" src="lab.js.src/BufferReader.js"></script>
 		<script type="text/javascript" src="lab.js.src/HistogramData.js"></script>
@@ -130,7 +130,13 @@
 					'top': 30,
 					'bottom': 30,
 					'right': 20
+				},
+
+				'features': {
+					'errorBand': false,
+					'errorBarsY' : true
 				}
+
 			};
 
 			// Initialize plot components
@@ -244,7 +250,7 @@
 			// Create the X and Y axis
 			this.xAxisGraphic = this.svgPlot.append("g")
 			    .attr("class", "x axis")
-			    .attr("transform", "translate(0," + height + ")")
+			    .attr("transform", "translate(0,"+height+")")
 			    .call(this.xAxis);
 			this.yAxisGraphic = this.svgPlot.append("g")
 			    .attr("class", "y axis")
@@ -275,7 +281,154 @@
 
 			// Update
 			this.rescaleAxes();
+			this.updateLegend();
 			this.update();
+
+		}
+
+		/**
+		 * Calculate how many points are inside each area and find
+		 * the one with the smallest number of points.
+		 *
+		 * This function will return the index of the area array specified.
+		 *
+		 * @param {array} areas - The array of the area boundaries to check (format: [x,y,w,h])
+		 */
+		HistoPlot.prototype.getLeastUsedArea = function(areas) {
+
+			// Initialize usage array
+			var usage = [ ];
+			for (var i=0; i<areas.length; i++) {
+				usage.push(0);
+			}
+
+			// Iterate over the histograms
+			for (var j=0; j<this.plots.length; j++) {
+				var histo = this.plots[j].histo;
+				// Run over bins and get point positions
+				for (var i=0; i<histo.bins; i++) {
+					// Get position
+					var x = this.xScale(histo.values[i][3]),
+						y = this.xScale(histo.values[i][0]);
+
+					// Hit-test areas
+					for (var k=0; k<areas.length; k++) {
+						if ( (x >= areas[k][0]) && (x <= (areas[k][0]+areas[k][2])) &&
+							 (y >= areas[k][1]) && (y <= (areas[k][1]+areas[k][3])) ) {
+							usage[k] += 1;
+							break;
+						}
+					}
+				}
+			}
+
+			// Find minimum
+			var min=usage[0], min_index=0;
+			for (var i=0; i<usage.length; i++) {
+				if (usage[i]<min) {
+					min=usage[i];
+					min_index=i;
+				}
+			}
+
+			// Return index
+			return min_index;
+
+		}
+
+		/**
+		 * Update the histogram elements
+		 */
+		HistoPlot.prototype.updateLegend = function() {
+			var self = this, lb = this.style.legendBullet,
+				width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
+				height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
+
+			//
+			// Find in which region to place the legend.
+			// The placeAt gets one of the following values:
+			//
+			//  +---+---+
+			//  | 0 | 1 |
+			//  +---+---+
+			//  | 2 | 3 |
+			//  +---+---+
+			//
+			var midW = width/2, midH = height/2,
+				placeAt = this.getLeastUsedArea([
+						[0,0,midW,midH], [midW,0,midW,midH],
+						[0,midH,midW,midH], [midW,midH,midW,midH]
+					]);
+
+			// Calculate offsets, based on the area we should place the legend
+			var rightAlign = false, ofsX = 0, ofsY = 0, yDirection = 1;
+			if (placeAt == 0) {
+				ofsX = this.style.titlePad*2 + 20;
+				ofsY = 20;
+			} else if (placeAt == 1) {
+				rightAlign = true;
+				ofsX = width;
+				ofsY = 20;
+			} else if (placeAt == 2) {
+				yDirection = -1;
+				ofsX = this.style.titlePad*2 + 20;
+				ofsY = height - this.style.titlePad*2 - 20;
+			} else if (placeAt == 3) {
+				rightAlign = true;
+				yDirection = -1;
+				ofsX = width;
+				ofsY = height - this.style.titlePad*2 - 20;
+			}
+
+			// Set legend alignment
+			this.svgLegend
+				.attr("transform", "translate("+ofsX+","+ofsY+")");
+
+			// Open data record
+			var record = this.svgLegend.selectAll("g.legend-entry").data(this.plots);
+
+			// Enter
+			var newGroups = record.enter()
+				.append("g")
+					.attr("class", "legend-entry");
+				if (rightAlign) {
+					newGroups.append("path")
+						.attr("d", "M"+(-lb)+","+(-lb/2)
+								  +"L0,"+(-lb/2)
+								  +"L0,"+(lb/2)
+								  +"L"+(-lb)+","+(lb/2)
+								  +"Z" );
+					newGroups.append("text")
+						.attr("transform", "translate("+(-lb-4)+",0)")
+						.style("dominant-baseline", "middle")
+						.style("text-anchor", "end" );
+				} else {
+					newGroups.append("path")
+						.attr("d", "M"+lb+","+(-lb/2)
+								  +"L0,"+(-lb/2)
+								  +"L0,"+(lb/2)
+								  +"L"+lb+","+(lb/2)
+								  +"Z" );
+					newGroups.append("text")
+						.attr("transform", "translate("+(lb+4)+",0)")
+						.style("dominant-baseline", "middle")
+						.style("text-anchor", "start" );
+				}
+
+			// Update
+			record
+				.attr("transform", function(d,i) { 
+					return "translate(0,"+(yDirection*i*self.style.legendHeight)+")"
+				});
+			record.selectAll("text")
+				.text(function(d,i) { return d.title });
+			record.selectAll("path")
+				.attr("fill", function(d,i) { return d.color });
+
+			// Delete
+			record.exit()
+				.remove();
+
 
 		}
 
@@ -301,7 +454,7 @@
 				};
 
 
-			// Line path template
+			// Line path templates
 			var self = this;
 			var pathLine = d3.svg.line()
 				//.interpolate("basis")
@@ -339,7 +492,9 @@
 						.attr("fill", shadeColor(plot.color, 60));
 
 				// Update
-				record.attr("d", pathArea);
+				record
+					.attr("d", pathArea)
+					.attr("visibility", this.style.features.errorBand ? "visible" : "hidden");
 
 				// Delete
 				record.exit()
@@ -399,12 +554,13 @@
 							e_dn = self.yScale(d[0]-d[2]) - self.yScale(d[0]);
 
 						// Draw upper error bar
-						var D_EUP =	"M"+(-bs)+","+(-e_up)+"L"+bs+","+(-e_up)+"Z" +
-									"M0,"+(-e_up)+"L0,"+(-bs)+"Z";
-						var D_EDN =	"M"+(-bs)+","+e_dn+"L"+bs+","+e_dn+"Z" +
-									"M0,"+e_dn+"L0,"+bs+"Z";
+						var D_YEUP = "M"+(-bs)+","+(-e_up)+"L"+bs+","+(-e_up)+"Z" +
+									 "M0,"+(-e_up)+"L0,"+(-bs)+"Z";
+						var D_YEDN = "M"+(-bs)+","+e_dn+"L"+bs+","+e_dn+"Z" +
+									 "M0,"+e_dn+"L0,"+bs+"Z";
 
-						return D_EDN + D_EUP + D_RECT;
+						return  (self.style.features.errorBarsY ? (D_YEUP+D_YEDN) : "") // Switchable Y error bars
+								+ D_RECT;
 
 					})
 
@@ -420,44 +576,6 @@
 
 			this.xAxisGraphic.call(this.xAxis);
 			this.yAxisGraphic.call(this.yAxis);
-
-			// -----------------------------
-			// Generate/Update Legend
-			// -----------------------------
-			var lb = this.style.legendBullet;
-
-			// Process legend
-			var record = this.svgLegend.selectAll("g.legend-entry")
-							.data(this.plots);
-
-			// Enter
-			var newGroups = record.enter()
-				.append("g")
-					.attr("class", "legend-entry");
-				newGroups.append("text")
-					.attr("transform", "translate("+(-lb-4)+",0)")
-					.style("dominant-baseline", "middle")
-			      	.style("text-anchor", "end");
-				newGroups.append("path")
-					.attr("d", "M"+(-lb)+","+(-lb/2)
-							  +"L0,"+(-lb/2)
-							  +"L0,"+(lb/2)
-							  +"L"+(-lb)+","+(lb/2)
-							  +"Z" );
-
-			// Update
-			record
-				.attr("transform", function(d,i) { 
-					return "translate(0,"+(-i*self.style.legendHeight)+")"
-				});
-			record.selectAll("text")
-				.text(function(d,i) { return d.title });
-			record.selectAll("path")
-				.attr("fill", function(d,i) { return d.color });
-
-			// Delete
-			record.exit()
-				.remove();
 
 		}
 
@@ -523,12 +641,13 @@
 			return str2ab(atob(b64));
 		}
 
-		function histoFromBuf() {
+		function histoFromBuf(name) {
 			var buf = buf64(srcBuf),
 				bufReader = new LiveQ.BufferReader(buf);
 
 			var histo = new LiveQ.HistogramData();
 			histo.updateFromReader(bufReader);
+			if (name) histo.id = name;
 			return histo;
 		}
 
