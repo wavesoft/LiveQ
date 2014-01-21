@@ -13,8 +13,8 @@
  */
 LiveQ.LabSocket = function( id ) {
 
-	// Prepare histogram reader
-	this.histograms = new LiveQ.HistogramReader();
+	// Initialize superclass
+	LiveQ.HistogramReader.call(this);
 
 	// Open websocket
 	this.url = "ws://" + location.host + "/vas/labsocket/" + id;
@@ -24,6 +24,9 @@ LiveQ.LabSocket = function( id ) {
 	this.running = false;
 
 }
+
+// Subclass from HistogramReader
+LiveQ.LabSocket.prototype = Object.create( LiveQ.HistogramReader.prototype );
 
 /**
  * Setup a new WebSocket on the given URL and bind on it's callbacks
@@ -147,12 +150,12 @@ LiveQ.LabSocket.prototype.handleDataFrame = function( action, reader ) {
 	if (action == 0x01) { /* Configuration Frame */
 
 		// Handle configuration frame
-		this.histograms.handleConfigFrame( reader );
+		this.handleConfigFrame( reader );
 
 	} else if (action == 0x02) { /* Histogram Data Frame */
 
 		// Handle histogram data frame
-		this.histograms.handleFrame( reader );
+		this.handleFrame( reader );
 
 	}
 
