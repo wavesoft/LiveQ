@@ -40,13 +40,10 @@ LiveQ.HistogramData = function( bins, id ) {
 	// If we have bins specified, generate an empty ArrayBuffer for the components.
 	if (this.bins > 0) {
 
-		// Allocate new blank buffer
-		var buf = new ArrayBuffer( 6 * this.bins * 8 );
-
-		// Fetch bin-views of 6 floats each
+		// Reset histogram values
 		var ofs = 0;
 		for (var i=0; i<this.bins; i++) {
-			this.values.push( new Float64Array( buf, ofs, 48 ) ); // (6 values) * (8 bytes)
+			this.values.push([0,0,0,0,0,0]); 
 			ofs += 48;
 		}
 
