@@ -20,8 +20,8 @@ LiveQ.PlotWindow = function(host, config) {
 	// Create SVG instance and specify dimentions
 	this.svg = d3.select(host)
 		.append("svg:svg")
-			.attr("width", width)
-			.attr("height", height);
+			.attr("width", this.width)
+			.attr("height", this.height);
 
 	// Predefined colors
 	this.colors = [
