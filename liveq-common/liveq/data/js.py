@@ -72,6 +72,8 @@ def packHistogram(histo):
 	Serialize historgram so it can be optimally streamed to the browser.
 
 	Note: This function ensure 64-bit alignment of the data.
+
+	C:\\Users\\icharala\\Local\\Develop\\Work\\LiveQ\\dat.local\\ee\\zhad\\T\\aleph1\\91.2\\ALEPH_2004_S5765862.dat
 	"""
 
 	# Start with histogram name
@@ -85,6 +87,11 @@ def packHistogram(histo):
 			histo.y, histo.yErrPlus, histo.yErrMinus,
 			histo.x, histo.xErrPlus, histo.xErrMinus
 		])
+
+	# Reshape array so the values are interleaved per bin,
+	# like this: y, yErrPlus, yErrMinus, x, xErrPlus, xErrMinus
+	npBuf = np.reshape(npBuf, (6, histo.bins))
+	npBuf = np.swapaxes(npBuf, 0, 1).flatten()
 
 	# Dump numpy buffer
 	buf += str(np.getbuffer(npBuf))

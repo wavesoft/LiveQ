@@ -24,40 +24,11 @@ LiveQ.HistogramData = function( bins, id ) {
 	this.id = id || "";
 
 	/**
-	 * The X-Values of every bin in the histogram.
+	 * The bin values of each histogram. Each bin is an Float64Array that contains
+	 * the following values: [ y, yErrPlus, yErrMinus, x, xErrPlus, xErrMinus ]
 	 * @member {Float64Array}
 	 */
-	this.x = [];
-
-	/**
-	 * The positive X-Error of every bin in the histogram.
-	 * @member {Float64Array}
-	 */
-	this.xErrPlus = [];
-
-	/**
-	 * The ngative X-Error of every bin in the histogram.
-	 * @member {Float64Array}
-	 */
-	this.xErrMinus = [];
-
-	/**
-	 * The Y-Values of every bin in the histogram.
-	 * @member {Float64Array}
-	 */
-	this.y = [];
-
-	/**
-	 * The positive Y-Error of every bin in the histogram.
-	 * @member {Float64Array}
-	 */
-	this.yErrPlus = [];
-
-	/**
-	 * The negative Y-Error of every bin in the histogram.
-	 * @member {Float64Array}
-	 */
-	this.yErrMinus = [];
+	this.values = [];
 
 	/**
 	 * Array of the callback functions to be fired when the histogram data are updated
@@ -72,14 +43,12 @@ LiveQ.HistogramData = function( bins, id ) {
 		// Allocate new blank buffer
 		var buf = new ArrayBuffer( 6 * this.bins * 8 );
 
-		// Fetch 6 views from it
-		ofs = 0;
-		this.y = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
-		this.yErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
-		this.yErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
-		this.x = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
-		this.xErrPlus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
-		this.xErrMinus = new Float64Array( buf, ofs, this.bins ); ofs+=this.bins*8;
+		// Fetch bin-views of 6 floats each
+		var ofs = 0;
+		for (var i=0; i<this.bins; i++) {
+			this.values.push( Float64Array( buf, ofs, 48 ) ); // (6 values) * (8 bytes)
+			ofs += 48;
+		}
 
 	}
 
@@ -122,42 +91,17 @@ LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID )
 			return false;
 		}
 	} else {
+		// Reset fields
 		this.id = id;
 		this.bins = bins;
 	}
 
 	// ---------------
-	// Get Y values (float64 arrays)
-	var y = reader.getFloat64Array( this.bins ),
-		yErrPlus = reader.getFloat64Array( this.bins ),
-		yErrMinus = reader.getFloat64Array( this.bins );
-	// Get Y values (float64 arrays)
-	var x = reader.getFloat64Array( this.bins ),
-		xErrPlus = reader.getFloat64Array( this.bins ),
-		xErrMinus = reader.getFloat64Array( this.bins );
+	// Replace bin contents
+	for (var i=0; i<this.bins; i++) {
+		this.values[i] = reader.getFloat64Array(6);
+	}
 	// ---------------
-
-	// Shorthand function to do copy assignment
-	var arrayCopy = function(src, dst) {
-		for (var i=0; i<bins; i++) { dst[i] = src[i]; }
-	}
-
-	// Check how se should apply the change
-	if (cp) {
-		arrayCopy(y, this.y);
-		arrayCopy(yErrPlus, this.yErrPlus);
-		arrayCopy(yErrMinus, this.yErrMinus);
-		arrayCopy(x, this.x);
-		arrayCopy(xErrPlus, this.xErrPlus);
-		arrayCopy(xErrMinus, this.xErrMinus);
-	} else {
-		this.y = y;
-		this.yErrPlus = yErrPlus;
-		this.yErrMinus = yErrMinus;
-		this.x = x;
-		this.xErrPlus = xErrPlus;
-		this.xErrMinus = xErrMinus;
-	}
 
 	// The histogram is updated, fire callbacks
 	for (var i=0; i<this._updateCallbacks.length; i++) {

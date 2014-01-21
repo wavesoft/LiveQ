@@ -2,26 +2,537 @@
 <html lang="en">
 	<head>
 		<title>Minimal test</title>
-		<script type="text/javascript" src="lib/d3.js"></script>
+		<script type="text/javascript" src="lib.local/d3.v3.min.js"></script>
 		<script type="text/javascript" src="lab.js.src/LiveQ.js"></script>
 		<script type="text/javascript" src="lab.js.src/BufferReader.js"></script>
 		<script type="text/javascript" src="lab.js.src/HistogramData.js"></script>
 		<script type="text/javascript" src="lab.js.src/ReferenceData.js"></script>
 		<script type="text/javascript" src="lab.js.src/HistogramReader.js"></script>
 		<script type="text/javascript" src="lab.js.src/LabSocket.js"></script>
+		<style type="text/css">
+
+		body {
+		  font: 10px sans-serif;
+		}
+
+		.axis path,
+		.axis line {
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+		}
+
+		path.plot-line {
+			fill: none;
+		}
+		path.plot-area {
+			stroke: none;
+		}
+		path.plot-bullet {
+			fill: #fff;
+		}
+
+		svg {
+			background: #efefef;
+		}
+
+		</style>
 		<script type="text/javascript">
+
+		// #################################################################################
+		// =================================================================================
+		//                            HISTOGRAM PLOT RECORD
+		// =================================================================================
+		// #################################################################################
+
+		var HistoPlotData = function(parent, histo, color, title) {
+
+			// Keep references
+			this.parent = parent;
+			this.histo = histo;
+
+			// Setup information
+			this.color = color || "red";
+			this.title = histo.id || "Histogram";
+
+			// Calculate the ID from the histogram
+			this.id = histo.id.substr(1).replace(/[\/_]/g,"-");
+
+		}
+
+		/**
+		 * Calculate and return the x and y bounds for this histogram
+		 */
+		HistoPlotData.prototype.getBounds = function() {
+			// Reset bounds
+			var vMin, vMax,
+				xMin=null, yMin=null,
+				xMax=null, yMax=null;
+
+			// Run over bins and calculate bounds (including error bars)
+			for (var i=0; i<this.histo.bins; i++) {
+
+				// Calculate the min/max for Y
+				vMax = this.histo.values[i][0] + this.histo.values[i][1];
+				vMin = this.histo.values[i][0] - this.histo.values[i][2];
+				if ((vMax>yMax) || (yMax==null)) yMax=vMax;
+				if ((vMin<yMin) || (yMin==null)) yMin=vMin;
+
+				// Calculate the min/max for X
+				vMax = this.histo.values[i][3] + this.histo.values[i][4];
+				vMin = this.histo.values[i][3] - this.histo.values[i][5];
+				if ((vMax>xMax) || (xMax==null)) xMax=vMax;
+				if ((vMin<xMin) || (xMin==null)) xMin=vMin;
+
+			}
+
+			// Return bounds
+			return [ xMin, xMax, yMin, yMax ];
+
+		}
+
+		// #################################################################################
+		// =================================================================================
+		//                               HISTOGRAM PLOT
+		// =================================================================================
+		// #################################################################################
+
+		var HistoPlot = function(host, width, height) {
+			var self = this;
+
+			// Store dimentions
+			this.width = width;
+			this.height = height;
+
+			// Create SVG instance and specify dimentions
+			this.svg = d3.select(host)
+				.append("svg:svg")
+					.attr("width", width)
+					.attr("height", height);
+
+			// Predefined colors
+			this.colors = [
+					"#0066FF", "#000000", "#CC6600", "#669900",
+					"#3333CC", "#993333", "#996633", "#006666"
+				];
+			this.lastColor = 0;
+
+			// Prepare style information
+			this.style = {
+
+				'bulletSize'   : 4,
+				'titlePad'	   : 5,
+				'legendBullet' : 10,
+				'legendHeight' : 16,
+
+				'plotMargin': {
+					'left': 40,
+					'top': 30,
+					'bottom': 30,
+					'right': 20
+				}
+			};
+
+			// Initialize plot components
+			this.initPlot();
+
+			// Initialize images
+			this.initImages(
+				"img.local/ALEPH_1996_S3486095_d43-x01-y01.png",
+				"img.local/ALEPH_1996_S3486095_d43-x01-y01-x.png",
+				"img.local/ALEPH_1996_S3486095_d43-x01-y01-y.png"
+				);
+
+			// Prepare histogram plots
+			this.plots = [ ];
+
+		}
+
+		/**
+		 * Initialize histogram images
+		 */
+		HistoPlot.prototype.initImages = function( iTitle, iX, iY ) {
+			var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
+				height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom,
+				self = this;
+
+			// Check for title
+			if (iX) {
+				var imTitle = new Image();
+				imTitle.onload = function() {
+					var imW = this.width, imH = this.height;
+
+					// Create X-Axis
+					self.imgXLabel = self.svgPlot.append("image")
+						.attr("xlink:href", iX)
+						.attr("width", imW)
+						.attr("height", imH)
+						.attr("x", width-imW )
+						.attr("y", height-imH-self.style.titlePad );
+
+				};
+				imTitle.src = iX;
+			}
+
+			// Check for title
+			if (iY) {
+				var imTitle = new Image();
+				imTitle.onload = function() {
+					var imW = this.width, imH = this.height;
+
+					// Create X-Axis
+					self.imgXLabel = self.svgPlot.append("image")
+						.attr("xlink:href", iY)
+						.attr("width", imW)
+						.attr("height", imH)
+						.attr("transform", "rotate(270) translate("+(-imW)+","+self.style.titlePad+")");
+
+
+				};
+				imTitle.src = iY;
+			}
+
+			// Check for title
+			if (iTitle) {
+				var imTitle = new Image();
+				imTitle.onload = function() {
+					var imW = this.width, imH = this.height;
+
+					// Create X-Axis
+					self.imgTitle = self.svg.append("image")
+						.attr("xlink:href", iTitle)
+						.attr("width", imW)
+						.attr("height", imH)
+						.attr("x", self.style.plotMargin.left+(width-imW)/2 )
+						.attr("y", self.style.titlePad );
+
+				};
+				imTitle.src = iTitle;
+			}
+
+		}
+
+		/**
+		 * Initialize histogram plots
+		 */
+		HistoPlot.prototype.initPlot = function() {
+			var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
+				height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
+
+			// Prepare scales
+			this.xScale = d3.scale.linear()
+				.range([0, width])
+				.clamp(true)
+				.domain([0, 1]);
+			this.yScale = d3.scale.log()
+				.range([height, 0])
+				.clamp(true)
+				.domain([0, 1]);
+
+			// Prepare axes
+			this.xAxis = d3.svg.axis()
+			    .scale(this.xScale)
+			    .orient("bottom");
+			this.yAxis = d3.svg.axis()
+			    .scale(this.yScale)
+			    .orient("left");
+
+			// Create a group for hosting the SVG plot
+			this.svgPlot = this.svg.append("g")
+				.attr("transform", "translate("+this.style.plotMargin.left+","+this.style.plotMargin.top+")");
+
+			// Create the X and Y axis
+			this.xAxisGraphic = this.svgPlot.append("g")
+			    .attr("class", "x axis")
+			    .attr("transform", "translate(0," + height + ")")
+			    .call(this.xAxis);
+			this.yAxisGraphic = this.svgPlot.append("g")
+			    .attr("class", "y axis")
+			    .call(this.yAxis);
+
+			// Crate group
+			this.svgLegend = this.svgPlot.append("g")
+			    .attr("transform", "translate("+width+","+(height-this.style.titlePad*2-20)+")");
+
+		}
+
+
+		/**
+		 * Add an extra plot
+		 */
+		HistoPlot.prototype.addHistogram = function(histo, color, title) {
+
+			// Pick next color if color is not defined
+			if (!color) {
+				color = this.colors[this.lastColor];
+				if (++this.lastColor>=this.colors.length)
+					this.lastColor=0;
+			}
+
+			// Create plot
+			var plot = new HistoPlotData(this, histo, color, title);
+			this.plots.push(plot);
+
+			// Update
+			this.rescaleAxes();
+			this.update();
+
+		}
+
+		/**
+		 * Update the histogram elements
+		 */
+		HistoPlot.prototype.update = function() {
+
+			// Tunables
+			var bulletSize = this.style.bulletSize,
+				margin = this.style.plotMargin,
+				shadeColor = function(color, percent) {   
+				    var num = parseInt(color.slice(1),16),
+				    	amt = Math.round(2.55 * percent),
+				    	R = (num >> 16) + amt,
+				    	G = (num >> 8 & 0x00FF) + amt,
+				    	B = (num & 0x0000FF) + amt;
+				    return "#" + (0x1000000 + 
+				    	(R<255?R<1?0:R:255)*0x10000 + 
+				    	(G<255?G<1?0:G:255)*0x100 + 
+				    	(B<255?B<1?0:B:255)
+				    	).toString(16).slice(1);
+				};
+
+
+			// Line path template
+			var self = this;
+			var pathLine = d3.svg.line()
+				//.interpolate("basis")
+				.x(function(d,i) { return self.xScale(d[3]); })
+				.y(function(d,i) { return self.yScale(d[0]); });
+			var pathArea = d3.svg.area()
+				.x(function(d)   { return self.xScale(d[3]); })
+				.y0(function(d)  { return self.yScale(d[0]-d[2]); })
+				.y1(function(d)  { return self.yScale(d[0]+d[1]); });
+
+			// Process plots
+			for (var i=0; i<this.plots.length; i++) {
+				var plot = this.plots[i];
+
+				// Access plot's group
+				var group = this.svgPlot.select("g.plot#"+plot.id);
+				if (group.empty()) {
+					group = this.svgPlot.append("g")
+						.attr("class", "plot")
+						.attr("id", plot.id);
+				}
+
+				// -----------------------------
+				//  Render Plot Area
+				// -----------------------------
+
+				// Access D3 record for this element
+				var record = group.selectAll("path.plot-area")
+								.data([plot.histo.values]);
+
+				// Enter
+				record.enter()
+					.append("svg:path")
+						.attr("class", "plot-area")
+						.attr("fill", shadeColor(plot.color, 60));
+
+				// Update
+				record.attr("d", pathArea);
+
+				// Delete
+				record.exit()
+					.remove();
+
+				// -----------------------------
+				//  Render Plot Lines
+				// -----------------------------
+
+				// Access D3 record for this element
+				var record = group.selectAll("path.plot-line")
+								.data([plot.histo.values]);
+
+				// Enter
+				record.enter()
+					.append("svg:path")
+						.attr("class", "plot-line")
+						.attr("stroke", plot.color);
+
+				// Update
+				record.attr("d", pathLine);
+
+				// Delete
+				record.exit()
+					.remove();
+
+				// -----------------------------
+				//  Render Plot Bullets
+				// -----------------------------
+
+				var record = group.selectAll("path.plot-bullet")
+								.data(plot.histo.values);
+
+				// Enter
+				record.enter()
+					.append("svg:path")
+						.attr("class", "plot-bullet")
+						.attr("stroke", plot.color);
+
+				// Update
+				record
+					.attr("transform", function(d,i){
+						return "translate(" + self.xScale(d[3]) + "," + self.yScale(d[0]) + ")"
+					})
+					.attr("d", function(d,i) {
+						var bs = bulletSize/2;
+
+						// Path for the bullet
+						var D_RECT= "M"+(-bs)+","+(-bs)+
+									"L"+bs+","+(-bs)+
+									"L"+bs+","+bs+
+									"L"+(-bs)+","+bs+
+									"Z";
+
+						// Calculate error bar sizes
+						var e_up = self.yScale(d[0]) - self.yScale(d[0]+d[1]),
+							e_dn = self.yScale(d[0]-d[2]) - self.yScale(d[0]);
+
+						// Draw upper error bar
+						var D_EUP =	"M"+(-bs)+","+(-e_up)+"L"+bs+","+(-e_up)+"Z" +
+									"M0,"+(-e_up)+"L0,"+(-bs)+"Z";
+						var D_EDN =	"M"+(-bs)+","+e_dn+"L"+bs+","+e_dn+"Z" +
+									"M0,"+e_dn+"L0,"+bs+"Z";
+
+						return D_EDN + D_EUP + D_RECT;
+
+					})
+
+				// Delete
+				record.exit()
+					.remove();
+
+			}
+
+			// -----------------------------
+			// Process axes
+			// -----------------------------
+
+			this.xAxisGraphic.call(this.xAxis);
+			this.yAxisGraphic.call(this.yAxis);
+
+			// -----------------------------
+			// Generate/Update Legend
+			// -----------------------------
+			var lb = this.style.legendBullet;
+
+			// Process legend
+			var record = this.svgLegend.selectAll("g.legend-entry")
+							.data(this.plots);
+
+			// Enter
+			var newGroups = record.enter()
+				.append("g")
+					.attr("class", "legend-entry");
+				newGroups.append("text")
+					.attr("transform", "translate("+(-lb-4)+",0)")
+					.style("dominant-baseline", "middle")
+			      	.style("text-anchor", "end");
+				newGroups.append("path")
+					.attr("d", "M"+(-lb)+","+(-lb/2)
+							  +"L0,"+(-lb/2)
+							  +"L0,"+(lb/2)
+							  +"L"+(-lb)+","+(lb/2)
+							  +"Z" );
+
+			// Update
+			record
+				.attr("transform", function(d,i) { 
+					return "translate(0,"+(-i*self.style.legendHeight)+")"
+				});
+			record.selectAll("text")
+				.text(function(d,i) { return d.title });
+			record.selectAll("path")
+				.attr("fill", function(d,i) { return d.color });
+
+			// Delete
+			record.exit()
+				.remove();
+
+		}
+
+		/**
+		 * Rescale axes in order to fit the histogram
+		 */
+		HistoPlot.prototype.rescaleAxes = function() {
+
+			// Reset histograms
+			var hBounds,
+				xMin=null, yMin=null,
+				xMax=null, yMax=null,
+				margin = this.style.plotMargin;
+
+			// Run over histograms and calculate bounds
+			for (var i=0; i<this.plots.length; i++) {
+				hBounds = this.plots[i].getBounds();
+				if (xMin == null) {
+					xMin = hBounds[0]; xMax = hBounds[1];
+					yMin = hBounds[2]; yMax = hBounds[3];
+				} else {
+					if (hBounds[0]<xMin) xMin=hBounds[0];
+					if (hBounds[1]>xMax) xMax=hBounds[1];
+					if (hBounds[2]<yMin) yMin=hBounds[2];
+					if (hBounds[3]<yMax) yMax=hBounds[3];
+				}
+			}
+
+			// Update scale domains
+			this.xScale
+				.range([0, this.width-margin.left-margin.right])
+				.domain([xMin, xMax]);
+			this.yScale
+				.range([this.height-margin.top-margin.bottom, 0])
+				.domain([yMin, yMax]);
+
+		}
+
+		// #################################################################################
+		// =================================================================================
+		//                               UTILITY FUNCTIONS
+		// =================================================================================
+		// #################################################################################
+
+		function mkdata() {
+			var data=[], max=100;
+			for (var i=0; i<max; i++) {
+				data.push([i*2, Math.random()*max*2]);
+			}
+			return data;
+		}
+
 		function str2ab(str) {
 		  var buf = new ArrayBuffer(str.length); // 2 bytes for each char
 		  var bufView = new Uint8Array(buf);
 		  for (var i=0, strLen=str.length; i<strLen; i++) {
-		    bufView[i] = str.charCodeAt(i);
+			bufView[i] = str.charCodeAt(i);
 		  }
 		  return buf;
 		}
+
 		function buf64(b64) {
 			return str2ab(atob(b64));
 		}
-		var srcBuf = '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TVsFLBf8dj+dS73jHo90P6XbhA7Jr3A/ajI5bl7Abj+lVwDc92tsPyGkcR/uJ2k/riEQZhVhYz9urgTMKAhhP61bHhr/Blk/P4oP87IUUz+p7dmNW2BIP6pvBQJQTUE/oQgClCHvLj8d5WXvuu4VP83MzMzMzCPAZmZmZmZmI8AAAAAAAAAjwJqZmZmZmSLAMzMzMzMzIsDNzMzMzMwhwGZmZmZmZiHAAAAAAAAAIcCamZmZmZkgwDMzMzMzMyDAmpmZmZmZH8DNzMzMzMwewAAAAAAAAB7AMzMzMzMzHcBmZmZmZmYcwJqZmZmZmRvAzczMzMzMGsAAAAAAAAAawDMzMzMzMxnAZmZmZmZmGMCamZmZmZkXwM3MzMzMzBbAAAAAAAAAFsAzMzMzMzMVwGZmZmZmZhTAmpmZmZmZE8DNzMzMzMwSwAAAAAAAABLAMzMzMzMzEcBmZmZmZmYQwDMzMzMzMw/AmpmZmZmZDcAAAAAAAAAMwGZmZmZmZgrAzczMzMzMCMAzMzMzMzMHwJqZmZmZmQXAAAAAAAAABMBmZmZmZmYCwM3MzMzMzADAZmZmZmZm/r8zMzMzMzP7vwAAAAAAAPi/zczMzMzM9L+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT8AmpmZmZm5P4CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/AJqZmZmZuT+AmZmZmZm5P8CZmZmZmbk/wJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT/AmZmZmZm5P8CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/wJmZmZmZuT/AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P8CZmZmZmbk/wJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/oJmZmZmZuT+AmZmZmZm5P6CZmZmZmbk/oJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/gJmZmZmZuT+gmZmZmZm5P5CZmZmZmbk/kJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/gJmZmZmZuT8AmpmZmZm5P4CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/AJqZmZmZuT+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT/AmZmZmZm5P8CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/wJmZmZmZuT/AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT+AmZmZmZm5P8CZmZmZmbk/wJmZmZmZuT+AmZmZmZm5P4CZmZmZmbk/gJmZmZmZuT/AmZmZmZm5P8CZmZmZmbk/oJmZmZmZuT+AmZmZmZm5P6CZmZmZmbk/oJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/gJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/oJmZmZmZuT+gmZmZmZm5P6CZmZmZmbk/oJmZmZmZuT+QmZmZmZm5Pw==';
+
+		function histoFromBuf() {
+			var buf = buf64(srcBuf),
+				bufReader = new LiveQ.BufferReader(buf);
+
+			var histo = new LiveQ.HistogramData();
+			histo.updateFromReader(bufReader);
+			return histo;
+		}
+
+		var srcBuf = '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';
 		</script>
 	</head>
 	<body>
