@@ -177,7 +177,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         histoBuffers = []
         for k, h in histos.iteritems():
             # Pack buffers
-            histoBuffers.append( js.packHistogram(h.toHistogram()) )
+            histoBuffers.append( js.packHistogram( h.toHistogram().normalize() ) )
 
         # Compile buffer and send
         self.sendBuffer( 0x02, 
