@@ -309,7 +309,7 @@
 				for (var i=0; i<histo.bins; i++) {
 					// Get position
 					var x = this.xScale(histo.values[i][3]),
-						y = this.xScale(histo.values[i][0]);
+						y = this.yScale(histo.values[i][0]);
 
 					// Hit-test areas
 					for (var k=0; k<areas.length; k++) {
