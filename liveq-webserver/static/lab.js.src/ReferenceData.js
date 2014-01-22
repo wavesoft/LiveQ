@@ -81,6 +81,14 @@ LiveQ.ReferenceData.fromReader = function( reader ) {
 	hc.observable = reader.getString();
 	// Read histogram group
 	hc.group = reader.getString();
+	// Read beam
+	hc.beam = reader.getString();
+	// Read energy
+	hc.energy = reader.getString();
+	// Read process
+	hc.process = reader.getString();
+	// Read params
+	hc.params = reader.getString();
 
 	// Get PNG for title
 	hc.imgTitle = reader.getData('image/png');

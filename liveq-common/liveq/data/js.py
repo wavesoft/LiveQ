@@ -85,15 +85,14 @@ def packHistogram(histo):
 	# Continue with histogram header (8 bytes)
 	buf += struct.pack("<II", histo.bins, nevts )
 
-	# Combine all numpy buffers
-	npBuf = np.concatenate([
+	# Combine all numpy buffers into a multi-dimentional array
+	npBuf = np.array([
 			histo.y, histo.yErrPlus, histo.yErrMinus,
 			histo.x, histo.xErrPlus, histo.xErrMinus
 		])
 
 	# Reshape array so the values are interleaved per bin,
 	# like this: y, yErrPlus, yErrMinus, x, xErrPlus, xErrMinus
-	npBuf = np.reshape(npBuf, (6, histo.bins))
 	npBuf = np.swapaxes(npBuf, 0, 1).flatten()
 
 	# Dump numpy buffer
@@ -109,15 +108,20 @@ def packDescription(desc):
 
 	# Pack histogram ID
 	buf = packString( desc['id'] )
-
 	# Pack histogram name
 	buf += packString( desc['title'] )
-
 	# Pack observable description
 	buf += packString( desc['observable'] )
-
 	# Pack group name
 	buf += packString( desc['group'] )
+	# Pack beam
+	buf += packString( desc['beam'] )
+	# Pack energy
+	buf += packString( desc['energy'] )
+	# Pack process
+	buf += packString( desc['process'] )
+	# Pack params
+	buf += packString( desc['params'] )
 
 	# Pack Title,X,Y pngs
 	buf += packFile( desc['files']['title'] )

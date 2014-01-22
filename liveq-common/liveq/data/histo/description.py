@@ -96,6 +96,10 @@ class HistoDescriptionLab:
 				'observable': str(desc[0]),
 				'group': str(desc[6]),
 				'cuts': str(desc[5]),
+				'beam': str(self.beam),
+				'process': str(self.process),
+				'energy': str(self.energy),
+				'params': str(params),
 
 				# Related files with these information
 				'files': {
