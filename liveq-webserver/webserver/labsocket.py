@@ -216,7 +216,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             pMessage = data['message']
         pVars = { }
         if 'vars' in data:
-            pVars = data['pVars']
+            pVars = data['vars']
 
         # Forward the status message
         self.sendStatus(pMessage, pVars)
