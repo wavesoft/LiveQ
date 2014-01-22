@@ -238,7 +238,7 @@ class AgentComponent(Component, SimpleFSM):
 
 		# Check if we don't have such job
 		if not jid in self.jobIndex:
-			return self._replyError("Could a job with the given ID" % str(e))
+			return self._replyError("Could a job with the given ID")
 
 		# Fetch job entry
 		job = self.jobIndex[jid]

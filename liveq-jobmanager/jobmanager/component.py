@@ -129,8 +129,8 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					self.logger.warn("Cannot contact agent %s to cancel job %s (%s)" % ( agent.uuid, job.id, ans['error'] ))
-				if ans['result'] == "ok":
+					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+				elif ans['result'] == "ok":
 					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
 				else:
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
@@ -147,8 +147,8 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					self.logger.warn("Cannot contact agent %s to start job %s (%s)" % ( agent.uuid, job.id, ans['error'] ))
-				if ans['result'] == "ok":
+					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+				elif ans['result'] == "ok":
 					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
 				else:
 					self.logger.warn("Cannot start job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
@@ -411,7 +411,9 @@ class JobManagerComponent(Component):
 					}, waitReply=True)
 
 				# Log results
-				if ans['result'] == "ok":
+				if not ans:
+					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+				elif ans['result'] == "ok":
 					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
 				else:
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))

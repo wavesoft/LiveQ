@@ -171,6 +171,7 @@ LiveQ.PlotWindow.prototype.initPlot = function() {
 
 	// Crate group
 	this.svgLegend = this.svgPlot.append("g")
+		.attr("class", "legend")
 	    .attr("transform", "translate("+width+","+(height-this.style.titlePad*2-20)+")");
 
 }

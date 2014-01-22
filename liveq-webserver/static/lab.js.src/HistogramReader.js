@@ -131,7 +131,7 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( configReader ) {
 		// Fire removal callbacks
 		if ((histo != undefined) && (typeof(histo) != 'function')) {
 			for (var i=0; i<this._onHistogramRemoved.length; i++) {
-				this._onHistogramRemoved[i]( histo, this.reference[histoID] );
+				this._onHistogramRemoved[i]( this.data[histoID], this.reference[histoID] );
 			}
 		}
 
@@ -158,7 +158,7 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( configReader ) {
 
 		// Fire histogram added callbacks
 		for (var i=0; i<this._onHistogramAdded.length; i++) {
-			this._onHistogramAdded[i]( histo, this.reference[histo.id] );
+			this._onHistogramAdded[i]( this.data[histo.id], this.reference[histo.id] );
 		}
 
 	}
