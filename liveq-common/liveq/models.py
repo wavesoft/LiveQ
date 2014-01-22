@@ -205,20 +205,20 @@ class Lab(BaseModel):
 
 		# Process tunables
 		cfgTunables = self.getTunables()
-		for k,v in cfgTunables.iteritems():
+		for k,t in cfgTunables.iteritems():
 
 			# Get value
 			v = 0.0
 			if not k in tunables:
 				# If we don't have the value, get default
-				v = float(v['def'])
+				v = float(t['def'])
 			else:
 				# Otherwise, clamp to limits
-				v = min( float(v['max']), max( float(v['min']), float(tunables[k]) ) )
+				v = min( float(t['max']), max( float(t['min']), float(tunables[k]) ) )
 
 			# Snap decimals when converting to string
 			if asString:
-				ans[k] = ("%." + str(v['dec']) + "f") % v
+				ans[k] = ("%." + str(t['dec']) + "f") % v
 			else:
 				ans[k] = v
 
