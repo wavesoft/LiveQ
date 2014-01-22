@@ -201,7 +201,7 @@ class Job:
 		"""
 
 		# Send status message
-		self.channel.send("status", {
+		self.channel.send("job_status", {
 				"message": message,
 				'vars': varMetrics
 			})
