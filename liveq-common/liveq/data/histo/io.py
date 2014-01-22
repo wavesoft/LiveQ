@@ -42,8 +42,6 @@ def packHistogram(histo):
 			'meta': histo.meta
 		}))
 
-	print "saving(numpy=%i, meta=%i)" % ( len(buf_numpy), len(buf_meta) )
-
 	# Combine two buffers and return
 	return struct.pack("<BII", 1, len(buf_numpy), len(buf_meta)) + buf_numpy + buf_meta
 
@@ -78,8 +76,6 @@ def unpackHistogram(buf, offset=0):
 	(var, lenNumpy, lenMeta) = struct.unpack("<BII", buf[offset:offset+9])
 	p = offset+9
 
-	print "loading(numpy=%i, meta=%i)" % ( lenNumpy, lenMeta )
-
 	# Extract numpy buffer
 	values = np.frombuffer( buf[p:p+lenNumpy] , dtype=np.float64)
 	p += lenNumpy
@@ -103,7 +99,7 @@ def unpackHistogram(buf, offset=0):
 				yErrMinus=values[csize*2:csize*3],
 				x=values[csize*3:csize*4],
 				xErrMinus=values[csize*4:csize*5],
-				xErrPlus=values[csize*5:csize*4]
+				xErrPlus=values[csize*5:csize*6]
 			),
 			# And the number of bytes used from buffer
 			p
@@ -124,8 +120,6 @@ def unpackHistogramCollection(buf, decode=False, decompress=False):
 	# Read header
 	(ver, numHistograms) = struct.unpack("<BI", buf[:5])
 	p = 5
-
-	print "Version=%i, num=%i" % (ver,numHistograms)
 
 	# Start piling histograms
 	hc = HistogramCollection()

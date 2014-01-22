@@ -194,42 +194,18 @@ class HistogramStore:
 		nid = tune.getNeighborhoodID()
 
 		# Fetch neighbors from neighborhood
-		print " - Key: %s" % nid
-
-		t_before = int(round(time.time() * 1000))
 		vBuf = Config.STORE.get("tune-%s:v" % nid)
 		mBuf = Config.STORE.get("tune-%s:m" % nid)
-		t_after = int(round(time.time() * 1000))
-		print " - Fetch: %i ms" % (t_after - t_before)
-
-		if vBuf == None:
-			print " - I.Buf: NONE"
-		else:
-			print " - I.Buf: %i, %i" % (len(vBuf), len(mBuf))
-
-		t_before = int(round(time.time() * 1000))
 		neighbors = HistogramStore._unpickle( vBuf, mBuf )
-		t_after = int(round(time.time() * 1000))
-		print " - Unpickle: %i ms" % (t_after - t_before)
-
-		print " - Entries: %i" % len(neighbors)
 
 		# Append collection to the neighborhood
 		collection.tune = tune
 		neighbors.append(collection)
 
 		# Put neighbors back to the neighborhood store
-		t_before = int(round(time.time() * 1000))
 		vBuf, mBuf = HistogramStore._pickle(neighbors)
-		t_after = int(round(time.time() * 1000))
-		print " - Pickle: %i ms" % (t_after - t_before)
-
-		print " - Buf: %i" % len(vBuf)
-		t_before = int(round(time.time() * 1000))
 		Config.STORE.set("tune-%s:v" % nid, vBuf )
 		Config.STORE.set("tune-%s:m" % nid, mBuf )
-		t_after = int(round(time.time() * 1000))
-		print " - Store: %i ms" % (t_after - t_before)
 
 	@staticmethod
 	def getNeighborhood(tune):
@@ -257,7 +233,6 @@ class HistogramStore:
 
 		# Get neighborhood
 		data = HistogramStore.getNeighborhood(tune)
-		#print "- getNeighborhood: %r" % data
 
 		# Iterate over items and create interpolation indices and data variables
 		datavalues = [ ]
@@ -268,23 +243,14 @@ class HistogramStore:
 			datavalues.append(hc)
 			indexvars.append(hc.tune.getValues())
 
-		#print "- data: %r" % datavalues
-		#print "- index: %r" % indexvars
-
 
 		# Flip matrix of indexvars
 		indexvars = np.swapaxes( np.array(indexvars), 0, 1 )
-		#print "- indexVars: %r" % indexvars
 
 		# Nothing available
 		if len(indexvars) == 0:
 			return None
 
-		#indexvars = np.array(indexvars)
-
-		#print "Check: %i == %i" % (len(datavalues), len(indexvars[0]))
-
 		# Create and return interpolator
-		#print "- running Rbf"
 		return Rbf( *indexvars, data=datavalues, function=function )
 
