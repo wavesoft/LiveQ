@@ -22,7 +22,7 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
 /**
  * Calculate and return the x and y bounds for this histogram
  */
-LiveQ.PlotHistogram.prototype.getBounds = function() {
+LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
 	// Reset bounds
 	var vMin, vMax,
 		xMin=null, yMin=null,
@@ -44,6 +44,10 @@ LiveQ.PlotHistogram.prototype.getBounds = function() {
 		if ((vMin<xMin) || (xMin==null)) xMin=vMin;
 
 	}
+
+	// If we are protecting logarithmic scale, do not allow to reach 0
+	if ((logProtect == true) || (logProtect == undefined))
+		if (yMin<=0) yMin=0.000001;
 
 	// Return bounds
 	return [ xMin, xMax, yMin, yMax ];

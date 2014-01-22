@@ -68,6 +68,17 @@ LiveQ.PlotWindow = function(host, config) {
 }
 
 /**
+ * Safe accessor to the yScale
+ */
+LiveQ.PlotWindow.prototype._yScale = function( v ) {
+	if (v == 0) {
+		return this.height;
+	} else {
+		return this.yScale(v);
+	}
+}
+
+/**
  * Initialize histogram images
  */
 LiveQ.PlotWindow.prototype.initImages = function( iTitle, iX, iY ) {
@@ -203,14 +214,14 @@ LiveQ.PlotWindow.prototype.addHistogram = function(histo, title, color) {
 }
 
 /**
- * Calculate how many points are inside each area and find
+ * Calculate how many points are inside each region and find
  * the one with the smallest number of points.
  *
- * This function will return the index of the area array specified.
+ * This function will return the index of the region array specified.
  *
- * @param {array} areas - The array of the area boundaries to check (format: [x,y,w,h])
+ * @param {array} areas - The array of the region boundaries to check (format: [x,y,w,h])
  */
-LiveQ.PlotWindow.prototype.getLeastUsedArea = function(areas) {
+LiveQ.PlotWindow.prototype.getLeastUsedRegion = function(areas) {
 
 	// Initialize usage array
 	var usage = [ ];
@@ -225,7 +236,7 @@ LiveQ.PlotWindow.prototype.getLeastUsedArea = function(areas) {
 		for (var i=0; i<histo.bins; i++) {
 			// Get position
 			var x = this.xScale(histo.values[i][3]),
-				y = this.yScale(histo.values[i][0]);
+				y = this._yScale(histo.values[i][0]);
 
 			// Hit-test areas
 			for (var k=0; k<areas.length; k++) {
@@ -271,7 +282,7 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
 	//  +---+---+
 	//
 	var midW = width/2, midH = height/2,
-		placeAt = this.getLeastUsedArea([
+		placeAt = this.getLeastUsedRegion([
 				[0,0,midW,midH], [midW,0,midW,midH],
 				[0,midH,midW,midH], [midW,midH,midW,midH]
 			]);
@@ -375,11 +386,11 @@ LiveQ.PlotWindow.prototype.update = function() {
 	var pathLine = d3.svg.line()
 		//.interpolate("basis")
 		.x(function(d,i) { return self.xScale(d[3]); })
-		.y(function(d,i) { return self.yScale(d[0]); });
+		.y(function(d,i) { return self._yScale(d[0]); });
 	var pathArea = d3.svg.area()
 		.x(function(d)   { return self.xScale(d[3]); })
-		.y0(function(d)  { return self.yScale(d[0]-d[2]); })
-		.y1(function(d)  { return self.yScale(d[0]+d[1]); });
+		.y0(function(d)  { return self._yScale(d[0]-d[2]); })
+		.y1(function(d)  { return self._yScale(d[0]+d[1]); });
 
 	// Process plots
 	for (var i=0; i<this.plots.length; i++) {
@@ -453,7 +464,7 @@ LiveQ.PlotWindow.prototype.update = function() {
 		// Update
 		record
 			.attr("transform", function(d,i){
-				return "translate(" + self.xScale(d[3]) + "," + self.yScale(d[0]) + ")"
+				return "translate(" + self.xScale(d[3]) + "," + self._yScale(d[0]) + ")"
 			})
 			.attr("d", function(d,i) {
 				var bs = bulletSize/2;
@@ -466,8 +477,8 @@ LiveQ.PlotWindow.prototype.update = function() {
 							"Z";
 
 				// Calculate error bar sizes
-				var e_up = self.yScale(d[0]) - self.yScale(d[0]+d[1]),
-					e_dn = self.yScale(d[0]-d[2]) - self.yScale(d[0]);
+				var e_up = self._yScale(d[0]) - self._yScale(d[0]+d[1]),
+					e_dn = self._yScale(d[0]-d[2]) - self._yScale(d[0]);
 
 				// Draw upper error bar
 				var D_YEUP = "M"+(-bs)+","+(-e_up)+"L"+bs+","+(-e_up)+"Z" +

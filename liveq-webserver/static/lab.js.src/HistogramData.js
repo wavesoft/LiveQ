@@ -43,7 +43,7 @@ LiveQ.HistogramData = function( bins, id ) {
 		// Reset histogram values
 		var ofs = 0;
 		for (var i=0; i<this.bins; i++) {
-			this.values.push([0.00001,0.00001,0.00001,0.00001,0.00001,0.00001]); 
+			this.values.push([0,0,0,0,0,0]); 
 			ofs += 48;
 		}
 
