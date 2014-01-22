@@ -236,7 +236,7 @@ def handleLoss( agent ):
 	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == agent.activeJob) ).execute().next()
 
 	# Send status
-	job.sendStatus("A worker from our group has gone offline. We have %i slots left", {"RES_SLOTS":values})
+	job.sendStatus("A worker from our group has gone offline. We have %i slots left", {"RES_SLOTS":values.count})
 
 	# Check if we were left with nothing
 	if values.count == 0:
