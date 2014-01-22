@@ -47,7 +47,7 @@
 		// =================================================================================
 		// #################################################################################
 
-		function ExampleLab() {
+		function ExampleLab(v) {
 
 			// Establish connection to the lab
 			this.lab = new LiveQ.LabSocket("3e63661c13854de7a9bdeed71be16bb9");
@@ -82,7 +82,7 @@
 
 			this.begin = function() {
 				this.lab.beginSimulation({
-					'TimeShower:alphaSvalue': 0.1
+					'TimeShower:alphaSvalue': (v==undefined) ? 0.1 : v
 				});
 			}
 
