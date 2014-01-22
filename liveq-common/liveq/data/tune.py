@@ -125,11 +125,11 @@ class Tune(dict):
 
 				# Get parameters
 				tv = TuneAddressingConfig.TUNE_CONFIG[k]
-				vDecimals = tv['decimals']
-				vRound = tv['round']
+				vDecimals = int(tv['decimals'])
+				vRound = float(tv['round'])
 
 			# Append index value
-			tid += (":%." + str(vDecimals) + "f") % (v / vRound)
+			tid += (":%." + str(vDecimals) + "f") % (float(v) / vRound)
 
 		# Return the tune id
 		return tid

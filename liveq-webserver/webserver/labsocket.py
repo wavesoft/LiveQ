@@ -342,6 +342,12 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 self.sendStatus("Could not contact interpolator", {"INTERPOLATION": "0"})
                 self.logger.warn("Could not contact interpolator")
 
+            elif ans['result'] != 'ok':
+
+                # Send error
+                self.sendStatus("Could not interpolate (%s)" % ans['error'])
+                self.logger.warn("Could not interpolate (%s)" % ans['error'])
+
             else:
 
                 # Send status

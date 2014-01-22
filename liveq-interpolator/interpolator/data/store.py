@@ -139,6 +139,10 @@ class HistogramStore:
 		into a list of InterpolatableCollections.
 		"""
 
+		# If we have missing data, return empty array
+		if not valueData or not metaData:
+			return []
+
 		# Unpack value buffer
 		values = np.frombuffer( HistogramStore.F_DECOMPRESS( valueData ) )
 
@@ -193,17 +197,18 @@ class HistogramStore:
 		print " - Key: %s" % nid
 
 		t_before = int(round(time.time() * 1000))
-		ibuf = Config.STORE.get("tune-" + nid)
+		vBuf = Config.STORE.get("tune-%s:v" % nid)
+		mBuf = Config.STORE.get("tune-%s:m" % nid)
 		t_after = int(round(time.time() * 1000))
 		print " - Fetch: %i ms" % (t_after - t_before)
 
-		if ibuf == None:
+		if vBuf == None:
 			print " - I.Buf: NONE"
 		else:
-			print " - I.Buf: %i" % len(ibuf)
+			print " - I.Buf: %i, %i" % (len(vBuf), len(mBuf))
 
 		t_before = int(round(time.time() * 1000))
-		neighbors = HistogramStore._unpickle( ibuf )
+		neighbors = HistogramStore._unpickle( vBuf, mBuf )
 		t_after = int(round(time.time() * 1000))
 		print " - Unpickle: %i ms" % (t_after - t_before)
 
@@ -235,8 +240,11 @@ class HistogramStore:
 		# Get neighborhood ID
 		nid = tune.getNeighborhoodID()
 
+		vBuf = Config.STORE.get("tune-%s:v" % nid)
+		mBuf = Config.STORE.get("tune-%s:m" % nid)
+
 		# Fetch neighbors from neighborhood
-		return HistogramStore._unpickle( Config.STORE.get("tune-" + nid) )
+		return HistogramStore._unpickle( vBuf, mBuf )
 
 	@staticmethod
 	def getInterpolator(tune, function='linear'):

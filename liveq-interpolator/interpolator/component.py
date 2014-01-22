@@ -77,6 +77,12 @@ class InterpolatorComponent(Component):
 
 		# Get an interpolator for this region
 		ipol = HistogramStore.getInterpolator(tune)
+		if not ipol:
+			self.ipolChannel.reply({
+					'result': 'error',
+					'error': 'Not enough data for interpolation'
+			})
+			return
 
 		# Run interpolation and get an InterpolatableCollection collection
 		histograms = ipol(*tune.getValues())
