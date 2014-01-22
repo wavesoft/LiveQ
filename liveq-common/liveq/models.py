@@ -205,7 +205,7 @@ class Lab(BaseModel):
 
 		# Process tunables
 		cfgTunables = self.getTunables()
-		for k,v in cfgTunables:
+		for k,v in cfgTunables.iteritems():
 
 			# Get value
 			v = 0.0
