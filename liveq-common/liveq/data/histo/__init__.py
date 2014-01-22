@@ -260,6 +260,7 @@ class Histogram:
 		meta = {
 			'x': [ self.x, self.xErrMinus, self.xErrPlus ],
 			'bins': self.bins,
+			'name': self.name,
 			'meta': self.meta
 		}
 
@@ -287,6 +288,7 @@ class Histogram:
 
 		# Return histogram instance
 		return Histogram(
+			name=meta['name'],
 			bins=meta['bins'],
 			x=x,
 			xErrMinus=xErrMinus,
