@@ -12,7 +12,7 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
 
 	// Setup information
 	this.color = color || "red";
-	this.title = histo.id || "Histogram";
+	this.title = title || histo.id;
 
 	// Calculate the ID from the histogram
 	this.id = histo.id.substr(1).replace(/[\/_]/g,"-");
