@@ -446,6 +446,12 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
                 )
 
+        elif action == "ping":
+
+            # Reply to ping/pong requests, using for keeping the websocket
+            # connection alive through Varnish
+            self.sendAction("pong")
+
         else:
 
             # Unknown request

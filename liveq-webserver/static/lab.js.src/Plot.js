@@ -69,6 +69,7 @@ LiveQ.PlotWindow = function(host, config) {
 
 /**
  * Safe accessor to the yScale
+ * @private
  */
 LiveQ.PlotWindow.prototype._yScale = function( v ) {
 	if (v == 0) {
@@ -80,6 +81,13 @@ LiveQ.PlotWindow.prototype._yScale = function( v ) {
 
 /**
  * Initialize histogram images
+ *
+ * This function preloads the given 3 images and places them on the histogram
+ *
+ * @param {string} iTitle - The URL of the image to use for title
+ * @param {string} iX - The URL of the image to use for X-Axis label
+ * @param {string} iY - The URL of the image to use for Y-Axis label
+ *
  */
 LiveQ.PlotWindow.prototype.initImages = function( iTitle, iX, iY ) {
 	var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
@@ -189,6 +197,10 @@ LiveQ.PlotWindow.prototype.initPlot = function() {
 
 /**
  * Add a histogram in the plot window
+ *
+ * @param {HistogramData} histo - The histogram data to place on the plot.
+ * @param {string} title - The title of the histogram. If missing, the histogram ID will be used.
+ * @param {string} color - The color of the new histogram. If missing, a color will be picked.
  */
 LiveQ.PlotWindow.prototype.addHistogram = function(histo, title, color) {
 
@@ -264,7 +276,9 @@ LiveQ.PlotWindow.prototype.getLeastUsedRegion = function(areas) {
 }
 
 /**
- * Update the histogram elements
+ * Update the histogram legend
+ *
+ * This function re-aligns and re-draws the legend object of the plot.
  */
 LiveQ.PlotWindow.prototype.updateLegend = function() {
 	var self = this, lb = this.style.legendBullet,
@@ -361,6 +375,9 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
 
 /**
  * Update the histogram elements
+ * 
+ * This function redraws the plot lines, the error bands and the error bars
+ * of all the plots in the PlotWindow.
  */
 LiveQ.PlotWindow.prototype.update = function() {
 
@@ -508,6 +525,10 @@ LiveQ.PlotWindow.prototype.update = function() {
 
 /**
  * Rescale axes in order to fit the histogram
+ *
+ * This function will find the boundaries of the X and Y values, and use them
+ * as the new range for the X and Y scale.
+ *
  */
 LiveQ.PlotWindow.prototype.rescaleAxes = function() {
 

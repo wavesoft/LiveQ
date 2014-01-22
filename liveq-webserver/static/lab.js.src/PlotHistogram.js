@@ -21,6 +21,8 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
 
 /**
  * Calculate and return the x and y bounds for this histogram
+ *
+ * @param {bool} logProtect - If set to true, the minimum y value will never be smaller than 0.000001
  */
 LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
 	// Reset bounds
