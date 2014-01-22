@@ -190,7 +190,7 @@ class IntermediateHistogramCollection(dict):
 		"""
 		
 		# Prepare buffer
-		buf = struct.pack("<BIB", 1, len(self), self.state)
+		buf = struct.pack("<BIB", 1, len(self), int(self.state))
 
 		# Start packing data
 		for histo in self.values():
