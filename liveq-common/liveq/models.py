@@ -194,3 +194,34 @@ class Lab(BaseModel):
 		Set the names of the histograms to send to the user
 		"""
 		self.histograms = ",".join(data)
+
+	def formatTunables(self, tunables, asString=False):
+		"""
+		Format tunables
+		"""
+
+		# Prepare response
+		ans = { }
+
+		# Process tunables
+		cfgTunables = self.getTunables()
+		for k,v in cfgTunables:
+
+			# Get value
+			v = 0.0
+			if not k in tunables:
+				# If we don't have the value, get default
+				v = float(v['def'])
+			else:
+				# Otherwise, clamp to limits
+				v = min( float(v['max']), max( float(v['min']), float(tunables[k]) ) )
+
+			# Snap decimals when converting to string
+			if asString:
+				ans[k] = ("%." + str(v['dec']) + "f") % v
+			else:
+				ans[k] = v
+
+		# Return answer
+		return ans
+

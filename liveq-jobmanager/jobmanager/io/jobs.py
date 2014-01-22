@@ -227,32 +227,8 @@ def createJob( lab, parameters, group, dataChannel ):
 		logging.warn("Could not find lab #%s" % lab)
 		return
 
-	# Process user's parameters (tunes)
-	userTunes = { }
-	tunables = labInst.getTunables()
-	for k,parm in tunables.iteritems():
-
-		# Get user parameter
-		if k in parameters:
-
-			# Convert to numbers
-			vValue = float(parameters[k])
-			vMax = float(parm['max'])
-			vMin = float(parm['min'])
-			vDecimals = int(parm['dec'])
-
-			# Wrap value betwen min and max
-			vValue = max( min( vMax, vValue ), vMin )
-
-			# Convert to a number with the specified precision
-			# and store it on the user parameters
-			userTunes[k] = ("%." + str(vDecimals) + "f") % vValue
-
-		else:
-
-			# Get default if missing
-			userTunes[k] = parm['def']
-
+	# Ensure user-provided tunes follow the appropriate format
+	userTunes = labInst.formatTunables(parameters)
 
 	# Deep merge lab default parameters and user's parameters
 	mergedParameters = deepupdate( { "tune": userTunes } , labInst.getParameters() )

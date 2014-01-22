@@ -329,10 +329,13 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # Send status
             self.sendStatus("Contacting interpolator", {"JOB_STATUS": "interpolating"})
 
+            # Format user tunables
+            tunables = self.lab.formatTunables( param )
+
             # First ask interpolator
             ans = self.ipolChannel.send("interpolate", {            
                     'lab': self.lab.uuid,
-                    'parameters': param
+                    'parameters': tunables
                 }, waitReply=True, timeout=5)
 
             # Check response
@@ -390,7 +393,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 'lab': self.lab.uuid,
                 'group': 'global',
                 'dataChannel': self.dataChannel.name,
-                'parameters': param
+                'parameters': tunables
             }, waitReply=True, timeout=5)
 
             # Check for I/O failure on the bus
