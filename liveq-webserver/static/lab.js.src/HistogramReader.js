@@ -181,7 +181,7 @@ LiveQ.HistogramReader.prototype.handleFrame = function( reader ) {
 		reserved = reader.getUint32();
 
 	// Read histograms
-	for (var i=0; i<numHistos; i++) {
+	for (var j=0; j<numHistos; j++) {
 
 		// Get histogram name
 		var histoID = reader.getString();
