@@ -31,6 +31,12 @@ LiveQ.HistogramData = function( bins, id ) {
 	this.values = [];
 
 	/**
+	 * The number of events in the histogram
+	 * @member {int}
+	 */
+	this.nevts = 0;
+
+	/**
 	 * Array of the callback functions to be fired when the histogram data are updated
 	 * @private
 	 * @member {array}
@@ -75,8 +81,11 @@ LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID )
 	// ---------------
 	// Get Histogram header (64 bit)
 	var bins = reader.getUint32(),
-		reserved = reader.getUint32();
+		nevts = reader.getUint32();
 	// ---------------
+
+	// Store number of events
+	this.nevts = nevts;
 
 	// Check how we should apply the information so far
 	if (cp) {

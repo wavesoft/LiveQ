@@ -72,15 +72,18 @@ def packHistogram(histo):
 	Serialize historgram so it can be optimally streamed to the browser.
 
 	Note: This function ensure 64-bit alignment of the data.
-
-	C:\\Users\\icharala\\Local\\Develop\\Work\\LiveQ\\dat.local\\ee\\zhad\\T\\aleph1\\91.2\\ALEPH_2004_S5765862.dat
 	"""
 
 	# Start with histogram name
 	buf = packString( histo.name )
 
+	# Get number of events from histogram metadata
+	nevts = 0
+	if 'nevts' in histo.meta:
+		nevts = int(histo.meta['nevts'])
+
 	# Continue with histogram header (8 bytes)
-	buf += struct.pack("<IBBBB", histo.bins, 0,0,0,0 )
+	buf += struct.pack("<II", histo.bins, nevts )
 
 	# Combine all numpy buffers
 	npBuf = np.concatenate([
