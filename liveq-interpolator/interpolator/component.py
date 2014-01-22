@@ -98,7 +98,7 @@ class InterpolatorComponent(Component):
 		self.ipolChannel.reply({
 				'result': 'ok',
 				'exact': 0,
-				'data': io.packHistogramCollection(requestedHistos)
+				'data': io.packHistogramCollection(pickedHistos)
 			})
 
 
