@@ -19,6 +19,7 @@
 
 import struct
 import base64
+import pylzma
 import numpy as np
 import cPickle as pickle
 
