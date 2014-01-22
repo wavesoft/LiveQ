@@ -395,6 +395,10 @@ class IntermediateHistogram:
 		xval = self.xlow + self.xhigh
 		xval /= 2.0
 
+		# Update metadata
+		self.meta['nevts'] = self.nevts
+		self.meta['crosssection'] = self.crosssection
+
 		return Histogram(
 				name=self.name,
 				bins=self.bins,
