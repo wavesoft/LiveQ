@@ -239,9 +239,13 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			return
 
+		# Send status
+		job.sendStatus("Processing data from %s" % channel.name)
+
 		# Get the intermediate histograms from the agent buffer
 		agentHistos = IntermediateHistogramCollection.fromPack( data['data'] )
 		if not agentHistos:
+			job.sendStatus("Could not parse data from worker %s" % channel.name)
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
 			return
 
@@ -249,6 +253,7 @@ class JobManagerComponent(Component):
 		# and return resulting histogram collection
 		sumHistos = job.updateHistograms( channel.name, agentHistos )
 		if sumHistos == None:
+			job.sendStatus("Unable to merge histograms")
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			return
 
@@ -277,9 +282,13 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			return
 
+		# Send status
+		job.sendStatus("Worker %s has finished the job" % channel.name)
+
 		# Get the merged histograms from the job store
 		histos = job.getHistograms()
 		if histos == None:
+			job.sendStatus("Unable to merge histograms")
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			return
 
@@ -290,6 +299,9 @@ class JobManagerComponent(Component):
 		# If all jobs are completed, forward the job_completed event,
 		# otherwise fire the job_data event.
 		if histos.state == 2:
+
+			# Send status
+			job.sendStatus("All workers have finished. Collecting final results.")
 
 			# Pack data once
 			histoPack = histos.pack()

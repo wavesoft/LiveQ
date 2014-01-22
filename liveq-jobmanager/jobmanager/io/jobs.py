@@ -193,14 +193,17 @@ class Job:
 		self.channel.close()
 		del JOB_CHANNELS[self.dataChannel]
 
-	def sendStatus(self, message):
+	def sendStatus(self, message, varMetrics={}):
 		"""
 		Send a status message to the job recepient
+
+		You can also provide machine-parsable metric variables
 		"""
 
 		# Send status message
 		self.channel.send("status", {
-				"message": message
+				"message": message,
+				'vars': varMetrics
 			})
 
 ##############################################################

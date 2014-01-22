@@ -225,11 +225,24 @@ def handleLoss( agent ):
 	Handle the fact that we lost the given agent unexpecidly
 	"""
 
+	# Check if it has an active job
+	if not agent.activeJob:
+		return
+
+	# Return a job instance
+	job = jobs.getJob(agent.activeJob)
+
 	# Check if that was the last agent handling this job
 	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == agent.activeJob) ).execute().next()
 
+	# Send status
+	job.sendStatus("A worker from our group has gone offline. We have %i slots left", {"RES_SLOTS":values})
+
 	# Check if we were left with nothing
 	if values.count == 0:
+
+		# Send status
+		job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
 
 		# Re-place job on queue with highest priority
 		Config.STORE.rpush( "scheduler:queue", agent.activeJob )
@@ -281,8 +294,16 @@ def process():
 
 	# Check if there is absolutely no free space
 	if not res.fitsAnother():
+		job.sendStatus("No free workers to place job. Will try later.", {"RES_SLOTS", "0"})
 		res.release()
 		return (None,None,None)
+
+	# Send job status
+	job.sendStatus("Got group resource metrics: free=%i, total=%i, workers=%i" % (res.free, res.total, res.individual), {
+			"RES_TOTAL": res.total,
+			"RES_FREE": res.free,
+			"RES_UNIQUE": res.individual
+		})
 
 	# Prepare some metrics
 	totalSlots = res.fairShare
@@ -297,6 +318,9 @@ def process():
 	# Check if we satisfied the job requirements
 	if usedSlots >= totalSlots:
 
+		# Send status
+		job.sendStatus("Job will start on %i free workers" % usedSlots, {"RES_SLOTS":usedSlots})
+
 		# Successful handling of the job. Pop it
 		logger.info("Job %s processed. Removing from group" % job.id)
 		popQueuedJob()
@@ -308,18 +332,35 @@ def process():
 	# Nope, check if we can also dispose some
 	d_slots = res.getDisposable( totalSlots - usedSlots )
 	if not d_slots:
-		# Could not find any free slot
-		res.release()
-		return (None,None,None)
+		# Could not find any disposable slot
+
+		# Check if we have occupied at least one slot by free slots
+		if usedSlots > 0:
+
+			# Send status
+			job.sendStatus("Job will start on %i free workers" % usedSlots, {"RES_SLOTS":usedSlots})
+
+			# Activate the already acquired number of slots
+			res.release()
+			return (job, [], markForJob(slots, job.id))
+
+		else:
+			res.release()
+			return (None,None,None)
 
 	# Store it to slots
 	slots += d_slots
 
-	logger.info("Found %i extra slots on by dispose %s" % ( usedSlots, job.group ))
+	# Send status
+	job.sendStatus("Stopping jobs on %i workers, in order to place our request" % len(d_slots), {"RES_DISPOSING": len(d_slots)})
+	logger.info("Found %i extra slots on by dispose %s" % ( len(d_slots), job.group ))
 
 	# Successful handling of the job. Pop it
 	logger.info("Job %s processed. Removing from group" % job.id)
 	popQueuedJob()
+
+	# Send status
+	job.sendStatus("Job will start on %i workers" % len(slots), {"RES_SLOTS":len(slots)})
 
 	# Release and return resultset
 	res.release()

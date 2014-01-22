@@ -32,15 +32,15 @@ from webserver.config import Config
 
 import tornado.websocket
 
-"""
-I/O Socket handler
-"""
 class LabSocketHandler(tornado.websocket.WebSocketHandler):
+    """
+    I/O Socket handler
+    """
 
-    """
-    Override constructor in order to initialize local variables
-    """
     def __init__(self, application, request, **kwargs):
+        """
+        Override constructor in order to initialize local variables
+        """
         tornado.websocket.WebSocketHandler.__init__(self, application, request, **kwargs)
 
         # Setup local variables
@@ -94,6 +94,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         # Bind events
         self.dataChannel.on('job_data', self.onBusData)
+        self.dataChannel.on('job_status', self.onBusStatus)
         self.dataChannel.on('job_completed', self.onBusCompleted)
 
     def on_close(self):
@@ -158,10 +159,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
     # --------------------------------------------------------------------------------
     ####################################################################################
 
-    """
-    [Bus Event] Data available
-    """
     def onBusData(self, data):
+        """
+        [Bus Event] Data available
+        """
 
         # If we have no job, ignore
         if not self.jobid:
@@ -185,10 +186,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             )
 
 
-    """
-    [Bus Event] Simulation completed
-    """
     def onBusCompleted(self, data):
+        """
+        [Bus Event] Simulation completed
+        """
 
         # If we have no job, ignore
         if not self.jobid:
@@ -199,6 +200,27 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
         # Reset tune
         self.jobid = None
+
+    def onBusStatus(self, data):
+        """
+        [Bus Status] Forward bus message 
+        """
+
+        # If we have no job, ignore
+        if not self.jobid:
+            return
+
+        # Extract parameters
+        pMessage = ""
+        if 'message' in data:
+            pMessage = data['message']
+        pVars = { }
+        if 'vars' in data:
+            pVars = data['pVars']
+
+        # Forward the status message
+        self.sendStatus(pMessage, pVars)
+
 
     ####################################################################################
     # --------------------------------------------------------------------------------
@@ -245,16 +267,20 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # And log the error
         self.logger.warn(error)
 
-    def sendStatus(self, message):
+    def sendStatus(self, message, varMetrics={}):
         """
-        Send a status message to the interface
+        Send a status message to the interface.
+
+        Optionally you can send status variables that can be processed
+        by the interface in the vars dict.
         """
 
         # Send the status message
         self.write_message({
                 "action": "status",
                 "param": {
-                    "message": message
+                    "message": message,
+                    "vars": varMetrics
                 }
             })
 
@@ -268,7 +294,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             return
 
         # Send status
-        self.sendStatus("Aborting previous job")
+        self.sendStatus("Aborting previous job", {"JOB_STATUS": "aborting"})
 
         # Ask job manager to cancel a job
         ans = self.jobChannel.send('job_cancel', {
@@ -284,7 +310,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             return self.sendError("Unable to cancel job: %s" % ans['error'])
 
         # Send status
-        self.sendStatus("Job aborted")
+        self.sendStatus("Job aborted", {"JOB_STATUS": "aborted"})
 
         # Clear job ID
         self.jobid = None
@@ -301,7 +327,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             self.abortJob()
 
             # Send status
-            self.sendStatus("Contacting interpolator")
+            self.sendStatus("Contacting interpolator", {"JOB_STATUS": "interpolating"})
 
             # First ask interpolator
             ans = self.ipolChannel.send("interpolate", {            
@@ -313,7 +339,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             if not ans:
 
                 # Send status
-                self.sendStatus("Could not contact interpolator")
+                self.sendStatus("Could not contact interpolator", {"INTERPOLATION", "0"})
                 self.logger.warn("Could not contact interpolator")
 
             else:
@@ -335,6 +361,9 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                         struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
                     )
 
+                # Send status message
+                self.sendStatus("Got interpolated results", {"INTERPOLATION", "1"})
+
                 # Check if we found excact match
                 if ans['exact']:
 
@@ -348,7 +377,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     return
 
             # Send status
-            self.sendStatus("Contacting job manager")
+            self.sendStatus("Contacting job manager", {"JOB_STATUS", "starting"})
 
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
@@ -367,7 +396,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 return self.sendError("Unable to place a job request: %s" % ans['error'])
 
             # Send status
-            self.sendStatus("Job #%s started" % ans['jid'])
+            self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS", "started"})
 
             # The job started, save the tune job ID
             self.jobid = ans['jid']

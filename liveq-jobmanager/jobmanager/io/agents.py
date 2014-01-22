@@ -61,6 +61,17 @@ def getAgent(uid):
 		# Return the new agent entry
 		return Agent.create(uuid=uid, group=getAgentGroup(DEFAULT_GROUP))
 
+def getAgentFromJob(jid):
+	"""
+	Return the agent that is running the given job
+	"""
+
+	# Try to fetch agent
+	try:
+		return Agent.get(Agent.activeJob==jid)
+	except Agent.DoesNotExist:
+		# Return none if missing
+		return None
 
 def updateActivity(uid):
 	"""
