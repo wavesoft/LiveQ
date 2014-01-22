@@ -122,7 +122,7 @@ class JobManagerComponent(Component):
 			for agent in a_cancel:
 
 				# Send status
-				job.sendStatus("Aborting job on agen %s" % agent.uuid)
+				job.sendStatus("Aborting job on worker %s" % agent.uuid)
 
 				# Get channel and send cancellations (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
@@ -132,7 +132,7 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					job.sendStatus("Could not contact agent %s" % agent.uuid)
+					job.sendStatus("Could not contact worker %s" % agent.uuid)
 					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
 
 					# Mark agent offline
@@ -150,7 +150,7 @@ class JobManagerComponent(Component):
 			for agent in a_start:
 
 				# Send status
-				job.sendStatus("Starting job on agen %s" % agent.uuid)
+				job.sendStatus("Starting job on worker %s" % agent.uuid)
 
 				# Get channel and send start (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
@@ -161,7 +161,7 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					job.sendStatus("Could not contact agent %s" % agent.uuid)
+					job.sendStatus("Could not contact worker %s" % agent.uuid)
 					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
 
 					# Mark agent offline

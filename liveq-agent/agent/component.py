@@ -234,11 +234,11 @@ class AgentComponent(Component, SimpleFSM):
 		try:
 			jid = message['jid']
 		except KeyError as e:
-			return self._replyError("Could not find key %s in job_start message" % str(e))
+			return self._replyError("Could not find key %s in job_cancel message" % str(e))
 
 		# Check if we don't have such job
 		if not jid in self.jobIndex:
-			return self._replyError("Could a job with the given ID")
+			return self._replyError("Could not find a job with the given ID")
 
 		# Fetch job entry
 		job = self.jobIndex[jid]

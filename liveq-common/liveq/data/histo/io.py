@@ -31,15 +31,17 @@ def packHistogram(histo):
 	"""
 
 	# Split to two buffers: numpy and metadata
-	buf_numpy = np.getbuffer(np.concatenate([
+	buf_numpy = str(np.getbuffer(np.concatenate([
 			histo.y, histo.yErrPlus, histo.yErrMinus,
 			histo.x, histo.xErrPlus, histo.xErrMinus
-		]))
-	buf_meta = pickle.dumps({
+		])))
+	buf_meta = str(pickle.dumps({
 			'bins': histo.bins,
 			'name': histo.name,
 			'meta': histo.meta
-		})
+		}))
+
+	print "saving(numpy=%i, meta=%i)" % ( len(buf_numpy), len(buf_meta) )
 
 	# Combine two buffers and return
 	return struct.pack("<BII", 1, len(buf_numpy), len(buf_meta)) + buf_numpy + buf_meta
@@ -67,6 +69,8 @@ def unpackHistogram(buf, offset=0):
 	# Read header
 	(var, lenNumpy, lenMeta) = struct.unpack("<BII", buf[offset:offset+9])
 	p = offset+9
+
+	print "loading(numpy=%i, meta=%i)" % ( lenNumpy, lenMeta )
 
 	# Extract numpy buffer
 	values = np.frombuffer( buf[p:p+lenNumpy] , dtype=np.float64)
@@ -103,16 +107,17 @@ def unpackHistogramCollection(buf):
 	"""
 
 	# Read header
-	(var, numHistograms) = struct.unpack("<BI", buf[:5])
+	(ver, numHistograms) = struct.unpack("<BI", buf[:5])
 	p = 5
+
+	print "Version=%i, num=%i" % (ver,numHistograms)
 
 	# Start piling histograms
 	hc = HistogramCollection()
 	for i in range(0,numHistograms):
 
 		# Read histogram and offset position
-		(histo, bs) = unpackHistogram(buf,p)
-		p += bs
+		(histo, p) = unpackHistogram(buf,p)
 
 		# Append histogram in collection
 		hc.append( histo )
