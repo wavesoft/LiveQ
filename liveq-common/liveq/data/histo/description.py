@@ -99,7 +99,7 @@ class HistoDescriptionLab:
 				'beam': str(self.beam),
 				'process': str(self.process),
 				'energy': str(self.energy),
-				'params': str(params),
+				'params': str(self.params),
 
 				# Related files with these information
 				'files': {
