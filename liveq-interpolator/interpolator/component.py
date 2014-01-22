@@ -109,12 +109,15 @@ class InterpolatorComponent(Component):
 
 		# Generate a tune object
 		tune = Tune(data['config'], labid=data['lab'])
+		print "Creating tune from lab=%s, vars=%r" % (data['lab'], data['config'])
 
 		# Unpack the intermediate histogram collection
 		histos = IntermediateHistogramCollection.fromPack(data['data'])
+		print "Read %i histograms from input" % len(histos)
 
 		# Convert intermediate histograms to a InterpolatableCollection object
 		histos = histos.toInterpolatableCollection( tune )
+		print "Got interpolatable collection of %i" % len(histos)
 
 		# Append data on the histogram store
 		HistogramStore.append( tune, histos )

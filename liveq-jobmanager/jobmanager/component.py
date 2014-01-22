@@ -446,10 +446,18 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+					job.sendStatus("Could not contact worker %s" % agent.uuid)
+					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
+
+					# Mark agent offline
+					self.manager.updatePresence( agent.uuid, 0 )
+					scheduler.markOffline( agent.uuid )
+					
 				elif ans['result'] == "ok":
+					job.sendStatus("Successfuly aborted")
 					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
 				else:
+					job.sendStatus("Could not abort: %s" % ans['error'])
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
 		# And then cleanup job

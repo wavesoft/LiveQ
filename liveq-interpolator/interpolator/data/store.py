@@ -192,6 +192,7 @@ class HistogramStore:
 		
 		# Get neighborhood ID
 		nid = tune.getNeighborhoodID()
+		print "NID: %s" % nid
 
 		# Fetch neighbors from neighborhood
 		print " - Key: %s" % nid

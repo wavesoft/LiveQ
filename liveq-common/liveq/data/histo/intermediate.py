@@ -443,6 +443,7 @@ class IntermediateHistogram:
 		name = data['HISTOSTATS']['d']['AidaPath']
 
 		# Convert values into a flat 2D numpy array
+		print ">> %r" % vBins
 		values = numpy.array(vBins, dtype=numpy.float64).flatten()
 
 		# Extract parts and build histogram

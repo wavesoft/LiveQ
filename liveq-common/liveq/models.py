@@ -148,13 +148,13 @@ class Lab(BaseModel):
 	repoType = CharField(max_length=12, default="svn")
 
 	#: The non-tunable parameters for the job
-	fixedParameters = CharField()
+	fixedParameters = CharField(max_length=1024)
 
 	#: The parameters the user can send
-	tunableParameters = CharField()
+	tunableParameters = CharField(max_length=2048)
 
 	#: The observed histograms
-	histograms = CharField()
+	histograms = CharField(max_length=1024)
 
 	#: The type of the histograms
 	histogramType = CharField(max_length=12, default="FLAT")
