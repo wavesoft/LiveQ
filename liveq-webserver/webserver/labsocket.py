@@ -332,7 +332,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # First ask interpolator
             ans = self.ipolChannel.send("interpolate", {            
                     'lab': self.lab.uuid,
-                    'parameters': self.lab.formatTunables( param )
+                    'parameters': param
                 }, waitReply=True, timeout=5)
 
             # Check response

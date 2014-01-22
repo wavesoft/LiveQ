@@ -20,6 +20,7 @@
 import logging
 import uuid
 import cPickle as pickle
+import random
 
 from jobmanager.config import Config
 
@@ -247,8 +248,18 @@ def createJob( lab, parameters, group, dataChannel ):
 			# and store it on the user parameters
 			userTunes[k] = ("%." + str(vDecimals) + "f") % vValue
 
+		else:
+
+			# Get default if missing
+			userTunes[k] = parm['def']
+
+
 	# Deep merge lab default parameters and user's parameters
 	mergedParameters = deepupdate( { "tune": userTunes } , labInst.getParameters() )
+
+	# Create new seed
+	random.seed()
+	mergedParameters['seed'] = int(random.random()*65535)
 
 	# Put more lab information in the parameters
 	mergedParameters['repoTag'] = labInst.repoTag
