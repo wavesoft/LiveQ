@@ -25,8 +25,8 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
 LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
 	// Reset bounds
 	var vMin, vMax,
-		xMinValues=[], xMaxValues=[],
-		yMinValues=[], yMaxValues=[];
+		xMin=null, yMin=null,
+		xMax=null, yMax=null;
 
 	// If the histogram is empty, return no bounds
 	if (this.histo.empty)
@@ -38,26 +38,16 @@ LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
 		// Calculate the min/max for Y
 		vMax = this.histo.values[i][0] + this.histo.values[i][1];
 		vMin = this.histo.values[i][0] - this.histo.values[i][2];
-		xMaxValues.push(vMax);
-		xMinValues.push(vMin);
+		if ((vMax>yMax) || (yMax==null)) yMax=vMax;
+		if ((vMin<yMin) || (yMin==null)) yMin=vMin;
 
 		// Calculate the min/max for X
 		vMax = this.histo.values[i][3] + this.histo.values[i][4];
 		vMin = this.histo.values[i][3] - this.histo.values[i][5];
-		yMaxValues.push(vMax);
-		yMinValues.push(vMin);
+		if ((vMax>xMax) || (xMax==null)) xMax=vMax;
+		if ((vMin<xMin) || (xMin==null)) xMin=vMin;
 
 	}
-
-	// Sort Min/Max values
-	xMaxValues.sort().reverse(); xMinValues.sort();
-	yMaxValues.sort().reverse(); yMinValues.sort();
-
-	// Add an extra padding on yMin/yMax xMin/xMax
-	xMin = xMinValues[0] - (xMinValues[1] - xMinValues[0]);
-	xMax = xMaxValues[0] + (xMaxValues[0] - xMaxValues[1]);
-	yMin = yMinValues[0] - (yMinValues[1] - yMinValues[0]);
-	yMax = yMaxValues[0] + (yMaxValues[0] - yMaxValues[1]);
 
 	// If we are protecting logarithmic scale, do not allow to reach 0
 	if ((logProtect == true) || (logProtect == undefined))
