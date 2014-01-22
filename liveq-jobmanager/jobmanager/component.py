@@ -121,6 +121,9 @@ class JobManagerComponent(Component):
 			# First, cancel the job on the given a_cancel agents
 			for agent in a_cancel:
 
+				# Send status
+				job.sendStatus("Aborting job on agen %s" % agent.uuid)
+
 				# Get channel and send cancellations (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_cancel', {
@@ -129,14 +132,25 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+					job.sendStatus("Could not contact agent %s" % agent.uuid)
+					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
+
+					# Mark agent offline
+					self.manager.updatePresence( agent.uuid, 0 )
+					scheduler.markOffline( agent.uuid )
+
 				elif ans['result'] == "ok":
+					job.sendStatus("Successfuly aborted")
 					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
 				else:
+					job.sendStatus("Could not abort: %s" % ans['error'])
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
 			# Then, start the job on a_start
 			for agent in a_start:
+
+				# Send status
+				job.sendStatus("Starting job on agen %s" % agent.uuid)
 
 				# Get channel and send start (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
@@ -147,10 +161,18 @@ class JobManagerComponent(Component):
 
 				# Log results
 				if not ans:
-					self.logger.warn("Could not contact %s to cancel job %s" % ( agent.uuid, job.id ) )
+					job.sendStatus("Could not contact agent %s" % agent.uuid)
+					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
+
+					# Mark agent offline
+					self.manager.updatePresence( agent.uuid, 0 )
+					scheduler.markOffline( agent.uuid )
+
 				elif ans['result'] == "ok":
+					job.sendStatus("Successfuly started")
 					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
 				else:
+					job.sendStatus("Could not start: %s" % ans['error'])
 					self.logger.warn("Cannot start job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
 		# Delay a bit
