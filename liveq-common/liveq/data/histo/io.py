@@ -47,7 +47,7 @@ def packHistogram(histo):
 	# Combine two buffers and return
 	return struct.pack("<BII", 1, len(buf_numpy), len(buf_meta)) + buf_numpy + buf_meta
 
-def packHistogramCollection(collection, base64=False, compress=False):
+def packHistogramCollection(collection, encode=False, compress=False):
 	"""
 	Pack a collection of histograms
 	"""
@@ -63,7 +63,7 @@ def packHistogramCollection(collection, base64=False, compress=False):
 	if compress:
 		buf = pylzma.compress(buf)
 	# Encode if asked
-	if base64:
+	if encode:
 		buf = base64.b64encode(buf)
 
 	# Return buffer
@@ -109,16 +109,16 @@ def unpackHistogram(buf, offset=0):
 			p
 		)
 
-def unpackHistogramCollection(buf, base64=False, compress=False):
+def unpackHistogramCollection(buf, decode=False, decompress=False):
 	"""
 	Unpack a collection of histograms
 	"""
 
 	# Dencode if asked
-	if base64:
+	if decode:
 		buf = base64.b64decode(buf)
 	# Deompress if asked
-	if compress:
+	if decompress:
 		buf = pylzma.decompress(buf)
 
 	# Read header

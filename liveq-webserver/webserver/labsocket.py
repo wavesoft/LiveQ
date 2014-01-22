@@ -358,7 +358,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 self.sendStatus("Processing interpolation")
 
                 # Fetch HistogramCollection from data
-                histos = io.unpackHistogramCollection( ans['data'], compress=True, base64=True)
+                histos = io.unpackHistogramCollection( ans['data'], decompress=True, decode=True)
 
                 # Pack histograms
                 histoBuffers = []
