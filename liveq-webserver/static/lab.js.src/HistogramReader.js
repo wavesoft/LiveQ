@@ -146,7 +146,7 @@ LiveQ.HistogramReader.prototype.handleConfigFrame = function( configReader ) {
 		reserved = configReader.getUint32();
 
 	// Read histograms
-	for (var i=0; i<numHistos; i++) {
+	for (var j=0; j<numHistos; j++) {
 		// Fetch histogram from buffer
 		var histo = LiveQ.ReferenceData.fromReader( configReader );
 
