@@ -339,7 +339,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             if not ans:
 
                 # Send status
-                self.sendStatus("Could not contact interpolator", {"INTERPOLATION", "0"})
+                self.sendStatus("Could not contact interpolator", {"INTERPOLATION": "0"})
                 self.logger.warn("Could not contact interpolator")
 
             else:
@@ -362,7 +362,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     )
 
                 # Send status message
-                self.sendStatus("Got interpolated results", {"INTERPOLATION", "1"})
+                self.sendStatus("Got interpolated results", {"INTERPOLATION": "1"})
 
                 # Check if we found excact match
                 if ans['exact']:
@@ -377,7 +377,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                     return
 
             # Send status
-            self.sendStatus("Contacting job manager", {"JOB_STATUS", "starting"})
+            self.sendStatus("Contacting job manager", {"JOB_STATUS": "starting"})
 
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
@@ -396,7 +396,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 return self.sendError("Unable to place a job request: %s" % ans['error'])
 
             # Send status
-            self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS", "started"})
+            self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
 
             # The job started, save the tune job ID
             self.jobid = ans['jid']
