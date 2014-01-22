@@ -48,7 +48,7 @@ class IntermediateHistogramCollection(dict):
 		# Initialize parent class
 		dict.__init__(self)
 		# Set state
-		self.state = state
+		self.state = int(state)
 
 	def append(self, ihisto):
 		"""
