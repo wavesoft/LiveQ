@@ -43,6 +43,3 @@ liveq-webserver/static/lab.js.src/out
 *.log
 local-environment.sh
 dump.rdb
-
-liveq-webserver/static/lib/d3.js
-liveq-webserver/static/lib/jquery-1.6.2.min.js

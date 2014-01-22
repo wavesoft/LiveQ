@@ -19,9 +19,14 @@
 ################################################################
 
 #
-# TODO: Rerwite this in order to use the yoda files that come with rivet, instead of the /dat folder
+# TODO: Rerwite this in order to use the yoda/AIDA files that come with rivet, instead of the /dat folder
 #       of MCPlots
 #
+
+# ----------
+import sys
+sys.path.append("../liveq-common")
+# ----------
 
 import shutil
 import os
@@ -189,6 +194,51 @@ def loadRivetHistograms(confFile):
 	# Return answer
 	return ans
 
+def analyzeRivetRef(baseDir):
+	"""
+	Load all the FLAT Rivet reference data from the given revet directory.
+	"""
+	
+	# Prepare response
+	ref = { }
+
+	# List all aida files in the directory
+	refFiles = glob.glob("%s/*.dat" % baseDir)
+
+	# Parse reference files
+	for rf in refFiles:
+
+		# Read the file
+		fdata = parseFLAT(rf)
+		try:
+
+			# Read the histogram name
+			hname = fdata['HISTOGRAM']['d']['AidaPath']
+
+			# Get plot metainfo
+			plotMeta = fdata['PLOT']['d']
+			plotTitle = plotMeta['Title']
+			plotXLabel = plotMeta['XLabel']
+			plotYLabel = plotMeta['YLabel']
+
+			# Ensure it's a REF file
+			if not hname.startswith("/REF"):
+				continue
+
+			# Store information
+			ref[hname[4:]] = {
+				'title': plotTitle,
+				'xlabel': plotXLabel,
+				'ylabel': plotYLabel,
+				'ref': rf
+			}
+
+		except KeyError as e:
+			print "!!! Could not load FLAT file %s: Missing section %s" % (ff, str(e))
+
+	# Return response
+	return ref
+
 def analyzeDAT(baseDir):
 	"""
 	Load all the FLAT files from the given directory and populate the histogram fields
@@ -300,7 +350,7 @@ def renderTEX(TeX, image, overwrite=False):
 
 histos = loadRivetHistograms( "/Users/icharala/Develop/mcplots/trunk/scripts/mcprod/configuration/rivet-histograms.map" )
 mcplots = loadMCPlots( "/Users/icharala/Develop/mcplots/trunk/www/mcplots.conf" )
-flatinfo = analyzeDAT( "/Users/icharala/Develop/LiveQ/tools/dat.local" )
+flatinfo = analyzeRivetRef( "/Users/icharala/Develop/LiveQ/tools/rivet.local" )
 out_dir = "ref.local"
 
 # Get histogram keys
@@ -356,8 +406,7 @@ for name in hkeys:
 		histos[name][idx] += [
 				abbrInfo[0], # Group name
 				abbrInfo[1], # HTML Name
-				refDst, 	 # Reference histogram
-				histoTeXName # LaTeX image base ID
+				histoTeXName # Histogam base ID
 			]
 
 		hasSomething = True

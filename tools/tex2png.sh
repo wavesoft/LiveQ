@@ -28,13 +28,13 @@ EOF
 pdflatex "\input{temp-formula.tex}" > /dev/null
 if [ $? -ne 0 ]; then
 	echo "-- Error --"
-	return 1
+	exit 1
 fi
 
 # And then to image
 #convert -density 400 temp-formula.pdf -resize 1000x${TEX_HEIGHT} ${TEX_IMAGE}
 #convert -trim temp-formula.pdf -sharpen 0x1.0 ${TEX_IMAGE}
-convert -trim -density 115 temp-formula.pdf -sharpen 0x1 ${TEX_IMAGE}
+convert -trim -density 90 temp-formula.pdf -sharpen 0x1 ${TEX_IMAGE}
 
 # Cleanup
 rm temp-formula.*
