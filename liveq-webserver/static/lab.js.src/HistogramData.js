@@ -38,6 +38,7 @@ LiveQ.HistogramData = function( bins, id ) {
 	this._updateCallbacks = [ ];
 
 	// If we have bins specified, generate an empty ArrayBuffer for the components.
+	this.empty = true;
 	if (this.bins > 0) {
 
 		// Reset histogram values
@@ -99,6 +100,9 @@ LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID )
 		this.values[i] = reader.getFloat64Array(6);
 	}
 	// ---------------
+
+	// We are not empty any more
+	this.empty = false;
 
 	// The histogram is updated, fire callbacks
 	for (var i=0; i<this._updateCallbacks.length; i++) {

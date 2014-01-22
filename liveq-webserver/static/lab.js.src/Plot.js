@@ -519,7 +519,12 @@ LiveQ.PlotWindow.prototype.rescaleAxes = function() {
 
 	// Run over histograms and calculate bounds
 	for (var i=0; i<this.plots.length; i++) {
+
+		// Fetch histogram bounds and skip empty ones
 		hBounds = this.plots[i].getBounds();
+		if (!hBounds) continue;
+
+		// Update collective bounds
 		if (xMin == null) {
 			xMin = hBounds[0]; xMax = hBounds[1];
 			yMin = hBounds[2]; yMax = hBounds[3];
@@ -530,6 +535,9 @@ LiveQ.PlotWindow.prototype.rescaleAxes = function() {
 			if (hBounds[3]<yMax) yMax=hBounds[3];
 		}
 	}
+
+	// Skip empty histograms
+	if ((xMin == null) || (yMin == null)) return;
 
 	// Update scale domains
 	this.xScale

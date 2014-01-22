@@ -28,6 +28,10 @@ LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
 		xMin=null, yMin=null,
 		xMax=null, yMax=null;
 
+	// If the histogram is empty, return no bounds
+	if (this.histo.empty)
+		return null;
+
 	// Run over bins and calculate bounds (including error bars)
 	for (var i=0; i<this.histo.bins; i++) {
 
