@@ -103,10 +103,10 @@ class HistoDescriptionLab:
 
 				# Related files with these information
 				'files': {
-					'ref': "%s/ref/%s.dat" % (self.description.basedir, str(desc[9])),
-					'title': "%s/tex/%s.png" % (self.description.basedir, str(desc[9])),
-					'xlabel': "%s/tex/%s-x.png" % (self.description.basedir, str(desc[9])),
-					'ylabel': "%s/tex/%s-y.png" % (self.description.basedir, str(desc[9]))
+					'ref': "%s/ref/%s.dat" % (self.description.basedir, str(desc[8])),
+					'title': "%s/tex/%s.png" % (self.description.basedir, str(desc[8])),
+					'xlabel': "%s/tex/%s-x.png" % (self.description.basedir, str(desc[8])),
+					'ylabel': "%s/tex/%s-y.png" % (self.description.basedir, str(desc[8]))
 				}
 			}
 
