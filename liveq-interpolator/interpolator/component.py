@@ -62,7 +62,7 @@ class InterpolatorComponent(Component):
 		"""
 		
 		# Ensure we have required parameters in the data
-		if not all([ x in data for x in ('lab', 'parameters')]):
+		if not all([ x in data for x in ('lab', 'parameters', 'histograms')]):
 			self.logger.warn("Missing parameters in the interpolationrequest")
 			return {
 				'result': 'error',
@@ -87,11 +87,18 @@ class InterpolatorComponent(Component):
 		# Run interpolation and get an InterpolatableCollection collection
 		histograms = ipol(*tune.getValues())
 
+		# Pick histograms to return
+		requestedHistos = data['histograms']
+		pickedHistos = [ ]
+		for histo in histograms:
+			if histo.name in requestedHistos:
+				pickedHistos.append(histo)
+
 		# Return a packed histogram collection
 		self.ipolChannel.reply({
 				'result': 'ok',
 				'exact': 0,
-				'data': io.packHistogramCollection( histograms )
+				'data': io.packHistogramCollection(requestedHistos)
 			})
 
 

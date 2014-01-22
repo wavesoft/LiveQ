@@ -46,6 +46,7 @@ from __future__ import division, print_function, absolute_import
 
 import sys
 
+from numpy.linalg import LinAlgError
 from numpy import (sqrt, log, asarray, array, newaxis, all, dot, exp, eye,
 				   float_, zeros, swapaxes)
 from numpy import linalg
@@ -194,7 +195,7 @@ class Rbf(object):
 	def __init__(self, *args, **kwargs):
 
 		# Pop data entry
-		if not'data' in kwargs:
+		if not 'data' in kwargs:
 			raise ValueError("data= kwargument was not specified!")
 		data = kwargs.pop('data')
 
@@ -251,7 +252,15 @@ class Rbf(object):
 			# In any other cases, create a node array
 			self.nodes = []
 			for di in self.di:
-				self.nodes.append( linalg.solve(self.A, di) )
+
+				# Try to create node and use None
+				# if it failed
+				try:
+					la = linalg.solve(self.A, di)
+				except LinAlgError as e:
+					la = None
+
+				self.nodes.append(la)
 
 
 	def _call_norm(self, x1, x2):
@@ -280,7 +289,8 @@ class Rbf(object):
 			ans = zeros( len(self.nodes) )
 			i = 0
 			for node in self.nodes:
-				ans[i] = dot(self._function(r), node).reshape(shp)
+				if node != None:
+					ans[i] = dot(self._function(r), node).reshape(shp)
 				i += 1
 
 			# Create and return a new histogram object
@@ -308,7 +318,8 @@ class Rbf(object):
 			ans = zeros( len(self.nodes) )
 			i = 0
 			for node in self.nodes:
-				ans[i] = dot(self._function(r), node).reshape(shp)
+				if node != None:
+					ans[i] = dot(self._function(r), node).reshape(shp)
 				i += 1
 
 			# Create and return a new histogram object

@@ -178,7 +178,7 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 		self._pingTimer = setInterval(function() {
 			// Send PING every 30 seconds
 			self.send("ping", {});
-		}, 10000);
+		}, 30000);
 
 	};
 

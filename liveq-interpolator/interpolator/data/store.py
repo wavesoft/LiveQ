@@ -257,6 +257,7 @@ class HistogramStore:
 
 		# Get neighborhood
 		data = HistogramStore.getNeighborhood(tune)
+		#print "- getNeighborhood: %r" % data
 
 		# Iterate over items and create interpolation indices and data variables
 		datavalues = [ ]
@@ -267,8 +268,13 @@ class HistogramStore:
 			datavalues.append(hc)
 			indexvars.append(hc.tune.getValues())
 
+		#print "- data: %r" % datavalues
+		#print "- index: %r" % indexvars
+
+
 		# Flip matrix of indexvars
 		indexvars = np.swapaxes( np.array(indexvars), 0, 1 )
+		#print "- indexVars: %r" % indexvars
 
 		# Nothing available
 		if len(indexvars) == 0:
@@ -279,5 +285,6 @@ class HistogramStore:
 		#print "Check: %i == %i" % (len(datavalues), len(indexvars[0]))
 
 		# Create and return interpolator
+		#print "- running Rbf"
 		return Rbf( *indexvars, data=datavalues, function=function )
 
