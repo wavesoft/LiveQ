@@ -194,3 +194,26 @@ class Lab(BaseModel):
 		Set the names of the histograms to send to the user
 		"""
 		self.histograms = ",".join(data)
+
+	def formatTunables(self, tunables):
+		"""
+		Format the provided tunables so they match the configuration (bounds and defaults)
+		"""
+
+		# Prepare answer
+		ans = { }
+
+		# Get process parameters
+		tunablesConfig = self.getTunables()
+		for k,v in tunablesConfig.iteritems():
+
+			# Prepare values for answer
+			if k in tunables:
+				ans[k] = min( max( float(tunables[k]), float(v['min']) ), float(v['max']) )
+			else:
+				ans[k] = 0.0
+				if 'default' in v:
+					ans[k] = float(v['default'])
+
+		# Return answer
+		return ans

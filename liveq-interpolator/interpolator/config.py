@@ -24,6 +24,7 @@ from liveq.config.core import CoreConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.tuneaddressing import TuneAddressingConfig
+from liveq.config.database import DatabaseConfig
 
 class InterpolatorConfig:
 	"""
@@ -37,7 +38,7 @@ class InterpolatorConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig, TuneAddressingConfig):
+class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, InterpolatorConfig, TuneAddressingConfig):
 	"""
 	Create a configuration for the INTERPOLATOR based on the core config
 	"""
@@ -56,6 +57,7 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, InterpolatorConfig, Tun
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
 		StoreConfig.fromConfig( config, runtimeConfig )
+		DatabaseConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		InterpolatorConfig.fromConfig( config, runtimeConfig )
 		TuneAddressingConfig.fromConfig( config, runtimeConfig )
