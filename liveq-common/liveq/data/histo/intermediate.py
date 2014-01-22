@@ -188,6 +188,10 @@ class IntermediateHistogramCollection(dict):
 
 		/!\ Note: This buffer is NOT 64-bit aligned!
 		"""
+
+		# Format values
+		if self.state == None:
+			self.state = 0
 		
 		# Prepare buffer
 		buf = struct.pack("<BIB", 1, len(self), int(self.state))
