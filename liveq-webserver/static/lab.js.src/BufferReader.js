@@ -40,7 +40,7 @@ LiveQ.BufferReader.prototype.getUint8 = function() {
 LiveQ.BufferReader.prototype.getUint16 = function() {
 
 	// Create buffer
-	var buf = new Uint16Array( this.buffer, this.position, 2 );
+	var buf = new Uint16Array( this.buffer, this.position, 1 );
 	// Forward position
 	this.position += 2;
 	// Return buffer
@@ -56,7 +56,7 @@ LiveQ.BufferReader.prototype.getUint16 = function() {
 LiveQ.BufferReader.prototype.getUint32 = function() {
 
 	// Create buffer
-	var buf = new Uint32Array( this.buffer, this.position, 4 );
+	var buf = new Uint32Array( this.buffer, this.position, 1 );
 	// Forward position
 	this.position += 4;
 	// Return buffer

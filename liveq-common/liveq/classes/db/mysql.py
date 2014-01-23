@@ -23,8 +23,64 @@ MySQL Database Class
 This class provides a MySQL connection to the peewee databse back-end.
 """
 
-from peewee import MySQLDatabase
+import logging
+from peewee import MySQLDatabase, OperationalError
 from liveq.config.classes import DatabaseConfigClass
+
+class DurableMySQLDatabase(MySQLDatabase):
+	"""
+	A DurableMySQLDatabase is an extension on the MySQLDatabase that re-connects if the
+	connection has gone off.
+	"""
+
+	def init(self, database, **connect_kwargs):
+		"""
+		Override the initialization so we add extra variables
+		"""
+
+		# Call superclass
+		MySQLDatabase.init(self, database, **connect_kwargs)
+
+		# Setup recovery flag
+		self.__recovering = False 
+
+	def sql_error_handler(self, exception, sql, params, require_commit):
+		"""
+		Handle an exception that might have occured during execution.
+
+		This function is mainly used to recover from OperationalError: (2006, 'MySQL server has gone away'),
+		which is caused when MySQL server disconnects because of inactivity.
+		"""
+
+		# Chcek if we got an error, while in recovery mode
+		if self.__recovering:
+			raise OperationalError(2006, 'MySQL server has gone away, and we cannot recover!')
+
+		# Check if we have an OperationalError of #2006 (MySQL server has gone away)
+		if exception.__class__ is OperationalError:
+
+			# Get exception number
+			e_num = exception.args[0]
+			if e_num == 2006:
+
+				# Reconnect
+				self.close()
+				self.connect()
+
+				# Mark recovery
+				self.__recovering = True
+				# Re-execute query
+				ans = self.execute_sql( sql, params, require_commit )
+				# Reset recovery flag
+				self.__recovering = False
+
+				# Return response
+				return ans
+
+		else:
+
+			# We can't handle this, use default handler
+			return MySQLDatabase.sql_error_handler(self, exception, sql, params, require_commit)
 
 class Config(DatabaseConfigClass):
 	"""
@@ -44,5 +100,5 @@ class Config(DatabaseConfigClass):
 	Create an SQL instance
 	"""
 	def instance(self, runtimeConfig):
-		return MySQLDatabase(self.DATABASE, host=self.HOST, user=self.USERNAME, passwd=self.PASSWORD)
+		return DurableMySQLDatabase(self.DATABASE, host=self.HOST, user=self.USERNAME, passwd=self.PASSWORD)
 
