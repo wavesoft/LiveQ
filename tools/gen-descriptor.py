@@ -396,7 +396,7 @@ for name in hkeys:
 
 		# Render title, x-label and y-label to images
 		print "TeX Title...",
-		renderTEX( "{\\large %s}" % meta['title'], "%s.png" % histoTeXBase)
+		renderTEX( "{\\large\\textbf{%s}}" % meta['title'], "%s.png" % histoTeXBase)
 		print "TeX XLabel...",
 		renderTEX( meta['xlabel'], "%s-x.png" % histoTeXBase )
 		print "TeX YLablel...",
