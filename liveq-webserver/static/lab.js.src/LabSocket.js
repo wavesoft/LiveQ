@@ -17,6 +17,12 @@ LiveQ.LabSocket = function( id ) {
 	LiveQ.HistogramReader.call(this);
 
 	/**
+	 * The ID of the lab
+	 * @member {string}
+	 */
+	this.id = id;
+
+	/**
 	 * Flag which marks that a simulation is running
 	 * @member {boolean}
 	 */
@@ -33,7 +39,6 @@ LiveQ.LabSocket = function( id ) {
 	 * @member {string}
 	 */
 	this.url = "ws://" + location.host + "/vas/labsocket/" + id;
-	this.setupSocket();
 
 	/**
 	 * Array of the callback functions to be fired when the socket is connected
@@ -50,12 +55,28 @@ LiveQ.LabSocket = function( id ) {
 	this._onDisconnect = [];
 
 	/**
+	 * Array of the callback functions to be fired when a log message is arrived
+	 * @private
+	 * @member {array}
+	 */
+	this._onLog = [];
+
+	/**
+	 * Array of the callback functions to be fired when an error has occured
+	 * @private
+	 * @member {array}
+	 */
+	this._onError = [];
+
+	/**
 	 * The timer ID used for pinging the server
 	 * @private
 	 * @member {int}
 	 */
 	this._pingTimer = null;
 
+	// Initialize connection
+	this.setupSocket();
 
 }
 
@@ -98,6 +119,44 @@ LiveQ.LabSocket.prototype.onDisconnect = function( cb ) {
 LiveQ.LabSocket.prototype.offDisconnect = function( cb ) {
 	var i = this._onDisconnect.indexOf(cb);
 	this._onDisconnect.splice(i,1);
+}
+
+/**
+ * Register a callback to be notified when the socket is connected
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.onLog = function( cb ) {
+	this._onLog.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onLog
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.offLog = function( cb ) {
+	var i = this._onLog.indexOf(cb);
+	this._onLog.splice(i,1);
+}
+
+/**
+ * Register a callback to be notified when an error occured
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.onError = function( cb ) {
+	this._onError.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onError
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.offError = function( cb ) {
+	var i = this._onError.indexOf(cb);
+	this._onError.splice(i,1);
 }
 
 /**
@@ -233,8 +292,18 @@ LiveQ.LabSocket.prototype.handleActionFrame = function( action, data ) {
 	if (action == "status") {  /* Status message */
 		console.log(data['message']);
 
+		// Fire callbacks
+		for (var i=0; i<this._onLog.length; i++) {
+			this._onLog[i](data['message'], data['vars']);
+		}
+
 	} else if (action == "error") { /* Error message */
 		console.error("I/O Error:",data['message']);
+
+		// Fire callbacks
+		for (var i=0; i<this._onError.length; i++) {
+			this._onError[i](data['message']);
+		}
 
 	} else if (action == "sim_completed") { /* Job completed */
 		console.log("Job completed");

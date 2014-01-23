@@ -33,7 +33,6 @@ liveq-common/ref-data
 
 # Test files
 *test.py
-tools/tex-images*
 
 # Temporary documentation
 liveq-webserver/static/lab.js.src/out

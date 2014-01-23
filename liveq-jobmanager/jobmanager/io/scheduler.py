@@ -24,7 +24,7 @@ import jobmanager.io.agents as agents
 import jobmanager.io.jobs as jobs
 
 from jobmanager.config import Config
-from peewee import fn
+from peewee import fn, RawQuery
 
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
 from liveq.utils.remotelock import RemoteLock
@@ -51,23 +51,22 @@ class GroupResources:
 		self.group = AgentGroup.get(uuid=group)
 		self.gid = self.group.id
 
-		# A bit more advanced query for fetching metrics
-		values = Agent.raw(
-			"SELECT \
-			  TOT.total, FREE.free, IND.individual \
-			FROM \
-			  ( SELECT COUNT(id) AS total FROM `agent` WHERE `state` = 1 AND `group_id` = %i ) AS TOT,\
-			  ( SELECT COUNT(id) AS free FROM `agent` WHERE `activeJob` = '' AND `state` = 1 AND `group_id` = %i ) AS FREE,\
-			  ( SELECT COUNT(DISTINCT activeJob) AS individual FROM `agent` WHERE `state` = 1 AND `group_id` = %i AND `activeJob` != '') AS IND" 
-			  % (self.gid,self.gid,self.gid)
-			).execute().next()
+		# Count total
+		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) ).tuples().execute().next()
+		self.total = values[0]
 
-		# Store metrics
-		self.total = values.total
-		self.free = values.free
+		# Count free
+		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob == "") ).tuples().execute().next()
+		self.free = values[0]
 		self.used = self.total - self.free
-		self.individual = values.individual
 
+		# Count individual
+		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) ).group_by( Agent.activeJob ).tuples().execute().next()
+		self.individual = values[0]
+		if self.free != 0:
+			self.individual -= 1
+
+		# Debug metrics
 		logger.info("Metrics %s { total=%i, free=%i, used=%i, individual=%i }" % (group, self.total, self.free, self.used, self.individual))
 
 		# Calculate the fair-share for the next request
@@ -294,7 +293,7 @@ def process():
 
 	# Check if there is absolutely no free space
 	if not res.fitsAnother():
-		job.sendStatus("No free workers to place job. Will try later.", {"RES_SLOTS", "0"})
+		job.sendStatus("No free workers to place job. Will try later.", {"RES_SLOTS": "0"})
 		res.release()
 		return (None,None,None)
 
