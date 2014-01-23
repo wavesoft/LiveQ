@@ -104,7 +104,7 @@ LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID )
 	}
 
 	// ---------------
-	// Replace bin contents
+	// Replace bin contents: [y, y+, y-, x, x+, x-]
 	for (var i=0; i<this.bins; i++) {
 		this.values[i] = reader.getFloat64Array(6);
 	}
@@ -158,3 +158,78 @@ LiveQ.HistogramData.fromReader = function( reader ) {
 
 }
 
+/**
+ * Calculate the Chi-squared between the current histogram and the specified
+ *
+ * @param {LiveQ.HistogramData} histogram - The histogram to compare to
+ * @returns {array} A HistogramData instance
+ */
+LiveQ.HistogramData.chi2ToReference = function( refHisto, uncertainty ) {
+
+	// Ensure equal bins
+	if (histogram.bins != this.bins) 
+		return null;
+
+	// Prepare chi2 per bin and average
+	var perBin = [];
+
+	// Put default value to uncertainty
+	if (!uncertainty) uncertainty=0.05;
+
+	// Handle bins
+	for (var i=0; i<this.bins; i++) {
+
+		// Require same bins filled. If data is filled and MC is not filled,
+		// we do not know what the chi2 of that bin is. Return error.
+		// (b.isEmpty() && !r.isEmpty()) return -1;
+		if ((this.values[i][0] == 0) && (refHisto.values[i][0] == 0)) {
+			perBin.push(0);
+			return null;
+		}
+
+		// Skip empty bins (if data is empty but theory is filled, it's ok. We
+		// are allowed to plot theory outside where there is data, we just 
+		// cannot calculate a chi2 there).
+		if ((this.values[i][0] == 0) || (refHisto.values[i][0] == 0)) {
+			perBin.push(0);
+			continue;
+		}
+
+		//
+		// compute one element of test statistics:
+		//                     (Theory - Data)^2
+		// X = --------------------------------------------------------
+		//      Sigma_data^2 + Sigma_theory^2 + (uncertainty*Theory)^2
+		//
+		var theory = this.values[i][0],
+			data = refHisto.values[i][0],
+			sTheory, sData;
+
+		if (theory > data) {
+			sTheory = this.values[i][2]   // yErrMinus
+			sData = refHisto.values[i][1] // yErrPlus
+		} else {
+			sTheory = this.values[i][1]   // yErrMinus
+			sData = refHisto.values[i][2] // yErrPlus
+		}
+
+		// Calculate nomin & denom 
+		var nomin = (theory-data)*(theory-data),
+			denom = sData*sData + sTheory*sTheory + (uncertainty*theory)*(uncertainty*theory);
+
+		// Ensure we don't divide by 0
+		if (denom == 0) {
+			perBin.push(0);
+			continue;
+		}
+
+		// Calculate bin Chi2
+		var X = nomin/denom;
+		perBin.push(X);
+
+	}
+
+	// Calculate averages
+	return perBin;
+
+}

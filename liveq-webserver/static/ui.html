@@ -30,7 +30,9 @@
 
     body {
       font: sans-serif;
-      padding-top: 70px;      
+      padding-top: 70px;
+      background: url(img/background.jpg) #000 no-repeat top center;
+      background-attachment: fixed;
     }
 
     div#log {
@@ -149,7 +151,7 @@
 
         // Create a new plot and store it in the histogram object
         histo.plot = new LiveQ.PlotWindow("#host", {
-            'width': 400,
+            'width': 340,
             'height': 300,
             'imgTitle': ref.imgTitle,
             'imgXLabel': ref.imgXLabel,
@@ -300,7 +302,7 @@
 
                 <div class="form-group">
                   <div class="col-sm-offset-6 col-sm-6">
-                    <button id="startSim" type="button" class="btn btn-success">Try these values</button>
+                    <button id="startSim" type="button" class="btn btn-success"><span class="glyphicon glyphicon-check"></span> Try these values</button>
                     <button id="stopSim" type="button" class="btn btn-danger">Stop</button>
                   </div>
                 </div>

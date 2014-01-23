@@ -142,6 +142,26 @@ class Job:
 		# Merge and return histograms
 		return intermediateCollectionMerge( histos.values() )
 
+	def removeAgentData(self, agent):
+		"""
+		Remove data from the given agent from the histogram
+		"""
+
+		# Fetch histogram buffer from store
+		buf = Config.STORE.get("job-%s:histo" % self.id)
+		if not buf:
+			return 0
+
+		# Unpickle
+		histos = pickle.loads(buf)
+		if agent in histos:
+			del histos[agent]
+
+		# Pickle and put back
+		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(histos))
+
+		# Return number of agents left
+		return len(histos)
 
 	def getMeta(self, name):
 		"""

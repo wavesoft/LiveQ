@@ -28,6 +28,8 @@ import bz2
 import pylzma
 import base64
 
+import traceback
+
 from liveq.utils.FLAT import FLATParser
 from liveq.data.histo import Histogram
 from liveq.data.histo.interpolate import InterpolatableCollection
@@ -443,8 +445,22 @@ class IntermediateHistogram:
 		name = data['HISTOSTATS']['d']['AidaPath']
 
 		# Convert values into a flat 2D numpy array
-		print ">> %r" % vBins
-		values = numpy.array(vBins, dtype=numpy.float64).flatten()
+		try:
+			values = numpy.array(vBins, dtype=numpy.float64).flatten()
+		except ValueError as e:
+			# Dump error
+			with open("/tmp/agent-errors.log", "a") as f:
+				f.write("-- Error loading intermediate FLAT from %s\n" % filename)
+				f.write("File contents:\n")
+
+				# Write contents of FLAT file
+				with open(filename, "r") as ir:
+					f.write(ir.read())
+
+				# Write contents of vBins
+				f.write("Bins:\n")
+				f.write("%r" % vBins)
+
 
 		# Extract parts and build histogram
 		return IntermediateHistogram(

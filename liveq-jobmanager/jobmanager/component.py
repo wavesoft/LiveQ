@@ -114,6 +114,12 @@ class JobManagerComponent(Component):
 		Internal component loop
 		"""
 
+		# Handle deferred completed jobs
+		jobs = scheduler.getCompletedJobs()
+		for job in jobs:
+			# Notify interested entities that the specified job is completed
+			self.notifyJobCompleted(job)
+
 		# Handle the next step in the scheduler
 		(job, a_cancel, a_start) = scheduler.process()
 		if job:
@@ -177,6 +183,48 @@ class JobManagerComponent(Component):
 
 		# Delay a bit
 		time.sleep(5)
+
+	def notifyJobCompleted(self, job, histos=None):
+		"""
+		Notify all the interested entities that the given job is completed
+		"""
+
+		# Get the merged histograms from the job store if we have
+		# not provided them as arguments
+		if not histos:
+			histos = job.getHistograms()
+			if histos == None:
+				job.sendStatus("Unable to merge histograms")
+				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+				return
+
+		# Send status
+		job.sendStatus("All workers have finished. Collecting final results.")
+
+		# Pack data once
+		histoPack = histos.pack()
+
+		# If ALL histograms have state=2 (completed), it means that the
+		# job is indeed completed. Reply to the job channel the final job data
+		job.channel.send("job_completed", {
+				'jid': jid,
+				'result': 0,
+				'data': histoPack
+			})
+
+		# Send the resulting data to the interpolation database
+		self.ipolChannel.send("results", {
+				'lab': job.lab.uuid,
+				'config': job.parameters['tune'],
+				'data': histoPack
+			})
+
+		# Cleanup job from scheduler
+		scheduler.releaseJob( job )
+
+		# And then cleanup job
+		job.release()
+
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -304,56 +352,47 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			return
 
-		# Send status
-		job.sendStatus("Worker %s has finished the job" % channel.name)
+		# Check result
+		ans = int(data['result'])
+		if ans != 0:
 
-		# Get the merged histograms from the job store
-		histos = job.getHistograms()
-		if histos == None:
-			job.sendStatus("Unable to merge histograms")
-			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
-			return
+			# Handle error
+			job.sendStatus("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
+			self.logger.warn("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
 
-		# Free this agent from the given job, allowing
-		# scheduler logic to process the free resource
-		scheduler.releaseFromJob( channel.name, job )
-
-		# If all jobs are completed, forward the job_completed event,
-		# otherwise fire the job_data event.
-		if histos.state == 2:
-
-			# Send status
-			job.sendStatus("All workers have finished. Collecting final results.")
-
-			# Pack data once
-			histoPack = histos.pack()
-
-			# If ALL histograms have state=2 (completed), it means that the
-			# job is indeed completed. Reply to the job channel the final job data
-			job.channel.send("job_completed", {
-					'jid': jid,
-					'result': 0,
-					'data': histoPack
-				})
-
-			# Send the resulting data to the interpolation database
-			self.ipolChannel.send("results", {
-					'lab': job.lab.uuid,
-					'config': job.parameters['tune'],
-					'data': histoPack
-				})
-
-			# Cleanup job from scheduler
-			scheduler.releaseJob( job )
-
-			# And then cleanup job
-			job.release()
+			# Handle the agent as lost
+			scheduler.handleLoss( agents.getAgent( channel.name ) )
 
 		else:
-			job.channel.send("job_data", {
-					'jid': jid,
-					'data': histos.pack()
-				})
+
+			# Send status
+			job.sendStatus("Worker %s has finished the job" % channel.name)
+			self.logger.info("Worker %s has finished the job" % channel.name)
+
+			# Get the merged histograms from the job store
+			histos = job.getHistograms()
+			if histos == None:
+				job.sendStatus("Unable to merge histograms")
+				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+				return
+
+			# Free this agent from the given job, allowing
+			# scheduler logic to process the free resource
+			scheduler.releaseFromJob( channel.name, job )
+
+			# If all jobs are completed, forward the job_completed event,
+			# otherwise fire the job_data event.
+			if histos.state == 2:
+
+				# Job is completed
+				self.notifyJobCompleted( job, histos=histos )
+				self.logger.info("All workers of job %s have finished" % jid)
+
+			else:
+				job.channel.send("job_data", {
+						'jid': jid,
+						'data': histos.pack()
+					})
 
 
 	# =========================

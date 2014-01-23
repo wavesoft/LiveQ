@@ -32,6 +32,14 @@ from liveq.models import Agent, AgentGroup
 
 logger = logging.getLogger("scheduler")
 
+#: An array that contains the job IDs that were completed
+#: after a process in the scheduler. 
+#:
+#: The contents of this array can be fetched through the getCompletedJobs()
+#: function.
+#:
+pendingCompletedJobs = [ ]
+
 class GroupResources:
 	"""
 	This class is used as a 'smart pointer' to the database groups. Instead of fetching
@@ -61,16 +69,17 @@ class GroupResources:
 		self.used = self.total - self.free
 
 		# Count individual
-		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) ).group_by( Agent.activeJob ).tuples().execute().next()
+		values = Agent.select( fn.Count( fn.Distinct( Agent.activeJob ) ) ).where( (Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob != "") ).tuples().execute().next()
 		self.individual = values[0]
-		if self.free != 0:
-			self.individual -= 1
 
 		# Debug metrics
 		logger.info("Metrics %s { total=%i, free=%i, used=%i, individual=%i }" % (group, self.total, self.free, self.used, self.individual))
 
 		# Calculate the fair-share for the next request
-		self.fairShare = max( int(round( float(self.total) / (self.individual + 1) )), 1 )
+		if self.individual > 0:
+			self.fairShare = max( int(round( float(self.total) / (self.individual + 1) )), 1 )
+		else:
+			self.fairShare = self.total
 
 	def release(self):
 		"""
@@ -125,7 +134,10 @@ class GroupResources:
 			)
 
 		# Calculate the trimdown to the existing services
-		trimdown = max( int(round( float(self.fairShare) / self.individual )), 1 )
+		if self.individual > 0:
+			trimdown = max( int(round( float(self.fairShare) / self.individual )), 1 )
+		else:
+			return [ ]
 
 		# Start trimming until we reach quota
 		ans = []
@@ -221,9 +233,13 @@ def peekQueueJob():
 
 def handleLoss( agent ):
 	"""
-	Handle the fact that we lost the given agent unexpecidly
-	"""
+	Handle the fact that we lost the given agent unexpecidly.
 
+	This function returns TRUE if by removing this agent the job is complete
+	and can be finalized.
+	"""
+	global pendingCompletedJobs
+	
 	# Check if it has an active job
 	if not agent.activeJob:
 		return
@@ -231,24 +247,43 @@ def handleLoss( agent ):
 	# Return a job instance
 	job = jobs.getJob(agent.activeJob)
 
+	# Remove agent data from the job and check
+	# how many agents are left in the array
+	agentDataCount = job.removeAgentData( agent.activeJob )
+
 	# Check if that was the last agent handling this job
 	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == agent.activeJob) ).execute().next()
 
 	# Send status
-	job.sendStatus("A worker from our group has gone offline. We have %i slots left", {"RES_SLOTS":values.count})
+	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % values.count, {"RES_SLOTS":values.count})
 
 	# Check if we were left with nothing
 	if values.count == 0:
 
-		# Send status
-		job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
+		# Check if this job has already some data piled in it's
+		# histogram buffer. If that's the case, we can consider the 
+		# job completed (with less agents that requested)
+		if agentDataCount > 0:
 
-		# Re-place job on queue with highest priority
-		Config.STORE.rpush( "scheduler:queue", agent.activeJob )
+			# Mark the job as completed, by placing it on the
+			# pendingCompletedJobs array, whose contents will
+			# be fetched in the process loop
+			pendingCompletedJobs.append( job )
+
+		else:
+
+			# Send status
+			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
+
+			# Re-place job on queue with highest priority
+			Config.STORE.rpush( "scheduler:queue", agent.activeJob )
 
 	# Remove the job binding
 	agent.activeJob = ""
 	agent.save()
+
+	# Return FALSE to denote that the job is re-scheduled
+	return False
 
 
 def markForJob(agents, job_id):
@@ -263,6 +298,20 @@ def markForJob(agents, job_id):
 
 	# Return again the agents array
 	return agents
+
+def getCompletedJobs():
+	"""
+	Return the jobs that were completed while processing an action in the scheduler
+	and reset the internal state.
+	"""
+	global pendingCompletedJobs
+
+	# Get instance and clean local state
+	jobs=pendingCompletedJobs
+	pendingCompletedJobs=[ ]
+
+	# Return jobs completed
+	return jobs
 
 def process():
 	"""
