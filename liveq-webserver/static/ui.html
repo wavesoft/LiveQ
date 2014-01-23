@@ -51,6 +51,14 @@
       color: #F00;
     }
 
+    div#log .done {
+      color: #060;
+    }
+
+    div#log .info {
+      color: #06F;
+    }
+
     span.description {
       display: none;
     }
@@ -186,7 +194,7 @@
 
       // Handle completion
       lab.onCompleted(function() {
-        addLog("Simulation completed");
+        addLog("Simulation completed", "done");
         $("#stopSim").hide();
       });
 
@@ -303,7 +311,7 @@
                 <div class="form-group">
                   <div class="col-sm-offset-6 col-sm-6">
                     <button id="startSim" type="button" class="btn btn-success"><span class="glyphicon glyphicon-check"></span> Try these values</button>
-                    <button id="stopSim" type="button" class="btn btn-danger">Stop</button>
+                    <button id="stopSim" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
                   </div>
                 </div>
 

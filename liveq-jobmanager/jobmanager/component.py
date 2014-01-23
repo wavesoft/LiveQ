@@ -195,7 +195,7 @@ class JobManagerComponent(Component):
 			histos = job.getHistograms()
 			if histos == None:
 				job.sendStatus("Unable to merge histograms")
-				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, job.id))
 				return
 
 		# Send status
@@ -207,7 +207,7 @@ class JobManagerComponent(Component):
 		# If ALL histograms have state=2 (completed), it means that the
 		# job is indeed completed. Reply to the job channel the final job data
 		job.channel.send("job_completed", {
-				'jid': jid,
+				'jid': job.id,
 				'result': 0,
 				'data': histoPack
 			})

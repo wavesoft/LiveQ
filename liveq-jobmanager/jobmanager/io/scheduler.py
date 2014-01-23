@@ -124,14 +124,7 @@ class GroupResources:
 			return []
 
 		# Find jobs that occupy more than one agent in the given group
-		values = Agent.raw(
-			"SELECT * \
-			 FROM \
-			  (SELECT COUNT(id) AS njobs, activeJob AS job FROM `agent` WHERE `group_id` = %i GROUP BY job) T \
-			 WHERE \
-			  T.njobs > 1"
-			  % self.gid
-			)
+		values = Agent.select( fn.Count( Agent.id ).alias("njobs"), Agent.activeJob ).where( (Agent.group == self.group) & (Agent.state == 1) ).group_by( Agent.activeJob )
 
 		# Calculate the trimdown to the existing services
 		if self.individual > 0:
@@ -144,8 +137,12 @@ class GroupResources:
 		numTrimmed = 0
 		for qualifiedJob in values:
 
+			# Skip nodes with less than 2 available slots
+			if qualifiedJob.njobs < 2:
+				continue
+
 			# Get the job id
-			jid = qualifiedJob.job
+			jid = qualifiedJob.activeJob
 
 			# If we need less agents than trimdown, reduce it
 			if (count - numTrimmed) < trimdown:

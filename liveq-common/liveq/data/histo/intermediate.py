@@ -451,6 +451,7 @@ class IntermediateHistogram:
 			# Dump error
 			with open("/tmp/agent-errors.log", "a") as f:
 				f.write("-- Error loading intermediate FLAT from %s\n" % filename)
+				traceback.print_exc(file=f)
 				f.write("File contents:\n")
 
 				# Write contents of FLAT file
