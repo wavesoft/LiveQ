@@ -205,6 +205,7 @@
 
       // Bind abort button
       $("#stopSim").click(function(e,i) {
+        addLog("Aborting simulation", "warn");
         lab.abortSimulation();
         $("#stopSim").hide();
       });
