@@ -108,26 +108,17 @@ class InterpolatorComponent(Component):
 		"""
 		
 		# Ensure we have required parameters in the data
-		if not all([ x in data for x in ('lab', 'config', 'data')]):
+		if not 'data' in data:
 			return {
 				'result': 'error',
 				'error': "Missing parameters in the request"
 			}
 
-		# Generate a tune object
-		tune = Tune(data['config'], labid=data['lab'])
-		print "Creating tune from lab=%s, vars=%r" % (data['lab'], data['config'])
-
-		# Unpack the intermediate histogram collection
-		histos = IntermediateHistogramCollection.fromPack(data['data'])
-		print "Read %i histograms from input" % len(histos)
-
-		# Convert intermediate histograms to a InterpolatableCollection object
-		histos = histos.toInterpolatableCollection( tune )
-		print "Got interpolatable collection of %i" % len(histos)
+		# Unpack intepolatable collection from data
+		histos = InterpolatableCollection.fromPack(data['data'])
 
 		# Append data on the histogram store
-		HistogramStore.append( tune, histos )
+		HistogramStore.append( histos )
 
 		# Return success response
 		self.ipolChannel.reply({

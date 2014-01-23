@@ -28,13 +28,12 @@ import jobmanager.io.agents as agents
 from jobmanager.config import Config
 from jobmanager.internal.agentmanager import JobAgentManager
 
-from liveq.io.bus import BusChannelException
 from liveq.component import Component
+from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
-
 from liveq.models import Agent, AgentGroup, AgentMetrics
-
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.tune import Tune
 
 class JobManagerComponent(Component):
 	"""
@@ -201,22 +200,22 @@ class JobManagerComponent(Component):
 		# Send status
 		job.sendStatus("All workers have finished. Collecting final results.")
 
-		# Pack data once
-		histoPack = histos.pack()
-
 		# If ALL histograms have state=2 (completed), it means that the
 		# job is indeed completed. Reply to the job channel the final job data
 		job.channel.send("job_completed", {
 				'jid': job.id,
 				'result': 0,
-				'data': histoPack
+				'data': histos.pack()
 			})
+
+		# Create lower-quality (fitted) histograms, and send them
+		# to the interpolation database
+		tune = Tune.fromLabData( job.lab.uuid, job.parameters['tune'] )
+		ipolHistograms = histos.toInterpolatableCollection(tune, histograms=histos)
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
-				'lab': job.lab.uuid,
-				'config': job.parameters['tune'],
-				'data': histoPack
+				'data': ipolHistograms.pack()
 			})
 
 		# Cleanup job from scheduler

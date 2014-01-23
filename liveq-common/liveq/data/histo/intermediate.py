@@ -107,14 +107,17 @@ class IntermediateHistogramCollection(dict):
 		return ans
 
 	@staticmethod
-	def fromPack(data):
+	def fromPack(buf, decompress=True, decode=True):
 		"""
 		The reverse function of pack() that reads the packed data 
 		and re-creates the IntermediateHistogramCollection object
 		"""
-		
+
 		# Decode and decompress
-		buf = IntermediateHistogramCollection.F_DECOMPRESS( base64.b64decode( data ) )
+		if decode:
+			buf = base64.b64decode(buf)
+		if decompress:
+			buf = IntermediateHistogramCollection.F_DECOMPRESS( buf )
 
 		# Get version, histogram count and state
 		(ver, numHistos, state) = struct.unpack("<BIB", buf[:6])
@@ -165,7 +168,7 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
-	def pack(self):
+	def pack(self, encode=True, compress=True):
 		"""
 		Generate a packed version of the data that can be streamed
 		over network.
@@ -219,7 +222,13 @@ class IntermediateHistogramCollection(dict):
 			buf += str( numpy.getbuffer( npbuf ) )
 
 		# Compress & encode
-		return base64.b64encode( IntermediateHistogramCollection.F_COMPRESS( buf ) )
+		if compress:
+			buf = IntermediateHistogramCollection.F_COMPRESS( buf )
+		if encode:
+			buf = base64.b64encode(buf)
+
+		# Return buffer
+		return buf
 
 	def subset(self, names):
 		"""
@@ -238,22 +247,26 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
-	def toInterpolatableCollection(self, tune):
+	def toInterpolatableCollection(self, tune, histograms=None):
 		"""
 		Convert the intermediate histogram into a collection that can be interpolated
+
+		Optionally, you can specify only a subset of histograms to convert.
 		"""
 
 		# Create histogram collection with the given tune
 		# as tune reference.
 		ans = InterpolatableCollection( tune=tune )
-		ans.beginUpdate()
 
 		# Pile-up the histograms
 		for k,hist in self.iteritems():
-			ans.append( hist.toHistogram() )
+			if not histograms or (k in histograms):
+				ans.append( hist.toHistogram() )
 
-		# Finalize and return
-		ans.endUpdate()
+		# Generate fits for interpolation
+		ans.regenFits(histograms)
+
+		# Return answer
 		return ans
 
 

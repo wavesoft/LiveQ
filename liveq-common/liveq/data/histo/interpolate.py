@@ -31,7 +31,7 @@ import base64
 from liveq.utils.FLAT import FLATParser
 from liveq.data.histo import Histogram
 
-class InterpolatableCollection(list):
+class InterpolatableCollection(dict):
 	"""
 	A collection of histograms that only keeps the histogram fits instead
 	of the real bin values.
@@ -43,175 +43,136 @@ class InterpolatableCollection(list):
 	F_COMPRESS = pylzma.compress
 	F_DECOMPRESS = pylzma.decompress
 
-	def __init__(self, dataCoeff=None, dataMeta=None, tune=None):
+	def __init__(self, tune=None, dataCoeff=None, dataMeta=None):
 		"""
 		Initialize the histogram collection
 		"""
 
 		# Initialize histogram
-		list.__init__(self)
-
-		#: Histogram coefficients
-		self.dataCoeff = dataCoeff
-
-		#: Histogram metadata
-		self.dataMeta = dataMeta
-
-		# If we have coefficients and metadata, run the set function
-		if dataCoeff != None and dataMeta != None:
-			self.set(dataCoeff, dataMeta)
+		dict.__init__(self)
 
 		#: Tune index
 		self.tune = tune
 
-		# Mark us as not in update
-		self.updating = False
+		#: The data coefficients
+		self.dataCoeff = dataCoeff
 
-		# Intermediate array to store histograms that will
-		# be completed upon endUpdate
-		self._limboHistos = [ ]
+		#: The metadata
+		self.dataMeta = dataMeta
 
-
-	def set(self, dataCoeff, dataMeta):
+	def append(self, ihisto):
 		"""
-		Re-generate histograms based on coefficients and histogram metadata
-		TODO: Optimize
+		Append an object in the collection and map them with their name
+		"""
+
+		# Store histogram by it's name
+		self[ihisto.name] = ihisto
+
+	def regenHistograms( self, histograms=None ):
+		"""
+		(Re)generate the histograms from the dataCoeff and dataMeta
+
+		Optionally you can specify only a subset of histograms to re-generate
 		"""
 
 		# Validate
-		if type(dataCoeff) != list and type(dataCoeff) != numpy.ndarray:
+		if type(self.dataCoeff) != list and type(self.dataCoeff) != numpy.ndarray:
 			raise ValueError("The dataCoeff parameter is not a list!")
-		if type(dataMeta) != list:
+		if type(self.dataMeta) != list:
 			raise ValueError("The dataMeta parameter is not a list!")
 
-		# Reset list
-		del self[:]
+		# Get histogram names if histograms is missing
+		if not histograms:
+			histograms = self.keys()
 
-		# Update local reference
-		self.dataCoeff = dataCoeff
-		self.dataMeta = dataMeta
+		# Create collection
+		self.clear()
 
 		# Calculate coefficient slice width
-		w = len(dataCoeff) / len(dataMeta)
+		w = len(self.dataCoeff) / len(self.dataMeta)
 
 		# Rebuild histograms
 		ofs=0
-		for meta in dataMeta:
+		for meta in self.dataMeta:
+
+			# Skip histogram if we were not asked to process it
+			if not meta['name'] in histograms:
+				continue
 
 			# Fetch coefficient slice and forward to next
-			coeff = dataCoeff[ofs:ofs+w]
+			coeff = self.dataCoeff[ofs:ofs+w]
 			ofs += w
 
 			# Create and store histogram
-			list.append(self, Histogram.fromFit( coeff, meta ) )
+			histo = Histogram.fromFit( coeff, meta )
+			self[histo.name] = histo
 
-
-	def beginUpdate(self, fnMetaValidate=None):
+	def regenFits( self, histograms=None ):
 		"""
-		Flush contents and start updating histogram store
-		"""
-		# Sanity checks
-		if self.updating:
-			raise RuntimeError("Please call beginUpdate() only once!")
+		(Re)generate dataCoeff and dataMeta from Histograms
 
-		# Reset
-		self.dataCoeff = [ ]
+		Optionally you can specify only a subset of histograms to fit
+		"""
+	
+		# Prepare response arrays
+		dataCoeff = [ ]
 		self.dataMeta = [ ]
 
-		# Reset list
-		del self[:]
+		# Get histogram names if histograms is missing
+		if not histograms:
+			histograms = self.keys()
 
-		# Mark us as under update
-		self.updating = True
+		# Sort keys
+		histograms.sort()
 
-	def endUpdate(self):
-		"""
-		Bind histogram values 
-		"""
+		# Process histograms in array
+		for hname in histograms:
 
-		# Sanity checks
-		if not self.updating:
-			raise RuntimeError("Please call beginUpdate() before changing the InterpolatableCollection!")
-	
-		# Prepare dataCoeff array
-		dataCoeff = [ ]
-
-		# Sort histograms by name
-		self._limboHistos.sort(key=lambda histo: histo.name)
-
-		# Process histograms in limbo
-		for histogram in self._limboHistos:
-
-			# Append histogram instance on refs
-			list.append(self, histogram)
+			# Fit histogram
+			coeff, meta = self[hname].polyFit()
 
 			# Append histogram coefficients on data coefficients
-			coeff, meta = histogram.polyFit()
 			dataCoeff.append( coeff )
 			self.dataMeta.append( meta )
 
-		# Convert to coefficients to numpy array
+		# Convert to coefficients to numpy array and return 
+		# the mix of dataCoeff / dataMeta
 		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 ).flatten()
 
-	def append(self, histogram):
-		"""
-		Append a histogram 
-		"""
-
-		# Sanity checks
-		if not self.updating:
-			raise RuntimeError("Please call beginUpdate() before changing the InterpolatableCollection!")
-
-		# Store histogram in libmo
-		self._limboHistos.append(histogram)
-
-	def equal(self, collection):
-		"""
-		Check if the collections is equal to the one specified
-		"""
-
-		# Ensure tunes are the same
-		if (collection.tune != None) and (self.tune != None):
-			if not collection.tune.equal( self.tune ):
-				print "!!! Collection tunes not equal"
-				return False
-
-		# Make sure histos are the same
-		for i in range(0,len(self)):
-			# If we are not the same return false
-			if not collection[i].equal( self[i] ):
-				print "!!! Histogram %i in collection not matching" % i
-				return False
-
-		# Return histograms
-		return True
-
 	@staticmethod
-	def fromPack( data ):
+	def fromPack( buf, decompress=False, decode=False ):
 		"""
 		The reverse function of pack() that reads the packed data 
 		and re-creates the InterpolatableCollection object
 		"""
 
 		# Decode and decompress
-		buf = InterpolatableCollection.F_DECOMPRESS( base64.b64decode( data ) )
+		if decode:
+			buf = base64.b64decode( buf )
+		if decompress:
+			buf = InterpolatableCollection.F_DECOMPRESS( buf )
 
 		# Get version, histogram count and state
 		(ver, lenCoef, lenMeta) = struct.unpack("!BII", buf[:9])
 		p = 9
 
+		# Create interpolatable collection
+		ic = InterpolatableCollection()
+
 		# Fetch coefficients from numpy buffer
-		dataCoeff = numpy.frombuffer( buf[p:p+lenCoef], dtype=numpy.float64 )
+		ic.dataCoeff = numpy.frombuffer( buf[p:p+lenCoef], dtype=numpy.float64 )
 		p += lenCoef
 
 		# Unpickle dictionary
-		dataMeta = pickle.loads( buf[p:p+lenMeta] )
+		kvdata = pickle.loads( buf[p:p+lenMeta] )
+		ic.dataMeta = kvdata['meta']
+		ic.tune = kvdata['tune']
 		p += lenMeta
 
 		# Return histogram
-		return InterpolatableCollection( dataCoeff=dataMeta, dataMeta=dataMeta )
+		return ic
 
-	def pack(self):
+	def pack(self, compress=False, encode=False):
 		"""
 		Generate a packed version of the data that can be streamed
 		over network.
@@ -238,9 +199,16 @@ class InterpolatableCollection(list):
 
 		# Prepare buffers
 		buf_coef = numpy.getbuffer( self.dataCoeff )
-		buf_meta = pickle.dumps( self.dataMeta )
+		buf_meta = pickle.dumps( { "meta":self.dataMeta, "tune":self.tune } )
 
-		# Build, compress and encode buffer
-		return base64.b64encode( InterpolatableCollection.F_COMPRESS(
-				struct.pack("<BII", 1, len(buf_coef), len(buf_meta)) + buf_coef + buf_meta
-			))
+		# Build buffer
+		buf = struct.pack("<BII", 1, len(buf_coef), len(buf_meta)) + buf_coef + buf_meta
+
+		# Decode and decompress
+		if compress:
+			buf = InterpolatableCollection.F_COMPRESS( buf )
+		if encode:
+			buf = base64.b64encode( buf )
+
+		# Return buffer
+		return buf

@@ -198,6 +198,12 @@ class HistogramStore:
 		mBuf = Config.STORE.get("tune-%s:m" % nid)
 		neighbors = HistogramStore._unpickle( vBuf, mBuf )
 
+		# Debug
+		print "--[ Appending ]------------"
+		print "Neighbors=%i" % len(neighbors)
+		print "Histograms=%i" % len(neighbors[0])
+		print "---------------------------"
+
 		# Append collection to the neighborhood
 		collection.tune = tune
 		neighbors.append(collection)
