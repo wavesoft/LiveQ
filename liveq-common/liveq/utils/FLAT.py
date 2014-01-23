@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import numpy
 import re
 
 class FLATParser:
@@ -83,7 +84,7 @@ class FLATParser:
 
 						# Split data values
 						data = FLATParser.WHITESPACE.split(line)
-						activesection['v'].append(data)
+						activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
 
 					else:
 

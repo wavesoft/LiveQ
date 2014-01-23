@@ -272,6 +272,11 @@ class MCPlots(JobApplication):
 			self.logger.debug("Cleaning-up job directory %s" % self.jobdir)
 			os.system("rm -rf '%s'" % self.jobdir)
 
+		# Clean data dir (with caution)
+		if len(self.datdir) > 1:
+			self.logger.debug("Cleaning-up data directory %s" % self.datdir)
+			os.system("rm -rf '%s'" % self.datdir)
+
 	def getState(self):
 		"""
 		Helper function to read the status.flag
