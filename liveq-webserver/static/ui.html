@@ -182,6 +182,12 @@
         addLog(msg, "error");
       });
 
+      // Handle completion
+      lab.onCompleted(function() {
+        addLog("Simulation completed");
+        $("#stopSim").hide();
+      });
+
       // Open main lab
       addLog("Initialized socket on lab " + lab.id);
 

@@ -69,6 +69,13 @@ LiveQ.LabSocket = function( id ) {
 	this._onError = [];
 
 	/**
+	 * Array of the callback functions to be fired when the simulation is completed
+	 * @private
+	 * @member {array}
+	 */
+	this._onCompleted = [];
+
+	/**
 	 * The timer ID used for pinging the server
 	 * @private
 	 * @member {int}
@@ -159,6 +166,24 @@ LiveQ.LabSocket.prototype.offError = function( cb ) {
 	this._onError.splice(i,1);
 }
 
+/**
+ * Register a callback to be notified when the simulation is completed
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.onCompleted = function( cb ) {
+	this._onCompleted.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onCompleted
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabSocket.prototype.offCompleted = function( cb ) {
+	var i = this._onCompleted.indexOf(cb);
+	this._onCompleted.splice(i,1);
+}
 /**
  * Setup a new WebSocket on the given URL and bind on it's callbacks
  * @param {string} url - The Websocket URL to connect to
@@ -307,6 +332,11 @@ LiveQ.LabSocket.prototype.handleActionFrame = function( action, data ) {
 
 	} else if (action == "sim_completed") { /* Job completed */
 		console.log("Job completed");
+
+		// Fire callbacks
+		for (var i=0; i<this._onLog.length; i++) {
+			this._onCompleted[i]();
+		}
 
 		// Simulation is completed
 		this.running = false;
