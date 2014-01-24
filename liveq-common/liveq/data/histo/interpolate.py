@@ -82,10 +82,6 @@ class InterpolatableCollection(dict):
 		if type(self.dataMeta) != list:
 			raise ValueError("The dataMeta parameter is not a list!")
 
-		# Get histogram names if histograms is missing
-		if not histograms:
-			histograms = self.keys()
-
 		# Create collection
 		self.clear()
 
@@ -97,7 +93,7 @@ class InterpolatableCollection(dict):
 		for meta in self.dataMeta:
 
 			# Skip histogram if we were not asked to process it
-			if not meta['name'] in histograms:
+			if histograms and (not meta['name'] in histograms):
 				continue
 
 			# Fetch coefficient slice and forward to next
@@ -147,7 +143,7 @@ class InterpolatableCollection(dict):
 		and re-creates the InterpolatableCollection object
 		"""
 
-		print ">>> Reconstructing from: '%s'" % buf
+		print "Parsing: '%s'" % buf
 
 		# Decode and decompress
 		if decode:
@@ -156,9 +152,7 @@ class InterpolatableCollection(dict):
 			buf = InterpolatableCollection.F_DECOMPRESS( buf )
 
 		# Get version, histogram count and state
-		(ver, lenCoef, lenMeta) = struct.unpack("!BII", buf[:9])
-		print ">>> Protocol version: " % ver
-		print ">>> Buffers: %i, %i" % (lenCoef, lenMeta)
+		(ver, lenCoef, lenMeta) = struct.unpack("<BII", buf[:9])
 		p = 9
 
 		# Create interpolatable collection
@@ -207,7 +201,6 @@ class InterpolatableCollection(dict):
 		buf_meta = str(pickle.dumps( { "meta":self.dataMeta, "tune":self.tune } ))
 
 		# Build buffer
-		print ">>> Buffers: %i, %i" % (lenCoef, lenMeta)
 		buf = struct.pack("<BII", 1, len(buf_coef), len(buf_meta)) + buf_coef + buf_meta
 
 		# Decode and decompress
@@ -217,5 +210,4 @@ class InterpolatableCollection(dict):
 			buf = base64.b64encode( buf )
 
 		# Return buffer
-		print ">>> Sending: '%s'" % buf
 		return buf

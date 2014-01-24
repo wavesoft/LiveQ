@@ -210,7 +210,7 @@ class JobManagerComponent(Component):
 
 		# Create lower-quality (fitted) histograms, and send them
 		# to the interpolation database
-		tune = Tune.fromLabData( job.lab.uuid, job.parameters['tune'] )
+		tune = Tune( job.parameters['tune'], labid=job.lab.uuid )
 		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=job.lab.getHistograms())
 
 		# Send the resulting data to the interpolation database

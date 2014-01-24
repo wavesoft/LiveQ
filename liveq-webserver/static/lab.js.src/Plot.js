@@ -407,6 +407,14 @@ LiveQ.PlotWindow.prototype.update = function() {
 		    	(G<255?G<1?0:G:255)*0x100 + 
 		    	(B<255?B<1?0:B:255)
 		    	).toString(16).slice(1);
+		},
+		colorOpacity = function(color, percent) {
+		    var num = parseInt(color.slice(1),16),
+		    	A = Math.round(percent/100),
+		    	R = parseInt((num >> 16) & 0xFF),
+		    	G = parseInt((num >> 8) & 0xFF),
+		    	B = parseInt(num & 0xFF);
+		    return "rgba("+R+", "+G+", "+B+", "+A+")";
 		};
 
 
@@ -445,7 +453,8 @@ LiveQ.PlotWindow.prototype.update = function() {
 		record.enter()
 			.append("svg:path")
 				.attr("class", "plot-area")
-				.attr("fill", shadeColor(plot.color, 60));
+				.attr("fill", plot.color)
+				.attr("fill-opacity", 0.3);
 
 		// Update
 		record

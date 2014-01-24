@@ -27,6 +27,7 @@ import liveq.data.histo.io as io
 
 from liveq.models import Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
 
 from webserver.config import Config
 
@@ -357,12 +358,15 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 # Send status
                 self.sendStatus("Processing interpolation")
 
-                # Fetch HistogramCollection from data
-                histos = io.unpackHistogramCollection( ans['data'], decompress=True, decode=True)
+                # Fetch InterpolatableCollection from data
+                histos = InterpolatableCollection.fromPack( ans['data'] )
+
+                # Re-generate histogram from coefficients
+                histos.regenHistograms()
 
                 # Pack histograms
                 histoBuffers = []
-                for h in histos:
+                for h in histos.values():
                     # Pack buffers
                     histoBuffers.append( js.packHistogram(h) )
 
