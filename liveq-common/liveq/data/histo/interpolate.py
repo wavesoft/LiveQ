@@ -24,6 +24,7 @@ import struct
 import numpy
 import glob
 
+import cPickle as pickle
 import bz2
 import pylzma
 import base64
@@ -140,11 +141,13 @@ class InterpolatableCollection(dict):
 		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 ).flatten()
 
 	@staticmethod
-	def fromPack( buf, decompress=False, decode=False ):
+	def fromPack( buf, decompress=True, decode=True ):
 		"""
 		The reverse function of pack() that reads the packed data 
 		and re-creates the InterpolatableCollection object
 		"""
+
+		print ">>> Reconstructing from: '%s'" % buf
 
 		# Decode and decompress
 		if decode:
@@ -172,7 +175,7 @@ class InterpolatableCollection(dict):
 		# Return histogram
 		return ic
 
-	def pack(self, compress=False, encode=False):
+	def pack(self, compress=True, encode=True):
 		"""
 		Generate a packed version of the data that can be streamed
 		over network.
@@ -198,8 +201,8 @@ class InterpolatableCollection(dict):
 		"""
 
 		# Prepare buffers
-		buf_coef = numpy.getbuffer( self.dataCoeff )
-		buf_meta = pickle.dumps( { "meta":self.dataMeta, "tune":self.tune } )
+		buf_coef = str(numpy.getbuffer( self.dataCoeff ))
+		buf_meta = str(pickle.dumps( { "meta":self.dataMeta, "tune":self.tune } ))
 
 		# Build buffer
 		buf = struct.pack("<BII", 1, len(buf_coef), len(buf_meta)) + buf_coef + buf_meta
@@ -211,4 +214,5 @@ class InterpolatableCollection(dict):
 			buf = base64.b64encode( buf )
 
 		# Return buffer
+		print ">>> Sending: '%s'" % buf
 		return buf

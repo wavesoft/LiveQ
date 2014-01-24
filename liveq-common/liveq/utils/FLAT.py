@@ -37,59 +37,55 @@ class FLATParser:
 		section = None
 		activesection = None
 
-		# Very simple FLAT file reader
+		# Dump the entire buffer in memory
+		buf = ""
 		with open(filename, 'r') as f:
+			buf = r.read()
 
-			# Read and chomb end-of-lie
-			while True:
+		# Start processing the buffer line-by-line
+		for line in buf.splitlines():
 
-				# Read next line and chomp \n
-				line = f.readline()
-				if not line:
-					break
-				line = line[:-1]
+			# Process lines
+			if not line:
+				# Empty line
+				pass
 
-				# Process lines
-				if not line:
-					# Empty line
-					pass
+			elif line.startswith("# BEGIN "):
 
-				elif line.startswith("# BEGIN "):
+				# Ignore labels found some times in AIDA files
+				dat = line.split(" ")
+				section = dat[2]
+				sectiontype = 0
 
-					# Ignore labels found some times in AIDA files
-					dat = line.split(" ")
-					section = dat[2]
-					sectiontype = 0
+				# Allocate section record
+				activesection = { "d": { }, "v": [ ] }
 
-					# Allocate section record
-					activesection = { "d": { }, "v": [ ] }
+			elif line.startswith("# END ") and (section != None):
+				# Section end
+				sections[section] = activesection
+				section = None
 
-				elif line.startswith("# END ") and (section != None):
-					# Section end
-					sections[section] = activesection
-					section = None
+			elif line.startswith("#") or line.startswith(";"):
+				# Comment
+				pass
 
-				elif line.startswith("#") or line.startswith(";"):
-					# Comment
-					pass
+			elif section:
+				# Data inside section
 
-				elif section:
-					# Data inside section
+				# Try to split
+				data = line.split("=",1)
 
-					# Try to split
-					data = line.split("=",1)
+				# Could not split : They are histogram data
+				if len(data) == 1:
 
-					# Could not split : They are histogram data
-					if len(data) == 1:
+					# Split data values
+					data = FLATParser.WHITESPACE.split(line)
+					activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
 
-						# Split data values
-						data = FLATParser.WHITESPACE.split(line)
-						activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
+				else:
 
-					else:
-
-						# Store value
-						activesection['d'][data[0]] = data[1]
+					# Store value
+					activesection['d'][data[0]] = data[1]
 
 		# Return sections
 		return sections

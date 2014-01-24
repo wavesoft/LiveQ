@@ -196,6 +196,7 @@
       lab.onCompleted(function() {
         addLog("Simulation completed", "done");
         $("#stopSim").hide();
+        $("#loading-spinner").hide();
       });
 
       // Open main lab
@@ -211,6 +212,7 @@
         addLog("Starting simulation");
         lab.beginSimulation( param );
         $("#stopSim").show();
+        $("#loading-spinner").show();
       });
 
       // Bind abort button
@@ -218,10 +220,12 @@
         addLog("Aborting simulation", "warn");
         lab.abortSimulation();
         $("#stopSim").hide();
+        $("#loading-spinner").hide();
       });
 
-      // Hide stop sim
+      // Hide stop sim and spinner
       $("#stopSim").hide();
+      $("#loading-spinner").hide();
 
     }
 
@@ -340,7 +344,7 @@
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Observables</h3>
+          <h3 class="panel-title">Observables <img id="loading-spinner" class="pull-right" src="img/loading.gif" alt="Loading" /></h3>
         </div>
         <div class="panel-body" id="host">
           &nbsp;

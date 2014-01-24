@@ -183,16 +183,16 @@ class JobManagerComponent(Component):
 		# Delay a bit
 		time.sleep(5)
 
-	def notifyJobCompleted(self, job, histos=None):
+	def notifyJobCompleted(self, job, histoCollection=None):
 		"""
 		Notify all the interested entities that the given job is completed
 		"""
 
 		# Get the merged histograms from the job store if we have
 		# not provided them as arguments
-		if not histos:
-			histos = job.getHistograms()
-			if histos == None:
+		if not histoCollection:
+			histoCollection = job.getHistograms()
+			if histoCollection == None:
 				job.sendStatus("Unable to merge histograms")
 				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, job.id))
 				return
@@ -205,13 +205,13 @@ class JobManagerComponent(Component):
 		job.channel.send("job_completed", {
 				'jid': job.id,
 				'result': 0,
-				'data': histos.pack()
+				'data': histoCollection.pack()
 			})
 
 		# Create lower-quality (fitted) histograms, and send them
 		# to the interpolation database
 		tune = Tune.fromLabData( job.lab.uuid, job.parameters['tune'] )
-		ipolHistograms = histos.toInterpolatableCollection(tune, histograms=histos)
+		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=job.lab.getHistograms())
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
@@ -384,7 +384,7 @@ class JobManagerComponent(Component):
 			if histos.state == 2:
 
 				# Job is completed
-				self.notifyJobCompleted( job, histos=histos )
+				self.notifyJobCompleted( job, histoCollection=histos )
 				self.logger.info("All workers of job %s have finished" % jid)
 
 			else:

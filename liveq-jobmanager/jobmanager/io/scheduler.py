@@ -241,15 +241,20 @@ def handleLoss( agent ):
 	if not agent.activeJob:
 		return
 
+	# Get job ID & Remove job from agent
+	job_id = agent.activeJob
+	agent.activeJob = ""
+	agent.save()
+
 	# Return a job instance
-	job = jobs.getJob(agent.activeJob)
+	job = jobs.getJob(job_id)
 
 	# Remove agent data from the job and check
 	# how many agents are left in the array
-	agentDataCount = job.removeAgentData( agent.activeJob )
+	agentDataCount = job.removeAgentData( job_id )
 
 	# Check if that was the last agent handling this job
-	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == agent.activeJob) ).execute().next()
+	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == job_id) ).execute().next()
 
 	# Send status
 	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % values.count, {"RES_SLOTS":values.count})
@@ -273,11 +278,7 @@ def handleLoss( agent ):
 			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
 
 			# Re-place job on queue with highest priority
-			Config.STORE.rpush( "scheduler:queue", agent.activeJob )
-
-	# Remove the job binding
-	agent.activeJob = ""
-	agent.save()
+			Config.STORE.rpush( "scheduler:queue", job_id )
 
 	# Return FALSE to denote that the job is re-scheduled
 	return False

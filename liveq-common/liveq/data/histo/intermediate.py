@@ -260,11 +260,11 @@ class IntermediateHistogramCollection(dict):
 
 		# Pile-up the histograms
 		for k,hist in self.iteritems():
-			if not histograms or (k in histograms):
+			if (not histograms) or (k in histograms):
 				ans.append( hist.toHistogram() )
 
 		# Generate fits for interpolation
-		ans.regenFits(histograms)
+		ans.regenFits()
 
 		# Return answer
 		return ans
@@ -458,23 +458,7 @@ class IntermediateHistogram:
 		name = data['HISTOSTATS']['d']['AidaPath']
 
 		# Convert values into a flat 2D numpy array
-		try:
-			values = numpy.array(vBins, dtype=numpy.float64).flatten()
-		except ValueError as e:
-			# Dump error
-			with open("/tmp/agent-errors.log", "a") as f:
-				f.write("-- Error loading intermediate FLAT from %s\n" % filename)
-				traceback.print_exc(file=f)
-				f.write("File contents:\n")
-
-				# Write contents of FLAT file
-				with open(filename, "r") as ir:
-					f.write(ir.read())
-
-				# Write contents of vBins
-				f.write("Bins:\n")
-				f.write("%r" % vBins)
-
+		values = numpy.array(vBins, dtype=numpy.float64).flatten()
 
 		# Extract parts and build histogram
 		return IntermediateHistogram(

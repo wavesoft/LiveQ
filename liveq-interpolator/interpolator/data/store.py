@@ -185,13 +185,17 @@ class HistogramStore:
 		return ans
 
 	@staticmethod
-	def append(tune, collection):
+	def append(collection):
 		"""
 		Put a histogram in the neighborhood
 		"""
+
+		# Require a tune
+		if not collection.tune:
+			raise ValueError("Missing tune information on the InterpolatableCollection provided!")
 		
 		# Get neighborhood ID
-		nid = tune.getNeighborhoodID()
+		nid = collection.tune.getNeighborhoodID()
 
 		# Fetch neighbors from neighborhood
 		vBuf = Config.STORE.get("tune-%s:v" % nid)
@@ -205,7 +209,6 @@ class HistogramStore:
 		print "---------------------------"
 
 		# Append collection to the neighborhood
-		collection.tune = tune
 		neighbors.append(collection)
 
 		# Put neighbors back to the neighborhood store

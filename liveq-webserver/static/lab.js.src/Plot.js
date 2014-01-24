@@ -46,7 +46,7 @@ LiveQ.PlotWindow = function(host, config) {
 		},
 
 		'features': {
-			'errorBand': false,
+			'errorBand': true,
 			'errorBarsY' : true
 		}
 
@@ -370,6 +370,18 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
 	record.exit()
 		.remove();
 
+
+}
+
+/**
+ * Update the backdrop
+ *
+ * This function updates the histogram backgrop where the error comparison
+ * is printed.
+ */
+LiveQ.PlotWindow.prototype.updateBackdrop = function() {
+
+	
 
 }
 

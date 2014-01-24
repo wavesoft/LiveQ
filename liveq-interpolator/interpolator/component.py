@@ -87,18 +87,14 @@ class InterpolatorComponent(Component):
 		# Run interpolation and get an InterpolatableCollection collection
 		histograms = ipol(*tune.getValues())
 
-		# Pick histograms to return
-		requestedHistos = data['histograms']
-		pickedHistos = [ ]
-		for histo in histograms:
-			if histo.name in requestedHistos:
-				pickedHistos.append(histo)
+		# Rebuild (from coefficients) only the histograms requested
+		histograms.regenHistograms( data['histograms'] )
 
 		# Return a packed histogram collection
 		self.ipolChannel.reply({
 				'result': 'ok',
 				'exact': 0,
-				'data': io.packHistogramCollection(pickedHistos, compress=True, encode=True)
+				'data': io.packHistogramCollection(histograms.values())
 			})
 
 

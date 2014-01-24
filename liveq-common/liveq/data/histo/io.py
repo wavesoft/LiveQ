@@ -45,7 +45,7 @@ def packHistogram(histo):
 	# Combine two buffers and return
 	return struct.pack("<BII", 1, len(buf_numpy), len(buf_meta)) + buf_numpy + buf_meta
 
-def packHistogramCollection(collection, encode=False, compress=False):
+def packHistogramCollection(collection, encode=True, compress=True):
 	"""
 	Pack a collection of histograms
 	"""
@@ -105,7 +105,7 @@ def unpackHistogram(buf, offset=0):
 			p
 		)
 
-def unpackHistogramCollection(buf, decode=False, decompress=False):
+def unpackHistogramCollection(buf, decode=True, decompress=True):
 	"""
 	Unpack a collection of histograms
 	"""

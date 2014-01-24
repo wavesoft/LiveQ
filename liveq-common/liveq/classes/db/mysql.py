@@ -24,7 +24,9 @@ This class provides a MySQL connection to the peewee databse back-end.
 """
 
 import logging
-from peewee import MySQLDatabase, OperationalError
+
+from _mysql_exceptions import OperationalError
+from peewee import MySQLDatabase
 from liveq.config.classes import DatabaseConfigClass
 
 class DurableMySQLDatabase(MySQLDatabase):
@@ -41,6 +43,9 @@ class DurableMySQLDatabase(MySQLDatabase):
 		# Call superclass
 		MySQLDatabase.init(self, database, **connect_kwargs)
 
+		# Get logger
+		self.logger = logging.getLogger("MySQL")
+
 		# Setup recovery flag
 		self.__recovering = False 
 
@@ -54,14 +59,17 @@ class DurableMySQLDatabase(MySQLDatabase):
 
 		# Chcek if we got an error, while in recovery mode
 		if self.__recovering:
+			self.logger.error("Re-raised exception %r (%r) during retry" % (exception.__class__, exception.args))
 			raise OperationalError(2006, 'MySQL server has gone away, and we cannot recover!')
 
 		# Check if we have an OperationalError of #2006 (MySQL server has gone away)
+		self.logger.warn("Got Exception %r (%r). Will try to recover" % (exception.__class__, exception.args))
 		if exception.__class__ is OperationalError:
 
 			# Get exception number
 			e_num = exception.args[0]
 			if e_num == 2006:
+				self.logger.info("Recovering SQL connection")
 
 				# Reconnect
 				self.close()
@@ -70,6 +78,7 @@ class DurableMySQLDatabase(MySQLDatabase):
 				# Mark recovery
 				self.__recovering = True
 				# Re-execute query
+				self.logger.info("Re-trying SQL Query")
 				ans = self.execute_sql( sql, params, require_commit )
 				# Reset recovery flag
 				self.__recovering = False
@@ -100,5 +109,5 @@ class Config(DatabaseConfigClass):
 	Create an SQL instance
 	"""
 	def instance(self, runtimeConfig):
-		return DurableMySQLDatabase(self.DATABASE, host=self.HOST, user=self.USERNAME, passwd=self.PASSWORD)
+		return DurableMySQLDatabase(self.DATABASE, host=self.HOST, user=self.USERNAME, passwd=self.PASSWORD, threadlocals=True)
 
