@@ -381,7 +381,7 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
  */
 LiveQ.PlotWindow.prototype.updateBackdrop = function() {
 
-	
+	//
 
 }
 

@@ -40,7 +40,7 @@ class FLATParser:
 		# Dump the entire buffer in memory
 		buf = ""
 		with open(filename, 'r') as f:
-			buf = r.read()
+			buf = f.read()
 
 		# Start processing the buffer line-by-line
 		for line in buf.splitlines():

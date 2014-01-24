@@ -157,6 +157,8 @@ class InterpolatableCollection(dict):
 
 		# Get version, histogram count and state
 		(ver, lenCoef, lenMeta) = struct.unpack("!BII", buf[:9])
+		print ">>> Protocol version: " % ver
+		print ">>> Buffers: %i, %i" % (lenCoef, lenMeta)
 		p = 9
 
 		# Create interpolatable collection
@@ -205,6 +207,7 @@ class InterpolatableCollection(dict):
 		buf_meta = str(pickle.dumps( { "meta":self.dataMeta, "tune":self.tune } ))
 
 		# Build buffer
+		print ">>> Buffers: %i, %i" % (lenCoef, lenMeta)
 		buf = struct.pack("<BII", 1, len(buf_coef), len(buf_meta)) + buf_coef + buf_meta
 
 		# Decode and decompress
