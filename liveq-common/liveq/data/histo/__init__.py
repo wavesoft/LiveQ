@@ -242,12 +242,17 @@ class Histogram:
 	Optionally it returns the metadata required to re-construct the histogram using Histogram.fromFit()
 	function.
 	"""
-	def polyFit(self, deg=4, meta=True):
+	def polyFit(self, deg=4, meta=True, logY=True):
 
 		# Coefficents for the plot
-		coeff = numpy.polyfit( self.x, self.y, deg )
-		coeffPlus = numpy.polyfit( self.x, self.y+self.yErrPlus, deg )
-		coeffMinus = numpy.polyfit( self.x, self.y-self.yErrMinus, deg )
+		if logY:
+			coeff = numpy.polyfit( self.x, numpy.log(self.y), deg )
+			coeffPlus = numpy.polyfit( self.x, numpy.log(self.y+self.yErrPlus), deg )
+			coeffMinus = numpy.polyfit( self.x, numpy.log(self.y-self.yErrMinus), deg )
+		else:
+			coeff = numpy.polyfit( self.x, self.y, deg )
+			coeffPlus = numpy.polyfit( self.x, self.y+self.yErrPlus, deg )
+			coeffMinus = numpy.polyfit( self.x, self.y-self.yErrMinus, deg )
 
 		# Calculate the combined coefficients
 		combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
@@ -259,6 +264,7 @@ class Histogram:
 		# Prepare metadata
 		meta = {
 			'x': [ self.x, self.xErrMinus, self.xErrPlus ],
+			'logY': logY,
 			'bins': self.bins,
 			'name': self.name,
 			'meta': self.meta
@@ -282,9 +288,14 @@ class Histogram:
 		cl = len(coeff) / 3
 
 		# Re-create bin values from fitted data
-		y = numpy.polyval( coeff[0:cl], x )
-		yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
-		yErrPlus = numpy.polyval( coeff[cl*2:cl*3], x )
+		if meta['logY']:
+			y = numpy.exp(numpy.polyval( coeff[0:cl], x ))
+			yErrMinus = numpy.exp(numpy.polyval( coeff[cl:cl*2], x ))
+			yErrPlus = numpy.exp(numpy.polyval( coeff[cl*2:cl*3], x ))
+		else:
+			y = numpy.polyval( coeff[0:cl], x )
+			yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
+			yErrPlus = numpy.polyval( coeff[cl*2:cl*3], x )
 
 		# Return histogram instance
 		return Histogram(
@@ -315,6 +326,9 @@ class Histogram:
 
 		# Get some metrics
 		vBins = data['HISTOGRAM']['v']
+		if len(vBins) < 1:
+			return None
+
 		numBins = len(vBins)
 		numValues = len(vBins[0])
 

@@ -12,7 +12,9 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 from random import random
 
-from liveq.data.histo import HistogramCollection, Histogram
+from liveq.data.histo import Histogram
+from liveq.data.histo.collection import HistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
 from liveq.data.tune import Tune
 
 from interpolator.data.store import HistogramStore
@@ -153,6 +155,7 @@ def plot_histos(histos, yscale='log'):
 		if type(histGroup) != list:
 			histGroup = [histGroup]
 
+
 		# Make plots
 		ci = 0
 		for h in histGroup:
@@ -163,9 +166,12 @@ def plot_histos(histos, yscale='log'):
 			if ci >= len(colors):
 				ci = 0
 
+			# Clip y-value
+			y = np.clip( h.y, 0.000001, np.max(h.y) )
+
 			# Plot just the basic plot with the specified color
 			ax.errorbar( 
-				h.x, h.y, 
+				h.x, y, 
 				yerr=[h.yErrMinus, h.yErrPlus], xerr=[h.xErrMinus, h.xErrPlus],
 				color=col,
 				label=h.name
@@ -222,6 +228,7 @@ def avgChi2(c1, c2):
 ##############################################################################################################
 ##############################################################################################################
 
+"""
 num = 50
 fv = 1.0
 maxVal = 3.14
@@ -265,6 +272,63 @@ plt.scatter(v_index[0], v_index[1], marker='o', c='b', alpha=0.5)
 
 plt.title("RBF %s interpolation, %i samples" % (ipol.function, num))
 plt.show()
+"""
+
+# Ignore ranking warnings from numpy
+import warnings
+warnings.simplefilter('ignore', np.RankWarning)
+
+# Run over the histogram collection
+import glob
+import os
+files = glob.glob("/Users/icharala/Develop/LiveQ/tools/rivet.local/*.dat")
+
+ranks = np.zeros(20)
+nranks = 0
+
+j = 0
+for f in files:
+
+	# Load histo
+	print "[%i/%i] %s..." % (j, len(files), os.path.basename(f)),
+	histo = Histogram.fromFLAT(f)
+	j += 1
+
+	# Validate
+	if not histo:
+		print "could not load"
+		continue
+	if histo.bins < 5:
+		print "too few bins"
+		continue
+
+	# Extimate best rank values
+	nranks += 1
+	for i in range(1,21):
+
+		try:
+			(coeff, meta) = histo.polyFit(deg=i)
+			histo2 = Histogram.fromFit(coeff, meta)
+		except:
+			print " [error] "
+			break
+
+		try:
+			rank = histo.chi2ToReference(histo2)
+		except ValueError:
+			rank = 100
+
+		if rank < 1:
+			ranks[i-1] += 1
+
+	# OK
+	print "ok"
+
+# Summarize
+ranks /= nranks
+
+for i in range(0,20):
+	print "%i = %f" % (i+1, ranks[i])
 
 
 """
