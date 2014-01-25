@@ -274,6 +274,7 @@ plt.title("RBF %s interpolation, %i samples" % (ipol.function, num))
 plt.show()
 """
 
+"""
 # Ignore ranking warnings from numpy
 import warnings
 warnings.simplefilter('ignore', np.RankWarning)
@@ -329,7 +330,38 @@ ranks /= nranks
 
 for i in range(0,20):
 	print "%i = %f" % (i+1, ranks[i])
+"""
 
+"""
+buf = "XQAAgAAAAISEZM8FJZFdt68n8AfwbCc0AMdzbxv+tfON2cpEoilvr7f0laXvGIEDPkFiePx2GXMq6ggA2bPqns8bDWBDQTsYhTRFVBlZEHKKOcz/bHABdkZ78Buk94Xk6a7HFlqyS+XvKW6IMpyLtdiqZS11mvA6GVLAqIh499mw2dvWfzMuJiEXnrQHPe9DZaOM6B6b55te+hTz3i2ZkZAcLt0jUYKMqCpdlcpsItAOXvvSqH5Ss6PDYTpuTz2K2f1pFG6wBI2LHwctEboAoojuQbP6RpgG7zTO7LaLOMBKIa1pyRUDUNYKYYp44G4UwMWHNSzOIyD1ZmxVw4u2WIB1UnhUETjbTrl///pHWD19iwtcjthw3IjBYnQVm01fQa4w+ihkHy7+x0vH9N/avnVolpyA9CVe0l4J7DmwJpBczMCP6BP2j7ArGn8nOX8okqL0lS/HMONN3aExxdj2YI5OVhkRvaEDukfqwxVMnB0QO35/ybx1OiBfOz4uuOviHd6Im4ewOMWcyHYcA5FVnB7MnNNtXL5MNusOzIyElTUzIlLBlKkfM0LqQcrCceGiVc41WlxQEMaZxk9VhO6yBjIyk2tG4olG9fPKitikOcxHhLOT5r41hHtzkViIWOVqOLPO0ZZ0ZU9SKvejSj918MpSJiAmkKf9VXcEzut37RdMLWBbssegGKwUj2ahDwK5251WEyTue8h78nXx7qeodQHZRJkmHyGcY1kBkYra+aQ+V7L4JYSMKnEaFrmOmXGaR7lnLlqJoRhKthq9CoUWxnxhV08lQuZKhQEPowmaIIx/szN+FZ7oFzMR5X+DqtQzO3s3g2TUExk9XsPKS3YHGvbrHtBmDdgzbBI6iwX0JSu463PQzRDvk6IXGZV1VqRUh2Nh4hLqK+3X+4oM/VWy0wibCXcoL73PcPVBHgJmE2nVXmdBn2Qfq4jnsoOgbs15ed2/g65I3sGnc0EhMgmO63O6hCtlKX9lMRzOglXez1ZPsUZ8kVd+zM8sLxGxq55y34mGUkTHzXBygMGvJ1orvR0N7ow8bt4144p1OWUvs02U0o/5Cy3ezyHJ1qjRIv/ZItIRTFPimMrxKImQF56JAWKW2vBiSHF5xHGNE8kbEBYmDBBUQtN2w1iJX5ZQF8Yr4+foFKiNeR94hQ4gLamYYNJVQvNcE6qG5z+GJelsDc+csLVi0gBEk1s7SsiBX0DiA1SvOLxjjTaeRP5I2956R2lt256xrzZ+nYyVfv6oPmTJME96CVGLBDPiBW8mu+McYRuCopNoGKfzywasKLenoaLZwESSz66wzZup0l0DTmpu/DwuPvIZXM3polynrjIsTZgmx8vlmZJkEMqpCLYp8BzzIBjzVgoolZoSpy13grOU8yyfoYyamISVHDiSwuqMxx3dwQLR1Nogxj4BTXCMAbyS8l5bh6q3y90QhSe4Vt/G9+b31eeHqB2l5C7umJZBGF/mSvyEPLDoO7tAZNF6E9T7Za9+SQePQCKHA+xDu5nnHqvJ2suY8nxJ94y+gy/L1IUGi9BTYNql4yRjVmrX+P6CSe+v13t560H6ZXKNXYVkDCimQ0Poa5pPUz3i+WZ61blFKe+ZC/dg7IYEkxy/Yp04QUCUZUVRUpwWWzPPfZT0Ype2SICRgnnlzQcWabZHe2761nP8zaeX"
+
+ic = InterpolatableCollection.fromPack(buf)
+ic.regenHistograms()
+
+print ic.keys()
+
+plot_histos([ic.values()])
+"""
+
+from interpolator.data.store import HistogramStore
+
+t = Tune({'StringZ:bLund': 0.8, 'TimeShower:alphaSvalue': 0.14, 'StringZ:aLund': 0.3}
+, labid="3e63661c13854de7a9bdeed71be16bb9")
+histos = HistogramStore.getNeighborhood(t)
+ans = [[],[]]
+for h in histos:
+	h.regenHistograms()
+	print "Regen: %r" % h.keys()
+	h1 = h.values()[0]
+	h2 = h.values()[1]
+	print "Bounds: %f - %f" % (np.min(h2.y), np.max(h2.y))
+	if math.isnan(np.min(h2.y)):
+		print "NAN!"
+		continue
+	ans[0].append(h1)
+	ans[1].append(h2)
+
+plot_histos(ans)
 
 """
 c = []
