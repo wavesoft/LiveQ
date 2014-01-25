@@ -401,6 +401,8 @@ LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
 
 	// Compare bins of those histograms
 	var yErrors = this.plots[0].histo.chi2ToReference( this.plots[1].histo );
+	if (!yErrors)
+		return;
 
 	// Calculate x-bounds
 	var data = [ ];
