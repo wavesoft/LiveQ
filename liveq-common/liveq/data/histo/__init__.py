@@ -245,15 +245,40 @@ class Histogram:
 	"""
 	def polyFit(self, deg=10, meta=True, logY=True):
 
+		# Keep only the y values that are non-zero
+		vy = [ ]
+		vyErrPlus = [ ]
+		vyErrMinus = [ ]
+		vx = [ ]
+
+		# Process bins
+		i=0
+		for y in self.y:
+
+			# Skip zero y-bins
+			if y != 0:
+				if logY:				
+					vy.append(numpy.log(y))
+					vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+					vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
+				else:
+					vy.append(y)
+				vx.append(self.x[i])
+
+			# Increase index
+			i += 1
+
+		# If we have no y-bins with values, return null
+		if len(vy) == 0:
+			if meta:
+				return (None, None)
+			else:
+				return None
+
 		# Coefficents for the plot
-		if logY:
-			coeff = numpy.polyfit( self.x, numpy.log(self.y), deg )
-			coeffPlus = numpy.polyfit( self.x, numpy.log(self.y+self.yErrPlus), deg )
-			coeffMinus = numpy.polyfit( self.x, numpy.log(self.y-self.yErrMinus), deg )
-		else:
-			coeff = numpy.polyfit( self.x, self.y, deg )
-			coeffPlus = numpy.polyfit( self.x, self.y+self.yErrPlus, deg )
-			coeffMinus = numpy.polyfit( self.x, self.y-self.yErrMinus, deg )
+		coeff = numpy.polyfit( vx, vy, deg )
+		coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
+		coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
 
 		# Calculate the combined coefficients
 		combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
@@ -293,9 +318,6 @@ class Histogram:
 			y = numpy.exp(numpy.polyval( coeff[0:cl], x ))
 			yErrMinus = numpy.exp(numpy.polyval( coeff[cl:cl*2], x ))
 			yErrPlus = numpy.exp(numpy.polyval( coeff[cl*2:cl*3], x ))
-			y = numpy.max(y, 0.0000001)
-			yErrMinus = numpy.max(y, 0.0000001)
-			yErrPlus = numpy.max(y, 0.0000001)
 		else:
 			y = numpy.polyval( coeff[0:cl], x )
 			yErrMinus = numpy.polyval( coeff[cl:cl*2], x )

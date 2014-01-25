@@ -245,7 +245,11 @@
 
       // Handle metadata update
       lab.onMetadataUpdated(function(meta) {
-        $("#nevts").html( commaThousands(meta['nevts']) );
+        if (meta['interpolation']) {
+          $("#nevts").html( '<span class="text-primary">(Interpolation)</span>' );
+        } else {
+          $("#nevts").html( commaThousands(meta['nevts']) );
+        }
       });
 
       // Open main lab

@@ -249,8 +249,6 @@ class HistogramStore:
 		indexvars = [ ]
 		for hc in data:
 
-			print "- @(%r) Has: %r" % (hc.tune, hc.dataCoeff)
-
 			# Fetch index cariables
 			datavalues.append(hc)
 			indexvars.append(hc.tune.getValues())

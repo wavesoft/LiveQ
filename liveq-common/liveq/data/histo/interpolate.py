@@ -128,6 +128,11 @@ class InterpolatableCollection(dict):
 			# Fit histogram
 			coeff, meta = self[hname].polyFit()
 
+			# Skip buggy histograms
+			if coeff == None:
+				logging.warn("Could not calculate fits for histogram %s" % hname)
+				continue
+
 			# Append histogram coefficients on data coefficients
 			dataCoeff.append( coeff )
 			self.dataMeta.append( meta )
@@ -142,8 +147,6 @@ class InterpolatableCollection(dict):
 		The reverse function of pack() that reads the packed data 
 		and re-creates the InterpolatableCollection object
 		"""
-
-		print "Parsing: '%s'" % buf
 
 		# Decode and decompress
 		if decode:

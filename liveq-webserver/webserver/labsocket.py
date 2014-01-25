@@ -373,7 +373,8 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
                 # Compile buffer and send
                 self.sendBuffer( 0x02, 
-                        struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                        # Set interpolate flag on the frame
+                        struct.pack("<BBHI", 1, 1, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
                     )
 
                 # Send status message

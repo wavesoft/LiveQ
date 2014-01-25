@@ -222,8 +222,8 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 	// Handle protocols according to versions
 	if (protoVersion == 1) {
 
-		var reserved0 = reader.getUint8(),
-			reserved1 = reader.getUint16(),
+		var flags = reader.getUint8(),
+			reserved0 = reader.getUint16(),
 			numHistos = reader.getUint32();
 
 		// Read histograms
@@ -257,10 +257,14 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 
 		}
 
+		// Check if the data are from interpolation
+		var fromInterpolation = ((flags & 0x01) != 0);
+
 		// Fire metadata update histogram
 		for (var i=0; i<this._onMetadataUpdated.length; i++) {
 			this._onMetadataUpdated[i]({
-				'nevts': numEvents
+				'nevts': numEvents,
+				'interpolation': fromInterpolation
 			});
 		}
 
