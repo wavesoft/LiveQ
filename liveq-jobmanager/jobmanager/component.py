@@ -132,13 +132,13 @@ class JobManagerComponent(Component):
 				# Get channel and send cancellations (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_cancel', {
-						'jid': job.id
+						'jid': agent.jobToCancel
 					}, waitReply=True)
 
 				# Log results
 				if not ans:
 					job.sendStatus("Could not contact worker %s" % agent.uuid)
-					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
+					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, agent.jobToCancel ) )
 
 					# Mark agent offline
 					self.manager.updatePresence( agent.uuid, 0 )
@@ -146,10 +146,10 @@ class JobManagerComponent(Component):
 
 				elif ans['result'] == "ok":
 					job.sendStatus("Successfuly aborted")
-					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
+					self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
 				else:
 					job.sendStatus("Could not abort: %s" % ans['error'])
-					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
+					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( agent.jobToCancel, agent.uuid, ans['error'] ))
 
 			# Then, start the job on a_start
 			for agent in a_start:

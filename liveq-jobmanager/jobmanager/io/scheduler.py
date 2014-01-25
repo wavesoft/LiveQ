@@ -159,6 +159,11 @@ class GroupResources:
 			query = Agent.select().where( (Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == jid) ).limit(trimdown)
 			trimAgents = query[:]
 
+			# Since activeJob will be overwritten, use a different
+			# variable name to keep the previous job ID
+			for agent in trimAgents:
+				agent.jobToCancel = agent.activeJob
+
 			# Append the agent objects in the answer
 			ans += trimAgents
 

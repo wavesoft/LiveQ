@@ -179,11 +179,11 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         histoBuffers = []
         for k, h in histos.iteritems():
             # Pack buffers
-            histoBuffers.append( js.packHistogram( h.toHistogram().normalize() ) )
+            histoBuffers.append( js.packHistogram( h.toHistogram().normalize(copy=False) ) )
 
         # Compile buffer and send
         self.sendBuffer( 0x02, 
-                struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
             )
 
 
@@ -359,6 +359,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 self.sendStatus("Processing interpolation")
 
                 # Fetch InterpolatableCollection from data
+                print ">> Incoming ipol data: %s" % ans['data']
                 histos = InterpolatableCollection.fromPack( ans['data'] )
 
                 # Re-generate histogram from coefficients
@@ -372,7 +373,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
                 # Compile buffer and send
                 self.sendBuffer( 0x02, 
-                        struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                        struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
                     )
 
                 # Send status message
@@ -451,7 +452,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Compile buffer and send
             self.sendBuffer( 0x01, 
-                    struct.pack("<II", len(histoBuffers), 0) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                    struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
                 )
 
         elif action == "ping":

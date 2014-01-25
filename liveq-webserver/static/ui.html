@@ -36,11 +36,10 @@
     }
 
     div#log {
-      height: 225px;
-      overflow-x: hidden;
-      overflow-y: scroll;
+      height: 100px;
+      overflow: auto;
       font-family: "Lucida Console", Monaco, monospace;
-      font-size: 12px;
+      font-size: 10px;
     }
 
     div#log .warn {
@@ -106,6 +105,43 @@
     </style>
 
     <script type="text/javascript">
+
+    // #################################################################################
+    // =================================================================================
+    //                                EVENT COUNTER
+    // =================================================================================
+    // #################################################################################
+
+    function EventCounter() {
+      this.lastTime = 0;
+      this.lastNevts = 0;
+    };
+
+    /**
+     */
+    EventCounter.prototype.update = function(nevts) {
+      var now = new Date().getTime() / 1000;
+
+    }
+
+    /**
+     */
+    EventCounter.prototype.start = function(nevts) {
+      var now = new Date().getTime() / 1000;
+      this.lastTime = now;
+      this.lastNevts = 0;
+      this.step = 1;
+    }
+
+    /**
+     */
+    EventCounter.prototype.onUpdate = function(v) {
+
+    }
+
+    function commaThousands(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
     // #################################################################################
     // =================================================================================
@@ -205,6 +241,11 @@
         addLog("Simulation completed", "done");
         $("#stopSim").hide();
         $("#loading-spinner").hide();
+      });
+
+      // Handle metadata update
+      lab.onMetadataUpdated(function(meta) {
+        $("#nevts").html( commaThousands(meta['nevts']) );
       });
 
       // Open main lab
@@ -336,12 +377,32 @@
         </div>
         <div class="col-md-6">
 
-          <div class="panel panel-default">
+          <div class="panel panel-default hidden-xs">
             <div class="panel-heading">
               <h3 class="panel-title">Log</h3>
             </div>
             <div class="panel-body" id="log">
               &nbsp;
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Information</h3>
+            </div>
+            <div class="panel-body">
+
+              <form class="form-horizontal" role="form">
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">No. of events:</label>
+                  <div class="col-sm-8">
+                    <p class="form-control-static" id="nevts">0</p>
+                  </div>
+                </div>
+
+              </form>
+
             </div>
           </div>
 
@@ -352,7 +413,7 @@
 
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h3 class="panel-title">Observables <span id="loading-spinner" class="pull-right"><span class="small">Simulation running</small> <img src="img/spinner.gif" alt="Loading" /></span></h3>
+          <h3 class="panel-title">Observables <span id="loading-spinner" class="pull-right"><span class="small">Simulation running</small> &nbsp; <img src="img/spinner.gif" alt="Loading" /></span></h3>
         </div>
         <div class="panel-body" id="host">
           &nbsp;

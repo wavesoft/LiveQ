@@ -172,9 +172,9 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 	// Handle protocols according to versions
 	if (protoVersion == 1) {
 
-		var reserved0 = reader.getUint8(),
-			reserved1 = reader.getUint16(),
-			numHistos = reader.getUint32();
+		var reserved0 = configReader.getUint8(),
+			reserved1 = configReader.getUint16(),
+			numHistos = configReader.getUint32();
 
 		// Read histograms
 		for (var j=0; j<numHistos; j++) {
@@ -216,7 +216,8 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 
 	// Read the frame header
-	var protoVersion = reader.getUint8();
+	var protoVersion = reader.getUint8(),
+		numEvents = 0;
 
 	// Handle protocols according to versions
 	if (protoVersion == 1) {
@@ -241,6 +242,10 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 				// reading of histogram ID (it has already happened)
 				histo.updateFromReader( reader, true, histoID );
 
+				// Update number of events
+				if (histo.nevts > 0)
+					numEvents = histo.nevts;
+
 				// Fire histogram update callbacks
 				for (var i=0; i<this._onHistogramUpdate.length; i++) {
 					this._onHistogramUpdate[i]( histo, this.reference[histoID] );
@@ -251,6 +256,14 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 			}
 
 		}
+
+		// Fire metadata update histogram
+		for (var i=0; i<this._onMetadataUpdated.length; i++) {
+			this._onMetadataUpdated[i]({
+				'nevts': numEvents
+			});
+		}
+
 
 	} else {
 
