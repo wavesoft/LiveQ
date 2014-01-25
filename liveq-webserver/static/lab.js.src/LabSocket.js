@@ -14,7 +14,7 @@
 LiveQ.LabSocket = function( id ) {
 
 	// Initialize superclass
-	LiveQ.HistogramReader.call(this);
+	LiveQ.LabProtocol.call(this);
 
 	/**
 	 * The ID of the lab
@@ -87,8 +87,8 @@ LiveQ.LabSocket = function( id ) {
 
 }
 
-// Subclass from HistogramReader
-LiveQ.LabSocket.prototype = Object.create( LiveQ.HistogramReader.prototype );
+// Subclass from LabProtocol
+LiveQ.LabSocket.prototype = Object.create( LiveQ.LabProtocol.prototype );
 
 /**
  * Register a callback to be notified when the socket is connected

@@ -74,6 +74,7 @@ class Histogram:
 		return Histogram(
 				name=self.name,
 				bins=self.bins,
+				meta=dict(self.meta),
 				y=numpy.copy(self.y),
 				yErrPlus=numpy.copy(self.yErrPlus),
 				yErrMinus=numpy.copy(self.yErrMinus),
@@ -242,7 +243,7 @@ class Histogram:
 	Optionally it returns the metadata required to re-construct the histogram using Histogram.fromFit()
 	function.
 	"""
-	def polyFit(self, deg=4, meta=True, logY=True):
+	def polyFit(self, deg=10, meta=True, logY=True):
 
 		# Coefficents for the plot
 		if logY:
@@ -292,6 +293,9 @@ class Histogram:
 			y = numpy.exp(numpy.polyval( coeff[0:cl], x ))
 			yErrMinus = numpy.exp(numpy.polyval( coeff[cl:cl*2], x ))
 			yErrPlus = numpy.exp(numpy.polyval( coeff[cl*2:cl*3], x ))
+			y = numpy.max(y, 0.0000001)
+			yErrMinus = numpy.max(y, 0.0000001)
+			yErrPlus = numpy.max(y, 0.0000001)
 		else:
 			y = numpy.polyval( coeff[0:cl], x )
 			yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
