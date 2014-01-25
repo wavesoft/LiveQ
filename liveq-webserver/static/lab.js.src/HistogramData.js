@@ -59,6 +59,25 @@ LiveQ.HistogramData = function( bins, id ) {
 }
 
 /**
+ * Construct a histogram from the specified input reader
+ *
+ * @param {LiveQ.BufferReader} reader - The input reader to read the histogram from
+ * @returns {LiveQ.HistogramData} A HistogramData instance
+ */
+LiveQ.HistogramData.fromReader = function( reader ) {
+
+	// Create new Histogram
+	var histo = new LiveQ.HistogramData();
+
+	// Update it's values
+	histo.updateFromReader(reader);
+
+	// Return instance
+	return histo;
+
+}
+
+/**
  * Update histogram data from the specified input reader
  *
  * @param {LiveQ.BufferReader} reader - The input reader to read the histogram from
@@ -140,34 +159,15 @@ LiveQ.HistogramData.prototype.offUpdate = function( cb ) {
 }
 
 /**
- * Construct a histogram from the specified input reader
- *
- * @param {LiveQ.BufferReader} reader - The input reader to read the histogram from
- * @returns {LiveQ.HistogramData} A HistogramData instance
- */
-LiveQ.HistogramData.fromReader = function( reader ) {
-
-	// Create new Histogram
-	var histo = new LiveQ.HistogramData();
-
-	// Update it's values
-	histo.updateFromReader(reader);
-
-	// Return instance
-	return histo;
-
-}
-
-/**
  * Calculate the Chi-squared between the current histogram and the specified
  *
  * @param {LiveQ.HistogramData} histogram - The histogram to compare to
  * @returns {array} A HistogramData instance
  */
-LiveQ.HistogramData.chi2ToReference = function( refHisto, uncertainty ) {
+LiveQ.HistogramData.prototype.chi2ToReference = function( refHisto, uncertainty ) {
 
 	// Ensure equal bins
-	if (histogram.bins != this.bins) 
+	if (refHisto.bins != this.bins) 
 		return null;
 
 	// Prepare chi2 per bin and average

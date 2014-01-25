@@ -1,3 +1,4 @@
+
 /**
  * A Plot window where plots can be placed
  * @class
@@ -179,6 +180,10 @@ LiveQ.PlotWindow.prototype.initPlot = function() {
 	this.svgPlot = this.svg.append("g")
 		.attr("transform", "translate("+this.style.plotMargin.left+","+this.style.plotMargin.top+")");
 
+	// Create backdrop
+	this.svgBackdrop = this.svgPlot.append("g")
+		.attr("class", "backdrop");
+
 	// Create the X and Y axis
 	this.xAxisGraphic = this.svgPlot.append("g")
 	    .attr("class", "x axis")
@@ -188,7 +193,7 @@ LiveQ.PlotWindow.prototype.initPlot = function() {
 	    .attr("class", "y axis")
 	    .call(this.yAxis);
 
-	// Crate group
+	// Crate legend
 	this.svgLegend = this.svgPlot.append("g")
 		.attr("class", "legend")
 	    .attr("transform", "translate("+width+","+(height-this.style.titlePad*2-20)+")");
@@ -374,14 +379,59 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
 }
 
 /**
- * Update the backdrop
+ * Update the backdrop error visualization
  *
- * This function updates the histogram backgrop where the error comparison
+ * This function updates the histogram backdrop where the error comparison
  * is printed.
  */
-LiveQ.PlotWindow.prototype.updateBackdrop = function() {
+LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
+	var self = this,
+		width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
+		height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
 
-	//
+	// Not enough data for visualizing error
+	if (this.plots.length < 2)
+		return;
+
+	// Prepare color scale
+	var colorScale = d3.scale.pow()
+		.range(['#FFFFFF', '#FFFF00', '#FF0000'])
+		.domain([0.1, 1, 4])
+		.clamp(true);
+
+	// Compare bins of those histograms
+	var yErrors = this.plots[0].histo.chi2ToReference( this.plots[1].histo );
+
+	// Calculate x-bounds
+	var data = [ ];
+	for (var i=0; i<this.plots[0].histo.values.length; i++) {
+		var val = this.plots[0].histo.values[i];
+		data.push([
+			val[3]-val[4],
+			val[3]+val[5],
+			yErrors[i]
+		]);
+	}
+
+	// Update backdrop
+	var record = this.svgBackdrop.selectAll("rect").data(data);
+
+	// Enter
+	record.enter()
+		.append("rect")
+			.attr("height", height)
+			.attr("y", 0)
+			.attr("fill-opacity", 0.3);
+
+	// Update
+	record
+		.attr("x", function(d,i){ return self.xScale(d[0]); })
+		.attr("width", function(d,i){ return (self.xScale(d[1]) - self.xScale(d[0])); })
+		.attr("fill", function(d,i){ return (d[2]==0)?"#000000":colorScale(d[2]); });
+
+	// Delete
+	record.exit()
+		.remove();
 
 }
 
@@ -542,6 +592,8 @@ LiveQ.PlotWindow.prototype.update = function() {
 	this.xAxisGraphic.call(this.xAxis);
 	this.yAxisGraphic.call(this.yAxis);
 
+	// Update comparison
+	this.updateErrorVisualization();
 }
 
 /**
