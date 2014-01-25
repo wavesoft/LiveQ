@@ -69,6 +69,14 @@
       height: 300px;
     }
 
+    div.color-legend > div.cl {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      border: solid 1px #666;
+      vertical-align: middle;
+    }
+
     /* =========== */
     /*  Histogram   */
     /* =========== */
@@ -348,6 +356,12 @@
         </div>
         <div class="panel-body" id="host">
           &nbsp;
+        </div>
+        <div class="panel-footer color-legend small">
+          <div class="cl" style="background: #999"></div> No data,
+          <div class="cl" style="background: #FFF"></div> &sigma; &le; 0.1,
+          <div class="cl" style="background: #FF0"></div> &sigma; = 1,
+          <div class="cl" style="background: #F00"></div> &sigma; &ge;= 4
         </div>
       </div>
 
