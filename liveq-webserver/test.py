@@ -39,7 +39,7 @@ runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.fromFile( "config/test.conf.local", runtimeConfig )
+	Config.fromFile( "config/webserver.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	sys.exit(1)
@@ -47,15 +47,10 @@ except ConfigException as e:
 # Handle SigINT
 handleSIGINT()
 
-# Open a channel on RabbitMQ
-c = Config.IBUS.openChannel("data")
-
-def handle_hallo(msg):
-	print "Got: %s" % str(msg)
-	c.reply({"what": "I am also fine. Thank you!"})
-
-c.on('hello', handle_hallo)
-
+# loop
+from liveq.models import Lab
 
 while True:
-	time.sleep(1)
+	a = Lab.select().execute().next()
+	print a
+	time.sleep(5)

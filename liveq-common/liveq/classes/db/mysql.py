@@ -23,10 +23,11 @@ MySQL Database Class
 This class provides a MySQL connection to the peewee databse back-end.
 """
 
+import time
 import logging
 
-from _mysql_exceptions import OperationalError
-from peewee import MySQLDatabase
+#from _mysql_exceptions import OperationalError
+from peewee import OperationalError, MySQLDatabase
 from liveq.config.classes import DatabaseConfigClass
 
 class DurableMySQLDatabase(MySQLDatabase):
@@ -49,47 +50,40 @@ class DurableMySQLDatabase(MySQLDatabase):
 		# Setup recovery flag
 		self.__recovering = False 
 
-	def sql_error_handler(self, exception, sql, params, require_commit):
+	def execute_sql(self, sql, params=None, require_commit=True):
 		"""
-		Handle an exception that might have occured during execution.
-
-		This function is mainly used to recover from OperationalError: (2006, 'MySQL server has gone away'),
-		which is caused when MySQL server disconnects because of inactivity.
+		Function to re-connect to server if it disconnects
 		"""
+		try:
+			return MySQLDatabase.execute_sql(self, sql, params, require_commit)
 
-		# Chcek if we got an error, while in recovery mode
-		if self.__recovering:
-			self.logger.error("Re-raised exception %r (%r) during retry" % (exception.__class__, exception.args))
-			raise OperationalError(2006, 'MySQL server has gone away, and we cannot recover!')
+		except OperationalError as e:
 
-		# Check if we have an OperationalError of #2006 (MySQL server has gone away)
-		self.logger.warn("Got Exception %r (%r). Will try to recover" % (exception.__class__, exception.args))
-		if exception.__class__ is OperationalError:
+			# If we are recovering, re-raise
+			if self.__recovering:
+				raise
 
-			# Get exception number
-			e_num = exception.args[0]
-			if e_num == 2006:
-				self.logger.info("Recovering SQL connection")
+			# Check for "SQL server has gone away"
+			if e.args[0] == 2006:
 
 				# Reconnect
 				self.close()
 				self.connect()
 
-				# Mark recovery
+				# Retry
 				self.__recovering = True
-				# Re-execute query
-				self.logger.info("Re-trying SQL Query")
-				ans = self.execute_sql( sql, params, require_commit )
-				# Reset recovery flag
-				self.__recovering = False
+				try:
+					ans = MySQLDatabase.execute_sql(self, sql, params, require_commit)
+					self.__recovering = False
+					return ans
+				except OperationalError as e:
+					self.__recovering = False
+					raise
 
-				# Return response
-				return ans
+			# Check for "Cannot connect to the SQL server"
+			elif e.args[0] == 2002:
+				pass
 
-		else:
-
-			# We can't handle this, use default handler
-			return MySQLDatabase.sql_error_handler(self, exception, sql, params, require_commit)
 
 class Config(DatabaseConfigClass):
 	"""
