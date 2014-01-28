@@ -400,7 +400,7 @@ LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
 		.clamp(true);
 
 	// Compare bins of those histograms
-	var yErrors = this.plots[0].histo.chi2ToReference( this.plots[1].histo );
+	var yErrors = LiveQ.Calculate.chi2Bins( this.plots[1].histo, this.plots[0].histo );
 	if (!yErrors)
 		return;
 
@@ -617,7 +617,7 @@ LiveQ.PlotWindow.prototype.rescaleAxes = function() {
 	for (var i=0; i<this.plots.length; i++) {
 
 		// Fetch histogram bounds and skip empty ones
-		hBounds = this.plots[i].getBounds();
+		hBounds = this.plots[i].histo.getBounds();
 		if (!hBounds) continue;
 
 		// Update collective bounds

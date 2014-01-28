@@ -20,42 +20,31 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
 }
 
 /**
- * Calculate and return the x and y bounds for this histogram
+ * Create and return the SVG group with the given ID
  *
- * @param {bool} logProtect - If set to true, the minimum y value will never be smaller than 0.000001
+ * @param {d3.selection} hostSVG - The SVG container where we should create our element
+ * @param {Object} boudns - An object that contains the bound rectangle fields for the plot: x,y,width,height 
+ * @returns {d3.selection} Returns an SVG element that will be used for rendering the plot
  */
-LiveQ.PlotHistogram.prototype.getBounds = function( logProtect ) {
-	// Reset bounds
-	var vMin, vMax,
-		xMin=null, yMin=null,
-		xMax=null, yMax=null;
+LiveQ.PlotHistogram.prototype.create = function( hostSVG, bounds ) {
+	
+}
 
-	// If the histogram is empty, return no bounds
-	if (this.histo.empty)
-		return null;
+/**
+ * Create and return the SVG group with the given ID
+ *
+ * @param {d3.selection} hostSVG - The SVG container where we should create our element
+ * @param {d3.selection} plotSVG - The SVG element created previously with the create() function
+ * @param {Object} boudns - An object that contains the bound rectangle fields for the plot: x,y,width,height 
+ * @returns {d3.selection} Removes the plotSVG element from the hostSVG container
+ */
+LiveQ.PlotHistogram.prototype.remove = function( hostSVG, plotSVG, bounds ) {
+	
+}
 
-	// Run over bins and calculate bounds (including error bars)
-	for (var i=0; i<this.histo.bins; i++) {
-
-		// Calculate the min/max for Y
-		vMax = this.histo.values[i][0] + this.histo.values[i][1];
-		vMin = this.histo.values[i][0] - this.histo.values[i][2];
-		if ((vMax>yMax) || (yMax==null)) yMax=vMax;
-		if ((vMin<yMin) || (yMin==null)) yMin=vMin;
-
-		// Calculate the min/max for X
-		vMax = this.histo.values[i][3] + this.histo.values[i][4];
-		vMin = this.histo.values[i][3] - this.histo.values[i][5];
-		if ((vMax>xMax) || (xMax==null)) xMax=vMax;
-		if ((vMin<xMin) || (xMin==null)) xMin=vMin;
-
-	}
-
-	// If we are protecting logarithmic scale, do not allow to reach 0
-	if ((logProtect == true) || (logProtect == undefined))
-		if (yMin<=0) yMin=0.000001;
-
-	// Return bounds
-	return [ xMin, xMax, yMin, yMax ];
+/**
+ * Update the metrics of the histogram
+ */
+LiveQ.PlotHistogram.prototype.update = function( hostSVG, plotSVG, bounds ) {
 
 }

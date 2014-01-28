@@ -21,6 +21,7 @@
     <script type="text/javascript" src="lab.js.src/LabSocket.js"></script>
     <script type="text/javascript" src="lab.js.src/Plot.js"></script>
     <script type="text/javascript" src="lab.js.src/PlotHistogram.js"></script>
+    <script type="text/javascript" src="lab.js.src/Calculate.js"></script>
 
     <style type="text/css">
 
@@ -232,6 +233,12 @@
 
         // Update plot
         histo.plot.update();
+
+        // Updating
+        console.log( "Means of", ref.id, ":", LiveQ.Calculate.chi2WithError(
+          histo.plot.plots[1].histo,
+          histo.plot.plots[0].histo
+          ));
 
       });
 
