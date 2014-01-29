@@ -4,7 +4,7 @@
  *
  * @class
  */
-LiveQ.PlotHistogram = function(parent, histo, color, title) {
+LiveQ.UI.PlotHistogram = function(parent, histo, color, title) {
 
 	// Keep references
 	this.parent = parent;
@@ -26,7 +26,7 @@ LiveQ.PlotHistogram = function(parent, histo, color, title) {
  * @param {Object} boudns - An object that contains the bound rectangle fields for the plot: x,y,width,height 
  * @returns {d3.selection} Returns an SVG element that will be used for rendering the plot
  */
-LiveQ.PlotHistogram.prototype.create = function( hostSVG, bounds ) {
+LiveQ.UI.PlotHistogram.prototype.create = function( hostSVG, bounds ) {
 	
 }
 
@@ -38,13 +38,13 @@ LiveQ.PlotHistogram.prototype.create = function( hostSVG, bounds ) {
  * @param {Object} boudns - An object that contains the bound rectangle fields for the plot: x,y,width,height 
  * @returns {d3.selection} Removes the plotSVG element from the hostSVG container
  */
-LiveQ.PlotHistogram.prototype.remove = function( hostSVG, plotSVG, bounds ) {
+LiveQ.UI.PlotHistogram.prototype.remove = function( hostSVG, plotSVG, bounds ) {
 	
 }
 
 /**
  * Update the metrics of the histogram
  */
-LiveQ.PlotHistogram.prototype.update = function( hostSVG, plotSVG, bounds ) {
+LiveQ.UI.PlotHistogram.prototype.update = function( hostSVG, plotSVG, bounds ) {
 
 }

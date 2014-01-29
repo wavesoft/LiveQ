@@ -25,7 +25,10 @@ import tornado.websocket
 import os.path
 import uuid
 
-from webserver.labsocket import LabSocketHandler
+from tornado.web import URLSpec
+from webserver.h.configure import ConfigHandler
+from webserver.h.labsocket import LabSocketHandler
+from webserver.h.index import IndexHandler
 from webserver.config import Config
 
 """
@@ -36,8 +39,9 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			(r"/vas/?", MainHandler),
-			(r"/vas/labsocket/(.*)", LabSocketHandler),
+			URLSpec(r"%s/?" % Config.BASE_URL, 				IndexHandler, 		name="index"),
+			URLSpec(r"%s/config?" % Config.BASE_URL, 		ConfigHandler, 		name="config"),
+			URLSpec(r"%s/labsocket/(.*)" % Config.BASE_URL, LabSocketHandler,	name="ws"),
 		]
 
 		# Get root dir of files
@@ -48,17 +52,9 @@ class MCPlotsServer(tornado.web.Application):
 			cookie_secret="ckjbe3n3809713g7baf13n8vapjtd64xfkjgd",
 			template_path=os.path.join(filesDir, "templates"),
 			static_path=os.path.join(filesDir, "static"),
-			static_url_prefix="/vas/static/",
+			static_url_prefix="%s/static/" % Config.BASE_URL,
 			xsrf_cookies=True,
 		)
 
 		# Setup tornado application
 		tornado.web.Application.__init__(self, handlers, **settings)
-
-"""
-Root page handler
-"""
-class MainHandler(tornado.web.RequestHandler):
-	def get(self):
-		self.render("index.html")
-

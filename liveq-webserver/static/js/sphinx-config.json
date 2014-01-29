@@ -1,0 +1,31 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": [
+            "README.md",
+            "liveq.js.src/LiveQ.js",
+            "liveq.js.src/BufferReader.js",
+            "liveq.js.src/Calculate.js",
+            "liveq.js.src/HistogramData.js",
+            "liveq.js.src/ReferenceData.js",
+            "liveq.js.src/LabProtocol.js",
+            "liveq.js.src/LabSocket.js",
+            "ui-common.js.src/UI.js",
+            "ui-common.js.src/EventCounter.js",
+            "ui-common.js.src/Plot.js",
+            "ui-common.js.src/PlotHistogram.js"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": false
+    }
+}
+
