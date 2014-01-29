@@ -54,7 +54,7 @@ class Tune(dict):
 				return
 
 			# Fetch lab tunable parameters	
-			keys = lab.getTunables()
+			keys = lab.getTunableNames()
 			
 			# Sort keys
 			ksorted = sorted(keys)
