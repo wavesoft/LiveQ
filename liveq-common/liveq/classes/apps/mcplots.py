@@ -81,6 +81,8 @@ class MCPlots(JobApplication):
 		self.tunename = ""
 		self.tunefile = ""
 		self.monitorThread = None
+		self.trackingFile = None
+		self.trackingTime = 0
 		self.state = STATE_ABORTED
 
 	##################################################################################
@@ -262,6 +264,57 @@ class MCPlots(JobApplication):
 	###
 	##################################################################################
 
+	def isDatasetModified(self):
+		"""
+		Check if the job data files are modified
+		"""
+
+		# Check if we have a valid tracking file
+		if (not self.trackingFile) or (not os.path.isfile(self.trackingFile)):
+
+			# Check if we lost job dir
+			if not os.path.isdir(self.jobdir):
+				self.logger.warn("Missing dump directory - Could not track changes")
+				return False
+
+			# List files in the job dir
+			files = glob.glob("%s/dump/*.dat" % self.jobdir)
+
+			# Check for empty file list
+			if not files:
+				self.logger.warn("Empty dump directory - Could not track changes")
+				return False
+
+			# Find the file modified the last
+			tfFile = ""
+			tfTime = 0
+			for f in files:
+				tf = os.path.getmtime(f)
+				if tf > tfTime:
+					tfTime = tf
+					tfFile = f
+
+			# Remember the name of the tracking file
+			self.trackingFile = tfFile
+			self.trackingTime = tfTime
+
+			# And yes, we were modified
+			return True
+
+		# Check the time the tracking file was modified
+		tfTime = os.path.getmtime(self.trackingFile)
+		if tfTime > self.trackingTime:
+
+			# Modified
+			self.trackingTime = tfTime
+			return True
+
+		else:
+
+			# Not modified
+			return False
+
+
 	def cleanup(self):
 		"""
 		Helper to cleanup current job files
@@ -276,6 +329,10 @@ class MCPlots(JobApplication):
 		if len(self.datdir) > 1:
 			self.logger.debug("Cleaning-up data directory %s" % self.datdir)
 			os.system("rm -rf '%s'" % self.datdir)
+
+		# Reset the tracking file
+		self.trackingFile = None
+		self.trackingTime = 0
 
 	def getState(self):
 		"""
@@ -381,9 +438,9 @@ class MCPlots(JobApplication):
 				# In any of these cases, exit the loop
 				break
 
-			# When it's time to send updates, read the histograms
-			# and dispatch the update event to the targets
-			if not runtime % self.config.UPDATE_INTERVAL:
+			# Every time the histogram timestamp is changed, send the
+			# updates to the server.
+			if self.isDatasetModified():
 
 				# Get intermediate histograms only when running
 				if self.getState() == "running":

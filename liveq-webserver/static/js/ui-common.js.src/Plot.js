@@ -3,7 +3,7 @@
  * A Plot window where plots can be placed
  * @class
  */
-LiveQ.PlotWindow = function(host, config) {
+LiveQ.UI.PlotWindow = function(host, config) {
 	var self = this;
 
 	// Prepare default configuration
@@ -72,7 +72,7 @@ LiveQ.PlotWindow = function(host, config) {
  * Safe accessor to the yScale
  * @private
  */
-LiveQ.PlotWindow.prototype._yScale = function( v ) {
+LiveQ.UI.PlotWindow.prototype._yScale = function( v ) {
 	if (v == 0) {
 		return this.height;
 	} else {
@@ -90,7 +90,7 @@ LiveQ.PlotWindow.prototype._yScale = function( v ) {
  * @param {string} iY - The URL of the image to use for Y-Axis label
  *
  */
-LiveQ.PlotWindow.prototype.initImages = function( iTitle, iX, iY ) {
+LiveQ.UI.PlotWindow.prototype.initImages = function( iTitle, iX, iY ) {
 	var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
 		height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom,
 		self = this;
@@ -154,7 +154,7 @@ LiveQ.PlotWindow.prototype.initImages = function( iTitle, iX, iY ) {
 /**
  * Initialize histogram plots
  */
-LiveQ.PlotWindow.prototype.initPlot = function() {
+LiveQ.UI.PlotWindow.prototype.initPlot = function() {
 	var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
 		height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
 
@@ -207,7 +207,7 @@ LiveQ.PlotWindow.prototype.initPlot = function() {
  * @param {string} title - The title of the histogram. If missing, the histogram ID will be used.
  * @param {string} color - The color of the new histogram. If missing, a color will be picked.
  */
-LiveQ.PlotWindow.prototype.addHistogram = function(histo, title, color) {
+LiveQ.UI.PlotWindow.prototype.addHistogram = function(histo, title, color) {
 
 	// Pick next color if color is not defined
 	if (!color) {
@@ -217,7 +217,7 @@ LiveQ.PlotWindow.prototype.addHistogram = function(histo, title, color) {
 	}
 
 	// Create plot
-	var plot = new LiveQ.PlotHistogram(this, histo, color, title);
+	var plot = new LiveQ.UI.PlotHistogram(this, histo, color, title);
 	this.plots.push(plot);
 
 	// Update
@@ -238,7 +238,7 @@ LiveQ.PlotWindow.prototype.addHistogram = function(histo, title, color) {
  *
  * @param {array} areas - The array of the region boundaries to check (format: [x,y,w,h])
  */
-LiveQ.PlotWindow.prototype.getLeastUsedRegion = function(areas) {
+LiveQ.UI.PlotWindow.prototype.getLeastUsedRegion = function(areas) {
 
 	// Initialize usage array
 	var usage = [ ];
@@ -285,7 +285,7 @@ LiveQ.PlotWindow.prototype.getLeastUsedRegion = function(areas) {
  *
  * This function re-aligns and re-draws the legend object of the plot.
  */
-LiveQ.PlotWindow.prototype.updateLegend = function() {
+LiveQ.UI.PlotWindow.prototype.updateLegend = function() {
 	var self = this, lb = this.style.legendBullet,
 		width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
 		height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
@@ -384,7 +384,7 @@ LiveQ.PlotWindow.prototype.updateLegend = function() {
  * This function updates the histogram backdrop where the error comparison
  * is printed.
  */
-LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
+LiveQ.UI.PlotWindow.prototype.updateErrorVisualization = function() {
 	var self = this,
 		width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
 		height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
@@ -400,7 +400,7 @@ LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
 		.clamp(true);
 
 	// Compare bins of those histograms
-	var yErrors = this.plots[0].histo.chi2ToReference( this.plots[1].histo );
+	var yErrors = LiveQ.Calculate.chi2Bins( this.plots[1].histo, this.plots[0].histo );
 	if (!yErrors)
 		return;
 
@@ -443,7 +443,7 @@ LiveQ.PlotWindow.prototype.updateErrorVisualization = function() {
  * This function redraws the plot lines, the error bands and the error bars
  * of all the plots in the PlotWindow.
  */
-LiveQ.PlotWindow.prototype.update = function() {
+LiveQ.UI.PlotWindow.prototype.update = function() {
 
 	// Tunables
 	var bulletSize = this.style.bulletSize,
@@ -605,7 +605,7 @@ LiveQ.PlotWindow.prototype.update = function() {
  * as the new range for the X and Y scale.
  *
  */
-LiveQ.PlotWindow.prototype.rescaleAxes = function() {
+LiveQ.UI.PlotWindow.prototype.rescaleAxes = function() {
 
 	// Reset histograms
 	var hBounds,
@@ -617,7 +617,7 @@ LiveQ.PlotWindow.prototype.rescaleAxes = function() {
 	for (var i=0; i<this.plots.length; i++) {
 
 		// Fetch histogram bounds and skip empty ones
-		hBounds = this.plots[i].getBounds();
+		hBounds = this.plots[i].histo.getBounds();
 		if (!hBounds) continue;
 
 		// Update collective bounds

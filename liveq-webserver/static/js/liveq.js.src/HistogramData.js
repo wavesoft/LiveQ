@@ -159,77 +159,42 @@ LiveQ.HistogramData.prototype.offUpdate = function( cb ) {
 }
 
 /**
- * Calculate the Chi-squared between the current histogram and the specified
+ * Calculate and return the x and y bounds for this histogram
  *
- * @param {LiveQ.HistogramData} histogram - The histogram to compare to
- * @returns {array} A HistogramData instance
+ * @param {bool} logProtect - If set to true, the minimum y value will never be smaller than 0.000001
  */
-LiveQ.HistogramData.prototype.chi2ToReference = function( refHisto, uncertainty ) {
+LiveQ.HistogramData.prototype.getBounds = function( logProtect ) {
+	// Reset bounds
+	var vMin, vMax,
+		xMin=null, yMin=null,
+		xMax=null, yMax=null;
 
-	// Ensure equal bins
-	if (refHisto.bins != this.bins) 
+	// If the histogram is empty, return no bounds
+	if (this.empty)
 		return null;
 
-	// Prepare chi2 per bin and average
-	var perBin = [];
-
-	// Put default value to uncertainty
-	if (!uncertainty) uncertainty=0.05;
-
-	// Handle bins
+	// Run over bins and calculate bounds (including error bars)
 	for (var i=0; i<this.bins; i++) {
 
-		// Require same bins filled. If data is filled and MC is not filled,
-		// we do not know what the chi2 of that bin is. Return error.
-		// (b.isEmpty() && !r.isEmpty()) return -1;
-		if ((this.values[i][0] == 0) && (refHisto.values[i][0] == 0)) {
-			perBin.push(0);
-			return null;
-		}
+		// Calculate the min/max for Y
+		vMax = this.values[i][0] + this.values[i][1];
+		vMin = this.values[i][0] - this.values[i][2];
+		if ((vMax>yMax) || (yMax==null)) yMax=vMax;
+		if ((vMin<yMin) || (yMin==null)) yMin=vMin;
 
-		// Skip empty bins (if data is empty but theory is filled, it's ok. We
-		// are allowed to plot theory outside where there is data, we just 
-		// cannot calculate a chi2 there).
-		if ((this.values[i][0] == 0) || (refHisto.values[i][0] == 0)) {
-			perBin.push(0);
-			continue;
-		}
-
-		//
-		// compute one element of test statistics:
-		//                     (Theory - Data)^2
-		// X = --------------------------------------------------------
-		//      Sigma_data^2 + Sigma_theory^2 + (uncertainty*Theory)^2
-		//
-		var theory = this.values[i][0],
-			data = refHisto.values[i][0],
-			sTheory, sData;
-
-		if (theory > data) {
-			sTheory = this.values[i][2]   // yErrMinus
-			sData = refHisto.values[i][1] // yErrPlus
-		} else {
-			sTheory = this.values[i][1]   // yErrMinus
-			sData = refHisto.values[i][2] // yErrPlus
-		}
-
-		// Calculate nomin & denom 
-		var nomin = (theory-data)*(theory-data),
-			denom = sData*sData + sTheory*sTheory + (uncertainty*theory)*(uncertainty*theory);
-
-		// Ensure we don't divide by 0
-		if (denom == 0) {
-			perBin.push(0);
-			continue;
-		}
-
-		// Calculate bin Chi2
-		var X = nomin/denom;
-		perBin.push(X);
+		// Calculate the min/max for X
+		vMax = this.values[i][3] + this.values[i][4];
+		vMin = this.values[i][3] - this.values[i][5];
+		if ((vMax>xMax) || (xMax==null)) xMax=vMax;
+		if ((vMin<xMin) || (xMin==null)) xMin=vMin;
 
 	}
 
-	// Calculate averages
-	return perBin;
+	// If we are protecting logarithmic scale, do not allow to reach 0
+	if ((logProtect == true) || (logProtect == undefined))
+		if (yMin<=0) yMin=0.000001;
+
+	// Return bounds
+	return [ xMin, xMax, yMin, yMax ];
 
 }

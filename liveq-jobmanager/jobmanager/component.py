@@ -220,6 +220,25 @@ class JobManagerComponent(Component):
 		# And then cleanup job
 		job.release()
 
+	def abortMissingJob(self, job_id, agentChannel):
+		"""
+		Abort the given job id on the given agent, because no appropriate job entry
+		was found in store.
+		"""
+
+		# Send cancellation synchronously
+		ans = agentChannel.send('job_cancel', {
+				'jid': job_id
+			}, waitReply=True)
+
+		# Log results
+		if not ans:
+			self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agentChannel.name, job_id ) )
+		elif ans['result'] == "ok":
+			self.logger.info("Successfuly cancelled job %s on %s" % ( job_id, agentChannel.name ))
+		else:
+			self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job_id, agentChannel.name, ans['error'] ))
+
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -302,6 +321,7 @@ class JobManagerComponent(Component):
 		job = jobs.getJob(jid)
 		if not job:
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
+			self.abortMissingJob(jid, channel)
 			return
 
 		# Send status

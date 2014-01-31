@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework Demo</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-liveq.html" %}
+    {% include "chunks/head-ui-play.html" %}
+
+    <script type="text/javascript">
+
+      function createInline() {
+          var inline = $('<div id="tunables-inline"></div>'),
+              triangle = $('<div class="triangle"></div>'),
+              row = $('<div class="row"></div>'),
+              c2 = $('<div class="col-md-4 col-input"></div>'),
+              c3 = $('<div class="col-md-8 col-desc"></div>');
+
+          // Nest
+          $(inline).append(triangle);
+          $(inline).append(row);
+          $(row).append(c2);
+          $(row).append(c3);
+
+          // Return instance
+          return inline;
+      }
+
+      function prepareInline(xOffset, data) {
+
+        // Fetch host element
+        var inline = $("#tunables-inline");
+        if (inline.length == 0)
+          inline = createInline();
+
+        // Fetch triangle
+        var triangle = inline.find(".triangle"),
+            col_input = inline.find(".col-input"),
+            col_desc = inline.find(".col-desc");
+
+        // Offset triangle
+        $(triangle).css({
+          'left': xOffset
+        });
+
+        // Prepare editable input
+        col_input.empty(); {
+          var input = $('<input type="text"></input>');
+          $(col_input).append(input);
+
+          $(input).knob({
+            'width': 100,
+            'height': 100
+          });
+        }
+
+        // Prepare description
+        col_desc.empty(); {
+          var head = $('<h2>Some title</h2>'),
+              body = $('<div><p>Suspendisse at cursus libero. Fusce consectetur purus et mauris euismod egestas. Fusce mollis, massa nec malesuada molestie, lorem massa suscipit nisi, quis vehicula enim erat non nunc. Phasellus ultrices nunc in ornare lacinia. Donec dui eros, vehicula congue laoreet non, venenatis vel nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Etiam quis urna dictum ipsum tempor venenatis at sed sem.</p><p>Proin a nisl justo. Quisque dictum nisl non sem tempor volutpat. Pellentesque viverra ut dolor sed adipiscing. Nunc porttitor tortor et dolor iaculis, ut molestie felis ultrices. Etiam mollis sapien tempor, aliquam dolor nec, lobortis eros. Cras fringilla sit amet metus sit amet posuere. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ornare risus nec dictum aliquet. Integer hendrerit in odio non mattis. Aenean elementum, est non ultrices fermentum, nisl metus sodales nisi, quis gravida purus ligula vel elit. Vivamus semper eget diam sit amet accumsan. Vivamus eget lacinia dolor, ut tincidunt justo. Suspendisse adipiscing sapien lectus, ac faucibus lectus vulputate a. Nam ut dolor ipsum. Ut consectetur neque nunc, vitae elementum risus consequat ut.</p></div>');
+          $(col_desc).append(head);
+          $(col_desc).append(body);
+        }
+
+        // Return
+        return inline;
+      }
+
+      function showInline(where, data) {
+        var refPos = $(where).first().position(),
+            next = $(where).next();
+
+        // Prepare inline
+        var inline = prepareInline( refPos.left+30, data );
+
+        // Find where the line breaks
+        console.log("First next",next, next.length);
+        while (next.length > 0) {
+          console.log("LOOPING!");
+
+          // Skip inline if we found it by accident
+          if (next.is(inline)) {
+            console.log("Skipping",next);
+            next = $(next).next();
+            console.log("Skipped into",next);
+            if (!next.length) return;
+          }
+
+          var top = $(next).first().position().top;
+          if (Math.abs(top - refPos.top) > 10) {
+            console.log("Break at", next, "because", top, "!=", refPos.top);
+            $(next).before(inline);
+            return;
+          }
+          next = $(next).next();
+        }
+
+        // Not found, put after where
+        window.w = where;
+        console.log("Adding after", where, "because not found");
+        $(where).after(inline);
+
+      }
+
+      $(function() {
+        $(".-tunable-button").click(function(e) {
+          showInline(this, this.innerHTML);
+        });
+      });
+    </script>
+
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <!-- First row -->
+      <div class="row">
+
+        <!-- Tunables column -->
+        <div class="col-md-6">
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Tunables</h3>
+            </div>
+            <div class="panel-body">
+
+              <form class="form-horizontal" role="form">
+
+                <!-- Data are appended here -->
+                <div id="tunables"></div>
+
+                <!-- Button to start simulation -->
+                <div class="form-group">
+                  <div class="col-sm-offset-6 col-sm-6">
+                    <button id="startSim" type="button" class="btn btn-success"><span class="glyphicon glyphicon-check"></span> Try these values</button>
+                    <button id="stopSim" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span></button>
+                  </div>
+                </div>
+
+              </form>
+
+              <div class="-tunable-button">
+                <h2>&alpha;<sub>s</sub></h2>
+                <div class="subtitle">TimeShower:alphaSvalue</div>
+                <div class="value">0.3142</div>
+              </div>
+
+              <div class="-tunable-button">
+                <h2>&alpha;L</h2>
+                <div class="subtitle">StringZ:aLund</div>
+                <div class="value">0.4</div>
+              </div>
+
+
+              <div class="-tunable-button">
+                <h2>&beta;L</h2>
+                <div class="subtitle">StringZ:bLund</div>
+                <div class="value">0.8</div>
+              </div>
+
+              <div class="-tunable-button">
+                <h2>R<sub>1</sub></h2>
+                <div class="subtitle">RandomValue:First</div>
+                <div class="value">0.1</div>
+              </div>
+
+              <div class="-tunable-button">
+                <h2>R<sub>2</sub></h2>
+                <div class="subtitle">RandomValue:Second</div>
+                <div class="value">0.1</div>
+              </div>
+
+              <div class="-tunable-button">
+                <h2>R<sub>3</sub></h2>
+                <div class="subtitle">RandomValue:Third</div>
+                <div class="value">0.1</div>
+              </div>
+
+              <div class="-tunable-button">
+                <h2>R<sub>4</sub></h2>
+                <div class="subtitle">RandomValue:Fourth</div>
+                <div class="value">0.1</div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Column -->
+        <div class="col-md-6">
+
+          <div class="panel panel-default hidden-xs">
+            <div class="panel-heading">
+              <h3 class="panel-title">Log</h3>
+            </div>
+            <div class="panel-body" id="log">
+              &nbsp;
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Information</h3>
+            </div>
+            <div class="panel-body">
+
+              <form class="form-horizontal" role="form">
+
+                <div class="form-group">
+                  <label class="col-sm-4 control-label">No. of events:</label>
+                  <div class="col-sm-8">
+                    <p class="form-control-static" id="nevts">0</p>
+                  </div>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Observables <span id="loading-spinner" class="pull-right"><span class="running-text">Simulation running</small> &nbsp; <img src="{{ static_url("img/spinner.gif") }}" alt="Loading" /></span></h3>
+        </div>
+        <div class="panel-body" id="host">
+          &nbsp;
+        </div>
+        <div class="panel-footer color-legend small">
+          <div class="cl" style="background: #999"></div> No data,
+          <div class="cl" style="background: #FFF"></div> &sigma; &le; 0.1,
+          <div class="cl" style="background: #FF0"></div> &sigma; = 1,
+          <div class="cl" style="background: #F00"></div> &sigma; &ge;= 4
+        </div>
+      </div>
+
+
+      <!-- In-line modal window -->
+      <div class="modal fade" id="inlineModal" tabindex="-1" role="dialog" aria-labelledby="inlineModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="inlineModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+              <iframe id="inlineModalFrame" border="0"></iframe>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+
+      <script type="text/javascript">LiveQ.UI.initLab("{{ lab_uuid }}");</script>
+
+    </div>
+
+  </body>
+</html>

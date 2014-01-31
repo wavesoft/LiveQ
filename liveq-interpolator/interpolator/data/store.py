@@ -209,8 +209,22 @@ class HistogramStore:
 			print "Histograms=%i" % len(neighbors[0])
 		print "---------------------------"
 
-		# Append collection to the neighborhood
-		neighbors.append(collection)
+		# Replace identical indices
+		i = 0
+		found = False
+		for e in collection:
+
+			# If tunes match exactly, use the newer data for the interpolation
+			if e.tune.equal(collection.tune):
+				neighbors[i] = collection
+				found = True
+				break
+			i += 1
+
+		# Append collection to the neighborhood if a
+		# simmilar entry was not found.
+		if not found:
+			neighbors.append(collection)
 
 		# Put neighbors back to the neighborhood store
 		vBuf, mBuf = HistogramStore._pickle(neighbors)

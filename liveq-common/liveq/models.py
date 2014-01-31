@@ -44,7 +44,8 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab ]:
+	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, 
+					Tutorials, Tunables, Observables, TunableToObservable ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -137,25 +138,20 @@ class Lab(BaseModel):
 	#: Add an additional UUID lookup index that allows
 	#: annonymization of the Lab IDs
 	uuid = CharField(max_length=128, index=True, unique=True)
-
+	#: The name of the lab
+	name = CharField(max_length=128)
 	#: The repository tag/version to checkout
 	repoTag = CharField()
-
 	#: The repository base that contains the software
 	repoURL = CharField()
-
 	#: The repository type that will be used
 	repoType = CharField(max_length=12, default="svn")
-
 	#: The non-tunable parameters for the job
-	fixedParameters = CharField(max_length=1024)
-
+	fixedParameters = TextField()
 	#: The parameters the user can send
-	tunableParameters = CharField(max_length=2048)
-
+	tunableParameters = TextField()
 	#: The observed histograms
-	histograms = CharField(max_length=2048)
-
+	histograms = TextField()
 	#: The type of the histograms
 	histogramType = CharField(max_length=12, default="FLAT")
 
@@ -171,17 +167,17 @@ class Lab(BaseModel):
 		"""
 		self.fixedParameters = json.dumps(data)
 
-	def getTunables(self):
+	def getTunableNames(self):
 		"""
-		Return the configuration for the tunable parameters
+		Return the names of the tunables
 		"""
-		return json.loads(self.tunableParameters)
+		return str(self.tunableParameters).split(",")
 
-	def setTunables(self, data):
+	def setTunableNames(self, data):
 		"""
-		Update the configuration for the tunable parameters
+		Update the names of the tunables
 		"""
-		self.tunableParameters = json.dumps(data)
+		self.tunableParameters = ",".join(data)
 
 	def getHistograms(self):
 		"""
@@ -194,6 +190,21 @@ class Lab(BaseModel):
 		Set the names of the histograms to send to the user
 		"""
 		self.histograms = ",".join(data)
+
+	def getTunables(self):
+		"""
+		Return the configuration for the tunable parameters
+		"""
+
+		config = { }
+		names = self.getTunableNames()
+		for name in names:
+
+			# Fetch the tunable record for every name
+			config[name] = Tunables.get(name=name)
+
+		# Return tunable configuration
+		return config
 
 	def formatTunables(self, tunables, asString=False):
 		"""
@@ -211,17 +222,122 @@ class Lab(BaseModel):
 			v = 0.0
 			if not k in tunables:
 				# If we don't have the value, get default
-				v = float(t['def'])
+				v = t.default
 			else:
 				# Otherwise, clamp to limits
-				v = min( float(t['max']), max( float(t['min']), float(tunables[k]) ) )
+				v = min( t.max, max( t.min, float(tunables[k]) ) )
 
 			# Snap decimals when converting to string
 			if asString:
-				ans[k] = ("%." + str(t['dec']) + "f") % v
+				ans[k] = ("%." + str(t.dec) + "f") % v
 			else:
 				ans[k] = v
 
 		# Return answer
 		return ans
+
+class Tutorials(BaseModel):
+	"""
+	Tutorials for the user
+	"""
+
+	#: The UUID of the tutorial
+	uuid = CharField(max_length=128, index=True, unique=True)
+	#: The human-readable name of the tutorial
+	title = CharField(max_length=128)
+	#: A URL for the tutorial
+	url = CharField(max_length=128)
+
+
+class Tunables(BaseModel):
+	"""
+	Description for the tunables as an individual parameter
+	"""
+
+	#: The name of variable of the tunable parameter
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: Beam type where this tunable is valid
+	beam = CharField(max_length=12, default="ee")
+	#: Beam energy where this tunable is valid
+	energy = FloatField(default=91.2)
+	#: Simulation process where this tunable is valid
+	process = CharField(max_length=12, default="zhad")
+
+	#: The human-readable name of the tunable
+	title = CharField(max_length=128)
+	#: A short description for this tunable
+	shortdesc = TextField(default="")
+	#: A URL for the long description
+	urldesc = CharField(max_length=128, default="")
+	#: The UUID of the tutorial
+	tutorial = CharField(max_length=64, default="")
+
+	#: The UI component to use for visualizing this variable
+	type = CharField(max_length=8, default="slider")
+	#: The default value for the tunable
+	default = FloatField(default=0.0)
+	#: The minimum value for the tunable
+	min = FloatField(default=0.0)
+	#: The maximum value for the tunable
+	max = FloatField(default=1.0)
+	#: The number of decimals to show on the value
+	dec = IntegerField(default=4)
+
+class Observables(BaseModel):
+	"""
+	The description of the ovservables
+	"""
+
+	#: The name of the histogram (AIDA Path) for this tunable
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: Beam type where this observable is valid
+	beam = CharField(max_length=12, default="ee")
+	#: Beam energy where this observable is valid
+	energy = FloatField(default=91.2)
+	#: Simulation process where this observable is valid
+	process = CharField(max_length=12, default="zhad")
+
+	#: The human-readable name of the observable
+	title = CharField(max_length=128)
+	#: A short description for this tunable
+	shortdesc = TextField(default="")
+	#: A URL for the long description
+	urldesc = CharField(max_length=128, default="")
+	#: The UUID of the tutorial
+	tutorial = CharField(max_length=64, default="")
+
+	#: Image for the far-left side of the histogram
+	leftImg = CharField(max_length=128, default="")
+	#: Description for the far-left side of the histogram
+	leftDesc = TextField(default="")
+
+	#: Image for the far-right side of the histogram
+	rightImg = CharField(max_length=128, default="")
+	#: Description for the far-right side of the histogram
+	rightDesc = TextField(default="")
+
+
+class TunableToObservable(BaseModel):
+	"""
+	The description of the link between the tunable and the observable
+	"""
+
+	#: The tunable to link from
+	tunable = ForeignKeyField(Tunables, related_name='tunable')
+	#: The observable where it links to
+	observable = ForeignKeyField(Observables, related_name='observable')
+
+	#: The title of this relation
+	title = CharField(max_length=128)
+	#: A short description for this link
+	shortdesc = TextField(default="")
+	#: A URL for the long description
+	urldesc = CharField(max_length=128, default="")
+	#: The UUID of the tutorial
+	tutorial = CharField(max_length=64, default="")
+
+	#: The importance of this relation
+	importance = IntegerField(default=0)
 

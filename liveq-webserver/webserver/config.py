@@ -33,6 +33,7 @@ Local configuration for the agent
 class WebserverConfig:
 
 	SERVER_PORT = 8080
+	BASE_URL = "/vas"
 	HISTODESC_PATH = ""
 	HISTODESC = None
 
@@ -40,6 +41,7 @@ class WebserverConfig:
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
+		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
 
 		# Create a histogram description from the reference data path
 		WebserverConfig.HISTODESC = HistoDescription( WebserverConfig.HISTODESC_PATH )
