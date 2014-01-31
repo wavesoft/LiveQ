@@ -29,6 +29,7 @@ from liveq.models import Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
+from webserver.common.minimacros import convertMiniMacros
 from webserver.config import Config
 
 import tornado.websocket
@@ -285,6 +286,53 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 }
             })
 
+    def sendConfigurationFrame(self):
+        """
+        Send the first, configuration frame to the agent
+        """
+
+        # Fetch description for the tunables
+        data = []
+        tunables = self.lab.getTunables()
+        for n, t in tunables.iteritems():
+
+            data.append({
+                    'name': n,
+                    'title': t.title,
+                    'desc': convertMiniMacros(t.shortdesc),
+                    'url': t.urldesc,
+                    'tut': t.tutorial,
+                    'type': t.type,
+                    'def': t.default,
+                    'min': t.min,
+                    'max': t.max,
+                    'dec': t.dec
+                })
+
+        # Pack tunables in buffer
+        tunablesBuffer = js.packString(tornado.escape.json_encode(data))
+
+        # Fetch descriptions for the histograms
+        histo_ids = self.lab.getHistograms()
+        histoBuffers = []
+        for hid in histo_ids:
+
+            # Fetch description record
+            descRecord = self.histodesc.describeHistogram( hid )
+            if not descRecord:
+                self.sendError("Could not find description for histogram %s" % hid)
+                return
+
+            # Compile to buffer and store on histoBuffers array
+            histoBuffers.append( js.packDescription(descRecord) )
+
+        # Compile buffer and send
+        self.sendBuffer( 0x01, 
+                # Header must be 64-bit aligned
+                struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + ''.join(histoBuffers)
+            )
+
+
     def abortJob(self):
         """
         Abort a previously running job
@@ -437,24 +485,8 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # Fetch configuration and send configuration frame
             self.logger.info("Handshake with client API v%s" % self.cversion)
 
-            # Fetch descriptions for the histograms
-            histo_ids = self.lab.getHistograms()
-            histoBuffers = []
-            for hid in histo_ids:
-
-                # Fetch description record
-                descRecord = self.histodesc.describeHistogram( hid )
-                if not descRecord:
-                    self.sendError("Could not find description for histogram %s" % hid)
-                    return
-
-                # Compile to buffer and store on histoBuffers array
-                histoBuffers.append( js.packDescription(descRecord) )
-
-            # Compile buffer and send
-            self.sendBuffer( 0x01, 
-                    struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
-                )
+            # Send configuration frame
+            self.sendConfigurationFrame()
 
         elif action == "ping":
 

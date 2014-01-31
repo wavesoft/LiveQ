@@ -17,28 +17,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
-import tornado.escape
-import tornado.web
-
 from webserver.config import Config
-from webserver.common.navbar import getNavbarData
 from liveq.models import Lab
 
-"""
-Root page handler
-"""
-class IndexHandler(tornado.web.RequestHandler):
-	def get(self):
+def convertMiniMacros(data):
+	"""
+	Convert some small macros that exist on descriptions in the database
+	"""
 
-		# Get lab ID
-		lab_id = self.get_argument("lab")
+	# Replace image directory
+	data = data.replace("{{images}}", "%s/static/img" % Config.BASE_URL)
 
-		# Get lab object
-		lab = Lab.get( Lab.uuid == lab_id )
-
-		self.render(
-			"play.html", 
-			navbar=getNavbarData(),
-			lab_uuid=lab.uuid
-			)
+	# Return string
+	return data

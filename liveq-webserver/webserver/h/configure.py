@@ -22,10 +22,11 @@ import tornado.escape
 import tornado.web
 
 from webserver.config import Config
+from webserver.common.navbar import getNavbarData
 
 """
 Lab configuration page handler
 """
 class ConfigHandler(tornado.web.RequestHandler):
 	def get(self):
-		self.render("configure.html")
+		self.render("configure.html", navbar=getNavbarData())

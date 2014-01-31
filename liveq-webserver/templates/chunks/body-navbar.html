@@ -16,7 +16,11 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle active" data-toggle="dropdown">Play <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a href="#">AlphaS - T</a></li>
+
+                {% for lab in navbar['labs'] %}
+                  <li><a href="{{ reverse_url("index") }}?lab={{ lab[1] }}">{{ lab[0] }}</a></li>
+                {% end %}
+
               </ul>
             </li>
             <li><a href="{{ reverse_url("config") }}">Config</a></li>

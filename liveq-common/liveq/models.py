@@ -171,13 +171,13 @@ class Lab(BaseModel):
 		"""
 		Return the names of the tunables
 		"""
-		return str(self.tunables).split(",")
+		return str(self.tunableParameters).split(",")
 
 	def setTunableNames(self, data):
 		"""
 		Update the names of the tunables
 		"""
-		self.tunables = ",".join(data)
+		self.tunableParameters = ",".join(data)
 
 	def getHistograms(self):
 		"""
@@ -205,12 +205,6 @@ class Lab(BaseModel):
 
 		# Return tunable configuration
 		return config
-
-	def setTunables(self, data):
-		"""
-		Update the configuration for the tunable parameters
-		"""
-		self.tunableParameters = json.dumps(data)
 
 	def formatTunables(self, tunables, asString=False):
 		"""

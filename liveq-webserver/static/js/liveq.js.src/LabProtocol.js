@@ -60,6 +60,13 @@ LiveQ.LabProtocol = function( ) {
 	 */
 	this._onMetadataUpdated = [];
 
+	/**
+	 * Array of the callback functions to be fired when the tunable configuration arrives
+	 * @private
+	 * @member {array}
+	 */
+	this._onTunablesUpdated = [];
+
 }
 
 /**
@@ -137,6 +144,26 @@ LiveQ.LabProtocol.prototype.offMetadataUpdated = function( cb ) {
 	var i = this._onMetadataUpdated.indexOf(cb);
 	this._onMetadataUpdated.splice(i,1);
 }
+
+/**
+ * Register a callback to be notified when the tunable information have arrived
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.onTunablesUpdated = function( cb ) {
+	this._onTunablesUpdated.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onTunablesUpdated
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.offTunablesUpdated = function( cb ) {
+	var i = this._onTunablesUpdated.indexOf(cb);
+	this._onTunablesUpdated.splice(i,1);
+}
+
 /**
  * Configure LabProtocol with the given configuration frame
  *
@@ -175,6 +202,15 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 		var reserved0 = configReader.getUint8(),
 			reserved1 = configReader.getUint16(),
 			numHistos = configReader.getUint32();
+
+		// Fetch configuration data
+		var configJSON = configReader.getString();
+		if (configJSON) {
+			configJSON = JSON.parse( configJSON );
+			for (var i=0; i<this._onTunablesUpdated.length; i++) {
+				this._onTunablesUpdated[i]( configJSON );
+			}
+		}
 
 		// Read histograms
 		for (var j=0; j<numHistos; j++) {

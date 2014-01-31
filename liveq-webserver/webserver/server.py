@@ -39,8 +39,8 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			URLSpec(r"%s/?" % Config.BASE_URL, 				IndexHandler, 		name="index"),
-			URLSpec(r"%s/config?" % Config.BASE_URL, 		ConfigHandler, 		name="config"),
+			URLSpec(r"%s/" % Config.BASE_URL, 				IndexHandler, 		name="index"),
+			URLSpec(r"%s/config" % Config.BASE_URL, 		ConfigHandler, 		name="config"),
 			URLSpec(r"%s/labsocket/(.*)" % Config.BASE_URL, LabSocketHandler,	name="ws"),
 		]
 

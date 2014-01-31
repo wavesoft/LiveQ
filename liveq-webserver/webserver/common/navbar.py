@@ -17,28 +17,23 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
-import tornado.escape
-import tornado.web
-
 from webserver.config import Config
-from webserver.common.navbar import getNavbarData
 from liveq.models import Lab
 
-"""
-Root page handler
-"""
-class IndexHandler(tornado.web.RequestHandler):
-	def get(self):
+def getNavbarData():
+	"""
+	Return the required data for the navigation bar
+	"""
 
-		# Get lab ID
-		lab_id = self.get_argument("lab")
+	# Prepare lab links
+	labLinks = [ ]
 
-		# Get lab object
-		lab = Lab.get( Lab.uuid == lab_id )
+	# Fetch the labs
+	labs = Lab.select()
+	for lab in labs:
+		labLinks.append([ lab.name, lab.uuid ])
 
-		self.render(
-			"play.html", 
-			navbar=getNavbarData(),
-			lab_uuid=lab.uuid
-			)
+	# Return lab links
+	return {
+			"labs": labLinks
+		}
