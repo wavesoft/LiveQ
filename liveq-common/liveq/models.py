@@ -154,7 +154,7 @@ class Lab(BaseModel):
 	tunableParameters = CharField(max_length=2048)
 
 	#: The observed histograms
-	histograms = CharField(max_length=1024)
+	histograms = CharField(max_length=2048)
 
 	#: The type of the histograms
 	histogramType = CharField(max_length=12, default="FLAT")

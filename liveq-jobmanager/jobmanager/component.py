@@ -26,7 +26,6 @@ import jobmanager.io.scheduler as scheduler
 import jobmanager.io.agents as agents
 
 from jobmanager.config import Config
-from jobmanager.internal.agentmanager import JobAgentManager
 
 from liveq.component import Component
 from liveq.io.bus import BusChannelException
@@ -72,9 +71,6 @@ class JobManagerComponent(Component):
 
 		# Channel mapping
 		self.channels = { }
-
-		# Agent monitor
-		self.manager = JobAgentManager()
 
 	def _setupChannelCallbacks(self, channel):
 		"""
@@ -141,7 +137,7 @@ class JobManagerComponent(Component):
 					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, agent.jobToCancel ) )
 
 					# Mark agent offline
-					self.manager.updatePresence( agent.uuid, 0 )
+					agents.updatePresence( agent.uuid, 0 )
 					scheduler.markOffline( agent.uuid )
 
 				elif ans['result'] == "ok":
@@ -170,7 +166,7 @@ class JobManagerComponent(Component):
 					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
 
 					# Mark agent offline
-					self.manager.updatePresence( agent.uuid, 0 )
+					agents.updatePresence( agent.uuid, 0 )
 					scheduler.markOffline( agent.uuid )
 
 				elif ans['result'] == "ok":
@@ -254,7 +250,7 @@ class JobManagerComponent(Component):
 		self.logger.info("[%s] Channel is open" % channel.name)
 
 		# Turn agent on
-		self.manager.updatePresence( channel.name, 1 )
+		agents.updatePresence( channel.name, 1 )
 
 		# Notify scheduler that the agent is online
 		scheduler.markOnline( channel.name )
@@ -266,7 +262,7 @@ class JobManagerComponent(Component):
 		self.logger.info("[%s] Channel is closed" % channel.name)
 
 		# Turn agent off
-		self.manager.updatePresence( channel.name, 0 )
+		agents.updatePresence( channel.name, 0 )
 
 		# Notify scheduler that the agent is offline
 		scheduler.markOffline( channel.name )
@@ -278,7 +274,7 @@ class JobManagerComponent(Component):
 		self.logger.info("[%s] Agent version %s shake hands" % (channel.name, message['version']))
 
 		# Let manager know that we got a handshake
-		self.manager.updateHandshake( channel.name, message )
+		agents.updateHandshake( channel.name, message )
 
 		# If the agent has free slots, reset it's job status
 		if message['free_slots'] > 0:
@@ -488,7 +484,7 @@ class JobManagerComponent(Component):
 					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
 
 					# Mark agent offline
-					self.manager.updatePresence( agent.uuid, 0 )
+					agents.updatePresence( agent.uuid, 0 )
 					scheduler.markOffline( agent.uuid )
 					
 				elif ans['result'] == "ok":

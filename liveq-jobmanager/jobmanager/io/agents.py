@@ -79,8 +79,62 @@ def updateActivity(uid):
 	"""
 
 	# Get agent by UID		
-	agentEntry = self.getAgent(uid)
+	agentEntry = getAgent(uid)
 
 	# Update activity
 	agentEntry.lastActivity = time.time()
 	agentEntry.save()
+
+def updatePresence(uid, state=1):
+	"""
+	Update the expiry timeout of the given agent and it's presence
+	"""
+	
+	agentEntry = getAgent(uid)
+
+	# Switch state and last time seen
+	agentEntry.state = state
+	agentEntry.lastActivity = time.time()
+
+	# Save entry
+	agentEntry.save()
+
+def updateHandshake(uid, attrib):
+	"""
+	This function is called when a handshake is received from the remote agent.
+	This updates the database in order to reflect the new state.
+	"""
+	
+	# Prepare parameters
+	group = "global"
+	features = ""
+	slots = 1
+	version = 1
+
+	# Update parameters from the attribs received
+	if "group" in attrib:
+		group = attrib['group']
+	if "slots" in attrib:
+		slots = attrib['slots']
+	if "features" in attrib:
+		features = attrib['features']
+	if "version" in attrib:
+		version = int(attrib['version'])
+
+	# Fetch references
+	groupEntry = getAgentGroup(group)
+	agentEntry = getAgent(uid)
+
+	# Update fields
+	agentEntry.lastActivity = time.time()
+	agentEntry.group = groupEntry
+	agentEntry.slots = slots
+	agentEntry.features = features
+	agentEntry.version = version
+
+	# The agent is now active
+	agentEntry.state = 1
+
+	# Save entry
+	agentEntry.save()
+	return agentEntry
