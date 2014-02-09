@@ -60,7 +60,7 @@ LiveQ.ReferenceData = function( ) {
 	 * The reference histogram for the data set.
 	 * @member {LiveQ.HistogramData}
 	 */
-	this.reference = "";
+	this.reference = null;
 
 }
 
