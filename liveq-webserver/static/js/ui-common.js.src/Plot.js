@@ -20,6 +20,7 @@ LiveQ.UI.PlotWindow = function(host, config) {
 
 	// Create SVG instance and specify dimentions
 	this.svg = d3.select(host)
+		.attr("class", "plot-window")
 		.append("svg:svg")
 			.attr("width", this.width)
 			.attr("height", this.height);
@@ -34,7 +35,7 @@ LiveQ.UI.PlotWindow = function(host, config) {
 	// Prepare style information
 	this.style = {
 
-		'bulletSize'   : 4,
+		'bulletSize'   : 2,
 		'titlePad'	   : 5,
 		'legendBullet' : 10,
 		'legendHeight' : 16,
@@ -48,7 +49,8 @@ LiveQ.UI.PlotWindow = function(host, config) {
 
 		'features': {
 			'errorBand': true,
-			'errorBarsY' : true
+			'errorBarsY' : true,
+			'colorError': false
 		}
 
 	};
@@ -181,8 +183,10 @@ LiveQ.UI.PlotWindow.prototype.initPlot = function() {
 		.attr("transform", "translate("+this.style.plotMargin.left+","+this.style.plotMargin.top+")");
 
 	// Create backdrop
-	this.svgBackdrop = this.svgPlot.append("g")
-		.attr("class", "backdrop");
+	if (this.style.features.colorError) {
+		this.svgBackdrop = this.svgPlot.append("g")
+			.attr("class", "backdrop");
+	}
 
 	// Create the X and Y axis
 	this.xAxisGraphic = this.svgPlot.append("g")
@@ -416,24 +420,26 @@ LiveQ.UI.PlotWindow.prototype.updateErrorVisualization = function() {
 	}
 
 	// Update backdrop
-	var record = this.svgBackdrop.selectAll("rect").data(data);
+	if (this.style.features.colorError) {
+		var record = this.svgBackdrop.selectAll("rect").data(data);
 
-	// Enter
-	record.enter()
-		.append("rect")
-			.attr("height", height)
-			.attr("y", 0)
-			.attr("fill-opacity", 0.3);
+		// Enter
+		record.enter()
+			.append("rect")
+				.attr("height", height)
+				.attr("y", 0)
+				.attr("fill-opacity", 0.3);
 
-	// Update
-	record
-		.attr("x", function(d,i){ return self.xScale(d[0]); })
-		.attr("width", function(d,i){ return (self.xScale(d[1]) - self.xScale(d[0])); })
-		.attr("fill", function(d,i){ return (d[2]==0)?"#000000":colorScale(d[2]); });
+		// Update
+		record
+			.attr("x", function(d,i){ return self.xScale(d[0]); })
+			.attr("width", function(d,i){ return (self.xScale(d[1]) - self.xScale(d[0])); })
+			.attr("fill", function(d,i){ return (d[2]==0)?"#000000":colorScale(d[2]); });
 
-	// Delete
-	record.exit()
-		.remove();
+		// Delete
+		record.exit()
+			.remove();
+	}
 
 }
 

@@ -204,9 +204,8 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 			numHistos = configReader.getUint32();
 
 		// Fetch configuration data
-		var configJSON = configReader.getString();
+		var configJSON = configReader.getJSON();
 		if (configJSON) {
-			configJSON = JSON.parse( configJSON );
 			for (var i=0; i<this._onTunablesUpdated.length; i++) {
 				this._onTunablesUpdated[i]( configJSON );
 			}

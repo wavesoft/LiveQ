@@ -232,3 +232,22 @@ LiveQ.BufferReader.prototype.getData = function(mime) {
 	return "data:"+mime+";base64,"+btoa(text);
 
 }
+
+/**
+ * Fetch a string from the current position, up to the length specified in the buffer
+ * and parse the result as a JSON object.
+ *
+ * Note: This function will automatically align the position to 64-bits.
+ *
+ * @returns {string}
+ */
+LiveQ.BufferReader.prototype.getJSON = function() {
+
+	// Get string
+	var jsonString = this.getString();
+	if (!jsonString) return false;
+
+	// Parse json
+	return JSON.parse(jsonString);
+
+}

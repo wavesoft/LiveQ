@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework Demo</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Virtual Atom Smasher :: LiveQ Engine">
+    <meta name="author" content="Ioannis Charalampidis">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- LiveQ Stylesheets -->
+    <link href="css/liveq-ui-2.css" rel="stylesheet">
+    <link href="css/liveq-histogram.css" rel="stylesheet">
+    <!-- LiveQ Libraries -->
+    <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <!-- LiveQ Sources -->
+    <script type="text/javascript" src="js/liveq.js.src/LiveQ.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/BufferReader.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/HistogramData.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/ReferenceData.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/LabProtocol.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/LabSocket.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/Calculate.js"></script>
+    <!-- LiveQ UI -->
+    <script type="text/javascript" src="js/ui-common.js.src/UI.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/EventCounter.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/Plot.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/PlotHistogram.js"></script>
+    <!-- LiveQ Play UI -->
+    <script type="text/javascript" src="js/ui-play.js.src/Play.js"></script>
+     <link href="css/liveq-ui-play.css" rel="stylesheet">
+    <!-- Bootstrap slider -->
+    <script type="text/javascript" src="js/dragdealer.min.js"></script>
+    <!-- jQuery Knob -->
+    <script type="text/javascript" src="js/jquery.knob.js"></script>
+
+    <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
+
+    <script type="text/javascript">
+
+    $(function() {
+
+      // Overridable callback for bindSliders
+      var updateMajor = function(v) { },
+          updateMinor = function(v) { };
+
+      // Tunables slider
+      var ddMajor = new Dragdealer('tune-major', {
+        vertical: true, horizontal: false, slide: false,
+        animationCallback: function(x, y) {
+          updateMajor(y);
+        }
+      });
+      var ddMinor = new Dragdealer('tune-minor', {
+        vertical: true, horizontal: false, slide: false, steps: 100, snap: true,
+        animationCallback: function(x, y) {
+          updateMinor(y);
+        }
+      });
+
+      // Bind sliders to the given element
+      function bindSliders(element) {
+        var label = $(element).find("p");
+        
+      }
+
+      // Tunables expanding
+      var expander = $("#tune-pane");
+      $(".tunables li div").click(function() {
+        var parent = $(this).parent(),
+            act = !parent.hasClass("active");
+        $(".tunables li.active").removeClass("active");
+        if (act) parent.addClass("active");
+        parent.append(expander);
+      });
+
+
+    });
+
+
+    </script>
+
+    <style tyle="text/css">
+
+    body {
+      background: #EEE;
+    }
+
+    </style>
+
+  </head>
+  <body>
+
+    <div class="container">
+
+      <div class="dashboard">
+        <div class="tunables">
+
+          <div id="tune-pane" class="container">
+            <div class="row">
+              <div id="tune-pane-tune" class="col-xs-2">
+                <div class="v-slider big">
+                  <span class="v-label top">+3.00</span>
+                  <span class="v-label bottom">+0.00</span>
+                  <div id="tune-major" class="dragdealer">
+                    <div class="handle"></div>
+                  </div>
+                </div>
+              </div>
+              <div id="tune-pane-finetune" class="col-xs-2">
+                <div class="v-slider small">
+                  <span class="v-label title">Fine tuning</span>
+                  <div id="tune-minor" class="dragdealer">
+                    <div class="handle"></div>
+                  </div>
+                </div>
+              </div>
+              <div id="tune-pane-content" class="col-xs-8">
+                <h1>Blah</h1>
+                <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+              </div>
+            </div>
+          </div>
+
+          <ul> 
+
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+            <li>
+              <div class="tile">
+                <h3>A<sub>&sigmav;</sub></h3>
+                <p>0.4412</p>
+              </div>
+            </li>
+
+          </ul>
+
+        </div>
+        <div class="dashboard-observables">
+
+        </div>
+        <div class="dashboard-controls">
+
+        </div>
+      </div>
+
+
+      <script type="text/javascript">LiveQ.UI.initLab("{{ lab_uuid }}");</script>
+
+    </div>
+
+  </body>
+</html>

@@ -2,24 +2,24 @@
 /*  Histogram   */
 /* =========== */
 
-#host svg {
+.plot-window svg {
   font: 10px sans-serif;
   padding: 8px;
 }
 
-.axis path,
-.axis line {
+.plot-window .axis path,
+.plot-window .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
 
-path.plot-line {
+.plot-window path.plot-line {
   fill: none;
 }
-path.plot-area {
+.plot-window path.plot-area {
   stroke: none;
 }
-path.plot-bullet {
+.plot-window path.plot-bullet {
   fill: #fff;
 }

@@ -21,11 +21,12 @@
 import struct
 import uuid
 import logging
+import base64
 
 import liveq.data.js as js
 import liveq.data.histo.io as io
 
-from liveq.models import Lab
+from liveq.models import Lab, Observables
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
@@ -235,6 +236,8 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         Send a binary data to the websocket
         """
 
+        print "Sending frame %i\n-------\n%s\n---------\n" % (frameID, base64.b64encode(data))
+
         # Send a binary frame to WebSocket
         self.write_message( 
             # Header MUST be 64-bit aligned
@@ -299,6 +302,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             data.append({
                     'name': n,
                     'title': t.title,
+                    'short': t.short,
                     'desc': convertMiniMacros(t.shortdesc),
                     'url': t.urldesc,
                     'tut': t.tutorial,
@@ -317,11 +321,35 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         histoBuffers = []
         for hid in histo_ids:
 
-            # Fetch description record
+            # Fetch histogram information from file
             descRecord = self.histodesc.describeHistogram( hid )
             if not descRecord:
                 self.sendError("Could not find description for histogram %s" % hid)
                 return
+
+            # Fetch user information from database
+            try:
+
+                # Fetch the matching observable record
+                observableRecord = Observables.get(
+                    (Observables.name==hid) &
+                    (Observables.energy==descRecord['energy']) &
+                    (Observables.beam==descRecord['beam']) &
+                    (Observables.process==descRecord['process'])
+                    )
+
+                # Append extra fields
+                descRecord['title'] = str(observableRecord.title)
+                descRecord['short'] = str(observableRecord.short)
+                descRecord['shortdesc'] = str(observableRecord.shortdesc)
+                descRecord['leftdesc'] = str(observableRecord.leftDesc)
+                descRecord['rightdesc'] = str(observableRecord.rightDesc)
+
+            except Observables.DoesNotExist:
+                self.sendError("Could not find assisting information for histogram %s (e=%s, b=%s, p=%s)" % (hid, descRecord['energy'], descRecord['beam'], descRecord['process']))
+                return
+
+            print descRecord
 
             # Compile to buffer and store on histoBuffers array
             histoBuffers.append( js.packDescription(descRecord) )

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework Demo</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Virtual Atom Smasher :: LiveQ Engine">
+    <meta name="author" content="Ioannis Charalampidis">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- LiveQ Stylesheets -->
+    <link href="css/liveq-ui-3.css" rel="stylesheet">
+    <link href="css/liveq-histogram.css" rel="stylesheet">
+    <!-- LiveQ Libraries -->
+    <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <!-- LiveQ Sources -->
+    <script type="text/javascript" src="js/liveq.js.src/LiveQ.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/BufferReader.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/HistogramData.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/ReferenceData.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/LabProtocol.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/LabSocket.js"></script>
+    <script type="text/javascript" src="js/liveq.js.src/Calculate.js"></script>
+    <!-- LiveQ UI -->
+    <script type="text/javascript" src="js/ui-common.js.src/UI.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/Spinner.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/EventCounter.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/Plot.js"></script>
+    <script type="text/javascript" src="js/ui-common.js.src/PlotHistogram.js"></script>
+    <!-- LiveQ Play UI -->
+    <script type="text/javascript" src="js/ui-play.js.src/Tunables.js"></script>
+    <script type="text/javascript" src="js/ui-play.js.src/Observables.js"></script>
+    <script type="text/javascript" src="js/ui-play.js.src/Play.js"></script>
+     <link href="css/liveq-ui-play.css" rel="stylesheet">
+
+    <!-- ===================================================================== -->
+    <!-- ===================================================================== -->
+
+    <script type="text/javascript">
+
+    $(function() {
+
+      var configData = "AQAAAAEAAAC3A1t7Im1heCI6IDAuMjUsICJkZWMiOiA0LCAibmFtZSI6ICJUaW1lU2hvd2VyOmFscGhhU3ZhbHVlIiwgInRpdGxlIjogIlN0cm9uZyBGb3JjZSBDb3VwbGluZyBDb25zdGFudCIsICJ1cmwiOiAiaHR0cDovL2hvbWUudGhlcC5sdS5zZS9+dG9yYmpvcm4vcHl0aGlhODFodG1sL1dlbGNvbWUuaHRtbCIsICJ0eXBlIjogInNsaWRlciIsICJtaW4iOiAwLjA2LCAidHV0IjogIiIsICJkZWYiOiAwLjEzODMsICJkZXNjIjogIjxwPlRoaXMgcGFyYW1ldGVyIGNvbnRyb2xzIHRoZSBhbW91bnQgb2YgXCJicmVtc3N0YWhsdW5nXCIgZnJvbSBoaWdoLWVuZXJneSBxdWFya3MgYW5kIGdsdW9ucy48XC9wPlxyXG48cD5JZiA8c3Ryb25nPiZhbHBoYTs8c3ViPnM8XC9zdWI+PFwvc3Ryb25nPiBpcyBzbWFsbCwgYSBsaXR0bGUgcmFkaWF0aW9uIHdpbGwgYmUgcHJvZHVjZWQsIFxyXG5tZWFuaW5nIHRoYXQgdGhlIHBhcnRpY2xlcyB0aGF0IGNvbWUgb3V0IG9mIHRoZSBjb2xsaXNpb24gYXJlIGFsaWduZWQgYWxvbmcgb25seSBhIGZldyBcImpldFwiIFxyXG5kaXJlY3Rpb25zLjxcL3A+XHJcbjxwPjxpbWcgY2xhc3M9XCJpbWctcmVzcG9uc2l2ZVwiIHNyYz1cIi92YXMvc3RhdGljL2ltZy9kZXNjcmlwdGlvbi9BbHBoYVMvc21hbGwtYXMuanBnXCIgLz48XC9wPlxyXG48cD5JZiA8c3Ryb25nPiZhbHBoYTs8c3ViPnM8XC9zdWI+PFwvc3Ryb25nPiBpcyBiaWcsIGEgbG90cyBvZiByYWRpYXRpb24gaXMgcHJvZHVjZWQsXHJcbm1lYW5pbmcgdGhhdCB0aGUgcGFydGljbGVzIGluIGVhY2ggZXZlbnQgYXJlIGRpc3RyaWJ1dGVkIG1vcmUgc3BoZXJpY2FsbHksIGFsb25nIG1hbnkgXCJqZXRzXCIuPFwvcD5cclxuPHA+PGltZyBjbGFzcz1cImltZy1yZXNwb25zaXZlXCIgc3JjPVwiL3Zh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";
+
+
+      function base64toReader(b64Buf) {
+        var str = atob(b64Buf),
+            buf = new ArrayBuffer(str.length),
+            bufView = new Uint8Array(buf);
+        for (var i=0, strLen=str.length; i<strLen; i++) {
+          bufView[i] = str.charCodeAt(i) % 0xFF;
+        }
+        return new LiveQ.BufferReader(buf);
+      }
+
+      /*
+      for (var i=0; i<10; i++) {
+        t.add({
+          'id': 'TimeSeries:AlphaS:'+i,
+          'name': 'A<sub>'+i+'</sub>',
+          'value': 0.4123,
+          'min': 0.0,
+          'max': 1.0,
+          'title': 'Item #'+i,
+          'dec': 4,
+          'desc': '<h1>Item #'+i+'</h1><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus consequat sit amet nisl id vehicula. Maecenas interdum metus nec aliquam mollis. Nullam adipiscing leo quis felis aliquet eleifend. Donec lacinia sapien in cursus semper. Nulla interdum libero velit, sed fermentum dolor aliquet at. Donec sit amet magna erat. Duis dolor velit, sollicitudin eget pretium at, imperdiet sed dolor. Nunc sed nisl id massa fermentum pretium tincidunt nec erat. Praesent varius varius vulputate. Vestibulum scelerisque neque eu eleifend feugiat. Nunc nec posuere metus. Vestibulum pellentesque ornare lacus id venenatis. Suspendisse potenti.</p><p>Suspendisse fringilla urna vitae quam suscipit, a suscipit nulla bibendum. Vestibulum ut enim est. Praesent in nisl dolor. Ut varius massa at enim ultricies tristique. Donec eget enim et ligula porta venenatis. Suspendisse gravida suscipit orci. Nullam elementum tellus in nisl pharetra, ac pulvinar augue suscipit. Praesent ut enim nibh.</p><p>Donec eget vehicula nisl. Pellentesque eget ante justo. Proin condimentum eros ut libero ultricies, non sollicitudin eros condimentum. Phasellus eget auctor justo, ut pulvinar nunc. Mauris consequat mauris sed nibh congue, in venenatis odio ultrices. Suspendisse sodales tellus sed sem varius pharetra. Fusce a diam eu justo egestas cursus. Nulla eget egestas sem, a bibendum ligula. Donec fringilla sapien enim, a fermentum lorem pharetra ac. Mauris gravida mauris eu leo luctus condimentum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Morbi ullamcorper metus ut pharetra tristique. Curabitur in fermentum enim. Vestibulum ultrices est sit amet nisi mattis ultricies. Quisque a scelerisque leo, sed auctor orci.</p>'
+        });
+      }
+
+*/
+
+      // Setup backend
+      var lab = new LiveQ.LabSocket('3e63661c13854de7a9bdeed71be16bb9');
+      //var lab = new LiveQ.LabProtocol();
+
+      // Setup UI
+      var t = new LiveQ.UI.Tunables("#tunables");
+      var o = new LiveQ.UI.Observables("#observables");
+
+      $("#tunables-send").click(function() {
+        console.log(t.getParameters());
+      });
+
+
+      lab.onTunablesUpdated(function(tunables) {
+        for (var i=0; i<tunables.length; i++) {
+          var parm = tunables[i];
+
+          // Start from default value
+          parm.value = parm.def;
+
+          // Add tunable
+          t.add(parm);
+
+        }
+      });
+
+      lab.onHistogramAdded(function( histo, ref ) {
+        o.add( histo, ref );
+      });
+
+      // Handle configuration frame (test)
+      //lab.handleConfigFrame( base64toReader(configData) );
+
+
+    });
+
+
+    </script>
+
+    <style tyle="text/css">
+
+    body {
+      padding-top: 70px;
+    }
+    
+    </style>
+
+  </head>
+  <body>
+
+
+    <div class="container">
+
+      <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Virtual Atom Smasher <small>- Demonstration of visuals</small></a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </nav>
+
+      <!-- First row -->
+      <div class="row">
+
+        <!-- Tunables column -->
+        <div class="col-md-6">
+          <h2>Tunables</h2>
+          <div id="tunables"></div>
+          <div class="text-right">
+            <button class="btn btn-primary" id="tunables-send">Send</button>
+          </div>
+        </div>
+
+        <!-- Observables -->
+        <div class="col-md-6">
+          <h2>Observables</h2>
+          <div id="observables"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </body>
+</html>

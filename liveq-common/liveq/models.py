@@ -184,7 +184,7 @@ class Lab(BaseModel):
 		Return the names of the histograms to send to the user
 		"""
 		return str(self.histograms).split(",")
-
+		
 	def setHistograms(self, data):
 		"""
 		Set the names of the histograms to send to the user
@@ -256,11 +256,13 @@ class Tunables(BaseModel):
 
 	#: The name of variable of the tunable parameter
 	name = CharField(max_length=128, index=True, unique=True)
+	#: The short (iconic title)
+	short = CharField(max_length=10)
 
 	#: Beam type where this tunable is valid
 	beam = CharField(max_length=12, default="ee")
 	#: Beam energy where this tunable is valid
-	energy = FloatField(default=91.2)
+	energy = CharField(max_length=12, default="91.2")
 	#: Simulation process where this tunable is valid
 	process = CharField(max_length=12, default="zhad")
 
@@ -291,11 +293,13 @@ class Observables(BaseModel):
 
 	#: The name of the histogram (AIDA Path) for this tunable
 	name = CharField(max_length=128, index=True, unique=True)
+	#: The short (iconic title)
+	short = CharField(max_length=10)
 
 	#: Beam type where this observable is valid
 	beam = CharField(max_length=12, default="ee")
 	#: Beam energy where this observable is valid
-	energy = FloatField(default=91.2)
+	energy = CharField(max_length=12, default="91.2")
 	#: Simulation process where this observable is valid
 	process = CharField(max_length=12, default="zhad")
 

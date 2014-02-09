@@ -21,10 +21,28 @@ LiveQ.ReferenceData = function( ) {
 	this.id = "";
 
 	/**
-	 * The name of the histogram.
+	 * The title of the histogram.
 	 * @member {string}
 	 */
-	this.name = "";
+	this.title = "";
+
+	/**
+	 * Short description of the histogram.
+	 * @member {string}
+	 */
+	this.shortdesc = "";
+
+	/**
+	 * Short description for the left-side of the histogram.
+	 * @member {string}
+	 */
+	this.leftdesc = "";
+
+	/**
+	 * Short description for the right-side of the histogram.
+	 * @member {string}
+	 */
+	this.rightdesc = "";
 
 	/**
 	 * The name of the observable of the histogram.
@@ -73,22 +91,23 @@ LiveQ.ReferenceData = function( ) {
 LiveQ.ReferenceData.fromReader = function( reader ) {
 	var hc = new LiveQ.ReferenceData();
 
-	// Read histogram id
-	hc.id = reader.getString();
-	// Read histogram name
-	hc.name = reader.getString();
-	// Read histogram observable
-	hc.observable = reader.getString();
-	// Read histogram group
-	hc.group = reader.getString();
-	// Read beam
-	hc.beam = reader.getString();
-	// Read energy
-	hc.energy = reader.getString();
-	// Read process
-	hc.process = reader.getString();
-	// Read params
-	hc.params = reader.getString();
+	// Get configuration
+	var config = reader.getJSON();
+	console.log(config);
+
+	// Store local references
+	hc.id = config['id'];
+	hc.title = config['title'];
+	hc.short = config['short'];
+	hc.observable = config['observable'];
+	hc.group = config['group'];
+	hc.beam = config['beam'];
+	hc.energy = config['energy'];
+	hc.process = config['process'];
+	hc.params = config['params'];
+	hc.shortdesc = config['shortdesc'];
+	hc.leftdesc = config['leftdesc'];
+	hc.rightdesc = config['rightdesc'];
 
 	// Get PNG for title
 	hc.imgTitle = reader.getData('image/png');

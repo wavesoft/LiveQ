@@ -1,0 +1,303 @@
+/**
+ * Utility class to apply smaller font dimentions in a document
+ * that contains headers, paragraphs and other elemetns.
+ */
+div.small-body {
+  font-size: 0.9em;
+}
+div.small-body p {
+  margin: 3px 0px;
+}
+div.small-body h1 {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin: 3px 0px;
+}
+/**
+ * Tunables group
+ */
+#tunables {
+  position: relative;
+  -webkit-transition: height linear 0.2s;
+  -moz-transition: height linear 0.2s;
+  -o-transition: height linear 0.2s;
+  transition: height linear 0.2s;
+}
+#tunables div.tune {
+  position: absolute;
+  background: #66ccff;
+  color: #ffffff;
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#tunables div.tune > h4 {
+  margin: 5px 0px;
+  font-size: 1.5em;
+  width: 64px;
+  color: #336699;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#tunables div.tune > div.value {
+  margin: 0;
+  font-size: 1em;
+  width: 64px;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#tunables div.tune > div.value.highlight {
+  color: #ffcc66;
+}
+#tunables div.tune > div.tune-desc {
+  position: absolute;
+  left: 129px;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  color: #333333;
+  background-color: #cceeff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  text-align: left;
+  padding: 4px;
+  -webkit-transition: opacity linear 0.2s;
+  -moz-transition: opacity linear 0.2s;
+  -o-transition: opacity linear 0.2s;
+  transition: opacity linear 0.2s;
+}
+#tunables div.tune > div.tune-ctl {
+  background-color: #00aaff;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  height: 36.57142857px;
+  width: 128px;
+  -webkit-transition: opacity linear 0.2s;
+  -moz-transition: opacity linear 0.2s;
+  -o-transition: opacity linear 0.2s;
+  transition: opacity linear 0.2s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#tunables div.tune > div.tune-ctl > div.b {
+  width: 50%;
+  position: absolute;
+  font-size: 1.5em;
+  height: 36.57142857px;
+  cursor: pointer;
+}
+#tunables div.tune > div.tune-ctl > div.b:active {
+  background-color: #000 !important;
+  color: #999;
+}
+#tunables div.tune > div.tune-ctl > div.b.plus {
+  right: 0;
+  background-color: #99ddff;
+}
+#tunables div.tune > div.tune-ctl > div.b.minus {
+  left: 0;
+  background-color: #00aaff;
+}
+#tunables div.tune.expand {
+  height: 128px;
+  width: 100%;
+}
+#tunables div.tune.expand:hover:after {
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  left: 2px;
+  top: 2px;
+  position: absolute;
+  border-top-color: #00aaff;
+  border-width: 8px;
+}
+#tunables div.tune.expand > h4 {
+  width: 128px;
+  margin: 7px 0px;
+  font-size: 2em;
+}
+#tunables div.tune.expand > div.value {
+  width: 128px;
+  font-size: 1.5em;
+}
+#tunables div.tune.expand > div.tune-desc {
+  opacity: 1;
+  cursor: auto;
+}
+#tunables div.tune.expand > div.tune-ctl {
+  opacity: 1;
+}
+/**
+ * Observables group
+ */
+#observables {
+  position: relative;
+}
+#observables div.observable {
+  position: absolute;
+  background-color: #cccccc;
+  color: #999999;
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  border: solid 1px;
+  border-color: transparent;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#observables div.observable > h4 {
+  margin: 10px 0px 4px;
+  font-size: 1.2em;
+  width: 64px;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#observables div.observable > div.value {
+  margin: 0;
+  font-size: 1em;
+  width: 64px;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#observables div.observable.fit-0 {
+  background-color: #66cc00;
+  color: #e6ffcc;
+}
+#observables div.observable.fit-0.expand {
+  color: #4d9900;
+}
+#observables div.observable.fit-0 div.observ-status > div.status {
+  background: #e0f5cc;
+}
+#observables div.observable.fit-0 div.observ-status > div.detail {
+  background: #ade477;
+}
+#observables div.observable.fit-1 {
+  background-color: #669933;
+  color: #e6f2d9;
+}
+#observables div.observable.fit-1.expand {
+  color: #4d7326;
+}
+#observables div.observable.fit-1 div.observ-status > div.status {
+  background: #e0ebd6;
+}
+#observables div.observable.fit-1 div.observ-status > div.detail {
+  background: #adc992;
+}
+#observables div.observable.fit-2 {
+  background-color: #ff9900;
+  color: #ffffff;
+}
+#observables div.observable.fit-2.expand {
+  color: #cc7a00;
+}
+#observables div.observable.fit-2 div.observ-status > div.status {
+  background: #ffebcc;
+}
+#observables div.observable.fit-2 div.observ-status > div.detail {
+  background: #ffc266;
+}
+#observables div.observable.fit-3 {
+  background-color: #990000;
+  color: #ff9999;
+}
+#observables div.observable.fit-3.expand {
+  color: #660000;
+}
+#observables div.observable.fit-3 div.observ-status > div.status {
+  background: #ebcccc;
+}
+#observables div.observable.fit-3 div.observ-status > div.detail {
+  background: #cd8383;
+}
+#observables div.observable div.plot-window {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  opacity: 0;
+  -webkit-transition: opacity linear 0.2s;
+  -moz-transition: opacity linear 0.2s;
+  -o-transition: opacity linear 0.2s;
+  transition: opacity linear 0.2s;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#observables div.observable div.observ-desc {
+  position: absolute;
+  background: #cccccc;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 256px;
+  text-align: left;
+  color: #333333;
+  padding: 4px;
+}
+#observables div.observable div.observ-status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 256px;
+}
+#observables div.observable div.observ-status > div.status {
+  font-size: 1.5em;
+  padding: 4px;
+}
+#observables div.observable div.observ-status > div.detail {
+  font-size: 0.8em;
+  padding: 4px;
+}
+#observables div.observable.expand.full {
+  background-color: #ffffff;
+  border-color: #cccccc;
+  height: 256px;
+  width: 100%;
+}
+#observables div.observable.expand.full > h4 {
+  opacity: 0;
+}
+#observables div.observable.expand.full > div.value {
+  opacity: 0;
+}
+#observables div.observable.expand.full .plot-window {
+  opacity: 1;
+}
+#observables div.observable.expand.part {
+  background-color: #ffffff;
+  width: 254px;
+  height: 254px;
+}

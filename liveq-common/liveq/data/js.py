@@ -21,6 +21,7 @@ import logging
 import struct
 import numpy as np
 import base64
+import json
 
 from liveq.data.histo import Histogram
 
@@ -106,22 +107,12 @@ def packDescription(desc):
 	Pack a histogram description, as obtained from HistoDescriptionLab.describeHistogram
 	"""
 
-	# Pack histogram ID
-	buf = packString( desc['id'] )
-	# Pack histogram name
-	buf += packString( desc['title'] )
-	# Pack observable description
-	buf += packString( desc['observable'] )
-	# Pack group name
-	buf += packString( desc['group'] )
-	# Pack beam
-	buf += packString( desc['beam'] )
-	# Pack energy
-	buf += packString( desc['energy'] )
-	# Pack process
-	buf += packString( desc['process'] )
-	# Pack params
-	buf += packString( desc['params'] )
+	# Create a copy only with the useful info
+	uDesc = dict(desc)
+	del uDesc['files']
+
+	# Pack the useful info dictionary
+	buf = packString( json.dumps(uDesc) )
 
 	# Pack Title,X,Y pngs
 	buf += packFile( desc['files']['title'] )

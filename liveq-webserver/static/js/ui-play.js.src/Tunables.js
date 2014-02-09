@@ -109,7 +109,7 @@ LiveQ.UI.Tunables.prototype.createController = function( config ) {
   var spinner = new LiveQ.UI.Spinner( config, function(newValue) {
     
     // Update value
-    self.set( config.id, newValue );
+    self.set( config.name, newValue );
 
   });
 
@@ -147,7 +147,7 @@ LiveQ.UI.Tunables.prototype.createController = function( config ) {
  * @param {Object} config - The configuration node for this tunable
  */
 LiveQ.UI.Tunables.prototype.createDescription = function( config ) {
-  var elm = $('<div class="tune-desc">'+config.desc+'</div>');
+  var elm = $('<div class="tune-desc small-body"><h1>' + config.title + '</h1>'+config.desc+'</div>');
   elm.click(function(e){ e.stopPropagation(); });
   return elm;
 }
@@ -191,7 +191,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
         scrollTop: self.host.offset().top + parseInt($(elm).attr("data-top"))
       }, 250);
 
-    }, 10);
+    }, 50);
 
   } else {
     var nonExpanded = elm.parent().find("div.tune:not(.expand)");
@@ -215,7 +215,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
         elm.find(".tune-ctl").first().detach();
       }, self.css['animation-ms']);
 
-    }, 10);
+    }, 50);
 
   }
 
@@ -260,7 +260,7 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
   // Prepare element
   var self = this,
       elm = $('<div class="tune"></div>'),
-      hName = $('<h4>'+config.name+'</h4>'),
+      hName = $('<h4>'+config.short+'</h4>'),
       hValue = $('<div class="value">'+config.value.toFixed(config.dec)+'</div>');
 
   // Nest elements
@@ -272,7 +272,7 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
 
   // Register value
   config['element'] = elm;
-  this.parameters[config.id] = config;
+  this.parameters[config.name] = config;
   this.groups[config.group] = config;
 
   // Register click handler
