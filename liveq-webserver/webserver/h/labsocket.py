@@ -411,9 +411,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             self.logger.warn("Could not contact interpolator")
 
             # If we asked only for interpolation, return
-            if action == "sim_estimate":
-                self.sendError("Could not estimate result")
-                return False
+            return False
 
         elif ans['result'] != 'ok':
 
@@ -422,9 +420,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             self.logger.warn("Could not interpolate (%s)" % ans['error'])
 
             # If we asked only for interpolation, return
-            if action == "sim_estimate":
-                self.sendError("Could not estimate result")
-                return False
+            return False
 
         else:
 
@@ -550,7 +546,8 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             tunables = self.lab.formatTunables( param )
 
             # Send interpolation
-            self.sendInterpolation(tunables)
+            if not self.sendInterpolation(tunables):
+                self.sendError("Could not estimate result")
 
         elif action == "sim_abort":
 
