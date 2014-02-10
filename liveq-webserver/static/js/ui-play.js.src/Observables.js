@@ -170,7 +170,8 @@ LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 	if (!chi2[1]) chi2[1] = 0;
 
 	// Check if the error is trusted (less than 10%)
-	var trusted = ((chi2[1] / chi2[0]) < 0.1),
+	// (ONLY FOR NOW: Also display results if we have more than 100,000 events)
+	var trusted = ((chi2[1] / chi2[0]) < 0.1) || (config.data.nevts > 100000),
 		fitClass = "", fitStr = "";
 
 	// Remove all possible fit classes from the plot
