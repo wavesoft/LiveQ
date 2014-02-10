@@ -257,7 +257,7 @@ class Tunables(BaseModel):
 	#: The name of variable of the tunable parameter
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
-	short = CharField(max_length=10)
+	short = CharField(max_length=50)
 
 	#: Beam type where this tunable is valid
 	beam = CharField(max_length=12, default="ee")
@@ -294,7 +294,7 @@ class Observables(BaseModel):
 	#: The name of the histogram (AIDA Path) for this tunable
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
-	short = CharField(max_length=10)
+	short = CharField(max_length=50)
 
 	#: Beam type where this observable is valid
 	beam = CharField(max_length=12, default="ee")

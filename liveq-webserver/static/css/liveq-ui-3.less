@@ -71,6 +71,33 @@ div.small-body {
 }
 
 /**
+ * Log window
+ */
+div.log {
+    height: 100px;
+    overflow: auto;
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 10px;
+
+	div:first {
+	    font-weight: bold;
+	}
+	.warn {
+	    color: #F60;
+	}
+	.error {
+	    color: #F00;
+	}
+	.done {
+	    color: #060;
+	}
+	.info {
+	    color: #06F;
+	}
+
+}
+
+/**
  * Tunables group
  */
 #tunables {
@@ -202,6 +229,7 @@ div.small-body {
 #observables {
 
 	position: relative;
+	.transition( height @tunables-easing );
 
 	div.observable {
 
@@ -223,7 +251,7 @@ div.small-body {
 		.transition( all @observ-easing );
 
 		> h4 {
-			margin: 10px 0px 4px;
+			margin: 8px 0px 4px;
 			font-size: 1.2em;
 			width: @observ-sm;
 			.transition( all @observ-easing );
@@ -231,6 +259,12 @@ div.small-body {
 		> div.value {
 			margin: 0;
 			font-size: 1em;
+			width: @observ-sm;
+			.transition( all @observ-easing );
+		}
+		> div.error {
+			margin: 0;
+			font-size: 0.6em;
 			width: @observ-sm;
 			.transition( all @observ-easing );
 		}
@@ -333,6 +367,9 @@ div.small-body {
 				opacity: 0;
 			}
 			> div.value {
+				opacity: 0;
+			}
+			> div.error {
 				opacity: 0;
 			}
 			.plot-window {

@@ -14,6 +14,30 @@ div.small-body h1 {
   margin: 3px 0px;
 }
 /**
+ * Log window
+ */
+div.log {
+  height: 100px;
+  overflow: auto;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 10px;
+}
+div.log div:first {
+  font-weight: bold;
+}
+div.log .warn {
+  color: #F60;
+}
+div.log .error {
+  color: #F00;
+}
+div.log .done {
+  color: #060;
+}
+div.log .info {
+  color: #06F;
+}
+/**
  * Tunables group
  */
 #tunables {
@@ -152,6 +176,10 @@ div.small-body h1 {
  */
 #observables {
   position: relative;
+  -webkit-transition: height linear 0.2s;
+  -moz-transition: height linear 0.2s;
+  -o-transition: height linear 0.2s;
+  transition: height linear 0.2s;
 }
 #observables div.observable {
   position: absolute;
@@ -171,7 +199,7 @@ div.small-body h1 {
   transition: all linear 0.2s;
 }
 #observables div.observable > h4 {
-  margin: 10px 0px 4px;
+  margin: 8px 0px 4px;
   font-size: 1.2em;
   width: 64px;
   -webkit-transition: all linear 0.2s;
@@ -182,6 +210,15 @@ div.small-body h1 {
 #observables div.observable > div.value {
   margin: 0;
   font-size: 1em;
+  width: 64px;
+  -webkit-transition: all linear 0.2s;
+  -moz-transition: all linear 0.2s;
+  -o-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+}
+#observables div.observable > div.error {
+  margin: 0;
+  font-size: 0.6em;
   width: 64px;
   -webkit-transition: all linear 0.2s;
   -moz-transition: all linear 0.2s;
@@ -291,6 +328,9 @@ div.small-body h1 {
   opacity: 0;
 }
 #observables div.observable.expand.full > div.value {
+  opacity: 0;
+}
+#observables div.observable.expand.full > div.error {
   opacity: 0;
 }
 #observables div.observable.expand.full .plot-window {

@@ -16,10 +16,66 @@ LiveQ.UI.Observables = function( host ) {
   this.css = {
     'observ-sm': 64,
     'observ-xl': 256,
-    'observ-pad': 10,
+    'observ-pad': 5,
     'observ-sep': 10,
     'animation-ms': 200
   };
+
+}
+
+/**
+ * Reorder expanded and non-expanded elements
+ */
+LiveQ.UI.Observables.prototype.reorder = function() {
+  var y=0, x=0, w=this.host.width(), self=this,
+      elements = this.host.find(".observable");
+
+  // Prepare element groups
+  var groups = { };
+
+  // First walk over the expanded elements, which
+  // are independant of group
+  elements.each(function(i,e) {
+
+    // Stack expanded elements
+    if ($(e).hasClass("expand") && $(e).hasClass("full")) {
+      $(e).css({
+        "left": 0,
+        "top": y
+      });
+      $(e).attr('data-top', y);
+      y += self.css['observ-xl'] + self.css['observ-pad'];
+    }
+
+  });
+
+  // Separator
+  if (y > 0)
+    y += self.css['observ-sep'];
+
+  // Then walk over non-expanded
+  elements.each(function(i,e) {
+    if (!$(e).hasClass("expand") && !$(e).hasClass("full")) {
+      $(e).css({
+        "left": x,
+        "top": y
+      });
+      $(e).attr('data-top', y);
+      x += self.css['observ-sm'] + self.css['observ-pad'];
+      if ((x+self.css['observ-sm']) >= w) {
+        y += self.css['observ-sm'] + self.css['observ-pad'];
+        x = 0;
+      }
+    }
+  });
+
+  // Add last element height to calculate element height
+  if (x != 0) {
+    y += self.css['observ-sm'] + self.css['observ-pad'];
+  }
+
+  // Update the height of the host
+  $(this.host).css("height", y);
 
 }
 
@@ -53,16 +109,53 @@ LiveQ.UI.Observables.prototype.createStatus = function( config ) {
  * Toggle histogram visibility
  */
 LiveQ.UI.Observables.prototype.toggle = function( element, config ) {
+  var elm = $(element), self = this;
 
-	if (element.hasClass("expand")) {
+  // Switching to EXPANDED
+  if (!elm.hasClass("expand")) {
+    var expanded = elm.parent().find("div.observable.expand");
 
-	} else {
+    // Reorder to the last selection
+    elm.detach();
+    if (expanded.length == 0) {
+      this.host.prepend(elm);
+    } else {
+      elm.insertAfter(expanded.last());          
+    }
 
-	}
+    // Delay-apply the class and animation
+    setTimeout(function() {
+      elm.addClass("expand");
+      elm.addClass("full");
+      self.reorder();
 
-	$(element).toggleClass("expand");
-	$(element).toggleClass("full");
+      // Scroll to top of the element
+      $('html,body').animate({
+        scrollTop: self.host.offset().top + parseInt($(elm).attr("data-top"))
+      }, 250);
 
+    }, 50);
+
+  } else {
+    var nonExpanded = elm.parent().find("div.observable:not(.expand)");
+
+    // Reorder to the top of non-selected
+    elm.detach();
+    if (nonExpanded.length == 0) {
+      this.host.append(elm);
+    } else {
+      elm.insertBefore(nonExpanded.first());          
+    }
+
+    // Delay-apply the class and animation
+    setTimeout(function() {
+      elm.removeClass("expand");
+      elm.removeClass("full");
+      self.reorder();
+
+    }, 50);
+
+  }
 }
 
 /**
@@ -70,13 +163,15 @@ LiveQ.UI.Observables.prototype.toggle = function( element, config ) {
  */
 LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 	// Calculate Chi2 and Chi2 Error
+	console.log(config.data, config.ref.reference);
 	var chi2 = LiveQ.Calculate.chi2WithError( config.data, config.ref.reference );
+	console.log(chi2);
 	if (!chi2[0]) chi2[0] = 0;
 	if (!chi2[1]) chi2[1] = 0;
 
 	// Check if the error is trusted (less than 10%)
 	var trusted = ((chi2[1] / chi2[0]) < 0.1),
-		fitClass = "", fitStr = "Low Statistics";
+		fitClass = "", fitStr = "";
 
 	// Remove all possible fit classes from the plot
 	for (var i=0; i<4; i++) { config.element.removeClass("fit-"+i); }
@@ -85,16 +180,22 @@ LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 	if (trusted) {
 		if (chi2[0] < 0.5 ) { // Excellent fit
 			config.element.addClass("fit-0");
-			fitStr = "Perfect";
+			fitStr = "Perfect Match";
 		} else if (chi2[0] < 1.0 ) { // Good fit
 			config.element.addClass("fit-1");
-			fitStr = "Good";
+			fitStr = "Good Match";
 		} else if (chi2[0] < 4.0 ) { // Fair fit
 			config.element.addClass("fit-2");
-			fitStr = "Fair";
+			fitStr = "Fair Match";
 		} else { // Bad fit
 			config.element.addClass("fit-3");
-			fitStr = "Bad";
+			fitStr = "Bad Match";
+		}
+	} else {
+		if (config.data.nevts == 0) {
+			fitStr = "No Data";
+		} else {
+			fitStr = "Low Statistics";
 		}
 	}
 
@@ -104,6 +205,10 @@ LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 		"<div><strong>Error:</strong> " + chi2[0].toFixed(4) + " &plusmn; " + chi2[1].toFixed(2) + "</div>"
 	);
 	config.element.find("div.status").html( "[ <strong>" + fitStr + "</strong> ]" );
+
+	// Update value
+	config.element.find("div.value").html( chi2[0].toFixed(2) );
+	config.element.find("div.error").html( "&plusmn;" + chi2[1].toFixed(2) );
 
 }
 
@@ -117,11 +222,13 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 		elm = $('<div class="observable fit-0"></div>'),
 		hName = $('<h4>'+histoReference.short+'</h4>'),
 		hValue = $('<div class="value">0.00</div>'),
+		hError = $('<div class="error">0.00</div>'),
 		plotElm = $('<div class="plot"></div>');
 
 	// Nest elements
 	elm.append(hName);
 	elm.append(hValue);
+	elm.append(hError);
 	elm.append(plotElm);
 
 	// Create a new plot and store it in the histogram object
@@ -135,7 +242,7 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 
 	// Plat histogram & Reference data
 	plot.addHistogram( histoReference.reference, "Reference data" )
-	plot.addHistogram( histoData, histoReference.name );
+	plot.addHistogram( histoData, histoReference.title );
 
 	// Prepare config object for this observable and store it
 	var config = {
@@ -156,6 +263,7 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 
 	// Register a callback when histogram updates
 	histoData.onUpdate(function() {
+		plot.update();
 		self.updateStatus(config);
 	});
 
@@ -168,6 +276,7 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 	this.host.append(elm);
 
 	// Initialize first status update
-	self.updateStatus(config);
+	this.updateStatus(config);
+	this.reorder();
 
 }

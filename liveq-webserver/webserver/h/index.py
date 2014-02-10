@@ -38,7 +38,7 @@ class IndexHandler(tornado.web.RequestHandler):
 		lab = Lab.get( Lab.uuid == lab_id )
 
 		self.render(
-			"play.html", 
+			"play-2.html", 
 			navbar=getNavbarData(),
 			lab_uuid=lab.uuid
 			)

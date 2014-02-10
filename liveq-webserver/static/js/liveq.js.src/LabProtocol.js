@@ -67,6 +67,13 @@ LiveQ.LabProtocol = function( ) {
 	 */
 	this._onTunablesUpdated = [];
 
+	/**
+	 * Array of the callback functions to be fired when data arrive from the server
+	 * @private
+	 * @member {array}
+	 */
+	this._onDataArrived = [];
+
 }
 
 /**
@@ -162,6 +169,25 @@ LiveQ.LabProtocol.prototype.onTunablesUpdated = function( cb ) {
 LiveQ.LabProtocol.prototype.offTunablesUpdated = function( cb ) {
 	var i = this._onTunablesUpdated.indexOf(cb);
 	this._onTunablesUpdated.splice(i,1);
+}
+
+/**
+ * Register a callback to be notified when data arrive from the server
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.onDataArrived = function( cb ) {
+	this._onDataArrived.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onDataArrived
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.offDataArrived = function( cb ) {
+	var i = this._onDataArrived.indexOf(cb);
+	this._onDataArrived.splice(i,1);
 }
 
 /**
@@ -301,6 +327,11 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 				'nevts': numEvents,
 				'interpolation': fromInterpolation
 			});
+		}
+
+		// Let everybody know that data arrived
+		for (var i=0; i<this._onDataArrived.length; i++) {
+			this._onDataArrived[i]( fromInterpolation );
 		}
 
 

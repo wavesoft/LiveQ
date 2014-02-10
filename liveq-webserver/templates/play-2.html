@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework Demo</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-liveq.html" %}
+    {% include "chunks/head-ui-play-2.html" %}
+
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <!-- First row -->
+      <div class="row">
+        <div class="col-md-12 text-right">
+
+          <div class="panel panel-default">
+            <div class="panel-body">
+
+              <h4 class="pull-left"><em>Demonstration interface of Virtual Atom Smasher</em></h4>
+              <button class="btn btn-danger" id="sim-abort">Abort</button>
+              <button class="btn btn-default" id="sim-begin">Start simulation!</button>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Second row -->
+      <div class="row">
+
+        <!-- Tunables column -->
+        <div class="col-md-6">
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Tunables</h3>
+            </div>
+            <div class="panel-body">
+
+                <!-- Data are appended here -->
+                <div id="tunables"></div>
+
+            </div>
+            <div class="panel-footer color-legend small">
+              Click on a tile to change it's value.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Observables -->
+        <div class="col-md-6">
+
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Observables <span id="loading-spinner" class="pull-right">
+                <span class="running-text">Simulation running</small> &nbsp; <img src="{{ static_url("img/spinner.gif") }}" alt="Loading" /></span>
+              </h3>
+            </div>
+            <div class="panel-body">
+
+                <!-- Data are appended here -->
+                <div id="observables"></div>
+
+            </div>
+            <div class="panel-footer color-legend small">
+              <div class="cl" style="background: #999"></div> No data,
+              <div class="cl" style="background: #66CC00"></div> &sigma; &le; 0.5,
+              <div class="cl" style="background: #669933"></div> &sigma; &le; 1,
+              <div class="cl" style="background: #FF9900"></div> &sigma; &le; 4
+              <div class="cl" style="background: #990000"></div> &sigma; &ge;= 4
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="modal fade" id="sim-waiting-modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Initializing simulation</h4>
+          </div>
+          <div class="modal-body">
+            <p>Please wait a moment until we contact the worker nodes...</p>
+            <div class="log"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" id="sim-modal-abort">Abort Simulation</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+	  <script type="text/javascript">LiveQ.UI.initLab("{{ lab_uuid }}");</script>
+
+  </body>
+</html>

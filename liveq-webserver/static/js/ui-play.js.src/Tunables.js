@@ -168,7 +168,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
     // Reorder to the last selection
     elm.detach();
     if (expanded.length == 0) {
-      $("#tunables").prepend(elm);
+      this.host.prepend(elm);
     } else {
       elm.insertAfter(expanded.last());          
     }
@@ -184,7 +184,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
     // Delay-apply the class and animation
     setTimeout(function() {
       elm.addClass("expand");
-      self.reorder("#tunables");
+      self.reorder();
 
       // Scroll to top of the element
       $('html,body').animate({
@@ -199,7 +199,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
     // Reorder to the top of non-selected
     elm.detach();
     if (nonExpanded.length == 0) {
-      $("#tunables").append(elm);
+      this.host.append(elm);
     } else {
       elm.insertBefore(nonExpanded.first());          
     }
@@ -207,7 +207,7 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
     // Delay-apply the class and animation
     setTimeout(function() {
       elm.removeClass("expand");
-      self.reorder("#tunables");
+      self.reorder();
 
       // Dispose control & description after effect continues
       setTimeout(function() {

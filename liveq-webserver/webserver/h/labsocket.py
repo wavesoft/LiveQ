@@ -236,8 +236,6 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         Send a binary data to the websocket
         """
 
-        print "Sending frame %i\n-------\n%s\n---------\n" % (frameID, base64.b64encode(data))
-
         # Send a binary frame to WebSocket
         self.write_message( 
             # Header MUST be 64-bit aligned
