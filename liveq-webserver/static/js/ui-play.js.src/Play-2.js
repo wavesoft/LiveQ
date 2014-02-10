@@ -137,6 +137,19 @@
       });
 
       /**
+       * Trigger interpolations every time we change a value
+       */
+      var ipolTimer = null;
+      $(t).on('change', function(e, tunable, parm, value) {
+        // Request interpolation 0.5 second after the variables are 
+        // done changing
+        if (ipolTimer != null) clearTimeout(ipolTimer);
+        ipolTimer = setTimeout(function() {
+          lab.beginSimulation( t.getParameters(), true );
+        }, 500);
+      });
+
+      /**
        * Implement the highlighting & expanding of
        * linked or correlated histograms.
        */

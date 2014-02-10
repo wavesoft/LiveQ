@@ -401,10 +401,14 @@ LiveQ.LabSocket.prototype.send = function(action, parameters) {
  * @param {object} parameters - An object with the tunable parameter names and their values
  *
  */
-LiveQ.LabSocket.prototype.beginSimulation = function(parameters) {
+LiveQ.LabSocket.prototype.beginSimulation = function(parameters, onlyInterpolate) {
 
 	// Begin simulation with the given parameters
-	this.send("sim_start", parameters);
+	if (onlyInterpolate) {
+		this.send("sim_estimate", parameters);
+	} else {
+		this.send("sim_start", parameters);
+	}
 
 	// Mark simulation as active
 	this.running = true;
