@@ -387,6 +387,86 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
             )
 
+    def sendInterpolation(self, tunables):
+        """
+        Try to contact interpolator and reply an interpolation data frame.
+        If the process was successful, True is returned, otherwise False
+        """
+
+        # Send status
+        self.sendStatus("Contacting interpolator", {"JOB_STATUS": "interpolating"})
+
+        # First ask interpolator
+        ans = self.ipolChannel.send("interpolate", {            
+                'lab': self.lab.uuid,
+                'parameters': tunables,
+                'histograms': self.lab.getHistograms()
+            }, waitReply=True, timeout=5)
+
+        # Check response
+        if not ans:
+
+            # Send status
+            self.sendStatus("Could not contact interpolator", {"INTERPOLATION": "0"})
+            self.logger.warn("Could not contact interpolator")
+
+            # If we asked only for interpolation, return
+            if action == "sim_estimate":
+                self.sendError("Could not estimate result")
+                return False
+
+        elif ans['result'] != 'ok':
+
+            # Send error
+            self.sendStatus("Could not interpolate (%s)" % ans['error'])
+            self.logger.warn("Could not interpolate (%s)" % ans['error'])
+
+            # If we asked only for interpolation, return
+            if action == "sim_estimate":
+                self.sendError("Could not estimate result")
+                return False
+
+        else:
+
+            # Send status
+            self.sendStatus("Processing interpolation")
+
+            # Fetch InterpolatableCollection from data
+            histos = InterpolatableCollection.fromPack( ans['data'] )
+
+            # Re-generate histogram from coefficients
+            histos.regenHistograms()
+
+            # Pack histograms
+            histoBuffers = []
+            for h in histos.values():
+                # Pack buffers
+                histoBuffers.append( js.packHistogram(h) )
+
+            # Compile buffer and send
+            self.sendBuffer( 0x02, 
+                    # Set interpolate flag on the frame
+                    struct.pack("<BBHI", 1, 1, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+                )
+
+            # Send status message
+            self.sendStatus("Got interpolated results", {"INTERPOLATION": "1"})
+
+            # Check if we found excact match
+            if ans['exact']:
+
+                # Let interface know that this is the real answer
+                self.sendAction( "sim_completed", { 'result': data['result'] } )
+
+                # Don't store any jobID
+                self.jobid = None
+
+                # And exit
+                return True
+
+        # Never reached
+        return True
+
 
     def abortJob(self):
         """
@@ -430,70 +510,11 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # If we are already running a tune (jobid is defined), cancel and restart
             self.abortJob()
 
-            # Send status
-            self.sendStatus("Contacting interpolator", {"JOB_STATUS": "interpolating"})
-
             # Format user tunables
             tunables = self.lab.formatTunables( param )
 
-            # First ask interpolator
-            ans = self.ipolChannel.send("interpolate", {            
-                    'lab': self.lab.uuid,
-                    'parameters': tunables,
-                    'histograms': self.lab.getHistograms()
-                }, waitReply=True, timeout=5)
-
-            # Check response
-            if not ans:
-
-                # Send status
-                self.sendStatus("Could not contact interpolator", {"INTERPOLATION": "0"})
-                self.logger.warn("Could not contact interpolator")
-
-            elif ans['result'] != 'ok':
-
-                # Send error
-                self.sendStatus("Could not interpolate (%s)" % ans['error'])
-                self.logger.warn("Could not interpolate (%s)" % ans['error'])
-
-            else:
-
-                # Send status
-                self.sendStatus("Processing interpolation")
-
-                # Fetch InterpolatableCollection from data
-                print ">> Incoming ipol data: %s" % ans['data']
-                histos = InterpolatableCollection.fromPack( ans['data'] )
-
-                # Re-generate histogram from coefficients
-                histos.regenHistograms()
-
-                # Pack histograms
-                histoBuffers = []
-                for h in histos.values():
-                    # Pack buffers
-                    histoBuffers.append( js.packHistogram(h) )
-
-                # Compile buffer and send
-                self.sendBuffer( 0x02, 
-                        # Set interpolate flag on the frame
-                        struct.pack("<BBHI", 1, 1, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
-                    )
-
-                # Send status message
-                self.sendStatus("Got interpolated results", {"INTERPOLATION": "1"})
-
-                # Check if we found excact match
-                if ans['exact']:
-
-                    # Let interface know that this is the real answer
-                    self.sendAction( "sim_completed", { 'result': data['result'] } )
-
-                    # Don't store any jobID
-                    self.jobid = None
-
-                    # And exit
-                    return
+            # Send interpolation
+            self.sendInterpolation(tunables)
 
             # Send status
             self.sendStatus("Contacting job manager", {"JOB_STATUS": "starting"})
@@ -519,6 +540,17 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # The job started, save the tune job ID
             self.jobid = ans['jid']
+
+
+        elif action == "sim_estimate":
+            # We requested just an estimate.
+            # No need to have full job management
+
+            # Format user tunables
+            tunables = self.lab.formatTunables( param )
+
+            # Send interpolation
+            self.sendInterpolation(tunables)
 
         elif action == "sim_abort":
 
