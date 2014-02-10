@@ -26,7 +26,7 @@ import base64
 import liveq.data.js as js
 import liveq.data.histo.io as io
 
-from liveq.models import Lab, Observables
+from liveq.models import Lab, Observables, TunableToObservable
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
@@ -292,11 +292,20 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         Send the first, configuration frame to the agent
         """
 
+        # Prepare the tunable and observable names, for
+        # locating links afterwards
+        l_tunables = []
+        l_observables = []
+
         # Fetch description for the tunables
         data = []
         tunables = self.lab.getTunables()
         for n, t in tunables.iteritems():
 
+            # Collect tunable names
+            l_tunables.append(n)
+
+            # Prepare record to send to javascript
             data.append({
                     'name': n,
                     'title': t.title,
@@ -347,15 +356,35 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 self.sendError("Could not find assisting information for histogram %s (e=%s, b=%s, p=%s)" % (hid, descRecord['energy'], descRecord['beam'], descRecord['process']))
                 return
 
-            print descRecord
+            # Collect observable names
+            l_observables.append(descRecord['id'])
 
             # Compile to buffer and store on histoBuffers array
             histoBuffers.append( js.packDescription(descRecord) )
 
+        # Collect links between tunables and observables
+        links = []
+        if l_observables and l_tunables:
+            entries = TunableToObservable.select().where( 
+                    TunableToObservable.tunable << l_tunables, 
+                    TunableToObservable.observable << l_observables
+                )
+            for e in entries:
+                links.append({
+                        'tunable': e.tunable,
+                        'observable': e.observable,
+                        'title': e.title,
+                        'shortdesc': e.shortdesc,
+                        'urldesc': e.urldesc,
+                        'importance': e.importance
+                    })
+
+        linksBuffer = js.packString(tornado.escape.json_encode(links))
+
         # Compile buffer and send
         self.sendBuffer( 0x01, 
                 # Header must be 64-bit aligned
-                struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + ''.join(histoBuffers)
+                struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
             )
 
 

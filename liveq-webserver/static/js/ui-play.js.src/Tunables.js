@@ -191,6 +191,9 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
         scrollTop: self.host.offset().top + parseInt($(elm).attr("data-top"))
       }, 250);
 
+      // Fire expanded notification
+      $(self).trigger('expand', config);
+
     }, 50);
 
   } else {
@@ -213,6 +216,10 @@ LiveQ.UI.Tunables.prototype.toggle = function( element, config ) {
       setTimeout(function() {
         elm.find(".tune-desc").first().detach();
         elm.find(".tune-ctl").first().detach();
+
+        // Fire collapsed event upon completion
+        $(self).trigger('collapse', config);
+
       }, self.css['animation-ms']);
 
     }, 50);
@@ -250,6 +257,9 @@ LiveQ.UI.Tunables.prototype.set = function( parameter, value ) {
     self.highlightTimer = null;
   }, 250);
 
+  // Let listeners know
+  $(this).trigger('change', parm, parameter, value);
+
 }
 
 /**
@@ -277,6 +287,8 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
 
   // Register click handler
   elm.click(function() { self.toggle(this, config); });
+  elm.mouseover(function(){ $(self).trigger('hover', config); });
+  elm.mouseout(function(){ $(self).trigger('hout', config); });
 
   // Append element on host
   this.host.append(elm);
@@ -293,4 +305,21 @@ LiveQ.UI.Tunables.prototype.getParameters = function() {
     ans[k] = v.value;
   });
   return ans;
+}
+
+/**
+ * Mark the specified list of tunables 
+ */
+LiveQ.UI.Tunables.prototype.mark = function( list ) {
+
+  // Remove mark from all elements
+  this.host.find("div.tune.mark")
+    .removeClass("mark");
+
+  // Lookup config for the list
+  for (var i=0; i<list.length; i++) {
+    var config = this.parameters[list[i]];
+    config.element.addClass("mark");
+  }
+
 }

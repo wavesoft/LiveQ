@@ -329,12 +329,12 @@ class TunableToObservable(BaseModel):
 	"""
 
 	#: The tunable to link from
-	tunable = ForeignKeyField(Tunables, related_name='tunable')
+	tunable = CharField(max_length=128, index=True, unique=False)
 	#: The observable where it links to
-	observable = ForeignKeyField(Observables, related_name='observable')
+	observable = CharField(max_length=128, index=True, unique=False)
 
 	#: The title of this relation
-	title = CharField(max_length=128)
+	title = CharField(max_length=128, default="")
 	#: A short description for this link
 	shortdesc = TextField(default="")
 	#: A URL for the long description

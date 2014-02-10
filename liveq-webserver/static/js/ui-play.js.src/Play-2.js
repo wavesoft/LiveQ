@@ -22,6 +22,10 @@
 
 	LiveQ.UI.initLab = function(id) {
 
+      // State variables
+      var modalOpen = false,
+          tunableToObservable = [];
+
       // Setup backend
       var lab = new LiveQ.LabSocket(id);
 
@@ -29,7 +33,9 @@
       var t = new LiveQ.UI.Tunables("#tunables");
       var o = new LiveQ.UI.Observables("#observables");
 
-      var modalOpen = false;
+      /**
+       * Handler of the simulation start button
+       */
       $("#sim-begin").click(function() {
         // Clear log
         $("div.log").empty();
@@ -48,7 +54,9 @@
 
       });
 
-      // Bind abort function(s)
+      /**
+       * Bind to various abort buttons
+       */
       var abortFn = function() {
         // Abort simulation
         lab.abortSimulation();
@@ -65,6 +73,10 @@
       $("#sim-modal-abort").click(abortFn);
       $("#sim-abort").click(abortFn);
 
+      /**
+       * Notification when server data are available
+       * This functino hides the modal pop-over
+       */
       lab.onDataArrived(function(ipol) {
         if (ipol) return;
         if (modalOpen) {
@@ -74,33 +86,49 @@
         }
       });
 
-      lab.onTunablesUpdated(function(tunables) {
+      /**
+       * Generate tunables when tunable configuration is arrived.
+       */
+      lab.onTunablesUpdated(function(tunables, links) {
+
+        // Create tunables
         for (var i=0; i<tunables.length; i++) {
           var parm = tunables[i];
-
           // Start from default value
           parm.value = parm.def;
-
           // Add tunable
           t.add(parm);
-
         }
+
+        // Keep reference of tunable-to-observable links
+        tunableToObservable = links;
+
       });
 
+      /**
+       * Generate observable when a histogram is added.
+       */
       lab.onHistogramAdded(function( histo, ref ) {
         o.add( histo, ref );
       });
 
-      // Log messages
+      /**
+       * Store log messages to log elements
+       */
       lab.onLog(function(msg) {
         addLog(msg);
       });
 
-      // Log errors
+      /**
+       * Store error messages to log elements
+       */
       lab.onError(function(msg) {
         addLog(msg, "error");
       });
 
+      /**
+       * Cleanup when the simulation is completed
+       */
       lab.onCompleted(function() {
         addLog("Simulation completed", "done");
         $("#sim-abort").hide();
@@ -108,12 +136,58 @@
         $("#running-text").hide();
       });
 
+      /**
+       * Implement the highlighting & expanding of
+       * linked or correlated histograms.
+       */
+      $(t).on('expand', function(e, tunable) {
+        // Collapse all elements
+        o.collapseAll();
+        // Find the observables to expand
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
+            o.expand(e.observable);
+            o.tooltip(e.observable, e.title);
+          }
+        }
+      });
+      $(t).on('collapse', function(e, tunable) {
+        // Find the observables to expand
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
+            o.collapse(e.observable);
+            o.tooltip(e.observable, "");
+          }
+        }
+      });
+      $(t).on('hover', function(e, tunable) {
+        var marklist = [];
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
+            marklist.push(e.observable);
+          }
+        }
+        o.mark(marklist);
+        t.mark([tunable.name]);
+      });
+      $(t).on('hout', function(e, tunable) {
+        o.mark([]);
+        t.mark([]);
+      });
+
+      // ==========================
+      //   onLoad Initializations
+      // ==========================
+
       // Prepare modal
       $('#sim-waiting-modal').modal({
         'show': false
       });
 
-      // Hide abort button
+      // Hide elements
       $("#sim-abort").hide();
       $("#running-text").hide();
       $("#loading-spinner").hide();

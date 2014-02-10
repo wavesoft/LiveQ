@@ -163,9 +163,7 @@ LiveQ.UI.Observables.prototype.toggle = function( element, config ) {
  */
 LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 	// Calculate Chi2 and Chi2 Error
-	console.log(config.data, config.ref.reference);
 	var chi2 = LiveQ.Calculate.chi2WithError( config.data, config.ref.reference );
-	console.log(chi2);
 	if (!chi2[0]) chi2[0] = 0;
 	if (!chi2[1]) chi2[1] = 0;
 
@@ -279,5 +277,91 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 	// Initialize first status update
 	this.updateStatus(config);
 	this.reorder();
+
+}
+
+/**
+ * Collapse all observables 
+ */
+LiveQ.UI.Observables.prototype.collapseAll = function() {
+
+	// Remove expanded classes from all elements
+	this.host.find("div.observable.expand")
+		.removeClass("expand")
+		.removeClass("full")
+		.removeClass("part");
+	this.reorder();
+
+}
+
+/**
+ * Expand the given observable 
+ */
+LiveQ.UI.Observables.prototype.expand = function( observable, state ) {
+
+	// Lookup config
+	var config = this.observables[observable];
+
+	// Add default state to full
+	if (!state) state="full";
+
+	// Update element
+	config.element.addClass("expand");
+	config.element.addClass(state);
+	this.reorder();
+
+}
+
+/**
+ * Collapse the given observable 
+ */
+LiveQ.UI.Observables.prototype.collapse = function( observable, state ) {
+
+	// Lookup config
+	var config = this.observables[observable];
+
+	// Update element
+	config.element
+		.removeClass("expand")
+		.removeClass("full")
+		.removeClass("part");
+	this.reorder();
+
+}
+
+/**
+ * Mark the specified list of observables 
+ */
+LiveQ.UI.Observables.prototype.mark = function( list ) {
+
+	// Remove mark from all elements
+	this.host.find("div.observable.mark")
+		.removeClass("mark");
+
+	// Lookup config for the list
+	for (var i=0; i<list.length; i++) {
+		var config = this.observables[list[i]];
+		config.element.addClass("mark");
+	}
+
+}
+
+/**
+ * Add a tooltip on the observable pane 
+ */
+LiveQ.UI.Observables.prototype.tooltip = function( observable, tip ) {
+
+	// Lookup config
+	var config = this.observables[observable];
+
+	// Update tooltip
+	if (tip == "") {
+		$(config.element).tooltip('destroy');
+	} else {
+		$(config.element).tooltip({
+			'title': tip,
+			'placement': 'left'
+		});
+	}
 
 }

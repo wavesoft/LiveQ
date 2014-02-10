@@ -119,7 +119,14 @@ div.log {
 		cursor: pointer;
 		overflow: hidden;
 
+		border: solid 1px;
+		border-color: transparent;
+
 		.transition( all @tunables-easing );
+
+		&.mark {
+			border-color: #FF0000 !important;
+		}
 
 		> h4 {
 			margin: 5px 0px;
@@ -249,6 +256,12 @@ div.log {
 		border-color: transparent;
 
 		.transition( all @observ-easing );
+
+		&.mark {
+			border-color: #FF0000 !important;
+			color: #FF0000 !important;
+			background: #FFFFFF !important;
+		}
 
 		> h4 {
 			margin: 8px 0px 4px;

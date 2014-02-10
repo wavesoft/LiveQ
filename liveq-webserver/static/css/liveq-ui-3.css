@@ -57,10 +57,15 @@ div.log .info {
   text-align: center;
   cursor: pointer;
   overflow: hidden;
+  border: solid 1px;
+  border-color: transparent;
   -webkit-transition: all linear 0.2s;
   -moz-transition: all linear 0.2s;
   -o-transition: all linear 0.2s;
   transition: all linear 0.2s;
+}
+#tunables div.tune.mark {
+  border-color: #FF0000 !important;
 }
 #tunables div.tune > h4 {
   margin: 5px 0px;
@@ -197,6 +202,11 @@ div.log .info {
   -moz-transition: all linear 0.2s;
   -o-transition: all linear 0.2s;
   transition: all linear 0.2s;
+}
+#observables div.observable.mark {
+  border-color: #FF0000 !important;
+  color: #FF0000 !important;
+  background: #FFFFFF !important;
 }
 #observables div.observable > h4 {
   margin: 8px 0px 4px;
