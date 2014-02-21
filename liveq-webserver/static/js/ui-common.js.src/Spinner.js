@@ -80,7 +80,7 @@ LiveQ.UI.Spinner.prototype.start = function(direction) {
     // Timer for increasing step
     self.timerIncrease = setInterval(function() {
 
-      // Increse steps every second
+      // Increse steps every 1.5 seconds
       if (self.stepDecimals > 1) {
         self.stepDecimals -= 1;
       }

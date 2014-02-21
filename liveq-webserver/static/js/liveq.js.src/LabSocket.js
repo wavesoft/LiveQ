@@ -104,7 +104,7 @@ LiveQ.LabSocket.prototype.onConnect = function( cb ) {
  *
  * @param {function} cb - The callback function
  */
-LiveQ.LabSocket.prototype.offDisconnect = function( cb ) {
+LiveQ.LabSocket.prototype.offConnect = function( cb ) {
 	var i = this._onConnect.indexOf(cb);
 	this._onConnect.splice(i,1);
 }
