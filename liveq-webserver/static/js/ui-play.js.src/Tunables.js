@@ -323,3 +323,13 @@ LiveQ.UI.Tunables.prototype.mark = function( list ) {
   }
 
 }
+
+/**
+ * Return the DOM to corresponds to the tunable with
+ * the given name
+ */
+LiveQ.UI.Observables.prototype.getElement = function( tunable ) {
+  var parm = this.parameters[parameter];
+  if (!parm) return undefined;
+  return parm['element'];
+}

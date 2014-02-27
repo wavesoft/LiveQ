@@ -212,7 +212,7 @@ class HistogramStore:
 		# Replace identical indices
 		i = 0
 		found = False
-		for e in collection:
+		for e in neighbors:
 
 			# If tunes match exactly, use the newer data for the interpolation
 			if e.tune.equal(collection.tune):

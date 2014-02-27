@@ -365,3 +365,13 @@ LiveQ.UI.Observables.prototype.tooltip = function( observable, tip ) {
 	}
 
 }
+
+/**
+ * Return the DOM to corresponds to the observable with
+ * the given name
+ */
+LiveQ.UI.Observables.prototype.getElement = function( observable ) {
+	var config = this.observables[observable];
+	if (!config) return undefined;
+	return config['element'];
+}

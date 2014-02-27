@@ -32,6 +32,7 @@
       // Setup UI
       var t = new LiveQ.UI.Tunables("#tunables");
       var o = new LiveQ.UI.Observables("#observables");
+      var cui = new LiveQ.UI.Correlations();
 
       /**
        * Handler of the simulation start button
@@ -180,7 +181,17 @@
         for (var i=0; i<tunableToObservable.length; i++) {
           var e = tunableToObservable[i];
           if (e.tunable == tunable.name) {
+
+            // Put observable on mark list
             marklist.push(e.observable);
+
+            // Place correlation
+            cui.add(
+                tunable['element'],
+                o.getElement(e.observable),
+                e.title
+              );
+
           }
         }
         o.mark(marklist);
@@ -189,6 +200,7 @@
       $(t).on('hout', function(e, tunable) {
         o.mark([]);
         t.mark([]);
+        cui.clear();
       });
 
       // ==========================
