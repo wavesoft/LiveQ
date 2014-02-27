@@ -196,12 +196,12 @@ class Lab(BaseModel):
 		Return the configuration for the tunable parameters
 		"""
 
-		config = { }
+		config = []
 		names = self.getTunableNames()
 		for name in names:
 
 			# Fetch the tunable record for every name
-			config[name] = Tunables.get(name=name)
+			config.append( Tunables.get(name=name) )
 
 		# Return tunable configuration
 		return config

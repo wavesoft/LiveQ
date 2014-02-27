@@ -300,14 +300,14 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         # Fetch description for the tunables
         data = []
         tunables = self.lab.getTunables()
-        for n, t in tunables.iteritems():
+        for t in tunables:
 
             # Collect tunable names
-            l_tunables.append(n)
+            l_tunables.append(t.name)
 
             # Prepare record to send to javascript
             data.append({
-                    'name': n,
+                    'name': t.name,
                     'title': t.title,
                     'short': t.short,
                     'desc': convertMiniMacros(t.shortdesc),
