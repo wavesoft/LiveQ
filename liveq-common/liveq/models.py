@@ -216,9 +216,10 @@ class Lab(BaseModel):
 
 		# Process tunables
 		cfgTunables = self.getTunables()
-		for k,t in cfgTunables.iteritems():
+		for t in cfgTunables:
 
 			# Get value
+			k = t.name
 			v = 0.0
 			if not k in tunables:
 				# If we don't have the value, get default
