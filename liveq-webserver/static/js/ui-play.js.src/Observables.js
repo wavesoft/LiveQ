@@ -189,13 +189,13 @@ LiveQ.UI.Observables.prototype.updateStatus = function( config ) {
 
 	// Check what fit class we are on
 	if (trusted) {
-		if (chi2[0] < 0.5 ) { // Excellent fit
+		if (chi2[0] < 1.0 ) { // Excellent fit
 			config.element.addClass("fit-0");
 			fitStr = "Perfect Match";
-		} else if (chi2[0] < 1.0 ) { // Good fit
+		} else if (chi2[0] < 4.0 ) { // Good fit
 			config.element.addClass("fit-1");
 			fitStr = "Good Match";
-		} else if (chi2[0] < 4.0 ) { // Fair fit
+		} else if (chi2[0] < 9.0 ) { // Fair fit
 			config.element.addClass("fit-2");
 			fitStr = "Fair Match";
 		} else { // Bad fit
