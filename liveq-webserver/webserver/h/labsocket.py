@@ -351,6 +351,7 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
                 descRecord['shortdesc'] = str(observableRecord.shortdesc)
                 descRecord['leftdesc'] = str(observableRecord.leftDesc)
                 descRecord['rightdesc'] = str(observableRecord.rightDesc)
+                descRecord['urldesc'] = str(observableRecord.urldesc)
 
             except Observables.DoesNotExist:
                 self.sendError("Could not find assisting information for histogram %s (e=%s, b=%s, p=%s)" % (hid, descRecord['energy'], descRecord['beam'], descRecord['process']))

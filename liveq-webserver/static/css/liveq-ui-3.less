@@ -98,6 +98,34 @@ div.log {
 }
 
 /**
+ * Help popover
+ */
+div.help-modal {
+	div.help-tile {
+		width: 128px;
+		height: 64px;
+		float: left;
+		display: block;
+		background-color: @tunables-c-back;
+		border: solid 1px @tunables-c-front;
+		color: @tunables-c-front;
+		text-align: center;
+
+		div.short {
+			color: @tunables-c-title;
+			font-size: 20px;
+			font-weight: bold;
+			margin-top: 4px;
+		}
+
+		div.full {
+			font-size: 10px;
+			margin-top: 5px;
+		}
+	}
+}
+
+/**
  * Tunables group
  */
 #tunables {
@@ -157,6 +185,13 @@ div.log {
 			text-align: left;
 			padding: @tunables-desc-pad;
 			.transition( opacity @tunables-easing );
+
+			a.tune-desc-more {
+				position: absolute;
+				right: 2px;
+				top: 2px;
+			}
+
 		}
 		> div.tune-ctl {
 			background-color: darken(@tunables-c-back, 20%);
@@ -351,6 +386,15 @@ div.log {
 			text-align: left;
 			color: @observ-c-desc;
 			padding: @observ-desc-pad;
+
+			a.tune-desc-more {
+				position: absolute;
+				right: 2px;
+				top: 2px;
+				color: #999;
+				visibility: hidden;
+			}
+
 		}
 
 		div.observ-status {
@@ -387,6 +431,10 @@ div.log {
 			}
 			.plot-window {
 				opacity: 1;
+			}
+
+			a.tune-desc-more {
+				visibility: visible;
 			}
 
 		}

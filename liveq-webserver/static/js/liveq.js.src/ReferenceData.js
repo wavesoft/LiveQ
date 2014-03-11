@@ -57,6 +57,12 @@ LiveQ.ReferenceData = function( ) {
 	this.group = "";
 
 	/**
+	 * The URL where more information can be found.
+	 * @member {string}
+	 */
+	this.url = "";
+
+	/**
 	 * The data: url that contains the image of the title (with the rendered LaTeX).
 	 * @member {string}
 	 */
@@ -93,6 +99,7 @@ LiveQ.ReferenceData.fromReader = function( reader ) {
 
 	// Get configuration
 	var config = reader.getJSON();
+	console.log(config);
 
 	// Store local references
 	hc.id = config['id'];
@@ -107,6 +114,7 @@ LiveQ.ReferenceData.fromReader = function( reader ) {
 	hc.shortdesc = config['shortdesc'];
 	hc.leftdesc = config['leftdesc'];
 	hc.rightdesc = config['rightdesc'];
+	hc.url = config['urldesc'];
 
 	// Get PNG for title
 	hc.imgTitle = reader.getData('image/png');

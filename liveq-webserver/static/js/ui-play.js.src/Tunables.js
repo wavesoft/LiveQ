@@ -147,8 +147,18 @@ LiveQ.UI.Tunables.prototype.createController = function( config ) {
  * @param {Object} config - The configuration node for this tunable
  */
 LiveQ.UI.Tunables.prototype.createDescription = function( config ) {
-  var elm = $('<div class="tune-desc small-body"><h1>' + config.title + '</h1>'+config.desc+'</div>');
+  var elm = $('<div class="tune-desc small-body"><h1>' + config.title + '</h1>'+config.desc+'</div>'),
+      btnMore = $('<a class="tune-desc-more" href="javascript:;"><span class="glyphicon glyphicon-question-sign"></span></a>');
+
+  elm.append(btnMore);
   elm.click(function(e){ e.stopPropagation(); });
+  btnMore.click(function(e) {
+    LiveQ.UI.explainations.show(
+        '<span class="label label-default">' + config['short'] + '</span> ' + config['title'],
+        'help?type=tunable&name=' + config['name'],
+        config['url']
+      );
+  });
   return elm;
 }
 
@@ -328,7 +338,7 @@ LiveQ.UI.Tunables.prototype.mark = function( list ) {
  * Return the DOM to corresponds to the tunable with
  * the given name
  */
-LiveQ.UI.Observables.prototype.getElement = function( tunable ) {
+LiveQ.UI.Tunables.prototype.getElement = function( tunable ) {
   var parm = this.parameters[parameter];
   if (!parm) return undefined;
   return parm['element'];

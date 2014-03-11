@@ -18,7 +18,7 @@
               <ul class="dropdown-menu">
 
                 {% for lab in navbar['labs'] %}
-                  <li><a href="{{ reverse_url("index") }}?lab={{ lab[1] }}">{{ lab[0] }}</a></li>
+                  <li><a href="{{ reverse_url("play") }}?lab={{ lab[1] }}">{{ lab[0] }}</a></li>
                 {% end %}
 
               </ul>

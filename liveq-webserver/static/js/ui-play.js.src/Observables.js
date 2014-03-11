@@ -85,7 +85,19 @@ LiveQ.UI.Observables.prototype.reorder = function() {
 LiveQ.UI.Observables.prototype.createDescription = function( config ) {
 	var elm = $(
 		'<div class="observ-desc small-body"><h1>'+config.ref.title+'</h1>'+
-		config.ref.shortdesc+'</div>');
+		config.ref.shortdesc+'</div>'),
+      btnMore = $('<a class="tune-desc-more" href="javascript:;"><span class="glyphicon glyphicon-question-sign"></span></a>');
+
+	elm.append(btnMore);
+	btnMore.click(function(e) {
+		e.stopPropagation();
+		LiveQ.UI.explainations.show(
+			'<span class="label label-default">' + config.ref.short + '</span> ' + config.ref.title,
+			'help?type=observable&name=' + config.ref.id,
+			config.ref.url
+		);
+	});
+
 	return elm;
 }
 

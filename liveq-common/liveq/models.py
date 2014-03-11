@@ -271,6 +271,8 @@ class Tunables(BaseModel):
 	title = CharField(max_length=128)
 	#: A short description for this tunable
 	shortdesc = TextField(default="")
+	#: A long description for this tunable
+	longdesc = TextField(default="")
 	#: A URL for the long description
 	urldesc = CharField(max_length=128, default="")
 	#: The UUID of the tutorial
@@ -292,7 +294,7 @@ class Observables(BaseModel):
 	The description of the ovservables
 	"""
 
-	#: The name of the histogram (AIDA Path) for this tunable
+	#: The name of the histogram (AIDA Path) for this observable
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
 	short = CharField(max_length=50)
@@ -306,8 +308,10 @@ class Observables(BaseModel):
 
 	#: The human-readable name of the observable
 	title = CharField(max_length=128)
-	#: A short description for this tunable
+	#: A short description for this observable
 	shortdesc = TextField(default="")
+	#: A long description for this observable
+	longdesc = TextField(default="")
 	#: A URL for the long description
 	urldesc = CharField(max_length=128, default="")
 	#: The UUID of the tutorial

@@ -28,7 +28,7 @@ import uuid
 from tornado.web import URLSpec
 from webserver.h.configure import ConfigHandler
 from webserver.h.labsocket import LabSocketHandler
-from webserver.h.index import IndexHandler
+from webserver.h.index import IndexHandler, PlayHandler, HelpHandler
 from webserver.config import Config
 
 """
@@ -39,7 +39,10 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
+			URLSpec(r"%s" % Config.BASE_URL, 				IndexHandler),
 			URLSpec(r"%s/" % Config.BASE_URL, 				IndexHandler, 		name="index"),
+			URLSpec(r"%s/play" % Config.BASE_URL, 			PlayHandler, 		name="play"),
+			URLSpec(r"%s/help" % Config.BASE_URL, 			HelpHandler, 		name="help"),
 			URLSpec(r"%s/config" % Config.BASE_URL, 		ConfigHandler, 		name="config"),
 			URLSpec(r"%s/labsocket/(.*)" % Config.BASE_URL, LabSocketHandler,	name="ws"),
 		]

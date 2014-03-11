@@ -38,6 +38,29 @@ div.log .info {
   color: #06F;
 }
 /**
+ * Help popover
+ */
+div.help-modal div.help-tile {
+  width: 128px;
+  height: 64px;
+  float: left;
+  display: block;
+  background-color: #66ccff;
+  border: solid 1px #ffffff;
+  color: #ffffff;
+  text-align: center;
+}
+div.help-modal div.help-tile div.short {
+  color: #336699;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+div.help-modal div.help-tile div.full {
+  font-size: 10px;
+  margin-top: 5px;
+}
+/**
  * Tunables group
  */
 #tunables {
@@ -107,13 +130,18 @@ div.log .info {
   -o-transition: opacity linear 0.2s;
   transition: opacity linear 0.2s;
 }
+#tunables div.tune > div.tune-desc a.tune-desc-more {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+}
 #tunables div.tune > div.tune-ctl {
   background-color: #00aaff;
   position: absolute;
   bottom: 0;
   left: 0;
   opacity: 0;
-  height: 36.57142857px;
+  height: 36.57142857142857px;
   width: 128px;
   -webkit-transition: opacity linear 0.2s;
   -moz-transition: opacity linear 0.2s;
@@ -130,7 +158,7 @@ div.log .info {
   width: 50%;
   position: absolute;
   font-size: 1.5em;
-  height: 36.57142857px;
+  height: 36.57142857142857px;
   cursor: pointer;
 }
 #tunables div.tune > div.tune-ctl > div.b:active {
@@ -314,6 +342,13 @@ div.log .info {
   color: #333333;
   padding: 4px;
 }
+#observables div.observable div.observ-desc a.tune-desc-more {
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  color: #999;
+  visibility: hidden;
+}
 #observables div.observable div.observ-status {
   position: absolute;
   right: 0;
@@ -345,6 +380,9 @@ div.log .info {
 }
 #observables div.observable.expand.full .plot-window {
   opacity: 1;
+}
+#observables div.observable.expand.full a.tune-desc-more {
+  visibility: visible;
 }
 #observables div.observable.expand.part {
   background-color: #ffffff;

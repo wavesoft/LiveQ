@@ -23,12 +23,20 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from liveq.models import Lab
+from liveq.models import Lab, Observables, Tunables
+from webserver.common.minimacros import convertMiniMacros
 
 """
 Root page handler
 """
 class IndexHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.render(
+			"welcome.html", 
+			navbar=getNavbarData()
+			)
+
+class PlayHandler(tornado.web.RequestHandler):
 	def get(self):
 
 		# Get lab ID
@@ -42,3 +50,40 @@ class IndexHandler(tornado.web.RequestHandler):
 			navbar=getNavbarData(),
 			lab_uuid=lab.uuid
 			)
+
+class HelpHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Get arguments
+		desc_type = self.get_argument("type")
+		desc_name = self.get_argument("name")
+
+		# Render tunable description
+		if desc_type == "tunable":
+
+			# Get tunable
+			obj = Tunables.get( Tunables.name == desc_name )
+
+			# Render help page
+			self.render(
+				"help-modal.html",
+				body=convertMiniMacros(obj.longdesc),
+				title=obj.title,
+				name=obj.name,
+				short=obj.short
+				)
+
+		elif desc_type == "observable":
+
+			# Get observable
+			obj = Observables.get( Observables.name == desc_name )
+
+			# Render help page
+			self.render(
+				"help-modal.html",
+				body=convertMiniMacros(obj.longdesc),
+				title=obj.title,
+				name=obj.name,
+				short=obj.short
+				)
+
