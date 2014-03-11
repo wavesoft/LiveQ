@@ -46,7 +46,7 @@ class PlayHandler(tornado.web.RequestHandler):
 		lab = Lab.get( Lab.uuid == lab_id )
 
 		self.render(
-			"play-2.html", 
+			"play.html", 
 			navbar=getNavbarData(),
 			lab_uuid=lab.uuid
 			)

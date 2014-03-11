@@ -1,197 +1,222 @@
 
 (function() {
-
+  
   function commaThousands(x) {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
+    }
 
   function getTS() {
     var d = new Date();
     return  ('0' + d.getHours()).slice(-2) + ":" +
-            ('0' + d.getMinutes()).slice(-2) + ":" +
-            ('0' + d.getSeconds()).slice(-2);
+        ('0' + d.getMinutes()).slice(-2) + ":" +
+        ('0' + d.getSeconds()).slice(-2);
   }
 
   function addLog(html, cls) {
     var logLine = $('<div></div>');
-    if (!cls) cls="";
-    $(logLine).attr("class", cls);
-    $(logLine).html("["+getTS()+"]: "+html);
-    $("#log").prepend(logLine);
+        if (!cls) cls="";
+        $(logLine).attr("class", cls);
+        $(logLine).html("["+getTS()+"]: "+html);
+        $("div.log").prepend(logLine);
   }
 
-  function popoverInline(url) {
-    $("#inlineModalFrame").attr("href", url);
-    $("#inlineModal").modal('show');
-  }
+  LiveQ.UI.initLab = function(id) {
 
+      // State variables
+      var modalOpen = false,
+          tunableToObservable = [];
 
-  var tunableLookup = [];
-  function appendTunableInput(host, id, entry) {
+      // Setup backend
+      var lab = new LiveQ.LabSocket(id);
 
-    // Prepare and nest group and label
-    var group  = $('<div class="form-group"></div>'),
-        label  = $('<label for="'+id+'" class="col-sm-6 control-label">'+entry['title']+'</label>'),
-        cGroup = $('<div class="col-sm-6"></div>');
+      // Setup UI
+      var t = new LiveQ.UI.Tunables("#tunables");
+      var o = new LiveQ.UI.Observables("#observables");
+      var cui = new LiveQ.UI.Correlations();
 
-    // Nest elements
-    $(host).append(group);
-    group.append(label);
-    group.append(cGroup);
+      /**
+       * Handler of the simulation start button
+       */
+      $("#sim-begin").click(function() {
+        // Clear log
+        $("div.log").empty();
 
-    // Fetch decimals
-    var decimals = parseInt(entry['dec']);
+        // Start simulation
+        lab.beginSimulation( t.getParameters() );
 
-    // Prepare and nest component and values
-    var input = $('<input type="text"></input>');
-    if (entry['type'] == 'slider') {
+        // Show waiting modal
+        modalOpen = true;
+        $("#sim-waiting-modal").modal('show');
 
-      // Slider needs element to be in place
-      cGroup.append(input);
+        // Show abort button
+        $("#sim-abort").show();
+        $("#loading-spinner").show();
+        $("#running-text").show();
 
-      // Create slider
-      $(input).slider({
-        'id': id,
-        'min': entry['min'],
-        'max': entry['max'],
-        'value': entry['def'],
-        'step': Math.pow(10, -decimals),
-        'formater': function(value) {
-          return Number(value).toFixed(decimals);
+      });
+
+      /**
+       * Bind to various abort buttons
+       */
+      var abortFn = function() {
+        // Abort simulation
+        lab.abortSimulation();
+        // Hide modal
+        if (modalOpen) {
+          $("#sim-waiting-modal").modal('hide');
+          modalOpen = false;
+        }
+        // Hide abort button
+        $("#sim-abort").hide();
+        $("#loading-spinner").hide();
+        $("#running-text").hide();
+      };
+      $("#sim-modal-abort").click(abortFn);
+      $("#sim-abort").click(abortFn);
+
+      /**
+       * Notification when server data are available
+       * This functino hides the modal pop-over
+       */
+      lab.onDataArrived(function(ipol) {
+        if (ipol) return;
+        if (modalOpen) {
+          addLog("Got first data", "done");
+          $("#sim-waiting-modal").modal('hide');
+          modalOpen = false;
         }
       });
 
-      // Place default
-      $(input).attr('value', entry['def']);
+      /**
+       * Generate tunables when tunable configuration is arrived.
+       */
+      lab.onTunablesUpdated(function(tunables, links) {
 
-    }
+        // Create tunables
+        for (var i=0; i<tunables.length; i++) {
+          var parm = tunables[i];
+          // Start from default value
+          parm.value = parm.def;
+          // Add tunable
+          t.add(parm);
+        }
 
-    // Create popover on the control element
-    $(group).popover({
-      'html': true,
-      'content': entry['desc'],
-      'trigger': 'hover',
-      'placement': 'bottom'
-    });
+        // Keep reference of tunable-to-observable links
+        tunableToObservable = links;
 
-    // Append input field on the lookup table
-    tunableLookup.push([ entry['name'], input[0] ]);
+      });
 
-    // Return group
-    return group;
+      /**
+       * Generate observable when a histogram is added.
+       */
+      lab.onHistogramAdded(function( histo, ref ) {
+        o.add( histo, ref );
+      });
 
-  }
+      /**
+       * Store log messages to log elements
+       */
+      lab.onLog(function(msg) {
+        addLog(msg);
+      });
 
-  function collectTunables() {
-    var ans = { };
-    for (var i=0; i<tunableLookup.length; i++) {
-      ans[tunableLookup[0]] = $(tunableLookup[1]).val();
-    }
-  }
+      /**
+       * Store error messages to log elements
+       */
+      lab.onError(function(msg) {
+        addLog(msg, "error");
+      });
 
-  var site;
-  LiveQ.UI.initLab = function(lab) {
+      /**
+       * Cleanup when the simulation is completed
+       */
+      lab.onCompleted(function() {
+        addLog("Simulation completed", "done");
+        $("#sim-abort").hide();
+        $("#loading-spinner").hide();
+        $("#running-text").hide();
+      });
 
-    // Establish connection to the lab
-    var lab = new LiveQ.LabSocket(lab);
+      /**
+       * Trigger interpolations every time we change a value
+       */
+      var ipolTimer = null;
+      $(t).on('change', function(e, tunable, parm, value) {
+        // Request interpolation 0.5 second after the variables are 
+        // done changing
+        if (ipolTimer != null) clearTimeout(ipolTimer);
+        ipolTimer = setTimeout(function() {
+          lab.beginSimulation( t.getParameters(), true );
+        }, 500);
+      });
 
-    // Update tunable fields when we have data
-    lab.onTunablesUpdated(function(tunables) {
+      /**
+       * Implement the highlighting & expanding of
+       * linked or correlated histograms.
+       */
+      $(t).on('expand', function(e, tunable) {
+        // Collapse all elements
+        o.collapseAll();
+        // Find the observables to expand
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
+            o.expand(e.observable);
+            o.tooltip(e.observable, e.title);
+          }
+        }
+      });
+      $(t).on('collapse', function(e, tunable) {
+        // Find the observables to expand
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
+            o.collapse(e.observable);
+            o.tooltip(e.observable, "");
+          }
+        }
+      });
+      $(t).on('hover', function(e, tunable) {
+        var marklist = [];
+        for (var i=0; i<tunableToObservable.length; i++) {
+          var e = tunableToObservable[i];
+          if (e.tunable == tunable.name) {
 
-      // Remove previous tunables and reset
-      $("#tunables").empty();
-      tunableLookup = [];
+            // Put observable on mark list
+            marklist.push(e.observable);
 
-      // Create tunables
-      for (var i=0; i<tunables.length; i++) {
-        appendTunableInput($("#tunables"), 'tunable-'+i, tunables[i]);
-      }
+            // Place correlation
+            cui.add(
+                tunable['element'],
+                o.getElement(e.observable),
+                e.title
+              );
 
-    });
+          }
+        }
+        o.mark(marklist);
+        t.mark([tunable.name]);
+      });
+      $(t).on('hout', function(e, tunable) {
+        o.mark([]);
+        t.mark([]);
+        cui.clear();
+      });
 
-    // Create new histogram plot when a histogram is added
-    lab.onHistogramAdded(function(histo, ref) {
+      // ==========================
+      //   onLoad Initializations
+      // ==========================
 
-      // Create a new plot and store it in the histogram object
-      histo.plot = new LiveQ.UI.PlotWindow("#host", {
-          'width': 340,
-          'height': 300,
-          'imgTitle': ref.imgTitle,
-          'imgXLabel': ref.imgXLabel,
-          'imgYLabel': ref.imgYLabel
-        });
+      // Prepare modal
+      $('#sim-waiting-modal').modal({
+        'show': false
+      });
 
-      // Place the reference data
-      histo.plot.addHistogram( ref.reference, "Reference data" )
-
-      // Place histogram
-      histo.plot.addHistogram( histo, ref.name );
-
-    });
-
-    // Redraw histogram when updated
-    lab.onHistogramUpdate(function(histo, ref) {
-
-      // Update plot
-      histo.plot.update();
-
-      // Updating
-      console.log( "Means of", ref.id, ":", LiveQ.Calculate.chi2WithError(
-        histo.plot.plots[1].histo,
-        histo.plot.plots[0].histo
-        ));
-
-    });
-
-    // Log messages
-    lab.onLog(function(msg) {
-      addLog(msg);
-    });
-
-    // Log errors
-    lab.onError(function(msg) {
-      addLog(msg, "error");
-    });
-
-    // Handle completion
-    lab.onCompleted(function() {
-      addLog("Simulation completed", "done");
-      $("#stopSim").hide();
+      // Hide elements
+      $("#sim-abort").hide();
+      $("#running-text").hide();
       $("#loading-spinner").hide();
-    });
 
-    // Handle metadata update
-    lab.onMetadataUpdated(function(meta) {
-      if (meta['interpolation']) {
-        $("#nevts").html( commaThousands(meta['nevts']) + ' <span class="text-primary"> (Interpolation)</span>' );
-      } else {
-        $("#nevts").html( commaThousands(meta['nevts']) );
-      }
-    });
-
-    // Open main lab
-    addLog("Initialized socket on lab " + lab.id);
-
-    // Bind buttons
-    $("#startSim").click(function(e,i) {
-      addLog("Starting simulation");
-      lab.beginSimulation( collectTunables() );
-      $("#stopSim").show();
-      $("#loading-spinner").show();
-    });
-
-    // Bind abort button
-    $("#stopSim").click(function(e,i) {
-      addLog("Aborting simulation", "warn");
-      lab.abortSimulation();
-      $("#stopSim").hide();
-      $("#loading-spinner").hide();
-    });
-
-    // Hide stop sim and spinner
-    $("#stopSim").hide();
-    $("#loading-spinner").hide();
-
-  }
+    };
 
 })();
