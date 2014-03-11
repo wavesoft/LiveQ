@@ -78,14 +78,20 @@ class TuneAddressingConfig(ComponentClassConfig):
 				# Replace '/' with ':'
 				k = k.replace('/', ':')
 
-				try:
-					# Compile and store normalizer function
-					TuneAddressingConfig.TUNE_NORMALIZER[k] = eval("lambda x: %s" % v)
+				# Skip some defaults
+				if k in ("__name__",):
+					pass
 
-				except:
-					# Catch compilation exceptions
-					logging.warn("Unable to compile expression '%s' for '%s' normalizer!" % (v,k))
-					continue
+				else:
+					try:
+						# Compile and store normalizer function
+						TuneAddressingConfig.TUNE_NORMALIZER[k] = eval("lambda x: %s" % v)
+						logging.info("Using expression '%s' for normalizing %s" % (v,k))
+
+					except:
+						# Catch compilation exceptions
+						logging.warn("Unable to compile expression '%s' for '%s' normalizer!" % (v,k))
+						continue
 		
 		# Get default variables
 		config = config._sections["parameter-index"]

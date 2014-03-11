@@ -229,15 +229,15 @@ class JobManagerComponent(Component):
 		# Send cancellation synchronously
 		ans = agentChannel.send('job_cancel', {
 				'jid': job_id
-			}, waitReply=True)
+			}, waitReply=False)
 
 		# Log results
-		if not ans:
-			self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agentChannel.name, job_id ) )
-		elif ans['result'] == "ok":
-			self.logger.info("Successfuly cancelled job %s on %s" % ( job_id, agentChannel.name ))
-		else:
-			self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job_id, agentChannel.name, ans['error'] ))
+		#if not ans:
+		#	self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agentChannel.name, job_id ) )
+		#elif ans['result'] == "ok":
+		#	self.logger.info("Successfuly cancelled job %s on %s" % ( job_id, agentChannel.name ))
+		#else:
+		#	self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job_id, agentChannel.name, ans['error'] ))
 
 
 	####################################################################################
@@ -290,7 +290,7 @@ class JobManagerComponent(Component):
 		"""
 		Callback when a handshake arrives in the bus
 		"""
-		self.logger.info("[%s] Agent version %s shake hands" % (channel.name, message['version']))
+		self.logger.info("[%s] Agent v%s online (slots/free=%s/%s)" % (channel.name, message['version'], message['slots'], message['free_slots']))
 
 		# Let manager know that we got a handshake
 		agents.updateHandshake( channel.name, message )
