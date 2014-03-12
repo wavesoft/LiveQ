@@ -16,21 +16,24 @@ Popcorn.plugin( "maskedFocus", function( options ) {
 			if (!isVisible) focusElement.show();
 
 			// Focus to that element
-			LiveQ.UI.explainations.focusToElement(options.focus);
+			LiveQ.UI.explainations.focusToElement(options.focus, 500);
 
 			// Check if we have text
 			if ((options['text'] !== undefined) && (options['title'] !== undefined)) {
-				console.log("Showing popover", options);
-				focusElement.popover({
-					'content': options['text'],
-					'title': options['title'],
-					'placement': options['placement'] || 'bottom',
-					'trigger': 'manual',
-					'container': LiveQ.UI.explainations.eExplainBackdrop
-				});
-				focusElement.popover('show');
+				setTimeout(function() {
+					focusElement.popover({
+						'content': options['text'],
+						'title': options['title'],
+						'placement': options['placement'] || 'bottom',
+						'trigger': 'manual',
+						'container': LiveQ.UI.explainations.eExplainBackdrop
+					});
+					focusElement.popover('show');
+				}, 600);
 			}
 
+			// Realign explainations
+			LiveQ.UI.explainations.realignExplaination();
 
 		},
 		end: function(event, track) {
@@ -45,6 +48,9 @@ Popcorn.plugin( "maskedFocus", function( options ) {
 			// Hide popover
 			if (options['text'] !== undefined)
 				focusElement.popover('hide');
+
+			// Realign explainations
+			LiveQ.UI.explainations.realignExplaination();
 
 		}
 	}
@@ -164,8 +170,6 @@ LiveQ.UI.Explainations.prototype.hidePopup = function() {
  */
 LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, timeline ) {
 
-	console.log("Starting video presentation from ", videoSource, " using timeline ", timeline);
-
 	// Prepare explaination panel for the video
 	this.eExplainBody.empty();
 	var videoHost = $('<div id="misc-presentation-video"></div>').css({
@@ -223,34 +227,69 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 
 }
 
+function edge_intersect(v1,s1,v2,s2) {
+	return ((v1>=v2) && (v1<=v2+s2)) ||
+		   ((v2>=v1) && (v2<=v1+s1));
+}
+
 /**
  * Update the position of the floating explaination panel
  */
 LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 	var w = this.eExplainPanel.width(), h = this.eExplainPanel.height(), x, y;
 
+	// Default position
+	x = (window.innerWidth - w)/2;
+	y = (window.innerHeight - h)/2;
+
 	// Pick the appropriate position for the explaination window
-	if (!this.focusedElement) {
+	if (this.focusedElement) {
 
-		// Nothing visible->center it
-		x = (window.innerWidth - w)/2;
-		y = (window.innerHeight - h)/2;
+		// Get the element position
+		var elmPos = this.focusedElement.offset(),
+			elmW = this.focusedElement.width(),
+			elmH = this.focusedElement.height();
 
-	} else {
+		console.log("<", elmPos.left, elmPos.top, elmW, elmH, "> - <", x, y, w, h, ">");
+
+		// Check for blockage on X axis
+		if (edge_intersect(elmPos.left, elmW, x, w)) {
+			if (elmPos.left < window.innerWidth/2) {
+				x = elmPos.left + elmW + 50;
+			} else {
+				x = elmPos.left - w - 30;
+			}
+		}
+
+		// Check for blockage on Y axis
+		else if (edge_intersect(elmPos.top, elmH, y, h)) {
+			if (elmPos.top < window.innerHeight/2) {
+				y = elmPos.top + elmH + 50;
+			} else {
+				y = elmPos.top - h - 30;
+			}
+		}
 
 	}
 
 	// Animate the window to that location
 	this.eExplainPanel.animate({
 		'left': x, 'top': y
-	});
+	}, 500);
 
 }
 
 /**
  * Show the backdrop and focus element
  */
-LiveQ.UI.Explainations.prototype.focusToElement = function( element, text ) {
+LiveQ.UI.Explainations.prototype.focusToElement = function( element, delay ) {
+	var self = this,
+		focusFunction = function() {
+			$(element).css({
+				'z-index': 200001,
+				'position': 'relative'
+			});
+		};
 
 	// Put element above the backdrop
 	if (this.focusedElement) {
@@ -259,10 +298,14 @@ LiveQ.UI.Explainations.prototype.focusToElement = function( element, text ) {
 			'position': 'auto'
 		});
 	}
-	this.focusedElement = $(element).css({
-		'z-index': 200001,
-		'position': 'relative'
-	});
+	this.focusedElement = element;
+
+	// Check if we should fire this immediately or after some delay
+	if (!delay) {
+		focusFunction();
+	} else {
+		setTimeout(focusFunction, delay);
+	}
 
 }
 

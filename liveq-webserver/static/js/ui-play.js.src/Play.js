@@ -213,15 +213,19 @@
                 'at': 5,
                 'focus': $("#tunables-pane"),
                 'title': 'Tunables Pane',
-                'text': 'From here you can tune the model parameters',
-                'placement': 'right'
+                'text': 'From here you can tune the model parameters'
               },
               {
                 'at': 10,
                 'focus': $("#observables-pane"),
                 'title': 'Observables Pane',
-                'text': 'From here you see the effect of your tunes',
-                'placement': 'left'
+                'text': 'From here you see the effect of your tunes'
+              },
+              {
+                'at': 12,
+                'focus': $("#observables-legend"),
+                'title': 'Observables Pane',
+                'text': 'You can refer to the color coding in the legend'
               },
               {
                 'at': 15,
