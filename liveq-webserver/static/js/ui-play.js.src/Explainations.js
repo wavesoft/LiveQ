@@ -104,7 +104,8 @@ LiveQ.UI.Explainations = function() {
 		m_epHeader = $('<div class="panel-heading"></div>'),
 		e_explainBody = $('<div class="panel-body"></div>'),
 		e_explainFooter = $('<div class="panel-footer"></div>'),
-		e_explainHeader = $('<h3 class="panel-title">Panel title</h3>')
+		e_explainHeader = $('<h3 class="panel-title">Panel title</h3>'),
+		e_btnAbort = $('<button type="button" class="close" aria-hidden="true">&times;</button>')
 		e_backdrop = $('<div></div>');
 
 	// Style panel
@@ -116,6 +117,7 @@ LiveQ.UI.Explainations = function() {
 	e_backdrop.append(explainPanel);
 	explainPanel.append(m_epHeader);
 	explainPanel.append(e_explainBody);
+	m_epHeader.append(e_btnAbort);
 	m_epHeader.append(e_explainHeader);
 
 	// Prepare the backdrop
@@ -136,8 +138,15 @@ LiveQ.UI.Explainations = function() {
 	this.eExplainTitle = e_explainHeader;
 	this.eExplainBody = e_explainBody;
 	this.eExplainBackdrop = e_backdrop;
+	this.eExplainBtnAbort = e_btnAbort;
 
 };
+
+// ==========================================================================================
+// ==========================================================================================
+//                        CODE FOR MANAGING THE POP-UP EXPLAINATIONS
+// ==========================================================================================
+// ==========================================================================================
 
 /**
  * Display a modal
@@ -164,6 +173,12 @@ LiveQ.UI.Explainations.prototype.showPopup = function(title, bodyURL, moreURL) {
 LiveQ.UI.Explainations.prototype.hidePopup = function() {
 	this.modal.modal('hide');
 }
+
+// ==========================================================================================
+// ==========================================================================================
+//                 CODE FOR MANAGING THE VIDEO-INTERFACE EXPLAINATIONS
+// ==========================================================================================
+// ==========================================================================================
 
 /**
  * Explain something with a video sequence
@@ -217,6 +232,14 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 
 	// Bind to ended event
 	this.eExplainPopcorn.on('ended', function() {
+		self.unfocusElement();
+		self.eExplainBackdrop.fadeOut();
+	});
+
+	// Bind cancel link
+	this.eExplainBtnAbort.unbind("click");
+	this.eExplainBtnAbort.bind("click", function() {
+		self.eExplainPopcorn.pause();
 		self.unfocusElement();
 		self.eExplainBackdrop.fadeOut();
 	});
