@@ -204,8 +204,7 @@
       });
 
       // Test video introduction
-      $("#sim-intro").click(function() {
-
+      var showUIIntro = function() {
         LiveQ.UI.explainations.showVideoExplaination(
             "http://www.youtube.com/watch?v=OCWj5xgu5Ng&rel=0&controls=0",
             "Introduction to the interface",
@@ -243,8 +242,8 @@
               }
             ]
           );
-
-      });
+      };
+      $("#sim-intro").click(function() { showUIIntro(); });
 
       // ==========================
       //   onLoad Initializations
@@ -259,6 +258,15 @@
       $("#sim-abort").hide();
       $("#running-text").hide();
       $("#loading-spinner").hide();
+
+      // If that's the first time we are viewing the website,
+      // show the introduction video
+      if (!LiveQ.getCookie("first-use")) {
+        $(function() {
+          showUIIntro();
+          LiveQ.setCookie("first-use", 1, 3650);
+        });
+      };
 
     };
 
