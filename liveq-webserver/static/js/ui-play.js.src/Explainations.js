@@ -275,7 +275,7 @@ LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 	// Animate the window to that location
 	this.eExplainPanel.animate({
 		'left': x, 'top': y
-	}, 500);
+	}, 250);
 
 }
 

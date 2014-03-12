@@ -207,7 +207,7 @@
       $("#sim-intro").click(function() {
 
         LiveQ.UI.explainations.showVideoExplaination(
-            "http://www.youtube.com/watch?v=16kRVoSyO_w&rel=0&controls=0",
+            "http://www.youtube.com/watch?v=ScMzIvxBSi4&rel=0&controls=0",
             [
               {
                 'at': 5,
