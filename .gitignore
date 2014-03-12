@@ -42,6 +42,7 @@ liveq-webserver/static/lab.js.src/out
 *.log
 local-environment.sh
 dump.rdb
+*.local.*
 
 # Temporary files
 tools/temp*

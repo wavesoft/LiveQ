@@ -46,9 +46,13 @@ LiveQ.UI.Explainations = function() {
  * Display a modal
  */
 LiveQ.UI.Explainations.prototype.show = function(title, bodyURL, moreURL) {
+	var self = this;
 	this.modal.modal('show');
 	this.eTitle.html(title);
-	this.eBody.load(bodyURL);
+	this.eBody.load(bodyURL, function() {
+		// Activate tabs
+		self.eBody.children(".nav-tabs").tab();
+	});
 	if (moreURL) {
 		this.eMoreBtn.show();
 		this.eMoreBtn.attr('href', moreURL);

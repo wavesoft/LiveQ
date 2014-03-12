@@ -60,6 +60,9 @@ div.help-modal div.help-tile div.full {
   font-size: 10px;
   margin-top: 5px;
 }
+div.help-modal .tab-content {
+  padding: 5px;
+}
 /**
  * Tunables group
  */

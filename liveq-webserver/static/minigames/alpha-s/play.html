@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Alpha-S &lt;-&gt; Thrust Minigame</title>
+    	<script src="../../js/jquery.min.js"></script>
+    	<script src="../../js/jquery.knob.js"></script>
+		<script type="text/javascript">
+
+		var Game001 = function( container ) {
+			var self = this;
+				host = $(container),
+				canvas = document.createElement('canvas'),
+				knobInput = document.createElement('input');
+			
+			// Setup canvas
+			canvas.width = host.width();
+			canvas.height = host.height();
+			host.append(canvas);
+			host.append(knobInput);
+			host.css({
+				'position': 'relative'
+			});
+
+			// Open context
+			this.canvas = canvas;
+			this.context = canvas.getContext('2d');
+
+			// Generate information for a random event
+			this.eventData = [];
+			this.eventColors = [
+				'#009933', '#009933', '#FF9900', '#3366FF'
+			];
+			this.eventRotation = Math.random() * Math.PI;
+			for (var i=0; i<Math.round(Math.random()*40)*2+10; i++) {
+				this.eventData.push({
+					'type': Math.floor(Math.random()*3),
+					'color': Math.floor(Math.random()*4),
+					'r1': Math.random(),
+					'r2': Math.random(),
+					'r3': Math.random()
+				});
+			}
+
+			// Setup knob
+			knobInput.value = "1300";
+			this.knob = $(knobInput).knob({
+				min: 600,
+				max: 2500,
+				step: 1,
+				width: 100,
+				fgColor: '#3399FF',
+				inputColor: '#3399FF',
+				change: function(val) {
+					var alphaS = val / 10000;
+					self.drawSimulation( alphaS, 0.06, 0.25 );
+				},
+				format: function(val) {
+					console.log("<",val);
+					return Number(val/10000).toFixed(3);
+				}
+			}).css({
+				'position': 'absolute',
+				'left': '5px',
+				'top': '24px'
+			});
+
+			// Original render
+			this.drawSimulation( 0.130, 0.06, 0.25 );
+
+
+		};
+
+		/**
+		 * Draw the event as it would look like for alpha-S
+		 */
+		Game001.prototype.drawSimulation = function(aplhaS, asMin, asMax) {
+
+			// Calculate dimentions of the components
+			var ctx = this.context,
+				plotSize = 100,
+				padding = 5,
+				eventSize = this.canvas.height - plotSize - padding * 4;
+
+			// Clear
+			this.clear();
+
+			// Calculate a value between 0.0 and 1.0 based on 
+			// the AlphaS
+			var v = (aplhaS-asMin) / (asMax - asMin);
+
+			// Draw the event
+			this.drawEvent(this.canvas.width/2, padding+eventSize/2.0, eventSize/2.0, v);
+
+			// Plrepare X and Y coordinates of the plot
+			xp = (this.canvas.width-plotSize)/2;
+			yp = padding*2+padding+eventSize,plotSize,plotSize;
+
+			// Draw plot
+			this.drawGaussianHistogram(
+				xp,yp, plotSize, plotSize,
+				1-v*2,0.3+Math.sin(v*Math.PI/2+Math.PI/4)*1.0,
+				"Thrust Histogram (T)");
+
+			// Draw help text
+			ctx.font = "11px Tahoma";
+			ctx.textBaseline = "middle";
+			ctx.textAlign = "right";
+			ctx.fillStyle = '#993333'
+
+			var y = yp+plotSize/2,
+				txtPadding = 20;
+			ctx.fillText("On this side of the histogram the", xp-txtPadding, y ); y+=12;
+			ctx.fillText("events are more spherical.", xp-txtPadding, y );
+
+			y = yp+plotSize/2;
+			ctx.textAlign = "left";
+			ctx.fillText("On this side of the histogram the", xp+plotSize+txtPadding, y ); y+=12;
+			ctx.fillText("events are more pencil-like.", xp+plotSize+txtPadding, y );
+
+			// Draw title to the dial
+			ctx.fillStyle = '#3399FF'
+			ctx.font = "bold 14px Tahoma";
+			ctx.textAlign = "center";
+			ctx.textBaseline = "top";
+			ctx.fillText("As=", 50, 2 );
+
+			/*
+			this.drawGaussianHistogram(
+				canvas.width-5-100,canvas.height-5-100,100,100,
+				-1+v*2,0.3+Math.sin(v*Math.PI/2+Math.PI/4)*1.0,
+				"Inverse Thrust (1-T)");
+			*/
+		}
+
+		/**
+		 * Spread is between 0.0 and 1.0
+		 */
+		Game001.prototype.drawEvent = function(x,y,length,spread) {
+			var h = Math.round(this.eventData.length/2),
+				pieAngle = spread*Math.PI;
+
+			for (var i=0; i<h; i++) {
+				var e = this.eventData[i],
+					l = length/3 + length*2/3*e.r1,
+					a = this.eventRotation + pieAngle*(e.r2-0.5);
+
+				this.context.strokeStyle = this.eventColors[e.color];
+				if (e.type == 0) {
+					this.drawLine(x,y,a,l);
+				} else if (e.type == 1) {
+					this.drawCurve(x,y,a,l,Math.PI/4*e.r3);
+				} else if (e.type == 2) {
+					this.drawHelix(x,y,a,l,16);
+				}
+			}
+
+			for (var i=h; i<this.eventData.length; i++) {
+				var e = this.eventData[i],
+					l = length/3 + length*2/3*e.r1,
+					a = this.eventRotation + Math.PI + pieAngle*(e.r2-0.5);
+
+				this.context.strokeStyle = this.eventColors[e.color];
+				if (e.type == 0) {
+					this.drawLine(x,y,a,l);
+				} else if (e.type == 1) {
+					this.drawCurve(x,y,a,l,Math.PI/4*e.r3);
+				} else if (e.type == 2) {
+					this.drawHelix(x,y,a,l,16);
+				}
+			}
+
+		}
+
+		Game001.prototype.clear = function() {
+			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+		}
+
+
+		Game001.prototype.drawLine = function(x,y,a,l) {
+			var ctx = this.context,
+				x2=x+Math.cos(a)*l, y2=y+Math.sin(a)*l;
+			ctx.beginPath();
+			ctx.moveTo(x,y);
+			ctx.lineTo(x2,y2);
+			ctx.stroke();
+		}
+
+		Game001.prototype.drawCurve = function(x,y,a,l,curvature) {
+			var ctx = this.context,
+				x2=x+Math.cos(a+curvature/2)*l*2/3, y2=y+Math.sin(a+curvature/2)*l*2/3;
+				x3=x+Math.cos(a+curvature)*l, y3=y+Math.sin(a+curvature)*l;
+
+			ctx.beginPath();
+			ctx.moveTo(x,y);
+			ctx.quadraticCurveTo(x2,y2,x3,y3);
+			ctx.stroke();
+
+		}
+
+		Game001.prototype.drawHelix = function(x,y,a,l, loopWidth) {
+			var ctx = this.context,
+				loops = Math.floor(l/loopWidth),
+				stepL = l/loops,
+				sp_x = Math.cos(a)*stepL, sp_y = Math.sin(a)*stepL, // Parallel step
+				sv_x = Math.cos(a+Math.PI/2)*stepL, sv_y = Math.sin(a+Math.PI/2)*stepL; // Vertical step
+
+			// Draw First loop
+			ctx.beginPath();
+			var xp=x+sp_x/2,yp=y+sp_y/2,
+				x1=x-sv_x/2,y1=y-sv_y/2,
+				x2=x1+sp_x/2,y2=y1+sp_y/2;
+			ctx.moveTo(x,y);
+			ctx.bezierCurveTo(x1,y1,x2,y2,xp,yp);
+
+			// Continue with the rest of the loops
+			for (var i=1; i<loops+0.5; i+=0.25) {
+				var x1=xp, 			y1=yp,
+					x2=x1+sv_x/4,	y2=y1+sv_y/4,
+					x3=x2-sp_x/4,	y3=y2-sp_y/4,
+					x4=x3-sv_x/4,	y4=y3-sv_y/4,
+					x5=x4-sv_x/2,	y5=y4-sv_y/2,
+					x6=x5+sp_x/2,	y6=y5+sp_y/2,
+					x7=x6+sv_x/2,	y7=y6+sv_y/2;
+				ctx.moveTo(x1,y1);
+				ctx.bezierCurveTo(x2,y2,x3,y3,x4,y4);
+				ctx.bezierCurveTo(x5,y5,x6,y6,x7,y7);
+				xp=x7;yp=y7;
+			}
+			ctx.stroke();
+		}
+
+		Game001.prototype.drawGaussianHistogram = function(x,y,w,h, m,s2, title) {
+			var ctx = this.context,
+				textH = 15,
+				s = Math.sqrt(s2),
+				a = 1.0/s*Math.sqrt(Math.PI*2),
+				b = m,
+				c = s;
+
+			// Remove text height
+			h -= textH; y += textH;
+
+			// Draw axes
+			ctx.strokeStyle = '#000000';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(x,y);
+			ctx.lineTo(x,y+h);
+			ctx.lineTo(x+w,y+h);
+			ctx.stroke();
+
+			// Draw function
+			var py=0,first=true;
+			ctx.beginPath();
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = '#0066FF';
+			for (var px=0; px<w-4; px+=2) {
+
+				// Calculate y
+				py = ( 2 * Math.exp( - (Math.pow( ((px-(w/2))/(w/5)) -b, 2) / 2*c*c) )) * h*2/5;
+
+				// Get previous point
+				if (first) {
+					ctx.moveTo(px+x+2,y+h-py-2);
+					first = false;
+				} else {
+					ctx.lineTo(px+x+2,y+h-py-2);
+				}
+
+			}
+			ctx.stroke();
+
+			// Draw text
+			this.context.font = "12px Tahoma";
+			ctx.textBaseline = "bottom";
+			ctx.textAlign = "center";
+			ctx.fillStyle = '#333333'
+			ctx.fillText(title,x+w/2,y - textH+12);
+
+		}
+
+
+		</script>
+		<style type="text/css">
+		#core {
+			width: 500px;
+			height: 400px;
+			border: solid 1px #999;
+		}
+		</style>
+	</head>
+	<body>
+		<div id="core">
+		</div>
+		<script type="text/javascript">
+		var game = new Game001("#core");
+		</script>
+	</body>
+</html> 
