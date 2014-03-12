@@ -168,7 +168,8 @@ LiveQ.UI.Explainations.prototype.hidePopup = function() {
 /**
  * Explain something with a video sequence
  */
-LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, timeline ) {
+LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, title, timeline ) {
+	var self = this;
 
 	// Prepare explaination panel for the video
 	this.eExplainBody.empty();
@@ -177,6 +178,7 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 		'height': 300
 	});
 	this.eExplainBody.append(videoHost);
+	this.eExplainTitle.html(title);
 
 	// Load video & initialize popcorn
 	this.eExplainPopcorn = Popcorn.youtube(
@@ -188,7 +190,7 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 		var entry = timeline[i];
 
 		// Find where the current frame ends
-		var frameEnd = entry.at+10;
+		var frameEnd = entry.at+(entry['duration'] || 10);
 		if (i<timeline.length-1) frameEnd=timeline[i+1].at;
 
 		// Check what to do
@@ -205,13 +207,19 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 				// Optional
 				'title': entry['title'],
 				'text': entry['text'],
-				'placement': entry['placement']
+				'placement': entry['placement'],
 
 			});
 
 		}
 
 	}
+
+	// Bind to ended event
+	this.eExplainPopcorn.on('ended', function() {
+		self.unfocusElement();
+		self.eExplainBackdrop.fadeOut();
+	});
 
 	// Show backdrop
 	this.eExplainBackdrop.fadeIn();
@@ -220,7 +228,6 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 	this.realignExplaination();
 
 	// Start the video
-	var self = this;
 	setTimeout(function() {
 		self.eExplainPopcorn.play();
 	}, 1000);
@@ -249,8 +256,6 @@ LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 		var elmPos = this.focusedElement.offset(),
 			elmW = this.focusedElement.width(),
 			elmH = this.focusedElement.height();
-
-		console.log("<", elmPos.left, elmPos.top, elmW, elmH, "> - <", x, y, w, h, ">");
 
 		// Check for blockage on X axis
 		if (edge_intersect(elmPos.left, elmW, x, w)) {

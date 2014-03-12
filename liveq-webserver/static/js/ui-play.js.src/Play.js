@@ -207,7 +207,8 @@
       $("#sim-intro").click(function() {
 
         LiveQ.UI.explainations.showVideoExplaination(
-            "http://www.youtube.com/watch?v=ScMzIvxBSi4&rel=0&controls=0",
+            "http://www.youtube.com/watch?v=OCWj5xgu5Ng&rel=0&controls=0",
+            "Introduction to the interface",
             [
               {
                 'at': 5,
@@ -235,9 +236,10 @@
               },
               {
                 'at': 20,
+                'duration': 5,
                 'focus': $("#sim-abort"),
                 'title': 'Simulation Control',
-                'text': 'With this button you can abort it'
+                'text': 'With this button you can abort it',
               }
             ]
           );
