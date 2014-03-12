@@ -203,6 +203,43 @@
         cui.clear();
       });
 
+      // Test video introduction
+      $("#sim-intro").click(function() {
+
+        LiveQ.UI.explainations.showVideoExplaination(
+            "http://www.youtube.com/watch?v=16kRVoSyO_w&rel=0&controls=0",
+            [
+              {
+                'at': 5,
+                'focus': $("#tunables-pane"),
+                'title': 'Tunables Pane',
+                'text': 'From here you can tune the model parameters',
+                'placement': 'right'
+              },
+              {
+                'at': 10,
+                'focus': $("#observables-pane"),
+                'title': 'Observables Pane',
+                'text': 'From here you see the effect of your tunes',
+                'placement': 'left'
+              },
+              {
+                'at': 15,
+                'focus': $("#sim-begin"),
+                'title': 'Simulation Control',
+                'text': 'With this button you can start the simulation'
+              },
+              {
+                'at': 20,
+                'focus': $("#sim-abort"),
+                'title': 'Simulation Control',
+                'text': 'With this button you can abort it'
+              }
+            ]
+          );
+
+      });
+
       // ==========================
       //   onLoad Initializations
       // ==========================

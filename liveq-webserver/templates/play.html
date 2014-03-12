@@ -20,6 +20,7 @@
             <div class="panel-body">
 
               <h4 class="pull-left"><em>Demonstration interface of Virtual Atom Smasher</em></h4>
+              <button class="btn btn-default" id="sim-intro">Show Intro</button>
               <button class="btn btn-danger" id="sim-abort">Abort</button>
               <button class="btn btn-default" id="sim-begin">Start simulation!</button>
 
@@ -33,7 +34,7 @@
       <div class="row">
 
         <!-- Tunables column -->
-        <div class="col-md-6">
+        <div class="col-md-6" id="tunables-pane">
 
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -54,8 +55,7 @@
         </div>
 
         <!-- Observables -->
-        <div class="col-md-6">
-
+        <div class="col-md-6" id="observables-pane">
 
           <div class="panel panel-default">
             <div class="panel-heading">

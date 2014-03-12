@@ -153,7 +153,7 @@ LiveQ.UI.Tunables.prototype.createDescription = function( config ) {
   elm.append(btnMore);
   elm.click(function(e){ e.stopPropagation(); });
   btnMore.click(function(e) {
-    LiveQ.UI.explainations.show(
+    LiveQ.UI.explainations.showPopup(
         '<span class="label label-default">' + config['short'] + '</span> ' + config['title'],
         'help?type=tunable&name=' + config['name'],
         config['url']

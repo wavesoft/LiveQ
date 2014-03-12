@@ -91,7 +91,7 @@ LiveQ.UI.Observables.prototype.createDescription = function( config ) {
 	elm.append(btnMore);
 	btnMore.click(function(e) {
 		e.stopPropagation();
-		LiveQ.UI.explainations.show(
+		LiveQ.UI.explainations.showPopup(
 			'<span class="label label-default">' + config.ref.short + '</span> ' + config.ref.title,
 			'help?type=observable&name=' + config.ref.id,
 			config.ref.url

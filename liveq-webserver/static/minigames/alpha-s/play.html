@@ -58,7 +58,6 @@
 					self.drawSimulation( alphaS, 0.06, 0.25 );
 				},
 				format: function(val) {
-					console.log("<",val);
 					return Number(val/10000).toFixed(3);
 				}
 			}).css({
@@ -100,7 +99,6 @@
 			yp = padding*2+padding+eventSize,plotSize,plotSize;
 
 			// Draw plot
-			console.log(Math.sin(v*Math.PI));
 			this.drawGaussianHistogram(
 				xp,yp, plotSize, plotSize,
 				1-v*2,0.3+Math.sin(v*Math.PI)*0.5, 5+Math.sin(v*Math.PI)*5,
