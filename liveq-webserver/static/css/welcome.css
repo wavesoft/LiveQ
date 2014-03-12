@@ -1,0 +1,45 @@
+body {
+  font: sans-serif;
+  padding-top: 40px;
+  background: url(../img/background-detector.jpg) #000000 no-repeat center center;
+  background-attachment: fixed;
+}
+#welcome-frame {
+  border-radius: 20px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #efefef;
+}
+#welcome-frame .welcome-header > div {
+  padding-left: 80px;
+}
+#welcome-frame .welcome-header > div h1 {
+  margin: 8px;
+}
+#welcome-frame .welcome-header > div small {
+  font-size: 0.5em;
+}
+#welcome-frame .welcome-header > img {
+  float: left;
+}
+#welcome-frame .welcome-body {
+  background: #000;
+  padding: 10px;
+  margin-top: 20px;
+  border-top: solid 1px #999;
+  border-bottom: solid 1px #999;
+}
+#welcome-frame .welcome-footer img {
+  max-width: 70px;
+}
+#welcome-frame .btn,
+#welcome-frame .label {
+  color: #222;
+}
+.welcome-footer {
+  color: #FFF;
+  font-size: 0.85em;
+  text-align: center;
+  margin: 10px 0px;
+}

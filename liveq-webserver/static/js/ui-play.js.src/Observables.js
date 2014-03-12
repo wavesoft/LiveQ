@@ -252,8 +252,8 @@ LiveQ.UI.Observables.prototype.add = function( histoData, histoReference ) {
 	});
 
 	// Plat histogram & Reference data
-	plot.addHistogram( histoReference.reference, "Reference data" )
-	plot.addHistogram( histoData, histoReference.title );
+	plot.addHistogram( histoReference.reference, "Reference data", "#000000" );
+	plot.addHistogram( histoData, histoReference.title, "#0066FF" );
 
 	// Prepare config object for this observable and store it
 	var config = {

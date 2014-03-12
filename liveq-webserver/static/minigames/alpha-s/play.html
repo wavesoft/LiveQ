@@ -31,9 +31,12 @@
 				'#009933', '#009933', '#FF9900', '#3366FF'
 			];
 			this.eventRotation = Math.random() * Math.PI;
-			for (var i=0; i<Math.round(Math.random()*40)*2+10; i++) {
+			for (var i=0; i<Math.round(Math.random()*50)*2+20; i++) {
+				var tt = Math.floor(Math.random()*4);
+				if (tt==2) tt=1;
+				if (tt==3) tt=2;
 				this.eventData.push({
-					'type': Math.floor(Math.random()*3),
+					'type': tt,
 					'color': Math.floor(Math.random()*4),
 					'r1': Math.random(),
 					'r2': Math.random(),
@@ -61,7 +64,8 @@
 			}).css({
 				'position': 'absolute',
 				'left': '5px',
-				'top': '24px'
+				'top': '24px',
+				'cursor': 'pointer'
 			});
 
 			// Original render
@@ -96,9 +100,10 @@
 			yp = padding*2+padding+eventSize,plotSize,plotSize;
 
 			// Draw plot
+			console.log(Math.sin(v*Math.PI));
 			this.drawGaussianHistogram(
 				xp,yp, plotSize, plotSize,
-				1-v*2,0.3+Math.sin(v*Math.PI/2+Math.PI/4)*1.0,
+				1-v*2,0.3+Math.sin(v*Math.PI)*0.5, 5+Math.sin(v*Math.PI)*5,
 				"Thrust Histogram (T)");
 
 			// Draw help text
@@ -139,6 +144,7 @@
 			var h = Math.round(this.eventData.length/2),
 				pieAngle = spread*Math.PI;
 
+			// First half
 			for (var i=0; i<h; i++) {
 				var e = this.eventData[i],
 					l = length/3 + length*2/3*e.r1,
@@ -146,6 +152,7 @@
 
 				this.context.strokeStyle = this.eventColors[e.color];
 				if (e.type == 0) {
+					l += e.r3*length/2;
 					this.drawLine(x,y,a,l);
 				} else if (e.type == 1) {
 					this.drawCurve(x,y,a,l,Math.PI/4*e.r3);
@@ -154,6 +161,7 @@
 				}
 			}
 
+			// Second half
 			for (var i=h; i<this.eventData.length; i++) {
 				var e = this.eventData[i],
 					l = length/3 + length*2/3*e.r1,
@@ -229,7 +237,7 @@
 			ctx.stroke();
 		}
 
-		Game001.prototype.drawGaussianHistogram = function(x,y,w,h, m,s2, title) {
+		Game001.prototype.drawGaussianHistogram = function(x,y,w,h, m,s2,d, title) {
 			var ctx = this.context,
 				textH = 15,
 				s = Math.sqrt(s2),
@@ -257,7 +265,7 @@
 			for (var px=0; px<w-4; px+=2) {
 
 				// Calculate y
-				py = ( 2 * Math.exp( - (Math.pow( ((px-(w/2))/(w/5)) -b, 2) / 2*c*c) )) * h*2/5;
+				py = ( 2 * Math.exp( - (Math.pow( ((px-(w/2))/(w/5)) -b, 2) / 2*c*c) )) * (h-d)*2/5 + d;
 
 				// Get previous point
 				if (first) {
