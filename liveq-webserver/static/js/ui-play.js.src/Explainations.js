@@ -5,15 +5,34 @@
 Popcorn.plugin( "maskedFocus", function( options ) {
 
 	var isVisible = true,
-		focusElement = null;
+		focusElement = null,
+		classAdded = null;
 
 	return {
 		start: function(event, track) {
 			focusElement = options.focus,
 			isVisible = focusElement.is(":visible");
 
-			// Show element if it's hidden
-			if (!isVisible) focusElement.show();
+			// Fire onEnter
+			if (options['onEnter'] !== undefined)
+				options['onEnter']();
+
+			// Do some element preparations on the time for the animation
+			setTimeout(function() {
+				
+				// Show element if it's hidden
+				if (!isVisible) focusElement.show();
+
+				// Check if we should add a class
+				if ((options['addClass'] !== undefined) && !focusElement.hasClass(options['addClass'])) {
+					classAdded = options['addClass'];
+					focusElement.addClass(options['addClass']);
+				}
+
+				// Just in case something moved...
+				LiveQ.UI.explainations.realignExplaination();
+
+			}, 500);
 
 			// Focus to that element
 			LiveQ.UI.explainations.focusToElement(options.focus, 500);
@@ -48,6 +67,14 @@ Popcorn.plugin( "maskedFocus", function( options ) {
 			// Hide popover
 			if (options['text'] !== undefined)
 				focusElement.popover('hide');
+
+			// Remove class
+			if (classAdded)
+				focusElement.removeClass(classAdded);
+
+			// Fire onExit
+			if (options['onExit'] !== undefined)
+				options['onExit']();
 
 			// Realign explainations
 			LiveQ.UI.explainations.realignExplaination();
@@ -223,6 +250,9 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 				'title': entry['title'],
 				'text': entry['text'],
 				'placement': entry['placement'],
+				'addClass': entry['addClass'],
+				'onEnter': entry['onEnter'],
+				'onExit': entry['onExit']
 
 			});
 
@@ -276,9 +306,9 @@ LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 	if (this.focusedElement) {
 
 		// Get the element position
-		var elmPos = this.focusedElement.offset(),
-			elmW = this.focusedElement.width(),
-			elmH = this.focusedElement.height();
+		var elmPos = this.focusedElement.e.offset(),
+			elmW = this.focusedElement.e.width(),
+			elmH = this.focusedElement.e.height();
 
 		// Check for blockage on X axis
 		if (edge_intersect(elmPos.left, elmW, x, w)) {
@@ -321,12 +351,15 @@ LiveQ.UI.Explainations.prototype.focusToElement = function( element, delay ) {
 
 	// Put element above the backdrop
 	if (this.focusedElement) {
-		this.focusedElement.css({
+		this.focusedElement.e.css({
 			'z-index': 'auto',
-			'position': 'auto'
+			'position': this.focusedElement.lp
 		});
 	}
-	this.focusedElement = element;
+	this.focusedElement = {
+		'e': element,
+		'lp': element.css("position")
+	};
 
 	// Check if we should fire this immediately or after some delay
 	if (!delay) {
@@ -344,9 +377,9 @@ LiveQ.UI.Explainations.prototype.unfocusElement = function() {
 
 	// Reset element position and hide backdrop
 	if (this.focusedElement) {
-		this.focusedElement.css({
+		this.focusedElement.e.css({
 			'z-index': 'auto',
-			'position': 'auto'
+			'position': this.focusedElement.lp
 		});
 	}
 
