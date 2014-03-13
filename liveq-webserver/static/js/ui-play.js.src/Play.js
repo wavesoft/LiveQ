@@ -205,40 +205,71 @@
 
       // Test video introduction
       var showUIIntro = function() {
+        var doExpand = false;
         LiveQ.UI.explainations.showVideoExplaination(
-            "http://www.youtube.com/watch?v=OCWj5xgu5Ng&rel=0&controls=0",
+            "http://www.youtube.com/watch?v=x3S0s-qjNsY&rel=0&controls=0",
             "Introduction to the interface",
             [
               {
-                'at': 5,
+                'at': 8,
                 'focus': $("#tunables-pane"),
-                'title': 'Tunables Pane',
-                'text': 'From here you can tune the model parameters'
+                'title': 'Tunables Group',
+                'text': 'From here you can tune the model parameters.'
               },
               {
-                'at': 10,
+                'at': 13,
                 'focus': $("#observables-pane"),
-                'title': 'Observables Pane',
-                'text': 'From here you see the effect of your tunes'
+                'title': 'Observables Group',
+                'text': 'From here you see the effect of your tunes.'
               },
               {
-                'at': 12,
-                'focus': $("#observables-legend"),
-                'title': 'Observables Pane',
-                'text': 'You can refer to the color coding in the legend'
+                'at': 23.5,
+                'focus': $(".tune:first"),
+                'title': 'Tunable Tile',
+                'text': 'Click here to expand and edit it\'s value.'
               },
               {
-                'at': 15,
-                'focus': $("#sim-begin"),
-                'title': 'Simulation Control',
-                'text': 'With this button you can start the simulation'
+                'at': 28.9,
+                'focus': $(".tune:first"),
+                'title': 'Tunable Tile',
+                'text': 'Use the plus/minus buttons to change value, or click on the label to type it.',
+                onEnter: function() {
+                  doExpand = !$(".tune:first").hasClass("expand");
+                  if (doExpand) $(".tune:first").click();
+                }
               },
               {
-                'at': 20,
+                'at': 31.5,
+                'focus': $(".observable:first"),
+                'title': 'Observable Tile',
+                'text': 'Here you see the simulation histograms and how successful was the fit.',
+                'placement': 'top',
+                onEnter: function() {
+                  
+                  // Pick the first tunable parameter
+                  var cfg = {};
+                  for (k in t.parameters) {
+                    if (typeof(t.parameters[k]) == 'object') {
+                      cfg = t.parameters[k];
+                      break;
+                    }
+                  }
+                  console.log("Found cfg", cfg);
+
+                  // Fire change event
+                  t.set( cfg.name, cfg.value );
+
+                },
+                onExit: function() {
+                  $(".tune:first").click();
+                }
+              },
+              {
+                'at': 40.5,
                 'duration': 5,
-                'focus': $("#sim-abort"),
-                'title': 'Simulation Control',
-                'text': 'With this button you can abort it',
+                'focus': $("#sim-begin"),
+                'title': 'Start Simulation Button',
+                'text': 'Click this to start the simulation when you are ready.',
               }
             ]
           );

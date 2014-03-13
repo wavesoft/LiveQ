@@ -142,9 +142,9 @@ LiveQ.UI.Observables.prototype.toggle = function( element, config ) {
       self.reorder();
 
       // Scroll to top of the element
-      $('html,body').animate({
-        scrollTop: self.host.offset().top + parseInt($(elm).attr("data-top"))
-      }, 250);
+      //$('html,body').animate({
+      //  scrollTop: self.host.offset().top + parseInt($(elm).attr("data-top"))
+      //}, 250);
 
     }, 50);
 

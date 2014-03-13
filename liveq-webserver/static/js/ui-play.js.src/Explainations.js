@@ -211,7 +211,7 @@ LiveQ.UI.Explainations.prototype.showVideoExplaination = function( videoSource, 
 	this.eExplainBody.empty();
 	var videoHost = $('<div id="misc-presentation-video"></div>').css({
 		'width': 360,
-		'height': 300
+		'height': 203
 	});
 	this.eExplainBody.append(videoHost);
 	this.eExplainTitle.html(title);
@@ -305,20 +305,11 @@ LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 			elmH = this.focusedElement.e.height();
 
 		// Check for blockage on X axis
-		if (edge_intersect(elmPos.left, elmW, x, w)) {
+		if (edge_intersect(elmPos.left, elmW, x, w) && edge_intersect(elmPos.top, elmH, y, h)) {
 			if (elmPos.left < window.innerWidth/2) {
 				x = elmPos.left + elmW + 50;
 			} else {
 				x = elmPos.left - w - 30;
-			}
-		}
-
-		// Check for blockage on Y axis
-		else if (edge_intersect(elmPos.top, elmH, y, h)) {
-			if (elmPos.top < window.innerHeight/2) {
-				y = elmPos.top + elmH + 50;
-			} else {
-				y = elmPos.top - h - 30;
 			}
 		}
 
