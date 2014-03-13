@@ -388,3 +388,15 @@ LiveQ.UI.Observables.prototype.getElement = function( observable ) {
 	if (!config) return undefined;
 	return config['element'];
 }
+
+/**
+ * Return the average of the Chi-Squared errors of all histograms
+ */
+LiveQ.UI.Observables.prototype.getAverageError = function() {
+	var ans = 0, ansc = 0;
+	$.each(this.observables, function (k,v) {
+		var chi2 = LiveQ.Calculate.chi2WithError( v.data, v.ref.reference );
+		ans += chi2[0]; ansc += 1;
+	});
+	return ans / ansc;
+}

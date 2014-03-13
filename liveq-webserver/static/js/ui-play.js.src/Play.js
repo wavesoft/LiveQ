@@ -130,11 +130,67 @@
       /**
        * Cleanup when the simulation is completed
        */
-      lab.onCompleted(function() {
+      lab.onCompleted(window.ff = function() {
+
         addLog("Simulation completed", "done");
         $("#sim-abort").hide();
         $("#loading-spinner").hide();
         $("#running-text").hide();
+
+        // Check the quality of the results
+        var error = o.getAverageError(),
+            matchPrefix, matchTitle, matchBody, matchAccept;
+        if (error < 0.5) {
+          matchPrefix = "perfect";
+          matchTitle = "Perfect Match";
+          matchBody = "Wow! You found a perfect match! You managed tune the theoretical model in the best possible way! That's quite rare you know...";
+          matchAccept = true;
+
+        } else if (error < 1.0) {
+          matchPrefix = "good";
+          matchTitle = "Good Match";
+          matchBody = "Congratulations! You managed to tune the theoretical model in the most optimal way!"
+          matchAccept = true;
+
+        } else if (error < 4.0) {
+          matchPrefix = "acceptable";
+          matchTitle = "Acceptable Match";
+          matchBody = "Good work! You managed to find something quite close to what we need, but we will need something better.";
+          matchAccept = true;
+
+        } else if (error < 9.0) {
+          matchPrefix = "fair";
+          matchTitle = "Fair Match";
+          matchBody = "You have done a good job, but you still have some way to go until you find something more precise.";
+          matchAccept = false;
+
+        } else {
+          matchPrefix = "bad";
+          matchTitle = "Bad Match";
+          matchBody = "Your model is completely mistuned. Please try different values!";
+          matchAccept = false;
+
+        }
+
+        // Update modal
+        $("#sim-status .modal-body h3").html(matchTitle);
+        $("#sim-status .modal-body p").html(matchBody);
+        $("#sim-status .modal-body img").attr({
+          'src': '/vas/static/img/models/' + matchPrefix + '.png',
+          'alt': matchPrefix,
+          'title': matchTitle
+        });
+
+        // Hide/show next level
+        if (matchAccept) {
+          $("#sim-next-level").show();
+        } else {
+          $("#sim-next-level").hide();
+        }
+
+        // Show modal
+        $('#sim-status').modal('show');
+
       });
 
       /**
@@ -214,13 +270,15 @@
                 'at': 8,
                 'focus': $("#tunables-pane"),
                 'title': 'Tunables Group',
-                'text': 'From here you can tune the model parameters.'
+                'text': 'From here you can tune the model parameters.',
+                'placement': 'top'
               },
               {
                 'at': 13,
                 'focus': $("#observables-pane"),
                 'title': 'Observables Group',
-                'text': 'From here you see the effect of your tunes.'
+                'text': 'From here you see the effect of your tunes.',
+                'placement': 'top'
               },
               {
                 'at': 23.5,
@@ -280,8 +338,11 @@
       //   onLoad Initializations
       // ==========================
 
-      // Prepare modal
+      // Prepare modals
       $('#sim-waiting-modal').modal({
+        'show': false
+      });
+      $('#sim-status').modal({
         'show': false
       });
 
