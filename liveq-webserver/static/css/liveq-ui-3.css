@@ -115,6 +115,13 @@ div.help-modal .tab-content {
 #tunables div.tune > div.value.highlight {
   color: #ffcc66;
 }
+#tunables div.tune > input {
+  width: 64px;
+  text-align: center;
+  color: #000;
+  left: 0px;
+  position: absolute;
+}
 #tunables div.tune > div.tune-desc {
   position: absolute;
   left: 129px;
@@ -200,6 +207,9 @@ div.help-modal .tab-content {
   width: 128px;
   font-size: 1.5em;
 }
+#tunables div.tune.expand > input {
+  width: 128px;
+}
 #tunables div.tune.expand > div.tune-desc {
   opacity: 1;
   cursor: auto;
@@ -236,8 +246,6 @@ div.help-modal .tab-content {
 }
 #observables div.observable.mark {
   border-color: #FF0000 !important;
-  color: #FF0000 !important;
-  background: #FFFFFF !important;
 }
 #observables div.observable > h4 {
   margin: 8px 0px 4px;

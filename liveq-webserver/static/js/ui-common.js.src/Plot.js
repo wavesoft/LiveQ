@@ -371,9 +371,19 @@ LiveQ.UI.PlotWindow.prototype.updateLegend = function() {
 			return "translate(0,"+(yDirection*i*self.style.legendHeight)+")"
 		});
 	record.selectAll("text")
-		.text(function(d,i) { return d.title });
+		.text(function(d,i) { return d.title + (d.histo.interpolated?" [Estimate]":"") });
 	record.selectAll("path")
-		.attr("fill", function(d,i) { return d.color });
+		.attr("fill", function(d,i) { 
+			var color = d.color;
+			if (typeof(d.color) == 'object') {
+				if (d.histo.interpolated) {
+					color = d.color[1];
+				} else {
+					color = d.color[0];
+				}
+			}
+			return color; 
+		});
 
 	// Delete
 	record.exit()
@@ -499,6 +509,16 @@ LiveQ.UI.PlotWindow.prototype.update = function() {
 				.attr("id", plot.id);
 		}
 
+		// Pick a plot color if we have multiple
+		var color = plot.color;
+		if (typeof(plot.color) == 'object') {
+			if (plot.histo.interpolated) {
+				color = plot.color[1];
+			} else {
+				color = plot.color[0];
+			}
+		}
+
 		// -----------------------------
 		//  Render Plot Area
 		// -----------------------------
@@ -511,13 +531,14 @@ LiveQ.UI.PlotWindow.prototype.update = function() {
 		record.enter()
 			.append("svg:path")
 				.attr("class", "plot-area")
-				.attr("fill", plot.color)
+				.attr("fill", color)
 				.attr("fill-opacity", 0.3);
 
 		// Update
 		record
 			.attr("d", pathArea)
-			.attr("visibility", this.style.features.errorBand ? "visible" : "hidden");
+			.attr("visibility", this.style.features.errorBand ? "visible" : "hidden")
+			.attr("fill", color);
 
 		// Delete
 		record.exit()
@@ -535,10 +556,11 @@ LiveQ.UI.PlotWindow.prototype.update = function() {
 		record.enter()
 			.append("svg:path")
 				.attr("class", "plot-line")
-				.attr("stroke", plot.color);
+				.attr("stroke", color);
 
 		// Update
-		record.attr("d", pathLine);
+		record.attr("d", pathLine)
+				.attr("stroke", color);
 
 		// Delete
 		record.exit()
@@ -555,7 +577,7 @@ LiveQ.UI.PlotWindow.prototype.update = function() {
 		record.enter()
 			.append("svg:path")
 				.attr("class", "plot-bullet")
-				.attr("stroke", plot.color);
+				.attr("stroke", color);
 
 		// Update
 		record
@@ -586,6 +608,7 @@ LiveQ.UI.PlotWindow.prototype.update = function() {
 						+ D_RECT;
 
 			})
+			.attr("stroke", color);
 
 		// Delete
 		record.exit()

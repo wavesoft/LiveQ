@@ -29,9 +29,6 @@ Popcorn.plugin( "maskedFocus", function( options ) {
 					focusElement.addClass(options['addClass']);
 				}
 
-				// Just in case something moved...
-				LiveQ.UI.explainations.realignExplaination();
-
 			}, 500);
 
 			// Focus to that element
@@ -50,9 +47,6 @@ Popcorn.plugin( "maskedFocus", function( options ) {
 					focusElement.popover('show');
 				}, 600);
 			}
-
-			// Realign explainations
-			LiveQ.UI.explainations.realignExplaination();
 
 		},
 		end: function(event, track) {
@@ -343,10 +337,16 @@ LiveQ.UI.Explainations.prototype.realignExplaination = function() {
 LiveQ.UI.Explainations.prototype.focusToElement = function( element, delay ) {
 	var self = this,
 		focusFunction = function() {
+
+			// Focus the element
 			$(element).css({
 				'z-index': 200001,
 				'position': 'relative'
 			});
+
+			// Realign explainations
+			LiveQ.UI.explainations.realignExplaination();
+
 		};
 
 	// Put element above the backdrop

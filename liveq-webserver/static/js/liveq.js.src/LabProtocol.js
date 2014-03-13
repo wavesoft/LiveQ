@@ -288,6 +288,9 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 			reserved0 = reader.getUint16(),
 			numHistos = reader.getUint32();
 
+		// Check if the data are from interpolation
+		var fromInterpolation = ((flags & 0x01) != 0);
+
 		// Read histograms
 		for (var j=0; j<numHistos; j++) {
 
@@ -302,7 +305,7 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 
 				// Update histogram bins from reader, skipping the
 				// reading of histogram ID (it has already happened)
-				histo.updateFromReader( reader, true, histoID );
+				histo.updateFromReader( reader, true, histoID, fromInterpolation );
 
 				// Update number of events
 				if (histo.nevts > 0)
@@ -318,9 +321,6 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 			}
 
 		}
-
-		// Check if the data are from interpolation
-		var fromInterpolation = ((flags & 0x01) != 0);
 
 		// Fire metadata update histogram
 		for (var i=0; i<this._onMetadataUpdated.length; i++) {

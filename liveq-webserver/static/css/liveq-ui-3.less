@@ -178,6 +178,13 @@ div.help-modal {
 			}
 
 		}
+		> input {
+			width: @tunables-sm;
+			text-align: center;
+			color: #000;
+			left: 0px;
+			position: absolute;
+		}
 		> div.tune-desc {
 			position: absolute;
 			left: (@tunables-xl+1px); right: 1px; top: 1px; bottom: 1px;
@@ -255,6 +262,9 @@ div.help-modal {
 				width: @tunables-xl;
 				font-size: 1.5em;
 			}
+			> input {
+				width: @tunables-xl;
+			}
 			> div.tune-desc {
 				opacity: 1;
 				cursor: auto;
@@ -298,8 +308,6 @@ div.help-modal {
 
 		&.mark {
 			border-color: #FF0000 !important;
-			color: #FF0000 !important;
-			background: #FFFFFF !important;
 		}
 
 		> h4 {

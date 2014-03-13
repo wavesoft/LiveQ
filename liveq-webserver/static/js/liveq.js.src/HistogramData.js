@@ -37,6 +37,12 @@ LiveQ.HistogramData = function( bins, id ) {
 	this.nevts = 0;
 
 	/**
+	 * Flag to define if the histogram is interpolated
+	 * @member {boolean}
+	 */
+	this.interpolated = false;
+
+	/**
 	 * Array of the callback functions to be fired when the histogram data are updated
 	 * @private
 	 * @member {array}
@@ -82,8 +88,9 @@ LiveQ.HistogramData.fromReader = function( reader ) {
  *
  * @param {LiveQ.BufferReader} reader - The input reader to read the histogram from
  * @param {bool} copy 				  - If spcified, the data will be copied to the local fields
+ * @param {bool} interpolated		  - The flag that defines if the data are interpolated
  */
-LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID ) {
+LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID, interpolated ) {
 
 	// Get copy value
 	var cp = (copy == undefined) ? false : copy;
@@ -103,8 +110,9 @@ LiveQ.HistogramData.prototype.updateFromReader = function( reader, copy, useID )
 		nevts = reader.getUint32();
 	// ---------------
 
-	// Store number of events
+	// Store number of events & interpolated flags
 	this.nevts = nevts;
+	this.interpolated = interpolated || false;
 
 	// Check how we should apply the information so far
 	if (cp) {

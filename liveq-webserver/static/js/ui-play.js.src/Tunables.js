@@ -106,7 +106,7 @@ LiveQ.UI.Tunables.prototype.createController = function( config ) {
   elm.append(bMinus);
 
   // Setup spinner
-  var spinner = new LiveQ.UI.Spinner( config, function(newValue) {
+  var spinner = this.spinner = new LiveQ.UI.Spinner( config, function(newValue) {
     
     // Update value
     self.set( config.name, newValue );
@@ -137,6 +137,7 @@ LiveQ.UI.Tunables.prototype.createController = function( config ) {
     e.stopPropagation();
     spinner.stop();
   });
+
 
   return elm;
 }
@@ -253,6 +254,11 @@ LiveQ.UI.Tunables.prototype.set = function( parameter, value ) {
 
   // Update value to the config
   parm.value = parseFloat(value);
+  if (parm.value < parm.min) parm.value = parm.min;
+  if (parm.value > parm.max) parm.value = parm.max;
+
+  // Update value to spinner
+  this.spinner.value = value;
 
   // Update value to UI
   var elmVal = parm.element.find("div.value");
@@ -281,11 +287,14 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
   var self = this,
       elm = $('<div class="tune"></div>'),
       hName = $('<h4>'+config.short+'</h4>'),
-      hValue = $('<div class="value">'+config.value.toFixed(config.dec)+'</div>');
+      hValue = $('<div class="value">'+config.value.toFixed(config.dec)+'</div>'),
+      hInput = $('<input type="text"></div>');
 
   // Nest elements
   elm.append(hName);
   elm.append(hValue);
+  elm.append(hInput);
+  hInput.hide();
 
   // Ensure syntax of config group
   if (!config.group) config.group = "";
@@ -299,6 +308,34 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
   elm.click(function() { self.toggle(this, config); });
   elm.mouseover(function(){ $(self).trigger('hover', config); });
   elm.mouseout(function(){ $(self).trigger('hout', config); });
+
+  // Edit on click
+  hValue.click(function(e) {
+    if (!elm.hasClass("expand")) return;
+    e.stopPropagation();
+    hValue.hide();
+    hInput.show();
+    hInput.focus();
+
+    var value = String(config.value);
+    hInput.attr("value", value);
+    hInput[0].setSelectionRange(0, value.length);
+  });
+  hInput.blur(function() {
+    hValue.show();
+    hInput.hide();
+    self.set( config.name, parseFloat(hInput.val()) );
+  });
+  hInput.click(function(e) {
+    e.stopPropagation();
+  });
+  hInput.keypress(function(e) {
+    if (e.keyCode == 13) {
+      hValue.show();
+      hInput.hide();
+      self.set( config.name, parseFloat(hInput.val()) );
+    }
+  });
 
   // Append element on host
   this.host.append(elm);
