@@ -55,7 +55,7 @@ handleSIGINT()
 
 # Setup port defaults
 define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
-define("ssl_certificate", default=Config.SSL, help="The host certificate for the server", type=str)
+define("ssl_certificate", default=Config.SSL_CERTIFICATE, help="The host certificate for the server", type=str)
 define("ssl_key", default=Config.SSL_KEY, help="The host certificate key for the server", type=str)
 define("ssl_ca", default=Config.SSL_CA, help="The CA certificate", type=str)
 define("ssl", default=Config.SSL, help="Set to 1 to enable SSL", type=int)
