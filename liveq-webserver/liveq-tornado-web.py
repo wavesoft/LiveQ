@@ -55,6 +55,7 @@ handleSIGINT()
 
 # Setup port defaults
 define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
+define("ssl_port", default=Config.SSL_PORT, help="The SSL Port to use (if equal to 'port', HTTP will be disabled)", type=int)
 define("ssl_certificate", default=Config.SSL_CERTIFICATE, help="The host certificate for the server", type=str)
 define("ssl_key", default=Config.SSL_KEY, help="The host certificate key for the server", type=str)
 define("ssl_ca", default=Config.SSL_CA, help="The CA certificate", type=str)
@@ -66,19 +67,21 @@ def main():
 	tornado.options.parse_command_line()
 	app = MCPlotsServer()
 
+	# Start an additional HTTP server
+	if options.port != options.ssl_port:
+		http_server = tornado.httpserver.HTTPServer(app)
+		logging.info("Starting HTTP server on port %s" % options.port)
+		http_server.listen(options.port)
+
 	# Setup the SSL Server if requested to do so
-	if (options.ssl):
-		http_server = tornado.httpserver.HTTPServer(app, ssl_options={
+	if options.ssl and options.ssl_port:
+		https_server = tornado.httpserver.HTTPServer(app, ssl_options={
 			"certfile": options.ssl_certificate,
 			"keyfile": options.ssl_key,
 			"ca_certs": options.ssl_ca
 		})
-		logging.info("Starting HTTPS server on port %s" % options.port)
-		http_server.listen(options.port)
-
-	else:
-		logging.info("Starting HTTP server on port %s" % options.port)
-		app.listen(options.port)
+		logging.info("Starting HTTPS server on port %s" % options.ssl_port)
+		https_server.listen(options.ssl_port)
 
 	# Start the main loop
 	tornado.ioloop.IOLoop.instance().start()
