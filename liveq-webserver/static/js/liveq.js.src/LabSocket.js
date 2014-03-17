@@ -82,6 +82,11 @@ LiveQ.LabSocket = function( id ) {
 	 */
 	this._pingTimer = null;
 
+	// If we are browsing the website through SSL, use SSL also
+	// for the socket.
+	if (String(window.location).substr(0,5) == "https")
+		this.url = "wss://" + location.host + "/vas/labsocket/" + id;
+
 	// Initialize connection
 	this.setupSocket();
 

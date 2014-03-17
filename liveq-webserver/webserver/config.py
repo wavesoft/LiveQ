@@ -36,12 +36,20 @@ class WebserverConfig:
 	BASE_URL = "/vas"
 	HISTODESC_PATH = ""
 	HISTODESC = None
+	SSL = False
+	SSL_CERTIFICATE = ""
+	SSL_KEY = ""
+	SSL_CA = ""
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
+		WebserverConfig.SSL = bool(config.get("webserver", "ssl"))
+		WebserverConfig.SSL_CERTIFICATE = config.get("webserver", "ssl_certificate")
+		WebserverConfig.SSL_KEY = config.get("webserver", "ssl_key")
+		WebserverConfig.SSL_CA = config.get("webserver", "ssl_ca")
 
 		# Create a histogram description from the reference data path
 		WebserverConfig.HISTODESC = HistoDescription( WebserverConfig.HISTODESC_PATH )
