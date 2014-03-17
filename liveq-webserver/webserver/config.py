@@ -37,6 +37,7 @@ class WebserverConfig:
 	HISTODESC_PATH = ""
 	HISTODESC = None
 	SSL = False
+	SSL_PORT = 8043
 	SSL_CERTIFICATE = ""
 	SSL_KEY = ""
 	SSL_CA = ""
