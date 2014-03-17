@@ -46,7 +46,7 @@ class WebserverConfig:
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
-		WebserverConfig.SSL = bool(config.get("webserver", "ssl"))
+		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
 		WebserverConfig.SSL_CERTIFICATE = config.get("webserver", "ssl_certificate")
 		WebserverConfig.SSL_KEY = config.get("webserver", "ssl_key")
 		WebserverConfig.SSL_CA = config.get("webserver", "ssl_ca")

@@ -58,7 +58,7 @@ define("port", default=Config.SERVER_PORT, help="Port to listen for incoming con
 define("ssl_certificate", default=Config.SSL_CERTIFICATE, help="The host certificate for the server", type=str)
 define("ssl_key", default=Config.SSL_KEY, help="The host certificate key for the server", type=str)
 define("ssl_ca", default=Config.SSL_CA, help="The CA certificate", type=str)
-define("ssl", default=Config.SSL, help="Set to 1 to enable SSL", type=int)
+define("ssl", default=Config.SSL, help="Set to 1 to enable SSL", type=bool)
 
 def main():
 
@@ -73,9 +73,11 @@ def main():
 			"keyfile": options.ssl_key,
 			"ca_certs": options.ssl_ca
 		})
+		logging.info("Starting HTTPS server on port %s" % options.port)
 		http_server.listen(options.port)
 
 	else:
+		logging.info("Starting HTTP server on port %s" % options.port)
 		app.listen(options.port)
 
 	# Start the main loop
@@ -83,7 +85,6 @@ def main():
 
 # Prepare thread for the webserver
 t = threading.Thread(target=main)
-logging.info("Starting weberver on port %s" % options.port)
 t.start()
 
 # Main idle loop
@@ -95,4 +96,4 @@ while True:
 		break
 
 	# Idle loop
-	time.sleep(1)
+	time.sleep(0.25)
