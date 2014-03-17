@@ -195,110 +195,89 @@ LiveQ.LabSocket.prototype.offCompleted = function( cb ) {
  */
 LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 	var self = this;
+	try {
 
-	// Create new WebSocket to the given url
-	this.socket = new WebSocket(this.url);
+		// Create new WebSocket to the given url
+		this.socket = new WebSocket(this.url);
 
-	// -----------------------------------------------------------
-	// Bind a listener to the incoming WebSocket Data
-	// This listener supports both binary and text data receiving
-	// 
-	this.socket.onmessage = function(event) {
+		// -----------------------------------------------------------
+		// Bind a listener to the incoming WebSocket Data
+		// This listener supports both binary and text data receiving
+		// 
+		this.socket.onmessage = function(event) {
 
-		// Check if the incoming data is a binary frame
-		if (event.data instanceof Blob) {
-			// If we have a binary response, read input
+			// Check if the incoming data is a binary frame
+			if (event.data instanceof Blob) {
+				// If we have a binary response, read input
 
-			// Prepare FileReader to read Blob into a ArrayBuffer
-			var blobReader = new FileReader();
-			blobReader.onload = function() {
+				// Prepare FileReader to read Blob into a ArrayBuffer
+				var blobReader = new FileReader();
+				blobReader.onload = function() {
 
-				// Encapsuate ArrayBuffer in a BufferReader class
-				var reader = new LiveQ.BufferReader(this.result);
+					// Encapsuate ArrayBuffer in a BufferReader class
+					var reader = new LiveQ.BufferReader(this.result);
 
-				// Read the frame header (64 bit)
-				var frameID = reader.getUint32(),
-					reserved = reader.getUint32();
+					// Read the frame header (64 bit)
+					var frameID = reader.getUint32(),
+						reserved = reader.getUint32();
 
-				// Handle data frame
-				self.handleDataFrame( frameID, reader );
+					// Handle data frame
+					self.handleDataFrame( frameID, reader );
 
-			};
+				};
 
-			// Send Blob to the FileReader
-			blobReader.readAsArrayBuffer(event.data);
+				// Send Blob to the FileReader
+				blobReader.readAsArrayBuffer(event.data);
 
-		} else {
-			// Parse JSON frame
+			} else {
+				// Parse JSON frame
 
-			// Convert data to JSON
-			var data = JSON.parse(event.data);
-			// Extract parameters
-			var param = data['param'] || { };
-			// Handle action
-			self.handleActionFrame( data['action'], param );
+				// Convert data to JSON
+				var data = JSON.parse(event.data);
+				// Extract parameters
+				var param = data['param'] || { };
+				// Handle action
+				self.handleActionFrame( data['action'], param );
 
-		}
+			}
 
 
-	};
+		};
 
-	// -----------------------------------------------------------
-	// Upon connection, we will need to send handshake and request 
-	// the initial configuration for the histograms.
-	// 
-	this.socket.onopen = function() {
-		console.log("Connection open")
+		// -----------------------------------------------------------
+		// Upon connection, we will need to send handshake and request 
+		// the initial configuration for the histograms.
+		// 
+		this.socket.onopen = function() {
+			console.log("Connection open")
 
-		// Handshake
-		self.send("handshake", { "version": LiveQ.version });
+			// Handshake
+			self.send("handshake", { "version": LiveQ.version });
 
-		// We are connected
-		self.connected = true;
+			// We are connected
+			self.connected = true;
 
-		// Fire callbacks
-		for (var i=0; i<self._onConnect.length; i++) {
-			self._onConnect[i](self);
-		}
+			// Fire callbacks
+			for (var i=0; i<self._onConnect.length; i++) {
+				self._onConnect[i](self);
+			}
 
-		// Start ping timer
-		if (self._pingTimer)
-			clearInterval(self._pingTimer);
-		self._pingTimer = setInterval(function() {
-			// Send PING every 30 seconds
-			self.send("ping", {});
-		}, 30000);
+			// Start ping timer
+			if (self._pingTimer)
+				clearInterval(self._pingTimer);
+			self._pingTimer = setInterval(function() {
+				// Send PING every 30 seconds
+				self.send("ping", {});
+			}, 30000);
 
-	};
+		};
 
-	// -----------------------------------------------------------
-	// If for any reason the socket is closed, retry connection
-	//
-	this.socket.onclose = (function() {
-		console.log("Connection closed");
+		// -----------------------------------------------------------
+		// If for any reason the socket is closed, retry connection
+		//
+		this.socket.onclose = (function() {
+			console.log("Connection closed");
 
-		// We are disconnected
-		self.connected = false;
-
-		// Fire callbacks
-		for (var i=0; i<self._onDisconnect.length; i++) {
-			self._onDisconnect[i](self);
-		}
-
-		// Clear timer
-		if (self._pingTimer)
-			clearInterval(self._pingTimer);
-
-	}).bind(this);
-
-	// -----------------------------------------------------------
-	// Handle socket errors
-	//
-	this.socket.onerror = (function(ws, error) {
-		console.error(error);
-
-		// If we were connected, that's an I/O error -> We are not connected any more
-		if (self.connected) {
 			// We are disconnected
 			self.connected = false;
 
@@ -306,9 +285,45 @@ LiveQ.LabSocket.prototype.setupSocket = function( url ) {
 			for (var i=0; i<self._onDisconnect.length; i++) {
 				self._onDisconnect[i](self);
 			}
+
+			// Clear timer
+			if (self._pingTimer)
+				clearInterval(self._pingTimer);
+
+		}).bind(this);
+
+		// -----------------------------------------------------------
+		// Handle socket errors
+		//
+		this.socket.onerror = (function(ws, error) {
+			console.error(error);
+
+			// If we were connected, that's an I/O error -> We are not connected any more
+			if (self.connected) {
+				// We are disconnected
+				self.connected = false;
+
+				// Fire callbacks
+				for (var i=0; i<self._onError.length; i++) {
+					self._onError[i](self, "Socket Error", true);
+				}
+				for (var i=0; i<self._onDisconnect.length; i++) {
+					self._onDisconnect[i](self);
+				}
+			}
+
+		}).bind(this);
+
+	} catch (e) {
+		console.error("Socket exception", e);
+
+		// Fire callbacks on exception
+		for (var i=0; i<self._onError.length; i++) {
+			self._onError[i](self, "Socket exception", true);
 		}
 
-	}).bind(this);
+	}
+
 }
 
 /**
@@ -332,7 +347,7 @@ LiveQ.LabSocket.prototype.handleActionFrame = function( action, data ) {
 
 		// Fire callbacks
 		for (var i=0; i<this._onError.length; i++) {
-			this._onError[i](data['message']);
+			this._onError[i](data['message'], false);
 		}
 
 	} else if (action == "sim_completed") { /* Job completed */

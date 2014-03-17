@@ -19,11 +19,15 @@
         $("div.log").prepend(logLine);
   }
 
-  function show_disconnected_bsod() {
+  var already_bsod = false;
+  function show_bsod(icon, text) {
+    if (already_bsod) return;
+    already_bsod = true;
+
     setTimeout(function() {
       var e_bsod = $('<div id="bsod"></div>'),
-          e_icon = $('<div class="bsod-icon">&#9889;</div>'),
-          e_text = $('<div>Your connection with the server was interrupted. Please <a href="javascript:;">reload the site</a> to try again.</div>'),
+          e_icon = $('<div class="bsod-icon">' + ( icon || "&times;" ) + '</div>'),
+          e_text = $('<div>' + ( text || "Your connection with the server was interrupted" ) + '. Please <a href="javascript:;">reload the site</a> to try again.</div>'),
           e_floater = $('<div></div>');
 
       // Nest elements
@@ -41,7 +45,7 @@
         window.location.reload();
       });
 
-    }, 1000);
+    }, 500);
   }
 
   LiveQ.UI.initLab = function(id) {
@@ -102,7 +106,15 @@
        * Handle disconnection with the sterver
        */
       lab.onDisconnect(function() {
-        show_disconnected_bsod();
+        show_bsod("&times;", "Your connection with the server was interrupted");
+      });
+
+      /**
+       * Handle error feedback
+       */
+      lab.onError(function(message, critical) {
+        if (critical)
+          show_bsod("!", "Could not establish connection with the server");
       });
 
       /**
@@ -156,6 +168,16 @@
        */
       lab.onError(function(msg) {
         addLog(msg, "error");
+      });
+
+      /**
+       * Stop connection timeout timer
+       */
+      var cctimer = setTimeout(function() {
+        show_bsod("!", "Timed out while trying to connect with the server.");
+      }, 5000);
+      lab.onConnect(function(msg) {
+        clearTimeout(cctimer);
       });
 
       /**
