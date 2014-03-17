@@ -1,4 +1,29 @@
 
+  function show_disconnected_bsod() {
+    setTimeout(function() {
+      var e_bsod = $('<div id="bsod"></div>'),
+          e_icon = $('<div class="bsod-icon">&#9889;</div>'),
+          e_text = $('<div>Your connection with the server was interrupted. Please <a href="javascript:;">reload the site</a> to try again.</div>'),
+          e_floater = $('<div></div>');
+
+      // Nest elements
+      e_bsod.append(e_floater);
+      e_floater.append(e_icon);
+      e_floater.append(e_text);
+      $(document.body).append(e_bsod);
+
+      // Fade-in
+      e_bsod.hide();
+      e_bsod.fadeIn();
+
+      // Bind reload
+      $(e_text).click(function() {
+        window.location.reload();
+      });
+
+    }, 1000);
+  }
+
 (function() {
   
   function commaThousands(x) {
@@ -73,6 +98,13 @@
       };
       $("#sim-modal-abort").click(abortFn);
       $("#sim-abort").click(abortFn);
+
+      /**
+       * Handle disconnection with the sterver
+       */
+      lab.onDisconnect(function() {
+        show_disconnected_bsod();
+      });
 
       /**
        * Notification when server data are available

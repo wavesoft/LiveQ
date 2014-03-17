@@ -64,6 +64,31 @@ div.help-modal .tab-content {
   padding: 5px;
 }
 /**
+ * Blue screen of death
+ */
+#bsod {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20000;
+}
+#bsod > div:before {
+  height: 50%;
+}
+#bsod > div {
+  margin: -20px auto 0;
+  height: 320px;
+  width: 320px;
+  text-align: center;
+  color: #fff;
+}
+#bsod > div .bsod-icon {
+  font-size: 250px;
+}
+/**
  * Tunables group
  */
 #tunables {
@@ -151,7 +176,7 @@ div.help-modal .tab-content {
   bottom: 0;
   left: 0;
   opacity: 0;
-  height: 36.57142857142857px;
+  height: 36.57142857px;
   width: 128px;
   -webkit-transition: opacity linear 0.2s;
   -moz-transition: opacity linear 0.2s;
@@ -168,7 +193,7 @@ div.help-modal .tab-content {
   width: 50%;
   position: absolute;
   font-size: 1.5em;
-  height: 36.57142857142857px;
+  height: 36.57142857px;
   cursor: pointer;
 }
 #tunables div.tune > div.tune-ctl > div.b:active {

@@ -305,9 +305,10 @@ LiveQ.UI.Tunables.prototype.add = function( config ) {
   this.groups[config.group] = config;
 
   // Register click handler
+  var fireHover = true;
   elm.click(function() { self.toggle(this, config); });
-  elm.mouseover(function(){ $(self).trigger('hover', config); });
-  elm.mouseout(function(){ $(self).trigger('hout', config); });
+  elm.mouseover(function(){ if (fireHover) { $(self).trigger('hover', config); fireHover = false; } });
+  elm.mouseout(function(){ $(self).trigger('hout', config); fireHover = true; });
 
   // Edit on click
   hValue.click(function(e) {

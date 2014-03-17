@@ -130,6 +130,35 @@ div.help-modal {
 }
 
 /**
+ * Blue screen of death
+ */
+#bsod {
+
+	position: fixed;
+	background-color: rgba(0,0,0,0.8);
+	top: 0; left: 0; right: 0; bottom: 0;
+	z-index: 20000;
+
+	> div:before {
+		height: 50%;
+	}
+
+	> div {
+
+		margin: -20px auto 0;
+		height: 320px; width: 320px;
+		text-align: center;
+		color: #fff;
+
+		.bsod-icon {
+			font-size: 250px;
+		}
+
+	}
+
+}
+
+/**
  * Tunables group
  */
 #tunables {
