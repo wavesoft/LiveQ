@@ -1,3 +1,23 @@
+(function() {
+  
+  function commaThousands(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+  function getTS() {
+    var d = new Date();
+    return  ('0' + d.getHours()).slice(-2) + ":" +
+        ('0' + d.getMinutes()).slice(-2) + ":" +
+        ('0' + d.getSeconds()).slice(-2);
+  }
+
+  function addLog(html, cls) {
+    var logLine = $('<div></div>');
+        if (!cls) cls="";
+        $(logLine).attr("class", cls);
+        $(logLine).html("["+getTS()+"]: "+html);
+        $("div.log").prepend(logLine);
+  }
 
   function show_disconnected_bsod() {
     setTimeout(function() {
@@ -22,27 +42,6 @@
       });
 
     }, 1000);
-  }
-
-(function() {
-  
-  function commaThousands(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
-
-  function getTS() {
-    var d = new Date();
-    return  ('0' + d.getHours()).slice(-2) + ":" +
-        ('0' + d.getMinutes()).slice(-2) + ":" +
-        ('0' + d.getSeconds()).slice(-2);
-  }
-
-  function addLog(html, cls) {
-    var logLine = $('<div></div>');
-        if (!cls) cls="";
-        $(logLine).attr("class", cls);
-        $(logLine).html("["+getTS()+"]: "+html);
-        $("div.log").prepend(logLine);
   }
 
   LiveQ.UI.initLab = function(id) {
