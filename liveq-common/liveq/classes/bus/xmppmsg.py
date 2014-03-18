@@ -461,7 +461,7 @@ class XMPPBus(Bus, ClientXMPP):
 		# Get JID
 		jid = str(event['from'])
 
-		# Notify bare id (if exists) that the connection is now closed
+		# Notify bare id channels (if exists) that the connection is now closed
 		barejid = jid.split("/")[0]
 		if barejid in self.channels:
 			self.channels[barejid].trigger('close')

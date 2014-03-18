@@ -18,72 +18,45 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+# ----------
 import sys
-import signal
-import logging
-import time
+sys.path.append("../liveq-common")
+# ----------
 
-from liveq.config import Config
-from liveq.internal.exceptions import *
-from liveq.internal.application import STATE_RUNNING
-from liveq.utils.FLAT import FLATParser
-from liveq.utils.hugedata import Hugedata
+import time
+import logging
+
+from agent.io.jobmanagers import JobManagers
+from agent.config import Config
+
+from liveq.exceptions import ConfigException
+from liveq import handleSIGINT, exit
+
+# Prepare runtime configuration
+runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.readFile( "config/liveq.conf.local" )
+	Config.fromFile( "config/agent.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
-	sys.exit(1)
-except Exception as e:
-	print("ERROR   Unexpected exception %s while reading configuration: %s" % (e.__class__.__name__, e))
-	sys.exit(1)
+	exit(1)
 
-# Configure logging
-logging.basicConfig(level=Config.LOG_LEVEL, format='%(levelname)-8s %(message)s')
+# Hook sigint -> Shutdown
+handleSIGINT()
 
-# ======== TEST
+# Banner
+logging.info("Starting agent tests %s" % Config.UUID)
 
-src = FLATParser.parse("/tmp/data/dump/DELPHI_2002_069_CONF_603_d01-x01-y01.dat")
-dst = Hugedata.jsCompress(src)
+# Login to the server
+jobmanagers = JobManagers( Config.SERVER_CHANNEL )
+jobmanagers.login()
 
-print dst
+# Pick JIDs
+while True:
 
-sys.exit(0)
+	jid = jobmanagers.jid()
+	print "JID: %s" % jid
 
-#adapter = Config.ADAPTER.instance({})
-#adapter.connect()
-#adapter.process(block=True)
-
-runconfig = {
-
-	# Run configuration
-	"beam": "ee", 
-	"process": "zhad", 
-	"energy": 91.2, 
-	"params": "-",
-	"specific": "-",
-	"generator": "pythia8",
-	"version": "8.175",
-	"events": 10000,
-	"seed": 123123,
-
-	# Tune configuration
-	"tune": {
-		"TimeShower:alphaSvalue": 0.31
-	}
-
-}
-
-jobapp = Config.APP.instance({})
-jobapp.setConfig( runconfig )
-jobapp.start()
-
-def signal_handler(signal, frame):
-        jobapp.kill()
-
-signal.signal(signal.SIGINT, signal_handler)
-
-while jobapp.state == STATE_RUNNING:
-	logging.debug("****************** MAIN LOOP ******************")
 	time.sleep(1)
+

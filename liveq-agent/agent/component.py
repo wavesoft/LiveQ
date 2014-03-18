@@ -21,11 +21,11 @@ import logging
 import time
 
 from agent.config import Config
+from agent.io.jobmanagers import JobManagers
 
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
-from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.utils.fsm import SimpleFSM
 
 from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
@@ -49,25 +49,25 @@ class AgentComponent(Component, SimpleFSM):
 		self.logger = logging.getLogger("agent")
 		self.logger.debug("Agent component started")
 
-		# Open a communication channel with the server on the external bus
-		# (Currently that's the XMPP channel - but we prefer to be abstract)
-		self.serverChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
-
 		# The slots where job instances are placed
 		self.slots = [None] * int(Config.AGENT_SLOTS)
 		self.jobIndex = { }
 		self.runtimeConfig = { }
 
-		# TODO: Uhnack this
-		# This establishes a presence relationship with the server entity.
-		if isinstance(Config.EBUS, XMPPBus):
-			self.logger.debug("Subscribing %s to my roster" % Config.SERVER_CHANNEL)
-			Config.EBUS.send_presence(pto=Config.SERVER_CHANNEL, ptype='subscribe')
+		# Open an input channel from the server on the external bus
+		# (Currently that's the XMPP channel - but we prefer to be abstract)
+		self.serverInChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
 
 		# Bind incoming message handlers
-		self.serverChannel.on('job_start', self.cmdJobStart)
-		self.serverChannel.on('job_cancel', self.cmdJobCancel)
-		self.serverChannel.on('close', self.onDisconnect)
+		self.serverInChannel.on('job_start', self.cmdJobStart)
+		self.serverInChannel.on('job_cancel', self.cmdJobCancel)
+		self.serverInChannel.on('close', self.onDisconnect)
+
+		# Establish connection with the job managers
+		# This class allows us to pick an agent where we are going
+		# to send the response data.
+		self.jobmanagers = JobManagers( Config.SERVER_CHANNEL )
+		self.jobmanagers.login()
 
 		# Start with the handshake
 		self.schedule(self.stateHandshake)
@@ -87,7 +87,7 @@ class AgentComponent(Component, SimpleFSM):
 
 			# Send handshake message to the bus and retrive
 			# initial acknowledgement
-			ans = self.serverChannel.send('handshake', {
+			ans = self.jobmanagers.channel().send('handshake', {
 					'version': AgentComponent.VERSION,
 					'slots': Config.AGENT_SLOTS,
 					'free_slots': free_slots,
@@ -137,7 +137,7 @@ class AgentComponent(Component, SimpleFSM):
 		Shorthand function to reply with an error message
 		"""
 		self.logger.warn(message)
-		self.serverChannel.reply({
+		self.serverInChannel.reply({
 				'result': 'error',
 				'error': message
 			})
@@ -213,7 +213,7 @@ class AgentComponent(Component, SimpleFSM):
 					return self._replyError("Unexpected error: %s" % str(e))
 
 				# Done
-				self.serverChannel.reply({
+				self.serverInChannel.reply({
 						'result': 'ok'
 					})
 				return 
@@ -251,7 +251,7 @@ class AgentComponent(Component, SimpleFSM):
 		job.kill()
 
 		# Reply OK
-		self.serverChannel.reply({
+		self.serverInChannel.reply({
 				'result': 'ok'
 			})
 
@@ -263,7 +263,7 @@ class AgentComponent(Component, SimpleFSM):
 		self.logger.info("Sending job data for job %s" % app.jobid)
 
 		# Forward message to the server channel
-		self.serverChannel.send('job_data', {
+		self.jobmanagers.channel().send('job_data', {
 				'jid': app.jobid,
 				'final': final,
 				'data': data
@@ -282,7 +282,7 @@ class AgentComponent(Component, SimpleFSM):
 			del self.jobIndex[app.jobid]
 
 			# Forward the event to the server
-			self.serverChannel.send('job_completed', {
+			self.jobmanagers.channel().send('job_completed', {
 					'jid': app.jobid,
 					'result': 0
 				})
@@ -297,7 +297,7 @@ class AgentComponent(Component, SimpleFSM):
 			del self.jobIndex[app.jobid]
 
 			# Forward the event to the server
-			self.serverChannel.send('job_completed', {
+			self.jobmanagers.channel().send('job_completed', {
 					'jid': app.jobid,
 					'result': res
 				})
