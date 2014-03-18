@@ -100,4 +100,4 @@ class JobManagers:
 		"""
 
 		# Return a channel for the picked jid
-		return Config.EBUS.openChannel( jid() )
+		return Config.EBUS.openChannel( self.jid() )
