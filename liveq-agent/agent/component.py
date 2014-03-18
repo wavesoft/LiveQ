@@ -21,29 +21,26 @@ import logging
 import time
 
 from agent.config import Config
-from agent.io.jobmanagers import JobManagers
+from agent.io.jobmanagers import JobManagers, NoJobManagersError
 
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
-from liveq.utils.fsm import SimpleFSM
-
 from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException
 
-class AgentComponent(Component, SimpleFSM):
+class AgentComponent(Component):
 	"""
 	Core agent
 	"""
 
 	# Agent core version
-	VERSION = 1
+	VERSION = 2
 
 	def __init__(self):
 		"""
 		Initialize AgentComponent component
 		"""
 		Component.__init__(self)
-		SimpleFSM.__init__(self)
 
 		# Setup logger
 		self.logger = logging.getLogger("agent")
@@ -54,29 +51,22 @@ class AgentComponent(Component, SimpleFSM):
 		self.jobIndex = { }
 		self.runtimeConfig = { }
 
-		# Open an input channel from the server on the external bus
-		# (Currently that's the XMPP channel - but we prefer to be abstract)
-		self.serverInChannel = Config.EBUS.openChannel( Config.SERVER_CHANNEL )
+		# Create a JobManagers class which is going to take care of
+		# the abstraction and the load-balancing of the I/O between
+		# the agent and the job managers.
+		self.jobmanagers = JobManagers( Config.SERVER_CHANNEL )
 
 		# Bind incoming message handlers
-		self.serverInChannel.on('job_start', self.cmdJobStart)
-		self.serverInChannel.on('job_cancel', self.cmdJobCancel)
-		self.serverInChannel.on('close', self.onDisconnect)
+		self.jobmanagers.on('job_start', self.cmdJobStart)
+		self.jobmanagers.on('job_cancel', self.cmdJobCancel)
 
-		# Establish connection with the job managers
-		# This class allows us to pick an agent where we are going
-		# to send the response data.
-		self.jobmanagers = JobManagers( Config.SERVER_CHANNEL )
-		self.jobmanagers.login()
+		# Setup tool callbacks for the jobmanagers
+		self.jobmanagers.handshakeFn(self.sendHandshake)
 
-		# Start with the handshake
-		self.schedule(self.stateHandshake)
-
-	def stateHandshake(self):
+	def sendHandshake(self, channel):
 		"""
-		[State] Establish server handshake
+		Send handshake to the first available server channel
 		"""
-		self.logger.debug("Entering state: HANDSHAKE")
 		try:
 
 			# Count what's the slot usage
@@ -85,59 +75,25 @@ class AgentComponent(Component, SimpleFSM):
 				if not v:
 					free_slots += 1
 
-			# Send handshake message to the bus and retrive
-			# initial acknowledgement
-			ans = self.jobmanagers.channel().send('handshake', {
-					'version': AgentComponent.VERSION,
-					'slots': Config.AGENT_SLOTS,
-					'free_slots': free_slots,
-					'group': Config.AGENT_GROUP
-				}, waitReply=True)
-
-			# Check for errors on handshake
-			if ans == None:
-				self.logger.warn("No job manager was found online")
-				self.schedule(self.stateRetry)
-				return
-
-			# Handshake complete
-			# (Everything else is asynchronous)
-			self.logger.info("Handhake with server completed: %s" % str(ans))
+			# Send handshake message to the channel specified
+			channel.send('handshake', {
+				'version': AgentComponent.VERSION,
+				'slots': Config.AGENT_SLOTS,
+				'free_slots': free_slots,
+				'group': Config.AGENT_GROUP
+			})
 
 		except BusChannelException as e:
 
 			# There was an error, switch to retry state
-			self.schedule(self.stateRetry)
-			self.logger.warn("No reply from job manager")
-
-	def stateRetry(self):
-		"""
-		[State] Retry connection
-		"""
-		self.logger.debug("Entering state: RETRY")
-		
-		# Wait some time and re-try handshake
-		time.sleep(5)
-		self.schedule(self.stateHandshake)
-
-	def onDisconnect(self):
-		"""
-		Bus connection lost
-		"""
-		self.logger.info("Server channel connection lost")
-
-		# We lost the interaction with the server.
-		# Try to do handshake again and if it failed, 
-		# follow the retry protocol from there
-		self.schedule(self.stateHandshake)
-
+			self.logger.warn("Error while sending request: %s" % str(e))
 
 	def _replyError(self, message):
 		"""
 		Shorthand function to reply with an error message
 		"""
 		self.logger.warn(message)
-		self.serverInChannel.reply({
+		self.jobmanagers.reply({
 				'result': 'error',
 				'error': message
 			})
@@ -213,7 +169,7 @@ class AgentComponent(Component, SimpleFSM):
 					return self._replyError("Unexpected error: %s" % str(e))
 
 				# Done
-				self.serverInChannel.reply({
+				self.jobmanagers.reply({
 						'result': 'ok'
 					})
 				return 
@@ -251,7 +207,7 @@ class AgentComponent(Component, SimpleFSM):
 		job.kill()
 
 		# Reply OK
-		self.serverInChannel.reply({
+		self.jobmanagers.reply({
 				'result': 'ok'
 			})
 
@@ -263,7 +219,7 @@ class AgentComponent(Component, SimpleFSM):
 		self.logger.info("Sending job data for job %s" % app.jobid)
 
 		# Forward message to the server channel
-		self.jobmanagers.channel().send('job_data', {
+		self.jobmanagers.send('job_data', {
 				'jid': app.jobid,
 				'final': final,
 				'data': data
@@ -282,7 +238,7 @@ class AgentComponent(Component, SimpleFSM):
 			del self.jobIndex[app.jobid]
 
 			# Forward the event to the server
-			self.jobmanagers.channel().send('job_completed', {
+			self.jobmanagers.send('job_completed', {
 					'jid': app.jobid,
 					'result': 0
 				})
@@ -296,15 +252,16 @@ class AgentComponent(Component, SimpleFSM):
 			self.slots[app.slot] = None
 			del self.jobIndex[app.jobid]
 
-			# Forward the event to the server
-			self.jobmanagers.channel().send('job_completed', {
+			self.jobmanagers.send('job_completed', {
 					'jid': app.jobid,
 					'result': res
 				})
+
 
 	def step(self):
 		"""
 		Run the next cycle of the FSM
 		"""
-		self.stepFSM()
-		time.sleep(0.5)
+
+		# Run the timeslice of the job managers
+		self.jobmanagers.process(0.5)

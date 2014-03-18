@@ -303,7 +303,16 @@ class JobManagerComponent(Component):
 				agent.save()
 
 		# Reply with some data
-		channel.reply({ 'status': 'ok' })
+		version = int(message['version'])
+		if version == 1:
+			# VER 1: Older agents are listening for reply
+			channel.reply({ 'status': 'ok' })
+
+		else:
+			# VER 2: Newer agents are listening for new message
+			channel.send('handshake_ack', {
+					'status': 'ok'
+				})
 
 	def onAgentJobData(self, data, channel=None):
 		"""

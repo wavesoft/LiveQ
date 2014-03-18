@@ -485,7 +485,7 @@ class XMPPBus(Bus, ClientXMPP):
 
 		# Update state
 		self.connected = False
-		
+
 		# If that's expected do nothing
 		# Otherwise try to recover connection
 		if not self.disconnecting:
@@ -503,6 +503,9 @@ class XMPPBus(Bus, ClientXMPP):
 			self.disconnecting = True
 			self.reconnect()
 			self.disconnecting = False
+
+		# Let everybody know that the bus is offline
+		self.trigger("offline")
 
 	def systemShutdown(self):
 		"""
@@ -532,36 +535,8 @@ class XMPPBus(Bus, ClientXMPP):
 		self.send_presence()
 		self.get_roster()
 
-	def onDataMessage(self, iq):
-		"""
-		Handler for incoming IQ messages, to be routed
-		to the appropriate user channel
-		"""
-
-		# Get JID
-		jid = iq['from']
-
-		# Check if we can find a channel without resource
-		# (for load-balancing for example)
-		if not jid in self.channels:
-			parts = str(jid).split("/")
-
-			# If such channel exists, use that instead.
-			# Otherwise, keep doing what we were supposed to do
-			if parts[0] in self.channels:
-				jid = parts[0]
-
-		# Create a new channel if it is not already started
-		if not jid in self.channels:
-			c = XMPPUserChannel(self, jid)
-			self.trigger('channel', c)
-
-			# Store on database
-			self.channels[jid] = c
-
-		# Forward message on channel
-		channel = self.channels[jid]
-		channel._handle(iq)
+		# Let everybody know that the channel is online
+		self.trigger("online")
 
 	def onMessage(self, msg):
 		"""
@@ -575,27 +550,37 @@ class XMPPBus(Bus, ClientXMPP):
 			# Get JID
 			jid = str(msg['from'])
 
-			# Check if we can find a channel without resource
-			# (for load-balancing for example)
-			if not jid in self.channels:
-				parts = str(jid).split("/")
+			# Calculate the bare jid
+			parts = str(jid).split("/")
+			bare_jid = parts[0]
 
-				# If such channel exists, use that instead.
-				# Otherwise, keep doing what we were supposed to do
-				if parts[0] in self.channels:
-					jid = parts[0]
+			# Check if we have a bare jid as a channel
+			handled = False
+			if bare_jid in self.channels:
 
-			# Create a new channel if it is not already started
-			if not jid in self.channels:
+				# Forward message on bare channel
+				self.channels[bare_jid]._handle(msg)
+				handled = True
+
+			# Check if we have the excact id as channel
+			if jid in self.channels:
+
+				# Forward message on excact channel
+				self.channels[jid]._handle(msg)
+				handled = True
+
+			# Otherwise create new excact channel
+			if not handled:
+
+				# Create new channel
 				c = XMPPUserChannel(self, jid)
 				self.trigger('channel', c)
 
 				# Store on database
 				self.channels[jid] = c
 
-			# Forward message on channel
-			channel = self.channels[jid]
-			channel._handle(msg)
+				# Handle
+				c._handle(msg)
 
 		# Error responses might also intereset our channels
 		if msg['type'] == 'error':

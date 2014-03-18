@@ -50,13 +50,20 @@ logging.info("Starting agent tests %s" % Config.UUID)
 
 # Login to the server
 jobmanagers = JobManagers( Config.SERVER_CHANNEL )
-jobmanagers.login()
+
+def hsFunction(channel):
+
+	logging.info("Sending handshake to %s" % channel.name)	
+	channel.send('handshake', {
+		'version': 2,
+		'slots': 0,
+		'free_slots': 0,
+		'group': 'debug'
+	})
+jobmanagers.handshakeFn(hsFunction)
 
 # Pick JIDs
-while True:
-
-	jid = jobmanagers.jid()
-	print "JID: %s" % jid
-
-	time.sleep(1)
-
+while True: 
+	
+	jobmanagers.process(0.5)
+	print "--- Agent: %s" % jobmanagers.jid()
