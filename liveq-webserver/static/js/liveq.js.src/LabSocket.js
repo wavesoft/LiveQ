@@ -38,7 +38,7 @@ LiveQ.LabSocket = function( id ) {
 	 * The URL where the WebSocket is connected
 	 * @member {string}
 	 */
-	this.url = "ws://" + location.host + "/vas/labsocket/" + id;
+	this.url = "wss://" + location.host + "/vas/labsocket/" + id;
 
 	/**
 	 * Array of the callback functions to be fired when the socket is connected

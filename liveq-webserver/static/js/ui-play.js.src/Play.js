@@ -26,7 +26,7 @@
 
     setTimeout(function() {
       var e_bsod = $('<div id="bsod"></div>'),
-          e_icon = $('<div class="bsod-icon">' + ( icon || "&times;" ) + '</div>'),
+          e_icon = $('<div class="bsod-icon glyphicon glyphicon-' + (icon || "off" ) + '"></div>'),
           e_text = $('<div>' + ( text || "Your connection with the server was interrupted" ) + '. Please <a href="javascript:;">reload the site</a> to try again.</div>'),
           e_floater = $('<div></div>');
 
@@ -106,7 +106,7 @@
        * Handle disconnection with the sterver
        */
       lab.onDisconnect(function() {
-        show_bsod("&times;", "Your connection with the server was interrupted");
+        show_bsod("off", "Your connection with the server was interrupted");
       });
 
       /**
@@ -114,7 +114,7 @@
        */
       lab.onError(function(message, critical) {
         if (critical)
-          show_bsod("!", "Could not establish connection with the server");
+          show_bsod("exclamation-sign", "Could not establish connection with the server");
       });
 
       /**
@@ -174,7 +174,7 @@
        * Stop connection timeout timer
        */
       var cctimer = setTimeout(function() {
-        show_bsod("!", "Timed out while trying to connect with the server.");
+        show_bsod("exclamation-sign", "Timed out while trying to connect with the server.");
       }, 5000);
       lab.onConnect(function(msg) {
         clearTimeout(cctimer);
