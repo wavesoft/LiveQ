@@ -290,7 +290,7 @@ class JobManagerComponent(Component):
 		"""
 		Callback when a handshake arrives in the bus
 		"""
-		self.logger.info("[%s] Agent v%s online (slots/free=%s/%s)" % (channel.name, message['version'], message['slots'], message['free_slots']))
+		self.logger.info("[%s] Agent rev.%s came online (slots/free=%s/%s)" % (channel.name, message['version'], message['slots'], message['free_slots']))
 
 		# Let manager know that we got a handshake
 		agents.updateHandshake( channel.name, message )

@@ -176,7 +176,7 @@ div.help-modal .tab-content {
   bottom: 0;
   left: 0;
   opacity: 0;
-  height: 36.57142857px;
+  height: 36.57142857142857px;
   width: 128px;
   -webkit-transition: opacity linear 0.2s;
   -moz-transition: opacity linear 0.2s;
@@ -193,7 +193,7 @@ div.help-modal .tab-content {
   width: 50%;
   position: absolute;
   font-size: 1.5em;
-  height: 36.57142857px;
+  height: 36.57142857142857px;
   cursor: pointer;
 }
 #tunables div.tune > div.tune-ctl > div.b:active {
@@ -207,6 +207,9 @@ div.help-modal .tab-content {
 #tunables div.tune > div.tune-ctl > div.b.minus {
   left: 0;
   background-color: #00aaff;
+}
+#tunables div.tune input[type=text] {
+  font-size: 0.8em;
 }
 #tunables div.tune.expand {
   height: 128px;
@@ -241,6 +244,9 @@ div.help-modal .tab-content {
 }
 #tunables div.tune.expand > div.tune-ctl {
   opacity: 1;
+}
+#tunables div.tune.expand input[type=text] {
+  font-size: 1.2em;
 }
 /**
  * Observables group

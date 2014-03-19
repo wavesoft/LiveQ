@@ -26,15 +26,6 @@ import random
 import logging
 import time
 
-class NoJobManagersError(Exception):
-	"""
-	An error in the job managers
-	"""
-	def __init__(self, value):
-		self.value = value
-	def __str__(self):
-		return repr(self.value)
-
 class JobManagers:
 	"""
 	Job managers
@@ -44,7 +35,7 @@ class JobManagers:
 
 		# This works only with XMPP
 		if not isinstance(Config.EBUS, XMPPBus):
-			raise ValueError("The JobManagers class can only be used with XMPP Bus!")
+			raise ValueError("The JobManagers class can only be used with XMPP EBus!")
 
 		# Open logger
 		self.logger = logging.getLogger("job-managers")
@@ -143,7 +134,6 @@ class JobManagers:
 
 		# Make sure we have at least one agent online
 		if not self.serverJID in Config.EBUS.client_roster:
-			self.logger.warn("No online job managers found in the roster")
 			return []
 
 		# Pick a random Job Manager from the list
@@ -173,7 +163,7 @@ class JobManagers:
 
 		# Add/accept server in my roster, therefore keeping known the
 		# state of all the servers in the network
-		logging.debug("Subscribing %s to my roster" % self.serverJID)
+		self.logger.debug("Subscribing %s to my roster" % self.serverJID)
 		Config.EBUS.send_presence(pto=self.serverJID, ptype='subscribe')
 
 		# Pick a random server
@@ -181,6 +171,7 @@ class JobManagers:
 		if server_ids:
 			self.lastAgent = server_ids[  random.randint(0, len(server_ids)-1) ]
 		else:
+			self.logger.warn("No online job managers found in the roster")
 			self.lastAgent = ""
 
 		# Mark the bus as online
@@ -285,7 +276,7 @@ class JobManagers:
 			emsg = self.egress.get(True, timeslice)
 
 			# Check for TTL
-			if emsg[3] > time.time():
+			if emsg[2] > time.time():
 				self.logger.warn("Dropping timed out egress packet")
 				return
 

@@ -17,11 +17,11 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
 import time
+import logging
 
 from agent.config import Config
-from agent.io.jobmanagers import JobManagers, NoJobManagersError
+from agent.io.jobmanagers import JobManagers
 
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
