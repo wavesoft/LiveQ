@@ -370,7 +370,7 @@ class PostMortem:
 		# Dump configuration
 		if "config" in sections:
 			print " CONFIG"
-			print "--------"
+			print "-------------"
 			print ""
 			for k,v in sections['config'].iteritems():
 				print "%s: %s" % (k,v)
@@ -390,7 +390,7 @@ class PostMortem:
 		# Dump process information
 		if "proc" in sections:
 			print " PROCESSES"
-			print "-----------"
+			print "-------------"
 			print ""
 			for pid, proc in sections['proc'].iteritems():
 				print "[%i]" % pid
@@ -402,18 +402,18 @@ class PostMortem:
 				if 'stdout' in proc:
 					print " -STDOUT-"
 					for l in proc['stdout']:
-						print "<%s> %s" % (formatTime(l[0]), l[1])
+						print " <%s> %s" % (formatTime(l[0]), l[1])
 					print ""
 				if 'stderr' in proc:
 					print " -STDERR-"
 					for l in proc['stderr']:
-						print "<%s> %s" % (formatTime(l[0]), l[1])
+						print " <%s> %s" % (formatTime(l[0]), l[1])
 					print ""
 
 		# Dump logs
 		if "logs" in sections:
 			print " LOG FILE"
-			print "----------"
+			print "-------------"
 			print ""
 			for l in sections['logs']:
 				print "<%s> %s" % (formatTime(l[0]), l[1])

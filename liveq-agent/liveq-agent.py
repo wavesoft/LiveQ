@@ -39,6 +39,9 @@ runtimeConfig = { }
 # Load configuration
 try:
 	Config.fromFile( "config/agent.conf.local", runtimeConfig )
+	PostMortem.addGlobalConfig("global", Config)
+	PostMortem.addGlobalInfo("version", "2.0")
+	
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	exit(1)
@@ -51,4 +54,3 @@ logging.info("Starting agent %s" % Config.UUID)
 
 # Start Agent
 AgentComponent.runThreaded()
-
