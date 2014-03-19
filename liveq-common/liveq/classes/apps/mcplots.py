@@ -37,10 +37,10 @@ import shlex, subprocess, threading
 
 from liveq.io.application import *
 from liveq.utils.FLAT import FLATParser
-
 from liveq.events import GlobalEvents
 from liveq.config.classes import AppConfigClass
 from liveq.exceptions import JobConfigException, JobInternalException, JobRuntimeException, IntegrityException, ConfigException
+from liveq.debug.postmortem import PostMortem
 
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 
@@ -116,6 +116,9 @@ class MCPlots(JobApplication):
 		if not self.datdir:
 			raise JobRuntimeException("Unable to create data directory")
 
+		# Prepare post-mortem for the mcplots app
+		self.postmortem = PostMortem()
+
 		# Prepare macros for the cmdline
 		rundict = copy.deepcopy(self.jobconfig)
 		rundict["tune"] = self.config.TUNE
@@ -131,8 +134,11 @@ class MCPlots(JobApplication):
 		envDict['LIVEQ_DATDIR'] = self.datdir
 
 		# Launch process in it's own process group
-		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict)
+		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE)
 		self.logger.debug("Process started with PID=%i" % self.process.pid)
+
+		self.postmortem.addProcess(" ".join(args), self.process, stderr=True)
+		self.logger.debug("Post-mortem for the process started")
 
 		# Start a monitor thread
 		self.monitorThread = threading.Thread(target=self.monitor)
@@ -156,6 +162,9 @@ class MCPlots(JobApplication):
 		if self.state == STATE_KILLING:
 			raise IntegrityException("Race condition detected")
 		self.state = STATE_KILLING
+
+		# Complete post-mortem
+		self.postmortem.complete()
 
 		# Get process group
 		gid = os.getpgid(self.process.pid)
@@ -388,10 +397,12 @@ class MCPlots(JobApplication):
 		self.logger.debug("Started monitor thread")
 
 		# Reset variables
-		runtime = 0
+		run_time = 0
 
 		# Wait until the process changes state
 		while True:
+
+			# Check process status
 			res = self.process.poll()
 
 			# Check if the process changed state
@@ -406,6 +417,9 @@ class MCPlots(JobApplication):
 
 				else:
 					self.logger.debug("UNEXPECTED Process state changed to %i" % res)
+
+					# Complete post-mortem
+					self.postmortem.complete()
 
 					# Check the cause of the termination
 					if res == 0:
@@ -432,8 +446,9 @@ class MCPlots(JobApplication):
 						# Job is completed, do cleanup
 						self.cleanup()
 
-						# Dispatch the event to the listeners
-						self.trigger("job_aborted", res)
+						# Dispatch the event to the listeners, including the
+						# post-mortem report.
+						self.trigger("job_aborted", res, self.postmortem)
 
 				# In any of these cases, exit the loop
 				break
@@ -453,6 +468,6 @@ class MCPlots(JobApplication):
 
 			# Runtime clock and CPU anti-hoging
 			time.sleep(1)
-			runtime += 1
+			run_time += 1
 
 		self.logger.debug("Exiting monitor thread")

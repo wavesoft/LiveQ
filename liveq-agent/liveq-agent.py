@@ -29,6 +29,7 @@ import logging
 from agent.config import Config
 from agent.component import AgentComponent
 
+from liveq.debug.postmortem import PostMortem
 from liveq.exceptions import ConfigException
 from liveq import handleSIGINT, exit
 

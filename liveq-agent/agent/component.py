@@ -243,7 +243,7 @@ class AgentComponent(Component):
 					'result': 0
 				})
 
-	def onAppJobAborted(self, res, app=None):
+	def onAppJobAborted(self, res, postmortem, app=None):
 
 		# Check if we were already cleaned-up
 		if app.jobid in self.jobIndex:
@@ -252,9 +252,16 @@ class AgentComponent(Component):
 			self.slots[app.slot] = None
 			del self.jobIndex[app.jobid]
 
+			# Prepare post-mortem buffer
+			pmBuff = ""
+			if postmortem:
+				pmBuff = postmortem.toBuffer()
+
+			# Send completion report
 			self.jobmanagers.send('job_completed', {
 					'jid': app.jobid,
-					'result': res
+					'result': res,
+					'postmortem': pmBuff
 				})
 
 

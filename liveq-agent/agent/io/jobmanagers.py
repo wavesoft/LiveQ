@@ -26,12 +26,18 @@ import random
 import logging
 import time
 
+# How long should we wait for a timeout on handshake (Seconds)
+TIMEOUT_HANDSHAKE = 30
+
+# What's the time to live for every egress packet (Seconds)
+TIMEOUT_EGRESS = 120
+
 class JobManagers:
 	"""
 	Job managers
 	"""
 
-	def __init__(self, server, defaultTTL=30):
+	def __init__(self, server, defaultTTL=TIMEOUT_EGRESS):
 
 		# This works only with XMPP
 		if not isinstance(Config.EBUS, XMPPBus):
@@ -252,7 +258,7 @@ class JobManagers:
 		if self.busOnline and not self.handshakeCompleted and (self.handshakeTimeout < time.time()):
 
 			# Calculate the timeout for the handhsake
-			self.handshakeTimeout = time.time() + 30
+			self.handshakeTimeout = time.time() + TIMEOUT_HANDSHAKE
 
 			# Do the rest only if we have handshakeFunction defined
 			if self.handshakeFunction:

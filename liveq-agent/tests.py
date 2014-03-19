@@ -30,6 +30,7 @@ from agent.io.jobmanagers import JobManagers
 from agent.config import Config
 
 from liveq.exceptions import ConfigException
+from liveq.debug.postmortem import PostMortem
 from liveq import handleSIGINT, exit
 
 # Prepare runtime configuration
@@ -44,6 +45,31 @@ except ConfigException as e:
 
 # Hook sigint -> Shutdown
 handleSIGINT()
+
+# Setup post-mortem
+PostMortem.addGlobalConfig("global", Config)
+PostMortem.addGlobalInfo("version", "2.0")
+
+
+# Prepare post-mortem
+from subprocess import Popen, PIPE
+
+pm = PostMortem()
+p = Popen(["C:\\windows\\system32\\help.exe"], stdout=PIPE)
+pm.addProcess("C:\\windows\\system32\\help.exe", p, stdout=True)
+
+time.sleep(2)
+pm.complete()
+
+print pm.sections
+a = str(pm.sections)
+print pm.toBuffer()
+b = pm.toBuffer()
+
+print "dump=%i, compress=%i" % (len(a),len(b))
+
+# EXIT
+exit(0)
 
 # Banner
 logging.info("Starting agent tests %s" % Config.UUID)
