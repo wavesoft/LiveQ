@@ -148,29 +148,6 @@ class PostMortem:
 	GLOBAL_INFO = {}
 	GLOBAL_CONFIG = {}
 
-	@staticmethod
-	def addGlobalInfo(key, value, group="General"):
-		"""
-		Store global post-mortem information
-		"""
-
-		# Check if group is missing
-		if not group in PostMortem.GLOBAL_INFO:
-			PostMortem.GLOBAL_INFO[group] = {}
-
-		# Store value
-		PostMortem.GLOBAL_INFO[group][key] = value
-
-	@staticmethod
-	def addGlobalConfig(name, config, skip=[]):
-		"""
-		Store global post-mortem information
-		"""
-
-		# Store value
-		PostMortem.GLOBAL_CONFIG[name] = {}
-		parseConfig(config, PostMortem.GLOBAL_CONFIG[name], skip)
-
 	def __init__(self):
 		"""
 		Initialize the post-mortem logging class
@@ -200,6 +177,29 @@ class PostMortem:
 		We were forced to exit
 		"""
 		pass
+
+	@staticmethod
+	def addGlobalInfo(key, value, group="General"):
+		"""
+		Store global post-mortem information
+		"""
+
+		# Check if group is missing
+		if not group in PostMortem.GLOBAL_INFO:
+			PostMortem.GLOBAL_INFO[group] = {}
+
+		# Store value
+		PostMortem.GLOBAL_INFO[group][key] = value
+
+	@staticmethod
+	def addGlobalConfig(name, config, skip=[]):
+		"""
+		Store global post-mortem information
+		"""
+
+		# Store value
+		PostMortem.GLOBAL_CONFIG[name] = {}
+		parseConfig(config, PostMortem.GLOBAL_CONFIG[name], skip)
 
 	def addConfig(self, name, config, skip=[]):
 		"""
@@ -321,6 +321,21 @@ class PostMortem:
 		# Return
 		return sections
 
+	@staticmethod
+	def fromBuffer(buf, fromBase64=True):
+		"""
+		Decode a buffer previously encoded with asBuffer
+		"""
+
+		# Decode buffer
+		if fromBase64:
+			buf = base64.b64decode(buf)
+
+		# Decompress buffer
+		buf = zlib.decompress(buf)
+
+		# Unpickle into sections
+		return pickle.loads(buf)
 
 	###########################################################
 	## Thread functions
