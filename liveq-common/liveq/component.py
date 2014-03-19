@@ -95,7 +95,7 @@ class Component:
 		thread = threading.Thread(target=thread_main)
 		thread.start()
 
-		# Wait
+		# Wait for the thread to exit
 		while thread.is_alive():
 			time.sleep(1)
 
@@ -110,4 +110,10 @@ class Component:
 			cls.INSTANCE = cls()
 
 		# Run
-		cls.INSTANCE.run()
+		try:
+			cls.INSTANCE.run()
+		except Exception as e:
+			traceback.print_exc()
+			logging.error("Main thread exited with exception %s: %s" % ( e.__class__.__name__, str(e) ))
+			exit(128)
+

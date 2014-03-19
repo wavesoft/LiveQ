@@ -276,7 +276,7 @@ class JobManagers:
 			emsg = self.egress.get(True, timeslice)
 
 			# Check for TTL
-			if emsg[2] > time.time():
+			if time.time() > emsg[2]:
 				self.logger.warn("Dropping timed out egress packet")
 				return
 
