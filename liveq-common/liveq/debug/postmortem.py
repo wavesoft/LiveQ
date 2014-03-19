@@ -360,13 +360,17 @@ class PostMortem:
 		print "           * * POST MORTEM REPORT * *"
 		print "================================================="
 		print ""
-		print "Post-Mortem report generated at %s" % formatTime(sections['general']['time'])
-		print "Report rev.%i" % sections['general']['ver']
+		print " GENERAL "
+		print "----------"
+		print ""
+		print "Post-Mortem generated at: [%s]" % formatTime(sections['general']['time'])
+		print "Revision: %i" % sections['general']['ver']
+		print ""
 
 		# Dump configuration
 		if "config" in sections:
-			print " CONFIGURATION"
-			print "---------------"
+			print " CONFIG"
+			print "--------"
 			print ""
 			for k,v in sections['config'].iteritems():
 				print "%s: %s" % (k,v)
@@ -392,8 +396,8 @@ class PostMortem:
 				print "[%i]" % pid
 				print "path: %s" % proc['path']
 				print "result: %s" % proc['exit']
-				print "started: %s" % proc['t_at']
-				print "completed: %s" % proc['t_exit']
+				print "started: %s" % formatTime(proc['t_at'])
+				print "completed: %s" % formatTime(proc['t_exit'])
 				print ""
 				if 'stdout' in proc:
 					print " -STDOUT-"

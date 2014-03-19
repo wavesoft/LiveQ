@@ -164,6 +164,7 @@ class MCPlots(JobApplication):
 		self.state = STATE_KILLING
 
 		# Complete post-mortem
+		self.postmortem.addLog("Killed upon user request")
 		self.postmortem.complete()
 
 		# Get process group
@@ -180,7 +181,7 @@ class MCPlots(JobApplication):
 		self.monitorThread.join()
 
 		# Dispatch the event to the listeners
-		self.trigger("job_aborted", -1)
+		self.trigger("job_aborted", -1, self.postmortem)
 
 		# We are now officially killed
 		self.state = STATE_ABORTED
