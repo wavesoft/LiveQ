@@ -31,6 +31,7 @@ from liveq.component import Component
 from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.models import Agent, AgentGroup, AgentMetrics
+from liveq.debug.postmortem import PostMortem
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
 
@@ -383,6 +384,11 @@ class JobManagerComponent(Component):
 			# Handle error
 			job.sendStatus("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
 			self.logger.warn("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
+
+			# Check for post-mortem
+			if 'postmortem' in data:
+				data = PostMortem.fromBuffer(data['postmortem'])
+				PostMortem.render(data)
 
 			# Handle the agent as lost
 			scheduler.handleLoss( agents.getAgent( channel.name ) )

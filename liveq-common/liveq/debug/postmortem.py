@@ -27,6 +27,7 @@ import pprint
 import zlib
 import base64
 import cPickle as pickle
+import datetime
 
 import ConfigParser
 
@@ -139,6 +140,14 @@ def parseConfig(config, dat, skip=[], prefix=""):
 	# Store response
 	return dat
 
+def formatTime(time):
+	"""
+	Format unix time to string
+	"""
+
+	dt = datetime.datetime.fromtimestamp(time)
+	return "%i/%i/%i %i:%i:%i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
 class PostMortem:
 	"""
 	This class provides simple, post-mortem data collection information.
@@ -161,6 +170,10 @@ class PostMortem:
 
 		# Post-Mortem sections
 		self.sections = {
+			"general": {
+				"time": time.time(),
+				"ver": 1
+			},
 			"info": 	copy.deepcopy(PostMortem.GLOBAL_INFO),
 			"config":	copy.deepcopy(PostMortem.GLOBAL_CONFIG),
 			"proc": 	{},
@@ -337,6 +350,86 @@ class PostMortem:
 		# Unpickle into sections
 		return pickle.loads(buf)
 
+	@staticmethod
+	def render(sections):
+		"""
+		Visualize the post-mortem
+		"""
+
+		print "================================================="
+		print "           * * POST MORTEM REPORT * *"
+		print "================================================="
+		print ""
+		print "Post-Mortem report generated at %s" % formatTime(sections['general']['time'])
+		print "Report rev.%i" % sections['general']['ver']
+
+		# Dump configuration
+		if "config" in sections:
+			print " CONFIGURATION"
+			print "---------------"
+			print ""
+			for k,v in sections['config'].iteritems():
+				print "%s: %s" % (k,v)
+			print ""
+
+		# Dump information
+		if "info" in sections:
+			print " INFORMATION"
+			print "-------------"
+			print ""
+			for group, values in sections['info'].iteritems():
+				print "[%s]" % group
+				for k,v in values.iteritems():
+					print "%s: %s" % (k,v)
+				print ""
+
+		# Dump process information
+		if "proc" in sections:
+			print " PROCESSES"
+			print "-----------"
+			print ""
+			for pid, proc in sections['proc'].iteritems():
+				print "[%i]" % pid
+				print "path: %s" % proc['path']
+				print "result: %s" % proc['exit']
+				print "started: %s" % proc['t_at']
+				print "completed: %s" % proc['t_exit']
+				print ""
+				if 'stdout' in proc:
+					print " -STDOUT-"
+					for l in proc['stdout']:
+						print "<%s> %s" % (formatTime(l[0]), l[1])
+					print ""
+				if 'stderr' in proc:
+					print " -STDERR-"
+					for l in proc['stderr']:
+						print "<%s> %s" % (formatTime(l[0]), l[1])
+					print ""
+
+		# Dump logs
+		if "logs" in sections:
+			print " LOG FILE"
+			print "----------"
+			print ""
+			for l in sections['logs']:
+				print "<%s> %s" % (formatTime(l[0]), l[1])
+			print ""
+
+		# Stack traces
+		if "trace" in sections:
+			print " STACK TRACE"
+			print "-------------"
+			print ""
+			for st in sections['trace']:
+				print "Trace at %s" % formatTime(st[0])
+				for l in st[1]:
+					print l
+			print ""
+
+
+		print "================================================="
+
+
 	###########################################################
 	## Thread functions
 	###########################################################
@@ -380,11 +473,15 @@ class PostMortem:
 
 				# Check if we had something
 				if sout and ('stdout' in entry):
-					entry['stdout'] += filter(None, RX_NEWLINE.split(sout))
+					lines = filter(None, RX_NEWLINE.split(sout))
+					for l in lines:
+						entry['stdout'].append([time.time(), l])
 
 				# Check if we had something
 				if serr and ('stderr' in entry):
-					entry['stderr'] += filter(None, RX_NEWLINE.split(serr))
+					lines = filter(None, RX_NEWLINE.split(sout))
+					for l in lines:
+						entry['stderr'].append([time.time(), l])
 
 			except ValueError:
 				break
