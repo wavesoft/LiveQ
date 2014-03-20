@@ -34,11 +34,24 @@ class JobManagerConfig:
 	#: The names of the channels the user is trusting
 	TRUSTED_CHANNELS = []
 
+	#: The time after a failed node will be retried
+	FAIL_DELAY = 60
+
+	#: The maximum number of consecutive fails before the node is considered
+	#: invalid and won't be used again
+	FAIL_LIMIT = 10
+
+	#: The time after a node is considered invalid will be re-tried
+	FAIL_RETRY_DELAY = 86400
+
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 
 		channels = str(config.get("jobmanager", "trusted-channels"))
 		JobManagerConfig.TRUSTED_CHANNELS = channels.split(",")
+		JobManagerConfig.FAIL_DELAY = config.getint("jobmanager", "failure_delay")
+		JobManagerConfig.FAIL_LIMIT = config.getint("jobmanager", "failure_limit")
+		JobManagerConfig.FAIL_RETRY_DELAY = config.getint("jobmanager", "failure_retry_delay")
 
 """
 Create a configuration for the JOB MANAGER based on the core config

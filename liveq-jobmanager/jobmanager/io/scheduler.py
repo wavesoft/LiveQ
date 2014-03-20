@@ -18,6 +18,7 @@
 ################################################################
 
 import sys
+import time
 
 import logging
 import jobmanager.io.agents as agents
@@ -108,8 +109,14 @@ class GroupResources:
 		Return the free agent instances up to count times
 		"""
 
+		# Calculate the cooldown time after a failure
+		time_retry = time.time() - Config.FAIL_DELAY
+
 		# Place query
-		query = Agent.select().where( (Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == "") ).limit(count)
+		query = Agent.select().where( 
+				(Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == "") &
+				(Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
+			).limit(count)
 
 		# Fetch all elements
 		return query[:]

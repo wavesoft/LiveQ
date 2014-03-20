@@ -216,6 +216,17 @@ class AgentComponent(Component):
 		Callback from the application when the data are available
 		"""
 
+		# Check if the job record for the currently running job has gone away
+		if not app.jobid in self.jobIndex:
+
+			# Kill application
+			self.logger.warn("Killing job %s because job does not exit in local cache." % app.jobid)
+			app.kill()
+
+			# Exit
+			return
+
+
 		self.logger.info("Sending job data for job %s" % app.jobid)
 
 		# Forward message to the server channel

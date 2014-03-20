@@ -45,7 +45,8 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunables, Observables, TunableToObservable ]:
+					Tutorials, Tunables, Observables, TunableToObservable,
+					PostMortems ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -92,6 +93,11 @@ class Agent(BaseModel):
 	#: The state of the agent
 	state = IntegerField(default=0)
 
+	#: The timestamp of the last failure
+	fail_timestamp = IntegerField(default=0)
+	#: The number of failures before recovery
+	fail_count = IntegerField(default=0)
+
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
 	#: The job currently running on the agent
@@ -128,6 +134,8 @@ class AgentMetrics(BaseModel):
 	jobs_succeed = IntegerField(default=0)
 	#: Number of jobs failed in this agent
 	jobs_failed = IntegerField(default=0)
+	#: Number of jobs aborted in this agent
+	jobs_aborted = IntegerField(default=0)
 
 
 class Lab(BaseModel):
@@ -350,3 +358,14 @@ class TunableToObservable(BaseModel):
 	#: The importance of this relation
 	importance = IntegerField(default=0)
 
+class PostMortems(BaseModel):
+	"""
+	The description of post-mortems received from the worker nodes
+	"""
+
+	#: The timestamp of the post-mortem
+	timestamp = IntegerField(default=0)
+	#: The agent from which the PM originates
+	agent = ForeignKeyField(Agent)
+	#: The post-mortem payload
+	data = TextField(default="")

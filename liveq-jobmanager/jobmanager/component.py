@@ -170,12 +170,22 @@ class JobManagerComponent(Component):
 					agents.updatePresence( agent.uuid, 0 )
 					scheduler.markOffline( agent.uuid )
 
-				elif ans['result'] == "ok":
+					# Exit
+					return 
+
+				# We sent our request
+				agents.agentJobSent(agent.uuid, job)
+
+				if ans['result'] == "ok":
 					job.sendStatus("Successfuly started")
 					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
+
 				else:
 					job.sendStatus("Could not start: %s" % ans['error'])
 					self.logger.warn("Cannot start job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
+
+					# A failure occured on the agent - register it
+					agents.agentJobFailed(agent.uuid, job)
 
 		# Delay a bit
 		time.sleep(5)
@@ -385,13 +395,17 @@ class JobManagerComponent(Component):
 			job.sendStatus("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
 			self.logger.warn("Worker %s failed to run job (exit code=%i)" % (channel.name, ans))
 
-			# Check for post-mortem
-			if 'postmortem' in data:
-				data = PostMortem.fromBuffer(data['postmortem'])
-				PostMortem.render(data)
-
 			# Handle the agent as lost
-			scheduler.handleLoss( agents.getAgent( channel.name ) )
+			agent = agents.getAgent( channel.name )
+			scheduler.handleLoss( agent )
+
+			# Check for post-mortem data
+			pmData = None
+			if 'postmortem' in data:
+				pmData = data['postmortem']
+
+			# Register the agent job failure
+			agents.agentJobFailed( agent, job, pmData )
 
 		else:
 
@@ -424,6 +438,8 @@ class JobManagerComponent(Component):
 						'data': histos.pack()
 					})
 
+			# Register the agent job success
+			agents.agentJobSucceeded( agent, job )
 
 	# =========================
 	# Internal Bus Callbacks

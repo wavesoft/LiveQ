@@ -22,7 +22,8 @@ import logging
 
 from jobmanager.config import Config
 
-from liveq.models import Agent, AgentGroup
+from liveq.models import Agent, AgentGroup, AgentMetrics, PostMortems
+from liveq.debug.postmortem import PostMortem
 
 #: The name of the default group to use
 DEFAULT_GROUP = "global"
@@ -60,6 +61,20 @@ def getAgent(uid):
 
 		# Return the new agent entry
 		return Agent.create(uuid=uid, group=getAgentGroup(DEFAULT_GROUP))
+
+def getAgentMetrics(uid):
+	"""
+	Return the agent metrics record for the given agent.
+	"""
+
+	# First, get the agent entry
+	agent = getAgent(uid)
+
+	# Fetch or create group
+	try:
+		return AgentMetrics.get(AgentMetrics.uuid==uid)
+	except AgentMetrics.DoesNotExist:
+		return AgentMetrics.create(uuid=uid, agent=agent)
 
 def getAgentFromJob(jid):
 	"""
@@ -138,3 +153,94 @@ def updateHandshake(uid, attrib):
 	# Save entry
 	agentEntry.save()
 	return agentEntry
+
+def agentJobFailed(uid, job, postMortemBuffer=None):
+	"""
+	This function is called when an aget fails to complete a job.
+	This calculates the error metrics.
+
+	Optinally, it's possible to submit a post-mortem, as received
+	from the worker node, that can be used to diagnose errors.
+	"""
+
+	# Fetch the agent entry
+	agentEntry = getAgent(uid)
+
+	# Update error count and error timestamp
+	agentEntry.fail_count += 1
+	agentEntry.fail_timestamp = time.time()
+	agentEntry.save()
+
+	# Fetch agent metrics
+	agentMetrics = getAgentMetrics(uid)
+
+	# Update job counters
+	agentMetrics.jobs_failed += 1
+	agentMetrics.save()
+
+	# Register a post-mortem
+	if postMortemBuffer:
+
+		# Create a post-mortem
+		postmortemEntry = PostMortems.create(
+			agent=agentEntry,
+			timestamp=time.time(),
+			data=postMortemBuffer
+			)
+
+		# Save post-mortem
+		postmortemEntry.save()
+
+		# DEBUG
+		data = PostMortem.fromBuffer(postMortemBuffer)
+		PostMortem.render(data)
+
+
+def agentJobSucceeded(uid, job):
+	"""
+	This function is called when an aget successfully completes a job.
+	This calculates the success metrics and resets the error counter.
+	"""
+
+	# Fetch the agent entry
+	agentEntry = getAgent(uid)
+
+	# Reset error count and error timestamp
+	agentEntry.fail_count = 0
+	agentEntry.fail_timestamp = 0
+	agentEntry.save()
+
+	# Fetch agent metrics
+	agentMetrics = getAgentMetrics(uid)
+
+	# Update job counters
+	agentMetrics.jobs_succeed += 1
+	agentMetrics.save()
+
+
+def agentJobSent(uid, job):
+	"""
+	This function is called when we submit a job request to an agent.
+	This updates the agent metrics.
+	"""
+
+	# Fetch agent metrics
+	agentMetrics = getAgentMetrics(uid)
+
+	# Update job counters
+	agentMetrics.jobs_sent += 1
+	agentMetrics.save()
+
+def agentJobAborted(uid, job):
+	"""
+	This function is called when we abort a job on the agent.
+	This updates the agent metrics.
+	"""
+
+	# Fetch agent metrics
+	agentMetrics = getAgentMetrics(uid)
+
+	# Update job counters
+	agentMetrics.jobs_aborted += 1
+	agentMetrics.save()
+
