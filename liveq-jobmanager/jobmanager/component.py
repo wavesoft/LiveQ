@@ -405,7 +405,7 @@ class JobManagerComponent(Component):
 				pmData = data['postmortem']
 
 			# Register the agent job failure
-			agents.agentJobFailed( agent, job, pmData )
+			agents.agentJobFailed( agent.uuid, job, pmData )
 
 		else:
 
@@ -439,7 +439,7 @@ class JobManagerComponent(Component):
 					})
 
 			# Register the agent job success
-			agents.agentJobSucceeded( agent, job )
+			agents.agentJobSucceeded( agent.uuid, job )
 
 	# =========================
 	# Internal Bus Callbacks

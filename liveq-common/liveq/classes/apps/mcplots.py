@@ -164,7 +164,7 @@ class MCPlots(JobApplication):
 		self.state = STATE_KILLING
 
 		# Complete post-mortem
-		self.postmortem.addLog("Killed upon user request")
+		self.postmortem.log("Killed upon user request")
 		self.postmortem.complete()
 
 		# Get process group
@@ -454,9 +454,8 @@ class MCPlots(JobApplication):
 				# In any of these cases, exit the loop
 				break
 
-			# Every time the histogram timestamp is changed, send the
-			# updates to the server.
-			if self.isDatasetModified():
+			# Every time the histogram timestamp is changed, send the updates to the server.
+			if ((self.state == STATE_RUNNING) or (self.state == STATE_COMPLETED)) and self.isDatasetModified():
 
 				# Get intermediate histograms only when running
 				if self.getState() == "running":

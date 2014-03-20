@@ -221,15 +221,17 @@ class AgentComponent(Component):
 
 			# Kill application
 			self.logger.warn("Killing job %s because job does not exit in local cache." % app.jobid)
-			app.kill()
+			try:
+				app.kill()
+			except IntegrityException:
+				# We cannot kill (ex. race condition detected)
+				pass
 
 			# Exit
 			return
 
-
-		self.logger.info("Sending job data for job %s" % app.jobid)
-
 		# Forward message to the server channel
+		self.logger.info("Sending job data for job %s" % app.jobid)
 		self.jobmanagers.send('job_data', {
 				'jid': app.jobid,
 				'final': final,
