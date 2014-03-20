@@ -483,7 +483,7 @@ class PostMortem:
 
 				# Check if we had something
 				if serr and ('stderr' in entry):
-					lines = filter(None, RX_NEWLINE.split(sout))
+					lines = filter(None, RX_NEWLINE.split(serr))
 					for l in lines:
 						entry['stderr'].append([time.time(), l])
 
