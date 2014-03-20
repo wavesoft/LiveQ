@@ -77,6 +77,7 @@ class JobManagers:
 		# Open a bare JID connection with the server
 		self.inputChannel = Config.EBUS.openChannel( server )
 		self.inputChannel.on('close', self.onJobManagerDisconnect)
+		self.inputChannel.on('open', self.onJobManagerConnect)
 		self.inputChannel.on('handshake_ack', self.onHandshakeAck)
 
 		# Bind to bus-wide events
@@ -160,6 +161,18 @@ class JobManagers:
 
 			# If everything has gone offline, reset handshake flag
 			self.handshakeCompleted = False
+
+	def onJobManagerConnect(self):
+		"""
+		Callcaback when a job manager comes online
+		"""
+
+		# If we have no handshake, do it now
+		if not self.handshakeCompleted:
+
+			# Reduce the timeout, so we immediately continue with the handshake
+			self.handshakeTimeout = time.time() - 2
+
 
 	def onOnline(self):
 		"""
