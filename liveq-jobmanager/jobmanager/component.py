@@ -34,6 +34,7 @@ from liveq.models import Agent, AgentGroup, AgentMetrics
 from liveq.reporting.postmortem import PostMortem
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
+from liveq.reporting.lars import LARS
 
 class JobManagerComponent(Component):
 	"""
@@ -49,6 +50,10 @@ class JobManagerComponent(Component):
 		# Setup logger
 		self.logger = logging.getLogger("job-manager")
 		self.logger.info("JobManager component started")
+
+		# Initialize LiveQ Active Reporting System
+		LARS.initialize()
+		LARS.openEntity("components/job-manager", "%s#%s" % (Config.EBUS.jid, Config.EBUS.resource), autoKeepalive=True, alias="core")
 
 		# TODO: Uhnack this
 		# This establishes a presence relationship with the given entity.
@@ -144,6 +149,8 @@ class JobManagerComponent(Component):
 				elif ans['result'] == "ok":
 					job.sendStatus("Successfuly aborted")
 					self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
+					agents.agentJobAborted(agent.uuid, job)
+
 				else:
 					job.sendStatus("Could not abort: %s" % ans['error'])
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( agent.jobToCancel, agent.uuid, ans['error'] ))
@@ -228,6 +235,11 @@ class JobManagerComponent(Component):
 		# Cleanup job from scheduler
 		scheduler.releaseJob( job )
 
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+		report.add("active", -1)
+		report.add("completed", 1)
+
 		# And then cleanup job
 		job.release()
 
@@ -266,6 +278,10 @@ class JobManagerComponent(Component):
 		Callback when a channel is up
 		"""
 		self.logger.info("[%s] Channel created" % channel.name)
+
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+		report.set("connected", 1)
 
 		# Store on local map
 		self.channels[channel.name] = channel
@@ -313,11 +329,18 @@ class JobManagerComponent(Component):
 				agent.activeJob = ""
 				agent.save()
 
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+
 		# Reply with some data
 		version = int(message['version'])
 		if version == 1:
 			# VER 1: Older agents are listening for reply
 			channel.reply({ 'status': 'ok' })
+
+			# Send report
+			report.set("version", 1)
+			report.set("handshake", 1)
 
 		else:
 			# VER 2: Newer agents are listening for new message
@@ -325,16 +348,24 @@ class JobManagerComponent(Component):
 					'status': 'ok'
 				})
 
+			# Send report
+			report.set("version", 2)
+			report.set("handshake", 1)
+
 	def onAgentJobData(self, data, channel=None):
 		"""
 		Callback when we receive data from a job agent
 		"""
 		self.logger.info("[%s] Got data" % channel.name)
 
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+
 		# Extract and validate job ID from message
 		jid = data['jid']
 		if not jid:
 			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
+			report.add("errors/missing-job-id", 1)
 			return
 
 		# Fetch job class
@@ -342,6 +373,7 @@ class JobManagerComponent(Component):
 		if not job:
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			self.abortMissingJob(jid, channel)
+			report.add("errors/wrong-job-id", 1)
 			return
 
 		# Send status
@@ -352,6 +384,7 @@ class JobManagerComponent(Component):
 		if not agentHistos:
 			job.sendStatus("Could not parse data from worker %s" % channel.name)
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
+			report.add("errors/unpack-error", 1)
 			return
 
 		# Merge histograms with other histograms of the same job
@@ -360,7 +393,10 @@ class JobManagerComponent(Component):
 		if sumHistos == None:
 			job.sendStatus("Unable to merge histograms")
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+			report.add("errors/merge-error", 1)
 			return
+
+		report.add("data-frames", 1)
 
 		# Re-pack histogram collection and send to the
 		# internal bus for further processing
@@ -375,16 +411,23 @@ class JobManagerComponent(Component):
 		"""
 		self.logger.info("[%s] Job completed" % channel.name)
 
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+
 		# Extract and validate job ID from message
 		jid = data['jid']
 		if not jid:
 			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
+			report.add("errors/missing-job-id", 1)
 			return
+			# Send reports
+			report.add("jobs/failed", 1)
 
 		# Fetch job class
 		job = jobs.getJob(jid)
 		if not job:
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
+			report.add("errors/wrong-job-id", 1)
 			return
 
 		# Check result
@@ -514,6 +557,11 @@ class JobManagerComponent(Component):
 				})
 			return
 
+		# Send agent report to LARS
+		report = LARS.openGroup("agents", channel.name, alias=channel.name)
+		report.add("active", -1)
+		report.add("cancelled", 1)
+
 		# Abort job on scheduler and return the agents that were used
 		a_cancel = scheduler.abortJob( job )
 		if a_cancel:
@@ -541,6 +589,8 @@ class JobManagerComponent(Component):
 				elif ans['result'] == "ok":
 					job.sendStatus("Successfuly aborted")
 					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
+					agents.agentJobAborted(agent.uuid, job)
+
 				else:
 					job.sendStatus("Could not abort: %s" % ans['error'])
 					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))

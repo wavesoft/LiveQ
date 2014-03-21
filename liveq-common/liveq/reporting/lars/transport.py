@@ -17,28 +17,62 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-class LQHRS:
+import socket
+
+class LARSTransport:
 	"""
-	LiveQ Health Reporting System
+	Abstract base class for implementing a transport protocol
 	"""
 
-	def __init__(self, bus, channel):
+	def send(self, payload):
 		"""
-		Initialize the LiveQ Health Reporting
-		"""
-
-		#: The list of reports pending submission
-		self.reports = [ ]
-
-	def componentOnline(self, type, name):
-		"""
-		Notification for an online component
+		Send data through the transport
 		"""
 		pass
 
-	def componentOffline(self, type, name):
+class UDPTransport(LARSTransport):
+	"""
+	Default UDP transport that 
+	"""
+
+	def __init__(self, host, port):
 		"""
-		Notification for an offline component
+		Initialize the UDP socket
 		"""
-		pass
+
+		# Create a UDP socket
+		self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+		# Keep the address
+		self.addr = (host, port)
+
+	def send(self, payload):
+		"""
+		Send the given payload over the transport layer
+		"""
+
+		# Send message
+		self.socket.sendto(payload, self.addr)
+
+
+class BusTransport(LARSTransport):
+	"""
+	A transport system for LARS that uses an existing IBUS/EBUS channel
+	"""
+
+	def __init__(self, channel):
+		"""
+		Initialize the BusTransport bu storing the channel
+		"""
+
+		# The bus channel
+		self.channel = channel
+
+	def send(self, payload):
+		"""
+		Send the given payload over the bus channel
+		"""
+
+		# Send message
+		self.channel.send(payload)
 

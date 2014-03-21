@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,35 +17,45 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# ----------
-import sys
-sys.path.append("../liveq-common")
-# ----------
+from liveq.reporting.lars import LARS
 
-import logging
-import time
-import signal
-import sys
+class LARSRepeater:
+	"""
+	LiveQ LARS Repeater
 
-from dashboard.config import Config
-from dashboard.component import DashboardComponent
+	This class provides restricted access 
+	"""
 
-from liveq import handleSIGINT, exit
-from liveq.events import GlobalEvents
-from liveq.exceptions import ConfigException
+	def __init__(self, prefixes=None):
+		"""
+		Initialize the LARS repeater
+		"""
 
-# Prepare runtime configuration
-runtimeConfig = { }
+		#: The list of prefixes accepted
+		self.prefixes = prefixes
 
-# Load configuration
-try:
-	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	exit(1)
+	def accept(self, prefix):
+		"""
+		Accept the given prefix in addition
+		"""
 
-# Hook sigint -> Shutdown
-handleSIGINT()
+		# Append on list
+		self.prefixes.append(prefix)
+		return self
 
-# Start job manager
-JobManagerComponent.runThreaded()
+	def send(self, payload):
+		"""
+		Receive the data from the given payload
+		"""
+
+		# Reject prefixes 
+		if self.prefixes != None:
+			for pfx in self.prefixes:
+				# Check for matching prefix
+				if payload[1:len(pfx)] = pfx:
+					break
+			# No match accepted
+			return
+
+		# Forward payload if it passed the filters
+		LARS.forwardMessage(payload)

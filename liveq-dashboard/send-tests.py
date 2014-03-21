@@ -23,30 +23,17 @@ import sys
 sys.path.append("../liveq-common")
 # ----------
 
-import logging
-import time
-import signal
-import sys
+from liveq import handleSIGINT
+from liveq.reporting.lars import LARS
 
-from dashboard.config import Config
-from dashboard.component import DashboardComponent
+# Initialize LARS with defaults
+LARS.initialize(name="developer")
 
-from liveq import handleSIGINT, exit
-from liveq.events import GlobalEvents
-from liveq.exceptions import ConfigException
+# Open a job manager
+LARS.openEntity("components/job-manager", "jmliveq-master@t4t-xmpp.cern.ch/mobile-node-2", alias="jm")
 
-# Prepare runtime configuration
-runtimeConfig = { }
+LARS.get("jm").set("name", 4).add("surname", 51)
 
-# Load configuration
-try:
-	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	exit(1)
+LARS.get("jm").keepalive()
 
-# Hook sigint -> Shutdown
 handleSIGINT()
-
-# Start job manager
-JobManagerComponent.runThreaded()

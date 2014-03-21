@@ -30,6 +30,7 @@ from peewee import fn, RawQuery
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
 from liveq.utils.remotelock import RemoteLock
 from liveq.models import Agent, AgentGroup
+from liveq.reporting.lars import LARS
 
 logger = logging.getLogger("scheduler")
 

@@ -24,6 +24,7 @@ from jobmanager.config import Config
 
 from liveq.models import Agent, AgentGroup, AgentMetrics, PostMortems
 from liveq.reporting.postmortem import PostMortem
+from liveq.reporting.lars import LARS
 
 #: The name of the default group to use
 DEFAULT_GROUP = "global"
@@ -114,6 +115,11 @@ def updatePresence(uid, state=1):
 	# Save entry
 	agentEntry.save()
 
+
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.set("presence", state)
+
 def updateHandshake(uid, attrib):
 	"""
 	This function is called when a handshake is received from the remote agent.
@@ -150,6 +156,14 @@ def updateHandshake(uid, attrib):
 	# The agent is now active
 	agentEntry.state = 1
 
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.set("group", group)
+	report.set("slots", slots)
+	report.set("features", features)
+	report.set("version", version)
+	report.set("group", group)
+
 	# Save entry
 	agentEntry.save()
 	return agentEntry
@@ -177,6 +191,10 @@ def agentJobFailed(uid, job, postMortemBuffer=None):
 	# Update job counters
 	agentMetrics.jobs_failed += 1
 	agentMetrics.save()
+
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.add("jobs/failed", 1)
 
 	# Register a post-mortem
 	if postMortemBuffer:
@@ -217,6 +235,10 @@ def agentJobSucceeded(uid, job):
 	agentMetrics.jobs_succeed += 1
 	agentMetrics.save()
 
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.add("jobs/completed", 1)
+
 
 def agentJobSent(uid, job):
 	"""
@@ -231,6 +253,11 @@ def agentJobSent(uid, job):
 	agentMetrics.jobs_sent += 1
 	agentMetrics.save()
 
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.add("jobs/sent", 1)
+
+
 def agentJobAborted(uid, job):
 	"""
 	This function is called when we abort a job on the agent.
@@ -244,3 +271,6 @@ def agentJobAborted(uid, job):
 	agentMetrics.jobs_aborted += 1
 	agentMetrics.save()
 
+	# Send report to LARS
+	report = LARS.openGroup("agents", uid, alias=uid)
+	report.add("jobs/aborted", 1)

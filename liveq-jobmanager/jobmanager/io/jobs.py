@@ -28,6 +28,7 @@ from liveq.utils import deepupdate
 from liveq.models import Agent, Lab
 from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
+from liveq.reporting.lars import LARS
 
 JOB_CHANNELS = { }
 
@@ -50,6 +51,10 @@ class Job:
 		self.id = id
 		if not id:
 			self.id = uuid.uuid4().hex
+
+			# Send report to LARS
+			report = LARS.openGroup("labs/%s/jobs" % lab.uuid, self.id, alias=self.id)
+			report.add("active", 1)
 
 		# Prepare metadata
 		self.store_meta = {
