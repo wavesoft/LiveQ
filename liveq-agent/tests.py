@@ -30,7 +30,7 @@ from agent.io.jobmanagers import JobManagers
 from agent.config import Config
 
 from liveq.exceptions import ConfigException
-from liveq.debug.postmortem import PostMortem
+from liveq.reporting.postmortem import PostMortem
 from liveq import handleSIGINT, exit
 
 # Prepare runtime configuration

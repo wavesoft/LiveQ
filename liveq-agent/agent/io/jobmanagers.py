@@ -292,6 +292,17 @@ class JobManagers:
 
 		# Check for messages in the egress queue
 		try:
+
+			# Do not send data if:
+			#
+			# 1) We have no completed handshake
+			# 2) The queue is empty
+			# 3) There are no online job managers
+			#
+			if not self.handshakeCompleted or self.egress.empty() or not self.getOnlineManagers():
+				return
+
+			# Fetch the external message
 			emsg = self.egress.get(True, timeslice)
 
 			# Check for TTL

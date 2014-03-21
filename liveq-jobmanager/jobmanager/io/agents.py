@@ -23,7 +23,7 @@ import logging
 from jobmanager.config import Config
 
 from liveq.models import Agent, AgentGroup, AgentMetrics, PostMortems
-from liveq.debug.postmortem import PostMortem
+from liveq.reporting.postmortem import PostMortem
 
 #: The name of the default group to use
 DEFAULT_GROUP = "global"

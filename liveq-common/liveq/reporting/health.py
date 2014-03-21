@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,39 +17,28 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# ----------
-import sys
-sys.path.append("../liveq-common")
-# ----------
+class LQHRS:
+	"""
+	LiveQ Health Reporting System
+	"""
 
-import time
-import logging
+	def __init__(self, bus, channel):
+		"""
+		Initialize the LiveQ Health Reporting
+		"""
 
-from agent.config import Config
-from agent.component import AgentComponent
+		#: The list of reports pending submission
+		self.reports = [ ]
 
-from liveq.reporting.postmortem import PostMortem
-from liveq.exceptions import ConfigException
-from liveq import handleSIGINT, exit
+	def componentOnline(self, type, name):
+		"""
+		Notification for an online component
+		"""
+		pass
 
-# Prepare runtime configuration
-runtimeConfig = { }
+	def componentOffline(self, type, name):
+		"""
+		Notification for an offline component
+		"""
+		pass
 
-# Load configuration
-try:
-	Config.fromFile( "config/agent.conf.local", runtimeConfig )
-	PostMortem.addGlobalConfig("global", Config)
-	PostMortem.addGlobalInfo("version", "2.0")
-	
-except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
-	exit(1)
-
-# Hook sigint -> Shutdown
-handleSIGINT()
-
-# Banner
-logging.info("Starting agent %s" % Config.UUID)
-
-# Start Agent
-AgentComponent.runThreaded()

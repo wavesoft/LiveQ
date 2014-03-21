@@ -31,7 +31,7 @@ from liveq.component import Component
 from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.models import Agent, AgentGroup, AgentMetrics
-from liveq.debug.postmortem import PostMortem
+from liveq.reporting.postmortem import PostMortem
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
 
