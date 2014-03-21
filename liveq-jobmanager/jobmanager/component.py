@@ -90,6 +90,7 @@ class JobManagerComponent(Component):
 
 		channel.on('job_data', self.onAgentJobData, channel=channel)
 		channel.on('job_completed', self.onAgentJobCompleted, channel=channel)
+		channel.on('lars', self.onAgentLARSData, channel=channel)
 
 	def getAgentChannel(self, agentID):
 		"""
@@ -312,6 +313,20 @@ class JobManagerComponent(Component):
 
 		# Notify scheduler that the agent is offline
 		scheduler.markOffline( channel.name )
+
+	def onAgentLARSData(self, message, channel=None):
+		"""
+		Callback when LARS payload arrives
+		"""
+
+		# Open forwarder
+		repeater = LARS.openRepeater(alias=channel, prefixes=[
+				"lars/agents/%s" % channel.name.replace("/", "#")
+			])
+
+		# Process LARS frames
+		for frame in message['frames']:
+			repeater.send(frames)
 
 	def onAgentHandshake(self, message, channel=None):
 		"""

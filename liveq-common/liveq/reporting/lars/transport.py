@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import time
 import socket
 
 class LARSTransport:
@@ -60,19 +61,73 @@ class BusTransport(LARSTransport):
 	A transport system for LARS that uses an existing IBUS/EBUS channel
 	"""
 
-	def __init__(self, channel):
+	def __init__(self, channel, action="lars", throttling=True, delay=10):
 		"""
 		Initialize the BusTransport bu storing the channel
+
+		Since a bus is less real-time than direct UDPTransport, this class
+		support sthrottling of the stacked messages.
 		"""
 
 		# The bus channel
 		self.channel = channel
+		self.action = action
+
+		# Throttling information
+		self.throttling = throttling
+		self.throttling_delay = deley
+		self.throttling_stack = []
+		self.throttling_timer = time.time()
+
+	def flush(self):
+		"""
+		Flush the throttle queue to the channel
+		"""
+
+		# Reset throttling timer
+		self.throttling_timer = time.time()
+
+		# If we have some packets, send them now
+		if self.throttling_stack:
+
+			# Send a colleted frame
+			self.channel.send(self.action, {
+					"frames": self.throttling_stack
+				})
+			self.throttling_stack = []
+
+
+	def process(self):
+		"""
+		Process the egress queue
+		"""
+
+		# Timestamp
+		timestamp = time.time()
+
+		# Check if we reached the throttling timer and flush the queue if needed
+		if timestamp >= self.throttling_timer + self.throttling_delay:
+			self.flush()
 
 	def send(self, payload):
 		"""
 		Send the given payload over the bus channel
 		"""
 
-		# Send message
-		self.channel.send(payload)
+		# Check if we have throttling enabled
+		if self.throttling:
+			ts = time.time()
+
+			# If we are within the throttle timer, stack on the egress queue
+			if ts < self.throttling_timer + self.throttling_delay:
+				self.throttling_stack.append( payload )
+			else:
+				self.flush()
+
+		else:
+
+			# Otherwise send it in real-time
+			self.channel.send(self.action, {
+					"frames": [ payload ]
+				})
 
