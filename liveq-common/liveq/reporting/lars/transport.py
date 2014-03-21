@@ -29,7 +29,7 @@ class LARSTransport:
 		"""
 		Send data through the transport
 		"""
-		pass
+		raise NotImplementedError("LARS transport send() function not implementing")
 
 class UDPTransport(LARSTransport):
 	"""

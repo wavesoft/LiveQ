@@ -97,50 +97,95 @@ class LARSHeartbeatMonitor:
 
 class LARSStorage:
 
-	def __init__(self):
-		"""
-		"""
-		pass
-
 	def getIndex(self):
 		"""
+		Return a dictionary with the key structures in the store
 		"""
-		pass
+		raise NotImplementedError("LARS storage getIndex() function not implemented")
 
-	def setIndex(self):
+	def setIndex(self, index):
 		"""
+		Update the index dictionary
 		"""
-		pass
+		raise NotImplementedError("LARS storage setIndex() function not implemented")
 
 	def set(self, key, value):
 		"""
+		Update key value
 		"""
-		pass
+		raise NotImplementedError("LARS storage set() function not implemented")
 
 	def get(self, key, value):
 		"""
+		Return the key value
 		"""
-		pass
+		raise NotImplementedError("LARS storage get() function not implemented")
 
-class LARSAlerter:
+	def has(self, key):
+		"""
+		Check if the store contains the given key
+		"""
+		raise NotImplementedError("LARS storage has() function not implemented")
+
+class LARSMemoryStorage(LARSStorage):
 
 	def __init__(self):
 		"""
+		Initialize keys
 		"""
-		pass
+
+		#: Memory key/value store
+		self.keys = { }
+
+	def getIndex(self):
+		"""
+		Return the stored index
+		"""
+		return self.get("@index", {})
+
+	def setIndex(self, index):
+		"""
+		Update the stored index
+		"""
+		self.set("@index", index)
+
+		# Index updated
+		pprint.pprint(index)
+
+	def set(self, key, value):
+		"""
+		Update item key
+		"""
+		self.keys[key] = value
+
+	def get(self, key, default=None):
+		"""
+		Fetch key value
+		"""
+
+		# Return default if missing
+		if not key in self.keys:
+			return default
+
+		# Return key value
+		return self.keys[key]
+
+	def has(self, key):
+		"""
+		Check if the specified key exists in the key database
+		"""
+
+		return key in self.keys
 
 class LARSCollector:
 
-	def __init__(self):
+	def __init__(self, storage=None):
 		"""
 		Initialize LARS collector
 		"""
 
-		# The keys and keys values
-		self.keys = { }
-
-		# The representation tree for the structures
-		self.index = { }
+		# The storage class where the data I/O occurs
+		self.storage = storage
 
 		# The list of heartbeats in the map
 		self.heartbeats = { }
@@ -151,20 +196,22 @@ class LARSCollector:
 		"""
 
 		# If we are creating a new key, update tree mapping
-		if not key in self.keys:
+		if not self.storage.has(key):
 
 			# Create missing nodes
-			node = self.index
+			node = self.storage.getIndex()
+			index = node
 			parts = key.split("/")
 			for p in parts:
 				if not p in node:
 					node[p] = {}
 				node = node[p]
 
-			pprint.pprint(self.index)
+			# Update index
+			self.storage.setIndex(index)
 
 		# Update key value
-		self.keys[key] = value
+		self.storage.set(key, value)
 
 		print "       -->  %s=%s" % (key, value)
 
@@ -173,12 +220,8 @@ class LARSCollector:
 		Return the value of the given key, using the default value given if missing
 		"""
 
-		# Return default if missing
-		if not key in self.keys:
-			return default
-
-		# Return key value
-		return self.keys[key]
+		# Get key from storage
+		return self.storage.get(key, default)
 
 	def handleInput(self, alias, action, key, value):
 		"""
@@ -195,9 +238,9 @@ class LARSCollector:
 
 			# Get previous value
 			v = 0
-			if key in self.keys:
+			if not self.storage.has(key):
 				try:
-					v = int(self.get(key))
+					v = int(self.get(key, 0))
 				except ValueError:
 					pass
 
@@ -337,9 +380,13 @@ class LARSSocket:
 		self.collector.handleInput( d_alias, d_action, d_path, d_value )
 
 
-collector = LARSCollector()
+# Initialize LARS Connector
+collector = LARSCollector(storage=LARSMemoryStorage())
+
+# Bind a socket on the listener
 sock = LARSSocket(collector)
 
+# Start main loop
 while True:
 	sock.process()
 	collector.process()

@@ -52,7 +52,7 @@ class LARSRepeater:
 		if self.prefixes != None:
 			for pfx in self.prefixes:
 				# Check for matching prefix
-				if payload[1:len(pfx)] = pfx:
+				if payload[1:len(pfx)] == pfx:
 					break
 			# No match accepted
 			return
