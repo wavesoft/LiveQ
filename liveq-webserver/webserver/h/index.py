@@ -42,11 +42,16 @@ class PlayHandler(tornado.web.RequestHandler):
 		# Get lab ID
 		lab_id = self.get_argument("lab")
 
+		# Get developer UI option
+		template = "play.html"
+		if int(self.get_argument("dev", 0)) == 1:
+			template = "play-dev.html"
+
 		# Get lab object
 		lab = Lab.get( Lab.uuid == lab_id )
 
 		self.render(
-			"play.html", 
+			template, 
 			navbar=getNavbarData(),
 			lab_uuid=lab.uuid
 			)
