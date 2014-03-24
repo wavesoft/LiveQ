@@ -52,10 +52,11 @@ class LARSRepeater:
 		if self.prefixes != None:
 			for pfx in self.prefixes:
 				# Check for matching prefix
-				if payload[1:len(pfx)] == pfx:
+				if payload[17:17+len(pfx)] == pfx:
 					break
 			# No match accepted
 			return
 
 		# Forward payload if it passed the filters
 		LARS.forwardMessage(payload)
+

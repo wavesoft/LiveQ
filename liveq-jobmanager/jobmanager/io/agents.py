@@ -194,7 +194,7 @@ def agentJobFailed(uid, job, postMortemBuffer=None):
 
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
-	report.add("jobs/failed", 1)
+	report.openGroup("jobs").add("failed", 1)
 
 	# Register a post-mortem
 	if postMortemBuffer:
@@ -237,7 +237,7 @@ def agentJobSucceeded(uid, job):
 
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
-	report.add("jobs/completed", 1)
+	report.openGroup("jobs").add("completed", 1)
 
 
 def agentJobSent(uid, job):
@@ -255,7 +255,7 @@ def agentJobSent(uid, job):
 
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
-	report.add("jobs/sent", 1)
+	report.openGroup("jobs").add("sent", 1)
 
 
 def agentJobAborted(uid, job):
@@ -273,4 +273,5 @@ def agentJobAborted(uid, job):
 
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
-	report.add("jobs/aborted", 1)
+	report.openGroup("jobs").add("aborted", 1)
+

@@ -106,6 +106,23 @@ class LARSGroup:
 		return self
 
 
+	def event(self, key, name, *args):
+		"""
+		Send an event on the LARS server
+		"""
+
+		# Prepare arguments
+		arg_list = [name]
+		arg_list += map(str, args)
+
+		# Build value by joining the arguments
+		value = ",".join(arg_list)
+
+		# Send EVENT Message
+		LARS.sendMessage( ACTION_EVENT, "%s/%s" % (self.path, _sanitize(key)) , value)
+		return self
+
+
 class LARSEntity(LARSGroup):
 	"""
 	LiveQ LARS Entity

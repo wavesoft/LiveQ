@@ -23,17 +23,26 @@ import sys
 sys.path.append("../liveq-common")
 # ----------
 
+import re
 import time
 import socket
 import select
 
 import pprint
 from liveq.reporting.lars import *
+from liveq.events import EventDispatcher
 
 class LARSHeartbeatMonitor:
+	"""
+	The LARS Heartbeat monitor is a class instantiated for every heartbeat signal
+	in the LARS key.
+
+	It provides the mehanism of processing and identifying dead instances.
+	"""
 
 	def __init__(self, collector, key, timeout=DEFAULT_HB_INTERVAL, timeoutOverdrift=10):
 		"""
+		Initialize the heartbeat class
 		"""
 
 		# Store collector and key
@@ -95,6 +104,7 @@ class LARSHeartbeatMonitor:
 				self.active = False
 				self.collector.set("%s/keepalive/active" % self.key, False)
 
+
 class LARSStorage:
 
 	def getIndex(self):
@@ -127,6 +137,7 @@ class LARSStorage:
 		"""
 		raise NotImplementedError("LARS storage has() function not implemented")
 
+
 class LARSMemoryStorage(LARSStorage):
 
 	def __init__(self):
@@ -148,9 +159,6 @@ class LARSMemoryStorage(LARSStorage):
 		Update the stored index
 		"""
 		self.set("@index", index)
-
-		# Index updated
-		pprint.pprint(index)
 
 	def set(self, key, value):
 		"""
@@ -177,6 +185,43 @@ class LARSMemoryStorage(LARSStorage):
 
 		return key in self.keys
 
+class LARSEventReceiver(EventDispatcher):
+
+	def __init__(self, match=None):
+		"""
+		Setup keys
+		"""
+
+		self.match = match
+
+	def matches(self, key):
+		"""
+		Check if the match rules matches the specified key
+		"""
+
+		# If None, it matches everything
+		if (self.match == None):
+			return True
+
+		# Basic string match
+		elif type(self.match) == str:
+			return (key[0:len(self.match)] == self.match)
+
+		# List match
+		elif type(self.match) == list:
+			for m in self.match:
+				if key[o:len(m)] == m:
+					return True
+			return False
+
+		# Regex/Object match
+		elif self.match.match(k):
+			return True
+
+		# Nothing found
+		return False
+
+
 class LARSCollector:
 
 	def __init__(self, storage=None):
@@ -189,6 +234,36 @@ class LARSCollector:
 
 		# The list of heartbeats in the map
 		self.heartbeats = { }
+
+		# Event receivers
+		self.eventReceivers = []
+
+	def listen(self, match=None):
+		"""
+		Allocate and register a new event receiver
+		"""
+
+		# Create an event receiver
+		rcv = LARSEventReceiver(match=match)
+		self.eventReceivers.append(rcv)
+
+		# Return the receiver
+		return rcv
+
+	def forwardEvent(self, name, key, args):
+		"""
+		Forward event
+		"""
+
+		# Fire to the event receivers listening
+		# for the particular keys
+		for r in self.eventReceivers:
+
+			# Check if the receiver is valid for the key
+			if r.matches(key):
+
+				# Trigger the event
+				r.trigger(name, key, *args)
 
 	def set(self, key, value):
 		"""
@@ -210,10 +285,14 @@ class LARSCollector:
 			# Update index
 			self.storage.setIndex(index)
 
+			# Node created
+			self.forwardEvent("cerate", key, value)
+
 		# Update key value
 		self.storage.set(key, value)
 
-		print "       -->  %s=%s" % (key, value)
+		# Let event listeners know that we have updated a variable
+		self.forwardEvent("update", key, value)
 
 	def get(self, key, default=None):
 		"""
@@ -299,6 +378,14 @@ class LARSCollector:
 			# Start heartbeat
 			self.heartbeats[key].pulse( value )
 
+		elif action == ACTION_EVENT:
+
+			# Parse values
+			values = values.split(",")
+
+			# Forward event
+			self.forwardEvent(values[0], key, values[1:])
+
 	def process(self):
 		"""
 		Handle timeouts
@@ -371,7 +458,8 @@ class LARSSocket:
 				"list_remove",
 				"keepalive_start",
 				"keepalive_send",
-				"keepalive_stop"
+				"keepalive_stop",
+				"event"
 			]
 		print "[%s] {%s} %s : %s" % (d_ip, actions[d_action], d_path, d_value )
 		# ====================

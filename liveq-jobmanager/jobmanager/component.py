@@ -380,7 +380,7 @@ class JobManagerComponent(Component):
 		jid = data['jid']
 		if not jid:
 			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
-			report.add("errors/missing-job-id", 1)
+			report.openGroup("errors").add("missing-job-id", 1)
 			return
 
 		# Fetch job class
@@ -388,7 +388,7 @@ class JobManagerComponent(Component):
 		if not job:
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
 			self.abortMissingJob(jid, channel)
-			report.add("errors/wrong-job-id", 1)
+			report.openGroup("errors").add("wrong-job-id", 1)
 			return
 
 		# Send status
@@ -399,7 +399,7 @@ class JobManagerComponent(Component):
 		if not agentHistos:
 			job.sendStatus("Could not parse data from worker %s" % channel.name)
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
-			report.add("errors/unpack-error", 1)
+			report.openGroup("errors").add("unpack-error", 1)
 			return
 
 		# Merge histograms with other histograms of the same job
@@ -408,7 +408,7 @@ class JobManagerComponent(Component):
 		if sumHistos == None:
 			job.sendStatus("Unable to merge histograms")
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
-			report.add("errors/merge-error", 1)
+			report.openGroup("errors").add("merge-error", 1)
 			return
 
 		report.add("data-frames", 1)
@@ -433,16 +433,16 @@ class JobManagerComponent(Component):
 		jid = data['jid']
 		if not jid:
 			self.logger.warn("[%s] Missing job ID in the arguments" % channel.name)
-			report.add("errors/missing-job-id", 1)
+			report.openGroup("errors").add("missing-job-id", 1)
 			return
 			# Send reports
-			report.add("jobs/failed", 1)
+			report.openGroup("jobs").add("failed", 1)
 
 		# Fetch job class
 		job = jobs.getJob(jid)
 		if not job:
 			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
-			report.add("errors/wrong-job-id", 1)
+			report.openGroup("errors").add("wrong-job-id", 1)
 			return
 
 		# Check result

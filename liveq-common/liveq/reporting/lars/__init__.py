@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import time
 import logging
 
 from liveq.reporting.lars.transport import UDPTransport
@@ -44,6 +45,9 @@ ACTION_HB_SEND = 6
 
 #: Stop heartbeat monitor
 ACTION_HB_STOP = 7
+
+#: Event message
+ACTION_EVENT = 8
 
 #: Default LARS Heartbeat timeout
 DEFAULT_HB_INTERVAL = 30
@@ -100,6 +104,25 @@ class LARS:
 	def sendMessage(action, key, value=None):
 		"""
 		Send a message to the transport
+
+		We are using compact data format, instead of human-readable format.
+		That's because we want known the precise offsets of varous fields in the message,
+		in order to be able to process them quicly when forwarding them through different
+		layers.
+
+		The message payload includes only printable characters and has the 
+		the following format:
+
+		+------+-----+------------------------------------------------+
+		| Ofs  | Len | Description                                    |
+		+------+-----+------------------------------------------------+
+		|    0 |  1  | Action type ASCII[ 64 + action_id ]            |
+		|    1 |  16 | The UNIX timestamp of the message in hex       |
+		|   17 |  x  | The full-path of the key                       |
+		| 17+x |  1  | "=" The separator character for the value      |
+		| 18+x |  y  | The value of the key                           |
+		+------+-----+------------------------------------------------+
+		
 		"""
 
 		# Replace value if missing
@@ -109,7 +132,7 @@ class LARS:
 			value = "=%s" % str(value)
 
 		# Send raw frame
-		LARS.forwardMessage( "%c%s%s" % ( 64+action, key, value ) )
+		LARS.forwardMessage( "%c%016x%s%s" % ( 64+action, time.time(), key, value ) )
 
 	@staticmethod
 	def forwardMessage(payload):
