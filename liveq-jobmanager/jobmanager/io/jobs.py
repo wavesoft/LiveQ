@@ -219,6 +219,26 @@ class Job:
 		self.channel.close()
 		del JOB_CHANNELS[self.dataChannel]
 
+	def addAgentInfo(self, agent):
+		"""
+		Let other end of the job that an agent has gone online
+		"""
+
+		# Send status message
+		self.sendStatus("Acquired agent %s" % agent.uuid, varMetrics={
+				"agent_added": agent.uuid
+			})
+
+	def removeAgentInfo(self, agent):
+		"""
+		Let other end of the job that an agent has gone offline
+		"""
+
+		# Send status message
+		self.sendStatus("Lost agent %s" % agent.uuid, varMetrics={
+				"agent_removed": agent.uuid
+			})
+
 	def sendStatus(self, message, varMetrics={}):
 		"""
 		Send a status message to the job recepient

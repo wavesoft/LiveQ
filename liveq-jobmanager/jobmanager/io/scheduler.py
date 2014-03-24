@@ -262,6 +262,9 @@ def handleLoss( agent ):
 	# Return a job instance
 	job = jobs.getJob(job_id)
 
+	# Let the job know that it lost an agent
+	job.removeAgentInfo(agent)
+
 	# Remove agent data from the job and check
 	# how many agents are left in the array
 	agentDataCount = job.removeAgentData( job_id )

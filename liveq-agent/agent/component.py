@@ -206,11 +206,6 @@ class AgentComponent(Component):
 		# Kill job
 		job.kill()
 
-		# Reply OK
-		self.jobmanagers.reply({
-				'result': 'ok'
-			})
-
 	def onAppJobData(self, final, data, app=None):
 		"""
 		Callback from the application when the data are available

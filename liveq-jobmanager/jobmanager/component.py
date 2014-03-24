@@ -136,25 +136,16 @@ class JobManagerComponent(Component):
 				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_cancel', {
 						'jid': agent.jobToCancel
-					}, waitReply=True)
+					})
 
-				# Log results
-				if not ans:
-					job.sendStatus("Could not contact worker %s" % agent.uuid)
-					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, agent.jobToCancel ) )
+				# Let job2cancel know that it has lost an agent
+				job2c = jobs.getJob(agent.jobToCancel)
+				job2c.removeAgentInfo(agent)
 
-					# Mark agent offline
-					agents.updatePresence( agent.uuid, 0 )
-					scheduler.markOffline( agent.uuid )
-
-				elif ans['result'] == "ok":
-					job.sendStatus("Successfuly aborted")
-					self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
-					agents.agentJobAborted(agent.uuid, job)
-
-				else:
-					job.sendStatus("Could not abort: %s" % ans['error'])
-					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( agent.jobToCancel, agent.uuid, ans['error'] ))
+				# Assume aborted
+				self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
+				agents.agentJobAborted(agent.uuid, job)
+				job.addAgentInfo(agent)
 
 			# Then, start the job on a_start
 			for agent in a_start:
@@ -185,10 +176,12 @@ class JobManagerComponent(Component):
 				agents.agentJobSent(agent.uuid, job)
 
 				if ans['result'] == "ok":
-					job.sendStatus("Successfuly started")
+
+					job.addAgentInfo(agent)
 					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
 
 				else:
+
 					job.sendStatus("Could not start: %s" % ans['error'])
 					self.logger.warn("Cannot start job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
 
@@ -236,11 +229,6 @@ class JobManagerComponent(Component):
 		# Cleanup job from scheduler
 		scheduler.releaseJob( job )
 
-		# Send agent report to LARS
-		report = LARS.openGroup("agents", channel.name, alias=channel.name)
-		report.add("active", -1)
-		report.add("completed", 1)
-
 		# And then cleanup job
 		job.release()
 
@@ -253,15 +241,10 @@ class JobManagerComponent(Component):
 		# Send cancellation synchronously
 		ans = agentChannel.send('job_cancel', {
 				'jid': job_id
-			}, waitReply=False)
+			})
 
 		# Log results
-		#if not ans:
-		#	self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agentChannel.name, job_id ) )
-		#elif ans['result'] == "ok":
-		#	self.logger.info("Successfuly cancelled job %s on %s" % ( job_id, agentChannel.name ))
-		#else:
-		#	self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job_id, agentChannel.name, ans['error'] ))
+		self.logger.info("Successfuly request abort of job %s on %s" % ( job_id, agentChannel.name ))
 
 
 	####################################################################################
@@ -279,10 +262,6 @@ class JobManagerComponent(Component):
 		Callback when a channel is up
 		"""
 		self.logger.info("[%s] Channel created" % channel.name)
-
-		# Send agent report to LARS
-		report = LARS.openGroup("agents", channel.name, alias=channel.name)
-		report.set("connected", 1)
 
 		# Store on local map
 		self.channels[channel.name] = channel
@@ -391,9 +370,6 @@ class JobManagerComponent(Component):
 			report.openGroup("errors").add("wrong-job-id", 1)
 			return
 
-		# Send status
-		job.sendStatus("Processing data from %s" % channel.name)
-
 		# Get the intermediate histograms from the agent buffer
 		agentHistos = IntermediateHistogramCollection.fromPack( data['data'] )
 		if not agentHistos:
@@ -410,6 +386,12 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			report.openGroup("errors").add("merge-error", 1)
 			return
+
+		# Send status
+		job.sendStatus("Processing data from %s" % channel.name, varMetrics={
+				"agent_data": channel.name,
+				"agent_frames": 1
+			})
 
 		report.add("data-frames", 1)
 
@@ -463,7 +445,7 @@ class JobManagerComponent(Component):
 				pmData = data['postmortem']
 
 			# Register the agent job failure
-			agents.agentJobFailed( agent.uuid, job, pmData )
+			agents.agentJobFailed( channel.uuid, job, pmData )
 
 		else:
 
@@ -497,7 +479,7 @@ class JobManagerComponent(Component):
 					})
 
 			# Register the agent job success
-			agents.agentJobSucceeded( agent.uuid, job )
+			agents.agentJobSucceeded( channel.name, job )
 
 	# =========================
 	# Internal Bus Callbacks
@@ -572,11 +554,6 @@ class JobManagerComponent(Component):
 				})
 			return
 
-		# Send agent report to LARS
-		report = LARS.openGroup("agents", channel.name, alias=channel.name)
-		report.add("active", -1)
-		report.add("cancelled", 1)
-
 		# Abort job on scheduler and return the agents that were used
 		a_cancel = scheduler.abortJob( job )
 		if a_cancel:
@@ -590,25 +567,12 @@ class JobManagerComponent(Component):
 				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_cancel', {
 						'jid': jid
-					}, waitReply=True)
+					})
 
-				# Log results
-				if not ans:
-					job.sendStatus("Could not contact worker %s" % agent.uuid)
-					self.logger.warn("Could not contact %s to cancel job %s. Marking agent offline" % ( agent.uuid, job.id ) )
-
-					# Mark agent offline
-					agents.updatePresence( agent.uuid, 0 )
-					scheduler.markOffline( agent.uuid )
-					
-				elif ans['result'] == "ok":
-					job.sendStatus("Successfuly aborted")
-					self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
-					agents.agentJobAborted(agent.uuid, job)
-
-				else:
-					job.sendStatus("Could not abort: %s" % ans['error'])
-					self.logger.warn("Cannot cancel job %s on %s (%s)" % ( job.id, agent.uuid, ans['error'] ))
+				# Log successful abort
+				job.sendStatus("Successfuly aborted")
+				self.logger.info("Successfuly cancelled job %s on %s" % ( job.id, agent.uuid ))
+				agents.agentJobAborted(agent.uuid, job)
 
 		# And then cleanup job
 		job.release()
