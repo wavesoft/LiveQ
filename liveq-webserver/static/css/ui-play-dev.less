@@ -1,0 +1,136 @@
+
+// Define media dimentions
+@devm-sm:	~"(min-width: 768px)";
+@devm-md:	~"(min-width: 992px)";
+@devm-lg:	~"(min-width: 1200px)";
+
+html {
+	height: 100%;
+}
+
+body {
+	overflow: hidden;
+	height: 100%;
+}
+
+#game {
+
+	//////////////////////////////////////
+	//  SMALL DEVICES
+	//////////////////////////////////////
+
+	padding: 8px;
+
+	//////////////////////////////////////
+	//  DESKTOP/TABLET DEVICES
+	//////////////////////////////////////
+
+	// On devices bigger than small (mobile)
+	// stack them horizontally
+	@media @devm-sm {
+
+		// Fit entire window
+		width: 100%;
+		height: 100%;
+		padding: 0;
+
+		// Add frame
+		border: solid 10px #333;
+
+	}
+
+
+	#game-window {
+
+		// Hide overflows
+		overflow: hidden;
+		padding: 0px;
+		height: 100%;
+
+		#game-frame {
+
+			//////////////////////////////////////
+			//  GLOBALS
+			//////////////////////////////////////
+
+			white-space: nowrap;
+
+			// Common frame configuration
+			.frame {
+				height: 100%;
+			}
+
+			//////////////////////////////////////
+			//  SMALL DEVICES
+			//////////////////////////////////////
+
+			// The default values for the game-frame is for 
+
+			// Common frame configuration
+			.frame {
+				width: 100%;
+			}
+
+			//////////////////////////////////////
+			//  DESKTOP/TABLET DEVICES
+			//////////////////////////////////////
+
+			// On devices bigger than small (mobile)
+			// stack them horizontally
+			@media @devm-sm {
+
+				// Specify dimentions
+				height: 100%;
+				width: 133%;
+
+				.frame {
+					display: inline-block;
+					overflow: hidden;
+				}
+
+				// tunables and run is 1/3
+				.frame#tunables, .frame#run {
+					width: 33.333%;
+				}
+
+				// Results is 2/3
+				.frame#results {
+					width: 66.666%;
+				}
+
+				.frame#tunables {
+					-webkit-transition: width 0.25s;
+					transition: width 0.25s;
+				}
+
+			}
+
+		}
+
+		#game-frame.running {
+
+			//////////////////////////////////////
+			//  SMALL DEVICES
+			//////////////////////////////////////
+
+
+			//////////////////////////////////////
+			//  DESKTOP/TABLET DEVICES
+			//////////////////////////////////////
+
+			// On devices bigger than small (mobile)
+			// stack them horizontally
+			@media @devm-sm {
+
+				.frame#tunables {
+					width: 0;
+				}
+
+			}
+
+		}
+
+
+	}
+
+}
