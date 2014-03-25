@@ -568,6 +568,7 @@ div.log {
 				.tunables-grid {
 					display: block;
 					width: 100%;
+					min-height: @tunable-height+6px;
 
 					list-style-type: none; 
 					margin: 0; 
@@ -588,14 +589,40 @@ div.log {
 						}
 					}
 
+					// Text placeholder on the grid container
+					.label-placeholder {
+						width: 100%;
+						font-size: 12px;
+						text-align: center;
+						padding: 50px 0px;
+						color: @tunable-c-light;
+					}
+
+				}
+
+				// The tiles container
+				.tunables-tiles {
+					display: block;
+					width: 100%;
+
+					// Text placeholder on the tiles container
+					.label-placeholder {
+						width: 100%;
+						font-size: 12px;
+						text-align: center;
+						margin: 20px 0px;
+						padding: 0;
+						color: @tunable-c-light;
+					}
+
 				}
 
 				// Separator line between the two groups
 				.tunables-separator {
 					display: block;
 					width: 100%;
-					margin: 0;
-					height: 0;
+					margin: 5px;
+					height: 1px;
 
 					// Gradient background for the horizontal splitter
 					background: #ffffff;
@@ -607,17 +634,6 @@ div.log {
 					background: linear-gradient(to right,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
 					filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 );
 
-					// Fade-in when focused
-					&.visible {
-						margin: 5px;
-						height: 1px;
-					}
-				}
-
-				// The tiles container
-				.tunables-tiles {
-					display: block;
-					width: 100%;
 				}
 
 				// The tunable tiles which may move between .tunable-tiles container
@@ -643,6 +659,12 @@ div.log {
 
 					&.placeholder {
 						background: @tunable-c-back;
+
+						// Transition to zero
+						&.hidden {
+							width: 0;
+						}
+						
 					}
 
 					// =========================

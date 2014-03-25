@@ -12,6 +12,10 @@ LiveQ.Play.Tunable = function( host ) {
 	this.host.append(this.tunablesGrid);
 	this.host.append($('<div class="clearfix"></div>'));
 
+	// Add a grid placeholder
+	this.tunablesGridEmptyPlaceholder = $('<li class="label-placeholder">Click a tunable tile from below to start!</li>');
+	this.tunablesGrid.append(this.tunablesGridEmptyPlaceholder);
+
 	// Separator
 	this.tunablesSeparator = $('<div class="tunables-separator gradient grad-separator"></div>');
 	this.host.append(this.tunablesSeparator);
@@ -20,6 +24,10 @@ LiveQ.Play.Tunable = function( host ) {
 	this.tunables = $('<div class="tunables-tiles"></div>');
 	this.host.append(this.tunables);
 	this.host.append($('<div class="clearfix"></div>'));
+
+	// Add a tunables placeholder
+	this.tunablesEmptyPlaceholder = $('<div class="label-placeholder">( No more tunables )</div>');
+	this.tunables.append(this.tunablesEmptyPlaceholder);
 
 	this.parameters = [];
 }
@@ -46,9 +54,15 @@ LiveQ.Play.Tunable.prototype.getValues = function() {
  */
 LiveQ.Play.Tunable.prototype.add = function( config ) {
 
+	// Create tunables entry
 	var e = new LiveQ.Play.TunableEntry(this, config);
-	this.tunables.append(e.element);
 	this.parameters.push(e);
+
+	// Append entry on the tunables
+	this.tunables.append(e.element);
+
+	// Make sure tunables empty placeholder
+	this.tunablesEmptyPlaceholder.hide();
 
 }
 
@@ -70,6 +84,7 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 				"z-index": "",
 				"left": "",
 				"top": "",
+				"float": "",
 				"-webkit-transform": "",
 				"-moz-transform": "",
 				"-ms-transform": "",
@@ -80,6 +95,7 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 			// Update sortables
 			self.tunablesGrid.sortable({
 				'handle': '.btn-reorder',
+				'items': '> li.sortable-li',
 				start: function(event, ui) {
 					ui.item.children().first().addClass("dragging");
 					self.tunables.addClass("dim");
@@ -139,12 +155,13 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 				"z-index": 5000
 			});
 
-			// Collapse animation
-			placeholder.animate({
-				'width': 0
-			}, 250, function() {
-				placeholder.remove();
-			});
+			// Collapse placeholder using CSS transitions
+			setTimeout(function() {
+				placeholder.addClass("hidden");
+				setTimeout(function() {
+					placeholder.remove();
+				}, 250);
+			}, 500);
 
 			// Move element half-way on the animation
 			entry.element.animate({
@@ -176,7 +193,7 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 			// 1) Add the placeholder on the list (this is going to receive)
 			//    the element after the animation 
 
-			targetHost = $('<li></li>');
+			targetHost = $('<li class="sortable-li"></li>');
 			self.tunablesGrid.append(targetHost);
 
 			// ... and animate it to it's final dimentions
@@ -194,6 +211,9 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 			// it will call stage_2
 
 		};
+
+	// Hide tunables grid empty placeholder
+	this.tunablesGridEmptyPlaceholder.hide();
 
 	// Check if we want to use animations
 	if ((animate == undefined) || animate) {
@@ -214,12 +234,12 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 	}
 
 	// Make sure the tunablesGrid has the with-elements class
-	if (self.tunables.children().length <= 1) {
+	if (self.tunables.children(".tunable").length <= 1) {
 		setTimeout(function() {
-			self.tunablesSeparator.removeClass("visible");
-		}, 100);
+			self.tunablesEmptyPlaceholder.fadeIn();
+		}, 250);
 	} else {
-		self.tunablesSeparator.addClass("visible");
+		this.tunablesEmptyPlaceholder.hide();
 	}
 
 }
@@ -230,6 +250,9 @@ LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 	var self = this;
 
+	// Hude tunables gid empty placeholder
+	this.tunablesEmptyPlaceholder.hide();
+
 	// Check if we want to use animations
 	if ((animate == undefined) || animate) {
 
@@ -239,7 +262,7 @@ LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 			// Remove expanded class
 			entry.element.removeClass("expanded");
 
-			// Remove placeholder
+			// Remove placeholder 
 			var placeholder = entry.element.parent();
 			placeholder.animate({
 				"width": 0,
@@ -247,6 +270,12 @@ LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 			}, function() {
 				// Remove placeholder
 				placeholder.remove();
+
+				// Check if we should show the grid placeholder
+				if (self.tunablesGrid.find(".tunable").length  == 0) {
+					self.tunablesGridEmptyPlaceholder.fadeIn();
+				}
+
 			})
 
 			// Put back to list
@@ -260,12 +289,6 @@ LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 			entry.element.hide();
 			entry.element.fadeIn(250);
 
-			// Check if we should hide separator
-			if (self.tunablesGrid.children().length <= 1) {
-				self.tunablesSeparator.removeClass("visible");
-			} else {
-				self.tunablesSeparator.addClass("visible");
-			}
 
 		});
 
@@ -279,11 +302,9 @@ LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 		// Remove class
 		entry.element.removeClass("expanded");
 
-		// Check if we should hide separator
-		if (!self.tunablesGrid.children().length) {
-			self.tunablesSeparator.removeClass("visible");
-		} else {
-			self.tunablesSeparator.addClass("visible");
+		// Check if we should show the grid placeholder
+		if (self.tunablesGrid.find(".tunable").length <= 1) {
+			this.tunablesGridEmptyPlaceholder.fadeIn();
 		}
 
 	}
@@ -359,6 +380,7 @@ LiveQ.Play.TunableEntry = function( parent, config ){
 		if (spinnerMouseDown) {
 			e.stopPropagation();
 			self.spinner.stop();
+			spinnerMouseDown=false;
 			$(self.parent).trigger("change");
 		}
 	});

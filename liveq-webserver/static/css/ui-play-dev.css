@@ -350,6 +350,7 @@ div.log .info {
 #game #game-window #game-frame #tunables-host .tunables-grid {
   display: block;
   width: 100%;
+  min-height: 128px;
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -364,11 +365,30 @@ div.log .info {
 #game #game-window #game-frame #tunables-host .tunables-grid li .tunable {
   float: none;
 }
+#game #game-window #game-frame #tunables-host .tunables-grid .label-placeholder {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  padding: 50px 0px;
+  color: #cccccc;
+}
+#game #game-window #game-frame #tunables-host .tunables-tiles {
+  display: block;
+  width: 100%;
+}
+#game #game-window #game-frame #tunables-host .tunables-tiles .label-placeholder {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin: 20px 0px;
+  padding: 0;
+  color: #cccccc;
+}
 #game #game-window #game-frame #tunables-host .tunables-separator {
   display: block;
   width: 100%;
-  margin: 0;
-  height: 0;
+  margin: 5px;
+  height: 1px;
   background: #ffffff;
   background: -moz-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
   background: -webkit-gradient(linear, left top, right top, color-stop(0%, #ffffff), color-stop(50%, #cccccc), color-stop(100%, #ffffff));
@@ -377,14 +397,6 @@ div.log .info {
   background: -ms-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
   background: linear-gradient(to right, #ffffff 0%, #cccccc 50%, #ffffff 100%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=1);
-}
-#game #game-window #game-frame #tunables-host .tunables-separator.visible {
-  margin: 5px;
-  height: 1px;
-}
-#game #game-window #game-frame #tunables-host .tunables-tiles {
-  display: block;
-  width: 100%;
 }
 #game #game-window #game-frame #tunables-host .tunable {
   float: left;
@@ -417,6 +429,9 @@ div.log .info {
 }
 #game #game-window #game-frame #tunables-host .tunable.placeholder {
   background: #ffffff;
+}
+#game #game-window #game-frame #tunables-host .tunable.placeholder.hidden {
+  width: 0;
 }
 #game #game-window #game-frame #tunables-host .tunable .knob {
   position: absolute;

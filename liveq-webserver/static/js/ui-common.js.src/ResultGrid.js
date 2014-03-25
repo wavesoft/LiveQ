@@ -37,6 +37,25 @@ LiveQ.UI.ResultGrid = function(host) {
 	this.btnSortRankDesc = $('<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-sort-by-attributes-alt"></span></button>');
 	this.btnSortRankDesc.click(function() { self.sort(3); });
 
+	/*
+	this.btnSortNameAsc.tooltip({
+		'placement': 'left',
+		'title': 'Sort alphabetically, ascending'
+	});
+	this.btnSortNameDesc.tooltip({
+		'placement': 'left',
+		'title': 'Sort alphabetically, descending'
+	});
+	this.btnSortRankAsc.tooltip({
+		'placement': 'left',
+		'title': 'Sort by goodness of fit, ascending'
+	});
+	this.btnSortRankDesc.tooltip({
+		'placement': 'left',
+		'title': 'Sort by goodness of fit, descending'
+	});
+	*/
+
 	// Nest buttons
 	this.btnGroupSort.append(this.btnSortNameAsc);
 	this.btnGroupSort.append(this.btnSortNameDesc);
@@ -50,6 +69,11 @@ LiveQ.UI.ResultGrid = function(host) {
 
 	// Initial sort
 	this.sort(0);
+
+	// Bind on DOM window resizes
+	$(window).resize(function() {
+		self.resize();
+	});
 
 	// Sample data
 	/*
@@ -239,6 +263,15 @@ LiveQ.UI.ResultGrid.prototype.zero = function() {
 }
 
 /**
+ * Update all values
+ */
+LiveQ.UI.ResultGrid.prototype.resize = function() {
+	for (var i=0; i<this.entries.length; i++) {
+		this.entries[i].update();
+	}
+}
+
+/**
  * An entry in the resultgrid
  */
 LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
@@ -270,11 +303,15 @@ LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
 	this.valueHost.append(this.valueSnapshot);
 	this.valueOuter.append(this.valueInner);
 
-	// Bind histogram updates
+	// Setup hover descriptions
+
+
+	// Bind on histogram updates
 	var self = this;
 	this.histogram.onUpdate(function() {
 		self.update();
 	});
+
 }
 
 /**
