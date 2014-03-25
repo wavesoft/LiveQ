@@ -1,3 +1,6 @@
+/**
+ * Basic body styles
+ */
 html {
   height: 100%;
 }
@@ -5,15 +8,101 @@ body {
   overflow: hidden;
   height: 100%;
 }
-#game {
-  padding: 8px;
+/**
+ * Log window
+ */
+div.log {
+  height: 100px;
+  overflow: auto;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 10px;
 }
+div.log div:first {
+  font-weight: bold;
+}
+div.log .warn {
+  color: #F60;
+}
+div.log .error {
+  color: #F00;
+}
+div.log .done {
+  color: #060;
+}
+div.log .info {
+  color: #06F;
+}
+/**
+ * Blue screen of death
+ */
+#bsod {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.8);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20000;
+}
+#bsod > div:before {
+  height: 50%;
+}
+#bsod > div {
+  margin: 20px auto 0;
+  height: 320px;
+  width: 320px;
+  text-align: center;
+  color: #fff;
+}
+#bsod > div .bsod-icon {
+  font-size: 250px;
+}
+/**
+ * Questionable elements
+ */
+.questionable {
+  position: relative;
+}
+.questionable .btn-question {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  color: #ffffff;
+  background: #cc3300;
+  width: 20px;
+  height: 20px;
+  padding: 4px 0px 0px 5px;
+  font-size: 10px;
+  cursor: pointer;
+  display: none;
+}
+.questionable .btn-question:active {
+  background: #ff6633;
+}
+.questionable.questionable-active {
+  background-color: #ffeeee;
+  -webkit-border-radius: 0px 10px 0px 0px;
+  -moz-border-radius: 0px 10px 0px 0px;
+  -o-border-radius: 0px 10px 0px 0px;
+  border-radius: 0px 10px 0px 0px;
+}
+.questionable.questionable-active .questionable-back {
+  background-color: #ffeeee !important;
+}
+.questionable.questionable-active .btn-question {
+  display: block;
+}
+/**
+ * Game interface
+ */
 @media (min-width: 768px) {
   #game {
     width: 100%;
     height: 100%;
-    padding: 0;
-    border: solid 10px #333;
   }
 }
 #game #game-window {
@@ -26,6 +115,7 @@ body {
 }
 #game #game-window #game-frame .frame {
   height: 100%;
+  padding: 8px;
 }
 #game #game-window #game-frame .frame {
   width: 100%;
@@ -33,26 +123,127 @@ body {
 @media (min-width: 768px) {
   #game #game-window #game-frame {
     height: 100%;
-    width: 133%;
+    width: 125%;
+    position: relative;
   }
   #game #game-window #game-frame .frame {
     display: inline-block;
     overflow: hidden;
   }
-  #game #game-window #game-frame .frame#tunables,
+  #game #game-window #game-frame .frame#results-host {
+    width: 25%;
+  }
+  #game #game-window #game-frame .frame#tunables-host {
+    -webkit-transition: all 0.25s;
+    transition: all 0.25s;
+  }
+  #game #game-window #game-frame .clear {
+    clear: both;
+  }
+}
+#game #game-window #game-frame #tunables > .tunable {
+  float: left;
+  display: block;
+  overflow: hidden;
+  position: relative;
+  width: 84px;
+  height: 112px;
+  margin: 3px;
+}
+#game #game-window #game-frame #tunables > .tunable .knob {
+  position: absolute;
+  left: 2px;
+  top: 10px;
+}
+#game #game-window #game-frame #tunables > .tunable .circle-trim {
+  position: absolute;
+  left: -4px;
+  top: 4px;
+  background: #ffffff;
+  -webkit-border-radius: 90px;
+  -moz-border-radius: 90px;
+  -o-border-radius: 90px;
+  border-radius: 90px;
+  width: 90px;
+  height: 90px;
+}
+#game #game-window #game-frame #tunables > .tunable .btn-plus,
+#game #game-window #game-frame #tunables > .tunable .btn-minus {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  position: absolute;
+  display: block;
+  width: 32px;
+  height: 32px;
+  bottom: 0;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #66ccff;
+  padding-top: 14px;
+  font-size: 10px;
+}
+#game #game-window #game-frame #tunables > .tunable .btn-plus:active,
+#game #game-window #game-frame #tunables > .tunable .btn-minus:active {
+  background-color: #33bbff;
+}
+#game #game-window #game-frame #tunables > .tunable .btn-minus {
+  left: 0;
+  text-align: left;
+  padding-left: 7px;
+}
+#game #game-window #game-frame #tunables > .tunable .btn-plus {
+  right: 0;
+  text-align: right;
+  padding-right: 7px;
+}
+#game #game-window #game-frame #tunables > .tunable .label {
+  color: #666;
+  font-size: 18px;
+  font-weight: bold;
+  position: absolute;
+  text-align: center;
+  left: 0;
+  right: 0;
+  top: 68px;
+}
+#game #game-window #game-frame .frame#tunables-host,
+#game #game-window #game-frame #tunables,
+#game #game-window #game-frame .frame#run-host,
+#game #game-window #game-frame .frame#run {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  #game #game-window #game-frame .frame#tunables-host,
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run-host,
   #game #game-window #game-frame .frame#run {
-    width: 33.333%;
+    width: 282px;
   }
-  #game #game-window #game-frame .frame#results {
-    width: 66.666%;
+}
+@media (min-width: 992px) {
+  #game #game-window #game-frame .frame#tunables-host,
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run-host,
+  #game #game-window #game-frame .frame#run {
+    width: 376px;
   }
-  #game #game-window #game-frame .frame#tunables {
-    -webkit-transition: width 0.25s;
-    transition: width 0.25s;
+}
+@media (min-width: 1200px) {
+  #game #game-window #game-frame .frame#tunables-host,
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run-host,
+  #game #game-window #game-frame .frame#run {
+    width: 470px;
   }
 }
 @media (min-width: 768px) {
-  #game #game-window #game-frame.running .frame#tunables {
+  #game #game-window #game-frame.running .frame#tunables-host {
     width: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 }

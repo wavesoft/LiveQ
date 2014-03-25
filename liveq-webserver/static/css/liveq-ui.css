@@ -1,53 +1,43 @@
 body {
-    font: sans-serif;
+  font: sans-serif;
 }
-
 div#log {
-    height: 100px;
-    overflow: auto;
-    font-family: "Lucida Console", Monaco, monospace;
-    font-size: 10px;
+  height: 100px;
+  overflow: auto;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 10px;
 }
-
 div#log div:first {
-    font-weight: bold;
+  font-weight: bold;
 }
-
 div#log .warn {
-    color: #F60;
+  color: #F60;
 }
-
 div#log .error {
-    color: #F00;
+  color: #F00;
 }
-
 div#log .done {
-    color: #060;
+  color: #060;
 }
-
 div#log .info {
-    color: #06F;
+  color: #06F;
 }
-
 span.description {
-    display: none;
+  display: none;
 }
-
 span.running-text {
-    color: #F00;
-    font-size: 0.6em;
+  color: #F00;
+  font-size: 0.6em;
 }
-
 iframe#inlineModalFrame {
-    border: none;
-    width: 100%;
-    height: 300px;
+  border: none;
+  width: 100%;
+  height: 300px;
 }
-
 div.color-legend div.cl {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    border: solid 1px #666;
-    vertical-align: middle;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  border: solid 1px #666;
+  vertical-align: middle;
 }

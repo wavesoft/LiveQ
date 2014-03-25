@@ -47,7 +47,6 @@ LiveQ.UI.Spinner = function(config, callback) {
     if (self.value > self.max) self.value = self.max;
 
     // Callback
-    console.log(self.value);
     if (self.callback)
       self.callback(self.value);
   }

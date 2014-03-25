@@ -1,8 +1,65 @@
 
-// Define media dimentions
-@devm-sm:	~"(min-width: 768px)";
-@devm-md:	~"(min-width: 992px)";
-@devm-lg:	~"(min-width: 1200px)";
+// Predefined media dimentions
+@screen-sm-min:			768px;
+@screen-md-min:			992px;
+@screen-lg-min: 		1200px;
+
+// Questionable icon
+@questionable-color:	#FFF;
+@questionable-back:		#CC3300;
+@questionable-hover:	#FFEEEE;
+@questionable-size:		20px;
+
+// Tunable configurabion
+@tunable-width:			84px;
+@tunable-height:		112px;
+@tunable-margin:		5px;
+@tunable-circle-trim:	90px;
+@tunable-circle-top:	10px;
+@tunable-circle-radius:	78px;
+@tunable-c-back:		#FFFFFF;
+@tunable-c-color:		#66CCFF;
+@tunable-c-fore:		#FFFFFF;
+@tunable-btn-fontsize:	10px;
+@tunable-button-width:	(@tunable-width/2) - 10px;
+
+// Shorthand for cross-browser support
+.transition(@params) {
+ -webkit-transition: @params;
+    -moz-transition: @params;
+	  -o-transition: @params;
+	     transition: @params;
+}
+.transform(@params) {
+ -webkit-transform: @params;
+    -moz-transform: @params;
+	  -o-transform: @params;
+	     transform: @params;
+}
+.transform-origin(@params) {
+ -webkit-transform-origin: @params;
+    -moz-transform-origin: @params;
+	  -o-transform-origin: @params;
+	     transform-origin: @params;
+}
+.border-radius(@params) {
+ -webkit-border-radius: @params;
+    -moz-border-radius: @params;
+	  -o-border-radius: @params;
+	     border-radius: @params;
+}
+.disable-select() {
+ -webkit-touch-callout: none;
+   -webkit-user-select: none;
+    -khtml-user-select: none;
+      -moz-user-select: none;
+       -ms-user-select: none;
+		   user-select: none;
+}
+
+/**
+ * Basic body styles
+ */
 
 html {
 	height: 100%;
@@ -13,13 +70,116 @@ body {
 	height: 100%;
 }
 
+/**
+ * Log window
+ */
+div.log {
+    height: 100px;
+    overflow: auto;
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 10px;
+
+	div:first {
+	    font-weight: bold;
+	}
+	.warn {
+	    color: #F60;
+	}
+	.error {
+	    color: #F00;
+	}
+	.done {
+	    color: #060;
+	}
+	.info {
+	    color: #06F;
+	}
+
+}
+
+/**
+ * Blue screen of death
+ */
+#bsod {
+
+	position: fixed;
+	background-color: rgba(0,0,0,0.8);
+	top: 0; left: 0; right: 0; bottom: 0;
+	z-index: 20000;
+
+	> div:before {
+		height: 50%;
+	}
+
+	> div {
+
+		margin: 20px auto 0;
+		height: 320px; width: 320px;
+		text-align: center;
+		color: #fff;
+
+		.bsod-icon {
+			font-size: 250px;
+		}
+
+	}
+
+}
+
+/**
+ * Questionable elements
+ */
+.questionable {
+
+	// Positioning
+	position: relative;
+
+	// Defaults of the question button
+	.btn-question {
+		.border-radius( @questionable-size );
+		position: absolute;
+		right: 2px; top: 2px;
+		color: @questionable-color; 
+		background: @questionable-back;
+		width: @questionable-size; 
+		height: @questionable-size;
+		padding: (@questionable-size/4 - 1px) 0px 0px (@questionable-size/4);
+		font-size: (@questionable-size/2);
+		cursor: pointer;
+		display: none;
+	}
+
+	.btn-question:active {
+		background: lighten(@questionable-back, 20%);
+	}
+
+	// Active questionable element
+	&.questionable-active {
+
+		// Change element background
+		background-color: @questionable-hover;
+		.border-radius( 0px (@questionable-size/2) 0px 0px);
+
+		// Show background
+		.questionable-back {
+			background-color: @questionable-hover !important;
+		}
+
+		// Show button
+		.btn-question {
+			display: block;
+		}
+	}
+}
+
+/**
+ * Game interface
+ */
 #game {
 
 	//////////////////////////////////////
 	//  SMALL DEVICES
 	//////////////////////////////////////
-
-	padding: 8px;
 
 	//////////////////////////////////////
 	//  DESKTOP/TABLET DEVICES
@@ -27,15 +187,11 @@ body {
 
 	// On devices bigger than small (mobile)
 	// stack them horizontally
-	@media @devm-sm {
+	@media (min-width: @screen-sm-min) {
 
 		// Fit entire window
 		width: 100%;
 		height: 100%;
-		padding: 0;
-
-		// Add frame
-		border: solid 10px #333;
 
 	}
 
@@ -58,11 +214,12 @@ body {
 			// Common frame configuration
 			.frame {
 				height: 100%;
+				padding: 8px;
 			}
 
-			//////////////////////////////////////
+			// =========================
 			//  SMALL DEVICES
-			//////////////////////////////////////
+			// =========================
 
 			// The default values for the game-frame is for 
 
@@ -71,59 +228,167 @@ body {
 				width: 100%;
 			}
 
-			//////////////////////////////////////
-			//  DESKTOP/TABLET DEVICES
-			//////////////////////////////////////
+			// =========================
+			// DESKTOP/TABLET DEVICES
+			// =========================
 
 			// On devices bigger than small (mobile)
 			// stack them horizontally
-			@media @devm-sm {
+			@media (min-width: @screen-sm-min) {
 
 				// Specify dimentions
 				height: 100%;
-				width: 133%;
+				width: 125%;
+				position: relative;
 
 				.frame {
 					display: inline-block;
 					overflow: hidden;
 				}
 
-				// tunables and run is 1/3
-				.frame#tunables, .frame#run {
-					width: 33.333%;
-				}
-
 				// Results is 2/3
-				.frame#results {
-					width: 66.666%;
+				.frame#results-host {
+					width: 25%;
 				}
 
-				.frame#tunables {
-					-webkit-transition: width 0.25s;
-					transition: width 0.25s;
+				.frame#tunables-host {
+					-webkit-transition: all 0.25s;
+					transition: all 0.25s;
 				}
 
+				.clear {
+					clear: both;
+				}
+
+			}
+
+			//////////////////////////////////////
+			// Tunable tile
+			//////////////////////////////////////
+
+			#tunables > .tunable {
+				
+				// Tunable tile layou
+				float: left;
+				display: block;
+				overflow: hidden;
+				position: relative;
+				width: @tunable-width;
+				height: @tunable-height;
+				margin: @tunable-margin - 2;
+
+				.knob {
+					position: absolute;
+					left: 2px; top: @tunable-circle-top;
+				}
+
+				// Trimming circle for the +/- buttons
+				.circle-trim {
+					position: absolute;
+					left: (@tunable-width - @tunable-circle-trim) / 2 - 1px; 
+					top: @tunable-circle-top - (@tunable-circle-trim - @tunable-circle-radius) / 2;
+					background: @tunable-c-back;
+
+					.border-radius( @tunable-circle-trim );
+					width: @tunable-circle-trim; 
+					height: @tunable-circle-trim;
+				}
+
+				// +/- butons
+				.btn-plus, .btn-minus {
+					.disable-select( );
+
+					position: absolute;
+					display: block;
+
+					width: @tunable-button-width;
+					height: @tunable-button-width;
+					bottom: 0;
+
+					cursor: pointer;
+					color: @tunable-c-fore;
+					background-color: @tunable-c-color;
+					padding-top: @tunable-button-width - @tunable-btn-fontsize - 8px;
+					font-size: @tunable-btn-fontsize;
+
+				}
+				.btn-plus:active, .btn-minus:active {
+					background-color: darken(@tunable-c-color, 10%);
+				}
+				.btn-minus {
+					left: 0; 
+					text-align: left;
+					padding-left: 7px;
+				}
+				.btn-plus {
+					right: 0; 
+					text-align: right;
+					padding-right: 7px;
+				}
+
+				// Label 
+				.label {
+					color: #666;
+					font-size: 18px;
+					font-weight: bold;
+					position: absolute;
+					text-align: center;
+					left: 0; right: 0;
+					top: 68px;
+				}
+
+			}
+
+			//////////////////////////////////////
+			// Per-device media width
+			//////////////////////////////////////
+
+			// Different number of tiles allowed on the different
+			// screen dimentions
+			.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+				// Mobile phone
+				width: 100%;
+			}
+			@media (min-width: @screen-sm-min) {
+				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+					// Small screen
+					width: 3 * (@tunable-width + @tunable-margin*2);
+				}
+			}
+			@media (min-width: @screen-md-min) {
+				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+					// Medium-sized screen
+					width: 4 * (@tunable-width + @tunable-margin*2);
+				}
+			}
+			@media (min-width: @screen-lg-min) {
+				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+					// Large screen
+					width: 5 * (@tunable-width + @tunable-margin*2);
+				}
 			}
 
 		}
 
 		#game-frame.running {
 
-			//////////////////////////////////////
+			// =========================
 			//  SMALL DEVICES
-			//////////////////////////////////////
+			// =========================
 
 
-			//////////////////////////////////////
+			// =========================
 			//  DESKTOP/TABLET DEVICES
-			//////////////////////////////////////
+			// =========================
 
 			// On devices bigger than small (mobile)
 			// stack them horizontally
-			@media @devm-sm {
+			@media (min-width: @screen-sm-min) {
 
-				.frame#tunables {
+				.frame#tunables-host {
 					width: 0;
+					padding-left: 0;
+					padding-right: 0;
 				}
 
 			}

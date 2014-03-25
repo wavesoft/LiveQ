@@ -1,4 +1,13 @@
 /**
+ * Basic body styles
+ */
+body {
+  font: sans-serif;
+  padding-top: 70px;
+  background: url(../img/background.jpg) #000000 no-repeat top center;
+  background-attachment: fixed;
+}
+/**
  * Utility class to apply smaller font dimentions in a document
  * that contains headers, paragraphs and other elemetns.
  */
@@ -176,7 +185,7 @@ div.help-modal .tab-content {
   bottom: 0;
   left: 0;
   opacity: 0;
-  height: 36.57142857142857px;
+  height: 36.57142857px;
   width: 128px;
   -webkit-transition: opacity linear 0.2s;
   -moz-transition: opacity linear 0.2s;
@@ -193,7 +202,7 @@ div.help-modal .tab-content {
   width: 50%;
   position: absolute;
   font-size: 1.5em;
-  height: 36.57142857142857px;
+  height: 36.57142857px;
   cursor: pointer;
 }
 #tunables div.tune > div.tune-ctl > div.b:active {

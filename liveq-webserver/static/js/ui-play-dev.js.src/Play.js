@@ -4,40 +4,22 @@
 	 * Initialize Lab
 	 */
   	LiveQ.UI.initLab = function(id) {
-		//$("#frame-run").hide();
+
+  		var t = new LiveQ.UI.Tunable("#tunables");
+
+      for (var i=0; i<10; i++) {
+        t.add({
+          'short': 'As',
+          'title': 'Alpha-S',
+          'min': 0.0600,
+          'max': 0.2500,
+          'dec': 4
+        });
+      }
+
 	}
 
 	LiveQ.UI.slide = function(side) {
-
-		// Check to which side to slide
-		if (!side) {
-			var t1 = $("#frame-tunables"),
-				t2 = $("#frame-run"),
-				t3 = $("#frame-results");
-
-			w = $(t1).width();
-			t3.css({
-				"width": t3.width()
-			});
-
-			t2.show();
-			t2.css({
-				"width": 0,
-				"padding": 0
-			})
-			t2.animate({
-				"width": w,
-				"padding": "auto"
-			}, 1000, function() {
-			});
-
-			t1.animate({
-				"width": 0,
-				"padding": 0
-			}, 1000, function() {
-				t1.hide();
-			});
-		}
 
 	}
 
