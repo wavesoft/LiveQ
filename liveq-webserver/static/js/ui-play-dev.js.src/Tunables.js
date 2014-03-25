@@ -426,6 +426,24 @@ LiveQ.Play.TunableEntry = function( parent, config ){
 
 	}).addClass("knob");
 
+
+	// Setup tooltip
+	this.toolTip = this.element.tooltip({
+		'title' 	: this.title,
+		'trigger'	: 'manual',
+		'placement' : 'bottom',
+		'html' 		: true
+	});
+
+	this.element.mouseover(function() {
+		if (!self.element.hasClass("expanded"))
+			self.toolTip.tooltip('show');
+	});
+	this.element.mouseout(function() {
+		self.toolTip.tooltip('hide');
+	});
+
+
 	// Initialize initial value
 	this.set( this.value );
 
