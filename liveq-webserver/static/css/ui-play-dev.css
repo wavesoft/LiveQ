@@ -138,6 +138,9 @@ div.log .info {
   padding: 4px;
   border-bottom: solid 2px #AAA;
 }
+.resultgrid .resultgrid-header .flash-banner {
+  font-size: 18px;
+}
 .resultgrid .resultgrid-footer {
   height: 38px;
   bottom: 0px;

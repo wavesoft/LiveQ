@@ -12,7 +12,6 @@ LiveQ.Play.Results = function( host ) {
 	this.observableList = new LiveQ.UI.ResultGrid(this.elmObservableList);
 	this.host.append(this.elmObservableList);
 
-
 }
 
 LiveQ.Play.Results.prototype.add = function(histogram, reference) {
@@ -29,5 +28,9 @@ LiveQ.Play.Results.prototype.snapshotClear = function() {
 
 LiveQ.Play.Results.prototype.zero = function() {
 	this.observableList.zero();
+}
+
+LiveQ.Play.Results.prototype.flash = function( text, color ) {
+	this.observableList.flash(text, color);
 }
 

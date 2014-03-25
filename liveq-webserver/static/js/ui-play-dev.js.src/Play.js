@@ -46,6 +46,28 @@
     });
 
     /**
+     * Flash data activity
+     */
+    lab.onDataArrived(function(interpolated) {
+      if (interpolated) {
+        r.flash('<span class="glyphicon glyphicon-download"></span> Incoming planning data', "#FF9900");
+      } else {
+        r.flash('<span class="glyphicon glyphicon-download"></span> Incoming simulation data', "#3399FF");
+      }
+    });
+
+    /**
+     * Flash errors
+     */
+    lab.onError(function(message, critical) {
+      if (critical) {
+
+      } else {
+        r.flash('<span class="glyphicon glyphicon-warning-sign"></span> '+message, "#CC3300");
+      }
+    });
+
+    /**
      *
      */
     $(t).on('change', function() {

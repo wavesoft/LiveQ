@@ -63,6 +63,12 @@ LiveQ.UI.ResultGrid = function(host) {
 	this.btnGroupSort.append(this.btnSortRankDesc);
 	this.eHeader.append(this.btnGroupSort);
 
+	// Prepare flash banner
+	this.flashTimer = 0;
+	this.eFlashBanner = $('<span class="flash-banner"></span>');
+	this.eFlashBanner.hide();
+	this.eHeader.append(this.eFlashBanner);
+
 	// Prepare background for the grid body
 	this.eGridBack = $('<div class="resultgrid-body-back"></div>');
 	this.eBody.append(this.eGridBack);
@@ -84,6 +90,25 @@ LiveQ.UI.ResultGrid = function(host) {
 		});
 	}
 	*/
+
+}
+
+/**
+ * Show flash banner
+ */
+LiveQ.UI.ResultGrid.prototype.flash = function( text, color ) {
+	var self = this;
+
+	// Update text
+	this.eFlashBanner.html(text);
+	if (color) this.eFlashBanner.css({ 'color': color });
+
+	// Show immediately and fade out after a while
+	this.eFlashBanner.show();
+	clearTimeout(this.flashTimer);
+	this.flashTimer = setTimeout(function() {
+		self.eFlashBanner.fadeOut();
+	}, 500);
 
 }
 
