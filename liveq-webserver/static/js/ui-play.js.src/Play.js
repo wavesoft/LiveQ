@@ -404,14 +404,18 @@
       $("#running-text").hide();
       $("#loading-spinner").hide();
 
-      // If that's the first time we are viewing the website,
-      // show the introduction video
-      if (!LiveQ.getCookie("first-use")) {
-        $(function() {
-          showUIIntro();
-          LiveQ.setCookie("first-use", 1, 3650);
-        });
-      };
+      // Wait until lab is initialized (and therefore we have at least
+      // a tunable and an observable tile), before we display the introduction video
+      lab.onReady(function() {
+        // If that's the first time we are viewing the website,
+        // show the introduction video
+        if (!LiveQ.getCookie("first-use")) {
+          $(function() {
+            showUIIntro();
+            LiveQ.setCookie("first-use", 1, 3650);
+          });
+        };
+      });
 
     };
 

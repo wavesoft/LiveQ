@@ -12,19 +12,22 @@
 
 // Tunable configurabion
 @tunable-width:			84px;
-@tunable-height:		112px;
+@tunable-height:		122px;
+@tunable-collapsed-size:56px;
 @tunable-margin:		5px;
 @tunable-circle-trim:	90px;
-@tunable-circle-top:	10px;
+@tunable-circle-top:	20px;
 @tunable-circle-radius:	78px;
 @tunable-c-back:		#FFFFFF;
 @tunable-c-color:		#66CCFF;
 @tunable-c-fore:		#FFFFFF;
+@tunable-c-light:		#CCC;
 @tunable-btn-fontsize:	10px;
+@tunable-transition:	0.25s linear;
 @tunable-button-width:	(@tunable-width/2) - 10px;
 
 // Shorthand for cross-browser support
-.transition(@params) {
+.transition(@params;) {
  -webkit-transition: @params;
     -moz-transition: @params;
 	  -o-transition: @params;
@@ -48,13 +51,20 @@
 	  -o-border-radius: @params;
 	     border-radius: @params;
 }
-.disable-select() {
- -webkit-touch-callout: none;
-   -webkit-user-select: none;
-    -khtml-user-select: none;
-      -moz-user-select: none;
-       -ms-user-select: none;
-		   user-select: none;
+.user-select(@params) {
+ -webkit-touch-callout: @params;
+   -webkit-user-select: @params;
+    -khtml-user-select: @params;
+      -moz-user-select: @params;
+       -ms-user-select: @params;
+		   user-select: @params;
+}
+.pointer-events(@params) {
+   -webkit-pointer-events: @params;
+    -khtml-pointer-events: @params;
+      -moz-pointer-events: @params;
+       -ms-pointer-events: @params;
+		   pointer-events: @params;
 }
 
 /**
@@ -266,75 +276,305 @@ div.log {
 			// Tunable tile
 			//////////////////////////////////////
 
-			#tunables > .tunable {
-				
-				// Tunable tile layou
-				float: left;
-				display: block;
-				overflow: hidden;
-				position: relative;
-				width: @tunable-width;
-				height: @tunable-height;
-				margin: @tunable-margin - 2;
+			#tunables-host {
 
-				.knob {
-					position: absolute;
-					left: 2px; top: @tunable-circle-top;
-				}
-
-				// Trimming circle for the +/- buttons
-				.circle-trim {
-					position: absolute;
-					left: (@tunable-width - @tunable-circle-trim) / 2 - 1px; 
-					top: @tunable-circle-top - (@tunable-circle-trim - @tunable-circle-radius) / 2;
-					background: @tunable-c-back;
-
-					.border-radius( @tunable-circle-trim );
-					width: @tunable-circle-trim; 
-					height: @tunable-circle-trim;
-				}
-
-				// +/- butons
-				.btn-plus, .btn-minus {
-					.disable-select( );
-
-					position: absolute;
+				// The grid that contains the expanded tiles
+				ul.tunables-grid {
 					display: block;
+					width: 100%;
 
-					width: @tunable-button-width;
-					height: @tunable-button-width;
-					bottom: 0;
+					list-style-type: none; 
+					margin: 0; 
+					padding: 0; 
 
+					// The list elements, which contain
+					// the expanded tunable tiles
+					li { 
+
+						margin: 3px 3px 3px 0;
+						padding: 0;
+						width: @tunable-width;
+						height: @tunable-height;
+						float: left;
+
+						.tunable {
+							float: none;
+						}
+					}
+
+				}
+
+				// Separator line between the two groups
+				.tunables-separator {
+					display: block;
+					width: 100%;
+					margin: 0;
+					border-width: 1px 0px 0px 0px;
+					border-style: solid;
+					border-color: @tunable-c-back;
+					.transition( all @tunable-transition );
+
+					// Fade-in when focused
+					&.visible {
+						margin: 5px;
+						border-color: @tunable-c-light;
+					}
+				}
+
+				// The tiles container
+				.tunables-tiles {
+					display: block;
+					width: 100%;
+				}
+
+				// The tunable tiles which may move between .tunable-tiles container
+				// or .tunable-grid > li container.
+				.tunable {
+				
+					// Tunable tile layouy
+					float: left;
+					display: block;
+					overflow: hidden;
+					position: relative;
+					margin: @tunable-margin - 2;
+					.user-select(none);
+
+					// Enable select on input
+					input {
+						.user-select(auto);
+					}
+
+					// =========================
+					//  Placeholders
+					// =========================
+
+					&.placeholder {
+						background: @tunable-c-back;
+					}
+
+					// =========================
+					//  Layouts
+					// =========================
+
+					// Knob
+					.knob {
+						position: absolute;
+						left: 2px; top: @tunable-circle-top;
+					}
+
+					// Trimming circle for the +/- buttons
+					.circle-trim {
+						position: absolute;
+						left: (@tunable-width - @tunable-circle-trim) / 2 - 1px; 
+						top: @tunable-circle-top - (@tunable-circle-trim - @tunable-circle-radius) / 2;
+						background: @tunable-c-back;
+
+						.border-radius( @tunable-circle-trim );
+						width: @tunable-circle-trim; 
+						height: @tunable-circle-trim;
+
+						.pointer-events(none);
+					}
+
+					// Common for all buttons
+					.btn-plus, .btn-minus, .btn-collapse, .btn-reorder {
+						position: absolute;
+						display: block;
+						cursor: pointer;
+					}
+
+					// Collapse/Reorder buttons
+					.btn-collapse, .btn-reorder {
+						width: 18px;
+						height: 18px;
+						color: lighten(@tunable-c-light, 10%);
+					}
+					.btn-collapse {
+						right: 0;
+						text-align: right;
+						padding-top: 4px;
+						padding-right: 4px;
+					}
+					.btn-reorder {
+						cursor: move;
+						left: 0;
+						text-align: left;
+						padding-top: 4px;
+						padding-left: 4px;
+					}
+					.btn-collapse:hover, .btn-reorder:hover {
+						color: darken(@tunable-c-light, 10%);
+					}
+					.btn-collapse:active, .btn-reorder:active {
+						color: darken(@tunable-c-light, 40%);
+					}
+
+					// +/- butons
+					.btn-plus, .btn-minus {
+						.user-select(none);
+
+						width: @tunable-button-width;
+						height: @tunable-button-width;
+						bottom: 0;
+
+						color: @tunable-c-fore;
+						background-color: @tunable-c-color;
+						padding-top: @tunable-button-width - @tunable-btn-fontsize - 8px;
+						font-size: @tunable-btn-fontsize;
+
+					}
+					.btn-plus:active, .btn-minus:active {
+						background-color: darken(@tunable-c-color, 10%);
+					}
+					.btn-minus {
+						left: 0; 
+						text-align: left;
+						padding-left: 7px;
+					}
+					.btn-plus {
+						right: 0; 
+						text-align: right;
+						padding-right: 7px;
+					}
+
+					// Iconic name label 
+					.label-iconic {
+						color: darken(@tunable-c-color, 45%);
+						position: absolute;
+						text-align: center;
+						left: 0; right: 0;
+						font-size: 18px;
+						.transition( all @tunable-transition );
+						.pointer-events(none);
+					}
+
+					// Value label
+					.label-value {
+						color: lighten(@tunable-c-color, 25%);
+						position: absolute;
+						text-align: center;
+						left: 0; right: 0;
+						font-size: 12px;
+						.pointer-events(none);
+					}
+
+					// =========================
+					//  Dragging
+					// =========================
+
+					.label-drag {
+						display: block;
+						position: absolute;
+						left: 0; bottom: 0;
+						height: 35px; width: 100%;
+
+						text-align: center;
+						font-size: 12px;
+						font-weight: normal;
+						padding: 2px;
+
+						overflow: auto;
+						word-wrap: normal;
+						color: @tunable-c-light;
+
+						opacity: 0;
+						.transition( opacity @tunable-transition );
+						.pointer-events(none);
+						.user-select(none);
+					}
+
+					&.dragging {
+						border: dotted 1px #333;
+
+						.btn-plus, .btn-minus, .btn-collapse, .btn-reorder, .knob {
+							opacity: 0.25 !important;
+						}
+
+						.label-iconic {
+							font-size: 30px;
+							top: (@tunable-height - 60px) / 2 !important;
+						}
+
+						.label-drag {
+							opacity: 1;
+						}
+					}
+
+					// =========================
+					//  Hover version
+					// =========================
+
+					.btn-collapse, .btn-reorder {
+						display: none;
+					}
+
+					&:hover {
+						.btn-collapse, .btn-reorder {
+							display: block;
+						}
+					}
+
+					// =========================
+					//  Collapsed version
+					// =========================
+
+					.transition(
+						width @tunable-transition ~","
+						height @tunable-transition ~","
+						background-color @tunable-transition
+					);
 					cursor: pointer;
-					color: @tunable-c-fore;
+					width: @tunable-collapsed-size;
+					height: @tunable-collapsed-size;
 					background-color: @tunable-c-color;
-					padding-top: @tunable-button-width - @tunable-btn-fontsize - 8px;
-					font-size: @tunable-btn-fontsize;
 
-				}
-				.btn-plus:active, .btn-minus:active {
-					background-color: darken(@tunable-c-color, 10%);
-				}
-				.btn-minus {
-					left: 0; 
-					text-align: left;
-					padding-left: 7px;
-				}
-				.btn-plus {
-					right: 0; 
-					text-align: right;
-					padding-right: 7px;
-				}
+					.btn-plus, .btn-minus, .btn-collapse, .btn-reorder, .knob, .circle-trim {
+						.transition( opacity @tunable-transition );
+						.pointer-events(none);
+						opacity: 0;
+					}
 
-				// Label 
-				.label {
-					color: #666;
-					font-size: 18px;
-					font-weight: bold;
-					position: absolute;
-					text-align: center;
-					left: 0; right: 0;
-					top: 68px;
+					.label-iconic {
+						font-weight: normal;
+						top: 8px;
+					}
+
+					.label-value {
+						.transition( opacity @tunable-transition );
+						opacity: 1;
+						bottom: 8px;
+					}
+
+
+					// =========================
+					//  Expanded version
+					// =========================
+
+					&.expanded {
+
+						cursor: auto;
+						width: @tunable-width;
+						height: @tunable-height;
+						background-color: @tunable-c-back;
+
+						.btn-plus, .btn-minus, .btn-collapse, .btn-reorder, .knob, .circle-trim {
+							.pointer-events(auto);
+							opacity: 1;
+						}
+
+						.label-value {
+							opacity: 0;
+						}
+
+						.label-iconic {
+							font-weight: bold;
+							left: 0; right: 0;
+							top: 68px + @tunable-btn-fontsize;
+
+						}
+
+					}
+
 				}
 
 			}

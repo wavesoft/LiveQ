@@ -5,7 +5,7 @@
 	 */
   	LiveQ.UI.initLab = function(id) {
 
-  		var t = new LiveQ.UI.Tunable("#tunables");
+  		var t = new LiveQ.UI.Tunable("#tunables-host");
 
       for (var i=0; i<10; i++) {
         t.add({

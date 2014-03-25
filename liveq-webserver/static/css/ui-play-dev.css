@@ -141,24 +141,84 @@ div.log .info {
     clear: both;
   }
 }
-#game #game-window #game-frame #tunables > .tunable {
+#game #game-window #game-frame #tunables-host ul.tunables-grid {
+  display: block;
+  width: 100%;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#game #game-window #game-frame #tunables-host ul.tunables-grid li {
+  margin: 3px 3px 3px 0;
+  padding: 0;
+  width: 84px;
+  height: 122px;
+  float: left;
+}
+#game #game-window #game-frame #tunables-host ul.tunables-grid li .tunable {
+  float: none;
+}
+#game #game-window #game-frame #tunables-host .tunables-separator {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border-width: 1px 0px 0px 0px;
+  border-style: solid;
+  border-color: #ffffff;
+  -webkit-transition: all 0.25s linear;
+  -moz-transition: all 0.25s linear;
+  -o-transition: all 0.25s linear;
+  transition: all 0.25s linear;
+}
+#game #game-window #game-frame #tunables-host .tunables-separator.visible {
+  margin: 5px;
+  border-color: #cccccc;
+}
+#game #game-window #game-frame #tunables-host .tunables-tiles {
+  display: block;
+  width: 100%;
+}
+#game #game-window #game-frame #tunables-host .tunable {
   float: left;
   display: block;
   overflow: hidden;
   position: relative;
-  width: 84px;
-  height: 112px;
   margin: 3px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: width 0.25s linear , height 0.25s linear , background-color 0.25s linear;
+  -moz-transition: width 0.25s linear , height 0.25s linear , background-color 0.25s linear;
+  -o-transition: width 0.25s linear , height 0.25s linear , background-color 0.25s linear;
+  transition: width 0.25s linear , height 0.25s linear , background-color 0.25s linear;
+  cursor: pointer;
+  width: 56px;
+  height: 56px;
+  background-color: #66ccff;
 }
-#game #game-window #game-frame #tunables > .tunable .knob {
+#game #game-window #game-frame #tunables-host .tunable input {
+  -webkit-touch-callout: auto;
+  -webkit-user-select: auto;
+  -khtml-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+#game #game-window #game-frame #tunables-host .tunable.placeholder {
+  background: #ffffff;
+}
+#game #game-window #game-frame #tunables-host .tunable .knob {
   position: absolute;
   left: 2px;
-  top: 10px;
+  top: 20px;
 }
-#game #game-window #game-frame #tunables > .tunable .circle-trim {
+#game #game-window #game-frame #tunables-host .tunable .circle-trim {
   position: absolute;
   left: -4px;
-  top: 4px;
+  top: 14px;
   background: #ffffff;
   -webkit-border-radius: 90px;
   -moz-border-radius: 90px;
@@ -166,49 +226,219 @@ div.log .info {
   border-radius: 90px;
   width: 90px;
   height: 90px;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
 }
-#game #game-window #game-frame #tunables > .tunable .btn-plus,
-#game #game-window #game-frame #tunables > .tunable .btn-minus {
+#game #game-window #game-frame #tunables-host .tunable .btn-plus,
+#game #game-window #game-frame #tunables-host .tunable .btn-minus,
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder {
+  position: absolute;
+  display: block;
+  cursor: pointer;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder {
+  width: 18px;
+  height: 18px;
+  color: #e6e6e6;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse {
+  right: 0;
+  text-align: right;
+  padding-top: 4px;
+  padding-right: 4px;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder {
+  cursor: move;
+  left: 0;
+  text-align: left;
+  padding-top: 4px;
+  padding-left: 4px;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse:hover,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder:hover {
+  color: #b3b3b3;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse:active,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder:active {
+  color: #666666;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-plus,
+#game #game-window #game-frame #tunables-host .tunable .btn-minus {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  position: absolute;
-  display: block;
   width: 32px;
   height: 32px;
   bottom: 0;
-  cursor: pointer;
   color: #ffffff;
   background-color: #66ccff;
   padding-top: 14px;
   font-size: 10px;
 }
-#game #game-window #game-frame #tunables > .tunable .btn-plus:active,
-#game #game-window #game-frame #tunables > .tunable .btn-minus:active {
+#game #game-window #game-frame #tunables-host .tunable .btn-plus:active,
+#game #game-window #game-frame #tunables-host .tunable .btn-minus:active {
   background-color: #33bbff;
 }
-#game #game-window #game-frame #tunables > .tunable .btn-minus {
+#game #game-window #game-frame #tunables-host .tunable .btn-minus {
   left: 0;
   text-align: left;
   padding-left: 7px;
 }
-#game #game-window #game-frame #tunables > .tunable .btn-plus {
+#game #game-window #game-frame #tunables-host .tunable .btn-plus {
   right: 0;
   text-align: right;
   padding-right: 7px;
 }
-#game #game-window #game-frame #tunables > .tunable .label {
-  color: #666;
-  font-size: 18px;
-  font-weight: bold;
+#game #game-window #game-frame #tunables-host .tunable .label-iconic {
+  color: #00557f;
   position: absolute;
   text-align: center;
   left: 0;
   right: 0;
-  top: 68px;
+  font-size: 18px;
+  -webkit-transition: all 0.25s linear;
+  -moz-transition: all 0.25s linear;
+  -o-transition: all 0.25s linear;
+  transition: all 0.25s linear;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+}
+#game #game-window #game-frame #tunables-host .tunable .label-value {
+  color: #e5f7ff;
+  position: absolute;
+  text-align: center;
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+}
+#game #game-window #game-frame #tunables-host .tunable .label-drag {
+  display: block;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 35px;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  font-weight: normal;
+  padding: 2px;
+  overflow: auto;
+  word-wrap: normal;
+  color: #cccccc;
+  opacity: 0;
+  -webkit-transition: opacity 0.25s linear;
+  -moz-transition: opacity 0.25s linear;
+  -o-transition: opacity 0.25s linear;
+  transition: opacity 0.25s linear;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+#game #game-window #game-frame #tunables-host .tunable.dragging {
+  border: dotted 1px #333;
+}
+#game #game-window #game-frame #tunables-host .tunable.dragging .btn-plus,
+#game #game-window #game-frame #tunables-host .tunable.dragging .btn-minus,
+#game #game-window #game-frame #tunables-host .tunable.dragging .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable.dragging .btn-reorder,
+#game #game-window #game-frame #tunables-host .tunable.dragging .knob {
+  opacity: 0.25 !important;
+}
+#game #game-window #game-frame #tunables-host .tunable.dragging .label-iconic {
+  font-size: 30px;
+  top: 31px !important;
+}
+#game #game-window #game-frame #tunables-host .tunable.dragging .label-drag {
+  opacity: 1;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder {
+  display: none;
+}
+#game #game-window #game-frame #tunables-host .tunable:hover .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable:hover .btn-reorder {
+  display: block;
+}
+#game #game-window #game-frame #tunables-host .tunable .btn-plus,
+#game #game-window #game-frame #tunables-host .tunable .btn-minus,
+#game #game-window #game-frame #tunables-host .tunable .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable .btn-reorder,
+#game #game-window #game-frame #tunables-host .tunable .knob,
+#game #game-window #game-frame #tunables-host .tunable .circle-trim {
+  -webkit-transition: opacity 0.25s linear;
+  -moz-transition: opacity 0.25s linear;
+  -o-transition: opacity 0.25s linear;
+  transition: opacity 0.25s linear;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  opacity: 0;
+}
+#game #game-window #game-frame #tunables-host .tunable .label-iconic {
+  font-weight: normal;
+  top: 8px;
+}
+#game #game-window #game-frame #tunables-host .tunable .label-value {
+  -webkit-transition: opacity 0.25s linear;
+  -moz-transition: opacity 0.25s linear;
+  -o-transition: opacity 0.25s linear;
+  transition: opacity 0.25s linear;
+  opacity: 1;
+  bottom: 8px;
+}
+#game #game-window #game-frame #tunables-host .tunable.expanded {
+  cursor: auto;
+  width: 84px;
+  height: 122px;
+  background-color: #ffffff;
+}
+#game #game-window #game-frame #tunables-host .tunable.expanded .btn-plus,
+#game #game-window #game-frame #tunables-host .tunable.expanded .btn-minus,
+#game #game-window #game-frame #tunables-host .tunable.expanded .btn-collapse,
+#game #game-window #game-frame #tunables-host .tunable.expanded .btn-reorder,
+#game #game-window #game-frame #tunables-host .tunable.expanded .knob,
+#game #game-window #game-frame #tunables-host .tunable.expanded .circle-trim {
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
+  opacity: 1;
+}
+#game #game-window #game-frame #tunables-host .tunable.expanded .label-value {
+  opacity: 0;
+}
+#game #game-window #game-frame #tunables-host .tunable.expanded .label-iconic {
+  font-weight: bold;
+  left: 0;
+  right: 0;
+  top: 78px;
 }
 #game #game-window #game-frame .frame#tunables-host,
 #game #game-window #game-frame #tunables,

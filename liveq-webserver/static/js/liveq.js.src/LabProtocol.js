@@ -33,6 +33,12 @@ LiveQ.LabProtocol = function( ) {
 	this.data = { };
 
 	/**
+	 * Check if we ware initialized
+	 @ member {boolean}
+	 */
+	this.initialized = false;
+
+	/**
 	 * Array of the callback functions to be fired when a histogram is updated
 	 * @private
 	 * @member {array}
@@ -73,6 +79,14 @@ LiveQ.LabProtocol = function( ) {
 	 * @member {array}
 	 */
 	this._onDataArrived = [];
+
+	/**
+	 * Array of the callback functions to be fired when the lab is initialized
+	 * (When the configuration frame arrives)
+	 * @private
+	 * @member {array}
+	 */
+	this._onReady = [];
 
 }
 
@@ -191,6 +205,24 @@ LiveQ.LabProtocol.prototype.offDataArrived = function( cb ) {
 }
 
 /**
+ * Register a callback to be notified when the lab socket is initialized
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.onReady = function( cb ) {
+	this._onReady.push(cb);
+}
+
+/**
+ * Unregister a callback, previously registered with onReady
+ *
+ * @param {function} cb - The callback function
+ */
+LiveQ.LabProtocol.prototype.offReady = function( cb ) {
+	var i = this._onReady.indexOf(cb);
+	this._onReady.splice(i,1);
+}
+/**
  * Configure LabProtocol with the given configuration frame
  *
  * This function handles the incoming configuration frame and re-initializes
@@ -254,6 +286,14 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 				this._onHistogramAdded[i]( this.data[histo.id], this.reference[histo.id] );
 			}
 
+		}
+
+		// If we are not initialized, fire onReady
+		if (!this.initialized) {
+			this.initialized = true;
+			for (var i=0; i<this._onReady.length; i++) {
+				this._onReady[i]();
+			}
 		}
 
 	} else {
