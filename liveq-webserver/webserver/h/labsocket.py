@@ -510,16 +510,13 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # Format user tunables
             tunables = self.lab.formatTunables( param )
 
-            # Send interpolation
-            self.sendInterpolation(tunables)
-
             # Send status
             self.sendStatus("Contacting job manager", {"JOB_STATUS": "starting"})
 
             # Ask job manager to schedule a new job
             ans = self.jobChannel.send('job_start', {
                 'lab': self.lab.uuid,
-                'group': 'debug',
+                'group': 'global',
                 'dataChannel': self.dataChannel.name,
                 'parameters': tunables
             }, waitReply=True, timeout=5)

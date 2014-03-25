@@ -2,14 +2,14 @@
 /**
  * Make the g
  */
-LiveQ.UI.Questionable = function() {
+LiveQ.Play.Questionable = function() {
 	this.elements = [ ];
 }
 
 /**
  * Questionable element
  */
-LiveQ.UI.QuestionableElement = function(element, config) {
+LiveQ.Play.QuestionableElement = function(element, config) {
 	var self = this;
 
 	// Validate config
@@ -45,11 +45,11 @@ LiveQ.UI.QuestionableElement = function(element, config) {
 /**
  * Make the given element questionable
  */
-LiveQ.UI.Questionable.prototype.make = function(element, config) {
-	this.elements.push(new LiveQ.UI.QuestionableElement(element, config));
+LiveQ.Play.Questionable.prototype.make = function(element, config) {
+	this.elements.push(new LiveQ.Play.QuestionableElement(element, config));
 }
 
 /**
  * Create singleton
  */
-LiveQ.UI.questionable = new LiveQ.UI.Questionable();
+LiveQ.Play.questionable = new LiveQ.Play.Questionable();

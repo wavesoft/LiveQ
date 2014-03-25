@@ -26,8 +26,32 @@
 @tunable-transition:	0.25s linear;
 @tunable-button-width:	(@tunable-width/2) - 10px;
 
+// Results frame
+@results-grid-back:		#FFFFFF;
+@results-c-fit1:		#66CC00;
+@results-c-fit2:		#669933;
+@results-c-fit3:		#FF9900;
+@results-c-fit4:		#990000;
+@results-c-nodata:		#FFFFFF;
+@results-c-gridline:	#DDDDDD;
+@results-c-label:		#999999;
+@results-c-hover:		#99CCFF;
+@results-c-freezedata:	#000000;
+@results-row-label-w:	40px;
+@results-row-label-fnt:	20px;
+@results-row-pad-right:	10px;
+@results-row-height:	40px;
+@results-header-height:	38px;
+
+// Splitting configuration
+@panel-c-background:	#FFF;
+@panel-c-background-alt:#EEE;
+@panel-c-fadeback:		#DDD;
+@panel-pad-results:		5px;
+@split-transition:		0.25s linear;
+
 // Shorthand for cross-browser support
-.transition(@params;) {
+.transition(@params) {
  -webkit-transition: @params;
     -moz-transition: @params;
 	  -o-transition: @params;
@@ -44,6 +68,12 @@
     -moz-transform-origin: @params;
 	  -o-transform-origin: @params;
 	     transform-origin: @params;
+}
+.box-shadow(@params) {
+ -webkit-box-shadow: @params;
+    -moz-box-shadow: @params;
+	  -o-box-shadow: @params;
+	     box-shadow: @params;
 }
 .border-radius(@params) {
  -webkit-border-radius: @params;
@@ -183,6 +213,273 @@ div.log {
 }
 
 /**
+ * Helper gradients
+ */
+.gradient {
+	&.grad-separator {
+		background: #ffffff;
+		background: -moz-linear-gradient(left,  #ffffff 0%, #cccccc 50%, #ffffff 100%);
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffffff), color-stop(50%,#cccccc), color-stop(100%,#ffffff));
+		background: -webkit-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+		background: -o-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+		background: -ms-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+		background: linear-gradient(to right,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 );
+	}
+	&.grad-color-range {
+		background: #00ff00;
+		background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#00ff00), color-stop(10%,#008000), color-stop(20%,#ff9900), color-stop(100%,#aa0000));
+		background: -webkit-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
+		background: -o-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
+		background: -ms-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
+		background: linear-gradient(to right, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ff00', endColorstr='#aa0000',GradientType=1 );	
+	}
+}
+
+/**
+ * Result Grid Interface
+ */
+.resultgrid {
+
+	// Global results-grid information
+	position: relative;
+
+	// Header sizes
+	.resultgrid-header, .resultgrid-footer, .resultgrid-body {
+		position: absolute;
+		left: 0; width: 100%;
+	}
+
+	// Top header
+	.resultgrid-header {
+		top: 0px;
+		height: @results-header-height;
+		padding: 4px;
+		border-bottom: solid 2px #AAA;
+	}
+
+	// Bottom footer
+	.resultgrid-footer {
+		height: @results-header-height;
+		bottom: 0px;
+		border-top: solid 2px #AAA;
+
+		// The gradient in the bottom of the results table
+		.gradient {
+			display: block;
+			position: absolute;
+			top: 2px;
+			height: 10px;
+			left: @results-row-label-w; 
+			right: @results-row-pad-right;
+		}
+
+		// Labls on the gradient
+		.legend {
+			font-size: 10px;
+			color: #333;
+			div {
+				position: absolute;
+				top: 14px;
+			}
+			.good { left: @results-row-label-w; }
+			.bad { right: @results-row-pad-right; }
+		}
+	}
+
+	// Body
+	.resultgrid-body {
+		top: @results-header-height;
+		bottom: @results-header-height;
+		overflow-y: scroll;
+		overflow-x: hidden;
+
+		// The static background graphic that separates the sections
+		.resultgrid-body-back {
+			background-color: @results-grid-back;
+			position: absolute;
+			top: 0;  bottom: 0; 
+			left: @results-row-label-w; right: @results-row-pad-right;
+			background-color: @results-grid-back;
+		}
+
+		// The ResultGrid data row
+		.resultgrid-row {
+
+			position: relative;
+			display: block;
+			height: @results-row-height;
+			cursor: pointer;
+			width: 100%;
+
+			// Grid separation
+			border-bottom: solid 1px @results-c-gridline;
+
+			// Set height everywhere
+			div {
+				height: 100%;
+			}
+
+			// Value label
+			.value-label {
+				position: absolute;
+				left: 0px; top: (@results-row-height - @results-row-label-fnt)/2 - 5px;
+				width: @results-row-label-w;
+				text-align: center;
+				font-weight: bold;
+				color: @results-c-label;
+				font-size: @results-row-label-fnt;
+			}
+
+			// Value
+			.value-host {
+
+				position: absolute;
+				left: @results-row-label-w; 
+				right: @results-row-pad-right;
+
+				background-color: @results-grid-back;
+
+				.value-outer {
+					position: absolute;
+					.value-inner {
+						position: absolute;
+					}
+				}
+
+				.value-snapshot {
+					position: absolute;
+					background-color: rgba(
+						red(@results-c-freezedata), 
+						green(@results-c-freezedata),
+						blue(@results-c-freezedata),
+						0.6);
+				}
+
+			}
+
+			// No-data entry
+			&.no-data {
+				.value-host {
+					.value-outer {
+						left:0; right: 0;
+						background-color: @results-c-nodata;
+					}
+					.value-outer:after {
+						color: darken(@results-c-nodata, 20%);
+						position: absolute;
+						left: 0; width: 100%;
+						top: (@results-row-height/2) - 8px;
+						text-align: center;
+						font-size: 12px;
+						content: "( No data )";
+					}
+					.value-inner {
+						display: none;
+					}
+				}
+			}
+
+			// Coloring based on data quality
+			&.f1 {
+				.value-outer {
+					background-color: lighten(@results-c-fit1, 30%);
+				}
+				.value-inner {
+					background-color: @results-c-fit1;
+					color: darken(@results-c-fit1, 20%);
+				}
+			}
+			&.f2 {
+				.value-outer {
+					background-color: lighten(@results-c-fit2, 30%);
+				}
+				.value-inner {
+					background-color: @results-c-fit2;
+					color: darken(@results-c-fit2, 20%);
+				}
+			}
+			&.f3 {
+				.value-outer {
+					background-color: lighten(@results-c-fit3, 30%);
+				}
+				.value-inner {
+					background-color: @results-c-fit3;
+					color: darken(@results-c-fit3, 20%);
+				}
+			}
+			&.f4 {
+				.value-outer {
+					background-color: lighten(@results-c-fit4, 30%);
+				}
+				.value-inner {
+					background-color: @results-c-fit4;
+					color: darken(@results-c-fit4, 20%);
+				}
+			}
+
+			// Make it clear that the row can be hovered
+			&:hover {
+				background-color: @results-c-hover;
+				.value-label {
+					color: #FFF;
+				}
+				.value-host {
+					background-color: mix(@results-grid-back, @results-c-hover) !important;
+				}
+				&.no-data {
+					.value-outer {
+						background-color: mix(@results-c-nodata, @results-c-hover) !important;
+					}
+					.value-outer:after {
+						color: #FFF !important;
+					}
+				}
+				&.f1 {
+					.value-outer {
+						background-color: mix(lighten(@results-c-fit1, 30%), @results-c-hover) !important;
+					}
+					.value-inner {
+						background-color: mix(@results-c-fit1,  @results-c-hover) !important;
+					}
+				}
+				&.f2 {
+					.value-outer {
+						background-color: mix(lighten(@results-c-fit2, 30%), @results-c-hover) !important;
+					}
+					.value-inner {
+						background-color: mix(@results-c-fit2,  @results-c-hover) !important;
+					}
+				}
+				&.f3 {
+					.value-outer {
+						background-color: mix(lighten(@results-c-fit3, 30%), @results-c-hover) !important;
+					}
+					.value-inner {
+						background-color: mix(@results-c-fit3,  @results-c-hover) !important;
+					}
+				}
+				&.f4 {
+					.value-outer {
+						background-color: mix(lighten(@results-c-fit4, 30%), @results-c-hover) !important;
+					}
+					.value-inner {
+						background-color: mix(@results-c-fit4,  @results-c-hover) !important;
+					}
+				}
+			}
+
+
+		}
+
+
+	}
+
+}
+
+/**
  * Game interface
  */
 #game {
@@ -203,8 +500,13 @@ div.log {
 		width: 100%;
 		height: 100%;
 
+		border: solid 20px #999;
+
 	}
 
+	.dim {
+		opacity: 0.25;
+	}
 
 	#game-window {
 
@@ -221,65 +523,49 @@ div.log {
 
 			white-space: nowrap;
 
-			// Common frame configuration
-			.frame {
-				height: 100%;
-				padding: 8px;
+			.frame#tunables-host, .frame#run-host {
+				.transition(
+					width @split-transition ~"," 
+					background-color @split-transition
+				);
 			}
 
-			// =========================
-			//  SMALL DEVICES
-			// =========================
+			//////////////////////////////////////
+			// Results
+			//////////////////////////////////////
 
-			// The default values for the game-frame is for 
-
-			// Common frame configuration
-			.frame {
-				width: 100%;
-			}
-
-			// =========================
-			// DESKTOP/TABLET DEVICES
-			// =========================
-
-			// On devices bigger than small (mobile)
-			// stack them horizontally
-			@media (min-width: @screen-sm-min) {
-
-				// Specify dimentions
-				height: 100%;
-				width: 125%;
+			#results-host {
 				position: relative;
+				padding: 20px;
 
-				.frame {
-					display: inline-block;
-					overflow: hidden;
-				}
+				.results-list {
+					position: absolute;
+					left: @panel-pad-results; 
+					right: @panel-pad-results;
+					bottom: @panel-pad-results;
+					top: @panel-pad-results;
 
-				// Results is 2/3
-				.frame#results-host {
-					width: 25%;
-				}
-
-				.frame#tunables-host {
-					-webkit-transition: all 0.25s;
-					transition: all 0.25s;
-				}
-
-				.clear {
-					clear: both;
 				}
 
 			}
 
 			//////////////////////////////////////
-			// Tunable tile
+			// Tunables
 			//////////////////////////////////////
 
 			#tunables-host {
 
+				// Make it scrollable
+				overflow-x: hidden;
+				overflow-y: auto;
+
+				// Padding in the tunables
+				#tunables {
+					padding: 8px;
+				}
+
 				// The grid that contains the expanded tiles
-				ul.tunables-grid {
+				.tunables-grid {
 					display: block;
 					width: 100%;
 
@@ -309,15 +595,22 @@ div.log {
 					display: block;
 					width: 100%;
 					margin: 0;
-					border-width: 1px 0px 0px 0px;
-					border-style: solid;
-					border-color: @tunable-c-back;
-					.transition( all @tunable-transition );
+					height: 0;
+
+					// Gradient background for the horizontal splitter
+					background: #ffffff;
+					background: -moz-linear-gradient(left,  #ffffff 0%, #cccccc 50%, #ffffff 100%);
+					background: -webkit-gradient(linear, left top, right top, color-stop(0%,#ffffff), color-stop(50%,#cccccc), color-stop(100%,#ffffff));
+					background: -webkit-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+					background: -o-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+					background: -ms-linear-gradient(left,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+					background: linear-gradient(to right,  #ffffff 0%,#cccccc 50%,#ffffff 100%);
+					filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 );
 
 					// Fade-in when focused
 					&.visible {
 						margin: 5px;
-						border-color: @tunable-c-light;
+						height: 1px;
 					}
 				}
 
@@ -367,7 +660,7 @@ div.log {
 						position: absolute;
 						left: (@tunable-width - @tunable-circle-trim) / 2 - 1px; 
 						top: @tunable-circle-top - (@tunable-circle-trim - @tunable-circle-radius) / 2;
-						background: @tunable-c-back;
+						background-color: @tunable-c-back;
 
 						.border-radius( @tunable-circle-trim );
 						width: @tunable-circle-trim; 
@@ -387,13 +680,13 @@ div.log {
 					.btn-collapse, .btn-reorder {
 						width: 18px;
 						height: 18px;
-						color: lighten(@tunable-c-light, 10%);
 					}
 					.btn-collapse {
 						right: 0;
 						text-align: right;
 						padding-top: 4px;
 						padding-right: 4px;
+						color: lighten(@tunable-c-color, 10%);
 					}
 					.btn-reorder {
 						cursor: move;
@@ -401,6 +694,7 @@ div.log {
 						text-align: left;
 						padding-top: 4px;
 						padding-left: 4px;
+						color: lighten(@tunable-c-light, 10%);
 					}
 					.btn-collapse:hover, .btn-reorder:hover {
 						color: darken(@tunable-c-light, 10%);
@@ -534,6 +828,13 @@ div.log {
 						opacity: 0;
 					}
 
+					.circle-trim {
+						.transition(
+							opacity @tunable-transition ~","
+							background-color @split-transition
+						);
+					}
+
 					.label-iconic {
 						font-weight: normal;
 						top: 8px;
@@ -555,7 +856,7 @@ div.log {
 						cursor: auto;
 						width: @tunable-width;
 						height: @tunable-height;
-						background-color: @tunable-c-back;
+						background-color: transparent;
 
 						.btn-plus, .btn-minus, .btn-collapse, .btn-reorder, .knob, .circle-trim {
 							.pointer-events(auto);
@@ -580,59 +881,152 @@ div.log {
 			}
 
 			//////////////////////////////////////
-			// Per-device media width
+			// Per-device media dimentions
 			//////////////////////////////////////
-
-			// Different number of tiles allowed on the different
-			// screen dimentions
-			.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
-				// Mobile phone
-				width: 100%;
-			}
-			@media (min-width: @screen-sm-min) {
-				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
-					// Small screen
-					width: 3 * (@tunable-width + @tunable-margin*2);
-				}
-			}
-			@media (min-width: @screen-md-min) {
-				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
-					// Medium-sized screen
-					width: 4 * (@tunable-width + @tunable-margin*2);
-				}
-			}
-			@media (min-width: @screen-lg-min) {
-				.frame#tunables-host, #tunables, .frame#run-host, .frame#run {
-					// Large screen
-					width: 5 * (@tunable-width + @tunable-margin*2);
-				}
-			}
-
-		}
-
-		#game-frame.running {
 
 			// =========================
 			//  SMALL DEVICES
 			// =========================
 
+			// In small devices, the UI expands horizontally
+			.frame, .frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+				width: 100%;
+			}
+
+			.frame#tunables-host {
+				//.transition( height @split-transition ~"," width @split-transition );
+				//height: auto;
+			}
+			
+			.frame#run-host {
+				//.transition( height @split-transition ~"," width @split-transition );
+				//height: 0px;
+			}
 
 			// =========================
-			//  DESKTOP/TABLET DEVICES
+			// DESKTOP/TABLET DEVICES
 			// =========================
 
-			// On devices bigger than small (mobile)
-			// stack them horizontally
 			@media (min-width: @screen-sm-min) {
 
+				// Specify dimentions
+				height: 100%;
+				width: 100%;
+				position: relative;
+
+				// Default frame style
+				.frame {
+					display: block;
+					overflow: hidden;
+					height: 100%;
+				}
+
+				// The left-most element (tunables)
 				.frame#tunables-host {
-					width: 0;
-					padding-left: 0;
-					padding-right: 0;
+					float: left;
+					margin-right: 8px;
+				}
+
+				// The right-most element (running host)
+				.frame#run-host {
+					width: 0px;
+					float: right;
+					margin-left: 0;
+				}
+
+				// The results center frame, fills the gap
+				.frame#results-host {
+					width: auto;
+					background-color: @panel-c-background-alt;
 				}
 
 			}
 
+			// ============================
+			// SPECIAL PER-RESOLUTION RULES
+			// ============================
+
+			// Different number of tiles are shown on the different
+			// screen dimentions
+
+			@media (min-width: @screen-sm-min) {
+				.frame#tunables-host, #tunables {
+					// Small screen
+					width: 3 * (@tunable-width + @tunable-margin*2);
+				}
+				&.running {
+					.frame#run-host, .frame#run {
+						width: 3 * (@tunable-width + @tunable-margin*2);
+					}
+				}
+			}
+			@media (min-width: @screen-md-min) {
+				.frame#tunables-host, #tunables {
+					// Medium-sized screen
+					width: 4 * (@tunable-width + @tunable-margin*2);
+				}
+				&.running {
+					.frame#run-host, .frame#run {
+						width: 4 * (@tunable-width + @tunable-margin*2);
+					}
+				}
+			}
+			@media (min-width: @screen-lg-min) {
+				.frame#tunables-host, #tunables {
+					// Large screen
+					width: 5 * (@tunable-width + @tunable-margin*2);
+				}
+				&.running {
+					.frame#run-host, .frame#run {
+						width: 5 * (@tunable-width + @tunable-margin*2);
+					}
+				}
+			}
+
+
+			//////////////////////////////////////
+			// Switching for simulation run
+			//////////////////////////////////////
+
+			&.running {
+
+				// =========================
+				//  SMALL DEVICES
+				// =========================
+
+				.frame#tunables-host {
+					//height: 0;
+				}
+				
+				.frame#run-host {
+					//height: auto;
+				}
+
+
+				// =========================
+				//  DESKTOP/TABLET DEVICES
+				// =========================
+
+				// On devices bigger than small (mobile)
+				// stack them horizontally
+				@media (min-width: @screen-sm-min) {
+
+					.frame {
+						height: 100%;
+					}
+
+					.frame#tunables-host {
+						width: 0;
+						margin-right: 0;
+					}
+
+					.frame#run-host {
+						margin-left: 8px;
+					}
+
+				}
+
+			}
 		}
 
 

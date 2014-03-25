@@ -99,7 +99,6 @@ LiveQ.ReferenceData.fromReader = function( reader ) {
 
 	// Get configuration
 	var config = reader.getJSON();
-	console.log(config);
 
 	// Store local references
 	hc.id = config['id'];

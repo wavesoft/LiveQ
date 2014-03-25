@@ -2,8 +2,10 @@
 /**
  *
  */
-LiveQ.UI.Tunable = function( host ) {
-	this.host = $(host);
+LiveQ.Play.Tunable = function( host ) {
+
+	this.host = $('<div id="tunables"></div>');
+	$(host).append(this.host);
 
 	// Make the expanded tunables grid
 	this.tunablesGrid = $('<ul class="tunables-grid"></ul>');
@@ -11,7 +13,7 @@ LiveQ.UI.Tunable = function( host ) {
 	this.host.append($('<div class="clearfix"></div>'));
 
 	// Separator
-	this.tunablesSeparator = $('<div class="tunables-separator"></div>');
+	this.tunablesSeparator = $('<div class="tunables-separator gradient grad-separator"></div>');
 	this.host.append(this.tunablesSeparator);
 
 	// Make the tunables group
@@ -19,23 +21,41 @@ LiveQ.UI.Tunable = function( host ) {
 	this.host.append(this.tunables);
 	this.host.append($('<div class="clearfix"></div>'));
 
-	this.parameters = {};
+	this.parameters = [];
+}
+
+
+/**
+ * Get all values as a dictionary
+ */
+LiveQ.Play.Tunable.prototype.getValues = function() {
+
+	// Compile all values
+	var ans = {};
+	for (var i=0; i<this.parameters.length; i++) {
+		ans[this.parameters[i].name] = this.parameters[i].value;
+	}
+
+	// Return dictionary
+	return ans;
+
 }
 
 /**
  *
  */
-LiveQ.UI.Tunable.prototype.add = function( config ) {
+LiveQ.Play.Tunable.prototype.add = function( config ) {
 
-	var e = new LiveQ.UI.TunableEntry(this, config);
+	var e = new LiveQ.Play.TunableEntry(this, config);
 	this.tunables.append(e.element);
+	this.parameters.push(e);
 
 }
 
 /**
  * Expand an entry with a nice animation towards the grid
  */
-LiveQ.UI.Tunable.prototype.expand = function( entry ) {
+LiveQ.Play.Tunable.prototype.expand = function( entry, animate ) {
 	var self = this,
 
 		// Shared variables
@@ -62,9 +82,11 @@ LiveQ.UI.Tunable.prototype.expand = function( entry ) {
 				'handle': '.btn-reorder',
 				start: function(event, ui) {
 					ui.item.children().first().addClass("dragging");
+					self.tunables.addClass("dim");
 				},
 				stop: function(event, ui) {
 					ui.item.children().first().removeClass("dragging");
+					self.tunables.removeClass("dim");
 				}
 			});
 
@@ -72,12 +94,12 @@ LiveQ.UI.Tunable.prototype.expand = function( entry ) {
 
 		stage_3 = function() {
 
-			var dstPos = targetHost.offset();
+			var dstPos = targetHost.position();
 
 			// Move element to target destination
 			entry.element.animate({
 				"left": dstPos.left,
-				"top": dstPos.top
+				"top": dstPos.top+4
 			}, {
 				"easing": 'easeOutQuad',
 				"duration": 250,
@@ -101,8 +123,8 @@ LiveQ.UI.Tunable.prototype.expand = function( entry ) {
 			// 2) The
 			
 			// Calculate source/target position
-			var srcPos = entry.element.offset(),
-				dstPos = targetHost.offset(),
+			var srcPos = entry.element.position(),
+				dstPos = targetHost.position(),
 
 			// Calculate a midpoint between srcPos and dstPos
 				midLeft = (srcPos.left + dstPos.left)/2,
@@ -168,75 +190,125 @@ LiveQ.UI.Tunable.prototype.expand = function( entry ) {
 				'height': targetH
 			}, 250, stage_2);
 
-			// Make sure the tunablesGrid has the with-elements class
-			if (!self.tunablesSeparator.hasClass("visible"))
-				self.tunablesSeparator.addClass("visible");
-
 			// After the element has reached the final dimentions,
 			// it will call stage_2
 
 		};
 
-	// Start staged animation with stage 1
-	stage_1();
+	// Check if we want to use animations
+	if ((animate == undefined) || animate) {
+
+		// Start staged animation with stage 1
+		stage_1();
+
+	} else {
+
+		// Otherwise, immediate switch
+		targetHost = $('<li></li>');
+		targetHost.append( entry.element );
+		self.tunablesGrid.append(targetHost);
+
+		// Add class
+		entry.element.addClass("expanded");
+
+	}
+
+	// Make sure the tunablesGrid has the with-elements class
+	if (self.tunables.children().length <= 1) {
+		setTimeout(function() {
+			self.tunablesSeparator.removeClass("visible");
+		}, 100);
+	} else {
+		self.tunablesSeparator.addClass("visible");
+	}
 
 }
 
 /**
  * Collapse an element back to the list
  */
-LiveQ.UI.Tunable.prototype.collapse = function( entry ) {
+LiveQ.Play.Tunable.prototype.collapse = function( entry, animate ) {
 	var self = this;
 
-	// Hide
-	entry.element.fadeOut(function() {
+	// Check if we want to use animations
+	if ((animate == undefined) || animate) {
 
-		// Remove expanded class
+		// Hide
+		entry.element.fadeOut(250, function() {
+
+			// Remove expanded class
+			entry.element.removeClass("expanded");
+
+			// Remove placeholder
+			var placeholder = entry.element.parent();
+			placeholder.animate({
+				"width": 0,
+				"height": 0
+			}, function() {
+				// Remove placeholder
+				placeholder.remove();
+			})
+
+			// Put back to list
+			self.tunables.append(entry.element);
+
+			// Fade-in
+			entry.element.css({
+				"position": "",
+				"display": ""
+			});
+			entry.element.hide();
+			entry.element.fadeIn(250);
+
+			// Check if we should hide separator
+			if (self.tunablesGrid.children().length <= 1) {
+				self.tunablesSeparator.removeClass("visible");
+			} else {
+				self.tunablesSeparator.addClass("visible");
+			}
+
+		});
+
+	} else {
+
+		// Otherwise immediate switch
+		var host = entry.element.parent();
+		self.tunables.append(entry.element);
+		host.remove();
+
+		// Remove class
 		entry.element.removeClass("expanded");
 
-		// Remove placeholder
-		var placeholder = entry.element.parent();
-		placeholder.animate({
-			"width": 0,
-			"height": 0
-		}, function() {
-			// Remove placeholder
-			placeholder.remove();
-		})
-
-		// Put back to list
-		self.tunables.append(entry.element);
-
-		// Fade-in
-		entry.element.css({
-			"position": "",
-			"display": ""
-		});
-		entry.element.hide();
-		entry.element.fadeIn();
-
 		// Check if we should hide separator
-		if (self.tunablesGrid.children().length <= 1) {
+		if (!self.tunablesGrid.children().length) {
 			self.tunablesSeparator.removeClass("visible");
+		} else {
+			self.tunablesSeparator.addClass("visible");
 		}
 
-	});
+	}
 
 }
 
 /**
  * An entry in the tunables table
  */
-LiveQ.UI.TunableEntry = function( parent, config ){
+LiveQ.Play.TunableEntry = function( parent, config ){
 	var self = this;
 
 	// Setup configuration
+	this.name = config.name || "";
 	this.dec = config.dec || 3;
 	this.min = config.min || 0.0;
 	this.max = config.max || 1.0;
+	this.def = config.def || this.min;
 	this.value = config.value || this.min;
 	this.short = config.short || "";
 	this.title = config.title || "";
+	this.type = config.type || "slider";
+	this.tut = config.tut || "";
+	this.url = config.url || "";
+	this.desc = config.desc || "";
 
 	// Keep parent reference
 	this.parent = parent;
@@ -244,7 +316,7 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 	// Prepare elements
 	this.element = $('<div class="tunable"></div>');
 	this.hInput = $('<input type="text"></div>');
-	this.hCircleTrim = $('<div class="circle-trim questionable-back"></div>');
+	this.hCircleTrim = $('<div class="circle-trim"></div>');
 	this.hLabelIconic = $('<div class="label-iconic"></div>');
 	this.hLabelValue = $('<div class="label-value"></div>');
 	this.hBtnPlus = $('<div class="btn-plus"><span class="glyphicon glyphicon-plus"></span></div>');
@@ -271,21 +343,24 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 	this.spinner = new LiveQ.UI.Spinner( this, function(value) {
 		self.set( value );
 	});
+
+	var spinnerMouseDown = false;
 	this.hBtnPlus.mousedown(function(e) {
 		e.stopPropagation();
 		self.spinner.start(1);
-	});
-	this.hBtnPlus.mouseup(function(e) {
-		e.stopPropagation();
-		self.spinner.stop();
+		spinnerMouseDown = true;
 	});
 	this.hBtnMinus.mousedown(function(e) {
 		e.stopPropagation();
 		self.spinner.start(-1);
+		spinnerMouseDown = true;
 	});
-	this.hBtnMinus.mouseup(function(e) {
-		e.stopPropagation();
-		self.spinner.stop();
+	$(window).mouseup(function(e) {
+		if (spinnerMouseDown) {
+			e.stopPropagation();
+			self.spinner.stop();
+			$(self.parent).trigger("change");
+		}
 	});
 
 	// Calculate multiplier for the knob
@@ -305,13 +380,11 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 
 		// Format the number
 		'format' : function(v) {
-			console.warn("format>", v);
 			return Number(v/self.mul).toFixed(self.dec);
 		},
 
 		// Parse text field
 		'parse': function(v) {
-			console.warn("parse>", v);
 			if (typeof(v) == 'string') { // From text field
 				return parseFloat(v)*self.mul;
 			} else { // Internal
@@ -322,8 +395,11 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 		// Apply the value change
 		'release': function(v) {
 			if (self.changeLock) return;
-			console.warn("release>", v);
 			self.set(v/self.mul);
+
+			// Trigger change
+			$(self.parent).trigger("change");
+
 		}
 
 	}).addClass("knob");
@@ -339,7 +415,8 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 	});
 
 	// Setup collapse
-	this.hBtnCollapse.click(function() {
+	this.hBtnCollapse.click(function(e) {
+		e.stopPropagation();
 		self.parent.collapse(self);
 	});
 
@@ -348,7 +425,7 @@ LiveQ.UI.TunableEntry = function( parent, config ){
 /**
  * Update value
  */
-LiveQ.UI.TunableEntry.prototype.set = function( value ) {
+LiveQ.Play.TunableEntry.prototype.set = function( value ) {
 
 	// Update local attribs
 	this.value = value;
@@ -360,6 +437,4 @@ LiveQ.UI.TunableEntry.prototype.set = function( value ) {
 	this.hLabelValue.html( Number(value).toFixed(this.dec) );
 	this.changeLock = false;
 
-	// Value changed
-	console.log("Set>", value);
 }

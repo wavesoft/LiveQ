@@ -97,13 +97,222 @@ div.log .info {
   display: block;
 }
 /**
+ * Helper gradients
+ */
+.gradient.grad-separator {
+  background: #ffffff;
+  background: -moz-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #ffffff), color-stop(50%, #cccccc), color-stop(100%, #ffffff));
+  background: -webkit-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -o-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -ms-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: linear-gradient(to right, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=1);
+}
+.gradient.grad-color-range {
+  background: #00ff00;
+  background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #00ff00), color-stop(10%, #008000), color-stop(20%, #ff9900), color-stop(100%, #aa0000));
+  background: -webkit-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+  background: -o-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+  background: -ms-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+  background: linear-gradient(to right, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#aa0000', GradientType=1);
+}
+/**
+ * Result Grid Interface
+ */
+.resultgrid {
+  position: relative;
+}
+.resultgrid .resultgrid-header,
+.resultgrid .resultgrid-footer,
+.resultgrid .resultgrid-body {
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.resultgrid .resultgrid-header {
+  top: 0px;
+  height: 38px;
+  padding: 4px;
+  border-bottom: solid 2px #AAA;
+}
+.resultgrid .resultgrid-footer {
+  height: 38px;
+  bottom: 0px;
+  border-top: solid 2px #AAA;
+}
+.resultgrid .resultgrid-footer .gradient {
+  display: block;
+  position: absolute;
+  top: 2px;
+  height: 10px;
+  left: 40px;
+  right: 10px;
+}
+.resultgrid .resultgrid-footer .legend {
+  font-size: 10px;
+  color: #333;
+}
+.resultgrid .resultgrid-footer .legend div {
+  position: absolute;
+  top: 14px;
+}
+.resultgrid .resultgrid-footer .legend .good {
+  left: 40px;
+}
+.resultgrid .resultgrid-footer .legend .bad {
+  right: 10px;
+}
+.resultgrid .resultgrid-body {
+  top: 38px;
+  bottom: 38px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+.resultgrid .resultgrid-body .resultgrid-body-back {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 40px;
+  right: 10px;
+  background-color: #ffffff;
+}
+.resultgrid .resultgrid-body .resultgrid-row {
+  position: relative;
+  display: block;
+  height: 40px;
+  cursor: pointer;
+  width: 100%;
+  border-bottom: solid 1px #dddddd;
+}
+.resultgrid .resultgrid-body .resultgrid-row div {
+  height: 100%;
+}
+.resultgrid .resultgrid-body .resultgrid-row .value-label {
+  position: absolute;
+  left: 0px;
+  top: 5px;
+  width: 40px;
+  text-align: center;
+  font-weight: bold;
+  color: #999999;
+  font-size: 20px;
+}
+.resultgrid .resultgrid-body .resultgrid-row .value-host {
+  position: absolute;
+  left: 40px;
+  right: 10px;
+  background-color: #ffffff;
+}
+.resultgrid .resultgrid-body .resultgrid-row .value-host .value-outer {
+  position: absolute;
+}
+.resultgrid .resultgrid-body .resultgrid-row .value-host .value-outer .value-inner {
+  position: absolute;
+}
+.resultgrid .resultgrid-body .resultgrid-row .value-host .value-snapshot {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.resultgrid .resultgrid-body .resultgrid-row.no-data .value-host .value-outer {
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+}
+.resultgrid .resultgrid-body .resultgrid-row.no-data .value-host .value-outer:after {
+  color: #cccccc;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 12px;
+  text-align: center;
+  font-size: 12px;
+  content: "( No data )";
+}
+.resultgrid .resultgrid-body .resultgrid-row.no-data .value-host .value-inner {
+  display: none;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f1 .value-outer {
+  background-color: #b3ff66;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f1 .value-inner {
+  background-color: #66cc00;
+  color: #336600;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f2 .value-outer {
+  background-color: #b3d98c;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f2 .value-inner {
+  background-color: #669933;
+  color: #334d19;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f3 .value-outer {
+  background-color: #ffd699;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f3 .value-inner {
+  background-color: #ff9900;
+  color: #995c00;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f4 .value-outer {
+  background-color: #ff3333;
+}
+.resultgrid .resultgrid-body .resultgrid-row.f4 .value-inner {
+  background-color: #990000;
+  color: #330000;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover {
+  background-color: #99ccff;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover .value-label {
+  color: #FFF;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover .value-host {
+  background-color: #cce6ff !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.no-data .value-outer {
+  background-color: #cce6ff !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.no-data .value-outer:after {
+  color: #FFF !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f1 .value-outer {
+  background-color: #a6e6b3 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f1 .value-inner {
+  background-color: #80cc80 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f2 .value-outer {
+  background-color: #a6d2c6 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f2 .value-inner {
+  background-color: #80b399 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f3 .value-outer {
+  background-color: #ccd1cc !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f3 .value-inner {
+  background-color: #ccb380 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f4 .value-outer {
+  background-color: #cc8099 !important;
+}
+.resultgrid .resultgrid-body .resultgrid-row:hover.f4 .value-inner {
+  background-color: #996680 !important;
+}
+/**
  * Game interface
  */
 @media (min-width: 768px) {
   #game {
     width: 100%;
     height: 100%;
+    border: solid 20px #999;
   }
+}
+#game .dim {
+  opacity: 0.25;
 }
 #game #game-window {
   overflow: hidden;
@@ -113,66 +322,65 @@ div.log .info {
 #game #game-window #game-frame {
   white-space: nowrap;
 }
-#game #game-window #game-frame .frame {
-  height: 100%;
+#game #game-window #game-frame .frame#tunables-host,
+#game #game-window #game-frame .frame#run-host {
+  -webkit-transition: width 0.25s linear , background-color 0.25s linear;
+  -moz-transition: width 0.25s linear , background-color 0.25s linear;
+  -o-transition: width 0.25s linear , background-color 0.25s linear;
+  transition: width 0.25s linear , background-color 0.25s linear;
+}
+#game #game-window #game-frame #results-host {
+  position: relative;
+  padding: 20px;
+}
+#game #game-window #game-frame #results-host .results-list {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  top: 5px;
+}
+#game #game-window #game-frame #tunables-host {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#game #game-window #game-frame #tunables-host #tunables {
   padding: 8px;
 }
-#game #game-window #game-frame .frame {
-  width: 100%;
-}
-@media (min-width: 768px) {
-  #game #game-window #game-frame {
-    height: 100%;
-    width: 125%;
-    position: relative;
-  }
-  #game #game-window #game-frame .frame {
-    display: inline-block;
-    overflow: hidden;
-  }
-  #game #game-window #game-frame .frame#results-host {
-    width: 25%;
-  }
-  #game #game-window #game-frame .frame#tunables-host {
-    -webkit-transition: all 0.25s;
-    transition: all 0.25s;
-  }
-  #game #game-window #game-frame .clear {
-    clear: both;
-  }
-}
-#game #game-window #game-frame #tunables-host ul.tunables-grid {
+#game #game-window #game-frame #tunables-host .tunables-grid {
   display: block;
   width: 100%;
   list-style-type: none;
   margin: 0;
   padding: 0;
 }
-#game #game-window #game-frame #tunables-host ul.tunables-grid li {
+#game #game-window #game-frame #tunables-host .tunables-grid li {
   margin: 3px 3px 3px 0;
   padding: 0;
   width: 84px;
   height: 122px;
   float: left;
 }
-#game #game-window #game-frame #tunables-host ul.tunables-grid li .tunable {
+#game #game-window #game-frame #tunables-host .tunables-grid li .tunable {
   float: none;
 }
 #game #game-window #game-frame #tunables-host .tunables-separator {
   display: block;
   width: 100%;
   margin: 0;
-  border-width: 1px 0px 0px 0px;
-  border-style: solid;
-  border-color: #ffffff;
-  -webkit-transition: all 0.25s linear;
-  -moz-transition: all 0.25s linear;
-  -o-transition: all 0.25s linear;
-  transition: all 0.25s linear;
+  height: 0;
+  background: #ffffff;
+  background: -moz-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #ffffff), color-stop(50%, #cccccc), color-stop(100%, #ffffff));
+  background: -webkit-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -o-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: -ms-linear-gradient(left, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  background: linear-gradient(to right, #ffffff 0%, #cccccc 50%, #ffffff 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=1);
 }
 #game #game-window #game-frame #tunables-host .tunables-separator.visible {
   margin: 5px;
-  border-color: #cccccc;
+  height: 1px;
 }
 #game #game-window #game-frame #tunables-host .tunables-tiles {
   display: block;
@@ -219,7 +427,7 @@ div.log .info {
   position: absolute;
   left: -4px;
   top: 14px;
-  background: #ffffff;
+  background-color: #ffffff;
   -webkit-border-radius: 90px;
   -moz-border-radius: 90px;
   -o-border-radius: 90px;
@@ -244,13 +452,13 @@ div.log .info {
 #game #game-window #game-frame #tunables-host .tunable .btn-reorder {
   width: 18px;
   height: 18px;
-  color: #e6e6e6;
 }
 #game #game-window #game-frame #tunables-host .tunable .btn-collapse {
   right: 0;
   text-align: right;
   padding-top: 4px;
   padding-right: 4px;
+  color: #99ddff;
 }
 #game #game-window #game-frame #tunables-host .tunable .btn-reorder {
   cursor: move;
@@ -258,6 +466,7 @@ div.log .info {
   text-align: left;
   padding-top: 4px;
   padding-left: 4px;
+  color: #e6e6e6;
 }
 #game #game-window #game-frame #tunables-host .tunable .btn-collapse:hover,
 #game #game-window #game-frame #tunables-host .tunable .btn-reorder:hover {
@@ -400,6 +609,12 @@ div.log .info {
   pointer-events: none;
   opacity: 0;
 }
+#game #game-window #game-frame #tunables-host .tunable .circle-trim {
+  -webkit-transition: opacity 0.25s linear , background-color 0.25s linear;
+  -moz-transition: opacity 0.25s linear , background-color 0.25s linear;
+  -o-transition: opacity 0.25s linear , background-color 0.25s linear;
+  transition: opacity 0.25s linear , background-color 0.25s linear;
+}
 #game #game-window #game-frame #tunables-host .tunable .label-iconic {
   font-weight: normal;
   top: 8px;
@@ -416,7 +631,7 @@ div.log .info {
   cursor: auto;
   width: 84px;
   height: 122px;
-  background-color: #ffffff;
+  background-color: transparent;
 }
 #game #game-window #game-frame #tunables-host .tunable.expanded .btn-plus,
 #game #game-window #game-frame #tunables-host .tunable.expanded .btn-minus,
@@ -440,6 +655,7 @@ div.log .info {
   right: 0;
   top: 78px;
 }
+#game #game-window #game-frame .frame,
 #game #game-window #game-frame .frame#tunables-host,
 #game #game-window #game-frame #tunables,
 #game #game-window #game-frame .frame#run-host,
@@ -447,33 +663,69 @@ div.log .info {
   width: 100%;
 }
 @media (min-width: 768px) {
+  #game #game-window #game-frame {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+  #game #game-window #game-frame .frame {
+    display: block;
+    overflow: hidden;
+    height: 100%;
+  }
+  #game #game-window #game-frame .frame#tunables-host {
+    float: left;
+    margin-right: 8px;
+  }
+  #game #game-window #game-frame .frame#run-host {
+    width: 0px;
+    float: right;
+    margin-left: 0;
+  }
+  #game #game-window #game-frame .frame#results-host {
+    width: auto;
+    background-color: #eeeeee;
+  }
+}
+@media (min-width: 768px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables,
-  #game #game-window #game-frame .frame#run-host,
-  #game #game-window #game-frame .frame#run {
+  #game #game-window #game-frame #tunables {
+    width: 282px;
+  }
+  #game #game-window #game-frame.running .frame#run-host,
+  #game #game-window #game-frame.running .frame#run {
     width: 282px;
   }
 }
 @media (min-width: 992px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables,
-  #game #game-window #game-frame .frame#run-host,
-  #game #game-window #game-frame .frame#run {
+  #game #game-window #game-frame #tunables {
+    width: 376px;
+  }
+  #game #game-window #game-frame.running .frame#run-host,
+  #game #game-window #game-frame.running .frame#run {
     width: 376px;
   }
 }
 @media (min-width: 1200px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables,
-  #game #game-window #game-frame .frame#run-host,
-  #game #game-window #game-frame .frame#run {
+  #game #game-window #game-frame #tunables {
+    width: 470px;
+  }
+  #game #game-window #game-frame.running .frame#run-host,
+  #game #game-window #game-frame.running .frame#run {
     width: 470px;
   }
 }
 @media (min-width: 768px) {
+  #game #game-window #game-frame.running .frame {
+    height: 100%;
+  }
   #game #game-window #game-frame.running .frame#tunables-host {
     width: 0;
-    padding-left: 0;
-    padding-right: 0;
+    margin-right: 0;
+  }
+  #game #game-window #game-frame.running .frame#run-host {
+    margin-left: 8px;
   }
 }
