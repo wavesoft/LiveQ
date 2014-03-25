@@ -50,9 +50,9 @@
      */
     lab.onDataArrived(function(interpolated) {
       if (interpolated) {
-        r.flash('<span class="glyphicon glyphicon-download"></span> Incoming planning data', "#FF9900");
+        r.flash('<span class="glyphicon glyphicon-download"></span> Received planning data', "#FF9900");
       } else {
-        r.flash('<span class="glyphicon glyphicon-download"></span> Incoming simulation data', "#3399FF");
+        r.flash('<span class="glyphicon glyphicon-download"></span> Received simulation data', "#3399FF");
       }
     });
 
@@ -68,10 +68,43 @@
     });
 
     /**
-     *
+     * Wait for lab to become ready
+     */
+    lab.onReady(function() {
+
+      // Request interpolation over defaults
+      LiveQ.Play.startEstimate();
+
+    });
+
+    /**
+     * Fire interpolation when tunables change
      */
     $(t).on('change', function() {
       LiveQ.Play.startEstimate();
+    });
+
+    /**
+     * Bind mouse events
+     */
+    $("#btn-sim-start").click(function() {
+      $("#btn-sim-start").hide();
+      $("#btn-sim-abort").show();
+      LiveQ.Play.startSimulation();
+    });
+    $("#btn-sim-abort").click(function() {
+      $("#btn-sim-abort").hide();
+      $("#btn-sim-start").show();
+      LiveQ.Play.abortSimulation();
+    });
+
+    /**
+     * Initialize UI
+     */
+    $("#btn-sim-abort").hide();
+    $("#modal-histogram").modal({
+      'show': false,
+      'keyboard': true
     });
 
   };
@@ -118,6 +151,62 @@
 
     // Switch back
     $("#game-frame").removeClass("running");
+
+  }
+
+  /**
+   * Show plot details in a pop-up window
+   */
+  LiveQ.Play.showHistogramDetails = function( histoData, histoReference ) {
+
+    // Cleanup previous histogram
+    var plotElement = $('#modal-histogram-plot');
+    plotElement.empty();
+
+    // Figure out detector name
+    var parts = histoData.id.split("/");
+    parts = parts[1].split("_");
+
+    // Prepare plot window
+    var plot = new LiveQ.UI.PlotWindow( plotElement[0], {
+      'width': plotElement.width(),
+      'height': plotElement.height(),
+      'imgTitle': histoReference.imgTitle,
+      'imgXLabel': histoReference.imgXLabel,
+      'imgYLabel': histoReference.imgYLabel
+    });
+
+    // Add plots
+    plot.addHistogram( histoReference.reference, "Data from " + parts[0] + " experiment", "#000000" );
+    plot.addHistogram( histoData, histoReference.title, ["#0066FF", "#FF9900"] );
+
+    // Upadate modal title
+    $("#modal-histogram .modal-title").html('<span class="label label-default">' + histoReference.short + '</span> ' + histoReference.title + ' Histogram' );
+
+    // Prepare detail elements
+    $("#modal-d-desc").html(histoReference.shortdesc);
+    $("#modal-d-beam").html(histoReference.beam);
+    $("#modal-d-energy").html(histoReference.energy + " GEv");
+    $("#modal-d-proc").html(histoReference.process);
+    $("#modal-d-params").html(histoReference.params);
+
+    // Listen for event updates
+    var updateVars = function() {
+      $("#modal-d-nevts").html(histoData.nevts);
+      var chi = LiveQ.Calculate.chi2WithError( histoReference.reference, histoData );
+      $("#modal-d-chi2").html( Number(chi[0]).toFixed(2) + " &plusmn " + Number(chi[1]).toFixed(2) + "%" );
+    }
+    updateVars();
+
+    // TOOD: This registers onUpdate event which is never unregistered
+    histoData.onUpdate(function() {
+      updateVars();
+      plot.update();
+      plot.updateLegend();
+    });
+
+    // Show modal
+    $("#modal-histogram").modal('show');
 
   }
 

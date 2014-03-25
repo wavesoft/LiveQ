@@ -12,6 +12,11 @@ LiveQ.Play.Results = function( host ) {
 	this.observableList = new LiveQ.UI.ResultGrid(this.elmObservableList);
 	this.host.append(this.elmObservableList);
 
+	// Handle clicks on the observables list
+	$(this.observableList).on('click', function(e, histo) {
+		LiveQ.Play.showHistogramDetails( histo.histogram, histo.reference );
+	});
+
 }
 
 LiveQ.Play.Results.prototype.add = function(histogram, reference) {

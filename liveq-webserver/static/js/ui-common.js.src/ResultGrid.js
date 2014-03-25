@@ -153,6 +153,9 @@ LiveQ.UI.ResultGrid.prototype.add = function( histogram, reference ) {
 	// Resort
 	this.applySort();
 
+	// Return new element
+	return e;
+
 }
 
 
@@ -179,6 +182,7 @@ LiveQ.UI.ResultGrid.prototype.applySort = function() {
 	this.eBody.children(".resultgrid-row").remove();
 	for (var i=0; i<this.entries.length; i++) {
 		this.eBody.append(this.entries[i].row);
+		this.entries[i].rebindEvents();
 	}
 
 }
@@ -329,12 +333,24 @@ LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
 	this.valueOuter.append(this.valueInner);
 
 	// Setup hover descriptions
-
+	// TODO
 
 	// Bind on histogram updates
 	var self = this;
 	this.histogram.onUpdate(function() {
 		self.update();
+	});
+
+}
+
+/**
+ * Rebind events (called after destructive UI rebuild)
+ */
+LiveQ.UI.ResultGridEntry.prototype.rebindEvents = function() {
+
+	var self = this;
+	$(this.row).click(function() {
+		$(self.parent).trigger('click', self);
 	});
 
 }

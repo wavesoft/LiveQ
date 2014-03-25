@@ -305,13 +305,24 @@ div.log .info {
   background-color: #996680 !important;
 }
 /**
+ * Modal window for showing plot details
+ */
+#modal-histogram #modal-histogram-plot,
+#modal-histogram #modal-histogram-details {
+  float: left;
+}
+#modal-histogram #modal-histogram-plot {
+  width: 300px;
+  height: 300px;
+}
+/**
  * Game interface
  */
 @media (min-width: 768px) {
   #game {
     width: 100%;
     height: 100%;
-    border: solid 20px #999;
+    border: solid 10px #999999;
   }
 }
 #game .dim {
@@ -321,6 +332,17 @@ div.log .info {
   overflow: hidden;
   padding: 0px;
   height: 100%;
+}
+#game #game-window #game-controls {
+  text-align: right;
+  background-color: #999999;
+  border-radius: 10px 0px 0px 0px;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  height: 50px;
+  padding: 10px;
+  width: 240px;
 }
 #game #game-window #game-frame {
   white-space: nowrap;
@@ -340,8 +362,8 @@ div.log .info {
   position: absolute;
   left: 5px;
   right: 5px;
-  bottom: 5px;
-  top: 5px;
+  bottom: 45px;
+  top: 133px;
 }
 #game #game-window #game-frame #tunables-host {
   overflow-x: hidden;

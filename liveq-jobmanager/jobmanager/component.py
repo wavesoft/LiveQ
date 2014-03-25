@@ -117,8 +117,8 @@ class JobManagerComponent(Component):
 		"""
 
 		# Handle deferred completed jobs
-		jobs = scheduler.getCompletedJobs()
-		for job in jobs:
+		c_jobs = scheduler.getCompletedJobs()
+		for job in c_jobs:
 			# Notify interested entities that the specified job is completed
 			self.notifyJobCompleted(job)
 
