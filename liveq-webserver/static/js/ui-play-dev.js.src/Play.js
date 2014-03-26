@@ -265,7 +265,8 @@
       LiveQ.Play.abortSimulation();
     });
     $("#btn-help").click(function() {
-      $("#game-frame").toggleClass("running");
+      //$("#game-frame").toggleClass("running");
+      alert("Clicking here will allow you to hover over the elements in the interface and get more information");
     });
 
     /**
