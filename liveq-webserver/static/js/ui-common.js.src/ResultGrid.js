@@ -194,7 +194,7 @@ LiveQ.UI.ResultGrid.prototype.mapValue = function(v, width) {
 
 	var keyPoints = [
 			0.10,	// 1σ @ 10%
-			0.20,	// 2σ @ 20%
+			0.30,	// 2σ @ 30%
 			0.50,	// 3σ @ 50%
 			1.00	// 4σ @ 100%;
 		],
@@ -219,6 +219,7 @@ LiveQ.UI.ResultGrid.prototype.mapValue = function(v, width) {
 			// Logarithmic interpolation between 10% to 20%
 			console.log("[IPOL] lv=", lv, ", p=", (lv/keyChi[0]));
 			return  (lv/keyChi[0]) * (width * (keyPoints[1] - keyPoints[0])) + width*keyPoints[0];
+
 
 		} else if (lv < keyChi[1]) {
 
@@ -317,6 +318,8 @@ LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
 	this.valueOuter = $('<div class="value-outer"></div>');
 	this.valueInner = $('<div class="value-inner"></div>');
 	this.valueLabel = $('<div class="value-label"></div>');
+	this.descLabelHost = $('<div class="description-label-host"></div>');
+	this.descLabel = $('<div class="description-label"></div>');
 
 	// For snapshot
 	this.valueSnapshot = $('<div class="value-snapshot"></div>');
@@ -328,12 +331,14 @@ LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
 	// Nest elements
 	this.row.append(this.valueHost);
 	this.row.append(this.valueLabel);
+	this.row.append(this.descLabelHost);
 	this.valueHost.append(this.valueOuter);
 	this.valueHost.append(this.valueSnapshot);
 	this.valueOuter.append(this.valueInner);
+	this.descLabelHost.append(this.descLabel);
 
 	// Setup hover descriptions
-	// TODO
+	this.descLabel.text( reference.title );
 
 	// Bind on histogram updates
 	var self = this;
@@ -347,8 +352,9 @@ LiveQ.UI.ResultGridEntry = function( parent, histogram, reference ) {
  * Rebind events (called after destructive UI rebuild)
  */
 LiveQ.UI.ResultGridEntry.prototype.rebindEvents = function() {
-
 	var self = this;
+
+	// Click forwards click event
 	$(this.row).click(function() {
 		$(self.parent).trigger('click', self);
 	});

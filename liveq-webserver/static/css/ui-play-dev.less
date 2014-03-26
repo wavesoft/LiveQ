@@ -41,6 +41,7 @@
 @results-row-label-fnt:	20px;
 @results-row-pad-right:	10px;
 @results-row-height:	40px;
+@results-row-desc-h:	30px;
 @results-header-height:	38px;
 
 // Run information
@@ -50,7 +51,7 @@
 @panel-c-background:	#FFF;
 @panel-c-background-alt:#EEE;
 @panel-c-fadeback:		#DDD;
-@panel-c-frame:			#999;
+@panel-c-frame:			#666;
 @panel-border-size:		10px;
 @panel-pad-results:		5px;
 @panel-sz-controls:		50px;
@@ -237,13 +238,13 @@ div.log {
 	}
 	&.grad-color-range {
 		background: #00ff00;
-		background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#00ff00), color-stop(10%,#008000), color-stop(20%,#ff9900), color-stop(100%,#aa0000));
-		background: -webkit-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
-		background: -o-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
-		background: -ms-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
-		background: linear-gradient(to right, #00ff00 0%,#008000 10%,#ff9900 20%,#aa0000 100%);
-		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ff00', endColorstr='#aa0000',GradientType=1 );	
+		background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#00ff00), color-stop(10%,#008000), color-stop(30%,#ff9900), color-stop(100%,#800000));
+		background: -webkit-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 30%,#800000 100%);
+		background: -o-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 30%,#800000 100%);
+		background: -ms-linear-gradient(left, #00ff00 0%,#008000 10%,#ff9900 30%,#800000 100%);
+		background: linear-gradient(to right, #00ff00 0%,#008000 10%,#ff9900 30%,#800000 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ff00', endColorstr='#800000',GradientType=1 );
 	}
 }
 
@@ -320,7 +321,10 @@ div.log {
 			background-color: @results-grid-back;
 		}
 
+		// ====================================================================
 		// The ResultGrid data row
+		// ====================================================================
+
 		.resultgrid-row {
 
 			position: relative;
@@ -330,14 +334,46 @@ div.log {
 			width: 100%;
 
 			// Grid separation
-			border-bottom: solid 1px @results-c-gridline;
+			border-bottom: dashed 1px @results-c-gridline;
 
 			// Set height everywhere
 			div {
 				height: 100%;
 			}
 
+			// ====================================================================
+			// Description label
+			// ====================================================================
+
+			// Description host that occupies the whole width
+			.description-label-host {
+				position: absolute;
+				left: @results-row-label-w + 5px; 
+				right: @results-row-pad-right + 5px;
+				top: (@results-row-height - @results-row-desc-h) / 2;
+				height: @results-row-desc-h;
+
+				// Description label that expands in size
+				.description-label {
+					.border-radius( 5px );
+					.transition( opacity 0.25s linear );
+					.pointer-events( none );
+					display: inline-block;
+					max-width: 100%;
+					height: 100%;
+					padding: 4px;
+					font-size: 14px;
+					color: #FFF;
+					background: rgba(0,0,0,0.5);
+					opacity: 0;
+				}
+
+			}
+
+			// ====================================================================
 			// Value label
+			// ====================================================================
+
 			.value-label {
 				position: absolute;
 				left: 0px; top: (@results-row-height - @results-row-label-fnt)/2 - 5px;
@@ -348,7 +384,10 @@ div.log {
 				font-size: @results-row-label-fnt;
 			}
 
-			// Value
+			// ====================================================================
+			// Value with inner/outer components
+			// ====================================================================
+
 			.value-host {
 
 				position: absolute;
@@ -357,13 +396,16 @@ div.log {
 
 				background-color: @results-grid-back;
 
+				// Outer container the error bars
 				.value-outer {
 					position: absolute;
+					// Inner has a fixed width
 					.value-inner {
 						position: absolute;
 					}
 				}
 
+				// A snapshot element shows the user's choice
 				.value-snapshot {
 					position: absolute;
 					background: url(../img/stripe.png) repeat;
@@ -372,7 +414,10 @@ div.log {
 
 			}
 
+			// ====================================================================
 			// No-data entry
+			// ====================================================================
+
 			&.no-data {
 				.value-host {
 					.value-outer {
@@ -393,6 +438,10 @@ div.log {
 					}
 				}
 			}
+
+			// ====================================================================
+			// Element coloring
+			// ====================================================================
 
 			// Coloring based on data quality
 			&.f1 {
@@ -432,9 +481,17 @@ div.log {
 				}
 			}
 
-			// Make it clear that the row can be hovered
+			// ====================================================================
+			// Hoverer hightlight
+			// ====================================================================
+
 			&:hover {
 				background-color: @results-c-hover;
+				.description-label-host {
+					.description-label {
+						opacity: 1;
+					}
+				}
 				.value-label {
 					color: #FFF;
 				}
@@ -678,10 +735,15 @@ div.log {
 
 				// Padding in the tunables
 				#tunables {
+
 					padding: 8px;
+
 				}
 
+				// ====================================================================
 				// The grid that contains the expanded tiles
+				// ====================================================================
+
 				.tunables-grid {
 					display: block;
 					width: 100%;
@@ -717,7 +779,10 @@ div.log {
 
 				}
 
+				// ====================================================================
 				// The tiles container
+				// ====================================================================
+
 				.tunables-tiles {
 					display: block;
 					width: 100%;
@@ -734,7 +799,10 @@ div.log {
 
 				}
 
+				// ====================================================================
 				// Separator line between the two groups
+				// ====================================================================
+
 				.tunables-separator {
 					display: block;
 					width: 100%;
@@ -753,8 +821,10 @@ div.log {
 
 				}
 
+				// ====================================================================
 				// The tunable tiles which may move between .tunable-tiles container
 				// or .tunable-grid > li container.
+				// ====================================================================
 				.tunable {
 				
 					// Tunable tile layouy

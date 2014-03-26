@@ -111,13 +111,13 @@ div.log .info {
 }
 .gradient.grad-color-range {
   background: #00ff00;
-  background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #00ff00), color-stop(10%, #008000), color-stop(20%, #ff9900), color-stop(100%, #aa0000));
-  background: -webkit-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-  background: -o-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-  background: -ms-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-  background: linear-gradient(to right, #00ff00 0%, #008000 10%, #ff9900 20%, #aa0000 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#aa0000', GradientType=1);
+  background: -moz-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #00ff00), color-stop(10%, #008000), color-stop(30%, #ff9900), color-stop(100%, #800000));
+  background: -webkit-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+  background: -o-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+  background: -ms-linear-gradient(left, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+  background: linear-gradient(to right, #00ff00 0%, #008000 10%, #ff9900 30%, #800000 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ff00', endColorstr='#800000', GradientType=1);
 }
 /**
  * Result Grid Interface
@@ -188,10 +188,40 @@ div.log .info {
   height: 40px;
   cursor: pointer;
   width: 100%;
-  border-bottom: solid 1px #dddddd;
+  border-bottom: dashed 1px #dddddd;
 }
 .resultgrid .resultgrid-body .resultgrid-row div {
   height: 100%;
+}
+.resultgrid .resultgrid-body .resultgrid-row .description-label-host {
+  position: absolute;
+  left: 45px;
+  right: 15px;
+  top: 5px;
+  height: 30px;
+}
+.resultgrid .resultgrid-body .resultgrid-row .description-label-host .description-label {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-transition: opacity 0.25s linear;
+  -moz-transition: opacity 0.25s linear;
+  -o-transition: opacity 0.25s linear;
+  transition: opacity 0.25s linear;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  display: inline-block;
+  max-width: 100%;
+  height: 100%;
+  padding: 4px;
+  font-size: 14px;
+  color: #FFF;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
 }
 .resultgrid .resultgrid-body .resultgrid-row .value-label {
   position: absolute;
@@ -269,6 +299,9 @@ div.log .info {
 .resultgrid .resultgrid-body .resultgrid-row:hover {
   background-color: #99ccff;
 }
+.resultgrid .resultgrid-body .resultgrid-row:hover .description-label-host .description-label {
+  opacity: 1;
+}
 .resultgrid .resultgrid-body .resultgrid-row:hover .value-label {
   color: #FFF;
 }
@@ -323,7 +356,7 @@ div.log .info {
   #game {
     width: 100%;
     height: 100%;
-    border: solid 10px #999999;
+    border: solid 10px #666666;
   }
 }
 #game .dim {
@@ -358,7 +391,7 @@ div.log .info {
 }
 #game #game-window #game-controls {
   text-align: right;
-  background-color: #999999;
+  background-color: #666666;
   border-radius: 10px 0px 0px 0px;
   position: absolute;
   bottom: 5px;
