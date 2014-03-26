@@ -379,7 +379,7 @@ LiveQ.UI.ResultGridEntry.prototype.update = function() {
 	// Calculate the chi-squared of histograms
 	var chi = this.chi2(),
 		value = chi[0],
-		errors = chi[0]*chi[1];
+		errors = chi[0]*(chi[1]/100);
 
 	// Print results
 	console.log(chi, value, errors);

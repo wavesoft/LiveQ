@@ -508,16 +508,16 @@ div.log .info {
 #game #game-window #game-frame #run-host #run .run-content .run-status-table table th {
   border-color: #666;
 }
-#game #game-window #game-frame #run-host #run .run-content .run-status-table .run-d-events.f0 {
+#game #game-window #game-frame #run-host #run .run-content .run-status-table #run-d-fit.f0 {
   color: #66cc00;
 }
-#game #game-window #game-frame #run-host #run .run-content .run-status-table .run-d-events.f1 {
+#game #game-window #game-frame #run-host #run .run-content .run-status-table #run-d-fit.f1 {
   color: #669933;
 }
-#game #game-window #game-frame #run-host #run .run-content .run-status-table .run-d-events.f2 {
+#game #game-window #game-frame #run-host #run .run-content .run-status-table #run-d-fit.f2 {
   color: #ff9900;
 }
-#game #game-window #game-frame #run-host #run .run-content .run-status-table .run-d-events.f3 {
+#game #game-window #game-frame #run-host #run .run-content .run-status-table #run-d-fit.f3 {
   color: #990000;
 }
 #game #game-window #game-frame #run-host #run .run-content .run-status-log {
@@ -533,12 +533,33 @@ div.log .info {
   position: relative;
   padding: 20px;
 }
+#game #game-window #game-frame #results-host .results-grid {
+  background: #FFF;
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  height: 128px;
+  display: block;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#game #game-window #game-frame #results-host .results-grid li.label-placeholder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  text-align: center;
+  top: 54px;
+  color: #cccccc;
+}
 #game #game-window #game-frame #results-host .results-list {
   position: absolute;
   left: 5px;
   right: 5px;
   bottom: 45px;
-  top: 133px;
+  top: 138px;
 }
 #game #game-window #game-frame #results-host .results-footer {
   position: absolute;
@@ -587,7 +608,7 @@ div.log .info {
 #game #game-window #game-frame #tunables-host .tunables-grid li .tunable {
   float: none;
 }
-#game #game-window #game-frame #tunables-host .tunables-grid .label-placeholder {
+#game #game-window #game-frame #tunables-host .tunables-grid li.label-placeholder {
   width: 100%;
   font-size: 12px;
   text-align: center;

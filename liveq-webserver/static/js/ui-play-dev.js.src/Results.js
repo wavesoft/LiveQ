@@ -4,8 +4,10 @@ LiveQ.Play.Results = function( host ) {
 	this.host = $(host);
 
 	// Create the expanded grid
-	this.elmObservableGrid = $('<div class="results-grid"></div>');
+	this.elmObservableGrid = $('<ul class="results-grid"></ul>');
+	this.elmObservableGridPlaceholder = $('<li class="label-placeholder">Click on a tunable from the list below for more information.</li>')
 	this.host.append(this.elmObservableGrid);
+	this.elmObservableGrid.append(this.elmObservableGridPlaceholder);
 
 	// Create the results list
 	this.elmObservableList = $('<div class="results-list"></div>');

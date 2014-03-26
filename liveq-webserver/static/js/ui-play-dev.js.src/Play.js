@@ -144,7 +144,7 @@
 
       // Set status config
       status.setConfig({
-        'maxEvents': 1600000
+        'maxEvents': 1800000
       });
 
     });
@@ -363,7 +363,7 @@
     // Prepare detail elements
     $("#modal-d-desc").html(histoReference.shortdesc);
     $("#modal-d-beam").html(histoReference.beam);
-    $("#modal-d-energy").html(histoReference.energy + " GEv");
+    $("#modal-d-energy").html(histoReference.energy + " GeV");
     $("#modal-d-proc").html(histoReference.process);
     $("#modal-d-params").html(histoReference.params);
 

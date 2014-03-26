@@ -37,6 +37,7 @@
 @results-c-label:		#999999;
 @results-c-hover:		#99CCFF;
 @results-c-freezedata:	#000000;
+@results-c-light:		#CCCCCC;
 @results-row-label-w:	40px;
 @results-row-label-fnt:	20px;
 @results-row-pad-right:	10px;
@@ -58,7 +59,7 @@
 @panel-sz-controls:		50px;
 @panel-width-controls:	240px;
 @panel-pad-controls:	10px;
-@panel-sz-plots:		128px;
+@panel-sz-grid:			128px;
 @split-transition:		0.25s linear;
 
 // Shorthand for cross-browser support
@@ -130,7 +131,7 @@ div.log {
     font-size: 10px;
 
 	div:first-child {
-	    font-weight: bold;
+		font-weight: bold;
 	}
 	.warn {
 	    color: #F60;
@@ -751,7 +752,7 @@ div.log {
 								border-color: #666;
 							}
 
-							.run-d-events {
+							#run-d-fit {
 								&.f0 { color: @results-c-fit1 };
 								&.f1 { color: @results-c-fit2 };
 								&.f2 { color: @results-c-fit3 };
@@ -783,12 +784,42 @@ div.log {
 				position: relative;
 				padding: 20px;
 
+				.results-grid {
+					background: #FFF;
+					position: absolute;
+					left: @panel-pad-results; 
+					right: @panel-pad-results;
+					top: @panel-pad-results;
+					height: @panel-sz-grid;
+					display: block;
+
+					list-style-type: none; 
+					margin: 0; 
+					padding: 0; 
+
+					// The list elements, which contain
+					// the expanded tunable tiles
+					li { 
+
+					}
+
+					li.label-placeholder {
+						position: absolute;
+						left: 0; right: 0;
+						font-size: 12px;
+						text-align: center;
+						top: @panel-sz-grid/2 - 10px;
+						color: @results-c-light;
+					}
+
+				}
+
 				.results-list {
 					position: absolute;
 					left: @panel-pad-results; 
 					right: @panel-pad-results;
 					bottom: (@panel-pad-results + @panel-sz-controls - @panel-border-size);
-					top: (@panel-pad-results + @panel-sz-plots);
+					top: (@panel-pad-results*2 + @panel-sz-grid);
 				}
 
 				.results-footer {
@@ -866,7 +897,7 @@ div.log {
 					}
 
 					// Text placeholder on the grid container
-					.label-placeholder {
+					li.label-placeholder {
 						width: 100%;
 						font-size: 12px;
 						text-align: center;
