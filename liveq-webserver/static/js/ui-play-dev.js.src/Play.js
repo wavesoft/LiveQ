@@ -332,6 +332,8 @@
 
   }
 
+  var prevBoundFunction = null;
+
   /**
    * Show plot details in a pop-up window
    */
@@ -377,11 +379,13 @@
     updateVars();
 
     // TOOD: This registers onUpdate event which is never unregistered
-    histoData.onUpdate(function() {
+    if (prevBoundFunction) histoData.offUpdate(prevBoundFunction);
+    prevBoundFunction = function() {
       updateVars();
       plot.update();
       plot.updateLegend();
-    });
+    };
+    histoData.onUpdate(prevBoundFunction);
 
     // Show modal
     $("#modal-histogram").modal('show');
