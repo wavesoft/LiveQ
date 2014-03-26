@@ -378,7 +378,7 @@ LiveQ.UI.ResultGridEntry.prototype.update = function() {
 	// Print results
 	console.log(chi, value, errors);
 	if (this.histogram.interpolated) {
-		this.set( value, 20, true );
+		this.set( value, 10, true );
 	} else {
 		this.set( value, errors );
 	}

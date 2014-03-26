@@ -1,11 +1,60 @@
 (function() {
 
+  function commaThousands(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function getTS() {
+    var d = new Date();
+    return  ('0' + d.getHours()).slice(-2) + ":" +
+        ('0' + d.getMinutes()).slice(-2) + ":" +
+        ('0' + d.getSeconds()).slice(-2);
+  }
+
+  function addLog(html, cls) {
+    var logLine = $('<div></div>');
+        if (!cls) cls="";
+        $(logLine).attr("class", cls);
+        $(logLine).html("["+getTS()+"]: "+html);
+        $("div.log").prepend(logLine);
+  }
+
+  var already_bsod = false;
+  function show_bsod(icon, text) {
+    if (already_bsod) return;
+    already_bsod = true;
+
+    setTimeout(function() {
+      var e_bsod = $('<div id="bsod"></div>'),
+          e_icon = $('<div class="bsod-icon glyphicon glyphicon-' + (icon || "off" ) + '"></div>'),
+          e_text = $('<div>' + ( text || "Your connection with the server was interrupted" ) + '. Please <a href="javascript:;">reload the site</a> to try again.</div>'),
+          e_floater = $('<div></div>');
+
+      // Nest elements
+      e_bsod.append(e_floater);
+      e_floater.append(e_icon);
+      e_floater.append(e_text);
+      $(document.body).append(e_bsod);
+
+      // Fade-in
+      e_bsod.hide();
+      e_bsod.fadeIn();
+
+      // Bind reload
+      $(e_text).click(function() {
+        window.location.reload();
+      });
+
+    }, 500);
+  }
+
+  // Setup namespace
   LiveQ.Play = {
 
   };
 
   // Private variables
-  var t, r, lab;
+  var t, r, status, lab;
 
   /**
    * Initialize Lab
@@ -15,6 +64,7 @@
     // Setup UI
   	t = new LiveQ.Play.Tunable("#tunables-host");
     r = new LiveQ.Play.Results("#results-host");
+    status = new LiveQ.Play.SimulationWindow("#run-host");
 
     // Setup backend
     lab = new LiveQ.LabSocket(id);
@@ -192,7 +242,7 @@
 
     // Listen for event updates
     var updateVars = function() {
-      $("#modal-d-nevts").html(histoData.nevts);
+      $("#modal-d-nevts").html( commaThousands(histoData.nevts) );
       var chi = LiveQ.Calculate.chi2WithError( histoReference.reference, histoData );
       $("#modal-d-chi2").html( Number(chi[0]).toFixed(2) + " &plusmn " + Number(chi[1]).toFixed(2) + "%" );
     }

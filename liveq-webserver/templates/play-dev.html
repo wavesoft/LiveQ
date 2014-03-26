@@ -21,6 +21,22 @@
 
           <!-- Run panel -->
           <div id="run-host" class="frame">
+            <div id="run" class="frame">
+
+              <div class="sign-left"></div>
+
+              <div class="run-header">
+
+                <div id="run-g-progress" class="full-width"></div>
+                <div class="text-center">
+                  <div><strong>Number of events:</strong> <span class="run-d-events">1,000,000</span></div>
+                  <div><strong>Average &chi;<sub>2</sub> fit:</strong> <span class="run-d-events">3.12 &plusmn; 4.12%</span></div>
+                </div>
+
+              </div>
+              <div class="run-separator gradient grad-separator"></div>
+
+            </div>
           </div>
 
           <!-- Results container -->
@@ -32,9 +48,15 @@
         <!-- Game controls -->
         <div id="game-controls">
           <button id="btn-sim-help" type="button" class="btn btn-default"><span class="glyphicon glyphicon-question-sign"></span></button>
-          <button id="btn-sim-start" type="button" class="btn btn-default">Validate your values <span class="glyphicon glyphicon-chevron-right"></span></button>
-          <button id="btn-sim-abort" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-chevron-left"></span> Abort simulation run </button>
+          <button id="btn-sim-start" type="button" class="btn btn-primary">Validate your values <span class="glyphicon glyphicon-chevron-right"></span></button>
+          <button id="btn-sim-abort" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-chevron-left"></span> Abort simulation run </button>
         </div>
+
+        <!-- Screws for the UI -->
+        <div class="screw tl"></div>
+        <div class="screw tr"></div>
+        <div class="screw bl"></div>
+        <div class="screw br"></div>
 
       </div>
     </div>

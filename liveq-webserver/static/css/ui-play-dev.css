@@ -217,7 +217,8 @@ div.log .info {
 }
 .resultgrid .resultgrid-body .resultgrid-row .value-host .value-snapshot {
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.6);
+  background: url(../img/stripe.png) repeat;
+  opacity: 0.5;
 }
 .resultgrid .resultgrid-body .resultgrid-row.no-data .value-host .value-outer {
   left: 0;
@@ -333,6 +334,28 @@ div.log .info {
   padding: 0px;
   height: 100%;
 }
+#game #game-window .screw {
+  background: url(../img/screwhead.png) center center no-repeat;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+#game #game-window .screw.tl {
+  top: 0;
+  left: 0;
+}
+#game #game-window .screw.tr {
+  top: 0;
+  right: 0;
+}
+#game #game-window .screw.bl {
+  bottom: 0;
+  left: 0;
+}
+#game #game-window .screw.br {
+  bottom: 0;
+  right: 0;
+}
 #game #game-window #game-controls {
   text-align: right;
   background-color: #999999;
@@ -354,6 +377,29 @@ div.log .info {
   -o-transition: width 0.25s linear , background-color 0.25s linear;
   transition: width 0.25s linear , background-color 0.25s linear;
 }
+#game #game-window #game-frame #run-host #run {
+  position: relative;
+  background: #FFF0B2;
+}
+#game #game-window #game-frame #run-host #run div {
+  margin-left: 20px;
+}
+#game #game-window #game-frame #run-host #run .sign-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  margin-left: 0;
+  background: url(../img/yellow-stripe.jpg) repeat;
+}
+#game #game-window #game-frame #run-host #run .run-separator {
+  height: 1px;
+  margin: 5px;
+}
+#game #game-window #game-frame #run-host #run #run-g-progress {
+  height: 128px;
+}
 #game #game-window #game-frame #results-host {
   position: relative;
   padding: 20px;
@@ -364,6 +410,28 @@ div.log .info {
   right: 5px;
   bottom: 45px;
   top: 133px;
+}
+#game #game-window #game-frame #results-host .results-footer {
+  position: absolute;
+  bottom: 5px;
+  right: 250px;
+  height: 28.33333333px;
+  left: 45px;
+}
+#game #game-window #game-frame #results-host .results-footer span {
+  font-size: 12px;
+  color: #666;
+}
+#game #game-window #game-frame #results-host .results-footer .legend-icon {
+  width: 16px;
+  height: 16px;
+  border: solid 1px #666;
+  display: inline-block;
+  vertical-align: middle;
+}
+#game #game-window #game-frame #results-host .results-footer .legend-icon.sketch {
+  background: url(../img/icons/stripe.png);
+  margin-right: 5px;
 }
 #game #game-window #game-frame #tunables-host {
   overflow-x: hidden;
@@ -699,7 +767,8 @@ div.log .info {
 #game #game-window #game-frame .frame#tunables-host,
 #game #game-window #game-frame #tunables,
 #game #game-window #game-frame .frame#run-host,
-#game #game-window #game-frame .frame#run {
+#game #game-window #game-frame .frame#run,
+#game #game-window #game-frame .frame#run-host .full-width {
   width: 100%;
 }
 @media (min-width: 768px) {
@@ -720,7 +789,6 @@ div.log .info {
   #game #game-window #game-frame .frame#run-host {
     width: 0px;
     float: right;
-    margin-left: 0;
   }
   #game #game-window #game-frame .frame#results-host {
     width: auto;
@@ -729,17 +797,19 @@ div.log .info {
 }
 @media (min-width: 768px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables {
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run,
+  #game #game-window #game-frame .frame#run-host .full-width {
     width: 282px;
   }
-  #game #game-window #game-frame.running .frame#run-host,
-  #game #game-window #game-frame.running .frame#run {
+  #game #game-window #game-frame.running .frame#run-host {
     width: 282px;
   }
 }
 @media (min-width: 992px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables {
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run-host .full-width {
     width: 376px;
   }
   #game #game-window #game-frame.running .frame#run-host,
@@ -749,7 +819,8 @@ div.log .info {
 }
 @media (min-width: 1200px) {
   #game #game-window #game-frame .frame#tunables-host,
-  #game #game-window #game-frame #tunables {
+  #game #game-window #game-frame #tunables,
+  #game #game-window #game-frame .frame#run-host .full-width {
     width: 470px;
   }
   #game #game-window #game-frame.running .frame#run-host,
@@ -764,8 +835,5 @@ div.log .info {
   #game #game-window #game-frame.running .frame#tunables-host {
     width: 0;
     margin-right: 0;
-  }
-  #game #game-window #game-frame.running .frame#run-host {
-    margin-left: 8px;
   }
 }

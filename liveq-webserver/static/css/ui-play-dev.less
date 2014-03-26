@@ -43,6 +43,9 @@
 @results-row-height:	40px;
 @results-header-height:	38px;
 
+// Run information
+@run-sz-header:			128px;
+
 // Splitting configuration
 @panel-c-background:	#FFF;
 @panel-c-background-alt:#EEE;
@@ -363,11 +366,8 @@ div.log {
 
 				.value-snapshot {
 					position: absolute;
-					background-color: rgba(
-						red(@results-c-freezedata), 
-						green(@results-c-freezedata),
-						blue(@results-c-freezedata),
-						0.6);
+					background: url(../img/stripe.png) repeat;
+					opacity: 0.5;
 				}
 
 			}
@@ -545,6 +545,19 @@ div.log {
 		padding: 0px;
 		height: 100%;
 
+		// Screws for the UI
+		.screw {
+			background: url(../img/screwhead.png) center center no-repeat;
+			width: 20px; height: 20px;
+			position: absolute;
+
+			&.tl { top: 0; left: 0; }
+			&.tr { top: 0; right: 0;}
+			&.bl { bottom: 0; left: 0; }
+			&.br { bottom: 0; right: 0; }
+		}
+
+
 		#game-controls {
 			text-align: right;;
 
@@ -577,6 +590,41 @@ div.log {
 			// Results
 			//////////////////////////////////////
 
+			#run-host {
+				#run {
+
+					// Common
+					position: relative;
+					background: #FFF0B2;
+
+					div {
+						margin-left: 20px;
+					}
+
+					.sign-left {
+						position: absolute;
+						left: 0; top: 0; bottom: 0;
+						width: 20px;
+						margin-left: 0;
+						background: url(../img/yellow-stripe.jpg) repeat;
+					}
+
+					.run-separator {
+						height: 1px;
+						margin: 5px;
+					}
+
+					#run-g-progress {
+						height: @run-sz-header;
+					}
+
+				}
+			}
+
+			//////////////////////////////////////
+			// Results
+			//////////////////////////////////////
+
 			#results-host {
 				position: relative;
 				padding: 20px;
@@ -587,6 +635,32 @@ div.log {
 					right: @panel-pad-results;
 					bottom: (@panel-pad-results + @panel-sz-controls - @panel-border-size);
 					top: (@panel-pad-results + @panel-sz-plots);
+				}
+
+				.results-footer {
+					position: absolute;
+					bottom: @panel-border-size - @panel-pad-results;
+					right: @panel-width-controls + @panel-border-size;
+					height: @panel-sz-controls*2/3 - @panel-pad-results;
+					left: @panel-pad-results + @results-row-label-w;
+
+					span {
+						font-size: 12px;
+						color: #666;
+					}
+
+					.legend-icon {
+						width: 16px;
+						height: 16px;
+						border: solid 1px #666;
+						display: inline-block;
+						vertical-align: middle;
+
+						&.sketch {
+							background: url(../img/icons/stripe.png);
+							margin-right: 5px;
+						}
+					}
 
 				}
 
@@ -954,7 +1028,7 @@ div.log {
 			// =========================
 
 			// In small devices, the UI expands horizontally
-			.frame, .frame#tunables-host, #tunables, .frame#run-host, .frame#run {
+			.frame, .frame#tunables-host, #tunables, .frame#run-host, .frame#run, .frame#run-host .full-width {
 				width: 100%;
 			}
 
@@ -996,7 +1070,6 @@ div.log {
 				.frame#run-host {
 					width: 0px;
 					float: right;
-					margin-left: 0;
 				}
 
 				// The results center frame, fills the gap
@@ -1015,18 +1088,18 @@ div.log {
 			// screen dimentions
 
 			@media (min-width: @screen-sm-min) {
-				.frame#tunables-host, #tunables {
+				.frame#tunables-host, #tunables, .frame#run, .frame#run-host .full-width {
 					// Small screen
 					width: 3 * (@tunable-width + @tunable-margin*2);
 				}
 				&.running {
-					.frame#run-host, .frame#run {
+					.frame#run-host {
 						width: 3 * (@tunable-width + @tunable-margin*2);
 					}
 				}
 			}
 			@media (min-width: @screen-md-min) {
-				.frame#tunables-host, #tunables {
+				.frame#tunables-host, #tunables, .frame#run-host .full-width {
 					// Medium-sized screen
 					width: 4 * (@tunable-width + @tunable-margin*2);
 				}
@@ -1037,7 +1110,7 @@ div.log {
 				}
 			}
 			@media (min-width: @screen-lg-min) {
-				.frame#tunables-host, #tunables {
+				.frame#tunables-host, #tunables, .frame#run-host .full-width {
 					// Large screen
 					width: 5 * (@tunable-width + @tunable-margin*2);
 				}
@@ -1086,7 +1159,6 @@ div.log {
 					}
 
 					.frame#run-host {
-						margin-left: 8px;
 					}
 
 				}

@@ -140,7 +140,8 @@ class JobManagerComponent(Component):
 
 				# Let job2cancel know that it has lost an agent
 				job2c = jobs.getJob(agent.jobToCancel)
-				job2c.removeAgentInfo(agent)
+				if job2c:
+					job2c.removeAgentInfo(agent)
 
 				# Assume aborted
 				self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))

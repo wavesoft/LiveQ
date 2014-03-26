@@ -12,6 +12,14 @@ LiveQ.Play.Results = function( host ) {
 	this.observableList = new LiveQ.UI.ResultGrid(this.elmObservableList);
 	this.host.append(this.elmObservableList);
 
+	// Create the results list
+	this.elmObservableFooter = $('<div class="results-footer"></div>');
+	this.host.append(this.elmObservableFooter);
+
+	// Prepare gauges
+	var legend = $('<div class="legend-icon sketch"></div><span>Your planned data</span>');
+	this.elmObservableFooter.append(legend);
+
 	// Handle clicks on the observables list
 	$(this.observableList).on('click', function(e, histo) {
 		LiveQ.Play.showHistogramDetails( histo.histogram, histo.reference );
