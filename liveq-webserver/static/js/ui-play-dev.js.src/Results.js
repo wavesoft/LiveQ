@@ -25,10 +25,32 @@ LiveQ.Play.Results = function( host ) {
 		LiveQ.Play.showHistogramDetails( histo.histogram, histo.reference );
 	});
 
+	// The histograms added in the list
+	this.results = [];
+
+}
+
+/**
+ * Return the average of the Chi-Squared errors of all histograms
+ */
+LiveQ.Play.Results.prototype.getAverageError = function() {
+	var ans = 0, ansc = 0;
+	for (var i=0; i<this.results.length; i++) {
+		var chi2 = LiveQ.Calculate.chi2WithError(
+			this.results[i].histo, 
+			this.results[i].ref.reference
+		);
+		ans += chi2[0]; ansc += 1;
+	}
+	return ans / ansc;
 }
 
 LiveQ.Play.Results.prototype.add = function(histogram, reference) {
 	this.observableList.add( histogram, reference );
+	this.results.push({
+		'histo': histogram,
+		'ref': reference
+	});
 }
 
 LiveQ.Play.Results.prototype.snapshotSet = function() {

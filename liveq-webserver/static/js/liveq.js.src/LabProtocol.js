@@ -257,8 +257,8 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 	// Handle protocols according to versions
 	if (protoVersion == 1) {
 
-		var reserved0 = configReader.getUint8(),
-			reserved1 = configReader.getUint16(),
+		var flags = configReader.getUint8(),
+			numEvents = configReader.getUint16(),
 			numHistos = configReader.getUint32();
 
 		// Fetch configuration and links data
@@ -292,7 +292,11 @@ LiveQ.LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 		if (!this.initialized) {
 			this.initialized = true;
 			for (var i=0; i<this._onReady.length; i++) {
-				this._onReady[i]();
+				this._onReady[i]({
+					'protocol': 1,
+					'flags': flags,
+					'targetEvents': numEvents * 1000
+				});
 			}
 		}
 

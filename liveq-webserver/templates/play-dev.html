@@ -23,18 +23,52 @@
           <div id="run-host" class="frame">
             <div id="run" class="frame">
 
+              <!-- Left sign -->
               <div class="sign-left"></div>
+              <div class="run-content">
 
-              <div class="run-header">
+                <!-- Status message -->
+                <div id="run-d-status"></div>
 
-                <div id="run-g-progress" class="full-width"></div>
-                <div class="text-center">
-                  <div><strong>Number of events:</strong> <span class="run-d-events">1,000,000</span></div>
-                  <div><strong>Average &chi;<sub>2</sub> fit:</strong> <span class="run-d-events">3.12 &plusmn; 4.12%</span></div>
+                <!-- Progress gauge -->
+                <div class="run-gauge-container">
+                  <div id="run-d-gauge">
+                    <input type="text" value="0" />
+                  </div>
                 </div>
 
+                <!-- Status table -->
+                <div class="run-status-table">
+
+                  <table class="table table-condensed" width="100%">
+                    <thead>
+                      <tr>
+                        <th width="100">Events</th>
+                        <th><span id="run-d-events">-</span></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>Event rate:</th>
+                        <td><span id="run-d-rate">-</span><span class="text-warning"> /sec</span></td>
+                      </tr>
+                      <tr>
+                        <th>Workers:</th>
+                        <td><span id="run-d-workers">-</span></td>
+                      </tr>
+                      <tr>
+                        <th>Fit score:</th>
+                        <td><span id="run-d-fit">-</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+
+                <!-- Log window -->
+                <div class="run-status-log log" id="run-d-log"></div>
+
               </div>
-              <div class="run-separator gradient grad-separator"></div>
 
             </div>
           </div>
@@ -47,7 +81,7 @@
 
         <!-- Game controls -->
         <div id="game-controls">
-          <button id="btn-sim-help" type="button" class="btn btn-default"><span class="glyphicon glyphicon-question-sign"></span></button>
+          <button id="btn-help" type="button" class="btn btn-default"><span class="glyphicon glyphicon-question-sign"></span></button>
           <button id="btn-sim-start" type="button" class="btn btn-primary">Validate your values <span class="glyphicon glyphicon-chevron-right"></span></button>
           <button id="btn-sim-abort" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-chevron-left"></span> Abort simulation run </button>
         </div>
@@ -81,7 +115,7 @@
               </div>
 
               <div id="modal-histogram-details" class="col-md-6">
-                <table class="table" width="100%">
+                <table class="table table-condensed" width="100%">
                   <tr>
                     <th>Beam</th>
                     <td id="modal-d-beam"></td>
@@ -117,6 +151,28 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-info" id="modal-histogram-more"><span class="glyphicon glyphicon-book"></span> Learn more</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for showing the status when completed -->
+    <div class="modal fade" id="sim-status">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title">Simulation Completed</h4>
+          </div>
+          <div class="modal-body text-center">
+            <h3>[Placeholder]</h3>
+            <img src="" title="" />
+            <br />
+            <p>[Placeholder]</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <a id="sim-next-level" class="btn btn-success" href="play?lab=3eb1263a77f35ba11d334cc8e29fc0c3">Go to next level <span class="glyphicon glyphicon-chevron-right"></a>
           </div>
         </div>
       </div>

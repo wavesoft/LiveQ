@@ -46,6 +46,7 @@
 
 // Run information
 @run-sz-header:			128px;
+@run-sz-vbar:			20px;
 
 // Splitting configuration
 @panel-c-background:	#FFF;
@@ -124,12 +125,11 @@ body {
  * Log window
  */
 div.log {
-    height: 100px;
     overflow: auto;
     font-family: "Lucida Console", Monaco, monospace;
     font-size: 10px;
 
-	div:first {
+	div:first-child {
 	    font-weight: bold;
 	}
 	.warn {
@@ -654,25 +654,122 @@ div.log {
 					position: relative;
 					background: #FFF0B2;
 
-					div {
-						margin-left: 20px;
-					}
-
 					.sign-left {
 						position: absolute;
 						left: 0; top: 0; bottom: 0;
-						width: 20px;
+						width: @run-sz-vbar;
 						margin-left: 0;
 						background: url(../img/yellow-stripe.jpg) repeat;
 					}
 
-					.run-separator {
-						height: 1px;
-						margin: 5px;
-					}
+					.run-content {
 
-					#run-g-progress {
-						height: @run-sz-header;
+						// Align container
+						position: absolute;
+						left: @run-sz-vbar; 
+						right: 0; top: 0; bottom: 0;
+
+						// Status banner
+						#run-d-status {
+							position: absolute;
+							top: 0; left: 0; right: 0;
+							height: 45px;
+
+							background: #000;
+							text-align: center;
+							padding: 5px;
+							font-size: 24px;
+							font-weight: bold;
+							color: #333;
+
+							&.blank {
+								color: #000 !important;
+								text-shadow: none !important;
+							}
+							&.s-pend {
+								color: #E6E6E6;
+								text-shadow: 0 0 30px #FFFFFF
+							}
+							&.s-warn {
+								color: #FFCC00;
+								text-shadow: 0 0 30px #ffff00
+							}
+							&.s-run {
+								color: #00FF00;
+								text-shadow: 0 0 30px #00FF00
+							}
+							&.s-error {
+								color: #FF0000;
+								text-shadow: 0 0 30px #FF0000
+							}
+
+						}
+
+						// Gauge
+						.run-gauge-container {
+							position: absolute;
+							left: 0; right: 0;
+							top: 45px; height: 190px;
+							text-align: center;
+
+							#run-d-gauge {
+								display: inline-block;
+								padding: 8px;
+								margin: 10px 0px;
+								width: 190px;
+								height: 180px;
+								border-radius: 10px;
+								background: rgba(0,0,0,0.8);
+							}
+						}
+
+						// Status table
+						.run-status-table {
+							position: absolute;
+							left: 0; right: 0;
+							top: 240px; height: 140px;
+							padding: 8px;
+							background: rgba(0,0,0,0.2);
+
+							div {
+								position: relative;
+								height: 130px;
+
+								.run-status-gauge {
+									position: absolute;
+									left: 0; top: 0;
+									padding: 5px;
+									width: 120px;
+								}
+								.run-status-text {
+									left: 130px; top: 0; right: 0;
+								}
+
+							}
+
+							table td, table th {
+								border-color: #666;
+							}
+
+							.run-d-events {
+								&.f0 { color: @results-c-fit1 };
+								&.f1 { color: @results-c-fit2 };
+								&.f2 { color: @results-c-fit3 };
+								&.f3 { color: @results-c-fit4 };
+							}
+
+						}
+
+						.run-status-log {
+							position: absolute;
+							left: 0; right: 0; bottom: 0;
+							top: 385px; 
+
+							overflow-y: scroll;
+							overflow-x: hidden;
+
+						}
+
 					}
 
 				}
@@ -1169,23 +1266,23 @@ div.log {
 				}
 			}
 			@media (min-width: @screen-md-min) {
-				.frame#tunables-host, #tunables, .frame#run-host .full-width {
+				.frame#tunables-host, #tunables, .frame#run, .frame#run-host .full-width {
 					// Medium-sized screen
 					width: 4 * (@tunable-width + @tunable-margin*2);
 				}
 				&.running {
-					.frame#run-host, .frame#run {
+					.frame#run-host {
 						width: 4 * (@tunable-width + @tunable-margin*2);
 					}
 				}
 			}
 			@media (min-width: @screen-lg-min) {
-				.frame#tunables-host, #tunables, .frame#run-host .full-width {
+				.frame#tunables-host, #tunables, .frame#run, .frame#run-host .full-width {
 					// Large screen
 					width: 5 * (@tunable-width + @tunable-margin*2);
 				}
 				&.running {
-					.frame#run-host, .frame#run {
+					.frame#run-host {
 						width: 5 * (@tunable-width + @tunable-margin*2);
 					}
 				}

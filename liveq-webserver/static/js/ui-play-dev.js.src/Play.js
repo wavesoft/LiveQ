@@ -64,7 +64,7 @@
     // Setup UI
   	t = new LiveQ.Play.Tunable("#tunables-host");
     r = new LiveQ.Play.Results("#results-host");
-    status = new LiveQ.Play.SimulationWindow("#run-host");
+    status = new LiveQ.Play.RunWindow("#run-host");
 
     // Setup backend
     lab = new LiveQ.LabSocket(id);
@@ -96,9 +96,17 @@
     });
 
     /**
+     * Update interface
+     */
+    lab.onHistogramUpdate(function( histo, ref) {
+      status.updateFit( r.getAverageError() );
+    });
+
+    /**
      * Flash data activity
      */
     lab.onDataArrived(function(interpolated) {
+      status.setStatus(2);
       if (interpolated) {
         r.flash('<span class="glyphicon glyphicon-download"></span> Received planning data', "#FF9900");
       } else {
@@ -110,8 +118,9 @@
      * Flash errors
      */
     lab.onError(function(message, critical) {
+      addLog(message, "error");
+      status.setStatus(3);
       if (critical) {
-
       } else {
         r.flash('<span class="glyphicon glyphicon-warning-sign"></span> '+message, "#CC3300");
       }
@@ -120,10 +129,99 @@
     /**
      * Wait for lab to become ready
      */
-    lab.onReady(function() {
+    lab.onReady(function(config) {
 
       // Request interpolation over defaults
       LiveQ.Play.startEstimate();
+
+      // Set status config
+      status.setConfig({
+        'maxEvents': 1600000
+      });
+
+    });
+
+    /**
+     * Store log messages to log elements
+     */
+    lab.onLog(function(msg, data) {
+      addLog(msg);
+
+      if (data['agent_added'] != undefined) {
+        status.addAgent(data['agent_added']);
+      } else if (data['agent_removed'] != undefined) {
+        status.removeAgent(data['agent_removed']);
+      }
+    });
+
+    /**
+     * Metadata update
+     */
+    lab.onMetadataUpdated(function(meta) {
+      status.updateEvents(meta.nevts)
+    });
+
+    /**
+     * Cleanup when the simulation is completed
+     */
+    lab.onCompleted(window.ff = function() {
+
+      addLog("Simulation completed", "done");
+      status.setStatus(0);
+
+      // Check the quality of the results
+      var error = r.getAverageError(),
+          matchPrefix, matchTitle, matchBody, matchAccept;
+      if (error < 0.5) {
+        matchPrefix = "perfect";
+        matchTitle = "Perfect Match";
+        matchBody = "Wow! You found a perfect match! You managed tune the theoretical model in the best possible way! That's quite rare you know...";
+        matchAccept = true;
+
+      } else if (error < 1.0) {
+        matchPrefix = "good";
+        matchTitle = "Good Match";
+        matchBody = "Congratulations! You managed to tune the theoretical model in the most optimal way!"
+        matchAccept = true;
+
+      } else if (error < 4.0) {
+        matchPrefix = "acceptable";
+        matchTitle = "Acceptable Match";
+        matchBody = "Good work! You managed to find something quite close to what we need, but we will need something better.";
+        matchAccept = true;
+
+      } else if (error < 9.0) {
+        matchPrefix = "fair";
+        matchTitle = "Fair Match";
+        matchBody = "You have done a good job, but you still have some way to go until you find something more precise.";
+        matchAccept = false;
+
+      } else {
+        matchPrefix = "bad";
+        matchTitle = "Bad Match";
+        matchBody = "Your model is completely mistuned. Please try different values!";
+        matchAccept = false;
+
+      }
+
+      // Update modal
+      $("#sim-status .modal-body h3").html(matchTitle);
+      $("#sim-status .modal-body p").html(matchBody);
+      $("#sim-status .modal-body img").attr({
+        'src': '/vas/static/img/models/' + matchPrefix + '.png',
+        'alt': matchPrefix,
+        'title': matchTitle
+      });
+
+      // Hide/show next level
+      if (matchAccept) {
+        $("#sim-next-level").show();
+      } else {
+        $("#sim-next-level").hide();
+      }
+
+      // Show modal
+      $('#sim-status').modal('show');
 
     });
 
@@ -146,6 +244,9 @@
       $("#btn-sim-abort").hide();
       $("#btn-sim-start").show();
       LiveQ.Play.abortSimulation();
+    });
+    $("#btn-help").click(function() {
+      $("#game-frame").toggleClass("running");
     });
 
     /**
@@ -176,6 +277,10 @@
     // Start simulation
     $("#game-frame").addClass("running");
 
+    // Switch to starting
+    status.setStatus(1);
+    status.reset();
+
   }
 
   /**
@@ -201,6 +306,9 @@
 
     // Switch back
     $("#game-frame").removeClass("running");
+
+    // Set status
+    status.setStatus(0);
 
   }
 
