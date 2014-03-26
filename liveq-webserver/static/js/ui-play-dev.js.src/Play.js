@@ -103,6 +103,13 @@
     });
 
     /**
+     * Handle disconnection with the sterver
+     */
+    lab.onDisconnect(function() {
+      show_bsod("off", "Your connection with the server was interrupted");
+    });
+
+    /**
      * Flash data activity
      */
     lab.onDataArrived(function(interpolated) {
@@ -121,6 +128,7 @@
       addLog(message, "error");
       status.setStatus(3);
       if (critical) {
+        show_bsod("exclamation-sign", "Could not establish connection with the server");
       } else {
         r.flash('<span class="glyphicon glyphicon-warning-sign"></span> '+message, "#CC3300");
       }
@@ -154,11 +162,22 @@
       }
     });
 
+
     /**
      * Metadata update
      */
     lab.onMetadataUpdated(function(meta) {
       status.updateEvents(meta.nevts)
+    });
+
+    /**
+     * Add timeout timer for establishing connection
+     */
+    var cctimer = setTimeout(function() {
+      show_bsod("exclamation-sign", "Timed out while trying to connect with the server.");
+    }, 5000);
+    lab.onConnect(function(msg) {
+      clearTimeout(cctimer);
     });
 
     /**

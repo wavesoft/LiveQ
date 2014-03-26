@@ -53,6 +53,7 @@ LiveQ.Play.RunWindow = function(host) {
 	this.eValEvents = this.host.find('#run-d-events');
 	this.eValRate = this.host.find('#run-d-rate');
 	this.eValWorkers = this.host.find('#run-d-workers');
+	this.eValFitSuffix = this.host.find("#run-d-fit-suffix");
 	this.eValFit = this.host.find('#run-d-fit');
 
 	// Start blink timer
@@ -67,9 +68,10 @@ LiveQ.Play.RunWindow = function(host) {
 		
 		// Add entry in the ring buffer
 		self.eventRateRingbuffer.push( self.eventRate );
+		self.eventRate = 0;
 
 		// Check for overflow
-		if (self.eventRateRingbuffer.length > 10)
+		if (self.eventRateRingbuffer.length > 20)
 			self.eventRateRingbuffer.shift();
 
 		// Calculate average
@@ -80,7 +82,7 @@ LiveQ.Play.RunWindow = function(host) {
 		avg /= self.eventRateRingbuffer.length;
 
 		// Update
-		self.eValRate.text( commaThousands(parseInt(avg)) );
+		self.eValRate.text( commaThousands(Math.round(avg)) );
 
 	}, 1000);
 
@@ -119,6 +121,7 @@ LiveQ.Play.RunWindow.prototype.reset = function() {
 	this.eValRate.text("-");
 	this.eValWorkers.text("-");
 	this.eValFit.text("-");
+	this.eValFitSuffix.text("");
 
 	this.eProgressKnob.val(0).trigger('change');
 
@@ -170,12 +173,16 @@ LiveQ.Play.RunWindow.prototype.updateFit = function( fitValue ) {
 	this.eValFit.removeClass("f4");
 	if (fitValue < 1.00) {
 		this.eValFit.addClass("f1");
+		this.eValFitSuffix.text("(Good)");
 	} else if (fitValue < 2.00) {
 		this.eValFit.addClass("f2");
+		this.eValFitSuffix.text("(Acceptable)");
 	} else if (fitValue < 4.00) {
 		this.eValFit.addClass("f3");
+		this.eValFitSuffix.text("(Fair)");
 	} else {
 		this.eValFit.addClass("f4");
+		this.eValFitSuffix.text("(Bad)");
 	}
 
 }
@@ -213,7 +220,7 @@ LiveQ.Play.RunWindow.prototype.updateEvents = function( nevts ) {
 		this.eValEvents.text(nevts);
 
 		// Calculate event rate
-		var eventRate = nevts - this.eventCurrent;
+		this.eventRate += nevts - this.eventCurrent;
 
 		// Update number of events
 		this.eventCurrent = nevts;

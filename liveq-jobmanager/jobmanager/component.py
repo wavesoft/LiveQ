@@ -146,7 +146,6 @@ class JobManagerComponent(Component):
 				# Assume aborted
 				self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
 				agents.agentJobAborted(agent.uuid, job)
-				job.addAgentInfo(agent)
 
 			# Then, start the job on a_start
 			for agent in a_start:
