@@ -3,10 +3,38 @@
 	<head>
 		<title>Virtual Atom Smasher</title>
 		<!-- Virtual Atom Smasher Bootstrap -->
-		<script data-main="static/js/vas-core.js/main" type="text/javascript" src="static/js/require.js"></script>
-		<!-- ============================== -->
+		<!--
+		<script type="text/javascript" src="static/js/lib/jquery.js"></script>
+		<script type="text/javascript" src="static/js/lib/three.js"></script>
+		<script type="text/javascript" src="static/js/vas-3d.js/main.js"></script>
+		-->
+        <script data-main="static/js/bootstrap" src="static/js/require.js"></script>
+		<style type="text/css">
+		body {
+			overflow: hidden;
+		}
+		#game-frame {
+			position: absolute;
+			left: 0; right: 0;
+			top: 0; bottom: 0;
+		}
+		#game-frame .screen {
+			position: absolute;
+			left: 0; right: 0;
+			top: 0; bottom: 0;
+			background-color: #000;
+		}
+
+		.screen.error-screen {
+			background-color: #F0F;			
+		}
+		
+		</style>
 	</head>
 	<body>
+
+		<div id="game-frame">
+		<div>
 
 	</body>
 </html>

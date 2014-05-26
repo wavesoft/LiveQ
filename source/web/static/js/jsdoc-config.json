@@ -1,0 +1,38 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": [
+            "vas-core.js/components.js",
+            "vas-core.js/registry.js",
+            "vas-core.js/main.js",
+            "vas-core.js/ui.js",
+            "vas-core.js/util/event_base.js",
+            "vas-core.js/util/component.js"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "cleverLinks"     : false,
+        "monospaceLinks"  : false,
+        "default": {
+            "outputSourceFiles": true
+        },
+        "systemName"      : "DocStrap",
+        "footer"          : "",
+        "navType"         : "vertical",
+        "theme"           : "readable",
+        "linenums"        : true,
+        "collapseSymbols" : false,
+        "inverseNav"      : true
+    },
+    "opts": {
+        "template": "node_modules/ink-docstrap/template",
+        "destination": "../../doc/jsdoc"
+    }
+}
