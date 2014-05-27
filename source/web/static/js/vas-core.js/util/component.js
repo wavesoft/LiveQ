@@ -15,12 +15,16 @@ define(["core/util/event_base", "core/config"],
 		 *
 		 * @class
 		 * @classdesc The base Component class. All other components are derrived from this.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
 		 * @see {@link module:core/util/event_base~EventBase|EventBase} (Parent class)
 		 */
-		var Component = function() {
+		var Component = function( hostDOM ) {
 
 			// Initialize superclass
 			EventBase.call(this);
+
+			// Keep reference of the host DOM element
+			this.hostElement = hostDOM;
 
 		}
 
@@ -32,7 +36,6 @@ define(["core/util/event_base", "core/config"],
 		 * hidden. The callback parameter MUST be fired when the component
 		 * is ready for hiding.
 		 *
-		 * @abstract
 		 * @param {function} cb_ready - Callback to be fired when the component is ready for hiding.
 		 */
 		Component.prototype.onWillHide = function(cb_ready) {
@@ -44,7 +47,6 @@ define(["core/util/event_base", "core/config"],
 		 * shown. The callback parameter MUST be fired when the component
 		 * is ready for hiding.
 		 *
-		 * @abstract
 		 * @param {function} cb_ready - Callback to be fired when the component is ready for display.
 		 */
 		Component.prototype.onWillShow = function(cb_ready) {
@@ -53,42 +55,37 @@ define(["core/util/event_base", "core/config"],
 
 		/**
 		 * This function is called when the component is hidden
-		 *
-		 * @abstract
 		 */
 		Component.prototype.onHidden = function() {
 		};
 
 		/**
 		 * This function is called when the component is shown
-		 *
-		 * @abstract
 		 */
 		Component.prototype.onShown = function() {
 		};
 
 		/**
-		 * This function is called when the component is resized
+		 * This function is called when the host DOM element is resized
 		 *
 		 * @param {integer} width - The new width of the component
 		 * @param {integer} height - The new height of the component
-		 * @abstract
 		 */
 		Component.prototype.onResize = function(width, height) {
 		};
 
 		/**
-		 * This function is called after the component is intialized
-		 * and should return the DOM object to place on the document.
+		 * This function is used to provide a fixed-size dimentions for the
+		 * componenet -if it supports such-.
 		 *
-		 * @abstract
-		 * @returns {DOMElement}
+		 * This function should return either an array with the dimentions as
+		 * a [width, height] pair or **undefined** if it does not have any fixed dimentions.
+		 *
 		 */
-		Component.prototype.getDOMElement = function() {
-			if (this['__errorElement'] == undefined)
-				this.__errorElement = $('<div class="'+config.css['error-screen']+'"></div>');
-			return this.__errorElement;
+		Component.prototype.getPreferredSize = function() {
+			return undefined;
 		};
+
 
 		// Return component
 		return Component;

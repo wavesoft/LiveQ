@@ -11,8 +11,9 @@ define({
 	 * Configurable classes for various components
 	 */
 	'css': {
-		'screen'		: 	'screen',
-		'error-screen' 	: 	'error-screen'
+		'nav-mini'		: 'nav-mini',
+		'screen'		: 'screen',
+		'error-screen' 	: 'error-screen'
 	}
 
 });

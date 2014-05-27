@@ -10,6 +10,36 @@ define(["core/config", "core/util/component"],
 		 * sides. It allows components and screens to be registered and then processed by the
 		 * VAS core when needed.
 		 *
+		 * The Virtual Atom Smasher core engine uses the following component IDs. If you want
+		 * to override the default component you should register a custom component with the 
+		 * same ID
+		 *
+		 * The following table enumerates the components 
+		 * <table class="table">
+		 *   <tr><th> Name </th><th> Module.Class </th><th> Weight </th><th> Used on </th></tr>
+		 *   <tr>
+		 *      <th> home_screen </th><td>{@link module:core/components~HomeScreen|core/components.HomeScreen}</td><td>1</td>
+		 *      <td> This is a screen component (full-screen) which hosts the game's home screen. </td>
+		 *   </tr>
+		 *   <tr>
+		 *      <th> explain_screen </th><td>{@link module:core/components~ExplainScreen|core/components.ExplainScreen}</td><td>1</td>
+		 *      <td> This is a screen component where the user can browse descriptions for the tunable/observable parameters. </td>
+		 *   </tr>
+		 *   <tr>
+		 *      <th> tuning_screen </th><td>{@link module:core/components~TuningScreen|core/components.TuningScreen}</td><td>1</td>
+		 *      <td> This is a screen component that renders the user input screen. </td>
+		 *   </tr>
+		 *   <tr>
+		 *      <th> running_screen </th><td>{@link module:core/components~RunningScreen|core/components.RunningScreen}</td><td>1</td>
+		 *      <td> This is a screen component that displays the progress of the simulation. </td>
+		 *   </tr>
+		 *   <tr>
+		 *      <th> nav_mini </th><td>{@link module:core/components~Nav|core/components.Nav}</td><td>1</td>
+		 *      <td> This is a mini-bar for navigating the user. This component stays always on top and allows the user to change location. </td>
+		 *   </tr>
+		 * </table>
+		 *
+		 *
 		 * @exports core/registry
 		 */
 		var registry = {};
@@ -30,8 +60,8 @@ define(["core/config", "core/util/component"],
 		 *       // Define a custom component, subclassing
 		 *       // from a system component.
 		 *       //
-		 *       var MyTuningScreen = function() {
-		 *          C.TuningScreen.call(this);
+		 *       var MyTuningScreen = function(hostDOM) {
+		 *          C.TuningScreen.call(this, hostDOM);
 		 *       }
 		 *       MyTuningScreen.prototype = Object.create(C.TuningScreen.prototype);
 		 * 
@@ -48,11 +78,31 @@ define(["core/config", "core/util/component"],
 		/**
 		 * Register a component under the given name.
 		 *
+		 * If you are loading multiple modules and some of them are overloading others,
+		 * it's not easy to track their load sequence. Therefore, you can provide the optional
+		 * third parameter, which defines the **weight** of the component.
+		 *
+		 * Components with bigger weight override components with less weight. By default, the
+		 * core components of the Virtual Atom Smasher have weight 1, so you can create your
+		 * own customizations by having a weight bigger than or equal to 2.
+		 *
 		 * @param {string} name - The name of the component to register for
 		 * @param {Component} component - The class of the component to register
+		 * @param {integer} weight - The weight of this component (default: 5)
 		 */
-		registry.registerComponent = function(name, component) {
+		registry.registerComponent = function(name, component, weight) {
+			var w = weight || 5;
+
+			// Check if we already have a component
+			if (registry.components[name] != undefined) {
+				if (registry.components[name].__weight >= w)
+					return;
+			}
+
+			// Store component and it's weight
+			component.__weight = w;
 			registry.components[name] = component;
+			
 		}
 
 		/**
@@ -60,19 +110,18 @@ define(["core/config", "core/util/component"],
 		 * If the component does not exist, it creates an error component.
 		 *
 		 * @param {string} name - The name of the component to instance (from the registry)
-		 * @returns {Component} - Returns a component instance
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @returns {Component} - Returns a component instance or undefined if it was not found.
 		 */
-		registry.instanceComponent = function(name) {
+		registry.instanceComponent = function(name, hostDOM) {
 
 			// Lookup the component
 			var componentClass = registry.components[name];
-			if (componentClass == undefined) {
-				componentClass = Component;
-			}
+			if (componentClass == undefined)
+				return undefined;
 
 			// Instantiate
-			var inst = new componentClass();
-			inst.getDOMElement().addClass( config.css['screen'] );
+			var inst = new componentClass(hostDOM);
 
 			// Return instance
 			return inst;

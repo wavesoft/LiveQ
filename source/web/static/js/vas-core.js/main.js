@@ -2,25 +2,26 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["jquery", "core/config"], function($, config) {
+define(["jquery", "core/config", "core/UI"], function($, config, UI) {
 	var VAS = { };
+
+	/**
+	 * Initialize VAS to the given DOM element
+	 */
+	VAS.initialize = function() {
+
+		// Initialize UI
+		UI.initialize();
+
+	}
 
 	/**
 	 * Initialize VAS with the given game configuration and run
 	 */
-	VAS.run = function(game) {
+	VAS.run = function() {
 
-		// Store the game instance
-		VAS.game = game;
-
-		// Initialize VAS UI
-		require(["core/ui"], function(UI) {
-			VAS.UI = UI;
-
-			// Run main game
-			VAS.UI.selectScreen( "explain_screen" );
-
-		});
+		// Run main game
+		UI.selectScreen( "explain_screen" );
 
 	}
 

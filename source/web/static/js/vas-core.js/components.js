@@ -17,8 +17,8 @@ define(["core/config", "core/util/component" ],
 	 *       // Define a custom component, subclassing
 	 *       // from a system component.
 	 *       //
-	 *       var MyTuningScreen = function() {
-	 *          C.TuningScreen.call(this);
+	 *       var MyTuningScreen = function(hostDOM) {
+	 *          C.TuningScreen.call(this, hostDOM);
 	 *       }
 	 *       MyTuningScreen.prototype = Object.create(C.TuningScreen.prototype);
 	 * 
@@ -47,13 +47,14 @@ define(["core/config", "core/util/component" ],
 		 *
 		 * @class
 		 * @classdesc Abstract class for the tuning screen where the user can tune the configuration.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
 		 * @see {@link module:core/util/component~Component|Component} (Parent class)
 		 *
 		 */
-		var TuningScreen = function() {
+		var TuningScreen = function( hostDOM ) {
 
 			// Initialize base class
-			Component.call(this);
+			Component.call(this, hostDOM);
 
 		}
 
@@ -88,13 +89,14 @@ define(["core/config", "core/util/component" ],
 		 *
 		 * @class
 		 * @classdesc Abstract class for the running screen where the user can see the run results.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
 		 * @see {@link module:core/util/component~Component|Component} (Parent class)
 		 *
 		 */
-		var RunningScreen = function() {
+		var RunningScreen = function( hostDOM ) {
 
 			// Initialize base class
-			Component.call(this);
+			Component.call(this, hostDOM);
 
 		}
 
@@ -140,7 +142,7 @@ define(["core/config", "core/util/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
-		 * Initializes a new ExplainationScreen Component.
+		 * Initializes a new ExplainScreen Component.
 		 *
 		 * This component is displayed when the user is being explained a particular parameter
 		 * of the generator.
@@ -154,18 +156,19 @@ define(["core/config", "core/util/component" ],
 		 *
 		 * @class
 		 * @classdesc Abstract clas for the running screen where the user can tune the configuration.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
 		 * @see {@link module:core/util/component~Component|Component} (Parent class)
 		 *
 		 */
-		var ExplainationScreen = function() {
+		var ExplainScreen = function( hostDOM ) {
 
 			// Initialize base class
-			Component.call(this);
+			Component.call(this, hostDOM);
 
 		}
 
 		// Subclass from Component
-		ExplainationScreen.prototype = Object.create( Component.prototype );
+		ExplainScreen.prototype = Object.create( Component.prototype );
 
 		/**
 		 * Define the tunable configuration.
@@ -173,7 +176,7 @@ define(["core/config", "core/util/component" ],
 		 * @abstract
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
-		ExplainationScreen.prototype.setTunables = function(tunables) {
+		ExplainScreen.prototype.setTunables = function(tunables) {
 		};
 
 		/**
@@ -182,9 +185,116 @@ define(["core/config", "core/util/component" ],
 		 * @abstract
 		 * @param {array} observables - A list of Observable classes, one for each observable.
 		 */
-		ExplainationScreen.prototype.setObservables = function(observables) {
+		ExplainScreen.prototype.setObservables = function(observables) {
 		};
 
+		/**
+		 * Focus to the particular parameter
+		 *
+		 * @abstract
+		 * @param {string} name - The name of the parameter to focus upon
+		 */
+		ExplainScreen.prototype.focusParameter = function(name) {
+			
+		};
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new HomeScreen Component.
+		 *
+		 * This component is displayed as an introduction to the game. This is where the user gets
+		 * introduced, and a dashboard is displayed.
+		 *
+		 * @class
+		 * @classdesc Abstract clas for the home screen where the user sees an overview.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 *
+		 */
+		var HomeScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		HomeScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Set the user statistics.
+		 *
+		 * @abstract
+		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
+		 */
+		HomeScreen.prototype.setUserStatistics = function(tunables) {
+		};
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Nav Component.
+		 *
+		 * This component is used for letting the user navigate around the game.
+		 *
+		 * @class
+		 * @classdesc Abstract class for navigation controls.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 *
+		 */
+		var Nav = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		Nav.prototype = Object.create( Component.prototype );
+
+		/**
+		 * This function is called when the user starts to navigate navigates to the specified page.
+		 *
+		 * @abstract
+		 * @param {string} newPage - The name of the new page
+		 * @param {string} oldPage - The name of the old page
+		 */
+		Nav.prototype.onPageWillChange = function(newPage, oldPage) {
+
+		};
+
+		/**
+		 * This function is called when the user navigates to the specified page.
+		 *
+		 * @abstract
+		 * @param {string} newPage - The name of the new page
+		 * @param {string} oldPage - The name of the old page
+		 */
+		Nav.prototype.onPageChanged = function(newPage, oldPage) {
+
+		};
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Backdrop Component.
+		 *
+		 * This component is used as background (backdrop) for other components.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining backdrop images.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 *
+		 */
+		var Backdrop = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		Backdrop.prototype = Object.create( Component.prototype );
 
 		////////////////////////////////////////////////////////////
 		//             Event definitions for JSDoc                //
@@ -218,7 +328,7 @@ define(["core/config", "core/util/component" ],
 		 * another parameter.
 		 *
 		 * @param {string} parameter - The name of the parameter to request explaination for
-		 * @event module:core/components~ExplainationScreen#explainParameter		
+		 * @event module:core/components~ExplainScreen#explainParameter		
 		 */
 
 		/**
@@ -226,7 +336,7 @@ define(["core/config", "core/util/component" ],
 		 * another parameter.
 		 *
 		 * @param {string} game_id - The ID of the game to launch
-		 * @event module:core/components~ExplainationScreen#openGame		
+		 * @event module:core/components~ExplainScreen#openGame		
 		 */
 
 		/**
@@ -235,16 +345,19 @@ define(["core/config", "core/util/component" ],
 		 * redirecting the user.
 		 *
 		 * @param {string} url - The URL to navigate to
-		 * @event module:core/components~ExplainationScreen#openURL		
+		 * @event module:core/components~ExplainScreen#openURL		
 		 */
 
 		////////////////////////////////////////////////////////////
 
 		// Expose components
 		var components = {
-			'TuningScreen': 	  TuningScreen,
-			'RunningScreen': 	  RunningScreen,
-			'ExplainationScreen': ExplainationScreen
+			'TuningScreen'		: TuningScreen,
+			'RunningScreen'		: RunningScreen,
+			'ExplainScreen' 	: ExplainScreen,
+			'HomeScreen'		: HomeScreen,
+			'Nav'				: Nav,
+			'Backdrop'			: Backdrop,
 		};
 
 		return components;

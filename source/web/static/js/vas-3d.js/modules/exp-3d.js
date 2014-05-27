@@ -11,6 +11,15 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 	Engine.BasicScene = function() {
 		this.scene = new THREE.Object3D();
 
+		function pdf(p1, p2, p3, dist) {
+			p1.position.x = dist - 20;
+			p1.position.y = -20;
+			p2.position.x = dist + 20;
+			p2.position.y = -20;
+			p3.position.x = dist;
+			p3.position.y = 20;
+		}
+
 		// Place the two balls
 		var geom1 = new THREE.SphereGeometry(50, 10, 10),
 			mat1 = new THREE.MeshPhongMaterial({
@@ -34,12 +43,33 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 		this.m1.position.x = -dist;
 		this.m2.position.x = dist;
 
+		// Prepare some partons
+		var geom2 = new THREE.SphereGeometry(10, 10, 10),
+			mat3 = new THREE.MeshPhongMaterial({
+				color: 0x00ff00,
+			});
+
+		this.p1 = new THREE.Mesh(geom2, mat3);
+		this.p2 = new THREE.Mesh(geom2, mat3);
+		this.p3 = new THREE.Mesh(geom2, mat3);
+		pdf(this.p1, this.p2, this.p3, -dist);
+		this.p4 = new THREE.Mesh(geom2, mat3);
+		this.p5 = new THREE.Mesh(geom2, mat3);
+		this.p6 = new THREE.Mesh(geom2, mat3);
+		pdf(this.p4, this.p5, this.p6, dist);
+
+		this.scene.add(this.p1);
+		this.scene.add(this.p2);
+		this.scene.add(this.p3);
+		this.scene.add(this.p4);
+		this.scene.add(this.p5);
+		this.scene.add(this.p6);
+
 		// Update
 		this.update = (function() {
 			dist -= dist/50.0;
 			if (dist <= 50.0) {
 				var alpha = dist / 50.0;
-				console.log(alpha);
 				mat1.opacity = alpha*0.9+0.1;
 				mat1.needsUpdate = true;
 				mat2.opacity = alpha*0.9+0.1;
@@ -48,16 +78,21 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 			}
 			this.m1.position.x = -dist-50;
 			this.m2.position.x = dist+50;
+			pdf(this.p1, this.p2, this.p3, -dist-50);
+			pdf(this.p4, this.p5, this.p6, dist+50);
 
 		}).bind(this);
 
 	}
 
 
-	Engine.Particles = function(container) {
+
+
+	var Exp3DScreen = function( container ) {
+		C.ExplainScreen.call(this, container);
 
 		// Setup variables
-		this.container = $(container);
+		this.container = container;
 		this.mouse = new THREE.Vector2();
 		this.half = new THREE.Vector2();
 
@@ -83,9 +118,6 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 		light.position.set( 0, 0, 1 );
 		this.scene.add( light );
 
-		// Initial resize of the map
-		this.resize();
-
 		// ============================
 		//  Put some graphics 
 		// ============================
@@ -103,27 +135,20 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 			this.mouse.y = ( e.offsetY - this.half.y );
 		}).bind(this));
 
-		$(window).resize((function() {
-			this.resize();
-		}).bind(this));
-
 
 		// ============================
-		// Start animation loop
+		// Setup animation parameters
 		// ============================
 
-		this.animating = true;
-		this.animate();
+		this.animating = false;
+
 	}
+	Exp3DScreen.prototype = Object.create( C.ExplainScreen.prototype );
 
 	/**
 	 * Reisze canvas & engine dimentions to fit host
 	 */
-	Engine.Particles.prototype.resize = function() {
-
-		// Dimentions
-		var w = $(this.container).width(),
-			h = $(this.container).height();
+	Exp3DScreen.prototype.onResize = function(w,h) {
 
 		// Change camera aspect
 		this.camera.aspect = w / h;
@@ -141,7 +166,11 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 	/**
 	 * Animation function
 	 */
-	Engine.Particles.prototype.animate = function() {
+	Exp3DScreen.prototype.animate = function() {
+
+		// Stop animation if we are not animating
+		if (!this.animating)
+			return;
 
 		// Request animation
 		requestAnimationFrame( this.animate.bind(this) );
@@ -154,7 +183,7 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 	/**
 	 * Render the scene
 	 */
-	Engine.Particles.prototype.render = function() {
+	Exp3DScreen.prototype.render = function() {
 
 		// Initialize camera
 		this.camera.position.x += ( this.mouse.x - this.camera.position.x ) * 0.05;
@@ -172,16 +201,23 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 
 	}
 
-
-	var Exp3DScreen = function() {
-		C.ExplainationScreen.call(this);
-		this.engine = new Engine.Particles();
+	/**
+	 * Start animation when it's about to be shown
+	 */
+	Exp3DScreen.prototype.onWillShow = function(cb_ready) {
+		this.animating = true;
+		this.animate();
+		cb_ready();
 	}
-	Exp3DScreen.prototype = Object.create( C.ExplainationScreen );
-	Exp3DScreen.prototype.getDOMElement = function() {
-		return this.engine.
-	};
 
-	R.registerComponent('exp_screen', Exp3DScreen);
+	/**
+	 * Stop animation when hidden
+	 */
+	Exp3DScreen.prototype.onHidden = function() {
+		this.animating = false;
+	}
+
+
+	R.registerComponent('explain_screen', Exp3DScreen);
 
 })
