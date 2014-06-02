@@ -24,7 +24,7 @@ requirejs(
 
         // Game modules
         "vas-basic/main",
-        "vas-3d/modules/exp-3d",
+        "vas-3d/main",
 
 	], 
     function($, main) {

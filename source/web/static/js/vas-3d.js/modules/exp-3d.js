@@ -88,6 +88,10 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 
 
 
+
+
+
+
 	var Exp3DScreen = function( container ) {
 		C.ExplainScreen.call(this, container);
 
@@ -95,6 +99,10 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 		this.container = container;
 		this.mouse = new THREE.Vector2();
 		this.half = new THREE.Vector2();
+		this.animating = false;
+		this.lastScene = 0;
+		this.activeScene = 0;
+		this.scenes = [];
 
 		// ============================
 		//  Initialize 3D System
@@ -135,15 +143,23 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 			this.mouse.y = ( e.offsetY - this.half.y );
 		}).bind(this));
 
-
-		// ============================
-		// Setup animation parameters
-		// ============================
-
-		this.animating = false;
-
 	}
 	Exp3DScreen.prototype = Object.create( C.ExplainScreen.prototype );
+
+	/**
+	 * Register a scene on a particular point in time
+	 * @param {integer} time - The time (in seconds) where to place the scene
+	 * @param {vas-3d/com/explain_scene} scene - The scene object
+	 */
+	Exp3DScreen.prototype.addScene = function( time, scene ) {
+
+		// Register scene
+		this.scenes.append({
+			't': time,
+			's': scene
+		});
+
+	}
 
 	/**
 	 * Reisze canvas & engine dimentions to fit host
@@ -185,6 +201,17 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 	 */
 	Exp3DScreen.prototype.render = function() {
 
+		// Get time delta
+		var newTime = new Date().d.getMilliseconds(),
+			deltaTime = newTime - this.lastFrameTime;
+		this.lastFrameTime = newTime;
+
+		// Do scene transitions if required to do so
+		if (this.lastScene != this.activeScene) {
+			this.lastScene = 0;
+			this.activeScene = 0;
+		}
+
 		// Initialize camera
 		this.camera.position.x += ( this.mouse.x - this.camera.position.x ) * 0.05;
 		this.camera.position.y += ( - this.mouse.y - this.camera.position.y ) * 0.05;
@@ -205,6 +232,9 @@ define(["three", "core/registry", "core/components"], function(THREE, R, C) {
 	 * Start animation when it's about to be shown
 	 */
 	Exp3DScreen.prototype.onWillShow = function(cb_ready) {
+		if (!this.animating) {
+			this.lastFrameTime = new Date().d.getMilliseconds();
+		}
 		this.animating = true;
 		this.animate();
 		cb_ready();

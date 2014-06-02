@@ -25,6 +25,10 @@ define(["jquery", "core/config", "core/registry"],
 		UI.activeScreen = "";
 
 		/**
+		 * The 
+		 */
+
+		/**
 		 * Initialize the user interface for the game
 		 *
 		 * This function **MUST** be called in order to initialize the game layout.
@@ -33,6 +37,11 @@ define(["jquery", "core/config", "core/registry"],
 
 			// Initialize Virtual Atom Smasher Interface
 			UI.host = $(config['dom-host']);
+
+			// Place an overlay DOM
+			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
+			UI.overlayDOM.hide();
+			UI.host.append(UI.overlayDOM);
 
 			// Initialize screens
 			var screenNames = [ 'home_screen', 'explain_screen', 'tuning_screen', 'running_screen' ];
@@ -108,7 +117,21 @@ define(["jquery", "core/config", "core/registry"],
 		}
 
 		/**
-		 * Activate the screen with the given name.
+		 * Slide an overlay module as screen.
+		 *
+		 * @param {string} name - The name of the module to focus.
+		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 *
+		 */
+		UI.showOverlay = function(name, cb_ready) {
+
+			// Get preferred dimentions of the overlay
+
+		}
+
+
+		/**
+		 * Activate a screen module with the given name.
 		 *
 		 * @param {string} name - The name of the module to focus.
 		 * @param {function} cb_ready - The callback to fire when the screen has changed

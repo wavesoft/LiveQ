@@ -12,7 +12,8 @@ define({
 	 */
 	'css': {
 		'nav-mini'		: 'nav-mini',
-		'screen'		: 'screen',
+		'screen'		: 'screen fullscreen',
+		'overlay'		: 'overlay',
 		'error-screen' 	: 'error-screen'
 	}
 

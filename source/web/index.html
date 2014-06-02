@@ -13,21 +13,18 @@
 		body {
 			overflow: hidden;
 		}
-		#game-frame {
+		.fullscreen {
 			position: absolute;
 			left: 0; right: 0;
 			top: 0; bottom: 0;
+		}
+		.overlay {
+			z-index: 100;
+		}
+		#game-frame {
 			background-color: #000;
 		}
-		#game-frame .backdrop {
-			position: absolute;
-			left: 0; right: 0;
-			top: 0; bottom: 0;
-		}
 		#game-frame .screen {
-			position: absolute;
-			left: 0; right: 0;
-			top: 0; bottom: 0;
 			background-color: #000;
 		}
 		#game-frame .nav-mini {
@@ -45,12 +42,12 @@
 			border: solid 5px #FF6600;
 			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAIoUlEQVR42u2Zf2wUxxXHv7t7v3/7/AsbjAN1iDFOQktECgppRGX+aKU2JCS0DonagBBETWlcNTVpGhSaFErlFlqkkjQ/qiamIIpaqkptYoESoKSpSohFCgYRjEPx77vz/fDd3u3tbt+czfnsvTvfGhyolLFW632z8+59Zt68mTfL4f+8cDfagM8ArqeyI/dWrmX35Ue7X81S10C3jXT9hurbbjoAZnzFPPsrEDj0nI3sJiOfzKi7h+e5Y3UrSnCmbRCKrNqoPnazARxeeF/xck+tEx1tA+j9eDgFQfLZVL2tbpm3sbyO6t7qR8+l2LpsozTtAGSMAyNuMAcjrnB6VD7DaOZ7FjWUwGrloZoEnPlHAP2Xoruo2jR3oWtj9XxqmlQx2Cvi9LHAv6jt3Rl6v4Yx9/rLdAL8YHatfYel1IwrH4UxHJCOsB+la2b5Ldadt97uQCShwG0RACtBvB+EiYDm3eFEYjiJOAFYDBw+eCeAaDh5B7VbyAz3VFqWVNc7ce64H2JUriaIT6YLoKm02tJSf5cbcBkR8CVwuT0MX1es8wv3eedY7TzCcQUcafUwCBNP/3NIijJCdLHiIbDeK3Gc/yB00ltlWXQL6XK7DEBAwvG3ByGJyrQCrPdWml+aWWuDmXrSScbAaYQYkWHhVIQiSSRkdURxhmZVHfvfZuRhIrgYjYbTQ4aHkwjF5FS7s8eGkJTUMgIYmC6A1e4y475Zdfa0TODHVMiKOqkO9rbJMNKGvS7JY206jgchJ1UPAQSvGYCMtdLt0Ylyl9f4UlW9DZOZal+2Do4VTeln8aO3ENz/VN42HSdCUJLqXRmiRXR15ls3sgIw4yluR2fMNgM05Om3yGqrkUNphQnBUZ/OVmyLH4br/uc18qE/PAXx9N+ztvGSO/6bRsBkF9IyZxG555AE/6C0IhdEvhE4PGeBbXl1hRncVaUK60qZjFcQlZScAO4HtsJ298MaeeSd3yL8t5asbUrtBhhs9DvsYsNLc0QOSmhvjyA4KD1GAG/oBVhlcwkHZtVaoLd4HvwJ7F9crZEP/3M/hg7+uGA9NKHR+WGUBQEzASR0AYxCvF9Va1lsofCopxQ9RABLvqEFeG8fAgcKB/B1k/v0SFvI+K253pkM4Fs0Cq9XzDXpAvCufgGOpVqAyIl98O9/tiAdKnlo1xmRRaW8YTWfC7HtwnqK583zFpgh6Qi4roYNKPr60xp5qG0PAod2FKQjOiSj93KS+f0vCODDggDIaNbVK+laa7HyDZWzTajwCtQLCgaiMuTJw3yquFdsgHflDzVy/59+huDbeyZtz7YbLoGHL6ygrz+JSEi+QOK9dL1BMBeyAjDjqbfjJUUCKqtM8HoEKGS0jyLOMEWcAtaosRG4txEla36qkQ+++QxCR/dO2p525KkV22vhIVjZqg30XUmgp1eCGFdvzYTIBGCxMllUysPhvrZdtutLjSh7bLtG3t3SiOiZ47p0sYWedR7bjgx2KxBj6pcJ4IgGYBSijm7fcbq5je6iqUPYFizDzKe1Pf3Jlq8gfum0bn0KTejBPgWJeGo+fD+zTmMlQdBWE9tsdhDE+E1ZwQD1y1DVvE8jv9i0FFJ/l27jfRSDpAS2k/GbJ9bni0I7zWZsKirW4fyjxVhWjZpd72nkZ79Zqdv4gI+DJOFFMj5r/M21F/oq9fxfq0s5GM20TU4o0FMEuxu3vd4xTiYPB3Hu27UF62C+b1R5dA/SxJSRczHL5kKrqPGB2hmkwKjCRwlKvND4mVHqD/aNe070deH8E4sL7wSyrJiikJ3C6X+6aRVP4OcEoVlcJk7iRjK+dX6pCsFA+SuF0ISe+JlR6lrPQ3B40s+R9qPofG6VLh1sFIooq3PTdW6Ao00kdhHE97ICsISd3CbstEowCPpcJluZt/MwrDV3pp/7//gr9Pxu6zVopFEQjYhL/CMEkQ5xWUZAbTUbZMqaZOqBqfU+K2UPbULl48+lnz9+5gGET707JV2ywiOeFCjtFNh6MC5jyzYHajCSiTUKnFJjFGSYheSUfrh89abUPdFzCYGjh3S1ZV0nyYaU0bLKs73Qy3TtnZhuTrYbXchzyimHEEu9OPXx0F9ExUTzz8iMfpmMPpnrvckAWux8osltkBCSPj3z7SwE0YTsl1K5d85kJi9AalJDDZdwlBHRX0xnKK3a8DwqHhlL4i/v2YKe1l8W1JalTy7Kvf2yGTEYNxPA9lzv5gNoMquJFg8nIpxUdblP5ZomzN6ojTgXd3wX/YdeK0iHg0ZB4Xj44cg7CrlW4tTO1JwIgVP1h9S5zb9G+f2Pa+R9f34NF7c/qUuXZLBBFkw5D4NzAbDEJs4pI0cnKsend3VCUoRByn8y/rnNu1G+Ugtw5fct6NqdPSdWOQGSya6toN+l359LAJ0FA2RA3D76yA6X/CRrFhLiNiERzQvgmP953PnmCY28fc1SRM6e0siZz8s8AdjcLFGZmEz7cxmfFyAH1I/4eOwFPh6d9F3LrDkoaXgw/TzYdhDif7PbkUpaCCPpLBogY8v02KQXYBsvDjdzYoYL8TxUgxEcZRuFFlUw0NyiqamMP92TPSUJAjBPKwAXZQA0AjTkqpXitNmSyvf4Id/4Y+hRuNSmfiKAww3VZLpA0DWI0yJJG35WlKIS5vNOgohMF8BaSkpfSTWzpE7s2PaWfYXZwQ1HNiGW4VoGA1RK6QgY4+QUENTiYvYP6+mRLzPJ5HI2qiqlgQQ9fcfraQgabYwcccijstsgJzvg8431vLeY3Z8A+woTDq1HbNTtrFbA6XqV2q7L0LkIY5+YTuqx53p+5DsGv/8eSLTxK/ayEXiWjHmR7aeougnB4KOIiQRGibbJNO5k4VrK9QRohCi2pnrfZBqXgFPdErqdUENhcC4nExmujt5NAzBqKEu5WCh8N0sd26ZfdZMLupV/GgA3onwGcKPL/wCLTI1ersewngAAAABJRU5ErkJggg==);
 		}
-		
+
 		</style>
 	</head>
 	<body>
 		
-		<div id="game-frame">
+		<div id="game-frame" class="fullscreen">
 		<div>
 
 	</body>
