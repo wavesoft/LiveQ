@@ -22,7 +22,7 @@ define(
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "explain_screen", ExplainScreen, 1 );
+		R.registerComponent( "screen_explain", ExplainScreen, 1 );
 
 	}
 

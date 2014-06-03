@@ -4,12 +4,28 @@
     },
     "source": {
         "include": [
+
             "vas-core.js/components.js",
             "vas-core.js/registry.js",
+            "vas-core.js/global.js",
             "vas-core.js/main.js",
             "vas-core.js/ui.js",
             "vas-core.js/util/event_base.js",
-            "vas-core.js/util/component.js"
+            "vas-core.js/util/component.js",
+            "vas-core.js/util/animator.js",
+            "vas-core.js/util/easing.js",
+            "vas-core.js/data/histogram_meta.js",
+
+            "vas-basic.js/components/backdrop_explain.js",
+            "vas-basic.js/components/backdrop_home.js",
+            "vas-basic.js/components/backdrop_running.js",
+            "vas-basic.js/components/backdrop_tuning.js",
+            "vas-basic.js/components/screen_explain.js",
+            "vas-basic.js/components/screen_home.js",
+            "vas-basic.js/components/screen_running.js",
+            "vas-basic.js/components/screen_tuning.js",
+            "vas-basic.js/components/nav_mini.js"
+
         ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"

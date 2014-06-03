@@ -28,7 +28,7 @@ define(
 			hostDOM.click((function() {
 
 				// Fire the changeScreen event
-				this.trigger("changeScreen", "home_screen");
+				this.trigger("changeScreen", "screen_home");
 
 			}).bind(this));
 
@@ -39,7 +39,7 @@ define(
 		 * Hide mini-nav when we are on home
 		 */
 		NavMini.prototype.onPageWillChange = function(from, to) {
-			if (to == "home_screen") {
+			if (to == "screen_home") {
 				this.hostElement.fadeOut();
 			} else {
 				this.hostElement.fadeIn();

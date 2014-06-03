@@ -22,7 +22,7 @@ define(
 		RunningScreen.prototype = Object.create( C.RunningScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "running_screen", RunningScreen, 1 );
+		R.registerComponent( "screen_running", RunningScreen, 1 );
 
 	}
 

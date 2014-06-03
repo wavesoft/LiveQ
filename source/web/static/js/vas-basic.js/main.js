@@ -2,10 +2,10 @@
 define([
 	
 	// Screens
-	'vas-basic/components/explain_screen',
-	'vas-basic/components/home_screen',
-	'vas-basic/components/running_screen',
-	'vas-basic/components/tuning_screen',
+	'vas-basic/components/screen_explain',
+	'vas-basic/components/screen_home',
+	'vas-basic/components/screen_running',
+	'vas-basic/components/screen_tuning',
 
 	// Navigators
 	'vas-basic/components/nav_mini',

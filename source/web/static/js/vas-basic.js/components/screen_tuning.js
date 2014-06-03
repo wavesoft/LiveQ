@@ -22,7 +22,7 @@ define(
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "tuning_screen", TuningScreen, 1 );
+		R.registerComponent( "screen_tuning", TuningScreen, 1 );
 
 	}
 

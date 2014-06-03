@@ -7,18 +7,25 @@ define(["three", "vas-3d/util/metaballs"],
 		 * Create the Fluctuation class
 		 */
 
-		var Fluctuation = function( radius, blobs, speed, detail, isolevel ) {
+		var Fluctuation = function( config ) {
 
-			this.isolevel = isolevel || 0.5;
-			this.radius = radius || 4;
-			this.blobs = blobs || 3;
-			this.speed = speed || 1;
-			this.detail = detail || 20;
+			var cfg = config || {};
+			this.isolevel = cfg.isolevel || 0.5;
+			this.radius = cfg.radius || 4;
+			this.blobs = cfg.blobs || 3;
+			this.detail = cfg.detail || 20;
 			this.metaballBounds = 3;
+			this.color = cfg.color || 0xffff00;
+			this.transparent = cfg.transparent || true;
 
 			// Initialize mesh components
 			this.geometry = new THREE.Geometry();
-			this.material = new THREE.MeshLambertMaterial( {color: 0xffffff, side:THREE.DoubleSide} );
+			this.material = new THREE.MeshBasicMaterial({
+				color: this.color, 
+				side: THREE.DoubleSide, 
+				transparent: this.transparent, 
+				opacity: 1
+			});
 
 			// Initializ metaballs
 			this.metaballs = new Metaballs( 
@@ -45,14 +52,6 @@ define(["three", "vas-3d/util/metaballs"],
 			// Initialize fluctuation object
 			THREE.Object3D.call( this );
 
-			// Set scale according to radius
-			this.phase = 0;
-			this.scale.set(
-				this.radius/this.metaballBounds,
-				this.radius/this.metaballBounds,
-				this.radius/this.metaballBounds
-			);
-
 		}
 
 		Fluctuation.prototype = Object.create( THREE.Object3D.prototype );
@@ -74,24 +73,30 @@ define(["three", "vas-3d/util/metaballs"],
 			this.mesh = new THREE.Mesh( this.geometry, this.material );
 			this.add(this.mesh);
 
+			// Set scale according to radius
+			this.mesh.scale.set(
+				this.radius/this.metaballBounds,
+				this.radius/this.metaballBounds,
+				this.radius/this.metaballBounds
+			);
+
 		}
 
 		/**
-		 * Update fluctuation mesh 
+		 * Update fluctuation mesh by setting the position
+		 * of the metaballs in the specified phase.
 		 */
-		Fluctuation.prototype.update = function( timeDelta ) {
+		Fluctuation.prototype.setPhase = function( phase ) {
 
 			// Update blob metaball states
 			var r = this.metaballBounds/2;
-			this.phase += this.speed*timeDelta/1000;
 			for (var i=0; i<this.blobs; i++) {
 				var blob = this.blobStates[i];
-				console.log(i, blob);
 
 				// Calculate position in plane
 				blob.v.set(
-					Math.cos(this.phase*blob.ps) * r,
-					Math.sin(this.phase*blob.ps) * r,
+					Math.cos(phase*blob.ps) * r,
+					Math.sin(phase*blob.ps) * r,
 					0
 				);
 

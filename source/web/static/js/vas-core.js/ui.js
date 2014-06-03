@@ -44,7 +44,7 @@ define(["jquery", "core/config", "core/registry"],
 			UI.host.append(UI.overlayDOM);
 
 			// Initialize screens
-			var screenNames = [ 'home_screen', 'explain_screen', 'tuning_screen', 'running_screen' ];
+			var screenNames = [ 'screen_home', 'screen_explain', 'screen_tuning', 'screen_running' ];
 			UI.screens = {};
 			for (var i=0; i<screenNames.length; i++) {
 

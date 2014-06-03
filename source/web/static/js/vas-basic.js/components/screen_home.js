@@ -27,7 +27,7 @@ define(
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "home_screen", HomeScreen, 1 );
+		R.registerComponent( "screen_home", HomeScreen, 1 );
 
 	}
 
