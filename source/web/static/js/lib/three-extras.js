@@ -14,6 +14,8 @@ define(
 		"three-extras/shader-fxaa",
 		"three-extras/shader-hblur",
 		"three-extras/shader-vblur",
+		"three-extras/shader-blur",
+		"three-extras/shader-blend",
 	], 
 
 	/**

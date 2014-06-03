@@ -20,9 +20,9 @@ define(["three", "vas-3d/util/metaballs"],
 
 			// Initialize mesh components
 			this.geometry = new THREE.Geometry();
-			this.material = new THREE.MeshBasicMaterial({
+			this.material = new THREE.MeshPhongMaterial({
 				color: this.color, 
-				side: THREE.DoubleSide, 
+				side: THREE.BackSide, 
 				transparent: this.transparent, 
 				opacity: 1
 			});

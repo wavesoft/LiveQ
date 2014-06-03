@@ -73,7 +73,7 @@ define(
 
 							'cam.x': -s*2,
 							'cam.y': 0,
-							'cam.z': 1500,
+							'cam.z': 1300,
 						}
 					},
 
@@ -105,7 +105,7 @@ define(
 
 							'cam.x': -s,
 							'cam.y': -h/2,
-							'cam.z': 1200,
+							'cam.z': 800,
 						}
 					},
 
@@ -130,7 +130,7 @@ define(
 
 							'cam.x': -s/2,
 							'cam.y': 0,
-							'cam.z': 1050,
+							'cam.z': 500,
 						}
 					},
 
@@ -145,15 +145,7 @@ define(
 							'part3.a': 1,
 
 							'cam.x': 0,
-							'cam.z': 900,
-						}
-					},
-
-					// [P9] Second fluctiation goes aways
-					{
-						p: 4.0,
-						v: {
-							'cam.z': 1800,
+							'cam.z': 200,
 						}
 					},
 

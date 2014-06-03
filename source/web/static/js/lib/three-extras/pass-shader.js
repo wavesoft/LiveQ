@@ -10,9 +10,10 @@ define(["three"],
 		 * @author alteredq / http://alteredqualia.com/
 		 */
 
-		THREE.ShaderPass = function ( shader, textureID ) {
+		THREE.ShaderPass = function ( shader, textureID, textureIDAlt ) {
 
 			this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
+			this.textureIDAlt = ( textureIDAlt !== undefined ) ? textureIDAlt : "tDiffuse2";
 
 			this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -20,7 +21,8 @@ define(["three"],
 
 				uniforms: this.uniforms,
 				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
+				fragmentShader: shader.fragmentShader,
+				transparent: true
 
 			} );
 
@@ -44,9 +46,10 @@ define(["three"],
 			render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
 				if ( this.uniforms[ this.textureID ] ) {
-
 					this.uniforms[ this.textureID ].value = readBuffer;
-
+				}
+				if ( this.uniforms[ this.textureIDAlt ] ) {
+					this.uniforms[ this.textureIDAlt ].value = writeBuffer;
 				}
 
 				this.quad.material = this.material;

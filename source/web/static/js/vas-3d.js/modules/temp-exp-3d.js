@@ -1,13 +1,13 @@
 
 define(
 
-	[ "three", "three-postprocessing", 
+	[ "three", "three-extras", 
 	  "core/util/animator", "core/registry", "core/components",
 	  "vas-3d/util/fluctuation", "vas-3d/util/feyman",
 	  "vas-3d/scenes/fractal-test"
 	], 
 
-	function(THREE, THREEpp, Animator, R, C, Fluctuation, FeymanDiagram, FractalScene ) {
+	function(THREE, THREEx, Animator, R, C, Fluctuation, FeymanDiagram, FractalScene ) {
 
 		var Engine = { };
 
@@ -18,6 +18,36 @@ define(
 
 			this.cameraFocus = new THREE.Vector3();
 
+			// Prepare sprites
+			var particleMap = THREE.ImageUtils.loadTexture( "static/img/sprites.png" );
+				particleMap.repeat.set( 0.25, 0.25 );
+			var particleMat = new THREE.SpriteMaterial( { map: particleMap, color: 0xffffff, fog: true, transparent: true } ),
+				mat0 = particleMat.clone(),
+				mat1 = particleMat.clone(),
+				mat2 = particleMat.clone(),
+				mat3 = particleMat.clone();
+
+			mat0.map.offset.set( 0, 0.75 );
+			mat1.map.offset.set( 0, 0.50 );
+			mat2.map.offset.set( 0.25, 0.75 );
+			mat3.map.offset.set( 0.25, 0.50 );
+
+			var part0 = new THREE.Sprite( mat0 ),
+				part1 = new THREE.Sprite( mat1 ),
+				part2 = new THREE.Sprite( mat2 ),
+				part3 = new THREE.Sprite( mat3 );
+
+			part0.scale.set(80,80,80);
+			part1.scale.set(50,50,50);
+			part2.scale.set(30,30,30);
+			part3.scale.set(30,30,30);
+
+			window.part0 = part0;
+			window.part1 = part1;
+			window.part2 = part2;
+			window.part3 = part3;
+	
+			/*
 			// Prepare geometries
 			var geom0 = new THREE.SphereGeometry(80, 10, 10),
 				geom1 = new THREE.SphereGeometry(30, 10, 10),
@@ -44,11 +74,13 @@ define(
 				});
 
 			// Build scene components
-			var part0 = new THREE.Mesh( geom0, mat0 ),
+			var //part0 = new THREE.Mesh( geom0, mat0 ),
 				part1 = new THREE.Mesh( geom1, mat1 ),
 				part2 = new THREE.Mesh( geom2, mat2 ),
-				part3 = new THREE.Mesh( geom2, mat3 ),
-				fluc0 = new Fluctuation({ radius: 80, blobs: 4, detail: 10 }),
+				part3 = new THREE.Mesh( geom2, mat3 );
+				*/
+
+			var fluc0 = new Fluctuation({ radius: 80, blobs: 4, detail: 10 }),
 				fluc1 = new Fluctuation({ radius: 20, blobs: 4, detail: 10 });
 
 			// Initialize animation
@@ -77,10 +109,10 @@ define(
 			// Put everything on scene
 			fluc0.renderDepth = 0.5;
 			this.mainScene.add(fluc0);
-			this.glowScene.add(fluc0);
+			//this.glowScene.add(fluc0);
 			fluc1.renderDepth = 0.5;
 			this.mainScene.add(fluc1);
-			this.glowScene.add(fluc1);
+			//this.glowScene.add(fluc1);
 			part0.renderDepth = 0.0;
 			this.mainScene.add(part0);
 			part1.renderDepth = 0.1;
@@ -92,11 +124,17 @@ define(
 			feyman0.renderDepth = 1;
 			this.mainScene.add(feyman0);
 
+
+			// Put a grid
+			var grid = new THREE.GridHelper( 10000, 500 );
+			grid.position.y = -400;
+			this.mainScene.add(grid);
+
 			// Bind properties to animator
 			anim0.bind( 'part0.x', part0.position, 'x' );
 			anim0.bind( 'part0.y', part0.position, 'y' );
 			anim0.bind( 'part0.a', mat0, 'opacity' );
-			anim0.bind( 'part0.s', function(v,v){ part0.scale.set(v,v,v); });
+			//anim0.bind( 'part0.s', function(v,v){ part0.scale.set(v,v,v); });
 
 			anim0.bind( 'part1.x', part1.position, 'x' );
 			anim0.bind( 'part1.y', part1.position, 'y' );
@@ -257,20 +295,22 @@ define(
 			this.effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 			this.effectHBlur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
 			this.effectVBlur = new THREE.ShaderPass( THREE.VerticalBlurShader );
+			this.effectBlend = new THREE.ShaderPass( THREE.BlendShader );
 
 
 			this.renderGlow.clear = true;
-			this.renderMain.clear = false;
-			//this.renderMain.needsSwap = true;
-			//this.renderMain.needsSwap = true;
+			this.renderMain.clear = true;
+
+			this.effectVBlur.needsSwap = false;
 			this.effectCopy.renderToScreen = true;
-			this.effectVBlur.renderToScreen = true;
 
 			this.composer.addPass( this.renderGlow );
 			this.composer.addPass( this.effectHBlur );
 			this.composer.addPass( this.effectVBlur );
 
 			this.composer.addPass( this.renderMain );
+			this.composer.addPass( this.effectBlend );
+
 			this.composer.addPass( this.effectFXAA );
 			//this.composer.addPass( this.effectBloom );
 			this.composer.addPass( this.effectCopy );
@@ -285,6 +325,8 @@ define(
 			// ============================
 
 			this.activeScene = new Engine.Scene();
+			this.mainScene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+
 			this.mainScene.add(this.activeScene.mainScene);
 			this.glowScene.add(this.activeScene.glowScene)
 
@@ -377,13 +419,11 @@ define(
 
 			// Render
 			this.renderer.clear();
-			this.composer.render();
-			/*
+			//this.composer.render();
 			this.renderer.render( 
 				this.mainScene, 
 				this.camera 
 			);
-			*/
 
 		}
 
