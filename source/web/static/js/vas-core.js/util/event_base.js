@@ -28,6 +28,7 @@ define(
 		 */
 		var EventBase = function() {
 			this.__eventCallbacks = {};
+			this.__eventForwarders = [];
 		}
 
 		/**
@@ -71,6 +72,11 @@ define(
 			var args = Array.prototype.slice.call(arguments),
 				name = args.shift();
 
+			// Trigger to all forward receivers
+			for (var i=0; i<this.__eventForwarders.length; i++) {
+				this.__eventForwarders[i].trigger.apply( this.__eventForwarders[i], arguments );
+			}
+
 			// Require existing event
 			if (this.__eventCallbacks[name] == undefined)
 				return;
@@ -80,6 +86,16 @@ define(
 				this.__eventCallbacks[name][i].apply(this, args);
 			}
 		}
+
+		/**
+		 * Forward events
+		 *
+		 * @param {Object} receiver - The component to receive events
+		 */
+		EventBase.prototype.forwardEvents = function(receiver) {
+			this.__eventForwarders.push(receiver);
+		}
+
 
 		return EventBase;
 

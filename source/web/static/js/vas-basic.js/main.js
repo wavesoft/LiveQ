@@ -16,4 +16,8 @@ define([
 	'vas-basic/components/backdrop_running',
 	'vas-basic/components/backdrop_tuning',
 
+	// Explain screen details
+	'vas-basic/components/explain_engine',
+	'vas-basic/components/explain_physics',
+
 ]);

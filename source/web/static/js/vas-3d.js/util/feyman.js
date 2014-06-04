@@ -15,10 +15,10 @@ define(["three"],
 		/**
 		 * Add an extra kink on the current link on the feyman diagram
 		 */
-		FeymanKink.prototype.addKink = function(type) {
-			var kink = new FeymanKink(this.diagram, 0, 0, 0);
+		FeymanKink.prototype.addKink = function(x,y,z,linkType) {
+			var kink = new FeymanKink(this.diagram, x || 0, y || 0, z || 0);
 			this.diagram.lines.push({
-				'type': type,
+				'linkType': linkType,
 				'from': this,
 				'to': kink,
 			});
@@ -32,14 +32,15 @@ define(["three"],
 			THREE.Object3D.call(this);
 			this.lines = [];
 			this.lineObject = null;
+			this.material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 1, transparent: true, opacity: 1 } );
 		}
 		FeymanDiagram.prototype = Object.create( THREE.Object3D.prototype );
 
 		/**
 		 * Add a kink on the feyman diagram
 		 */
-		FeymanDiagram.prototype.addKink = function(type) {
-			return new FeymanKink(this, 0, 0, 0);
+		FeymanDiagram.prototype.addKink = function(x,y,z) {
+			return new FeymanKink(this, x || 0, y || 0, z || 0);
 		}
 
 		/**
@@ -58,11 +59,8 @@ define(["three"],
 				geometry.vertices.push( this.lines[i].to );
 			}
 
-			// Prepare material
-			var material = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 1 } );
-
 			// Build and place mesh
-			this.lineObject = new THREE.Line( geometry, material, THREE.LinePieces );
+			this.lineObject = new THREE.Line( geometry, this.material, THREE.LinePieces );
 			this.add( this.lineObject );
 
 		}

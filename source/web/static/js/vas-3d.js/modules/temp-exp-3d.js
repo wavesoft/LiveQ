@@ -3,42 +3,233 @@ define(
 
 	[ "three", "three-extras", 
 	  "core/util/animator", "core/registry", "core/components",
-	  "vas-3d/util/fluctuation", "vas-3d/util/feyman",
+	  "vas-3d/util/fluctuation", "vas-3d/util/fluctuation-sprite", "vas-3d/util/feyman",
 	  "vas-3d/scenes/fractal-test"
 	], 
 
-	function(THREE, THREEx, Animator, R, C, Fluctuation, FeymanDiagram, FractalScene ) {
+	function(THREE, THREEx, Animator, R, C, Fluctuation, FluctuationSprite, FeymanDiagram, FractalScene ) {
+
+
+		var BLANK_IMAGE = "data:image/gif;base64,R0lGODlhQABAAIAAAP8A/////yH5BAEAAAEALAAAAABAAEAAAAJFhI+py+0Po5y02ouz3rz7D4biSJbmiabqyrbuC8fyTNf2jef6zvf+DwwKh8Si8YhMKpfMpvMJjUqn1Kr1is1qt9yuF1AAADs=";
+
+		/**
+		 * Map wrapper for obtaining image instances
+		 */
+		var MapWrapper = function(definition) {
+			this.get = function( map, x, y ) {
+
+				// If nothing is found, return error map
+				if (definition[map] == undefined) {
+					console.warn("Scene: Could not find map '"+map+"'");
+					return THREE.ImageUtils.loadTexture(BLANK_IMAGE);
+				}
+
+				// Get info entry
+				var e = definition[map],
+					inst = THREE.ImageUtils.loadTexture( e.src );
+
+				// Check for sliced map
+				if (e.sprites !== undefined) {
+
+					// Get scale
+					var sx = 1/e.sprites[0], sy = 1/e.sprites[1];
+					inst.repeat.set( sx, sy );
+
+					// Apply offset
+					var cx = x || 0, cy = y || 0;
+					inst.offset.set( sx*cx, sy*cy );
+
+				}
+
+				return inst;
+
+			}
+		}
+
+		/**
+		 * Material wrapper for obtaining material instances
+		 */
+		var MatWrapper = function(definition) {
+			this.get = function( mat ) {
+
+				// If nothing is found, return error element
+				if (definition[mat] == undefined) {
+					console.warn("Scene: Could not find material '"+mat+"'");
+					return new THREE.MeshBasicMaterial({ color: 0xff00ff, side: THREE.DoubleSide });
+				}
+
+				// Return info entry
+				return definition[mat];
+
+			}
+		}
+
+		/**
+		 * Geometry wrapper for obtaining geometry instances
+		 */
+		var GeomWrapper = function(definition) {
+			this.get = function( geom ) {
+
+				// If nothing is found, return error geometry
+				if (definition[geom] == undefined) {
+					console.warn("Scene: Could not find geometry '"+geom+"'");
+					return new THREE.SphereGeometry( 1.0 );
+				}
+
+				// Return info entry
+				return definition[geom];
+
+			}
+		}
 
 		var Engine = { };
 
-
-		Engine.Scene = function() {
+		Engine.AutoScene = function( parent, sceneConfig ) {
+			var self = this;
 			this.mainScene = new THREE.Object3D();
 			this.glowScene = new THREE.Object3D();
 
+			this.camera = new THREE.Vector3(0,0,1800);
+			this.cameraTarget = new THREE.Vector3(0,0,0);
+
+			// Placeholder function until we have the objects ready
+			this.update = function(delta) { };
+
+			// Fetch global config
+			var Cfg = sceneConfig.config || {};
+
+			// Process definitions
+			var defMap = sceneConfig.getDefinitions(Cfg),
+				defArray = [], defNames = [];
+			for (k in defMap) {
+				defNames.push(k);
+				defArray.push(defMap[k]);
+			}
+
+			// Don't do anything until we get the required objects
+			requirejs( defArray,
+				function() {
+
+					// Bind definitions back to their names
+					var Def = { },
+						defRef = Array.prototype.slice.call(arguments);
+					for (var i=0; i<defRef.length; i++) {
+						Def[defNames[i]] = defRef[i];
+					}
+
+					// Prepare maps
+					var Map = new MapWrapper( sceneConfig.getMaps(Cfg, Def) );
+
+					// Prepare materials
+					var Mat = new MatWrapper( sceneConfig.getMaterials(Cfg, Def, Map) );
+
+					// Prepare geometries
+					var Geom = new GeomWrapper( sceneConfig.getGeometries(Cfg, Def) );
+
+					// Create animator
+					var animatorRef = new Animator({
+						duration: 10000,
+						timeline: sceneConfig.getTimeline(Cfg)
+					});
+
+					// Bind camera to animator
+					animatorRef.bind('camera.x', self.camera, 'x' );
+					animatorRef.bind('camera.y', self.camera, 'y' );
+					animatorRef.bind('camera.z', self.camera, 'z' );
+					animatorRef.bind('camera.target.x', self.cameraTarget, 'x' );
+					animatorRef.bind('camera.target.y', self.cameraTarget, 'y' );
+					animatorRef.bind('camera.target.z', self.cameraTarget, 'z' );
+
+					window.anim0 = animatorRef;
+
+					// Prepare objects
+					var Objects = sceneConfig.getObjects(Cfg, Def, Map, Mat, Geom),
+						updateFunctions = [];
+					for (k in Objects) {
+						var o = Objects[k];
+						if (typeof(o) == 'object') {
+
+							// Create instance
+							var obj = o.create();
+
+							// Place on scene
+							self.mainScene.add(obj);
+
+							// Bind object properties to animator
+							if (o['bind'] != undefined) {
+								for (p in o.bind) {
+									animatorRef.bind(
+											p,
+											(function(o,fn) {
+												return function(v,c) {
+													return fn(o,v,c);
+												};
+											})(obj,o.bind[p])
+										);
+								}
+							}
+
+							// Check if we should register
+							// an update loop function
+							if (o['update'] != undefined) {
+								updateFunctions.push(
+									(function(o,fn) {
+										return function(delta) {
+											return fn(o, delta)
+										}
+									})(obj,o.update)
+								);
+							}
+
+						}
+
+						// Replace the update function
+						self.update = function(delta) {
+							for (var i=0; i<updateFunctions.length; i++) { updateFunctions[i]( delta ); }
+							animatorRef.update(delta);
+						}
+
+					}
+
+				}
+			);
+
+		}
+
+
+		Engine.Scene = function( parent ) {
+			this.mainScene = new THREE.Object3D();
+			this.glowScene = new THREE.Object3D();
 			this.cameraFocus = new THREE.Vector3();
 
 			// Prepare sprites
-			var particleMap = THREE.ImageUtils.loadTexture( "static/img/sprites.png" );
-				particleMap.repeat.set( 0.25, 0.25 );
-			var particleMat = new THREE.SpriteMaterial( { map: particleMap, color: 0xffffff, fog: true, transparent: true } ),
-				mat0 = particleMat.clone(),
-				mat1 = particleMat.clone(),
-				mat2 = particleMat.clone(),
-				mat3 = particleMat.clone();
+			var mat0 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } ),
+				mat0 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } ),
+				mat1 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } ),
+				mat2 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } ),
+				mat3 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } );
+				mat4 = new THREE.SpriteMaterial( { map: THREE.ImageUtils.loadTexture( "static/img/sprites.png" ), color: 0xffffff, fog: true, transparent: true } );
 
 			mat0.map.offset.set( 0, 0.75 );
+			mat0.map.repeat.set( 0.25, 0.25 );
 			mat1.map.offset.set( 0, 0.50 );
+			mat1.map.repeat.set( 0.25, 0.25 );
 			mat2.map.offset.set( 0.25, 0.75 );
+			mat2.map.repeat.set( 0.25, 0.25 );
 			mat3.map.offset.set( 0.25, 0.50 );
+			mat3.map.repeat.set( 0.25, 0.25 );
+			mat4.map.offset.set( 0, 0.75 );
+			mat4.map.repeat.set( 0.25, 0.25 );
 
 			var part0 = new THREE.Sprite( mat0 ),
 				part1 = new THREE.Sprite( mat1 ),
+				part4 = new THREE.Sprite( mat4 ),
 				part2 = new THREE.Sprite( mat2 ),
 				part3 = new THREE.Sprite( mat3 );
 
 			part0.scale.set(80,80,80);
 			part1.scale.set(50,50,50);
+			part4.scale.set(50,50,50);
 			part2.scale.set(30,30,30);
 			part3.scale.set(30,30,30);
 
@@ -80,12 +271,22 @@ define(
 				part3 = new THREE.Mesh( geom2, mat3 );
 				*/
 
-			var fluc0 = new Fluctuation({ radius: 80, blobs: 4, detail: 10 }),
-				fluc1 = new Fluctuation({ radius: 20, blobs: 4, detail: 10 });
+			var //fluc0 = new Fluctuation({ radius: 80, blobs: 4, detail: 10 }),
+				//fluc1 = new Fluctuation({ radius: 20, blobs: 4, detail: 10 });
+				fluc0 = new FluctuationSprite({ radius: 50, lookat: parent.camera }), 
+				fluc1 = new FluctuationSprite({ radius: 20, lookat: parent.camera });
+
+			fluc0.position.z = -1;
+			fluc0.setParticleAR( 1, Math.PI/4, 0.25 );
+			fluc0.setParticleAR( 2, -Math.PI/4, 0.25 );
+
+			fluc1.position.z = -1;
+			fluc1.setParticleAR( 1, Math.PI/4, 0.25 );
+			fluc1.setParticleAR( 2, -Math.PI/4, 0.25 );
 
 			// Initialize animation
 			var anim0 = new Animator({
-				duration: 10000,
+				duration: 3000,
 				timeline: FractalScene.timeline
 			});
 
@@ -99,29 +300,22 @@ define(
 				f0k5 = f0k2.addKink();
 
 			// Addd
-			f0k0.set(-600,    0, 0);
-			f0k1.set(-400,    0, 0);
-			f0k2.set(-200, -100, 0);
-			f0k3.set(-200,  100, 0);
-			f0k4.set(-100, -200, 0);
-			f0k5.set(   0,  0, 0);
+			var s = 400, h = 200;
+			f0k0.set(-s*3,    0, 0);
+			f0k1.set(-s*2,    0, 0);
+			f0k2.set(-s,   -h/2, 0);
+			f0k3.set(-s,    h/2, 0);
+			f0k4.set(-s/2,   -h, 0);
+			f0k5.set(   0,    0, 0);
 
 			// Put everything on scene
-			fluc0.renderDepth = 0.5;
 			this.mainScene.add(fluc0);
-			//this.glowScene.add(fluc0);
-			fluc1.renderDepth = 0.5;
 			this.mainScene.add(fluc1);
-			//this.glowScene.add(fluc1);
-			part0.renderDepth = 0.0;
 			this.mainScene.add(part0);
-			part1.renderDepth = 0.1;
 			this.mainScene.add(part1);
-			part2.renderDepth = 0;
 			this.mainScene.add(part2);
-			part3.renderDepth = 0;
 			this.mainScene.add(part3);
-			feyman0.renderDepth = 1;
+			this.mainScene.add(part4);
 			this.mainScene.add(feyman0);
 
 
@@ -153,8 +347,10 @@ define(
 
 			anim0.bind( 'fluc0.x', fluc0.position, 'x' );
 			anim0.bind( 'fluc0.y', fluc0.position, 'y' );
-			anim0.bind( 'fluc0.a', fluc0.material, 'opacity' );
-			anim0.bind( 'fluc0.s', function(v,c){ fluc0.scale.set(v,v,v); });
+			//anim0.bind( 'fluc0.a', fluc0.material, 'opacity' );
+			//anim0.bind( 'fluc0.s', function(v,c){ fluc0.scale.set(v,v,v); });
+			anim0.bind( 'fluc0.a', fluc0.uniforms['fOpacity'], 'value' );
+			anim0.bind( 'fluc0.p', function(v,c) { fluc0.setPhase(v); } );
 
 			anim0.bind( 'fluc1.x', fluc1.position, 'x' );
 			anim0.bind( 'fluc1.y', fluc1.position, 'y' );
@@ -172,8 +368,8 @@ define(
 			this.update = function(delta) {
 				anim0.update(delta);
 				feyman0.update();
-				fluc0.setPhase(p);
-				fluc1.setPhase(p);
+				//fluc0.setPhase(p);
+				//fluc1.setPhase(p);
 				p += 0.1;
 			};
 
@@ -324,7 +520,7 @@ define(
 			//  Put some graphics 
 			// ============================
 
-			this.activeScene = new Engine.Scene();
+			this.activeScene = new Engine.AutoScene( this, FractalScene ) //new Engine.Scene( this );
 			this.mainScene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
 
 			this.mainScene.add(this.activeScene.mainScene);
@@ -335,8 +531,8 @@ define(
 			// ============================
 
 			$(this.container).mousemove((function(e) {
-				this.mouse.x = ( e.offsetX - this.half.x );
-				this.mouse.y = ( e.offsetY - this.half.y );
+				this.mouse.x = ( e.offsetX - this.half.x ) / this.half.x;
+				this.mouse.y = ( e.offsetY - this.half.y ) / this.half.y;
 			}).bind(this));
 
 
@@ -400,6 +596,7 @@ define(
 		Exp3DScreen.prototype.render = function() {
 
 			// Initialize camera
+			/*
 			this.camera.position.x += ( this.mouse.x - this.camera.position.x ) * 0.05;
 			this.camera.position.y += ( - this.mouse.y - this.camera.position.y ) * 0.05;
 			this.camera.lookAt(
@@ -409,13 +606,39 @@ define(
 							0
 						)
 				);
+			*/
 
-			// Update scene
+			// Calculate time delta
 			var lastFrameTime = Date.now(),
 				delta = lastFrameTime - this.lastFrameTime;
-			this.lastFrameTime = lastFrameTime;
+				this.lastFrameTime = lastFrameTime;
+
+			// Update scene
 			this.activeScene.update(delta);
-			this.camera.position.z = this.activeScene.cameraFocus.z;
+
+			// Get suggested camera position
+			var camPos = this.activeScene.camera.clone(),
+				camTarget = this.activeScene.cameraTarget.clone();
+
+			// Calculate horizontal and vertical camera vectors
+			var camZ = camTarget.clone().sub( camPos ),
+				camV = new THREE.Vector3( 0, 1, 0),
+				camH = camZ.clone(),
+				matrix = new THREE.Matrix4().makeRotationAxis( camV, Math.PI / 2 );
+				camH.applyMatrix4( matrix );
+
+			// Rock camera along the H/V axes
+			var rockDivider = 5,
+				rockLength = camZ.length()/rockDivider;
+			camV.normalize().multiplyScalar( this.mouse.y * rockLength );
+			camH.normalize().multiplyScalar( this.mouse.x * rockLength );
+
+			// 
+			camPos.add(camH).add(camV);
+
+			// Update camera
+			this.camera.position.set( camPos.x, camPos.y, camPos.z );
+			this.camera.lookAt( camTarget );
 
 			// Render
 			this.renderer.clear();
