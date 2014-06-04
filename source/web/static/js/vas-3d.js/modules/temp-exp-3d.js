@@ -634,7 +634,7 @@ define(
 			camH.normalize().multiplyScalar( this.mouse.x * rockLength );
 
 			// 
-			camPos.add(camH).add(camV);
+			camPos.add(camH); //.add(camV);
 
 			// Update camera
 			this.camera.position.set( camPos.x, camPos.y, camPos.z );

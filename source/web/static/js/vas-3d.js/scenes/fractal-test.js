@@ -104,6 +104,7 @@ define(["three", "three-extras"],
 				'feyman0': {
 					create: function() {
 						var fd = new Def.FeymanDiagram();
+						fd.renderDepth = 0.0001;
 
 						// Prepare kinks
 						fd.k0 =    fd.addKink( Cfg.p1[0],  Cfg.p1[1]  ),
@@ -116,7 +117,7 @@ define(["three", "three-extras"],
 						return fd;
 					},
 					bind: {
-						'feyman0.a': function(e,v) { e.material.opacity = v; console.log("Feyman0=",v); },
+						'feyman0.a': function(e,v) { e.material.opacity = v; },
 					},
 					update: function(e, delta) {
 						e.update();
@@ -241,6 +242,16 @@ define(["three", "three-extras"],
 					'cam.z': 1800,
 				},
 
+				'tags': {
+
+					'start': 	0.0,
+					'split1': 	1.0,
+					'split2': 	2.0,
+					'final': 	3.0,
+					'end': 		4.0
+
+				},
+
 				'keyframes': [
 
 					// Camera flyout
@@ -342,7 +353,7 @@ define(["three", "three-extras"],
 							p: 1.1,
 							v: {
 								'flucA0.a': 0,
-								'flucA0.s': 2,
+								'flucA0.s': 1,
 								// ------------
 								'partB1.a': 1,
 								'flucB1.a': 0,
@@ -354,7 +365,7 @@ define(["three", "three-extras"],
 							p: 1.5,
 							v: {
 								'flucA0.a': 0, // Fix
-								'flucA0.s': 2, // Fix
+								'flucA0.s': 1, // Fix
 
 								'partB1.a': 0,
 								'flucB1.a': 1,
@@ -374,14 +385,14 @@ define(["three", "three-extras"],
 						{
 							p: 2.1,
 							v: {
-								'flucB1.s': 5,
+								'flucB1.s': 1,
 								'flucB1.a': 0,
 							}
 						},
 						{
 							p: 3.0,
 							v: {
-								'flucB1.s': 5, // Fix
+								'flucB1.s': 1, // Fix
 								'flucB1.a': 0, // Fix
 
 								'feyman0.a': 0
