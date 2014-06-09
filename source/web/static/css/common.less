@@ -1,0 +1,61 @@
+
+// Shorthand for cross-browser syntax
+.transition(@params;) {
+ -webkit-transition: @params;
+    -moz-transition: @params;
+    -o-transition: @params;
+       transition: @params; }
+.transform(@params) {
+ -webkit-transform: @params;
+    -moz-transform: @params;
+    -o-transform: @params;
+       transform: @params; }
+.animation(@params) {
+ -webkit-animation: @params;
+    -moz-animation: @params;
+    -o-animation: @params;
+       animation: @params; }
+.animation-delay(@params) {
+ -webkit-animation-delay: @params;
+    -moz-animation-delay: @params;
+    -o-animation-delay: @params;
+       animation-delay: @params; }
+.transform-origin(@params) {
+ -webkit-transform-origin: @params;
+    -moz-transform-origin: @params;
+    -o-transform-origin: @params;
+       transform-origin: @params; }
+.box-shadow(@params) {
+ -webkit-box-shadow: @params;
+    -moz-box-shadow: @params;
+    -o-box-shadow: @params;
+       box-shadow: @params; }
+.text-shadow(@params) {
+ -webkit-text-shadow: @params;
+    -moz-text-shadow: @params;
+    -o-text-shadow: @params;
+       text-shadow: @params; }
+.border-radius(@params) {
+ -webkit-border-radius: @params;
+    -moz-border-radius: @params;
+    -o-border-radius: @params;
+       border-radius: @params; }
+.user-select(@params) {
+ -webkit-touch-callout: @params;
+   -webkit-user-select: @params;
+    -khtml-user-select: @params;
+      -moz-user-select: @params;
+       -ms-user-select: @params;
+       user-select: @params; }
+.pointer-events(@params) {
+   -webkit-pointer-events: @params;
+    -khtml-pointer-events: @params;
+      -moz-pointer-events: @params;
+       -ms-pointer-events: @params;
+       pointer-events: @params; }
+.keyframes(@name; @rules) {
+  @-webkit-keyframes @name { @rules(); };
+  @-moz-keyframes @name { @rules(); };
+  @-o-keyframes @name { @rules(); };
+  @keyframes @name { @rules(); }; }
+
