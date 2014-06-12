@@ -1,0 +1,257 @@
+
+        /**
+         * Gridline helper class
+         *
+         * This utility class provides the per-line management for
+         * visualizing the graph network.
+         */
+        var MachineDiagramLine = function(parent, node, y, x) {
+            this.parent = parent;
+            this.lastElement = null;
+            this.forkSource = node;
+            this.x = node.x || x || 0;
+            this.y = node.y || y || 0;
+
+            /**
+             * Stack an object in the line
+             */
+            this.stack = function(o) {
+                o.y = this.y;
+                o.x = ++this.x;
+
+                if (this.lastElement == null) {
+                    this.parent.links.push({
+                        'from': this.forkSource,
+                        'to': o,
+                        'mode': (this.forkSource.y == o.y) ? LINE_STRAIGHT : LINE_BRANCH,
+                    });
+                } else {
+                    this.parent.links.push({
+                        'from': this.lastElement,
+                        'to': o,
+                        'mode': LINE_STRAIGHT,
+                    });
+                }
+                this.lastElement = o;
+
+            }
+
+            /**
+             * Collapse line towards the specified node
+             */
+            this.collapseTowards = function(o) {
+                this.parent.links.push({
+                    'from': this.lastElement,
+                    'to': o,
+                    'mode': LINE_COLLAPSE,
+                });
+                this.parent.lines[this.y] = undefined;
+            }
+
+            /**
+             * Fork towards a new line
+             */
+            this.fork = function( forkNode ) {
+                forkNode.forks = forkNode.forks || 0;
+
+                if ((++forkNode.forks) == 1) {
+                    return this;
+
+                } else {
+
+                    // Start up-down scanning until we get a free line
+                    var i = this.y, c = 0, sp = 0;
+                    while (this.parent.lines[i] != undefined) {
+                        c++;
+
+                        sp = Math.ceil( c / 2 );
+                        if (c % 2 == 1) {
+                            i = this.y + sp;
+                        } else {
+                            i = this.y - sp;
+                        }
+                    }
+
+                    // Update negative index for offseting in the end
+                    if (i < this.parent.lineMin)
+                        this.parent.lineMin = i;
+
+                    // Return a line on these coordinates
+                    var l = new MachineDiagramLine(parent, forkNode, i, forkNode.x+1);
+                    this.parent.lines[i] = l;
+                    return l;
+
+                }
+            }
+
+        }
+
+
+        var Grid = function() {
+            this.lineMin = 0;
+            this.lineMax = 0;
+            this.lines = {};
+        }
+
+            /**
+             * Clean the entire grid
+             */
+            Grid.prototype.clear = function() {
+                this.lines = [];
+            }
+
+            /**
+             * Create/return a new gridline
+             */
+            Grid.prototype.getLine = function(y) {
+                if (this.lines[y] == undefined)
+                    this.lines[y] = new GridLine(this, y);
+                if (y < this.lineMin)
+                    this.lineMin = y;
+                if (y > this.lineMax)
+                    this.lineMax = y;
+                return this.lines[y];
+            }
+
+            /**
+             * Shift lines towards a direction
+             */
+            Grid.prototype.shiftLines = function(y, upwards) {
+                if (upwards) {
+                    for (var i=this.lineMin-1; i<y; i++) {
+                        this.lines[i].y--
+                        this.lines[i] = this.lines[i+1];
+                    }
+                    this.lines[y] = new GridLine(this, y);
+                } else {
+                    for (var i=this.lineMax+1; i>y; i--) {
+                        this.lines[i].y++;
+                        this.lines[i] = this.lines[i-1];
+                    }
+                    this.lines[y] = new GridLine(this, y);
+                }
+                return this.lines[y];
+            }
+
+            /**
+             * Return a chunk description for the given coordinates
+             */
+            Grid.prototype.getChunk = function(y,x,upwards) {
+
+                // Pick line specified on Y
+                var line = this.getLine(y);
+
+                // Check if line is not free, and therefore
+                // we have to shift lines in order to make space
+                if (!line.freeAt(x))
+                    line = this.shiftLines(y, upwards);
+
+                // Return line that contains this chunk
+                return line.setOffset(x);
+
+            }
+
+        var GridLine = function(grid, y) {
+
+            // Keep references
+            this.y = y;
+            this.grid = grid;
+            this.parent = parent;
+
+            // Initialize
+            this.chunks = [];
+            this.forkDepth = 0;
+
+            // Index pointers
+            this.x = 0;
+            this.activeChunk = null;
+
+        }
+
+            /**
+             * Push node on the current line chunk
+             */
+            GridLine.prototype.stack = function(node) {
+                if (!this.activeChunk) {
+                    this.activeChunk = new GridLineChunk(this);
+                    this.chunks.stack(this.activeChunk);
+                }
+                return this.activeChunk.stack(node);
+            }
+
+            /**
+             * Forward to next column
+             */
+            GridLine.prototype.forward = function() {
+                this.x++;
+                if (this.activeChunk)
+                    this.activeChunk.next();
+                return this;
+            }
+
+            /**
+             * Fork and return a new line object
+             */
+            GridLine.prototype.fork = function() {
+
+                // Increment fork depth
+                this.forkDepth++;
+
+                // Calculate line direction & offset
+                var direction = (this.forkDepth % 2 == 0) ? 1 : -1,
+                    offset = Math.ceil(this.forkDepth/2) * direction;
+
+                // Calculate the line we are going to go to
+
+
+            }
+
+            /**
+             * Check if line is free on the specified coordinates
+             */
+            GridLine.prototype.freeAt = function(x) {
+                for (var i=0; i<this.chunks.length; i++) {
+                    if ((x >= this.chunks[i].begin) && (x <= this.chunks[i].end)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            /**
+             * Select/create chunk for continuing on the given X position
+             */
+            GridLine.prototype.setOffset = function(x) {
+                for (var i=0; i<this.chunks.length; i++) {
+                    if (this.chunks[i].end+1 == x) {
+                        this.x = x;
+                        this.activeChunk = this.chunks[i];
+                        return this;
+                    }
+                }
+
+                // Create new chunk
+                this.x = x;
+                this.activeChunk = new GridLineChunk(this,x);
+                return this;
+
+            }
+
+
+        var GridLineChunk = function() {
+
+        }
+
+            /**
+             * Calculate the X offset for this chunk
+             */
+             GridLineChunk.prototype.x = function() {
+                return 0;
+             }
+
+            /**
+             * Calculate the Y offset for this chunk
+             */
+             GridLineChunk.prototype.y = function() {
+                return 0;
+             }

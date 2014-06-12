@@ -5,7 +5,7 @@ define(["three", "three-extras"],
 
 		var Scene = {};
 
-		var s = 400, h = 200, fBr = 80, f0r = 20, f1r = 5;
+		var s = 250, h = 150, fBr = 80, f0r = 20, f1r = 5;
 
 		Scene.config = {
 
@@ -43,12 +43,25 @@ define(["three", "three-extras"],
 					src: 'static/img/sprites.png',
 					sprites: [4,4]
 				},
+				'fluxes': {
+					src: 'static/img/particle-skins.png',
+					sprites: [2,2]
+				},
 				'fluc-glow': {
 					src: "static/img/star-blue-purple-glow.png"
 				},
 				'fluc-particle': {
+					src: "static/img/particle-03.png"
+				},
+				'backflux': {
 					src: "static/img/yellow_glow.png"
-				}
+				},
+				'fluxskin01': {
+					src: "static/img/skin01.png"
+				},
+				'fluxskin02': {
+					src: "static/img/skin02.png"
+				},
 			}
 		};
 
@@ -84,6 +97,12 @@ define(["three", "three-extras"],
 					fog: true,
 					transparent: true
 				}),
+				'backflux0': new Def.THREE.MeshBasicMaterial({
+					map: Map.get('fluxes', 0, 1),
+					color: 0xffffff,
+					fog: true,
+					transparent: true,
+				})
 			}
 		};
 
@@ -96,7 +115,7 @@ define(["three", "three-extras"],
 			return {
 				'grid': {
 					create: function() {
-						var grid = new Def.THREE.GridHelper( 10000, 500 );
+						var grid = new Def.THREE.GridHelper( 10000, 250 );
 						grid.position.y = -400;
 						return grid;
 					}
@@ -104,7 +123,7 @@ define(["three", "three-extras"],
 				'feyman0': {
 					create: function() {
 						var fd = new Def.FeymanDiagram();
-						fd.renderDepth = 0.0001;
+						fd.position.z = -10;
 
 						// Prepare kinks
 						fd.k0 =    fd.addKink( Cfg.p1[0],  Cfg.p1[1]  ),
@@ -123,10 +142,44 @@ define(["three", "three-extras"],
 						e.update();
 					}
 				},
+				'backflux0': {
+					create: function() {
+						var p = new Def.THREE.Mesh(
+							new Def.THREE.PlaneGeometry(1,1),
+							Mat.get('backflux0')
+						);
+
+						// Get the two point vectors
+						p.p1 = new THREE.Vector3(0,0,-100);
+						p.p2 = new THREE.Vector3(0,0,-100);
+
+						// Rescale
+						p.rescale = function() {
+							var horiz = this.p2.clone().sub(this.p1),
+								center = this.p2.clone().add(this.p1).divideScalar(2),
+								diameter = horiz.length();
+
+							this.position.copy(center);
+							this.scale.set(
+									diameter, diameter, diameter
+								);
+						}
+
+						return p;
+
+					},
+					bind: {
+						'backflux0.p1.x': function(e,v) { e.p1.setX(v-20); e.rescale(); },
+						'backflux0.p1.y': function(e,v) { e.p1.setY(v); e.rescale(); },
+						'backflux0.p2.x': function(e,v) { e.p2.setX(v+100); e.rescale(); },
+						'backflux0.p2.y': function(e,v) { e.p2.setY(v); e.rescale(); },
+						'backflux0.a': function(e,v) { e.material.opacity = v; }
+					}
+				},
 				'flucA0': {
 					create: function() {
 						var p = new Def.FluctuationSprite({
-							radius: Cfg.rA, mapBack: Map.get('fluc-glow'), mapParticle: Map.get('fluc-particle')
+							radius: Cfg.rA, mapSkin: Map.get('fluxskin01')
 						});
 						p.position.z = -5;
 						p.setParticleAR( 1, Math.PI/4, 0.25 );
@@ -144,7 +197,7 @@ define(["three", "three-extras"],
 				'flucB1': {
 					create: function() {
 						var p = new Def.FluctuationSprite({
-							radius: Cfg.rB, mapBack: Map.get('fluc-glow'), mapParticle: Map.get('fluc-particle')
+							radius: Cfg.rB, mapSkin: Map.get('fluxskin02')
 						});
 						p.position.z = -5;
 						p.setParticleAR( 1, 0, 0.25 );
@@ -227,6 +280,11 @@ define(["three", "three-extras"],
 
 				// Defaults for all objects
 				'defaults': {
+					'backflux0.a': 0,
+					'backflux0.p1.x': C.p1[0],
+					'backflux0.p1.y': C.p1[1],
+					'backflux0.p2.x': C.p1[0],
+					'backflux0.p2.y': C.p1[1],
 					'partA0.a': 0,
 					'partB0.a': 0,
 					'partB1.a': 0,
@@ -254,6 +312,24 @@ define(["three", "three-extras"],
 
 				'keyframes': [
 
+					// Backflux expansion
+					[
+						{
+							p: 0.0,
+							v: {
+								'backflux0.p2.x': C.p1[0],
+								'backflux0.p2.y': C.p1[1],
+							}
+						},
+						{
+							p: 3.0,
+							v: {
+								'backflux0.p2.x': C.p10[0],
+								'backflux0.p2.y': C.p10[1],
+							}
+						}
+					],
+
 					// Camera flyout
 					[
 						{
@@ -276,7 +352,7 @@ define(["three", "three-extras"],
 								'camera.y': C.p2[1],
 								'camera.target.x': C.p2[0],
 								'camera.target.y': C.p2[1],
-								'camera.z': 500,
+								'camera.z': 200,
 								'camera.target.z': 0,
 							},
 							e: {
@@ -327,6 +403,7 @@ define(["three", "three-extras"],
 						{
 							p: 0.0,
 							v: {
+								'backflux0.a': 0,
 								// ------------
 								'partA0.a': 1,
 								'flucA0.a': 0,
@@ -336,6 +413,8 @@ define(["three", "three-extras"],
 						{
 							p: 0.5,
 							v: {
+								'backflux0.a': 1,
+								// ------------
 								'partA0.a': 0,
 								'flucA0.a': 1,
 								'flucA0.p': 25,
@@ -352,10 +431,10 @@ define(["three", "three-extras"],
 						{
 							p: 1.1,
 							v: {
+								'flucA0.p': -1,
 								'flucA0.a': 0,
 								'flucA0.s': 1,
 								// ------------
-								'partB1.a': 1,
 								'flucB1.a': 0,
 								'flucB1.s': 1,
 								'flucB1.p': 50,
@@ -367,7 +446,6 @@ define(["three", "three-extras"],
 								'flucA0.a': 0, // Fix
 								'flucA0.s': 1, // Fix
 
-								'partB1.a': 0,
 								'flucB1.a': 1,
 								'flucB1.s': 1,
 								'flucB1.p': 25,
@@ -376,7 +454,6 @@ define(["three", "three-extras"],
 						{
 							p: 2.0,
 							v: {
-								'partB1.a': 0,
 								'flucB1.p': 0,
 								'flucB1.s': 1,
 								'flucB1.a': 1,
@@ -387,6 +464,7 @@ define(["three", "three-extras"],
 							v: {
 								'flucB1.s': 1,
 								'flucB1.a': 0,
+								'flucB1.p': -1,
 							}
 						},
 						{
@@ -409,12 +487,20 @@ define(["three", "three-extras"],
 					// Rapid animations
 					[
 						{
-							p: 0.999,
+							p: 0.0,
 							v: {
 								'partB0.a': 0,
 								'partB1.a': 0,
 							}
-						}, {
+						}, 
+						{
+							p: 0.8,
+							v: {
+								'partB0.a': 0,
+								'partB1.a': 0,
+							}
+						}, 
+						{
 							p: 1.0,
 							v: {
 								'partB0.a': 1,
@@ -422,7 +508,7 @@ define(["three", "three-extras"],
 							}
 						},
 						{
-							p: 1.999,
+							p: 1.8,
 							v: {
 								'partB0.a': 1,
 								'partC0.a': 0,

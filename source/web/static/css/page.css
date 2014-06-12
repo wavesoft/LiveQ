@@ -1,3 +1,10 @@
+/*
+.keyframes(@name; @rules) {
+  @-webkit-keyframes @name { @rules(); };
+  @-moz-keyframes @name { @rules(); };
+  @-o-keyframes @name { @rules(); };
+  @keyframes @name { @rules(); }; }
+*/
 html,
 body {
   overflow: hidden;
@@ -95,33 +102,41 @@ body {
   position: relative;
 }
 .game-scr-nav .icons .line {
-  border-width: 4px;
+  border-width: 0;
+  border-style: solid;
   border-color: #c0392b;
   position: absolute;
 }
 .game-scr-nav .icons .line.pos-straight {
-  border-style: none none solid none;
+  border-width: 0 0 4px 0;
 }
 .game-scr-nav .icons .line.pos-branch {
-  border-style: solid none none solid;
+  border-width: 4px 0 0 4px;
   border-radius: 10px 0 0 0;
 }
 .game-scr-nav .icons .line.pos-branch.pos-down {
-  border-style: none none solid solid;
+  border-width: 0 0 4px 4px;
   border-radius: 0 0 0 10px;
 }
 .game-scr-nav .icons .line.pos-collapse {
-  border-style: none solid solid none;
+  border-width: 0 4px 4px 0;
   border-radius: 0 0 10px 0;
 }
 .game-scr-nav .icons .line.pos-collapse.pos-down {
   border-radius: 0 10px 0  0;
-  border-style: solid solid none none;
+  border-width: 4px 4px 0 0;
+}
+.game-scr-nav .icons .line.dashed {
+  border-style: dashed;
 }
 .game-scr-nav .icons .icon {
   display: inline-block;
   width: 64px;
   position: absolute;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  -o-transition: all 0.2s linear;
+  transition: all 0.2s linear;
 }
 .game-scr-nav .icons .icon > div {
   margin-top: 5px;

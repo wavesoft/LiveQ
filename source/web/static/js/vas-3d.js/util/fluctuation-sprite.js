@@ -12,15 +12,11 @@ define(["three", "three-extras/shader-fluctuation"],
 			this.radius = config.radius || 1;
 
 			// Fetch maps
-			this.mapParticle = config.mapParticle || THREE.ImageUtils.loadTexture( "static/img/star-blue-purple-glow.png" );
-			this.mapBack = config.mapBack || THREE.ImageUtils.loadTexture( "static/img/yellow_glow.png" );
+			this.mapSkin = config.mapSkin || THREE.ImageUtils.loadTexture( "static/img/skin01.png" );
 
 			// Prepare shader uniforms
 			this.uniforms = THREE.UniformsUtils.clone( THREE.FluctuationShader.uniforms );
-			this.uniforms['tParticle'].value = this.mapParticle;
-			this.uniforms['tBack'].value = this.mapBack;
-			//this.uniforms['vRepeat'].value.set( 0.25, 0.25 );
-			//this.uniforms['vOffset'].value.set( 0.50, 0.75 );
+			this.uniforms['tSkin'].value = this.mapSkin;
 
 			// Prepare material
 			this.material = new THREE.ShaderMaterial( {
@@ -28,7 +24,8 @@ define(["three", "three-extras/shader-fluctuation"],
 				vertexShader: THREE.FluctuationShader.vertexShader,
 				fragmentShader: THREE.FluctuationShader.fragmentShader,
 				transparent: true,
-				opacity: 1
+				depthWrite: false,
+				opacity: 1,
 			});
 
 			// Create geometry

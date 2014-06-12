@@ -114,7 +114,9 @@ requirejs(
                     'shortdesc' : 'Description not available yet',
                     'icon'      : 'icon08',
                     'invert'    : true,
-                }
+                },
+
+
             ]);
         });
 

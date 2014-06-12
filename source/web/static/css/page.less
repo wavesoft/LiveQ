@@ -79,28 +79,32 @@ body {
 		position: relative;
 
 		.line {
-			border-width: 4px;
+			border-width: 0;
+			border-style: solid;
 			border-color: #c0392b;
 			position: absolute;
 
 			&.pos-straight {
-				border-style: none none solid none;
+				border-width: 0 0 4px 0;
 			}
 			&.pos-branch {
-				border-style: solid none none solid;
+				border-width: 4px 0 0 4px;
 				border-radius: 10px 0 0 0;
 				&.pos-down {
-					border-style: none none solid solid;
+					border-width: 0 0 4px 4px;
 					border-radius: 0 0 0 10px;
 				}
 			}
 			&.pos-collapse {
-				border-style: none solid solid none;
+				border-width: 0 4px 4px 0;
 				border-radius: 0 0 10px 0;
 				&.pos-down {
 					border-radius: 0 10px 0  0;
-					border-style: solid solid none none;
+					border-width: 4px 4px 0 0;
 				}
+			}
+			&.dashed {
+				border-style: dashed;
 			}
 		}
 
@@ -108,6 +112,7 @@ body {
 			display: inline-block;
 			width: @game-scr-nav-iconset-size;
 			position: absolute;
+			.transition( all 0.2s linear );
 
 			&>div {
 				margin-top: 5px;
