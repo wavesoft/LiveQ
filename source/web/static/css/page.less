@@ -77,12 +77,21 @@ body {
 
 	.icons {
 		position: relative;
+		.transition( ~"top 0.4s, left 0.4s" );
+
+		.focus-bar {
+			position: absolute;
+			background-color: #F1948A;
+			left: 0; top: 0;
+			.transition( ~"top 0.2s linear, left 0.2s linear" );
+		}
 
 		.line {
 			border-width: 0;
 			border-style: solid;
 			border-color: #c0392b;
 			position: absolute;
+			.transition( ~"top 0.2s linear, left 0.2s linear" );
 
 			&.pos-straight {
 				border-width: 0 0 4px 0;

@@ -8,9 +8,6 @@ define(["jquery"],
 			LINE_COLLAPSE = 2;
 
 
-
-
-
 		var Grid = function() {
 
 			// Line boundaries
@@ -108,7 +105,14 @@ define(["jquery"],
 			 * Align the X/Y coordinates of the node, according to the
 			 * current grid structure
 			 */
-			GridLine.prototype.stackNode = function(node) {
+			GridLine.prototype.stackNode = function(node, visible) {
+
+				// If not visible, just update coordinates
+				if (visible === false) {
+					node.x = this.x;
+					node.y = this.y;
+					return this;
+				}
 
 				// First stack occurs on this line
 				if (this.forkDepth == 0) {
@@ -160,6 +164,8 @@ define(["jquery"],
 			this.lines = [];
 			this.links = [];
 			this.lineMin = 0;
+			this.width = 0;
+			this.height = 0;
 			window.md = this;
 
 			// Grid
@@ -168,9 +174,15 @@ define(["jquery"],
 			// Build internal structures
 			this.host = host;
 			this.iconsHost = $('<div class="icons"></div>');
-			this.focusHost = $('<div class="focus"></div>');
+			this.focusBar = $('<div class="focus-bar"></div>');
+			this.iconsHost.append(this.focusBar);
 			host.append(this.iconsHost);
-			host.append(this.focusHost);
+
+			// Update on resize
+			var self = this;
+			$(window).resize(function() {
+				self.update();
+			});
 
 		}
 
@@ -250,63 +262,6 @@ define(["jquery"],
 				// Store on objectByID reference list
 				this.objectByID[o['id']] = o;
 
-				/*
-				if ((o['parent'] !== undefined) && (!o['parent'])) {
-
-					// Find rootNode element
-					this.rootNode = o;
-					o.x = 0;
-					o.y = 0;
-
-					// Create first line
-					this.getLine(o);
-				} else {
-
-					// Fetch parent node (or create new one if missing)
-					var p = this.objectByID[o['parent']],
-						parentLine = this.getLine(p);
-
-					// Fork from the parentn line (or keep the same if empty) 
-					// and stack the element there
-					var line = parentLine.fork(p);
-					line.stack( o );
-
-					// Store collapse information
-					var collapsed = false;
-					if (o['to'] != undefined) {
-
-						// Store object on collpase
-						if (this.collapse[o['to']] == undefined)
-							this.collapse[o['to']] = [];
-						this.collapse[o['to']].push(o);
-
-						// If such collapse target already exists,
-						// collapse line now
-						if (this.objectByID[o['to']] != undefined) {
-							collapsed = true;
-
-							// Collapse current line towards target
-							line.collapseTowards( this.objectByID[o['to']] );
-						}
-					}
-
-					// If this was a collapse target, handle collapse now
-					if (!collapsed) {
-						if (this.collapse[o['id']] != undefined) {
-							var collapseItems = this.collapse[o['id']];
-							for (var j=0; j<collapseItems.length; j++) {
-								var co = collapseItems[j],
-									collapseLine = this.getLine(co);
-
-								// Collapse given line towards us
-								collapseLine.collapseTowards(o);
-							}
-
-						}
-					}
-				}
-				*/
-
 			}
 
 			// If we don't have root node, pick the first
@@ -332,10 +287,10 @@ define(["jquery"],
 
 				// Place point-to-point link
 				this.links.push({
-						'from' : p,
-						   'to': o,
+						 'from' : p,
+						    'to': o,
 					  'collapse': false,
-					  'element': elm
+					   'element': elm
 					});
 
 				// If this node has a 'to' attribute,
@@ -348,28 +303,30 @@ define(["jquery"],
 
 					// Place point-to-point direct(false) link
 					this.links.push({
-							'from' : o,
-							   'to': this.objectByID[o['to']],
+							 'from' : o,
+							    'to': this.objectByID[o['to']],
 						  'collapse': true,
-						  'element': elm
+						   'element': elm
 						});
 
 				}
 
 			}
 
-			// Rebuild index
-			this.rebuildIndex();
+			// Focus on root node
+			this.focusNode = this.rootNode;
 
-			// Update DOM
+			// Rebuild grid & DOM
+			this.updateGrid();
 			this.updateDOM();
+			this.update();
 
 		}
 
 		/**
 		 * Populate the position information for the elements on the grid
 		 */
-		MachineDiagram.prototype.rebuildIndex = function() {
+		MachineDiagram.prototype.updateGrid = function() {
 
 			// Recursive function for building the tree
 			var placeChildren = function( line, node ) {
@@ -381,11 +338,7 @@ define(["jquery"],
 				// First align children
 				var lines = [];
 				for (var i=0; i<node.children.length; i++) {
-					if (node.children[i].visible)
-						lines.push( line.stackNode(node.children[i]) );
-					else {
-						lines.push( line );
-					}
+					lines.push( line.stackNode(node.children[i], node.children[i].visible ) );
 				}
 
 				// THEN nest further
@@ -411,7 +364,14 @@ define(["jquery"],
 
 		};
 
+		/**
+		 * Update DOM elements to reflect the changes in the grid 
+		 */
 		MachineDiagram.prototype.updateDOM = function() {
+
+			// Reset dimentions
+			this.width = 0;
+			this.height = 0;
 
 			// Spacing information
 			var xSpacing = 64,
@@ -419,19 +379,28 @@ define(["jquery"],
 				xLine = 20;
 
 			for (var i=0; i<this.objects.length; i++) {
-				var o = this.objects[i];
+				var o = this.objects[i],
+					l = (xSpacing+xLine) * o.x,
+					t = ySpacing * (o.y+Math.abs(this.lineMin));
 
 				// Move element
 				o.element.css({
-					left: (xSpacing+xLine) * o.x,
-					top: ySpacing * (o.y+Math.abs(this.lineMin))
+					left: l,
+					top: t
 				});
 
 				// Crossfade transition
 				if (o.visible) {
-					o.element.fadeIn();
+					o.element.fadeIn(200);
 				} else {
-					o.element.fadeOut();
+					o.element.fadeOut(200);
+				}
+
+				// Update bounds
+				if (o.visible) {
+					var w = o.element.width(), h = o.element.height();
+					if (t+h > this.height) this.height = t+h;
+					if (l+w > this.width) this.width = l+w;
 				}
 
 			}
@@ -448,12 +417,10 @@ define(["jquery"],
 					mode = LINE_STRAIGHT;
 
 				// Check line link mode
-				if (l.from.y != l.to.y) {
-					if (l.collapse) {
-						mode = LINE_COLLAPSE;
-					} else {
-						mode = LINE_BRANCH;
-					}
+				if (l.collapse) {
+					mode = LINE_COLLAPSE;
+				} else if (l.from.y != l.to.y) {
+					mode = LINE_BRANCH;
 				}
 
 				// Fetch and prepare DOM element
@@ -513,15 +480,15 @@ define(["jquery"],
 
 				// Check for visible/invisible/faded states
 				if (l.from.visible && l.to.visible) {
-					elm.fadeIn();
+					elm.fadeIn(200);
 				} else if (!l.from.visible && !l.to.visible) {
-					elm.fadeOut();
+					elm.fadeOut(200);
 				} else {
 					if (mode == LINE_STRAIGHT) {
-						elm.fadeIn();
+						elm.fadeIn(200);
 						elm.addClass("dashed");
 					} else {
-						elm.fadeOut();
+						elm.fadeOut(200);
 					}
 				}
 
@@ -529,138 +496,87 @@ define(["jquery"],
 
 		}
 
+		/**
+		 * Set state of all elements
+		 */
+		MachineDiagram.prototype.setState = function(stateInfo) {
+			$.each(stateInfo, (function(k,v) {
+				this.objectByID[k].visible = !!v;
+			}).bind(this))
 
-		MachineDiagram.prototype.rebuildDOM = function() {
-
-			// Spacing information
-			var xSpacing = 64,
-				ySpacing = 84,
-				xLine = 20;
-
-			// Empty container
-			this.iconsHost.empty();
-
-			// Using the visualization information from befure, build
-			// the DOM components.
-			for (var i=0; i<this.objects.length; i++) {
-				var o = this.objects[i],
-					elmHost = $('<div class="icon"></div>'),
-					elmA = $('<a></a>'),
-					elmDiv = $('<div></div>');
-
-				// Nest children
-				elmHost.append(elmA);
-				elmHost.append(elmDiv);
-				elmA.attr("title", o['title']);
-				elmA.attr("href", 'about:'+o['id']);
-				elmA.addClass(o['icon']);
-				elmDiv.html(o['short']);
-
-				// Check for inverted
-				if (o['invert'])
-					elmA.addClass('invert');
-
-				// Keep reference
-				o.element = elmHost;
-
-				elmHost.css({
-					left: (xSpacing+xLine) * o.x,
-					top: ySpacing * (o.y+Math.abs(this.lineMin))
-				});
-				this.iconsHost.append(elmHost);
-
-			}
-
-			// Using the visualization information from before, build
-			// the DOM components.
-			for (var i=0; i<this.links.length; i++) {
-				var l =this.links[i],
-					x1 = (xSpacing+xLine) * l[0].x,
-					y1 = ySpacing * (l[0].y - this.lineMin),
-					x2 = (xSpacing+xLine) * l[1].x,
-					y2 = ySpacing * (l[1].y - this.lineMin),
-					mode = LINE_STRAIGHT;
-
-				// Check line link mode
-				if (y1 != y2) {
-					if (l[2]) {
-						mode = LINE_COLLAPSE;
-					} else {
-						mode = LINE_BRANCH;
-					}
-				}
-
-				if (mode == LINE_STRAIGHT) {
-
-					var elm = $('<div></div>');
-					elm.addClass("line");
-					elm.addClass("pos-straight");
-					elm.css({
-						'left': x1 + xSpacing,
-						'width': x2-x1 - xSpacing,
-						'top': y1 + ySpacing/4
-					});
-					l.elm = elm;
-					this.iconsHost.append(elm);
-
-				} else if (mode == LINE_BRANCH) {
-
-					var elm = $('<div></div>');
-					elm.addClass("line");
-					elm.addClass("pos-branch");
-					if (y2 > y1) {
-						elm.addClass('pos-down');
-						elm.css({
-							'left': x1 + xSpacing/2,
-							'top': y1 + ySpacing,
-							'height': y2-y1 - ySpacing*3/4, 
-							'width': x2-x1 - xSpacing/2 - 5,
-						});
-					} else {
-						elm.css({
-							'left': x1 + xSpacing/2,
-							'top': y2 + ySpacing/4,
-							'height': y1-y2 - ySpacing/2 + 5, 
-							'width': x2-x1 - xSpacing/2 - 5,
-						});
-					}
-					l.elm = elm;
-					this.iconsHost.append(elm);
-
-				} else if (mode == LINE_COLLAPSE) {
-
-					var elm = $('<div></div>');
-					elm.addClass("line");
-					elm.addClass("pos-collapse");
-					if (y2 > y1) {
-						elm.addClass('pos-down');
-						elm.css({
-							'left': x1 + xSpacing,
-							'top': y1 + ySpacing/4,
-							'height': y2-y1 - ySpacing/2 + 5,
-							'width': x2-x1 - xSpacing/2 - 5,
-						});
-					} else {
-						elm.css({
-							'left': x1 + xSpacing,
-							'top': y1,
-							'height': y1-y2 - ySpacing*3/4, 
-							'width': x2-x1 - xSpacing/2 - 5,
-						});
-					}
-					l.elm = elm;
-					this.iconsHost.append(elm);
-
-				}
-			}
+			// Update index & DOM
+			this.updateGrid();
+			this.updateDOM();
+			this.update();
 
 		}
 
-		MachineDiagram.prototype.setState = function(state) {
+		/**
+		 * Set the focus element
+		 */
+		MachineDiagram.prototype.setFocus = function(name) {
+			if (this.objectByID[name] == undefined)
+				return;
 
+			this.focusNode = this.objectByID[name];
+			this.update();
 		}
 
+		/**
+		 * Re-align objects on map
+		 */
 		MachineDiagram.prototype.update = function() {
+			var w = this.host.width(),
+				h = this.host.height();
+
+			// Calculate focus info
+			var fX = w/2, fY = h/2, fW=0, fH=0;
+			if ((this.focusNode != undefined) && this.focusNode.visible) {
+				fX = parseInt(this.focusNode.element.css("left"));
+				fY = parseInt(this.focusNode.element.css("top"));
+				fW = this.focusNode.element.width();
+				fH = this.focusNode.element.height();
+			}
+
+			// Update icons host
+			var ofsTop = (h - this.height)/2,
+				ofsLeft = (w - this.width)/2;
+
+			// Calculate scroll offsets
+			var deltaX = 0, deltaY = 0;
+			if ((ofsLeft+fX-fW/2) < w/3) {
+				deltaX = w/3 - (ofsLeft+fX-fW/2);
+			} else if ((ofsLeft+fX+fW/2) > w*2/3) {
+				deltaX = w*2/3 - (ofsLeft+fX+fW/2);
+			}
+			if (ofsTop+fY < 10) {
+				deltaY = 10 - (ofsTop+fY);
+				console.log("UP");
+			} else if (ofsTop+fY+fH > h-10) {
+				deltaY = (h-10) - (ofsTop+fY+fH);
+				console.log("DOWN");
+			}
+
+			// Apply offset
+			ofsLeft += deltaX;
+			ofsTop += deltaY;
+			this.iconsHost.css({
+				'left': ofsLeft,
+				'top': ofsTop
+			});
+
+			// Update focus host
+			if (fW == 0) {
+				this.focusBar.fadeOut(200);
+			} else {
+				this.focusBar.fadeIn(200);
+				this.focusBar.css({
+					'left': fX,
+					'top': -ofsTop,
+					'width': fW,
+					'height': h-Math.min(0,ofsTop)
+				});
+			}
 		}
 
 

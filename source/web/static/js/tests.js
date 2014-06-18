@@ -29,7 +29,7 @@ requirejs(
     function($, MachineDiagram) {
 
         $(function() {
-            var md = new MachineDiagram($(".game-scr-nav > .icons"));
+            var md = new MachineDiagram($(".game-scr-nav"));
             md.setLayout([
                 {
                     'parent'    : '',

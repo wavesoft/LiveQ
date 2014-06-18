@@ -100,12 +100,30 @@ body {
 }
 .game-scr-nav .icons {
   position: relative;
+  -webkit-transition: top 0.4s, left 0.4s;
+  -moz-transition: top 0.4s, left 0.4s;
+  -o-transition: top 0.4s, left 0.4s;
+  transition: top 0.4s, left 0.4s;
+}
+.game-scr-nav .icons .focus-bar {
+  position: absolute;
+  background-color: #F1948A;
+  left: 0;
+  top: 0;
+  -webkit-transition: top 0.2s linear, left 0.2s linear;
+  -moz-transition: top 0.2s linear, left 0.2s linear;
+  -o-transition: top 0.2s linear, left 0.2s linear;
+  transition: top 0.2s linear, left 0.2s linear;
 }
 .game-scr-nav .icons .line {
   border-width: 0;
   border-style: solid;
   border-color: #c0392b;
   position: absolute;
+  -webkit-transition: top 0.2s linear, left 0.2s linear;
+  -moz-transition: top 0.2s linear, left 0.2s linear;
+  -o-transition: top 0.2s linear, left 0.2s linear;
+  transition: top 0.2s linear, left 0.2s linear;
 }
 .game-scr-nav .icons .line.pos-straight {
   border-width: 0 0 4px 0;
