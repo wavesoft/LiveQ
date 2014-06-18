@@ -24,7 +24,7 @@ define(
 		ExplainPhysics.prototype = Object.create( C.ExplainScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "explain_physics", ExplainPhysics, 1 );
+		R.registerComponent( "explain.physics", ExplainPhysics, 1 );
 
 	}
 

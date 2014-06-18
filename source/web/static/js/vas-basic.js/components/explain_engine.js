@@ -24,7 +24,7 @@ define(
 		ExplaingEngine.prototype = Object.create( C.ExplainScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "explain_engine", ExplaingEngine, 1 );
+		R.registerComponent( "explain.engine", ExplaingEngine, 1 );
 
 	}
 

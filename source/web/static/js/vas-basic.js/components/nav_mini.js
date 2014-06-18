@@ -47,7 +47,7 @@ define(
 		}
 
 		// Register home screen
-		R.registerComponent( "nav_mini", NavMini, 1 );
+		R.registerComponent( "nav.mini", NavMini, 1 );
 
 	}
 

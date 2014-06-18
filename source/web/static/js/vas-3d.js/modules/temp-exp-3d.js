@@ -416,7 +416,7 @@ define(
 		}
 
 
-		R.registerComponent('screen_explain', Exp3DScreen);
+		R.registerComponent('screen.explain', Exp3DScreen);
 
 	}
 

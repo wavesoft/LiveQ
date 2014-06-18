@@ -76,6 +76,16 @@ define(["core/config", "core/util/component"],
 		registry.components = {};
 
 		/**
+		 * This is a dictionary that contains arbitrary data objects,
+		 * indexed by their name.
+		 *
+		 * This can be used for defining scenes, timelines and other overridable
+		 * objects in the game. Like with the components, the data dictionary
+		 * also contain a priority attribute.
+		 */
+		register.data = {};
+
+		/**
 		 * Register a component under the given name.
 		 *
 		 * If you are loading multiple modules and some of them are overloading others,
@@ -125,6 +135,66 @@ define(["core/config", "core/util/component"],
 
 			// Return instance
 			return inst;
+
+		}
+
+		/**
+		 * Place a data object under the given name and weight.
+		 *
+		 * If you are loading multiple modules and some of them are overloading others,
+		 * it's not easy to track their load sequence. Therefore, you can provide the optional
+		 * third parameter, which defines the **weight** of the component.
+		 *
+		 * Components with bigger weight override data objects with less weight. By default, the
+		 * core data objects of the Virtual Atom Smasher have weight 4, so you can create your
+		 * own customizations by having a weight bigger than or equal to 5.
+		 *
+		 * @param {string} category - The general category of this data object
+		 * @param {string} name - The name of the data object to register for
+		 * @param {Object} data - The data payload to place in registry
+		 * @param {integer} weight - The weight of this data entry (default: 5)
+		 */
+		registry.setData = function(category, name, data, weight) {
+			var w = weight || 5;
+
+			// Check for category
+			if (registry.data[category] == undefined)
+				registry.data[category] = {};
+
+			// Check if we already have a component with
+			// bigger weight than us.
+			if (registry.data[category][name] != undefined) {
+				if (registry.data[category][name].w >= w)
+					return;
+			}
+
+			// Store data object and it's weight
+			registry.data[category][name] = {
+				'w': w,
+				'o': data
+			};
+			
+		}
+
+		/**
+		 * Fetch a data object previously registered with setData
+		 *
+		 * @param {string} category - The general category of this data object
+		 * @param {string} name - The name of the data object to fetch
+		 * @param {object} defaultValue - The default value to return if the object is missing
+		 */
+		registry.getData = function(category, name, defaultValue) {
+
+			// Check for missing category
+			if (registry.data[category] == undefined)
+				return defaultValue;
+
+			// Check for missing item
+			if (registry.data[category][name] == undefined)
+				return defaultValue;
+
+			// Return data object
+			return registry.data[category][name].o;
 
 		}
 

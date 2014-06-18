@@ -1,5 +1,5 @@
 
-define(["core/config", "core/util/component" ], 
+define(["core/config", "core/base/component" ], 
 
 	/**
 	 * This module provides the base classes for various root
@@ -23,7 +23,7 @@ define(["core/config", "core/util/component" ],
 	 *       MyTuningScreen.prototype = Object.create(C.TuningScreen.prototype);
 	 * 
 	 *       // Put my custom component on registry, under the ID 'tuning_screen'
-	 *       R.registerComponent('tuning_screen', MyTuningScreen);
+	 *       R.registerComponent('screen.tuning', MyTuningScreen);
 	 *
 	 *
      *    }
@@ -39,7 +39,7 @@ define(["core/config", "core/util/component" ],
 		 * Initializes a new TuningScreen Component.
 		 *
 		 * This component is displayed when the user is tuning the Monte-Carlo
-		 * generator. Before calling the component's {@link module:core/util/component~Component#focus|focus()} function
+		 * generator. Before calling the component's {@link module:core/base/component~Component#focus|focus()} function
 		 * the functions setTunables and setObservables are fired.
 		 *
 		 * For further dynamic updates, each tunable and observable class provide a dynamic
@@ -48,7 +48,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract class for the tuning screen where the user can tune the configuration.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var TuningScreen = function( hostDOM ) {
@@ -62,22 +62,122 @@ define(["core/config", "core/util/component" ],
 		TuningScreen.prototype = Object.create( Component.prototype );
 
 		/**
-		 * Define the tunable configuration
+		 * Define the tunable parameters
 		 *
+		 * Each parameter has the following format, as shown in the example:
+		 * @example <caption>Tunable configuration</caption>
+		 * myDashboard.setTunables([
+		 *    {
+	     *           id: 'num-01', // The index ID of the tunable
+	     *         type: 'num',    // One of: num,str,list,bool
+	     *          def: 0,        // The default value for this element
+	     *         meta: {         // Value metadata, for 'num' type:
+	     *            min: 0,      //   The minimum value
+	     *            max: 10,     //   The maximum value
+	     *            dec: 2       //   The decimals on the number
+	     *         },
+	     *         info: {         // Information for the user:
+		 *           name: '...',  //   The visible name for this parameter
+		 *          short: 'N01',  //   A short (iconic) name for this parameter
+		 *           book: 'r-01', //   Reference ID for providing more explaination 
+	     *         },
+	     *         corr: {         // Correlation information
+		 *            obs: [       // Correlation to objservables 
+		 *               {
+	     *                  id: '.',    // The objservable ID
+	     *                   w: 1,      // The correlation weight between 0 (unimportant) and 3 (most important)
+	     *                info: {       // The same as the previous 'info' entry
+	     *                    ...
+	     *                   },
+	     *                auto: {       // Automation information (not used yet)
+	 	 *                    ...
+	     *                   }
+		 *               }
+		 *            ],
+		 *            tun: [ .. ]	// Correlation to other tunables (same as above)
+	     *         }
+		 *    },
+		 *    ...
+		 * ]);
 		 * @abstract
-		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
+		 * @param {array} tunables - The tunable parameters
 		 */
-		TuningScreen.prototype.setTunables = function(tunables) {
+		TuningScreen.prototype.defineTunables = function(tunables) {
 		};
 
 		/**
-		 * Define the observable configuration
+		 * Define the observable parameters
+		 *
+		 * Each parameter has the following format, as shown in the example:
+		 * @example <caption>Tunable configuration</caption>
+		 * myDashboard.setObservables([
+		 *    {
+	     *           id: 'obs-01', // The index ID of the observable
+	     *         type: 'h2',	   // One of: h1 (Histo 1D), h2 (Histo 2D), 
+	     *         meta: {         // Metadata for the histogram (dependant per type)
+	     *            ...
+	     *         }
+	     *         info: {         // Information for the user:
+		 *           name: '...',  //   The visible name for this parameter
+		 *          short: 'N01',  //   A short (iconic) name for this parameter
+		 *           book: 'r-01', //   Reference ID for providing more explaination 
+	     *         },
+	     *         corr: {         // Correlation information
+		 *            obs: [       // Correlation to other objservables 
+		 *               {
+	     *                  id: '.',    // The objservable ID
+	     *                   w: 1,      // The correlation weight between 0 (unimportant) and 3 (most important)
+	     *                info: {       // The same as the previous 'info' entry
+	     *                    ...
+	     *                   },
+	     *                auto: {       // Automation information (not used yet)
+	 	 *                    ...
+	     *                   }
+		 *               }
+		 *            ],
+		 *            tun: [ .. ]	// Correlation to tunables (same as above)
+	     *         }
+		 *    },
+	     *    ...
+		 * ]);
+		 * @abstract
+		 * @param {array} observabes - The tunables record, as before
+		 */
+		TuningScreen.prototype.defineObservables = function(observables) {
+		};
+
+		/**
+		 * Define the level structure information
+		 *
+		 * The structure is explaine in the following example:
+		 * @example <caption>Level configuration</caption>
+		 * myDashboard.setLevelStructure([
+		 *    {
+		 *       tun: [ 'num-01', ... ],  // List of tunables to use
+		 *       obs: [ 'obs-01', ... ],  // List of observables to use
+		 *     train: [                   // Training packages required in order
+		 *        {                       // to play in this level
+	     *           id: 'train-01',      // The reference to the training package
+		 *        },
+		 *        ...
+		 *     ]
+		 *    },
+	     *    ...
+		 * ]);
+		 * @abstract
+		 * @param {array} observabes - The tunables record, as before
+		 */
+		TuningScreen.prototype.defineLevel = function(observables) {
+		};
+
+		/**
+		 * Select and enable interface controls for the specified level
 		 *
 		 * @abstract
-		 * @param {array} observables - A list of Observable classes, one for each observable.
+		 * @param {int} targetLevel - A zero-based index of the level to activate
 		 */
-		TuningScreen.prototype.setObservables = function(observables) {
-		};
+		TuneDashboard.prototype.setLevel = function( targetLevel ) {
+		}
 
 		
 		////////////////////////////////////////////////////////////
@@ -90,7 +190,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract class for the running screen where the user can see the run results.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var RunningScreen = function( hostDOM ) {
@@ -157,7 +257,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract clas for the running screen where the user can tune the configuration.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var ExplainScreen = function( hostDOM ) {
@@ -208,7 +308,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract clas for the home screen where the user sees an overview.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var HomeScreen = function( hostDOM ) {
@@ -239,7 +339,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract class for navigation controls.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var Nav = function( hostDOM ) {
@@ -283,7 +383,7 @@ define(["core/config", "core/util/component" ],
 		 * @class
 		 * @classdesc Abstract class for defining backdrop images.
 		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
-		 * @see {@link module:core/util/component~Component|Component} (Parent class)
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
 		 *
 		 */
 		var Backdrop = function( hostDOM ) {

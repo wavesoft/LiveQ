@@ -25,7 +25,7 @@ define(
 		TuningBackdrop.prototype = Object.create( C.Backdrop.prototype );
 
 		// Register home screen
-		R.registerComponent( "backdrop_tuning", TuningBackdrop, 1 );
+		R.registerComponent( "backdrop.tuning", TuningBackdrop, 1 );
 
 	}
 

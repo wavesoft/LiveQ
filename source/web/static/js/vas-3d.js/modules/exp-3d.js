@@ -245,7 +245,7 @@ define(["three", "core/util/animator", "core/registry", "core/components"],
 		}
 
 
-		R.registerComponent('explain_screen', Exp3DScreen);
+		R.registerComponent('explain.screen', Exp3DScreen);
 
 	}
 

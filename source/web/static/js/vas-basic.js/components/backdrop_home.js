@@ -25,7 +25,7 @@ define(
 		HomeBackdrop.prototype = Object.create( C.Backdrop.prototype );
 
 		// Register home screen
-		R.registerComponent( "backdrop_home", HomeBackdrop, 1 );
+		R.registerComponent( "backdrop.home", HomeBackdrop, 1 );
 
 	}
 

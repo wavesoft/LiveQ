@@ -8,6 +8,14 @@ define(["jquery"],
 			LINE_COLLAPSE = 2;
 
 
+		///////////////////////////////////////////////////////
+		//                   UTILITY CLASSES                 //
+		///////////////////////////////////////////////////////
+
+		/**
+		 * The grid class which helps arranging the items in a
+		 * grid-like fanout structure.
+		 */
 		var Grid = function() {
 
 			// Line boundaries
@@ -20,71 +28,75 @@ define(["jquery"],
 
 		}
 
-			/**
-			 * Clean the entire grid
-			 */
-			Grid.prototype.clear = function() {
-				this.lineMin = 0;
-				this.lineMax = 0;
-				this.lines = {};
-				this.normalizeList = [];
+		/**
+		 * Clean the entire grid
+		 */
+		Grid.prototype.clear = function() {
+			this.lineMin = 0;
+			this.lineMax = 0;
+			this.lines = {};
+			this.normalizeList = [];
+		}
+
+		/**
+		 * Normalize the line boundaries
+		 */
+		Grid.prototype.normalize = function() {
+			for (var i=0; i<this.normalizeList.length; i++) {
+				this.normalizeList[i].y -= this.lineMin;
 			}
+		}
 
-			/**
-			 * Normalize the line boundaries
-			 */
-			Grid.prototype.normalize = function() {
-				for (var i=0; i<this.normalizeList.length; i++) {
-					this.normalizeList[i].y -= this.lineMin;
-				}
-			}
+		/**
+		 * Get a clear line on the given coordinates and
+		 * shift other lines if required
+		 */
+		Grid.prototype.getClearLine = function(x, y, upwards) {
 
-			/**
-			 * Get a clear line on the given coordinates and
-			 * shift other lines if required
-			 */
-			Grid.prototype.getClearLine = function(x, y, upwards) {
+			// Update line metrics
+			if (y < this.lineMin) this.lineMin = y;
+			if (y > this.lineMax) this.lineMax = y;
 
-				// Update line metrics
-				if (y < this.lineMin) this.lineMin = y;
-				if (y > this.lineMax) this.lineMax = y;
-
-				// If line is not defined, we have space
-				if (this.lines[y] == undefined) {
-					this.lines[y] = new GridLine(this, y, x);
-					return this.lines[y];
-				}
-
-				// Otherwise we have to shift
-				if (upwards) {
-					for (var i=this.lineMin-1; i<y; i++) {
-						this.lines[i+1].y--;
-						this.lines[i] = this.lines[i+1];
-					}
-					this.lines[y] = new GridLine(this, y, x);
-				} else {
-					for (var i=this.lineMax+1; i>y; i--) {
-						this.lines[i-1].y++;
-						this.lines[i] = this.lines[i-1];
-					}
-					this.lines[y] = new GridLine(this, y, x);
-				}
-
-				// Return empty space
+			// If line is not defined, we have space
+			if (this.lines[y] == undefined) {
+				this.lines[y] = new GridLine(this, y, x);
 				return this.lines[y];
-
 			}
 
-			/**
-			 * Create/return the first line
-			 */
-			Grid.prototype.getFirstLine = function() {
-				if (this.lines[0] == undefined)
-					this.lines[0] = new GridLine(this, 0);
-				return this.lines[0];
+			// Otherwise we have to shift
+			if (upwards) {
+				for (var i=this.lineMin-1; i<y; i++) {
+					this.lines[i+1].y--;
+					this.lines[i] = this.lines[i+1];
+				}
+				this.lines[y] = new GridLine(this, y, x);
+			} else {
+				for (var i=this.lineMax+1; i>y; i--) {
+					this.lines[i-1].y++;
+					this.lines[i] = this.lines[i-1];
+				}
+				this.lines[y] = new GridLine(this, y, x);
 			}
 
+			// Return empty space
+			return this.lines[y];
 
+		}
+
+		/**
+		 * Create/return the first line
+		 */
+		Grid.prototype.getFirstLine = function() {
+			if (this.lines[0] == undefined)
+				this.lines[0] = new GridLine(this, 0);
+			return this.lines[0];
+		}
+
+
+		/**
+		 * A component of the Grid class wich takes care of
+		 * the horizontal distribution of objects.
+		 */
 		var GridLine = function(grid, y, x) {
 			this.grid = grid;
 			this.forkDepth = 0;
@@ -151,11 +163,9 @@ define(["jquery"],
 
 			}
 
-
-
-
-
-
+		///////////////////////////////////////////////////////
+		//                     MAIN CLASS                    //
+		///////////////////////////////////////////////////////
 
 		/**
 		 * Representation of the machine diagram
@@ -166,6 +176,8 @@ define(["jquery"],
 			this.lineMin = 0;
 			this.width = 0;
 			this.height = 0;
+
+			// @debug
 			window.md = this;
 
 			// Grid
@@ -183,22 +195,12 @@ define(["jquery"],
 			$(window).resize(function() {
 				self.update();
 			});
+			$(this.host).mousemove(function(e) {
+				self.mouseX = e.clientX / $(host).width();
+				self.mouseY = e.clientY / $(host).height();
+				self.update();
+			});
 
-		}
-
-		/** 
-		 * Return the grid line where this node belongs
-		 */
-		MachineDiagram.prototype.getLine = function(node) {
-			var l = this.lines[node.y];
-
-			// If such line does not exist, allocate new
-			if (l === undefined) {
-				l = new MachineDiagramLine(this, node);
-				this.lines[node.y] = l;
-			}
-
-			return l;
 		}
 
 		/**
@@ -518,7 +520,16 @@ define(["jquery"],
 			if (this.objectByID[name] == undefined)
 				return;
 
+			// Remove previous focus
+			if (this.focusNode)
+				this.focusNode.element.find("a").removeClass("focus");
+
+			// Update focus
 			this.focusNode = this.objectByID[name];
+			this.focusNode.element.find("a").addClass("focus");
+
+
+			// Update UI
 			this.update();
 		}
 
@@ -560,6 +571,8 @@ define(["jquery"],
 			// Apply offset
 			ofsLeft += deltaX;
 			ofsTop += deltaY;
+
+			// Update icon host position
 			this.iconsHost.css({
 				'left': ofsLeft,
 				'top': ofsTop
@@ -579,7 +592,7 @@ define(["jquery"],
 			}
 		}
 
-
+		// Return the machine diagram
 		return MachineDiagram;
 
 	}

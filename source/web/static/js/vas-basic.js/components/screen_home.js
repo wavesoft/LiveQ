@@ -21,13 +21,13 @@ define(
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="backdrop"></div>');
 			hostDOM.append(this.backdropDOM);
-			this.backdrop = R.instanceComponent("backdrop_home", this.backdropDOM);
+			this.backdrop = R.instanceComponent("backdrop.home", this.backdropDOM);
 
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "screen_home", HomeScreen, 1 );
+		R.registerComponent( "screen.home", HomeScreen, 1 );
 
 	}
 

@@ -44,7 +44,7 @@ define(["jquery", "core/config", "core/registry"],
 			UI.host.append(UI.overlayDOM);
 
 			// Initialize screens
-			var screenNames = [ 'screen_home', 'screen_explain', 'screen_tuning', 'screen_running' ];
+			var screenNames = [ 'screen.home', 'screen.explain', 'screen.tuning', 'screen.running' ];
 			UI.screens = {};
 			for (var i=0; i<screenNames.length; i++) {
 
@@ -79,7 +79,7 @@ define(["jquery", "core/config", "core/registry"],
 			UI.host.append(mininavDOM);
 			
 			// Try to create mini-nav
-			UI.mininav = R.instanceComponent("nav_mini", mininavDOM);
+			UI.mininav = R.instanceComponent("nav.mini", mininavDOM);
 			if (UI.mininav !== undefined) {
 
 				// Check for preferred dimentions

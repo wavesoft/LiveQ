@@ -21,7 +21,7 @@ define(["jquery", "core/config", "core/UI"], function($, config, UI) {
 	VAS.run = function() {
 
 		// Run main game
-		UI.selectScreen( "screen_explain" );
+		UI.selectScreen( "screen.explain" );
 
 	}
 

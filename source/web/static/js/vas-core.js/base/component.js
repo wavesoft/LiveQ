@@ -2,11 +2,10 @@
 define(["core/util/event_base", "core/config"], 
 
 	/**
-	 * This module provides the {@link EventBase} class which
-	 * is used in other places in this project for forwarding events
-	 * to interested parties.
+	 * This module provides the base component class which is used for derriving all of the
+	 * user interface widgets and screens.
 	 *
-	 * @exports core/util/component
+	 * @exports core/base/component
 	 */
 	function (EventBase, config) {
 

@@ -25,14 +25,14 @@ define(
 				hostDOM.append(expBottom);
 
 			// Prepare child components
-			this.comTop = C.instanceComponent( "explain_physics", expTop );
-			this.comBottom = C.instanceComponent( "explain_engine", expBottom );
+			this.comTop = C.instanceComponent( "explain.physics", expTop );
+			this.comBottom = C.instanceComponent( "explain.engine", expBottom );
 
 		}
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
 
 		// Register home screen
-		R.registerComponent( "screen_explain", ExplainScreen, 1 );
+		R.registerComponent( "screen.explain", ExplainScreen, 1 );
 
 	}
 
