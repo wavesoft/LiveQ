@@ -2,6 +2,21 @@
 define(["jquery", "core/config", "core/registry"], 
 	function($, config, R) {
 
+		///////////////////////////////////////////////////////////////
+		//                     HELPER FUNCTIONS                      //
+		///////////////////////////////////////////////////////////////
+
+		/**
+		 * Initialize a tuning screen
+		 */
+		function init_tuning_screen(screen) {
+
+		}
+
+		///////////////////////////////////////////////////////////////
+		//                       IMPLEMENTATION                      //
+		///////////////////////////////////////////////////////////////
+
 		/**
 		 * This module provides the basic user interface functionality 
 		 * to the Virtual Atom Smasher.
@@ -23,10 +38,6 @@ define(["jquery", "core/config", "core/registry"],
 		 * @type {MiniNavComponent}
 		 */
 		UI.activeScreen = "";
-
-		/**
-		 * The 
-		 */
 
 		/**
 		 * Initialize the user interface for the game

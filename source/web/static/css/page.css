@@ -87,6 +87,9 @@ body {
 #game-frame .screen {
   background-color: #000;
 }
+#game-frame .screen.tuning {
+  background-color: #FFF;
+}
 #game-frame .nav-mini {
   position: absolute;
   display: block;

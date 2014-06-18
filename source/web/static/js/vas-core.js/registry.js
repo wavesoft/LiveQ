@@ -1,5 +1,5 @@
 
-define(["core/config", "core/util/component"], 
+define(["core/config", "core/base/component"], 
 
 	function(config, Component) {
 
@@ -83,7 +83,7 @@ define(["core/config", "core/util/component"],
 		 * objects in the game. Like with the components, the data dictionary
 		 * also contain a priority attribute.
 		 */
-		register.data = {};
+		registry.data = {};
 
 		/**
 		 * Register a component under the given name.

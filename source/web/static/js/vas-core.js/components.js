@@ -176,7 +176,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {int} targetLevel - A zero-based index of the level to activate
 		 */
-		TuneDashboard.prototype.setLevel = function( targetLevel ) {
+		TuningScreen.prototype.setLevel = function( targetLevel ) {
 		}
 
 		

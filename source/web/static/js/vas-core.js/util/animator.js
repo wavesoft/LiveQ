@@ -155,6 +155,7 @@ define(["core/util/event_base", "core/util/easing"],
 			this.timeOffset = 0;
 			this.completedCallback = null;
 			this.chainCallback = null;
+			this.__onUpdateCallbacks = [];
 
 		};
 		Animator.prototype = Object.create(EventBase.prototype);
@@ -470,6 +471,15 @@ define(["core/util/event_base", "core/util/easing"],
 			// Normalize position & set step
 			var posNorm = pos / this.duration;
 
+			// Fire tick callbacks
+			for (var i=0; i<this.__onUpdateCallbacks.length; i++) {
+				try {
+					this.__onUpdateCallbacks[i]( this.timeOffset );
+				} catch(e) {
+					console.warn("Animator: onUpdate() callback #"+i+" raised exception",e);
+				}
+			}
+
 			// Fire callback if completed
 			if (this.timeOffset == this.duration) {
 
@@ -594,6 +604,27 @@ define(["core/util/event_base", "core/util/easing"],
 			var framePos = this.timeline.tags[tag] * this.duration;
 			this.goto( framePos, onComplete );
 
+		}
+
+		/**
+		 * Register a callback function to be fired on every animation updated.
+		 * The first argument is the current time.
+		 *
+		 * @param {function} func - A callback to be fired on every tick
+		 */
+		Animator.prototype.onUpdate = function( func ) {
+			this.__onUpdateCallbacks.push(func);
+		}
+
+		/**
+		 * Unregister a callback function previously registered with onUpdate()
+		 *
+		 * @param {function} func - A callback to be fired on every tick
+		 */
+		Animator.prototype.offUpdate = function( func ) {
+			var i = this.__onUpdateCallbacks.indexOf(func);
+			if (i<0) return;
+			this.__onUpdateCallbacks.splice(i,1);
 		}
 
 		// Return animator

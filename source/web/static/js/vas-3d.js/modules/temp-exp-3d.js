@@ -62,6 +62,20 @@ define(
 				return definition[mat];
 
 			}
+			this.bindTimeUpdates = function( animator ) {
+				for (var k in definition) {
+					var v = definition[k];
+
+					// If material contains 'fSceneTime' uniform, register an update callback
+					if ((v.uniforms !== undefined) && (v.uniforms['fSceneTime'] !== undefined) && (v.uniforms['fSceneTime'].type == 'f')) {
+						console.log("Will: ",v);
+						animator.onUpdate(function(cTime) {
+							v.uniforms['fSceneTime'].value = cTime;
+						});
+					}
+
+				}
+			}
 		}
 
 		/**
@@ -140,6 +154,9 @@ define(
 					animatorRef.bind('camera.target.y', self.cameraTarget, 'y' );
 					animatorRef.bind('camera.target.z', self.cameraTarget, 'z' );
 
+					// Bind automatic 'fSceneTime' uniform updates on the materials
+					Mat.bindTimeUpdates(animatorRef);
+
 					window.anim0 = animatorRef;
 
 					// Prepare objects
@@ -153,7 +170,6 @@ define(
 							var obj = o.create();
 
 							// Place on scene
-							console.log("-- ADDING ",k);
 							self.mainScene.add(obj);
 
 							// Bind object properties to animator
@@ -379,11 +395,11 @@ define(
 			// Rock camera along the H/V axes
 			var rockDivider = 5,
 				rockLength = camZ.length()/rockDivider;
-			camV.normalize().multiplyScalar( this.mouse.y * rockLength );
+			camV.normalize().multiplyScalar( this.mouse.y * rockLength / 5 );
 			camH.normalize().multiplyScalar( this.mouse.x * rockLength );
 
 			// 
-			camPos.add(camH); //.add(camV);
+			camPos.add(camH).add(camV);
 
 			// Update camera
 			this.camera.position.set( camPos.x, camPos.y, camPos.z );

@@ -32,10 +32,12 @@ requirejs(
         $(function() {
 
             // Initialize VAS 
-            main.initialize();
+            main.initialize(function() {
 
-            // Run
-            main.run();
+                // Wait until VAS is ready and run it
+                main.run();
+
+            });
 
         });
 

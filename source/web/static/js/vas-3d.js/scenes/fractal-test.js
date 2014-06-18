@@ -24,7 +24,15 @@ define(["three", "three-extras"],
 			p7:  [ -s+f1r, 		-h/2 	],  // \_ First particle
 			p8:  [ -s,			-h/2-f1r],  // \_ Second particle
 			p9:  [ -s/2,		-h 		],  //     \_ Second particle rest
-			p10: [ 0, 			0 		],  // Final position
+			p10: [ -f1r/2,		0 		],  // Final position
+
+			p20: [  f1r/2, 		 0 	 	],	// Next group final position
+			p21: [  s, 			-h/2 	],	// Next group first particle rest
+			p22: [  s/2, 		 h 		],	// Next group second particle rest
+			p23: [  2*s, 		 0 	 	],	// Next group first split
+			p24: [  s, 		 	 h/2 	],	// Next group second split
+			p25: [  3*s,		 0 		],	// Next group source position
+
 
 		};
 
@@ -33,7 +41,8 @@ define(["three", "three-extras"],
 				"THREE": 				"three", 
 				"THREEx": 				"three-extras",
 				"FeymanDiagram": 		"vas-3d/util/feyman",
-				"FluctuationSprite": 	"vas-3d/util/fluctuation-sprite"
+				"FluctuationSprite": 	"vas-3d/util/fluctuation-sprite",
+				"HazeSprite": 			"vas-3d/util/haze-sprite",
 			};
 		}
 
@@ -62,6 +71,15 @@ define(["three", "three-extras"],
 				'fluxskin02': {
 					src: "static/img/skin02.png"
 				},
+				'partHazeNoise': {
+					src: "static/img/particle-noise.jpg"
+				},
+				'partHazeMask': {
+					src: "static/img/particle-mask.jpg"
+				},
+				'partHazeDiffuse': {
+					src: "static/img/particle-03.png"
+				}
 			}
 		};
 
@@ -142,6 +160,29 @@ define(["three", "three-extras"],
 						e.update();
 					}
 				},
+				'feyman1': {
+					create: function() {
+						var fd = new Def.FeymanDiagram();
+						fd.position.z = -10;
+
+						// Prepare kinks
+						fd.k0 =    fd.addKink( Cfg.p25[0],  Cfg.p25[1]  ),
+						fd.k1 = fd.k0.addKink( Cfg.p23[0],  Cfg.p23[1]  ),
+						fd.k2 = fd.k1.addKink( Cfg.p24[0],  Cfg.p24[1]  ),
+						fd.k3 = fd.k1.addKink( Cfg.p21[0],  Cfg.p21[1]  ),
+						fd.k4 = fd.k2.addKink( Cfg.p22[0],  Cfg.p22[1]  ),
+						fd.k5 = fd.k2.addKink( Cfg.p20[0], Cfg.p20[1] );
+
+						return fd;
+					},
+					bind: {
+						'feyman1.a': function(e,v) { e.material.opacity = v; },
+					},
+					update: function(e, delta) {
+						e.update();
+					}
+				},
+				/*
 				'backflux0': {
 					create: function() {
 						var p = new Def.THREE.Mesh(
@@ -176,6 +217,85 @@ define(["three", "three-extras"],
 						'backflux0.a': function(e,v) { e.material.opacity = v; }
 					}
 				},
+				*/
+				'backflux0': {
+					create: function() {
+						var p = new Def.HazeSprite({
+							mapDiffuse: Map.get("partHazeDiffuse"),
+							mapNoise: Map.get("partHazeNoise"),
+							mapMask: Map.get("partHazeMask")
+						});
+
+						// Get the two point vectors
+						p.p1 = new THREE.Vector3(0,0,-100);
+						p.p2 = new THREE.Vector3(0,0,-100);
+
+						// Rescale
+						p.rescale = function() {
+							var horiz = this.p2.clone().sub(this.p1),
+								center = this.p2.clone().add(this.p1).divideScalar(2),
+								diameter = horiz.length();
+
+							this.position.copy(center);
+							this.scale.set(
+									diameter, diameter, diameter
+								);
+						}
+
+						p.t=0;
+						return p;
+
+					},
+					update: function(p, delta) {
+						p.setPhase( p.t += delta/10000 );
+					},
+					bind: {
+						'backflux0.p1.x': function(e,v) { e.p1.setX(v-20); e.rescale(); },
+						'backflux0.p1.y': function(e,v) { e.p1.setY(v); e.rescale(); },
+						'backflux0.p2.x': function(e,v) { e.p2.setX(v+100); e.rescale(); },
+						'backflux0.p2.y': function(e,v) { e.p2.setY(v); e.rescale(); },
+						'backflux0.a': function(e,v) { e.setOpacity(v); }
+					}
+				},
+				'backflux1': {
+					create: function() {
+						var p = new Def.HazeSprite({
+							mapDiffuse: Map.get("partHazeDiffuse"),
+							mapNoise: Map.get("partHazeNoise"),
+							mapMask: Map.get("partHazeMask")
+						});
+
+						// Get the two point vectors
+						p.p1 = new THREE.Vector3(0,0,-100);
+						p.p2 = new THREE.Vector3(0,0,-100);
+
+						// Rescale
+						p.rescale = function() {
+							var horiz = this.p2.clone().sub(this.p1),
+								center = this.p2.clone().add(this.p1).divideScalar(2),
+								diameter = horiz.length();
+
+							this.position.copy(center);
+							this.scale.set(
+									diameter, diameter, diameter
+								);
+						}
+
+						p.t=0;
+						return p;
+
+					},
+					update: function(p, delta) {
+						p.setPhase( p.t += delta/10000 );
+					},
+					bind: {
+						'backflux1.p1.x': function(e,v) { e.p1.setX(v-20); e.rescale(); },
+						'backflux1.p1.y': function(e,v) { e.p1.setY(v); e.rescale(); },
+						'backflux1.p2.x': function(e,v) { e.p2.setX(v+100); e.rescale(); },
+						'backflux1.p2.y': function(e,v) { e.p2.setY(v); e.rescale(); },
+						'backflux1.a': function(e,v) { e.setOpacity(v); }
+					}
+				},				
 				'flucA0': {
 					create: function() {
 						var p = new Def.FluctuationSprite({
@@ -283,8 +403,13 @@ define(["three", "three-extras"],
 					'backflux0.a': 0,
 					'backflux0.p1.x': C.p1[0],
 					'backflux0.p1.y': C.p1[1],
-					'backflux0.p2.x': C.p1[0],
-					'backflux0.p2.y': C.p1[1],
+					'backflux0.p2.x': C.p2[0],
+					'backflux0.p2.y': C.p2[1],
+					'backflux1.a': 0,
+					'backflux1.p1.x': C.p20[0],
+					'backflux1.p1.y': C.p20[1],
+					'backflux1.p2.x': C.p25[0],
+					'backflux1.p2.y': C.p25[1],
 					'partA0.a': 0,
 					'partB0.a': 0,
 					'partB1.a': 0,
@@ -295,6 +420,7 @@ define(["three", "three-extras"],
 					'flucB1.a': 0,
 					'flucB1.s': 1,
 					'feyman0.a': 0,
+					'feyman1.a': 0,
 					'cam.x': 0,
 					'cam.y': 0,
 					'cam.z': 1800,
@@ -403,8 +529,6 @@ define(["three", "three-extras"],
 						{
 							p: 0.0,
 							v: {
-								'backflux0.a': 0,
-								// ------------
 								'partA0.a': 1,
 								'flucA0.a': 0,
 								'flucA0.p': 50,
@@ -413,8 +537,6 @@ define(["three", "three-extras"],
 						{
 							p: 0.5,
 							v: {
-								'backflux0.a': 1,
-								// ------------
 								'partA0.a': 0,
 								'flucA0.a': 1,
 								'flucA0.p': 25,
@@ -423,6 +545,9 @@ define(["three", "three-extras"],
 						{
 							p: 1.0,
 							v: {
+								'backflux0.a': 0,
+								'backflux1.a': 0,
+								// ------------
 								'flucA0.p': 0,
 								'flucA0.a': 1,
 								'flucA0.s': 1,
@@ -431,6 +556,9 @@ define(["three", "three-extras"],
 						{
 							p: 1.1,
 							v: {
+								'backflux0.a': 0.2,
+								'backflux1.a': 0.2,
+								// ------------
 								'flucA0.p': -1,
 								'flucA0.a': 0,
 								'flucA0.s': 1,
@@ -443,6 +571,9 @@ define(["three", "three-extras"],
 						{
 							p: 1.5,
 							v: {
+								'backflux0.a': 1,
+								'backflux1.a': 1,
+								// ------------
 								'flucA0.a': 0, // Fix
 								'flucA0.s': 1, // Fix
 
@@ -473,13 +604,15 @@ define(["three", "three-extras"],
 								'flucB1.s': 1, // Fix
 								'flucB1.a': 0, // Fix
 
-								'feyman0.a': 0
+								'feyman0.a': 0,
+								'feyman1.a': 0,
 							}
 						},
 						{
 							p: 4.0,
 							v: {
-								'feyman0.a': 1
+								'feyman0.a': 1,
+								'feyman1.a': 1,
 							}
 						}
 					],

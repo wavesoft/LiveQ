@@ -133,7 +133,7 @@ class RabbitMQChannel(BusChannel):
 				channel = connection.channel()		
 
 				# Ensure queue exists
-				channel.queue_declare(self.qname_in)
+				channel.queue_declare(self.qname_in, auto_delete=True)
 
 				# Setup callbacks
 				channel.basic_consume(self.onMessageArrived,
@@ -179,7 +179,7 @@ class RabbitMQChannel(BusChannel):
 				channel = connection.channel()
 
 				# Ensure queue exists
-				channel.queue_declare(self.qname_out)
+				channel.queue_declare(self.qname_out, auto_delete=True)
 
 				# Start listening on the outgoing queue
 				self.logger.info("RabbitMQ Output channel %s is live" % self.qname_out)

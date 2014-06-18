@@ -28,7 +28,7 @@ define(
 			hostDOM.click((function() {
 
 				// Fire the changeScreen event
-				this.trigger("changeScreen", "screen_home");
+				this.trigger("changeScreen", "screen.tuning");
 
 			}).bind(this));
 
