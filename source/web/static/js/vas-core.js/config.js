@@ -15,7 +15,7 @@ define({
 		'databases'		: {
 			'tunables'		: 'tunables',
 			'observables'	: 'observables',
-			'levels'		: 'levels'
+			'levels'		: 'levels',
 		}
 	},
 
@@ -24,9 +24,11 @@ define({
 	 */
 	'css': {
 		'nav-mini'		: 'nav-mini',
-		'screen'		: 'screen fullscreen',
+		'screen'		: 'screen',
 		'overlay'		: 'overlay',
-		'error-screen' 	: 'error-screen'
+		'backdrop'		: 'backdrop',
+		'foreground'	: 'foreground',
+		'error-screen' 	: 'error-screen',
 	}
 
 });

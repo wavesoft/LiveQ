@@ -1,7 +1,7 @@
 
-define(["jquery"], 
+define(["jquery", "core/registry", "core/components"], 
 
-	function($) {
+	function($,R,C) {
 
 		var LINE_STRAIGHT = 0,
 			LINE_BRANCH = 1,
@@ -171,6 +171,8 @@ define(["jquery"],
 		 * Representation of the machine diagram
 		 */
 		var MachineDiagram = function(host) {
+			C.ExplainScreen.call(this, host);
+
 			this.lines = [];
 			this.links = [];
 			this.lineMin = 0;
@@ -183,6 +185,9 @@ define(["jquery"],
 			// Grid
 			this.grid = new Grid();
 
+			// Initialize host
+			host.addClass("machine-diagram");
+
 			// Build internal structures
 			this.host = host;
 			this.iconsHost = $('<div class="icons"></div>');
@@ -190,23 +195,26 @@ define(["jquery"],
 			this.iconsHost.append(this.focusBar);
 			host.append(this.iconsHost);
 
-			// Update on resize
-			var self = this;
-			$(window).resize(function() {
-				self.update();
-			});
-			$(this.host).mousemove(function(e) {
-				self.mouseX = e.clientX / $(host).width();
-				self.mouseY = e.clientY / $(host).height();
-				self.update();
-			});
+		}
 
+		// Subclass from ExplainScreen
+		MachineDiagram.prototype = Object.create( C.ExplainScreen.prototype );
+
+		/**
+		 * Receive resize events
+		 */
+		MachineDiagram.prototype.onResize = function(w,h) {
+			this.hostWidth = w;
+			this.hostHeight = h;
+			this.update();
 		}
 
 		/**
 		 * Define the layout object
 		 */
-		MachineDiagram.prototype.setLayout = function(layout) {
+		MachineDiagram.prototype.onMachineLayoutDefined = function(layout) {
+			console.log(layout);
+			var self = this;
 
 			// -- DEL --
 			this.collapse = [];
@@ -248,6 +256,17 @@ define(["jquery"],
 				elmA.attr("href",  'about:'+o['id']);
 				elmA.addClass(		o['icon']);
 				elmDiv.html(		o['short']);
+
+				// Forward events
+				elmA.click(function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+
+					var id = $(this).attr("href").split(":")[1];
+					self.trigger("focusProcess", id);
+					self.setFocus(id);
+
+				});
 
 				// Check for inverted class
 				if (o['invert'])
@@ -537,8 +556,8 @@ define(["jquery"],
 		 * Re-align objects on map
 		 */
 		MachineDiagram.prototype.update = function() {
-			var w = this.host.width(),
-				h = this.host.height();
+			var w = this.hostWidth,
+				h = this.hostHeight;
 
 			// Calculate focus info
 			var fX = w/2, fY = h/2, fW=0, fH=0;
@@ -592,8 +611,8 @@ define(["jquery"],
 			}
 		}
 
-		// Return the machine diagram
-		return MachineDiagram;
+		// Register machine diagram on the registry
+		R.registerComponent( 'explain.machine', MachineDiagram, 1 );
 
 	}
 

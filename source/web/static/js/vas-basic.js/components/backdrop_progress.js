@@ -7,7 +7,7 @@ define(
 	/**
 	 * Basic version of the home backdrop
 	 *
-	 * @exports basic/components/backdrop_running
+	 * @exports basic/components/backdrop_tuning
 	 */
 	function(R,C) {
 
@@ -15,17 +15,17 @@ define(
 		 * @class
 		 * @classdesc The basic home screen
 		 */
-		var RunningBackdrop = function( hostDOM ) {
+		var ProgressBackdrop = function( hostDOM ) {
 			C.Backdrop.call(this, hostDOM);
 
 			// The screen backdrop is just black
 			hostDOM.css({ 'background-color': '#FFF' });
 
 		}
-		RunningBackdrop.prototype = Object.create( C.Backdrop.prototype );
+		ProgressBackdrop.prototype = Object.create( C.Backdrop.prototype );
 
 		// Register home screen
-		R.registerComponent( "backdrop.running", RunningBackdrop, 1 );
+		R.registerComponent( "backdrop.progress", ProgressBackdrop, 1 );
 
 	}
 

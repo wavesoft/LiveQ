@@ -102,7 +102,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} tunables - The tunable parameters
 		 */
-		TuningScreen.prototype.defineTunables = function(tunables) {
+		TuningScreen.prototype.onTunablesDefined = function(tunables) {
 		};
 
 		/**
@@ -143,7 +143,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} observabes - The tunables record, as before
 		 */
-		TuningScreen.prototype.defineObservables = function(observables) {
+		TuningScreen.prototype.onObservablesDefined = function(observables) {
 		};
 
 		/**
@@ -167,7 +167,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} observabes - The tunables record, as before
 		 */
-		TuningScreen.prototype.defineLevel = function(observables) {
+		TuningScreen.prototype.onLevelsDefined = function(observables) {
 		};
 
 		/**
@@ -176,7 +176,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {int} targetLevel - A zero-based index of the level to activate
 		 */
-		TuningScreen.prototype.setLevel = function( targetLevel ) {
+		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
 		}
 
 		
@@ -209,7 +209,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
-		RunningScreen.prototype.setTunables = function(tunables) {
+		RunningScreen.prototype.onTunablesDefined = function(tunables) {
 		};
 
 		/**
@@ -218,7 +218,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} observables - A list of Observable classes, one for each observable.
 		 */
-		RunningScreen.prototype.setObservables = function(observables) {
+		RunningScreen.prototype.onObservablesDefined = function(observables) {
 		};
 
 		/**
@@ -227,7 +227,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {Machine} machine - A machine instance which contains additional information regarding the computing node.
 		 */
-		RunningScreen.prototype.addMachine = function(machine) {
+		RunningScreen.prototype.onMachineAdded = function(machine) {
 		};
 
 		/**
@@ -236,7 +236,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {Machine} machine - A machine instance which contains additional information regarding the computing node.
 		 */
-		RunningScreen.prototype.removeMachine = function(machine) {
+		RunningScreen.prototype.onMachineRemoved = function(machine) {
 		};
 
 
@@ -276,7 +276,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
-		ExplainScreen.prototype.setTunables = function(tunables) {
+		ExplainScreen.prototype.onTunablesDefined = function(tunables) {
 		};
 
 		/**
@@ -285,7 +285,25 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} observables - A list of Observable classes, one for each observable.
 		 */
-		ExplainScreen.prototype.setObservables = function(observables) {
+		ExplainScreen.prototype.onObservablesDefined = function(observables) {
+		};
+
+		/**
+		 * Define the scene configuration.
+		 *
+		 * @abstract
+		 * @param {array} scenes - A list of scene timelines, one for each observable.
+		 */
+		ExplainScreen.prototype.onScenesDefined = function(scenes) {
+		};
+
+		/**
+		 * Define the machine layout configuration.
+		 *
+		 * @abstract
+		 * @param {array} layout - A list of nodes to link in order to render the machine layout.
+		 */
+		ExplainScreen.prototype.onMachineLayoutDefined = function(layout) {
 		};
 
 		/**
@@ -294,7 +312,7 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {string} name - The name of the parameter to focus upon
 		 */
-		ExplainScreen.prototype.focusParameter = function(name) {
+		ExplainScreen.prototype.onParameterFocus = function(name) {
 			
 		};
 
@@ -327,8 +345,57 @@ define(["core/config", "core/base/component" ],
 		 * @abstract
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
-		HomeScreen.prototype.setUserStatistics = function(tunables) {
+		HomeScreen.prototype.onUserStatistics = function(tunables) {
 		};
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Progress Screen Component.
+		 *
+		 * This component is used for keeping the user busy while a long-lasting event is in progress.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining backdrop images.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var ProgressScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		ProgressScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Set the current progress status.
+		 *
+		 * @abstract
+		 * @param {float} position - A number indicating the progress position (between 0.0 and 1.0)
+		 * @param {string} message - A string representing the current task in action
+		 */
+		ProgressScreen.prototype.onProgress = function(position, message) {
+		};
+
+		/**
+		 * Mark the progress as completed
+		 *
+		 * @abstract
+		 */
+		ProgressScreen.prototype.onProgressCompleted = function() {
+		};
+
+		/**
+		 * Mark a progress error
+		 *
+		 * @abstract
+		 */
+		ProgressScreen.prototype.onProgressError = function() {
+		};
+
 
 		////////////////////////////////////////////////////////////
 		/**
@@ -456,6 +523,7 @@ define(["core/config", "core/base/component" ],
 			'RunningScreen'		: RunningScreen,
 			'ExplainScreen' 	: ExplainScreen,
 			'HomeScreen'		: HomeScreen,
+			'ProgressScreen'	: ProgressScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 		};

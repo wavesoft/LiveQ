@@ -25,6 +25,9 @@ define(["core/util/event_base", "core/config"],
 			// Keep reference of the host DOM element
 			this.hostElement = hostDOM;
 
+			// The child components
+			this.childComponents = [];
+
 		}
 
 		// Subclass from EventBase
@@ -83,6 +86,33 @@ define(["core/util/event_base", "core/config"],
 		 */
 		Component.prototype.getPreferredSize = function() {
 			return undefined;
+		};
+
+		/**
+		 * Add a child component wich is going to receive component events
+		 * and it's events will be propagated to this component.
+		 *
+		 * @param {Component} com - The component to handle
+		 */
+		Component.prototype.addChild = function(com) {
+			this.childComponents.push(com);
+
+			// Override all the onXXX functions
+			var self = this;
+			for (k in this) {
+				if ((k.substr(0,2) == "on") && (k.length > 2)) {
+					(function(key, comFn, comRef) {
+						console.log(key);
+						if (!comFn) return;
+						var originalFn = self[key];
+						self[key] = function() {
+							comFn.apply(comRef, arguments);
+							originalFn.apply(this, arguments);
+						}
+					})(k, com[k], com);
+				}
+			}
+
 		};
 
 

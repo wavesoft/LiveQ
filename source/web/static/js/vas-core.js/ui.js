@@ -40,6 +40,68 @@ define(["jquery", "core/config", "core/registry"],
 		UI.activeScreen = "";
 
 		/**
+		 * The currently registered screens
+		 *
+		 * @type {Object}
+		 */
+		UI.screens = {};
+
+		/**
+		 * Initialize & Register the specified screen by it's name
+		 */
+		UI.initAndPlaceScreen = function(name, validateSubclass) {
+
+			// Create host DOM for the component
+			var comDOM = $('<div class="'+config.css['screen']+'"></div>');
+			UI.host.append(comDOM);
+
+			// Create screen instance
+			var s = R.instanceComponent(name, comDOM), valid = true;
+			if (s !== undefined) {
+
+				// Check if we are requested to do a subclass validation
+				if (validateSubclass !== undefined) {
+					if (!(s instanceof validateSubclass)) {
+						// Mark DOM as invalid
+						comDOM.empty();
+						comDOM.addClass(config.css['error-screen']);
+						comDOM.html("Could not validate <strong>"+name+"</strong>");
+						valid = false;
+					}
+				}
+
+				if (valid) {
+					// Fire reisze right after it's placed on DOM
+					s.onResize(comDOM.width(), comDOM.height());
+					// Store it on screens if it's valid
+					UI.screens[name] = s;
+				}
+
+			} else {
+
+				// Otherwise mark it as an invalid screen
+				comDOM.addClass(config.css['error-screen']);
+				comDOM.html("Could load <strong>"+name+"</strong>");
+
+			}
+
+			// Activate first screen
+			if (!UI.activeScreen) {
+				UI.activeScreen = name;
+				// Fire the onShown event
+				s.onShown();
+			} else {
+				// Otherwise hide it
+				comDOM.hide();
+			}
+
+
+			// Return instance
+			return s;
+	
+		}
+
+		/**
 		 * Initialize the user interface for the game
 		 *
 		 * This function **MUST** be called in order to initialize the game layout.
@@ -53,64 +115,6 @@ define(["jquery", "core/config", "core/registry"],
 			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
 			UI.overlayDOM.hide();
 			UI.host.append(UI.overlayDOM);
-
-			// Initialize screens
-			var screenNames = [ 'screen.home', 'screen.explain', 'screen.tuning', 'screen.running' ];
-			UI.screens = {};
-			for (var i=0; i<screenNames.length; i++) {
-
-				// Create host DOM for the component
-				var comDOM = $('<div class="'+config.css['screen']+'"></div>');
-				UI.host.append(comDOM);
-
-				// Create screen instance
-				var s = R.instanceComponent(screenNames[i], comDOM);
-				if (s !== undefined) {
-
-					// Fire reisze right after it's placed on DOM
-					s.onResize(comDOM.width(), comDOM.height());
-
-					// Store it on screens if it's valid
-					UI.screens[screenNames[i]] = s;
-
-				} else {
-
-					// Otherwise mark it as an invalid screen
-					comDOM.addClass(config.css['error-screen']);
-
-				}
-
-				// Hide DOM
-				comDOM.hide();
-
-			}
-
-			// Create the mini-nav menu
-			var mininavDOM = $('<div class="'+config.css['nav-mini']+'"></div>');
-			UI.host.append(mininavDOM);
-			
-			// Try to create mini-nav
-			UI.mininav = R.instanceComponent("nav.mini", mininavDOM);
-			if (UI.mininav !== undefined) {
-
-				// Check for preferred dimentions
-				var dim = UI.mininav.getPreferredSize();
-				if (dim != undefined) {
-					mininavDOM,css({
-						'width': dim[0],
-						'height': dim[1]
-					});
-					UI.mininav.onResize( dim[0], dim[1] );
-				} else {
-					UI.mininav.onResize( mininavDOM.width(), mininavDOM.height() );
-				}
-
-				// Bind events
-				UI.mininav.on("changeScreen", function(to) {
-					UI.selectScreen(to);
-				});
-
-			}
 
 			// Bind on window events
 			$(window).resize(function() {

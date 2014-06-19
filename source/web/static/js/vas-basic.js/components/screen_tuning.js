@@ -1,13 +1,13 @@
 
 
-define(["jquery", "core/registry", "core/components", "core/db"], 
+define(["jquery", "core/config", "core/registry", "core/components", "core/db"], 
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/tuning_screen
 	 */
-	function($, R, C, DB) {
+	function($, config, R, C, DB) {
 
 		/**
 		 * Tuning dashboard screen
@@ -15,13 +15,25 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 		var TuningScreen = function(hostDOM) {
 			C.TuningScreen.call(this, hostDOM);
 
-			// Prepare host elements
+			// Initialize host
+			hostDOM.addClass("tuning");
 			this.host = hostDOM;
+
+			// Create a slpash backdrop
+			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
+			hostDOM.append(this.backdropDOM);
+			this.backdrop = R.instanceComponent("backdrop.tuning", this.backdropDOM);
+
+			// Create foreground
+			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
+			hostDOM.append(this.foregroundDOM);
+
+			// Prepare host elements
 			this.hostControls = $('<div class="tune-controls"></div>');
 			this.hostLevels = $('<div class="tune-levels"></div>');
-			this.host.append(this.hostControls);
-			this.host.append(this.hostLevels);
-			this.host.addClass("tuning");
+			this.foregroundDOM.append(this.hostControls);
+			this.foregroundDOM.append(this.hostLevels);
+
 
 			// Prepare fields
 			this.tunables = {};
@@ -32,21 +44,6 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 			this.tuneWidgets = {};
 			this.observeWidgets = {};
 
-			// Fetch configuration from database
-			var self = this;
-			DB.openDatabase("tunables").all(function(tunables) {
-				if (!tunables) return;
-				self.defineTunables(tunables);
-			});
-			DB.openDatabase("observables").all(function(observables) {
-				if (!observables) return;
-				self.defineObservables(observables);
-			});
-			DB.openDatabase("observables").all(function(observables) {
-				if (!observables) return;
-				self.defineObservables(observables);
-			});
-
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
 
@@ -55,7 +52,7 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 		 *
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
-		TuningScreen.prototype.defineTunables = function(tunables) {
+		TuningScreen.prototype.onTunablesDefined = function(tunables) {
 			this.tunables = {};
 
 			// Build the tunables-by ID lookup table
@@ -70,7 +67,7 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 		 *
 		 * @param {array} observables - A list of Observable classes, one for each observable.
 		 */
-		TuningScreen.prototype.defineObservables = function(observables) {
+		TuningScreen.prototype.onObservablesDefined = function(observables) {
 			this.observables = {};
 
 			// Build the observables-by ID lookup table
@@ -83,7 +80,7 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 		 * Define the level structure information
 		 * (MUST be called after the setTunables/setObservables) function calls.
 		 */
-		TuningScreen.prototype.defineLevel = function(levelInfo) {
+		TuningScreen.prototype.onLevelsDefined = function(levelInfo) {
 			this.levels = [];
 
 			// Prepare level records
@@ -135,7 +132,7 @@ define(["jquery", "core/registry", "core/components", "core/db"],
 		/**
 		 * Select an enable interface controls for the specified level
 		 */
-		TuningScreen.prototype.setLevel = function( targetLevel ) {
+		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
 
 			// Reset
 			this.hostLevels.empty();

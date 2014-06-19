@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/registry", "core/components"],
+	["core/config", "core/registry", "core/components"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/home_screen
 	 */
-	function(R,C) {
+	function(config,R,C) {
 
 		/**
 		 * @class
@@ -19,9 +19,13 @@ define(
 			C.HomeScreen.call(this, hostDOM);
 
 			// Create a slpash backdrop
-			this.backdropDOM = $('<div class="backdrop"></div>');
+			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
 			hostDOM.append(this.backdropDOM);
 			this.backdrop = R.instanceComponent("backdrop.home", this.backdropDOM);
+
+			// Create foreground DOM
+			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
+			hostDOM.append(this.foregroundDOM);
 
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );

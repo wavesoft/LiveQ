@@ -339,6 +339,13 @@ define(
 		}
 
 		/**
+		 * Focus on a particular process
+		 */
+		Exp3DScreen.prototype.focusProcess = function(procName) {
+			anim0.start();
+		}
+
+		/**
 		 * Animation function
 		 */
 		Exp3DScreen.prototype.animate = function() {
@@ -395,7 +402,7 @@ define(
 			// Rock camera along the H/V axes
 			var rockDivider = 5,
 				rockLength = camZ.length()/rockDivider;
-			camV.normalize().multiplyScalar( this.mouse.y * rockLength / 5 );
+			camV.normalize().multiplyScalar( this.mouse.y * rockLength / 20 );
 			camH.normalize().multiplyScalar( this.mouse.x * rockLength );
 
 			// 
@@ -432,7 +439,7 @@ define(
 		}
 
 
-		R.registerComponent('screen.explain', Exp3DScreen);
+		R.registerComponent('explain.physics', Exp3DScreen);
 
 	}
 

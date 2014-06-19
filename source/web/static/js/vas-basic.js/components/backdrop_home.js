@@ -19,7 +19,7 @@ define(
 			C.Backdrop.call(this, hostDOM);
 
 			// The screen backdrop is just black
-			hostDOM.css({ 'background-color': '#000' });
+			hostDOM.css({ 'background-color': '#FFF' });
 
 		}
 		HomeBackdrop.prototype = Object.create( C.Backdrop.prototype );

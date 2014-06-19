@@ -46,11 +46,11 @@ define(["jquery", "core/config"],
 		/**
 		 * Helper function to perform arbitrary couchDB API requests
 		 */
-		function couchdb_api(url,callback) {
+		function couchdb_api(url,callback, type) {
 			$.ajax({
 				'url' 	 	: url,
 				'method' 	: 'GET',
-				'dataType'	: 'json',
+				'dataType'	: type || 'json',
 				'success'	: function(data, status) { callback(data); },
 				'error'		: function(jqXHR, status, error) { 
 					callback(null); 
@@ -109,6 +109,26 @@ define(["jquery", "core/config"],
 		}
 
 		/**
+		 * Return the attachment of the specified document
+		 */
+		Database.prototype.getAttachment = function(doc, rev, callback) {
+			// Check for missing fields
+			if (typeof(rev) == 'function') {
+				callback = rev;
+				rev = false;
+			}
+
+			// Build API URL
+			var url = Config.db.url + "/" + this.db + "/" + doc + "/attachment";
+			if (rev) url += "?rev="+rev;
+
+			// Return plain-text response
+			couchdb_api( url, couchdb_translate_single(callback), 'text' );
+			
+		}
+
+
+		/**
 		 * Database interface
 		 *
 		 * @class
@@ -117,7 +137,17 @@ define(["jquery", "core/config"],
 		var DB = { };
 
 		/**
+		 * Database cache, used by other parts in the system
+		 *
+		 * @type {Object}
+		 */
+		DB.cache = {};
+
+		/**
 		 * Return an object for I/O operations on the specified database
+		 *
+		 * @param {string} name - The database name to open
+		 * @returns {Database} - The database instance
 		 */
 		DB.openDatabase = function(name) {
 			return new Database(name);
