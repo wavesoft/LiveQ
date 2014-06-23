@@ -145,6 +145,11 @@ def formatTime(time):
 	Format unix time to string
 	"""
 
+	# If we got none or false, return empty string
+	if not time:
+		return ""
+
+	# Format time
 	dt = datetime.datetime.fromtimestamp(time)
 	return "%i/%i/%i %i:%i:%i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
 

@@ -91,8 +91,17 @@ class IntermediateHistogramCollection(dict):
 		ans = IntermediateHistogramCollection()
 		for ffile in flatFiles:
 
+			# Skip files that have gone away in the meantime
+			if not os.path.isFile(ffile):
+				logging.error("File has gone away %s" % ffile)
+				continue
+
 			# Try to loag the given histogram
-			histo = IntermediateHistogram.fromFLAT( ffile )
+			try:
+				histo = IntermediateHistogram.fromFLAT( ffile )
+			except Exception as e:
+				logging.error("Exception while loading file %s" % ffile)
+				continue
 
 			# Report errors
 			if histo == None:
