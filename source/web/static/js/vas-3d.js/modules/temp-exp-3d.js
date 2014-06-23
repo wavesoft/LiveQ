@@ -286,7 +286,7 @@ define(
 			// ============================
 
 			this.activeScene = new Engine.AutoScene( this, FractalScene ) //new Engine.Scene( this );
-			this.mainScene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
+			this.mainScene.fog = new THREE.FogExp2( 0xffffff, 0.00025 );
 
 			this.mainScene.add(this.activeScene.mainScene);
 			this.glowScene.add(this.activeScene.glowScene)

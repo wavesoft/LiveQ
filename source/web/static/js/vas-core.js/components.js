@@ -155,6 +155,10 @@ define(["core/config", "core/base/component" ],
 		 *    {
 		 *       tun: [ 'num-01', ... ],  // List of tunables to use
 		 *       obs: [ 'obs-01', ... ],  // List of observables to use
+		 *     feats:                     // Machine features available in this level
+		 *        [                       // this information updates the machine diagram.
+		 *           'beam', 'event'
+		 *        ]
 		 *     train: [                   // Training packages required in order
 		 *        {                       // to play in this level
 	     *           id: 'train-01',      // The reference to the training package
