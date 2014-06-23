@@ -445,7 +445,7 @@ class JobManagerComponent(Component):
 				pmData = data['postmortem']
 
 			# Register the agent job failure
-			agents.agentJobFailed( channel.uuid, job, pmData )
+			agents.agentJobFailed( channel.name, job, pmData )
 
 		else:
 
