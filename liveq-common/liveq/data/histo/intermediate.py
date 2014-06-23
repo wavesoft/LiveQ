@@ -92,7 +92,7 @@ class IntermediateHistogramCollection(dict):
 		for ffile in flatFiles:
 
 			# Skip files that have gone away in the meantime
-			if not os.path.isFile(ffile):
+			if not os.path.isfile(ffile):
 				logging.error("File has gone away %s" % ffile)
 				continue
 
