@@ -472,6 +472,13 @@ define(["core/config", "core/base/component" ],
 		////////////////////////////////////////////////////////////
 
 		/**
+		 * This event is fired by the home screen in order to focus on another
+		 * screen.
+		 *
+		 * @event module:core/components~HomeScreen#changeScreen
+		 */
+
+		/**
 		 * This event should be fired when the user wants to abort the running
 		 * simulation.
 		 *

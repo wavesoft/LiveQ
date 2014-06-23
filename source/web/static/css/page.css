@@ -17,6 +17,14 @@ body {
   font-family: Tahoma, Arial;
   font-size: 12px;
 }
+h1 + p.subtitle {
+  margin-top: -15px;
+  font-style: italic;
+  color: #999999;
+}
+.text-center {
+  text-align: center;
+}
 .fullscreen {
   position: absolute;
   left: 0;

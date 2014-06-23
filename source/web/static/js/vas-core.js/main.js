@@ -61,7 +61,6 @@ define(
 			}
 
 			// Create some generic screens
-			UI.initAndPlaceScreen("screen.home");
 			UI.initAndPlaceScreen("screen.running");
 
 			// Break down initialization process in individual chainable functions
@@ -109,8 +108,27 @@ define(
 
 				};
 
+			var prog_home = progressAggregator.begin(1),
+				init_home = function(cb) {
+					var scrHome = UI.initAndPlaceScreen("screen.home");
+					if (!scrHome) {
+						console.error("Core: Unable to initialize home screen!");
+						return;
+					}
+
+					// Bind events
+					scrHome.on('changeScreen', function(name) {
+						UI.selectScreen(name);
+					});
+
+					// Complete home
+					prog_home.ok("Home screen ready");
+					cb();
+				};
+
+
 			var prog_explain = progressAggregator.begin(1),
-				init_explain = function() {
+				init_explain = function(cb) {
 
 					// Create explain screen
 					var scrExplain = UI.initAndPlaceScreen("screen.explain", Components.ExplainScreen);
@@ -130,15 +148,15 @@ define(
 					scrExplain.onMachineLayoutDefined( diagram.layout );
 
 					// Complete explain
-					prog_explain.ok("Initialized explaination screen");
-
+					prog_explain.ok("Explaination screen ready");
+					cb();
 				};
 
 			var prog_tune = progressAggregator.begin(1),
-				init_tune = function() {
+				init_tune = function(cb) {
 
 					// Create tuning screen
-					var scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.ExplainScreen);
+					var scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.TuningScreen);
 					if (!scrTuning) {
 						console.error("Core: Unable to initialize explaination screen!");
 						return;
@@ -150,19 +168,42 @@ define(
 					scrTuning.onLevelsDefined( DB.cache['levels'] );
 
 					// Complete tuning
-					prog_tune.ok("Initialized tuning screen");
+					prog_tune.ok("Tuning screen ready");
+					cb();
 
 				};
 
+			// Wait some time for the background resources to load
+			setTimeout(function() {
 
-			// Start initialization from the database
-			init_db(function() {
+				var chainRun = [
+						init_db, init_home, init_explain, init_tune
+					],
+					runChain = function(cb, index) {
+						var i = index || 0,
+							nextCB = cb;
 
-				// Then initialize explain & tune screens
-				init_explain();
-				init_tune();
+						// If we run out of chain, run callback
+						if (i >= chainRun.length) {
+							cb();
+							return;
+						}
 
-			});
+						// Run function in chain and call next function when completed
+						chainRun[i](function() { runChain(cb, i+1); })
+					};
+
+				// Run chained functions
+				runChain(function() {
+
+					// We are initialized, register an away alerter
+					$(window).bind('beforeunload', function() {
+						return "Navigating away will stop your current game session.";
+					});
+
+				});
+
+			}, 500)
 
 
 		}
@@ -173,7 +214,7 @@ define(
 		VAS.run = function() {
 
 			// Run main game
-			UI.selectScreen( "screen.explain" );
+			UI.selectScreen( "screen.home" );
 
 		}
 

@@ -18,6 +18,7 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 			// Initialize host
 			hostDOM.addClass("tuning");
 			this.host = hostDOM;
+			window.ts = this;
 
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
@@ -34,6 +35,13 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 			this.foregroundDOM.append(this.hostControls);
 			this.foregroundDOM.append(this.hostLevels);
 
+			// Prepare main screen
+			this.obsAngleSpan = Math.PI*3/4;
+			this.obsWideSpan = 400;
+			this.obsMinDistance = 200;
+			this.obsMaxDistance = 600;
+			this.obsValBounds = [0.33, 0.66];
+			this.prepareMainScreen();
 
 			// Prepare fields
 			this.tunables = {};
@@ -46,6 +54,84 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		////                      INTERFACE DESIGN FUNCTIONS                       ////
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Design the main user interface
+		 */
+		TuningScreen.prototype.prepareMainScreen = function() {
+
+			// Create arbitrary observables
+			this.obsElms = [];
+			var aStep = this.obsAngleSpan / 20,
+				aVal = 0;
+
+			// Create observables
+			for (var i=0; i<20; i++) {
+				var e = $('<div class="observable sz-big">'+i+'</div>');
+				this.foregroundDOM.append(e);
+				this.obsElms.push({
+					'elm': e,
+					'ang': aVal += aStep,
+					'val': Math.random()
+				});
+			}
+
+			// Realign observables
+			this.realignObservables();
+
+		}
+
+		/**
+		 * Realign observables
+		 */
+		TuningScreen.prototype.realignObservables = function() {
+
+			var cX = this.width / 2, cY = 150,
+				aOfs = this.obsAngleSpan/2,
+				xStep = this.obsWideSpan/this.obsElms.length,
+				xPos = -this.obsWideSpan/2;
+
+			for (var i=0; i<this.obsElms.length; i++) {
+				var o = this.obsElms[i],
+					r = o.val * (this.obsMaxDistance - this.obsMinDistance),
+					sz = o.elm.width();
+
+				// Pick classes
+				o.elm.removeClass(); o.elm.addClass("observable");
+				if (o.val < this.obsValBounds[0]) {
+					o.elm.addClass("val-bd");
+					sz = 64;
+				} else if (o.val < this.obsValBounds[1]) {
+					o.elm.addClass("val-md");
+					sz = 32;
+				} else {
+					o.elm.addClass("val-gd");
+					sz = 24;
+				}
+
+				// Get dimentions
+				o.elm.css({
+					'left': cX + Math.sin(o.ang-aOfs) * (r+this.obsMinDistance) + xPos - sz/2,
+					'top':  cY + Math.cos(o.ang-aOfs) * (r+this.obsMinDistance) - sz/2,
+				});
+
+				xPos += xStep;
+			}
+
+		}
+
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		////                          MAIN HOOK HANDLERS                           ////
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Define the tunable configuration
@@ -230,6 +316,22 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 			}
 
 		}
+
+		/**
+		 * Handle window resize
+		 */
+		TuningScreen.prototype.onResize = function(width, heigth) {
+			this.width = width;
+			this.heigth = heigth;
+
+			this.realignObservables();
+		}
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		////                    FUNCTIONALITY IMPLEMENTATION                       ////
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Handle an update on a particular parameter

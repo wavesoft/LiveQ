@@ -46,6 +46,9 @@ define(
 			this.elmLogo = $('<div class="logo"></div>');
 			this.foregroundDOM.append(this.elmLogo);
 
+			// Set to initializing
+			this.onProgress(0, "Initializing");
+
 		}
 		ProgressScreen.prototype = Object.create( C.ProgressScreen.prototype );
 
@@ -64,16 +67,18 @@ define(
 		 * Fade-out animation
 		 */
 		ProgressScreen.prototype.onWillHide = function(ready) {
-			this.hostElement.addClass("hidden");
-			setTimeout(ready, 500);
+			//this.hostElement.addClass("hidden");
+			//setTimeout(ready, 500);
+			ready();
 		}
 
 		/**
 		 * Fade-out animation
 		 */
 		ProgressScreen.prototype.onWillShow = function(ready) {
-			this.hostElement.removeClass("hidden");
-			setTimeout(ready, 500);
+			//this.hostElement.removeClass("hidden");
+			//setTimeout(ready, 500);
+			ready();
 		}
 
 		// Register home screen
