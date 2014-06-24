@@ -6,6 +6,115 @@
   @keyframes @name { @rules(); }; }
 */
 
+.screen.tuning .tuning-host {
+  position: absolute;
+}
+.screen.tuning a {
+  text-decoration: none;
+}
+.screen.tuning .progress-widget {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-border-radius: 160px;
+  -moz-border-radius: 160px;
+  -o-border-radius: 160px;
+  border-radius: 160px;
+  position: absolute;
+  display: block;
+  width: 156px;
+  height: 156px;
+  background-color: white;
+  border: solid 2px #34495e;
+}
+.screen.tuning .progress-widget div.title,
+.screen.tuning .progress-widget div.subtitle {
+  color: #2c3e50;
+  position: absolute;
+  text-align: center;
+  left: 40px;
+  right: 40px;
+}
+.screen.tuning .progress-widget div.title {
+  font-weight: 600;
+  font-size: 2.2em;
+  bottom: 70px;
+}
+.screen.tuning .progress-widget div.subtitle {
+  font-size: 1.3em;
+  top: 80px;
+}
+.screen.tuning .progress-widget div.knob {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+}
+.screen.tuning .progress-widget div.knob input {
+  display: none;
+}
+.screen.tuning .progress-widget a.button {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  position: absolute;
+  display: block;
+  line-height: 50px;
+  overflow: hidden;
+  background: #ecf0f1;
+  color: #c0392b;
+  -webkit-mask-image: url(../img/mask-tune.svg);
+  mask-image: url(../img/mask-tune.svg);
+  width: 108px;
+  height: 50px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 17px;
+  left: 24px;
+  top: 106px;
+}
+.screen.tuning .progress-widget a.button.active,
+.screen.tuning .progress-widget a.button:hover {
+  top: 123px;
+  background: #27ae60;
+  color: white;
+}
+.screen.tuning .indicator {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #27ae60;
+}
+.screen.tuning .tunable {
+  -webkit-border-radius: 74px;
+  -moz-border-radius: 74px;
+  -o-border-radius: 74px;
+  border-radius: 74px;
+  position: absolute;
+  display: block;
+  width: 74px;
+  height: 74px;
+  background-color: #34495e;
+}
+.screen.tuning .tunable a.button {
+  position: absolute;
+  display: block;
+  background: url(../img/tune-icons.png) no-repeat 0px 0px;
+  width: 37px;
+  height: 53px;
+  line-height: 53px;
+  overflow: hidden;
+  color: white;
+}
+.screen.tuning .tunable a.button.left {
+  padding-left: 4px;
+}
+.screen.tuning .tunable a.button.right {
+  text-align: right;
+  padding-right: 4px;
+}
 .screen.tuning .val-bd {
   width: 64px;
   height: 64px;

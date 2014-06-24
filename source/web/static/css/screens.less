@@ -7,6 +7,123 @@
 ///////////////////////////////////////////////
 .screen.tuning {
 
+	.tuning-host {
+		position: absolute;
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	//
+	// The big centeral widget 
+	// ==========================
+	//
+	.progress-widget {
+
+		.transition(all 0.4s);
+		.border-radius(160px);
+		position: absolute;
+		display: block;
+		width: 156px; height: 156px;
+		background-color: #FFF;
+		border: solid 2px #34495e;
+
+		div.title, div.subtitle {
+			color: #2c3e50;
+			position: absolute;
+			text-align: center;
+			left: 40px; right: 40px;
+		}
+
+		div.title {
+			font-weight: 600;
+			font-size: 2.2em;
+			bottom: 70px;
+		}
+
+		div.subtitle {
+			font-size: 1.3em;
+			top: 80px;
+		}
+
+		div.knob {
+			position: absolute;
+			left: 4px; top: 4px;
+
+			input {
+				display: none;
+			}
+		}
+
+		a.button {
+			.transition(all 0.4s);
+
+			position: absolute;
+			display: block;
+
+			//background: url(../img/tune-icons.png) no-repeat -37px 0px;
+			line-height: 50px;
+			overflow: hidden;
+
+			background: #ecf0f1;
+			color: #c0392b;
+
+			.mask-image( url(../img/mask-tune.svg) );
+			width: 108px; height: 50px;
+
+			cursor: pointer;
+			text-align: center;
+			font-size: 17px;
+			left: 24px;
+			top: 106px;
+
+			&.active, &:hover {
+				top: 123px;
+				background: #27ae60;
+				color: #FFF;
+			}
+		}
+
+	}
+
+	.indicator {
+		width: 0;  height: 0; 
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-top: 10px solid #27ae60;
+	}
+
+	.tunable {
+
+		.border-radius(74px);
+		position: absolute;
+		display: block;
+		width: 74px; height: 74px;
+		background-color: #34495e;
+
+		a.button {
+			position: absolute;
+			display: block;
+			background: url(../img/tune-icons.png) no-repeat 0px 0px;
+			width: 37px; height: 53px;
+			line-height: 53px;
+			overflow: hidden;
+			color: #FFF;
+
+			&.left {
+				padding-left: 4px;
+			}
+
+			&.right {
+				text-align: right;
+				padding-right: 4px;
+			}
+
+		}
+
+	}
+
 	.val-bd {
 		width: 64px;
 		height: 64px;

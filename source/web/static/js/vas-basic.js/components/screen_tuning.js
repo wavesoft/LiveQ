@@ -1,13 +1,13 @@
 
 
-define(["jquery", "core/config", "core/registry", "core/components", "core/db"], 
+define(["jquery", "core/config", "core/registry", "core/components", "core/db", "jquery-knob"], 
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/tuning_screen
 	 */
-	function($, config, R, C, DB) {
+	function($, config, R, C, DB, Knob) {
 
 		/**
 		 * Tuning dashboard screen
@@ -16,6 +16,7 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 			C.TuningScreen.call(this, hostDOM);
 
 			// Initialize host
+			var self = this;
 			hostDOM.addClass("tuning");
 			this.host = hostDOM;
 			window.ts = this;
@@ -30,17 +31,52 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 			hostDOM.append(this.foregroundDOM);
 
 			// Prepare host elements
+			this.hostTuning = $('<div class="tuning-host"></div>');
 			this.hostControls = $('<div class="tune-controls"></div>');
 			this.hostLevels = $('<div class="tune-levels"></div>');
+			this.foregroundDOM.append(this.hostTuning);
 			this.foregroundDOM.append(this.hostControls);
 			this.foregroundDOM.append(this.hostLevels);
 
+			// Prepare mouse events
+			this.mouse = { x:0 , y:0 };
+			this.foregroundDOM.mousemove(function(e) {
+				var yPosition = 300,
+					mouseX = 0,
+					mouseY = 0;
+
+				// Calculate mouse offset
+				mouseX = (e.clientX - self.width/2) / (self.width/2);
+				if (e.clientY > yPosition) {
+					mouseY = (e.clientY - yPosition) / (self.height - yPosition);
+				} else {
+					mouseY = 0;
+				}
+
+				// Convert to logarithmic scale
+				mouseX = Math.pow(Math.abs(mouseX),2) * (Math.abs(mouseX)/mouseX);
+				mouseY = Math.pow(Math.abs(mouseY),2) * (Math.abs(mouseY)/mouseY);
+
+				self.hostTuning.css({
+					'left': -mouseX * self.obsMaxDistance*2/3,
+					'top' : -mouseY * self.obsMaxDistance*2/3
+				});
+			});
+
+			// Prepare status widget
+			this.statusWidget = this.createStatusWidget( this.hostTuning );
+
 			// Prepare main screen
-			this.obsAngleSpan = Math.PI*3/4;
-			this.obsWideSpan = 400;
-			this.obsMinDistance = 200;
-			this.obsMaxDistance = 600;
-			this.obsValBounds = [0.33, 0.66];
+			this.obsAngleSpan = Math.PI;
+			this.obsWideSpan = 0;
+			this.obsMinDistance = 400;
+			this.obsMaxDistance = 800;
+
+			this.tunAngleSpan = Math.PI*3/2;
+			this.tunWideSpan = 0;
+			this.tunMinDistance = 200;
+			this.tunMaxDistance = 350;
+
 			this.prepareMainScreen();
 
 			// Prepare fields
@@ -62,28 +98,220 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 		///////////////////////////////////////////////////////////////////////////////
 
 		/**
+		 * Prepare progress widget
+		 */
+		TuningScreen.prototype.createStatusWidget = function() {
+			var StatusWidget = function(host) {
+
+				// Tunable parameters
+				var diameter = this.diameter = 160;
+
+				// Prepare host
+				this.element = $('<div class="progress-widget"></div>');
+				host.append(this.element);
+
+				// Prepare progress knob
+				this.progressKnob = $('<input type="text" value="25" />');
+				this.element.append(this.progressKnob);
+				this.progressKnob.knob({
+					min:0, max:100,
+					width 		: diameter - 12,
+					heigth 		: diameter - 12,
+					thickness	: 0.35,
+					angleArc 	: 270,
+					angleOffset : -135,
+					readOnly  	: true,
+					className 	: 'knob',
+					fgColor 	: "#16a085",
+					bgColor 	: "#bdc3c7",
+				});
+
+				// Prepare tunable icon
+				this.startIcon = $('<a href="do:begin" class="button">Begin</a>');
+				this.element.append(this.startIcon);
+
+				// Prepare label & sublabel
+				this.titleElm = $('<div class="title">Good</div>');
+				this.subtitleElm = $('<div class="subtitle">match</div>');
+				this.element.append(this.titleElm);
+				this.element.append(this.subtitleElm);
+
+				// Helper function
+				var self = this;
+				this.setPosition = function(x,y) {
+					self.element.css({
+						'left': x - diameter/2,
+						'top': y - diameter/2
+					});
+				}
+
+				// Update value
+				this.setValue = function(v) {
+
+				}
+
+			};
+
+			return new StatusWidget(this.hostTuning);
+		}
+
+		/**
+		 * Prepare tunable widget
+		 */
+		TuningScreen.prototype.createTunableWidget = function(container) {
+			var TunableWidget = function(hostDOM) {
+
+				// Tunable parameters
+				this.diameter = 74;
+
+				// Prepare host element
+				this.element = $('<div class="tunable"></div>');
+				hostDOM.append(this.element);
+
+				// Prepare & nest UI elements
+				this.leftWing = $('<a class="wing left">-</a>');
+				this.rightWing = $('<a class="wing right"+></a>');
+				this.centerDial = $('<div class="dial"></div>');
+				this.element.append(this.leftWing);
+				this.element.append(this.rightWing);
+				this.element.append(this.centerDial);
+
+				// Expose functions
+				var self = this;
+				this.setPosition = function(x,y) {
+					self.element.css({
+						'left': x - self.diameter/2,
+						'top' : y - self.diameter/2
+					});
+				}
+
+				this.setMetadata = function(meta) {
+				}
+
+			};
+
+			return new TunableWidget(container);
+		}
+
+		/**
+		 * Prepare observable widget
+		 */
+		TuningScreen.prototype.createObservableWidget = function(container) {
+			var ObservableWidget = function(hostDOM) {
+
+				// Keep position for updating
+				this.x = 0;
+				this.y = 0;
+				this.value = 0;
+				this.diameter = 64;
+
+				// Prepare host element
+				this.element = $('<div></div>');
+				hostDOM.append(this.element);
+
+				// Prepare an indicator when the element goes offscreen
+				this.indicator = $('<div class="indicator"></div>');
+				hostDOM.append(this.indicator);
+
+				// Prepare classes
+				this.element.addClass("observable");
+				this.element.addClass("sz-big");
+
+				// Expose functions
+				var self = this;
+				this.setPosition = function(x,y) {
+					self.x = x; self.y = y;
+					self.update();
+				}
+
+				this.setMetadata = function(meta) {
+					self.element.text(meta['short']);
+				}
+
+				this.update = function() {
+					self.element.css({
+						'left': self.x - self.diameter/2,
+						'top' : self.y - self.diameter/2
+					});
+					this.indicator.css({
+						'left': self.x - self.diameter/2,
+						'bottom': 2
+					});
+				}
+
+				this.setValue = function(v) {
+
+					// Pick classes
+					var obsValBounds = [0.33, 0.66];
+					self.value = v;
+
+					// Remove previous classes
+					self.element.removeClass("val-bd");
+					self.element.removeClass("val-md");
+					self.element.removeClass("val-gd");
+
+					// Append classes
+					if (v < obsValBounds[0]) {
+						self.element.addClass("val-bd");
+						self.diameter = 64;
+					} else if (v < obsValBounds[1]) {
+						self.element.addClass("val-md");
+						self.diameter = 32;
+					} else {
+						self.element.addClass("val-gd");
+						self.diameter = 24;
+					}
+
+					// Update position
+					self.update();
+
+				}
+
+			};
+
+			return new ObservableWidget(container);
+		}
+
+		/**
 		 * Design the main user interface
 		 */
 		TuningScreen.prototype.prepareMainScreen = function() {
 
 			// Create arbitrary observables
 			this.obsElms = [];
-			var aStep = this.obsAngleSpan / 20,
+			var aNum = 1,
+				aStep = this.obsAngleSpan / (aNum+1),
 				aVal = 0;
 
 			// Create observables
-			for (var i=0; i<20; i++) {
-				var e = $('<div class="observable sz-big">'+i+'</div>');
-				this.foregroundDOM.append(e);
-				this.obsElms.push({
-					'elm': e,
-					'ang': aVal += aStep,
-					'val': Math.random()
-				});
+			for (var i=0; i<aNum; i++) {
+				var e = this.createObservableWidget( this.hostTuning );
+				e.angle = (aVal += aStep);
+				e.setMetadata({ 'short': i });
+				e.setValue( Math.random() );
+				this.obsElms.push( e );
 			}
 
 			// Realign observables
 			this.realignObservables();
+
+			//////////////////////////////////////////////////////
+
+			// Prepare tunable parameters
+			this.tunElms = [];
+			var aNum = 2,
+				aStep = this.tunAngleSpan / (aNum+1);
+				aVal = 0;
+
+			// Create tunables
+			for (var i=0; i<aNum; i++) {
+				var e = this.createTunableWidget( this.hostTuning );
+				e.angle = (aVal += aStep);
+				this.tunElms.push( e );
+			}
+
+			// Realign observables
+			this.realignTunables();
 
 		}
 
@@ -91,41 +319,51 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 		 * Realign observables
 		 */
 		TuningScreen.prototype.realignObservables = function() {
-
 			var cX = this.width / 2, cY = 150,
-				aOfs = this.obsAngleSpan/2,
+				aOfs  = this.obsAngleSpan/2,
 				xStep = this.obsWideSpan/this.obsElms.length,
-				xPos = -this.obsWideSpan/2;
+				xPos  = -this.obsWideSpan/2;
+
+			this.statusWidget.setPosition( cX, cY );
 
 			for (var i=0; i<this.obsElms.length; i++) {
 				var o = this.obsElms[i],
-					r = o.val * (this.obsMaxDistance - this.obsMinDistance),
-					sz = o.elm.width();
-
-				// Pick classes
-				o.elm.removeClass(); o.elm.addClass("observable");
-				if (o.val < this.obsValBounds[0]) {
-					o.elm.addClass("val-bd");
-					sz = 64;
-				} else if (o.val < this.obsValBounds[1]) {
-					o.elm.addClass("val-md");
-					sz = 32;
-				} else {
-					o.elm.addClass("val-gd");
-					sz = 24;
-				}
+					r = o.value * (this.obsMaxDistance - this.obsMinDistance);
 
 				// Get dimentions
-				o.elm.css({
-					'left': cX + Math.sin(o.ang-aOfs) * (r+this.obsMinDistance) + xPos - sz/2,
-					'top':  cY + Math.cos(o.ang-aOfs) * (r+this.obsMinDistance) - sz/2,
-				});
+				o.setPosition(
+						cX + Math.sin(o.angle-aOfs) * (r+this.obsMinDistance) + xPos,
+						cY + Math.cos(o.angle-aOfs) * (r+this.obsMinDistance)
+					);
 
 				xPos += xStep;
 			}
 
 		}
 
+		/**
+		 * Realign tunables
+		 */
+		TuningScreen.prototype.realignTunables = function() {
+			var cX = this.width / 2, cY = 150,
+				aOfs  = this.tunAngleSpan/2,
+				xStep = this.tunWideSpan/this.tunElms.length,
+				xPos  = -this.tunWideSpan/2;
+
+			for (var i=0; i<this.tunElms.length; i++) {
+				var o = this.tunElms[i],
+					r = (this.tunMaxDistance - this.tunMinDistance) * 0;
+
+				// Get dimentions
+				o.setPosition(
+						cX + Math.sin(o.angle-aOfs) * (r+this.tunMinDistance) + xPos,
+						cY + Math.cos(o.angle-aOfs) * (r+this.tunMinDistance)
+					);
+
+				xPos += xStep;
+			}
+
+		}
 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
@@ -322,9 +560,10 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db"],
 		 */
 		TuningScreen.prototype.onResize = function(width, heigth) {
 			this.width = width;
-			this.heigth = heigth;
+			this.height = heigth;
 
 			this.realignObservables();
+			this.realignTunables();
 		}
 
 		///////////////////////////////////////////////////////////////////////////////

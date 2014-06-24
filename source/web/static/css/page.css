@@ -6,6 +6,7 @@
   @keyframes @name { @rules(); }; }
 */
 
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700);
 html,
 body {
   overflow: hidden;
@@ -14,7 +15,7 @@ body {
   height: 100%;
 }
 body {
-  font-family: Tahoma, Arial;
+  font-family: 'Source Sans Pro', sans-serif;
   font-size: 12px;
 }
 h1 + p.subtitle {
