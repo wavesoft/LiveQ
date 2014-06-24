@@ -150,6 +150,9 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 
 				}
 
+				this.onHostResize = function(width, heigth) {
+				}
+
 			};
 
 			return new StatusWidget(this.hostTuning);
@@ -162,7 +165,8 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 			var TunableWidget = function(hostDOM) {
 
 				// Tunable parameters
-				this.diameter = 74;
+				this.height = 74;
+				this.width = 100;
 
 				// Prepare host element
 				this.element = $('<div class="tunable"></div>');
@@ -170,7 +174,7 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 
 				// Prepare & nest UI elements
 				this.leftWing = $('<a class="wing left">-</a>');
-				this.rightWing = $('<a class="wing right"+></a>');
+				this.rightWing = $('<a class="wing right">+</a>');
 				this.centerDial = $('<div class="dial"></div>');
 				this.element.append(this.leftWing);
 				this.element.append(this.rightWing);
@@ -180,12 +184,15 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 				var self = this;
 				this.setPosition = function(x,y) {
 					self.element.css({
-						'left': x - self.diameter/2,
-						'top' : y - self.diameter/2
+						'left': x - self.width/2,
+						'top' : y - self.height/2
 					});
 				}
 
 				this.setMetadata = function(meta) {
+				}
+
+				this.onHostResize = function(width, heigth) {
 				}
 
 			};
@@ -234,8 +241,7 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 						'top' : self.y - self.diameter/2
 					});
 					this.indicator.css({
-						'left': self.x - self.diameter/2,
-						'bottom': 2
+						'left': self.x - self.diameter/2
 					});
 				}
 
@@ -265,6 +271,12 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 					// Update position
 					self.update();
 
+				}
+
+				this.onHostResize = function(width, heigth) {
+					self.indicator.css({
+						'top': heigth - 20
+					});
 				}
 
 			};
@@ -564,6 +576,16 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 
 			this.realignObservables();
 			this.realignTunables();
+
+			// Fire resize host on all children
+			this.statusWidget.onHostResize(width,heigth);
+			for (var i=0; i<this.obsElms.length; i++) {
+				this.obsElms[i].onHostResize(width, heigth);
+			}
+			for (var i=0; i<this.tunElms.length; i++) {
+				this.tunElms[i].onHostResize(width, heigth);
+			}
+
 		}
 
 		///////////////////////////////////////////////////////////////////////////////

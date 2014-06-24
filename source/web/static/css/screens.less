@@ -7,12 +7,10 @@
 ///////////////////////////////////////////////
 .screen.tuning {
 
+	a { text-decoration: none; }
+
 	.tuning-host {
 		position: absolute;
-	}
-
-	a {
-		text-decoration: none;
 	}
 
 	//
@@ -88,6 +86,7 @@
 	}
 
 	.indicator {
+		position: absolute;
 		width: 0;  height: 0; 
 		border-left: 10px solid transparent;
 		border-right: 10px solid transparent;
@@ -96,30 +95,59 @@
 
 	.tunable {
 
-		.border-radius(74px);
 		position: absolute;
 		display: block;
-		width: 74px; height: 74px;
-		background-color: #34495e;
+		width: 110px; height: 74px;
+		cursor: pointer;
 
-		a.button {
+		.dial {
 			position: absolute;
 			display: block;
-			background: url(../img/tune-icons.png) no-repeat 0px 0px;
+			width: 74px; height: 74px;
+			.border-radius(74px);
+			background-color: #34495e;
+			left: 18px;
+		}
+
+		a.wing {
+			.transition(all 0.4s);
+			.mask-image( url(../img/mask-wing.svg) );
+			background-color: #2980b9;
+			position: absolute;
 			width: 37px; height: 53px;
 			line-height: 53px;
-			overflow: hidden;
+			cursor: pointer;
+			text-indent: 5px;
+			font-size: 1.9em;
 			color: #FFF;
+			top: 10px;
+			opacity: 0;
+
+			&:hover {
+				background-color: #3498db;
+			}
 
 			&.left {
-				padding-left: 4px;
+				left: 18px;
 			}
 
 			&.right {
-				text-align: right;
-				padding-right: 4px;
+				left: 55px;
+				.transform( rotateZ(180deg) );
 			}
 
+		}
+
+		&:hover {
+			a.wing {
+				opacity: 1;
+				&.left {
+					left: 0px;
+				}
+				&.right {
+					left: 73px;
+				}
+			}
 		}
 
 	}
@@ -155,7 +183,7 @@
 	}
 
 	.line {
-		width: 100;
+		width: 100px;
 		height: 1;
 		border-top: solid 1px #666;
 	}

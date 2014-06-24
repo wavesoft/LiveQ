@@ -6,11 +6,11 @@
   @keyframes @name { @rules(); }; }
 */
 
-.screen.tuning .tuning-host {
-  position: absolute;
-}
 .screen.tuning a {
   text-decoration: none;
+}
+.screen.tuning .tuning-host {
+  position: absolute;
 }
 .screen.tuning .progress-widget {
   -webkit-transition: all 0.4s;
@@ -81,6 +81,7 @@
   color: white;
 }
 .screen.tuning .indicator {
+  position: absolute;
   width: 0;
   height: 0;
   border-left: 10px solid transparent;
@@ -88,32 +89,64 @@
   border-top: 10px solid #27ae60;
 }
 .screen.tuning .tunable {
-  -webkit-border-radius: 74px;
-  -moz-border-radius: 74px;
-  -o-border-radius: 74px;
-  border-radius: 74px;
+  position: absolute;
+  display: block;
+  width: 110px;
+  height: 74px;
+  cursor: pointer;
+}
+.screen.tuning .tunable .dial {
   position: absolute;
   display: block;
   width: 74px;
   height: 74px;
+  -webkit-border-radius: 74px;
+  -moz-border-radius: 74px;
+  -o-border-radius: 74px;
+  border-radius: 74px;
   background-color: #34495e;
+  left: 18px;
 }
-.screen.tuning .tunable a.button {
+.screen.tuning .tunable a.wing {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-mask-image: url(../img/mask-wing.svg);
+  mask-image: url(../img/mask-wing.svg);
+  background-color: #2980b9;
   position: absolute;
-  display: block;
-  background: url(../img/tune-icons.png) no-repeat 0px 0px;
   width: 37px;
   height: 53px;
   line-height: 53px;
-  overflow: hidden;
+  cursor: pointer;
+  text-indent: 5px;
+  font-size: 1.9em;
   color: white;
+  top: 10px;
+  opacity: 0;
 }
-.screen.tuning .tunable a.button.left {
-  padding-left: 4px;
+.screen.tuning .tunable a.wing:hover {
+  background-color: #3498db;
 }
-.screen.tuning .tunable a.button.right {
-  text-align: right;
-  padding-right: 4px;
+.screen.tuning .tunable a.wing.left {
+  left: 18px;
+}
+.screen.tuning .tunable a.wing.right {
+  left: 55px;
+  -webkit-transform: rotateZ(180deg);
+  -moz-transform: rotateZ(180deg);
+  -o-transform: rotateZ(180deg);
+  transform: rotateZ(180deg);
+}
+.screen.tuning .tunable:hover a.wing {
+  opacity: 1;
+}
+.screen.tuning .tunable:hover a.wing.left {
+  left: 0px;
+}
+.screen.tuning .tunable:hover a.wing.right {
+  left: 73px;
 }
 .screen.tuning .val-bd {
   width: 64px;
@@ -152,7 +185,7 @@
   background-color: #2ecc71;
 }
 .screen.tuning .line {
-  width: 100;
+  width: 100px;
   height: 1;
   border-top: solid 1px #666666;
 }
