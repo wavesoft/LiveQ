@@ -1,13 +1,24 @@
 
 
-define(["jquery", "core/config", "core/registry", "core/components", "core/db", "jquery-knob"], 
+define(
+
+	/**
+	 * Dependencies
+	 */
+	["jquery", "core/config", "core/registry", "core/base/components", "core/db", 
+
+	 // Self-registering dependencies
+	 "vas-basic/components/tuning/tunable", 
+	 "vas-basic/components/tuning/observable",
+	 "vas-basic/components/tuning/status",
+	 "jquery-knob"], 
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/tuning_screen
 	 */
-	function($, config, R, C, DB, Knob) {
+	function($, config, R, C, DB) {
 
 		/**
 		 * Tuning dashboard screen
@@ -50,31 +61,47 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 				if (e.clientY > yPosition) {
 					mouseY = (e.clientY - yPosition) / (self.height - yPosition);
 				} else {
-					mouseY = 0;
+					mouseY = 0.01;
 				}
 
-				// Convert to logarithmic scale
-				mouseX = Math.pow(Math.abs(mouseX),2) * (Math.abs(mouseX)/mouseX);
-				mouseY = Math.pow(Math.abs(mouseY),2) * (Math.abs(mouseY)/mouseY);
+				// Convert to exp^4 scale in order to limit
+				// the moving frequency in the center
+				mouseX = Math.pow(Math.abs(mouseX),4) * (Math.abs(mouseX)/mouseX);
+				mouseY = Math.pow(Math.abs(mouseY),4) * (Math.abs(mouseY)/mouseY);
 
+				// Calculate how much distance the mouse should pan
+				// the screen around for
+				var overPan = 50,
+					panX = (overPan+self.obsMaxDistance*2) - self.width,
+					panY = (overPan+self.obsMaxDistance+self.pivotY) - self.height;
+				if (panX < 0) panX = 0;
+				if (panY < 0) panY = 0;
+
+				// Aply cursor panning
 				self.hostTuning.css({
-					'left': -mouseX * self.obsMaxDistance*2/3,
-					'top' : -mouseY * self.obsMaxDistance*2/3
+					'left': -mouseX * panX,
+					'top' : -mouseY * panY
 				});
+
+				// Update horizon
+				self.forwardHorizon();
+
 			});
 
 			// Prepare status widget
-			this.statusWidget = this.createStatusWidget( this.hostTuning );
+			this.statusWidget = R.instanceComponent( "widget.tuning_status", this.hostTuning );
+			if (!this.statusWidget)
+				console.warn("Unable to instantiate tuning status widget!");
 
 			// Prepare main screen
 			this.obsAngleSpan = Math.PI;
 			this.obsWideSpan = 0;
 			this.obsMinDistance = 400;
-			this.obsMaxDistance = 800;
+			this.obsMaxDistance = 600;
 
 			this.tunAngleSpan = Math.PI*3/2;
 			this.tunWideSpan = 0;
-			this.tunMinDistance = 200;
+			this.tunMinDistance = 150;
 			this.tunMaxDistance = 350;
 
 			this.prepareMainScreen();
@@ -97,282 +124,87 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 
-		/**
-		 * Prepare progress widget
-		 */
-		TuningScreen.prototype.createStatusWidget = function() {
-			var StatusWidget = function(host) {
-
-				// Tunable parameters
-				var diameter = this.diameter = 160;
-
-				// Prepare host
-				this.element = $('<div class="progress-widget"></div>');
-				host.append(this.element);
-
-				// Prepare progress knob
-				this.progressKnob = $('<input type="text" value="25" />');
-				this.element.append(this.progressKnob);
-				this.progressKnob.knob({
-					min:0, max:100,
-					width 		: diameter - 12,
-					heigth 		: diameter - 12,
-					thickness	: 0.35,
-					angleArc 	: 270,
-					angleOffset : -135,
-					readOnly  	: true,
-					className 	: 'knob',
-					fgColor 	: "#16a085",
-					bgColor 	: "#bdc3c7",
-				});
-
-				// Prepare tunable icon
-				this.startIcon = $('<a href="do:begin" class="button">Begin</a>');
-				this.element.append(this.startIcon);
-
-				// Prepare label & sublabel
-				this.titleElm = $('<div class="title">Good</div>');
-				this.subtitleElm = $('<div class="subtitle">match</div>');
-				this.element.append(this.titleElm);
-				this.element.append(this.subtitleElm);
-
-				// Helper function
-				var self = this;
-				this.setPosition = function(x,y) {
-					self.element.css({
-						'left': x - diameter/2,
-						'top': y - diameter/2
-					});
-				}
-
-				// Update value
-				this.setValue = function(v) {
-
-				}
-
-				this.onHostResize = function(width, heigth) {
-				}
-
-			};
-
-			return new StatusWidget(this.hostTuning);
-		}
-
-		/**
-		 * Prepare tunable widget
-		 */
-		TuningScreen.prototype.createTunableWidget = function(container) {
-			var TunableWidget = function(hostDOM) {
-
-				// Tunable parameters
-				this.height = 74;
-				this.width = 100;
-
-				// Prepare host element
-				this.element = $('<div class="tunable"></div>');
-				hostDOM.append(this.element);
-
-				// Prepare & nest UI elements
-				this.leftWing = $('<a class="wing left">-</a>');
-				this.rightWing = $('<a class="wing right">+</a>');
-				this.centerDial = $('<div class="dial"></div>');
-				this.element.append(this.leftWing);
-				this.element.append(this.rightWing);
-				this.element.append(this.centerDial);
-
-				// Expose functions
-				var self = this;
-				this.setPosition = function(x,y) {
-					self.element.css({
-						'left': x - self.width/2,
-						'top' : y - self.height/2
-					});
-				}
-
-				this.setMetadata = function(meta) {
-				}
-
-				this.onHostResize = function(width, heigth) {
-				}
-
-			};
-
-			return new TunableWidget(container);
-		}
-
-		/**
-		 * Prepare observable widget
-		 */
-		TuningScreen.prototype.createObservableWidget = function(container) {
-			var ObservableWidget = function(hostDOM) {
-
-				// Keep position for updating
-				this.x = 0;
-				this.y = 0;
-				this.value = 0;
-				this.diameter = 64;
-
-				// Prepare host element
-				this.element = $('<div></div>');
-				hostDOM.append(this.element);
-
-				// Prepare an indicator when the element goes offscreen
-				this.indicator = $('<div class="indicator"></div>');
-				hostDOM.append(this.indicator);
-
-				// Prepare classes
-				this.element.addClass("observable");
-				this.element.addClass("sz-big");
-
-				// Expose functions
-				var self = this;
-				this.setPosition = function(x,y) {
-					self.x = x; self.y = y;
-					self.update();
-				}
-
-				this.setMetadata = function(meta) {
-					self.element.text(meta['short']);
-				}
-
-				this.update = function() {
-					self.element.css({
-						'left': self.x - self.diameter/2,
-						'top' : self.y - self.diameter/2
-					});
-					this.indicator.css({
-						'left': self.x - self.diameter/2
-					});
-				}
-
-				this.setValue = function(v) {
-
-					// Pick classes
-					var obsValBounds = [0.33, 0.66];
-					self.value = v;
-
-					// Remove previous classes
-					self.element.removeClass("val-bd");
-					self.element.removeClass("val-md");
-					self.element.removeClass("val-gd");
-
-					// Append classes
-					if (v < obsValBounds[0]) {
-						self.element.addClass("val-bd");
-						self.diameter = 64;
-					} else if (v < obsValBounds[1]) {
-						self.element.addClass("val-md");
-						self.diameter = 32;
-					} else {
-						self.element.addClass("val-gd");
-						self.diameter = 24;
-					}
-
-					// Update position
-					self.update();
-
-				}
-
-				this.onHostResize = function(width, heigth) {
-					self.indicator.css({
-						'top': heigth - 20
-					});
-				}
-
-			};
-
-			return new ObservableWidget(container);
-		}
 
 		/**
 		 * Design the main user interface
 		 */
 		TuningScreen.prototype.prepareMainScreen = function() {
 
+			// Calculate pivot point
+			this.pivotX = this.width / 2;
+			this.pivotY = 150;
+
 			// Create arbitrary observables
 			this.obsElms = [];
-			var aNum = 1,
+			var aNum = 100,
 				aStep = this.obsAngleSpan / (aNum+1),
-				aVal = 0;
+				aVal = -this.obsAngleSpan / 2;
 
 			// Create observables
 			for (var i=0; i<aNum; i++) {
-				var e = this.createObservableWidget( this.hostTuning );
-				e.angle = (aVal += aStep);
-				e.setMetadata({ 'short': i });
-				e.setValue( Math.random() );
-				this.obsElms.push( e );
-			}
+				var e = R.instanceComponent("widget.observable.default", this.hostTuning );
+				if (!e) {
+					console.warn("Unable to instantiate an observable widget!");
+					continue;
+				}
 
-			// Realign observables
-			this.realignObservables();
+				// Set pivot configuration for doing this nice
+				// circular distribution
+				e.setPivotConfig( 
+					this.pivotX, 			// Pivot X
+					this.pivotY, 			// Pivot Y
+					(aVal += aStep),		// Angle around pivot
+					this.obsMinDistance, 	// Min distance
+					this.obsMaxDistance		// Max distance
+				);
+
+				// Set default values
+				e.onMetaUpdate({ 'short': i });
+				e.onUpdate( Math.random() );
+
+				// Store on elements
+				this.obsElms.push( e );
+
+			}
 
 			//////////////////////////////////////////////////////
 
 			// Prepare tunable parameters
 			this.tunElms = [];
-			var aNum = 2,
-				aStep = this.tunAngleSpan / (aNum+1);
-				aVal = 0;
 
 			// Create tunables
-			for (var i=0; i<aNum; i++) {
-				var e = this.createTunableWidget( this.hostTuning );
-				e.angle = (aVal += aStep);
-				this.tunElms.push( e );
-			}
+			var tVal = this.tunMinDistance, tStep = (this.tunMaxDistance - this.tunMinDistance) / 10;
+			for (var j=0; j<10; j++) {
 
-			// Realign observables
-			this.realignTunables();
+				var aNum = parseInt(Math.random() * 10),
+					aStep = this.tunAngleSpan / (aNum+1);
+					aVal = -this.tunAngleSpan / 2;
 
-		}
+				for (var i=0; i<aNum; i++) {
+					var e = R.instanceComponent("widget.tunable.default", this.hostTuning );
+					if (!e) {
+						console.warn("Unable to instantiate a tuning widget!");
+						continue;
+					}
 
-		/**
-		 * Realign observables
-		 */
-		TuningScreen.prototype.realignObservables = function() {
-			var cX = this.width / 2, cY = 150,
-				aOfs  = this.obsAngleSpan/2,
-				xStep = this.obsWideSpan/this.obsElms.length,
-				xPos  = -this.obsWideSpan/2;
-
-			this.statusWidget.setPosition( cX, cY );
-
-			for (var i=0; i<this.obsElms.length; i++) {
-				var o = this.obsElms[i],
-					r = o.value * (this.obsMaxDistance - this.obsMinDistance);
-
-				// Get dimentions
-				o.setPosition(
-						cX + Math.sin(o.angle-aOfs) * (r+this.obsMinDistance) + xPos,
-						cY + Math.cos(o.angle-aOfs) * (r+this.obsMinDistance)
+					// Set pivot configuration for doing this nice
+					// circular distribution
+					e.setPivotConfig( 
+						this.pivotX, 			// Pivot X
+						this.pivotY, 			// Pivot Y
+						(aVal += aStep),		// Angle around pivot
+						tVal 					// Track position
 					);
 
-				xPos += xStep;
-			}
+					// Set default values
+					e.onMetaUpdate({ 'short': i });
+					e.onUpdate(0.000);
+					e.setActive( j == 0 );
 
-		}
+					this.tunElms.push( e );
+				}
 
-		/**
-		 * Realign tunables
-		 */
-		TuningScreen.prototype.realignTunables = function() {
-			var cX = this.width / 2, cY = 150,
-				aOfs  = this.tunAngleSpan/2,
-				xStep = this.tunWideSpan/this.tunElms.length,
-				xPos  = -this.tunWideSpan/2;
-
-			for (var i=0; i<this.tunElms.length; i++) {
-				var o = this.tunElms[i],
-					r = (this.tunMaxDistance - this.tunMinDistance) * 0;
-
-				// Get dimentions
-				o.setPosition(
-						cX + Math.sin(o.angle-aOfs) * (r+this.tunMinDistance) + xPos,
-						cY + Math.cos(o.angle-aOfs) * (r+this.tunMinDistance)
-					);
-
-				xPos += xStep;
+				tVal += tStep;
 			}
 
 		}
@@ -570,21 +402,30 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 		/**
 		 * Handle window resize
 		 */
-		TuningScreen.prototype.onResize = function(width, heigth) {
+		TuningScreen.prototype.onResize = function(width, height) {
 			this.width = width;
-			this.height = heigth;
+			this.height = height;
 
-			this.realignObservables();
-			this.realignTunables();
+			// Calculate new pivot position
+			this.pivotX = this.width / 2;
+			this.pivotY = 150;
+
+			// Place status widget on pivot
+			this.statusWidget.setPosition( this.pivotX, this.pivotY );
 
 			// Fire resize host on all children
-			this.statusWidget.onHostResize(width,heigth);
+			this.statusWidget.onResize(width,height);
 			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].onHostResize(width, heigth);
+				this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
+				this.obsElms[i].onResize(width, height);
 			}
 			for (var i=0; i<this.tunElms.length; i++) {
-				this.tunElms[i].onHostResize(width, heigth);
+				this.tunElms[i].setPivotConfig(this.pivotX, this.pivotY);
+				this.tunElms[i].onResize(width, height);
 			}
+
+			// Update horizon
+			this.forwardHorizon();
 
 		}
 
@@ -593,6 +434,25 @@ define(["jquery", "core/config", "core/registry", "core/components", "core/db", 
 		////                    FUNCTIONALITY IMPLEMENTATION                       ////
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Activate a particlar track of tunables
+		 */
+		TuningScreen.prototype.forwardHorizon = function() {
+		}
+
+		/**
+		 * Forward the horizon update
+		 */
+		TuningScreen.prototype.forwardHorizon = function() {
+			var vOffs = -parseInt( this.hostTuning.css("top") );
+			for (var i=0; i<this.obsElms.length; i++) {
+				this.obsElms[i].onHorizonTopChanged(vOffs + this.height);
+			}
+			for (var i=0; i<this.tunElms.length; i++) {
+				this.tunElms[i].onHorizonTopChanged(vOffs + this.height);
+			}
+		}
 
 		/**
 		 * Handle an update on a particular parameter

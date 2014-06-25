@@ -83,6 +83,11 @@
 			}
 		}
 
+		div.c-marker {
+			position: absolute;
+			border: dashed 1px #999;
+		}
+
 	}
 
 	.indicator {
@@ -93,25 +98,62 @@
 		border-top: 10px solid #27ae60;
 	}
 
+	// ========================
+	//  Tunable bubble element
+	// ========================
+
 	.tunable {
 
+		.transition(all 0.2s);
 		position: absolute;
 		display: block;
 		width: 110px; height: 74px;
 		cursor: pointer;
+		z-index: 100;
 
 		.dial {
+			.transition(all 0.2s);
 			position: absolute;
 			display: block;
 			width: 74px; height: 74px;
 			.border-radius(74px);
 			background-color: #34495e;
 			left: 18px;
+			border-style: solid;
+			border-width: 0;
+			border-color: #34495e;
+
+			input, div.title {
+				.transition(all 0.2s);
+				position: absolute;
+				left: 10px; right: 10px;
+				width: 52px;
+				text-align: center;
+			}
+
+			input {
+				.transition(all 0.2s);
+				border: none;
+				background-color: transparent;
+				color: #fff;
+				font-size: 1.2em;
+				top: 37px;
+			}
+
+			div.title {
+				.transition(all 0.2s);
+				color: #fff;
+				font-size: 1.8em;
+				bottom: 37px;
+				font-weight: bold;
+			}
+
 		}
 
 		a.wing {
-			.transition(all 0.4s);
+			.transition(all 0.2s);
 			.mask-image( url(../img/mask-wing.svg) );
+			.user-select( none );
 			background-color: #2980b9;
 			position: absolute;
 			width: 37px; height: 53px;
@@ -126,6 +168,9 @@
 			&:hover {
 				background-color: #3498db;
 			}
+			&:active {
+				background-color: #71B7E6;
+			}
 
 			&.left {
 				left: 18px;
@@ -138,7 +183,33 @@
 
 		}
 
-		&:hover {
+		// ----------------------
+		//  Expanded for editing
+		// ----------------------
+
+		&.expanded {
+			z-index: 110;
+			
+			.dial {
+				border-width: 10px;
+				padding: -10px;
+				background-color: #FFF;
+				width: 54px; height: 54px;
+				.border-radius(54px);
+
+				input{
+					color: #000;
+					left: 0px;
+					top: 14px;
+					font-size: 1.5em;
+				}
+				div.title {
+					color: #34495e;
+					left: 0px;
+					bottom: 27px;
+					opacity: 0;
+				}
+			}
 			a.wing {
 				opacity: 1;
 				&.left {
@@ -148,6 +219,28 @@
 					left: 73px;
 				}
 			}
+		}
+
+		// ------------------
+		//  Inactive status
+		// ------------------
+
+		&.inactive {
+			.transform( scale(0.5) );
+			z-index: 50;
+			opacity: 0.8;
+
+			.dial {
+				background-color: #7f8c8d;				
+			}
+			a.wing { display: none; }
+			input  { cursor: pointer; }
+			&:hover {
+				.transform( scale(0.7) );
+				opacity: 1;
+				z-index: 110;
+			}
+
 		}
 
 	}

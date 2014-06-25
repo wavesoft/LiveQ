@@ -112,6 +112,7 @@ h1 + p.subtitle {
   top: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 #game-frame .screen .foreground {
   position: absolute;
@@ -119,6 +120,7 @@ h1 + p.subtitle {
   top: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 #game-frame .nav-mini {
   position: absolute;

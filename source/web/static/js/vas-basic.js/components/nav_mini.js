@@ -2,7 +2,7 @@
 define(
 
 	// Requirements
-	["core/registry", "core/components", "core/ui"],
+	["core/registry", "core/base/components", "core/ui"],
 
 	/**
 	 * Basic version of the home screen

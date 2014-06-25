@@ -7,7 +7,7 @@ define(["core/base/component"],
 	 *
 	 * @exports core/base/data_widget
 	 */
-	function (DataWidget) {
+	function (Component) {
 
 		/**
 		 * Instantiate a new DataWidget component

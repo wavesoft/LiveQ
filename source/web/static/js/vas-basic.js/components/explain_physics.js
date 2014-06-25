@@ -2,7 +2,7 @@
 define(
 
 	// Requirements
-	["jquery", "core/registry", "core/components"],
+	["jquery", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the engine description

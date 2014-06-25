@@ -1,5 +1,5 @@
 
-define(["jquery", "core/registry", "core/components"], 
+define(["jquery", "core/registry", "core/base/components"], 
 
 	function($,R,C) {
 

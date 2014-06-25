@@ -80,6 +80,10 @@
   background: #27ae60;
   color: white;
 }
+.screen.tuning .progress-widget div.c-marker {
+  position: absolute;
+  border: dashed 1px #999999;
+}
 .screen.tuning .indicator {
   position: absolute;
   width: 0;
@@ -89,13 +93,22 @@
   border-top: 10px solid #27ae60;
 }
 .screen.tuning .tunable {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
   position: absolute;
   display: block;
   width: 110px;
   height: 74px;
   cursor: pointer;
+  z-index: 100;
 }
 .screen.tuning .tunable .dial {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
   position: absolute;
   display: block;
   width: 74px;
@@ -106,14 +119,56 @@
   border-radius: 74px;
   background-color: #34495e;
   left: 18px;
+  border-style: solid;
+  border-width: 0;
+  border-color: #34495e;
+}
+.screen.tuning .tunable .dial input,
+.screen.tuning .tunable .dial div.title {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  width: 52px;
+  text-align: center;
+}
+.screen.tuning .tunable .dial input {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  border: none;
+  background-color: transparent;
+  color: white;
+  font-size: 1.2em;
+  top: 37px;
+}
+.screen.tuning .tunable .dial div.title {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  color: white;
+  font-size: 1.8em;
+  bottom: 37px;
+  font-weight: bold;
 }
 .screen.tuning .tunable a.wing {
-  -webkit-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  transition: all 0.4s;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
   -webkit-mask-image: url(../img/mask-wing.svg);
   mask-image: url(../img/mask-wing.svg);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   background-color: #2980b9;
   position: absolute;
   width: 37px;
@@ -129,6 +184,9 @@
 .screen.tuning .tunable a.wing:hover {
   background-color: #3498db;
 }
+.screen.tuning .tunable a.wing:active {
+  background-color: #71b7e6;
+}
 .screen.tuning .tunable a.wing.left {
   left: 18px;
 }
@@ -139,14 +197,65 @@
   -o-transform: rotateZ(180deg);
   transform: rotateZ(180deg);
 }
-.screen.tuning .tunable:hover a.wing {
+.screen.tuning .tunable.expanded {
+  z-index: 110;
+}
+.screen.tuning .tunable.expanded .dial {
+  border-width: 10px;
+  padding: -10px;
+  background-color: white;
+  width: 54px;
+  height: 54px;
+  -webkit-border-radius: 54px;
+  -moz-border-radius: 54px;
+  -o-border-radius: 54px;
+  border-radius: 54px;
+}
+.screen.tuning .tunable.expanded .dial input {
+  color: black;
+  left: 0px;
+  top: 14px;
+  font-size: 1.5em;
+}
+.screen.tuning .tunable.expanded .dial div.title {
+  color: #34495e;
+  left: 0px;
+  bottom: 27px;
+  opacity: 0;
+}
+.screen.tuning .tunable.expanded a.wing {
   opacity: 1;
 }
-.screen.tuning .tunable:hover a.wing.left {
+.screen.tuning .tunable.expanded a.wing.left {
   left: 0px;
 }
-.screen.tuning .tunable:hover a.wing.right {
+.screen.tuning .tunable.expanded a.wing.right {
   left: 73px;
+}
+.screen.tuning .tunable.inactive {
+  -webkit-transform: scale(0.5);
+  -moz-transform: scale(0.5);
+  -o-transform: scale(0.5);
+  transform: scale(0.5);
+  z-index: 50;
+  opacity: 0.8;
+}
+.screen.tuning .tunable.inactive .dial {
+  background-color: #7f8c8d;
+}
+.screen.tuning .tunable.inactive a.wing {
+  display: none;
+}
+.screen.tuning .tunable.inactive input {
+  cursor: pointer;
+}
+.screen.tuning .tunable.inactive:hover {
+  -webkit-transform: scale(0.7);
+  -moz-transform: scale(0.7);
+  -o-transform: scale(0.7);
+  transform: scale(0.7);
+  opacity: 1;
+  z-index: 110;
 }
 .screen.tuning .val-bd {
   width: 64px;

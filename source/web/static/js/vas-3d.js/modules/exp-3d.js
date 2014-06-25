@@ -1,5 +1,5 @@
 
-define(["three", "core/util/animator", "core/registry", "core/components"], 
+define(["three", "core/util/animator", "core/registry", "core/base/components"], 
 
 	function(THREE, Animator, R, C) {
 

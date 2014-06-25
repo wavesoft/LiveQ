@@ -2,7 +2,7 @@
 define(
 
 	// Requirements
-	["core/registry", "core/components"],
+	["core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home backdrop

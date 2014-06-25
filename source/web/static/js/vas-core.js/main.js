@@ -4,7 +4,7 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/UI", "core/db", "core/components", "core/util/progress_aggregator"], 
+	["jquery", "core/config",  "core/registry", "core/UI", "core/db", "core/base/components", "core/util/progress_aggregator"], 
 
 	function($, config, R, UI, DB, Components, ProgressAggregator) {
 		var VAS = { };

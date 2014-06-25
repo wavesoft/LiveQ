@@ -2,7 +2,7 @@
 define(
 
 	// Requirements
-	["jquery", "core/config", "core/registry", "core/components"],
+	["jquery", "core/config", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home screen

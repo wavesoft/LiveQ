@@ -10,7 +10,7 @@ define(["core/config", "core/base/component" ],
 	 *
 	 * @example <caption>Example of creating a custom component</caption>
 	 * // my_module.js
-	 * define(["core/registry", "core/components"],
+	 * define(["core/registry", "core/base/components"],
 	 *    function(R, C) {
 	 *    
 	 *       //
@@ -28,7 +28,7 @@ define(["core/config", "core/base/component" ],
 	 *
      *    }
      * );
- 	 * @exports core/components
+ 	 * @exports core/base/components
 	 */
 	function(config, Component) {
 
@@ -475,14 +475,14 @@ define(["core/config", "core/base/component" ],
 		 * This event is fired by the home screen in order to focus on another
 		 * screen.
 		 *
-		 * @event module:core/components~HomeScreen#changeScreen
+		 * @event module:core/base/components~HomeScreen#changeScreen
 		 */
 
 		/**
 		 * This event should be fired when the user wants to abort the running
 		 * simulation.
 		 *
-		 * @event module:core/components~RunningScreen#abortRun		
+		 * @event module:core/base/components~RunningScreen#abortRun		
 		 */
 
 		/**
@@ -491,14 +491,14 @@ define(["core/config", "core/base/component" ],
 		 * will fire the respective updates on the tunable histograms.
 		 *
 		 * @param {object} parameters - A key/value pair with the tunable name and it's value.
-		 * @event module:core/components~TuningScreen#changeParameters		
+		 * @event module:core/base/components~TuningScreen#changeParameters		
 		 */
 
 		/**
 		 * This event should be fired when the user wants to submit the values.
 		 *
 		 * @param {object} parameters - A key/value pair with the tunable name and it's value.
-		 * @event module:core/components~TuningScreen#submitParameters		
+		 * @event module:core/base/components~TuningScreen#submitParameters		
 		 */
 
 		/**
@@ -506,7 +506,7 @@ define(["core/config", "core/base/component" ],
 		 * another parameter.
 		 *
 		 * @param {string} parameter - The name of the parameter to request explaination for
-		 * @event module:core/components~ExplainScreen#explainParameter		
+		 * @event module:core/base/components~ExplainScreen#explainParameter		
 		 */
 
 		/**
@@ -514,7 +514,7 @@ define(["core/config", "core/base/component" ],
 		 * another parameter.
 		 *
 		 * @param {string} game_id - The ID of the game to launch
-		 * @event module:core/components~ExplainScreen#openGame		
+		 * @event module:core/base/components~ExplainScreen#openGame		
 		 */
 
 		/**
@@ -523,7 +523,7 @@ define(["core/config", "core/base/component" ],
 		 * redirecting the user.
 		 *
 		 * @param {string} url - The URL to navigate to
-		 * @event module:core/components~ExplainScreen#openURL		
+		 * @event module:core/base/components~ExplainScreen#openURL		
 		 */
 
 		////////////////////////////////////////////////////////////

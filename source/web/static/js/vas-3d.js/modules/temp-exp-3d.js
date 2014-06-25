@@ -2,7 +2,7 @@
 define(
 
 	[ "three", "three-extras", 
-	  "core/util/animator", "core/registry", "core/components",
+	  "core/util/animator", "core/registry", "core/base/components",
 	  "vas-3d/util/fluctuation", "vas-3d/util/fluctuation-sprite", "vas-3d/util/feyman",
 	  "vas-3d/scenes/fractal-test"
 	], 
