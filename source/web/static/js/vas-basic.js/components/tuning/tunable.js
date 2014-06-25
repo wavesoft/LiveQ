@@ -21,6 +21,7 @@ define(
 
 			// Prepare variables
 			this.active = true;
+			this.isFocused = false;
 			this.value = 0;
 
 			// Prepare host element
@@ -47,15 +48,21 @@ define(
 
 				// If we are active, expand
 				if (self.active) {
-					self.element.addClass("expanded");
-					self.inpValue[0].select();
+					if (!self.isFocused) {
+						self.element.addClass("expanded");
+						self.inpValue[0].select();
+						self.isFocused = true;
+					}
 				} else {
 				}
 
 			});
 			this.element.mouseout(function() {
-				self.element.removeClass("expanded");
-				self.inpValue[0].blur();
+				if (self.isFocused) {
+					self.element.removeClass("expanded");
+					self.inpValue[0].blur();
+					self.isFocused = false;
+				}
 			});
 
 		};
@@ -78,7 +85,8 @@ define(
 		 * Update tuning widget value
 		 */
 		DefaultTunableWidget.prototype.onUpdate = function(value) {
-			this.value = value;			
+			this.value = value;
+			this.update();
 		}
 
 		////////////////////////////////////////////////////////////

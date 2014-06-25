@@ -57,7 +57,8 @@ define(
 		 * Update tuning widget value
 		 */
 		DefaultObservableWidget.prototype.onUpdate = function(value) {
-
+			this.value = value;
+			this.update();
 		}
 
 		////////////////////////////////////////////////////////////
@@ -68,7 +69,8 @@ define(
 		 * Analyze histogram and try return a goodness of fit value between 0.0 (bad) and 1.0 (perfect)
 		 */
 		DefaultObservableWidget.prototype.getValue = function() {
-			return Math.random();
+			//return Math.random();
+			return this.value;
 		}
 
 		/**
