@@ -58,6 +58,50 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		//             Event definitions for JSDoc                //
 		////////////////////////////////////////////////////////////
 
+		/**
+		 * This event is fired when the user requested more information regarding the 
+		 * tunable component (typically this appears when the user leaves the mouse for
+		 * a couple of milliseconds on the tile)
+		 *
+		 * @param {object} meta - The metadata of the tunable widget to show more details for
+		 * @event module:core/base/tuning_components~TunableWidget#showDetails		
+		 */
+
+		/**
+		 * This event is fired when the tunable component does not require to 
+		 * the additional information displayed.
+		 *
+		 * @event module:core/base/tuning_components~TunableWidget#hideDetails		
+		 */
+
+		/**
+		 * This event is fired when the user has clicked on the tunable component.
+		 *
+		 * @event module:core/base/tuning_components~TunableWidget#click	
+		 */
+
+		/**
+		 * This event is fired when the user requested more information regarding the 
+		 * observable component (typically this appears when the user leaves the mouse for
+		 * a couple of milliseconds on the tile)
+		 *
+		 * @param {object} meta - The metadata of the observable widget to show more details for
+		 * @event module:core/base/tuning_components~ObservableWidget#showDetails		
+		 */
+
+		/**
+		 * This event is fired when the observable component does not require to 
+		 * the additional information displayed.
+		 *
+		 * @event module:core/base/tuning_components~ObservableWidget#hideDetails		
+		 */
+
+		/**
+		 * This event is fired when the user has clicked on the observable component.
+		 *
+		 * @event module:core/base/tuning_components~ObservableWidget#click	
+		 */
+
 		////////////////////////////////////////////////////////////
 
 		// Expose tuning components

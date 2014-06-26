@@ -8,15 +8,12 @@ define(
 	["jquery", "core/config", "core/registry", "core/base/components", "core/db", 
 
 	 // Self-registering dependencies
-	 "vas-basic/components/tuning/tunable", 
-	 "vas-basic/components/tuning/observable",
-	 "vas-basic/components/tuning/status",
 	 "jquery-knob"], 
 
 	/**
 	 * Basic version of the home screen
 	 *
-	 * @exports basic/components/tuning_screen
+	 * @exports vas-basic/components/tuning_screen
 	 */
 	function($, config, R, C, DB) {
 
@@ -26,11 +23,15 @@ define(
 		var TuningScreen = function(hostDOM) {
 			C.TuningScreen.call(this, hostDOM);
 
-			// Initialize host
+			// Prepare properties
 			var self = this;
-			hostDOM.addClass("tuning");
 			this.host = hostDOM;
+			this.width = 0;
+			this.height = 0;
 			window.ts = this;
+
+			// Initialize host DOM
+			hostDOM.addClass("tuning");
 
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
@@ -94,9 +95,9 @@ define(
 				console.warn("Unable to instantiate tuning status widget!");
 
 			// Prepare pop-up drawer
-			this.popupDrawer = R.instanceComponent( "widget.tunable_drawer.default", this.hostTuning );
-			if (!this.popupDrawer)
-				console.warn("Unable to instantiate pop-up drawer");
+			this.popupOnScreen = R.instanceComponent( "widget.onscreen.default", this.hostTuning );
+			if (!this.popupOnScreen)
+				console.warn("Unable to instantiate onscreen description element");
 
 			// Prepare main screen
 			this.obsAngleSpan = Math.PI;
@@ -131,9 +132,129 @@ define(
 
 
 		/**
+		 * Create an tunable widget
+		 */
+		TuningScreen.prototype.createTunable = function( angle, level, metadata ) {
+
+			// Try to instantiate the observable component
+			var e = R.instanceComponent("widget.tunable.default", this.hostTuning );
+			if (!e) {
+				console.warn("Unable to instantiate a tuning widget!");
+				return undefined;
+			}
+
+			// Set pivot configuration for doing this nice
+			// circular distribution
+			e.setPivotConfig( 
+				this.pivotX, 			// Pivot X
+				this.pivotY, 			// Pivot Y
+				angle,					// Angle around pivot
+				level 					// Track position
+			);
+
+			// Bind pop-up events
+			e.on('showDetails', (function(elm) {
+				return function(metadata) {
+
+					// Prepare popup
+					var comBodyHost = $('<div></div>');
+					this.popupOnScreen.setAnchor( elm.x, elm.y, 80, (elm.x > this.pivotX) ? 0 : 1 );
+					this.popupOnScreen.setBody(comBodyHost);
+					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
+
+					// Prepare the body component
+					var comBody = R.instanceComponent("infoblock.tunable", comBodyHost);
+					if (comBody) {
+						comBody.setWidget( e );
+					} else {
+						console.warn("Could not instantiate tunable infoblock!");
+					}
+
+					// Display popup screen
+					this.popupOnScreen.setVisible(true);
+
+				}
+			})(e).bind(this));
+			e.on('hideDetails', (function(elm) {
+				return function(metadata) {
+					this.popupOnScreen.setVisible(false);
+				}
+			})(e).bind(this));
+
+			// Set default values
+			e.onMetadataUpdate( metadata );
+			e.onUpdate(0.000);
+
+			return e;
+
+		}
+
+		/**
+		 * Create an observable widget
+		 */
+		TuningScreen.prototype.createObservable = function( angle, metadata ) {
+
+			// Try to instantiate the observable component
+			var e = R.instanceComponent("widget.observable.default", this.hostTuning );
+			if (!e) {
+				console.warn("Unable to instantiate an observable widget!");
+				return undefined;
+			}
+
+			console.log(this.pivotX, this.pivotY, angle);
+
+			// Set pivot configuration for doing this nice
+			// circular distribution
+			e.setPivotConfig( 
+				this.pivotX, 			// Pivot X
+				this.pivotY, 			// Pivot Y
+				angle,					// Angle around pivot
+				this.obsMinDistance, 	// Min distance
+				this.obsMaxDistance		// Max distance
+			);
+
+			// Bind pop-up events
+			e.on('showDetails', (function(elm) {
+				return function(metadata) {
+
+					// Prepare popup
+					var comBodyHost = $('<div></div>');
+					this.popupOnScreen.setAnchor( elm.x, elm.y, 80, (elm.x > this.pivotX) ? 0 : 1 );
+					this.popupOnScreen.setBody(comBodyHost);
+					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
+
+					// Prepare the body component
+					var comBody = R.instanceComponent("infoblock.observable", comBodyHost);
+					if (comBody) {
+						comBody.setWidget( e );
+					} else {
+						console.warn("Could not instantiate observable infoblock!");
+					}
+
+					// Display popup screen
+					this.popupOnScreen.setVisible(true);
+
+				}
+			})(e).bind(this));
+			e.on('hideDetails', (function(elm) {
+				return function(metadata) {
+					this.popupOnScreen.setVisible(false);
+				}
+			})(e).bind(this));
+
+			// Set metadata and value
+			e.onMetadataUpdate( metadata );
+			e.onUpdate( undefined );
+
+			return e;
+
+		}
+
+		/**
 		 * Design the main user interface
 		 */
 		TuningScreen.prototype.prepareMainScreen = function() {
+			var self = this;
 
 			// Calculate pivot point
 			this.pivotX = this.width / 2;
@@ -147,28 +268,20 @@ define(
 
 			// Create observables
 			for (var i=0; i<aNum; i++) {
-				var e = R.instanceComponent("widget.observable.default", this.hostTuning );
-				if (!e) {
-					console.warn("Unable to instantiate an observable widget!");
-					continue;
-				}
+				var o = this.createObservable(
+						(aVal += aStep),
+						{ 
+							'info': {
+								'short': 'O'+i,
+								'name' : 'Observable #'+i,
+								'book' : 'book-'+i
+							}
+						}
+					);
 
-				// Set pivot configuration for doing this nice
-				// circular distribution
-				e.setPivotConfig( 
-					this.pivotX, 			// Pivot X
-					this.pivotY, 			// Pivot Y
-					(aVal += aStep),		// Angle around pivot
-					this.obsMinDistance, 	// Min distance
-					this.obsMaxDistance		// Max distance
-				);
-
-				// Set default values
-				e.onMetaUpdate({ 'short': i });
-				e.onUpdate( Math.random() );
-
-				// Store on elements
-				this.obsElms.push( e );
+				// Store on observable elements
+				if (!o) continue;
+				this.obsElms.push( o );
 
 			}
 
@@ -176,40 +289,55 @@ define(
 
 			// Prepare tunable parameters
 			this.tunElms = [];
+			this.tunablesLevelRings = [];
 
 			// Create tunables
 			var tVal = this.tunMinDistance, tStep = (this.tunMaxDistance - this.tunMinDistance) / 10;
 			for (var j=0; j<10; j++) {
 
-				var aNum = parseInt(Math.random() * 10),
+				var levData = [],
+					aNum = parseInt(Math.random() * 10),
 					aStep = this.tunAngleSpan / (aNum+1);
 					aVal = -this.tunAngleSpan / 2;
 
 				for (var i=0; i<aNum; i++) {
-					var e = R.instanceComponent("widget.tunable.default", this.hostTuning );
-					if (!e) {
-						console.warn("Unable to instantiate a tuning widget!");
-						continue;
-					}
+					var o = this.createTunable(
+							(aVal += aStep),
+							tVal,
+							{
+								'value': {
+									'min'  : 0,
+									'max'  : 100,
+									'dec'  : 2,
+								},
+								'info': {
+									'short': 'T'+i,
+									'name' : 'Tunable #'+i,
+									'book' : 'book-'+i
+								}
+							}
+						);
+					if (!o) return;
 
-					// Set pivot configuration for doing this nice
-					// circular distribution
-					e.setPivotConfig( 
-						this.pivotX, 			// Pivot X
-						this.pivotY, 			// Pivot Y
-						(aVal += aStep),		// Angle around pivot
-						tVal 					// Track position
-					);
+					// Activate the first level
+					o.setActive( j == 0 );
 
-					// Set default values
-					e.onMetaUpdate({ 'short': i });
-					e.onUpdate(0.000);
-					e.setActive( j == 0 );
+					this.tunElms.push( o );
 
-					this.tunElms.push( e );
+					// Bind on tune rings
+					levData.push(o);
+					o.on('click', (function(ring) {
+						return function() {
+							this.focusTunableRing( ring );
+						}
+					})(j).bind(this));
+
 				}
 
+				// Update tunable level rings
+				this.tunablesLevelRings.push(levData);
 				tVal += tStep;
+
 			}
 
 		}
@@ -349,7 +477,7 @@ define(
 					}
 
 					// Update widget metadata
-					tunWidget.onMetaUpdate( tun.meta );
+					tunWidget.onMetadataUpdate( tun.meta );
 
 					// Reset to default
 					tunWidget.onUpdate( tun.def );
@@ -390,7 +518,7 @@ define(
 					}
 
 					// Update widget metadata
-					obsWidget.onMetaUpdate( obs.meta );
+					obsWidget.onMetadataUpdate( obs.meta );
 
 					// Reset to default
 					obsWidget.onUpdate( undefined );
@@ -443,7 +571,12 @@ define(
 		/**
 		 * Activate a particlar track of tunables
 		 */
-		TuningScreen.prototype.forwardHorizon = function() {
+		TuningScreen.prototype.focusTunableRing = function(id) {
+			for (var j=0; j<this.tunablesLevelRings.length; j++) {
+				for (var i=0; i<this.tunablesLevelRings[j].length; i++) {
+					this.tunablesLevelRings[j][i].setActive( j == id );
+				}
+			}
 		}
 
 		/**

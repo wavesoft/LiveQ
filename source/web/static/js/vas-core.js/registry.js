@@ -131,7 +131,12 @@ define(["core/config", "core/base/component"],
 				return undefined;
 
 			// Instantiate
-			var inst = new componentClass(hostDOM);
+			var inst = undefined;
+			try {
+				inst = new componentClass(hostDOM);
+			} catch (e) {
+				console.error("Could not instantiate component '"+name+"'. Exception: ",e);
+			}
 
 			// Return instance
 			return inst;

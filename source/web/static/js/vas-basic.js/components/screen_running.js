@@ -7,7 +7,7 @@ define(
 	/**
 	 * Basic version of the home screen
 	 *
-	 * @exports basic/components/running_screen
+	 * @exports vas-basic/components/running_screen
 	 */
 	function(config,R,C) {
 

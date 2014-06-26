@@ -25,7 +25,9 @@ define(
 			hostDOM.append(btnHome);
 
 			// When clicked, goto home
-			hostDOM.click((function() {
+			hostDOM.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
 
 				// Fire the changeScreen event
 				this.trigger("changeScreen", "screen.home");
@@ -40,9 +42,9 @@ define(
 		 */
 		NavMini.prototype.onPageWillChange = function(from, to) {
 			if ((to == "screen.home") || (to == "screen.progress")) {
-				this.hostElement.fadeOut();
+				this.hostDOM.fadeOut();
 			} else {
-				this.hostElement.fadeIn();
+				this.hostDOM.fadeIn();
 			}
 		}
 

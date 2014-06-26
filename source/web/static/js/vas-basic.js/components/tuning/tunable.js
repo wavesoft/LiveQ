@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/tuning_components" ], 
+	["jquery", "core/registry","core/base/tuning_components", "core/util/spinner" ], 
 
 	/**
 	 * This is the default tunable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/tunable
 	 */
-	function(config, R, TC) {
+	function(config, R, TC, Spinner) {
 
 		var DefaultTunableWidget = function(hostDOM) {
 
@@ -21,8 +21,9 @@ define(
 
 			// Prepare variables
 			this.active = true;
-			this.isFocused = false;
 			this.value = 0;
+			this.mouseOver = false;
+			this._handleTimer = 0;
 
 			// Prepare host element
 			this.element = $('<div class="tunable"></div>');
@@ -42,28 +43,31 @@ define(
 			this.centerDial.append(this.lblTitle);
 			this.centerDial.append(this.inpValue);
 
-			// Auto-focus on hover
-			var self = this;
-			this.element.mouseover(function() {
+			// Prepare spinner
+			this.spinner = new Spinner({}, this.onUpdate);
 
-				// If we are active, expand
-				if (self.active) {
-					if (!self.isFocused) {
-						self.element.addClass("expanded");
-						self.inpValue[0].select();
-						self.isFocused = true;
-					}
-				} else {
-				}
-
-			});
-			this.element.mouseout(function() {
-				if (self.isFocused) {
-					self.element.removeClass("expanded");
-					self.inpValue[0].blur();
-					self.isFocused = false;
-				}
-			});
+			// Handle pointer events
+			this.element.mouseenter((function() {
+				this.mouseOver = true;
+				if (this.active)
+					this.handleFocus();
+			}).bind(this));
+			this.element.mouseleave((function() {
+				this.mouseOver = false;
+				this.handleBlur();
+			}).bind(this));
+			this.element.click((function() {
+				this.trigger( "click" );
+			}).bind(this));
+			this.leftWing.mousedown((function() {
+				this.spinner.start(-1);
+			}).bind(this));
+			this.rightWing.mousedown((function() {
+				this.spinner.start(1);
+			}).bind(this));
+			this.hostDOM.mouseup((function() {
+				this.spinner.stop();
+			}).bind(this));
 
 		};
 
@@ -79,6 +83,13 @@ define(
 		 */
 		DefaultTunableWidget.prototype.onMetadataUpdate = function(meta) {
 			this.meta = meta;
+
+			// Update spinner with the new metadata 
+			this.spinner = new Spinner({}, this.onUpdate);
+
+			// Update labels
+			this.lblTitle.text(meta['info']['short']);
+
 		}
 
 		/**
@@ -92,6 +103,41 @@ define(
 		////////////////////////////////////////////////////////////
 		//            Implementation-specific functions           //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * Local callback to update value
+		 */
+		DefaultTunableWidget.prototype.setValue = function(value) {
+			var v = parseFloat(value);
+		}
+
+		/**
+		 * Take appropriate actions to focus this element
+		 */
+		DefaultTunableWidget.prototype.handleFocus = function() {
+			this.element.addClass("expanded");
+			this.inpValue[0].select();
+
+			clearTimeout(this._handleTimer);
+			this._handleTimer = setTimeout((function() {
+				this.trigger( "showDetails", this.meta );
+			}).bind(this), 500);
+
+		}
+
+		/**
+		 * Take appropriate actions to blur this element
+		 */
+		DefaultTunableWidget.prototype.handleBlur = function() {
+			this.element.removeClass("expanded");
+			this.inpValue[0].blur();
+
+			clearTimeout(this._handleTimer);
+			this._handleTimer = setTimeout((function() {
+				this.trigger( "hideDetails" );
+			}).bind(this), 100);
+		}
+
 
 		/**
 		 * This event is fired when the view is scrolled/resized and it
@@ -115,6 +161,8 @@ define(
 			this.active = active;
 			if (active) {
 				this.element.removeClass("inactive");
+				if (this.mouseOver)
+					this.handleFocus();
 			} else {
 				this.element.addClass("inactive");
 			}

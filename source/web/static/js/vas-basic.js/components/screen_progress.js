@@ -7,7 +7,7 @@ define(
 	/**
 	 * Basic version of the home screen
 	 *
-	 * @exports basic/components/running_screen
+	 * @exports vas-basic/components/running_screen
 	 */
 	function(config,R,C) {
 
@@ -67,7 +67,7 @@ define(
 		 * Fade-out animation
 		 */
 		ProgressScreen.prototype.onWillHide = function(ready) {
-			//this.hostElement.addClass("hidden");
+			//this.hostDOM.addClass("hidden");
 			//setTimeout(ready, 500);
 			ready();
 		}
@@ -76,7 +76,7 @@ define(
 		 * Fade-out animation
 		 */
 		ProgressScreen.prototype.onWillShow = function(ready) {
-			//this.hostElement.removeClass("hidden");
+			//this.hostDOM.removeClass("hidden");
 			//setTimeout(ready, 500);
 			ready();
 		}

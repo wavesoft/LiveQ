@@ -55,7 +55,7 @@ define(
 
 				// Bind events
 				UI.mininav.on("changeScreen", function(to) {
-					UI.selectScreen(to);
+					UI.selectScreen(to, UI.Transitions.ZOOM_OUT);
 				});
 
 			}
@@ -144,7 +144,6 @@ define(
 
 					// Check for machine layout
 					var diagram = DB.cache['definitions']['machine-diagram'] || { layout: [] };
-					console.log(DB.cache['definitions']);
 					scrExplain.onMachineLayoutDefined( diagram.layout );
 
 					// Complete explain
@@ -166,6 +165,12 @@ define(
 					scrTuning.onTunablesDefined( DB.cache['tunables'] );
 					scrTuning.onObservablesDefined( DB.cache['observables'] );
 					scrTuning.onLevelsDefined( DB.cache['levels'] );
+
+					// Bind events
+					scrTuning.on('explainParameter', function(parameter) {
+						UI.selectScreen("screen.explain")
+							.onParameterFocus(parameter);
+					});
 
 					// Complete tuning
 					prog_tune.ok("Tuning screen ready");

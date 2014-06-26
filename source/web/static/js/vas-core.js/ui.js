@@ -13,6 +13,28 @@ define(["jquery", "core/config", "core/registry"],
 
 		}
 
+		/**
+		 * Find vendor suffix
+		 */
+		function get_vendor_suffix() {
+			var styles = window.getComputedStyle(document.documentElement, ''),
+				pre = (Array.prototype.slice
+				.call(styles)
+				.join('') 
+				.match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
+				)[1]
+			return pre;				
+		}
+
+		/**
+		 * Append vendor suffix on the given string
+		 */
+		function with_vendor_suffix(txt) {
+			var suff = get_vendor_suffix();
+			if (!suff) return txt;
+			return suff + txt[0].toUpperCase() + txt.substr(1);
+		}
+
 		///////////////////////////////////////////////////////////////
 		//                       IMPLEMENTATION                      //
 		///////////////////////////////////////////////////////////////
@@ -24,6 +46,13 @@ define(["jquery", "core/config", "core/registry"],
 		 * @exports core/ui
 		 */
 		var UI = {};
+
+		/**
+		 * Vendor suffix, for calculating events & CSS properties
+		 *
+		 * @type {string}
+		 */
+		UI.vendorSuffix = get_vendor_suffix();
 
 		/**
 		 * The name of the currently active screen
@@ -45,6 +74,15 @@ define(["jquery", "core/config", "core/registry"],
 		 * @type {Object}
 		 */
 		UI.screens = {};
+
+		/**
+		 * Screen transitions
+		 *
+		 */
+		UI.Transitions = {
+			ZOOM_IN  : [ 'pt-page-scaleDown', 	'pt-page-scaleUpDown pt-page-delay300' ],
+			ZOOM_OUT : [ 'pt-page-scaleDownUp', 'pt-page-scaleUp pt-page-delay300' ],
+		};
 
 		/**
 		 * Initialize & Register the specified screen by it's name
@@ -85,14 +123,20 @@ define(["jquery", "core/config", "core/registry"],
 
 			}
 
+			// Perserve the original classes
+			comDOM.data("originalClasses", comDOM.attr("class"));
+
 			// Activate first screen
 			if (!UI.activeScreen) {
 				UI.activeScreen = name;
 				// Fire the onShown event
 				s.onShown();
+				// Make it current
+				comDOM.addClass("pt-current");
+				comDOM.addClass("pt-page-ontop");
 			} else {
 				// Otherwise hide it
-				comDOM.hide();
+				//comDOM.hide();
 			}
 
 
@@ -112,7 +156,7 @@ define(["jquery", "core/config", "core/registry"],
 			UI.host = $(config['dom-host']);
 
 			// Place an overlay DOM
-			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
+			UI.overlayDOM = $('<div class="'+config.css['overlay']+' pt-main pt-perspective"></div>');
 			UI.overlayDOM.hide();
 			UI.host.append(UI.overlayDOM);
 
@@ -125,7 +169,7 @@ define(["jquery", "core/config", "core/registry"],
 					return;
 
 				// Resize it
-				scr.onResize( scr.hostElement.width(), scr.hostElement.height() );
+				scr.onResize( scr.hostDOM.width(), scr.hostDOM.height() );
 
 			});
 
@@ -149,10 +193,19 @@ define(["jquery", "core/config", "core/registry"],
 		 * Activate a screen module with the given name.
 		 *
 		 * @param {string} name - The name of the module to focus.
-		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 * @param {transition} array - (Optional) The transition to choose (from UI.Transitions)
+		 * @param {function} cb_ready - (Optional) The callback to fire when the screen has changed
 		 *
 		 */
-		UI.selectScreen = function(name, cb_ready) {
+		UI.selectScreen = function(name, transition, cb_ready) {
+
+			// Check for missing transition
+			if (transition == undefined) {
+				transition = UI.Transitions.ZOOM_IN;
+			} else if (typeof(transition) == 'function') {
+				cb_ready = transition;
+				transition = UI.Transitions.ZOOM_IN;
+			}
 
 			// Get prev/next screen
 			var ePrev = UI.screens[UI.activeScreen],
@@ -161,29 +214,43 @@ define(["jquery", "core/config", "core/registry"],
 			console.log(UI.activeScreen," -> ",name);
 
 			// Concurrent cross-fade
-			var crossFade = function(cb) {
-				var v = 0;
-				
-				// Fade out old
-				if (ePrev !== undefined) {
-					ePrev.hostElement.fadeOut(500, function() {
-						if (++v == 2) { cb(); }
-					});
-				} else {
-					v++;
-				}
-				
-				// Fade in new
-				if (eNext !== undefined) {
-					eNext.hostElement.fadeIn(500, function() {
-						if (++v == 2) { cb(); }
-					});
-				} else {
-					v++;
+			var pageTransition = function(cb) {
+
+				// Find the event name for the 'animation completed' event
+				var animEndEventNames = {
+						'webkitAnimation' : 'webkitAnimationEnd',
+						'oAnimation' : 'oAnimationEnd',
+						'msAnimation' : 'MSAnimationEnd',
+						'animation' : 'animationend'
+					},
+					animEndEventName = animEndEventNames[ with_vendor_suffix('animation') ];
+
+				// Add page-transitions for moving out
+				ePrev.hostDOM.addClass( transition[0] );
+				eNext.hostDOM.addClass( transition[1] + " pt-page-ontop pt-current");
+
+				// Local function to finalize animation
+				var finalizeAnimation = function() {
+
+					// Remove all the page transition classes from both pages
+					eNext.hostDOM.attr("class", eNext.hostDOM.data("originalClasses") + " pt-current" );
+					ePrev.hostDOM.attr("class", ePrev.hostDOM.data("originalClasses") );
+
+					// Fire callback
+					cb();
+
 				}
 
-				// Check if nothing could fade
-				if (v==2) cb();
+				// Listen for CSS 'animation completed' events
+				var vc = 0; 
+				ePrev.hostDOM.on( animEndEventName, function() {
+					ePrev.hostDOM.off( animEndEventName );
+					if (++vc == 2) finalizeAnimation();
+				} );
+				eNext.hostDOM.on( animEndEventName, function() {
+					eNext.hostDOM.off( animEndEventName );
+					if (++vc == 2) finalizeAnimation();
+				} );
 
 			};
 
@@ -203,7 +270,7 @@ define(["jquery", "core/config", "core/registry"],
 
 					// Call onResize function just to make sure
 					// the component will have the appropriate dimentions
-					eNext.onResize( eNext.hostElement.width(), eNext.hostElement.height() );
+					eNext.onResize( eNext.hostDOM.width(), eNext.hostDOM.height() );
 
 					// Inform new screen that will be shown
 					eNext.onWillShow(cb);
@@ -219,7 +286,7 @@ define(["jquery", "core/config", "core/registry"],
 					UI.mininav.onPageWillChange( UI.activeScreen, name );
 
 				// And cross-fade simultanously
-				crossFade(function() {
+				pageTransition(function() {
 
 					// Fire shown/hidden
 					if (ePrev !== undefined) ePrev.onHidden();
@@ -233,12 +300,14 @@ define(["jquery", "core/config", "core/registry"],
 					UI.activeScreen = name;
 
 					// Fire ready callback
-					if (cb_ready)
-						cb_ready();
+					if (cb_ready) cb_ready();
 
 				});
 
 			}); });
+
+			// Return the screen we are focusing into
+			return eNext;
 
 		}
 

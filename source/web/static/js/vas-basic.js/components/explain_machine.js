@@ -213,7 +213,6 @@ define(["jquery", "core/registry", "core/base/components"],
 		 * Define the layout object
 		 */
 		MachineDiagram.prototype.onMachineLayoutDefined = function(layout) {
-			console.log(layout);
 			var self = this;
 
 			// -- DEL --
@@ -581,10 +580,8 @@ define(["jquery", "core/registry", "core/base/components"],
 			}
 			if (ofsTop+fY < 10) {
 				deltaY = 10 - (ofsTop+fY);
-				console.log("UP");
 			} else if (ofsTop+fY+fH > h-10) {
 				deltaY = (h-10) - (ofsTop+fY+fH);
-				console.log("DOWN");
 			}
 
 			// Apply offset

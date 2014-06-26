@@ -71,7 +71,7 @@ define(["core/config", "core/base/component" ],
 	     *           id: 'num-01', // The index ID of the tunable
 	     *         type: 'num',    // One of: num,str,list,bool
 	     *          def: 0,        // The default value for this element
-	     *         meta: {         // Value metadata, for 'num' type:
+	     *         value: {        // Value metadata, for 'num' type:
 	     *            min: 0,      //   The minimum value
 	     *            max: 10,     //   The maximum value
 	     *            dec: 2       //   The decimals on the number
@@ -499,6 +499,13 @@ define(["core/config", "core/base/component" ],
 		 *
 		 * @param {object} parameters - A key/value pair with the tunable name and it's value.
 		 * @event module:core/base/components~TuningScreen#submitParameters		
+		 */
+
+		/**
+		 * This event should be fired when the user wants more information regarding a particular parameter.
+		 *
+		 * @param {string} parameter - The name of the parameter to request explaination for
+		 * @event module:core/base/components~TuningScreen#explainParameter		
 		 */
 
 		/**

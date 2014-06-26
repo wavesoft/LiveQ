@@ -23,7 +23,7 @@ define(["core/util/event_base", "core/config"],
 			EventBase.call(this);
 
 			// Keep reference of the host DOM element
-			this.hostElement = hostDOM;
+			this.hostDOM = hostDOM;
 
 			// The child components
 			this.childComponents = [];

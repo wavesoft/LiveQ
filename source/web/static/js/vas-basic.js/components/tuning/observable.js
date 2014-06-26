@@ -18,8 +18,11 @@ define(
 			// Keep position for updating
 			this.x = 0;
 			this.y = 0;
+			this.active = true;
 			this.value = 0;
 			this.diameter = 64;
+			this.mouseOver= false;
+			this._handleTimer = 0;
 
 			// Prepare host element
 			this.element = $('<div></div>');
@@ -33,8 +36,19 @@ define(
 			this.element.addClass("observable");
 			this.element.addClass("sz-big");
 
-			// Expose functions
-			var self = this;
+			// Handle pointer events
+			this.element.mouseenter((function() {
+				this.mouseOver = true;
+				if (this.active)
+					this.handleFocus();
+			}).bind(this));
+			this.element.mouseleave((function() {
+				this.mouseOver = false;
+				this.handleBlur();
+			}).bind(this));
+			this.element.click((function() {
+				this.trigger( "click" );
+			}).bind(this));
 
 		};
 
@@ -50,20 +64,59 @@ define(
 		 */
 		DefaultObservableWidget.prototype.onMetadataUpdate = function(meta) {
 			this.meta = meta;
-			this.element.text(meta['short']);
+			this.element.text(meta['info']['short']);
 		}
 
 		/**
 		 * Update tuning widget value
 		 */
 		DefaultObservableWidget.prototype.onUpdate = function(value) {
-			this.value = value;
+			if (value == undefined) { // Reset
+				this.value = 0;
+			} else {
+				this.value = value;
+			}
 			this.update();
 		}
 
 		////////////////////////////////////////////////////////////
 		//            Implementation-specific functions           //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * Take appropriate actions to focus this element
+		 */
+		DefaultObservableWidget.prototype.handleFocus = function() {
+			clearTimeout(this._handleTimer);
+			this._handleTimer = setTimeout((function() {
+				this.trigger( "showDetails", this.meta );
+			}).bind(this), 250);
+
+		}
+
+		/**
+		 * Take appropriate actions to blur this element
+		 */
+		DefaultObservableWidget.prototype.handleBlur = function() {
+			clearTimeout(this._handleTimer);
+			this._handleTimer = setTimeout((function() {
+				this.trigger( "hideDetails" );
+			}).bind(this), 100);
+		}
+
+		/**
+		 * Activate/deactivate tunable
+		 */
+		DefaultObservableWidget.prototype.setActive = function(active) {
+			this.active = active;
+			if (active) {
+				this.element.removeClass("inactive");
+				if (this.mouseOver)
+					this.handleFocus();
+			} else {
+				this.element.addClass("inactive");
+			}
+		}
 
 		/**
 		 * Analyze histogram and try return a goodness of fit value between 0.0 (bad) and 1.0 (perfect)

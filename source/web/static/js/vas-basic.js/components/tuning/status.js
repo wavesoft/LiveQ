@@ -83,13 +83,17 @@ define(
 		 * Update tuning widget metadata
 		 */
 		DefaultStatusWidget.prototype.onMetadataUpdate = function(meta) {
+			
 		}
 
 		/**
 		 * Update tuning widget value
 		 */
 		DefaultStatusWidget.prototype.onUpdate = function(value) {
+			if (value == undefined) { // Reset
 
+			}
+			this.update();
 		}
 
 		////////////////////////////////////////////////////////////

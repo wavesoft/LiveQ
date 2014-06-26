@@ -19,7 +19,10 @@ define(
 			C.Backdrop.call(this, hostDOM);
 
 			// The screen backdrop is just black
-			hostDOM.css({ 'background-color': '#FFF' });
+			hostDOM.css({
+				'background-color': '#FFF',
+				'background-image': 'url(static/img/white_abstract.jpg)'
+			});
 
 		}
 		TuningBackdrop.prototype = Object.create( C.Backdrop.prototype );

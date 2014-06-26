@@ -5,6 +5,7 @@
   @-o-keyframes @name { @rules(); };
   @keyframes @name { @rules(); }; }
 */
+
 .screen.tuning a {
   text-decoration: none;
 }
@@ -24,7 +25,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: #FFF;
+  background-color: white;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.title,
@@ -77,11 +78,11 @@
 .screen.tuning .progress-widget a.button:hover {
   top: 123px;
   background: #27ae60;
-  color: #FFF;
+  color: white;
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.tuning .indicator {
   position: absolute;
@@ -141,7 +142,7 @@
   transition: all 0.2s;
   border: none;
   background-color: transparent;
-  color: #fff;
+  color: white;
   font-size: 1.2em;
   top: 37px;
 }
@@ -150,7 +151,7 @@
   -moz-transition: all 0.2s;
   -o-transition: all 0.2s;
   transition: all 0.2s;
-  color: #fff;
+  color: white;
   font-size: 1.8em;
   bottom: 37px;
   font-weight: bold;
@@ -176,7 +177,7 @@
   cursor: pointer;
   text-indent: 5px;
   font-size: 1.9em;
-  color: #FFF;
+  color: white;
   top: 10px;
   opacity: 0;
 }
@@ -184,7 +185,7 @@
   background-color: #3498db;
 }
 .screen.tuning .tunable a.wing:active {
-  background-color: #71B7E6;
+  background-color: #71b7e6;
 }
 .screen.tuning .tunable a.wing.left {
   left: 18px;
@@ -202,7 +203,7 @@
 .screen.tuning .tunable.expanded .dial {
   border-width: 10px;
   padding: -10px;
-  background-color: #FFF;
+  background-color: white;
   width: 54px;
   height: 54px;
   -webkit-border-radius: 54px;
@@ -211,7 +212,7 @@
   border-radius: 54px;
 }
 .screen.tuning .tunable.expanded .dial input {
-  color: #000;
+  color: black;
   left: 0px;
   top: 14px;
   font-size: 1.5em;
@@ -256,7 +257,33 @@
   opacity: 1;
   z-index: 110;
 }
-.screen.tuning .val-bd {
+.screen.tuning .line {
+  width: 100px;
+  height: 1;
+  border-top: solid 1px #666666;
+}
+.screen.tuning .observable {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  color: white;
+  position: absolute;
+  text-align: center;
+  cursor: pointer;
+  z-index: 100;
+}
+.screen.tuning .observable.inactive {
+  opacity: 0.6;
+  -webkit-transform: scale(0.8);
+  -moz-transform: scale(0.8);
+  -o-transform: scale(0.8);
+  transform: scale(0.8);
+}
+.screen.tuning .observable:hover {
+  z-index: 110;
+}
+.screen.tuning .observable.val-bd {
   width: 64px;
   height: 64px;
   line-height: 64px;
@@ -268,7 +295,7 @@
   border: solid 2px #c0392b;
   background-color: #e74c3c;
 }
-.screen.tuning .val-md {
+.screen.tuning .observable.val-md {
   width: 32px;
   height: 32px;
   line-height: 32px;
@@ -280,7 +307,7 @@
   border: solid 2px #f39c12;
   background-color: #e67e22;
 }
-.screen.tuning .val-gd {
+.screen.tuning .observable.val-gd {
   width: 24px;
   height: 24px;
   line-height: 24px;
@@ -292,28 +319,31 @@
   border: solid 2px #27ae60;
   background-color: #2ecc71;
 }
-.screen.tuning .line {
-  width: 100px;
-  height: 1;
-  border-top: solid 1px #666;
-}
-.screen.tuning .observable {
-  -webkit-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  transition: all 0.4s;
-  color: #FFF;
+.screen.tuning .onscreen {
   position: absolute;
-  text-align: center;
-}
-.screen.tuning .drawer {
-  position: absolute;
-  background: #999999;
-  overflow-x: hidden;
+  background: rgba(64, 64, 64, 0.9);
   width: 350px;
   height: 250px;
+  opacity: 0;
+  z-index: 0;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-transform: scale(0.1);
+  -moz-transform: scale(0.1);
+  -o-transform: scale(0.1);
+  transform: scale(0.1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  /* easeInBack */
+
 }
-.screen.tuning .drawer:after {
+.screen.tuning .onscreen:after {
   top: 50%;
   border: solid transparent;
   content: " ";
@@ -325,20 +355,59 @@
   border-width: 16px;
   margin-top: -16px;
 }
-.screen.tuning .drawer.left:after {
+.screen.tuning .onscreen.visible {
+  z-index: 500;
+  opacity: 1;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  /* easeOutBack */
+
+}
+.screen.tuning .onscreen.left:after {
   left: 100%;
-  border-left-color: #999999;
+  border-left-color: rgba(64, 64, 64, 0.9);
 }
-.screen.tuning .drawer.right:after {
+.screen.tuning .onscreen.right:after {
   right: 100%;
-  border-right-color: #999999;
+  border-right-color: rgba(64, 64, 64, 0.9);
 }
-.screen.tuning .drawer .document {
+.screen.tuning .onscreen .bullet {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #e74c3c;
+  left: 8px;
+  top: 10px;
+}
+.screen.tuning .onscreen .title {
+  position: absolute;
+  left: 22px;
+  top: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+}
+.screen.tuning .onscreen .document {
+  position: absolute;
   width: 340px;
-  height: 240px;
-  margin: 5px;
+  height: 220px;
+  left: 5px;
+  top: 25px;
   overflow-x: hidden;
   overflow-y: auto;
+  color: #eeeeee;
 }
 .screen.home .home-menu {
   position: absolute;
@@ -351,15 +420,15 @@
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399FF;
+  background-color: #3399ff;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70B8FF;
+  background-color: #70b8ff;
 }
 .screen.explain {
   padding: 0;
@@ -385,7 +454,7 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .focus-bar {
   position: absolute;
-  background-color: #F1948A;
+  background-color: #f1948a;
   left: 0;
   top: 0;
   -webkit-transition: top 0.2s linear, left 0.2s linear;
@@ -451,7 +520,7 @@
   border-style: solid;
   border-color: transparent;
   border-width: 3px;
-  background-color: #FFF;
+  background-color: white;
   -webkit-border-radius: 24px;
   -moz-border-radius: 24px;
   -o-border-radius: 24px;
@@ -459,8 +528,8 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.focus {
-  background-color: #fcc;
-  border-color: #FFF;
+  background-color: #ffcccc;
+  border-color: white;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert {
   background-position-y: 0;
@@ -468,7 +537,7 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert.focus {
-  border-color: #FFF;
+  border-color: white;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.icon01 {
   background-position-x: 0;
@@ -498,7 +567,7 @@
   background-position-x: -336px;
 }
 .screen.progress {
-  background-color: #FFF;
+  background-color: white;
 }
 .screen.progress.hidden div.logo {
   top: -400px;
@@ -516,6 +585,7 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   left: 50%;
   top: 40%;
@@ -533,12 +603,13 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999;
+  color: #999999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -554,8 +625,9 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
-  background-color: #eee;
+  background-color: #eeeeee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -566,7 +638,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #FF9900;
+  background-color: #ff9900;
   display: block;
   margin: 1px 0;
   height: 2px;
