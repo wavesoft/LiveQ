@@ -93,6 +93,11 @@ define(
 			if (!this.statusWidget)
 				console.warn("Unable to instantiate tuning status widget!");
 
+			// Prepare pop-up drawer
+			this.popupDrawer = R.instanceComponent( "widget.tunable_drawer.default", this.hostTuning );
+			if (!this.popupDrawer)
+				console.warn("Unable to instantiate pop-up drawer");
+
 			// Prepare main screen
 			this.obsAngleSpan = Math.PI;
 			this.obsWideSpan = 0;

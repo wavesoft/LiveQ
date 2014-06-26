@@ -23,8 +23,12 @@ define(
 			this.visible = false;
 
 			// Prepare drawer
-			this.element = $('<div class="drawer"></div>')
+			this.element = $('<div class="drawer"></div>');
 			hostDOM.append(this.element);
+
+			// Prepare description component
+			this.textContainer = $('<div class="document"></div>');
+			this.element.append( this.textContainer );
 
 		};
 

@@ -288,6 +288,54 @@
 		text-align: center;
 	}
 
+	// ------------------
+	//  Drawer pop-up
+	// ------------------
+	.drawer {
+		position: absolute;
+		background: #999999;
+		overflow-x: hidden;
+		width: 350px;
+		height: 250px;
+
+		&:after {
+			top: 50%;
+			border: solid transparent;
+			content: " ";
+			height: 0;
+			width: 0;
+			position: absolute;
+			pointer-events: none;
+			border-color: rgba(153, 153, 153, 0);
+			border-width: 16px;
+			margin-top: -16px;
+		}
+
+		&.left {
+			&:after {
+				left: 100%;
+				border-left-color: #999999;
+			}
+		}
+
+		&.right {
+			&:after {
+				right: 100%;
+				border-right-color: #999999;
+			}
+		}
+
+		.document {
+			width: 340px;
+			height: 240px;
+			margin: 5px;
+			overflow-x: hidden;
+			overflow-y: auto;
+			color: #eee;
+		}
+
+	}
+
 }
 
 ///////////////////////////////////////////////
