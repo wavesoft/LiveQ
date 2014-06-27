@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/config", "core/registry", "core/base/components"],
+	[ "jquery", "core/config", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports vas-basic/components/running_screen
 	 */
-	function(config,R,C) {
+	function($, config,R,C) {
 
 		/**
 		 * @class
@@ -17,6 +17,9 @@ define(
 		 */
 		var RunningScreen = function( hostDOM ) {
 			C.RunningScreen.call(this, hostDOM);
+
+			// Prepare configuration
+			this.diameter = 200;
 
 			// Prepare host
 			hostDOM.addClass("running");
@@ -30,12 +33,45 @@ define(
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append( this.foregroundDOM );
 
+			// Prepare progress status
+			this.progressGroup = $('<div class="progress"></div>');
+			hostDOM.append( this.progressGroup );
+
+			// Prepare progress knob
+			this.progressKnobBlur = $('<input type="text" value="25" />');
+			this.progressKnob = $('<input type="text" value="25" />');
+			this.progressGroup.append(this.progressKnob);
+			this.progressGroup.append(this.progressKnobBlur);
+			this.progressKnob.knob({
+				min:0, max:100,
+				width 		: this.diameter - 12,
+				height 		: this.diameter - 12,
+				thickness	: 0.1,
+				angleArc 	: 270,
+				angleOffset : 45,
+				readOnly  	: true,
+				className 	: 'knob',
+				fgColor 	: "#FFCC00",
+				bgColor 	: "#EEEEEE",
+			});
+			this.progressKnobBlur.knob({
+				min:0, max:100,
+				width 		: this.diameter - 12,
+				height 		: this.diameter - 12,
+				thickness	: 0.1,
+				angleArc 	: 270,
+				angleOffset : 45,
+				readOnly  	: true,
+				className 	: 'knob blur',
+				fgColor 	: "#FFCC00",
+				bgColor 	: "#FFFFFF",
+			});
+
 			// Create globe
 			this.globeDOM = $('<div class="globe"></div>');
 			hostDOM.append( this.globeDOM );
 			this.globe = R.instanceComponent("widget.globe3d", this.globeDOM);
 
-			// 
 
 		}
 		RunningScreen.prototype = Object.create( C.RunningScreen.prototype );
@@ -52,7 +88,13 @@ define(
 			this.globe.onResize( globeW, globeH );
 			this.globeDOM.css({
 				'left': (this.width - globeW) / 2,
-				'top' : (this.height - globeH) / 2
+				'top' : (this.height - globeH) / 2,
+			});
+
+			// Realign background
+			this.progressGroup.css({
+				'left': (this.width - this.diameter) / 2,
+				'top': (this.height - this.diameter) / 2,
 			});
 
 		}

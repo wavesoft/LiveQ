@@ -27,8 +27,7 @@ define(
 			this.scene = new THREE.Scene();
 
 			// Initialize renderer
-			this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-			this.renderer.setClearColor( 0xffffff );
+			this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 			this.hostDOM.append(this.renderer.domElement);
 
 			// Prepare composer

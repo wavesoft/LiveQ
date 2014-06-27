@@ -682,8 +682,38 @@
   width: 0;
 }
 .running .globe {
-  width: 160px;
-  height: 160px;
   position: absolute;
   display: block;
+  width: 160px;
+  height: 160px;
+}
+.running .progress {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  -webkit-border-radius: 200px;
+  -moz-border-radius: 200px;
+  -o-border-radius: 200px;
+  border-radius: 200px;
+  position: absolute;
+  display: block;
+  width: 200px;
+  height: 200px;
+  background-color: #FFF;
+  border: solid 2px #34495e;
+}
+.running .progress .knob {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+.running .progress .knob input {
+  display: none;
+}
+.running .progress .knob.blur {
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  filter: blur(5px);
 }
