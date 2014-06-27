@@ -5,7 +5,6 @@
   @-o-keyframes @name { @rules(); };
   @keyframes @name { @rules(); }; }
 */
-
 .screen.tuning a {
   text-decoration: none;
 }
@@ -84,14 +83,6 @@
   position: absolute;
   border: dashed 1px #999999;
 }
-.screen.tuning .indicator {
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid #27ae60;
-}
 .screen.tuning .tunable {
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
@@ -145,6 +136,9 @@
   color: white;
   font-size: 1.2em;
   top: 37px;
+}
+.screen.tuning .tunable .dial input:focus {
+  outline: none;
 }
 .screen.tuning .tunable .dial div.title {
   -webkit-transition: all 0.2s;
@@ -273,141 +267,90 @@
   cursor: pointer;
   z-index: 100;
 }
-.screen.tuning .observable.inactive {
-  opacity: 0.6;
-  -webkit-transform: scale(0.8);
-  -moz-transform: scale(0.8);
-  -o-transform: scale(0.8);
-  transform: scale(0.8);
-}
-.screen.tuning .observable:hover {
-  z-index: 110;
-}
 .screen.tuning .observable.val-bd {
-  width: 64px;
-  height: 64px;
-  line-height: 64px;
-  font-size: 32px;
-  -webkit-border-radius: 64px;
-  -moz-border-radius: 64px;
-  -o-border-radius: 64px;
-  border-radius: 64px;
-  border: solid 2px #c0392b;
+  width: 54px;
+  height: 54px;
+  line-height: 54px;
+  font-size: 27px;
+  -webkit-border-radius: 54px;
+  -moz-border-radius: 54px;
+  -o-border-radius: 54px;
+  border-radius: 54px;
+  border: solid 2px;
+  border-color: #d62c1a;
   background-color: #e74c3c;
 }
 .screen.tuning .observable.val-md {
-  width: 32px;
-  height: 32px;
-  line-height: 32px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
   font-size: 20px;
-  -webkit-border-radius: 32px;
-  -moz-border-radius: 32px;
-  -o-border-radius: 32px;
-  border-radius: 32px;
-  border: solid 2px #f39c12;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  -o-border-radius: 40px;
+  border-radius: 40px;
+  border: solid 2px;
+  border-color: #bf6516;
   background-color: #e67e22;
 }
 .screen.tuning .observable.val-gd {
   width: 24px;
   height: 24px;
   line-height: 24px;
-  font-size: 18px;
+  font-size: 12px;
   -webkit-border-radius: 24px;
   -moz-border-radius: 24px;
   -o-border-radius: 24px;
   border-radius: 24px;
-  border: solid 2px #27ae60;
+  border: solid 2px;
+  border-color: #25a25a;
   background-color: #2ecc71;
 }
-.screen.tuning .onscreen {
-  position: absolute;
-  background: rgba(64, 64, 64, 0.9);
-  width: 350px;
-  height: 250px;
-  opacity: 0;
-  z-index: 0;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -o-border-radius: 8px;
-  border-radius: 8px;
-  -webkit-transform: scale(0.1);
-  -moz-transform: scale(0.1);
-  -o-transform: scale(0.1);
-  transform: scale(0.1);
-  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
-  /* older webkit */
-  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
-  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
-  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
-  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
-  /* easeInBack */
-
+.screen.tuning .observable.inactive {
+  z-index: 50;
+  -webkit-transform: scale(0.5);
+  -moz-transform: scale(0.5);
+  -o-transform: scale(0.5);
+  transform: scale(0.5);
 }
-.screen.tuning .onscreen:after {
-  top: 50%;
-  border: solid transparent;
-  content: " ";
-  height: 0;
-  width: 0;
-  position: absolute;
-  pointer-events: none;
-  border-color: rgba(153, 153, 153, 0);
-  border-width: 16px;
-  margin-top: -16px;
+.screen.tuning .observable.inactive.val-bd {
+  border-color: #b07973;
+  background-color: #c39893;
 }
-.screen.tuning .onscreen.visible {
-  z-index: 500;
+.screen.tuning .observable.inactive.val-md {
+  border-color: #a88260;
+  background-color: #ba9c81;
+}
+.screen.tuning .observable.inactive.val-gd {
+  border-color: #6c8e7a;
+  background-color: #89a494;
+}
+.screen.tuning .observable:hover {
+  z-index: 110;
+}
+.screen.tuning .observable:hover.inactive {
   opacity: 1;
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
-  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
-  /* older webkit */
-  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-  /* easeOutBack */
-
 }
-.screen.tuning .onscreen.left:after {
-  left: 100%;
-  border-left-color: rgba(64, 64, 64, 0.9);
-}
-.screen.tuning .onscreen.right:after {
-  right: 100%;
-  border-right-color: rgba(64, 64, 64, 0.9);
-}
-.screen.tuning .onscreen .bullet {
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -o-border-radius: 8px;
-  border-radius: 8px;
+.screen.tuning .indicator {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background: #e74c3c;
-  left: 8px;
-  top: 10px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  z-index: 80;
 }
-.screen.tuning .onscreen .title {
-  position: absolute;
-  left: 22px;
-  top: 5px;
-  color: white;
-  font-weight: bold;
-  font-size: 15px;
+.screen.tuning .indicator.val-gd {
+  border-top: 10px solid #2ecc71;
 }
-.screen.tuning .onscreen .document {
-  position: absolute;
-  width: 340px;
-  height: 220px;
-  left: 5px;
-  top: 25px;
-  overflow-x: hidden;
-  overflow-y: auto;
-  color: #eeeeee;
+.screen.tuning .indicator.val-md {
+  border-top: 10px solid #e67e22;
+}
+.screen.tuning .indicator.val-bd {
+  border-top: 10px solid #e74c3c;
 }
 .screen.home .home-menu {
   position: absolute;
@@ -436,6 +379,105 @@
 .screen.explain .explain-top {
   height: 65%;
   margin: 0;
+}
+.screen.explain .explain-top .parameter {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  position: absolute;
+  display: block;
+  width: 40px;
+  height: 40px;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  -o-border-radius: 40px;
+  border-radius: 40px;
+  background-color: #2980b9;
+  cursor: pointer;
+}
+.screen.explain .explain-top .parameter:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 48px;
+  height: 48px;
+  border: solid 4px;
+  border-color: #2980b9;
+  -webkit-border-radius: 48px;
+  -moz-border-radius: 48px;
+  -o-border-radius: 48px;
+  border-radius: 48px;
+  opacity: 0;
+  -webkit-transform: scale(0.1);
+  -moz-transform: scale(0.1);
+  -o-transform: scale(0.1);
+  transform: scale(0.1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  /* easeInBack */
+
+}
+.screen.explain .explain-top .parameter h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.4em;
+  width: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: white;
+}
+.screen.explain .explain-top .parameter div.title {
+  display: none;
+}
+.screen.explain .explain-top .parameter div.title .arrow_box {
+  position: relative;
+  background-color: #2980b9;
+}
+.screen.explain .explain-top .parameter div.title .arrow_box:after {
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: transparent;
+  border-width: 30px;
+  margin-top: -30px;
+}
+.screen.explain .explain-top .parameter div.title.left {
+  right: 100%;
+  border-right-color: #2980b9;
+}
+.screen.explain .explain-top .parameter div.title.right {
+  left: 100%;
+  border-left-color: #2980b9;
+}
+.screen.explain .explain-top .parameter:hover {
+  background-color: #3498db;
+}
+.screen.explain .explain-top .parameter:hover:after {
+  opacity: 1.0;
+  border-color: #3498db;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  /* easeOutBack */
+
 }
 .screen.explain .explain-bottom {
   height: 35%;

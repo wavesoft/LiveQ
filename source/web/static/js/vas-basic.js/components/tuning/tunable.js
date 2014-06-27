@@ -23,6 +23,10 @@ define(
 			this.active = true;
 			this.value = 0;
 			this.mouseOver = false;
+			this.focused = false;
+
+			// Local properties
+			this._triggerTimer = 0;
 			this._handleTimer = 0;
 
 			// Prepare host element
@@ -38,13 +42,13 @@ define(
 			this.element.append(this.centerDial);
 
 			// Prepare input/label elements
-			this.inpValue = $('<input type="text" value="0.000"></input>');
+			this.inpValue = $('<input type="text" />');
 			this.lblTitle = $('<div class="title">T</div>');
 			this.centerDial.append(this.lblTitle);
 			this.centerDial.append(this.inpValue);
 
 			// Prepare spinner
-			this.spinner = new Spinner({}, this.onUpdate);
+			this.spinner = new Spinner({}, this.handleValueUpdate.bind(this));
 
 			// Handle pointer events
 			this.element.mouseenter((function() {
@@ -85,7 +89,7 @@ define(
 			this.meta = meta;
 
 			// Update spinner with the new metadata 
-			this.spinner = new Spinner({}, this.onUpdate);
+			this.spinner = new Spinner(meta['value'], this.handleValueUpdate.bind(this));
 
 			// Update labels
 			this.lblTitle.text(meta['info']['short']);
@@ -97,6 +101,7 @@ define(
 		 */
 		DefaultTunableWidget.prototype.onUpdate = function(value) {
 			this.value = value;
+			this.spinner.value = value;
 			this.update();
 		}
 
@@ -105,10 +110,21 @@ define(
 		////////////////////////////////////////////////////////////
 
 		/**
-		 * Local callback to update value
+		 * Handle a value update
 		 */
-		DefaultTunableWidget.prototype.setValue = function(value) {
-			var v = parseFloat(value);
+		DefaultTunableWidget.prototype.handleValueUpdate = function(value) {
+
+			// Update UI
+			this.onUpdate(value);
+
+			// Throttle value change event
+			clearTimeout(this._triggerTimer || 0);
+			this._triggerTimer = setTimeout((function() {
+				this.trigger( 'valueChanged', this.value );
+				console.log("Value changed: ",this.value);
+			}).bind(this), 250);
+
+
 		}
 
 		/**
@@ -123,6 +139,10 @@ define(
 				this.trigger( "showDetails", this.meta );
 			}).bind(this), 500);
 
+			// Keep the value we wad when we were focuse
+			this.focusValue = this.value;
+			this.focused = true;
+
 		}
 
 		/**
@@ -136,8 +156,46 @@ define(
 			this._handleTimer = setTimeout((function() {
 				this.trigger( "hideDetails" );
 			}).bind(this), 100);
-		}
 
+			// Update the value if we were active and focused
+			if (this.focused) {				
+
+				// Try to parse the value
+				try {
+
+					// Try to parse the new value
+					var newVal = parseFloat( this.inpValue.val() );
+					if (isNaN(newVal)) {
+						this.update();
+					} else {
+
+						// Get value metadata
+						var valueMeta = this.meta['value'] || {},
+							valMin = valueMeta['min'] || 0,
+							valMax = valueMeta['max'] || 1;
+
+						// Wrap value
+						if (newVal < valMin)
+							newVal = valMin;
+						if (newVal > valMax)
+							newVal = valMax;
+
+						// Trigger update
+						if (newVal != this.focusValue)
+							this.handleValueUpdate(newVal);
+						else
+							this.update();
+
+					}
+
+				} catch (e) {
+					this.update();
+				}
+
+			}
+			this.focused = false;
+
+		}
 
 		/**
 		 * This event is fired when the view is scrolled/resized and it
@@ -194,8 +252,14 @@ define(
 		 */
 		DefaultTunableWidget.prototype.update = function() {
 
+			// Get number of dcimals for formatting
+			var decimals = 2;
+			if (this.meta && this.meta['value'])
+				decimals = this.meta['value']['decimals'] || 2;
+
 			// Calculate position around pivot
 			var v = this.getValue();
+			this.inpValue.val( v.toFixed(decimals) );
 
 			// Update position
 			this.x = this.pivotX + Math.sin(this.angle) * this.trackOffset;

@@ -64,3 +64,20 @@
   @-o-keyframes @name { @rules(); };
   @keyframes @name { @rules(); }; }
 */
+
+
+// Transition helpers (from caesar)
+.easing-back-in() {
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.600, 0, 0.735, 0.045), opacity 0.2s; /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
+     -moz-transition: -moz-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
+       -o-transition: -o-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
+          transition: transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; /* easeInBack */
+}
+.easing-back-out() {
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1), opacity 0.2s; /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
+     -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
+       -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
+          transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; /* easeOutBack */
+}

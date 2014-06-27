@@ -111,10 +111,17 @@ define(
 			this.active = active;
 			if (active) {
 				this.element.removeClass("inactive");
+
+				// Update indicator position
+				this.onHorizonTopChanged(this.bottom);
+
+				// Check for pop-up window display
 				if (this.mouseOver)
 					this.handleFocus();
+
 			} else {
 				this.element.addClass("inactive");
+				this.indicator.hide();
 			}
 		}
 
@@ -132,6 +139,9 @@ define(
 		 */
 		DefaultObservableWidget.prototype.onHorizonTopChanged = function(bottom) {
 			this.bottom = bottom;
+
+			// Update indicator position only if active
+			if (!this.active) return;
 			if (this.y > this.bottom) {
 				this.indicator.css({
 					'top': bottom - 15
@@ -182,16 +192,22 @@ define(
 			this.element.removeClass("val-bd");
 			this.element.removeClass("val-md");
 			this.element.removeClass("val-gd");
+			this.indicator.removeClass("val-bd");
+			this.indicator.removeClass("val-md");
+			this.indicator.removeClass("val-gd");
 
 			// Append classes
 			if (v < obsValBounds[0]) {
 				this.element.addClass("val-bd");
-				this.diameter = 64;
+				this.indicator.addClass("val-bd");
+				this.diameter = 54;
 			} else if (v < obsValBounds[1]) {
 				this.element.addClass("val-md");
-				this.diameter = 32;
+				this.indicator.addClass("val-md");
+				this.diameter = 50;
 			} else {
 				this.element.addClass("val-gd");
+				this.indicator.addClass("val-gd");
 				this.diameter = 24;
 			}
 

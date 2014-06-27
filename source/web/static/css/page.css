@@ -5,7 +5,6 @@
   @-o-keyframes @name { @rules(); };
   @keyframes @name { @rules(); }; }
 */
-
 @import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700);
 html,
 body {
@@ -90,6 +89,96 @@ h1 + p.subtitle {
 }
 .vrows .vrow-12 {
   height: 100%;
+}
+.onscreen {
+  position: absolute;
+  background: rgba(64, 64, 64, 0.9);
+  width: 350px;
+  height: 250px;
+  opacity: 0;
+  z-index: 0;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-transform: scale(0.1);
+  -moz-transform: scale(0.1);
+  -o-transform: scale(0.1);
+  transform: scale(0.1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  /* easeInBack */
+
+}
+.onscreen:after {
+  top: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(153, 153, 153, 0);
+  border-width: 16px;
+  margin-top: -16px;
+}
+.onscreen.visible {
+  z-index: 500;
+  opacity: 1;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  /* easeOutBack */
+
+}
+.onscreen.left:after {
+  left: 100%;
+  border-left-color: rgba(64, 64, 64, 0.9);
+}
+.onscreen.right:after {
+  right: 100%;
+  border-right-color: rgba(64, 64, 64, 0.9);
+}
+.onscreen .bullet {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #e74c3c;
+  left: 8px;
+  top: 10px;
+}
+.onscreen .title {
+  position: absolute;
+  left: 22px;
+  top: 5px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+}
+.onscreen .document {
+  position: absolute;
+  width: 340px;
+  height: 220px;
+  left: 5px;
+  top: 25px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  color: #eeeeee;
 }
 #game-frame {
   background-color: white;

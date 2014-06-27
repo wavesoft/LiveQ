@@ -81,6 +81,12 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		 */
 
 		/**
+		 * This event is fired when the user has changed the value of the tunable.
+		 *
+		 * @event module:core/base/tuning_components~TunableWidget#valueChanged	
+		 */
+
+		/**
 		 * This event is fired when the user requested more information regarding the 
 		 * observable component (typically this appears when the user leaves the mouse for
 		 * a couple of milliseconds on the tile)

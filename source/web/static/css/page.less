@@ -38,6 +38,10 @@ h1 + p.subtitle {
 	z-index: 100;
 }
 
+// ===============================
+//  Vertical grid system
+// ===============================
+
 .vrows {
 
 	padding: 0;
@@ -62,6 +66,97 @@ h1 + p.subtitle {
 	.vrow-12 { height: 100%; }
 
 }
+
+// ===============================
+//  On-Screen Pop-Up Window
+// ===============================
+.onscreen {
+	position: absolute;
+	background: rgba(64,64,64,0.9);
+	width: 350px;
+	height: 250px;
+	opacity: 0;
+	z-index: 0;
+
+	.border-radius( 8px );
+
+	.transform( scale(0.1) );
+	.easing-back-in();
+
+	&:after {
+		top: 50%;
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		border-color: rgba(153, 153, 153, 0);
+		border-width: 16px;
+		margin-top: -16px;
+	}
+
+	&.visible {
+		z-index: 500;
+		opacity: 1;
+		.transform( scale(1) );
+		.easing-back-out( );
+	}
+
+	&.left {
+		&:after {
+			left: 100%;
+			border-left-color: rgba(64,64,64,0.9);
+		}
+	}
+
+	&.right {
+		&:after {
+			right: 100%;
+			border-right-color: rgba(64,64,64,0.9);
+		}
+	}
+
+	.title {
+
+	}
+
+	.bullet {
+		.border-radius( 8px );
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		background: #e74c3c;
+		left: 8px;
+		top: 10px;
+	}
+
+	.title {
+		position: absolute;
+		left: 22px;
+		top: 5px;
+		color: #FFF;
+		font-weight: bold;
+		font-size: 15px;
+	}
+
+	.document {
+		position: absolute;
+		width: 340px;
+		height: 220px;
+		left: 5px;
+		top: 25px;
+		overflow-x: hidden;
+		overflow-y: auto;
+		color: #eee;
+	}
+
+}
+
+
+// ===============================
+//  Main game components
+// ===============================
 
 #game-frame {
 	background-color: #FFF;
@@ -120,6 +215,10 @@ h1 + p.subtitle {
 	}
 
 }
+
+// ================================
+//  Placeholder for missing screen
+// ================================
 
 .screen.error-screen {
 	min-height: 48px;

@@ -260,29 +260,47 @@ define(
 			this.pivotX = this.width / 2;
 			this.pivotY = 150;
 
-			// Create arbitrary observables
+			// Prepare observable parameters
 			this.obsElms = [];
-			var aNum = 100,
-				aStep = this.obsAngleSpan / (aNum+1),
-				aVal = -this.obsAngleSpan / 2;
+			this.observablesLevelRings = [];
 
-			// Create observables
-			for (var i=0; i<aNum; i++) {
-				var o = this.createObservable(
-						(aVal += aStep),
-						{ 
-							'info': {
-								'short': 'O'+i,
-								'name' : 'Observable #'+i,
-								'book' : 'book-'+i
+			// Create observables for 10 levels
+			for (var j=0; j<10; j++) {
+				var ring = [];
+
+				var aNum = parseInt(Math.random() * 10),
+					aStep = this.obsAngleSpan / (aNum+1),
+					aVal = -this.obsAngleSpan / 2;
+
+				for (var i=0; i<aNum; i++) {
+					var o = this.createObservable(
+							(aVal += aStep),
+							{ 
+								'info': {
+									'short': 'O'+i,
+									'name' : 'Observable #'+i,
+									'book' : 'book-'+i
+								}
 							}
+						);
+
+					// Store on observable elements
+					if (!o) continue;
+					this.obsElms.push( o );
+
+					// Bind on tune rings
+					o.on('click', (function(ring) {
+						return function() {
+							this.focusTunableRing( ring );
 						}
-					);
+					})(j).bind(this));
 
-				// Store on observable elements
-				if (!o) continue;
-				this.obsElms.push( o );
+					o.setActive( j == 0 );
+					ring.push( o );
 
+				}
+
+				this.observablesLevelRings.push(ring);
 			}
 
 			//////////////////////////////////////////////////////
@@ -307,7 +325,7 @@ define(
 							{
 								'value': {
 									'min'  : 0,
-									'max'  : 100,
+									'max'  : 10,
 									'dec'  : 2,
 								},
 								'info': {
@@ -575,6 +593,9 @@ define(
 			for (var j=0; j<this.tunablesLevelRings.length; j++) {
 				for (var i=0; i<this.tunablesLevelRings[j].length; i++) {
 					this.tunablesLevelRings[j][i].setActive( j == id );
+				}
+				for (var i=0; i<this.observablesLevelRings[j].length; i++) {
+					this.observablesLevelRings[j][i].setActive( j == id );
 				}
 			}
 		}

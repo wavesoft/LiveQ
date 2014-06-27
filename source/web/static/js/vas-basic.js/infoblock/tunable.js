@@ -18,6 +18,9 @@ define(
 			// Initialize widget
 			Component.call(this, hostDOM);
 
+			// Prepare infoblock
+			
+
 		};
 
 		// Subclass from ObservableWidget

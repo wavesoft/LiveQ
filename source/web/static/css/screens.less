@@ -5,6 +5,14 @@
 ///////////////////////////////////////////////
 // Tuning Screen
 ///////////////////////////////////////////////
+
+@tuning-scr-c-good 		: #2ecc71;
+@tuning-scr-sz-good 	: 24px;
+@tuning-scr-c-average 	: #e67e22;
+@tuning-scr-sz-average 	: 40px;
+@tuning-scr-c-bad		: #e74c3c;
+@tuning-scr-sz-bad		: 54px;
+
 .screen.tuning {
 
 	a { text-decoration: none; }
@@ -90,14 +98,6 @@
 
 	}
 
-	.indicator {
-		position: absolute;
-		width: 0;  height: 0; 
-		border-left: 10px solid transparent;
-		border-right: 10px solid transparent;
-		border-top: 10px solid #27ae60;
-	}
-
 	// ========================
 	//  Tunable bubble element
 	// ========================
@@ -138,6 +138,10 @@
 				color: #fff;
 				font-size: 1.2em;
 				top: 37px;
+
+				&:focus {
+					outline: none;
+				}
 			}
 
 			div.title {
@@ -263,141 +267,93 @@
 		cursor: pointer;
 		z-index: 100;
 
+		&.val-bd {
+			width: @tuning-scr-sz-bad;
+			height: @tuning-scr-sz-bad;
+			line-height: @tuning-scr-sz-bad;
+			font-size: @tuning-scr-sz-bad/2;
+			.border-radius(@tuning-scr-sz-bad);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-bad, 10%);
+			background-color: @tuning-scr-c-bad;
+		}
+
+		&.val-md {
+			width: @tuning-scr-sz-average;
+			height: @tuning-scr-sz-average;
+			line-height: @tuning-scr-sz-average;
+			font-size: @tuning-scr-sz-average/2;
+			.border-radius(@tuning-scr-sz-average);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-average, 10%);
+			background-color: @tuning-scr-c-average;
+		}
+
+		&.val-gd {
+			width: @tuning-scr-sz-good;
+			height: @tuning-scr-sz-good;
+			line-height: @tuning-scr-sz-good;
+			font-size: @tuning-scr-sz-good/2;
+			.border-radius(@tuning-scr-sz-good);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-good, 10%);
+			background-color: @tuning-scr-c-good;
+		}
+
 		&.inactive {
-			opacity: 0.6;
-			.transform( scale(0.8) );
+
+			// Scale down and put back
+			z-index: 50;
+			.transform( scale(0.5) );
+
+			// Dull the colors
+			&.val-bd {
+				@dull-bd: hsl( hue(@tuning-scr-c-bad), saturation(@tuning-scr-c-bad)-50, lightness(@tuning-scr-c-bad)+10 );
+				border-color: darken(@dull-bd, 10%);
+				background-color: @dull-bd;
+			}
+			&.val-md {
+				@dull-md: hsl( hue(@tuning-scr-c-average), saturation(@tuning-scr-c-average)-50, lightness(@tuning-scr-c-average)+10 );
+				border-color: darken(@dull-md, 10%);
+				background-color: @dull-md;
+			}
+			&.val-gd {
+				@dull-gd: hsl( hue(@tuning-scr-c-good), saturation(@tuning-scr-c-good)-50, lightness(@tuning-scr-c-good)+10 );
+				border-color: darken(@dull-gd, 10%);
+				background-color: @dull-gd;
+			}
+
 		}
 
 		&:hover {
 			z-index: 110;
-		}
 
-		&.val-bd {
-			width: 64px;
-			height: 64px;
-			line-height: 64px;
-			font-size: 32px;
-			.border-radius(64px);
-			border: solid 2px #c0392b;
-			background-color: #e74c3c;
-		}
-
-		&.val-md {
-			width: 32px;
-			height: 32px;
-			line-height: 32px;
-			font-size: 20px;
-			.border-radius(32px);
-			border: solid 2px #f39c12;
-			background-color: #e67e22;
-		}
-
-		&.val-gd {
-			width: 24px;
-			height: 24px;
-			line-height: 24px;
-			font-size: 18px;
-			.border-radius(24px);
-			border: solid 2px #27ae60;
-			background-color: #2ecc71;
+			&.inactive {
+				opacity: 1;
+				.transform( scale(1) );
+			}
 		}
 
 	}
 
-	// ------------------
-	//  onscreen pop-up
-	// ------------------
-	.onscreen {
+	// Ovservable indicator
+	.indicator {
 		position: absolute;
-		background: rgba(64,64,64,0.9);
-		width: 350px;
-		height: 250px;
-		opacity: 0;
-		z-index: 0;
-
-		.border-radius( 8px );
-
-		.transform( scale(0.1) );
-		-webkit-transition: -webkit-transform 0.2s cubic-bezier(0.600, 0, 0.735, 0.045), opacity 0.2s; /* older webkit */
-		-webkit-transition: -webkit-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
-		   -moz-transition: -moz-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
-		     -o-transition: -o-transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; 
-		        transition: transform 0.2s cubic-bezier(0.600, -0.280, 0.735, 0.045), opacity 0.2s; /* easeInBack */
-
-		&:after {
-			top: 50%;
-			border: solid transparent;
-			content: " ";
-			height: 0;
-			width: 0;
-			position: absolute;
-			pointer-events: none;
-			border-color: rgba(153, 153, 153, 0);
-			border-width: 16px;
-			margin-top: -16px;
+		width: 0;  height: 0; 
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		z-index: 80;
+		&.val-gd {
+			border-top: 10px solid @tuning-scr-c-good;
 		}
-
-		&.visible {
-			z-index: 500;
-			opacity: 1;
-			.transform( scale(1) );
-
-			-webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1), opacity 0.2s; /* older webkit */
-			-webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
-			   -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
-			     -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; 
-			        transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.320, 1.275), opacity 0.2s; /* easeOutBack */
+		&.val-md {
+			border-top: 10px solid @tuning-scr-c-average;
 		}
-
-		&.left {
-			&:after {
-				left: 100%;
-				border-left-color: rgba(64,64,64,0.9);
-			}
+		&.val-bd {
+			border-top: 10px solid @tuning-scr-c-bad;			
 		}
-
-		&.right {
-			&:after {
-				right: 100%;
-				border-right-color: rgba(64,64,64,0.9);
-			}
-		}
-
-		.title {
-
-		}
-
-		.bullet {
-			.border-radius( 8px );
-			position: absolute;
-			width: 10px;
-			height: 10px;
-			background: #e74c3c;
-			left: 8px;
-			top: 10px;
-		}
-
-		.title {
-			position: absolute;
-			left: 22px;
-			top: 5px;
-			color: #FFF;
-			font-weight: bold;
-			font-size: 15px;
-		}
-
-		.document {
-			position: absolute;
-			width: 340px;
-			height: 220px;
-			left: 5px;
-			top: 25px;
-			overflow-x: hidden;
-			overflow-y: auto;
-			color: #eee;
-		}
-
 	}
+
 
 }
 
@@ -441,6 +397,9 @@
 @game-scr-nav-iconset-size   : 64px;
 @game-scr-nav-iconset-a-size : 42px;
 @game-scr-nav-iconset-border : 3px;
+@game-scr-parameter-size	 : 40px;
+@game-scr-parameter-color	 : #2980b9;
+@game-scr-parameter-hover-c	 : #3498db;
 
 .screen.explain {
 	padding: 0;
@@ -448,6 +407,90 @@
 	.explain-top {
 		height: 65%;
 		margin: 0;
+
+		.parameter {
+
+			.transition(all 0.4s);
+			position: absolute;
+			display: block;
+			width: @game-scr-parameter-size;
+			height: @game-scr-parameter-size;
+			.border-radius( @game-scr-parameter-size );
+			background-color: @game-scr-parameter-color;
+			cursor: pointer;
+
+			&:after {
+				content: " ";
+				display: block;
+				position: absolute;
+				left: -8px; top: -8px;
+				width: @game-scr-parameter-size + 8px;
+				height: @game-scr-parameter-size + 8px;
+				border: solid 4px;
+				border-color: @game-scr-parameter-color;
+				.border-radius( @game-scr-parameter-size + 8px );
+
+				opacity: 0;
+				.transform( scale(0.1) );
+				.easing-back-in( );
+			}
+
+			h1 {
+				margin: 0;
+				padding: 0;
+				font-size: 1.4em;
+				width: @game-scr-parameter-size;
+				line-height: @game-scr-parameter-size;
+				text-align: center;
+				color: #fff;
+			}
+
+			div.title {
+				display: none;
+
+				.arrow_box {
+					position: relative;
+					background-color: @game-scr-parameter-color;
+				}
+				.arrow_box:after {
+					top: 50%;
+					border: solid transparent;
+					content: " ";
+					height: 0;
+					width: 0;
+					position: absolute;
+					pointer-events: none;
+					border-color: rgba(0, 0, 0, 0);
+					border-width: 30px;
+					margin-top: -30px;
+				}
+
+				&.left {
+					right: 100%;
+					border-right-color: @game-scr-parameter-color;
+				}
+				&.right {
+					left: 100%;
+					border-left-color: @game-scr-parameter-color;
+				}
+
+			}
+
+			&:hover {
+
+				background-color: @game-scr-parameter-hover-c;
+
+				&:after {
+					opacity: 1.0;
+					border-color: @game-scr-parameter-hover-c;
+					.transform( scale(1.0) );
+					.easing-back-out( );
+				}
+
+			}
+
+		}
+
 	}
 
 	.explain-bottom {
