@@ -24,7 +24,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: white;
+  background-color: #FFF;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.title,
@@ -77,11 +77,11 @@
 .screen.tuning .progress-widget a.button:hover {
   top: 123px;
   background: #27ae60;
-  color: white;
+  color: #FFF;
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.tuning .tunable {
   -webkit-transition: all 0.2s;
@@ -133,7 +133,7 @@
   transition: all 0.2s;
   border: none;
   background-color: transparent;
-  color: white;
+  color: #fff;
   font-size: 1.2em;
   top: 37px;
 }
@@ -145,7 +145,7 @@
   -moz-transition: all 0.2s;
   -o-transition: all 0.2s;
   transition: all 0.2s;
-  color: white;
+  color: #fff;
   font-size: 1.8em;
   bottom: 37px;
   font-weight: bold;
@@ -171,7 +171,7 @@
   cursor: pointer;
   text-indent: 5px;
   font-size: 1.9em;
-  color: white;
+  color: #FFF;
   top: 10px;
   opacity: 0;
 }
@@ -179,7 +179,7 @@
   background-color: #3498db;
 }
 .screen.tuning .tunable a.wing:active {
-  background-color: #71b7e6;
+  background-color: #71B7E6;
 }
 .screen.tuning .tunable a.wing.left {
   left: 18px;
@@ -197,7 +197,7 @@
 .screen.tuning .tunable.expanded .dial {
   border-width: 10px;
   padding: -10px;
-  background-color: white;
+  background-color: #FFF;
   width: 54px;
   height: 54px;
   -webkit-border-radius: 54px;
@@ -206,7 +206,7 @@
   border-radius: 54px;
 }
 .screen.tuning .tunable.expanded .dial input {
-  color: black;
+  color: #000;
   left: 0px;
   top: 14px;
   font-size: 1.5em;
@@ -254,14 +254,14 @@
 .screen.tuning .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666666;
+  border-top: solid 1px #666;
 }
 .screen.tuning .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: white;
+  color: #FFF;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -315,14 +315,14 @@
 }
 .screen.tuning .observable.inactive.val-bd {
   border-color: #b07973;
-  background-color: #c39893;
+  background-color: #c29893;
 }
 .screen.tuning .observable.inactive.val-md {
-  border-color: #a88260;
-  background-color: #ba9c81;
+  border-color: #a98260;
+  background-color: #bb9c81;
 }
 .screen.tuning .observable.inactive.val-gd {
-  border-color: #6c8e7a;
+  border-color: #6d8d7a;
   background-color: #89a494;
 }
 .screen.tuning .observable:hover {
@@ -363,15 +363,15 @@
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399ff;
+  background-color: #3399FF;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70b8ff;
+  background-color: #70B8FF;
 }
 .screen.explain {
   padding: 0;
@@ -422,7 +422,6 @@
   -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   /* easeInBack */
-
 }
 .screen.explain .explain-top .parameter h1 {
   margin: 0;
@@ -431,7 +430,7 @@
   width: 40px;
   line-height: 40px;
   text-align: center;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-top .parameter div.title {
   display: none;
@@ -448,7 +447,7 @@
   width: 0;
   position: absolute;
   pointer-events: none;
-  border-color: transparent;
+  border-color: rgba(0, 0, 0, 0);
   border-width: 30px;
   margin-top: -30px;
 }
@@ -477,7 +476,6 @@
   -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   /* easeOutBack */
-
 }
 .screen.explain .explain-bottom {
   height: 35%;
@@ -496,7 +494,7 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .focus-bar {
   position: absolute;
-  background-color: #f1948a;
+  background-color: #F1948A;
   left: 0;
   top: 0;
   -webkit-transition: top 0.2s linear, left 0.2s linear;
@@ -562,7 +560,7 @@
   border-style: solid;
   border-color: transparent;
   border-width: 3px;
-  background-color: white;
+  background-color: #FFF;
   -webkit-border-radius: 24px;
   -moz-border-radius: 24px;
   -o-border-radius: 24px;
@@ -570,8 +568,8 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.focus {
-  background-color: #ffcccc;
-  border-color: white;
+  background-color: #fcc;
+  border-color: #FFF;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert {
   background-position-y: 0;
@@ -579,7 +577,7 @@
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert.focus {
-  border-color: white;
+  border-color: #FFF;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.icon01 {
   background-position-x: 0;
@@ -609,7 +607,7 @@
   background-position-x: -336px;
 }
 .screen.progress {
-  background-color: white;
+  background-color: #FFF;
 }
 .screen.progress.hidden div.logo {
   top: -400px;
@@ -627,7 +625,6 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   left: 50%;
   top: 40%;
@@ -645,13 +642,12 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999999;
+  color: #999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -667,9 +663,8 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
-  background-color: #eeeeee;
+  background-color: #eee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -680,9 +675,15 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #ff9900;
+  background-color: #FF9900;
   display: block;
   margin: 1px 0;
   height: 2px;
   width: 0;
+}
+.running .globe {
+  width: 160px;
+  height: 160px;
+  position: absolute;
+  display: block;
 }

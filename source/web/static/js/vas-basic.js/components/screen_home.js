@@ -48,7 +48,7 @@ define(
 					})
 				);
 			this.menuFloater.append(
-					$('<a href="#" class="btn btn-default">Results Screen</a>')
+					$('<a href="#" class="btn btn-default">Running Screen</a>')
 					.click(function() {
 						self.trigger("changeScreen", "screen.running");
 					})

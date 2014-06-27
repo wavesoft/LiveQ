@@ -180,6 +180,11 @@ define(
 					this.popupOnScreen.setVisible(false);
 				}
 			})(e).bind(this));
+			e.on('valueChanged', (function(value) {
+				for (var i=0; i<this.obsElms.length; i++) {
+					this.obsElms[i].onUpdate(Math.random());
+				}
+			}).bind(this));
 
 			// Set default values
 			e.onMetadataUpdate( metadata );

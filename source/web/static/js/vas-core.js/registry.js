@@ -127,16 +127,18 @@ define(["core/config", "core/base/component"],
 
 			// Lookup the component
 			var componentClass = registry.components[name];
-			if (componentClass == undefined)
+			if (componentClass == undefined) {
+				console.error("Registry: Could not instantiate component '"+name+"'. Not in registry!");
 				return undefined;
+			}
 
 			// Instantiate
 			var inst = undefined;
-			try {
+			//try {
 				inst = new componentClass(hostDOM);
-			} catch (e) {
-				console.error("Could not instantiate component '"+name+"'. Exception: ",e);
-			}
+			//} catch (e) {
+			//	console.error("Registry: Could not instantiate component '"+name+"'. Exception: ",e);
+			//}
 
 			// Return instance
 			return inst;
