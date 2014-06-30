@@ -85,7 +85,7 @@ define(
 		/**
 		 * Update tuning widget metadata
 		 */
-		DefaultTunableWidget.prototype.onMetadataUpdate = function(meta) {
+		DefaultTunableWidget.prototype.onMetaUpdate = function(meta) {
 			this.meta = meta;
 
 			// Update spinner with the new metadata 

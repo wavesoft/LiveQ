@@ -64,7 +64,7 @@ LiveQ.LabProtocol = function( ) {
 	 * @private
 	 * @member {array}
 	 */
-	this._onMetadataUpdated = [];
+	this._onMetaUpdated = [];
 
 	/**
 	 * Array of the callback functions to be fired when the tunable configuration arrives
@@ -152,18 +152,18 @@ LiveQ.LabProtocol.prototype.offHistogramRemoved = function( cb ) {
  *
  * @param {function} cb - The callback function
  */
-LiveQ.LabProtocol.prototype.onMetadataUpdated = function( cb ) {
-	this._onMetadataUpdated.push(cb);
+LiveQ.LabProtocol.prototype.onMetaUpdated = function( cb ) {
+	this._onMetaUpdated.push(cb);
 }
 
 /**
- * Unregister a callback, previously registered with onMetadataUpdated
+ * Unregister a callback, previously registered with onMetaUpdated
  *
  * @param {function} cb - The callback function
  */
 LiveQ.LabProtocol.prototype.offMetadataUpdated = function( cb ) {
-	var i = this._onMetadataUpdated.indexOf(cb);
-	this._onMetadataUpdated.splice(i,1);
+	var i = this._onMetaUpdated.indexOf(cb);
+	this._onMetaUpdated.splice(i,1);
 }
 
 /**
@@ -367,8 +367,8 @@ LiveQ.LabProtocol.prototype.handleFrame = function( reader ) {
 		}
 
 		// Fire metadata update histogram
-		for (var i=0; i<this._onMetadataUpdated.length; i++) {
-			this._onMetadataUpdated[i]({
+		for (var i=0; i<this._onMetaUpdated.length; i++) {
+			this._onMetaUpdated[i]({
 				'nevts': numEvents,
 				'interpolation': fromInterpolation
 			});

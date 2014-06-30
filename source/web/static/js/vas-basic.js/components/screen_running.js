@@ -185,7 +185,7 @@ define(
 			})(e).bind(this));
 
 			// Set metadata and value
-			e.onMetadataUpdate( metadata );
+			e.onMetaUpdate( metadata );
 			e.onUpdate( undefined );
 
 			return e;

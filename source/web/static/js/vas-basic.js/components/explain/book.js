@@ -46,20 +46,41 @@ define(
 		}
 		ExplainBook.prototype = Object.create( C.ExplainScreen.prototype );
 
+		////////////////////////////////////////////////////////////
+		//            Implementation-specific functions           //
+		////////////////////////////////////////////////////////////
+
+		/**
+		 * Update the book definitions
+		 */
+		ExplainBook.prototype.onBookDefined = function(bookID) {
+			
+		}
+
+		////////////////////////////////////////////////////////////
+		//          Implementation of the ExplainScreen           //
+		////////////////////////////////////////////////////////////
+
 		/**
 		 * Handle the onWillShow event
 		 */
-		this.onWillShow = function(cb) {
-			this.hostDOM.addClass("visible");
-			setTimeout(cb, 200); // The display animation takes 200ms
+		ExplainBook.prototype.onWillShow = function(cb) {
+			this.hostDOM.css("display", "block");
+			setTimeout((function() {
+				this.hostDOM.addClass("visible");
+				setTimeout(cb, 200); // The display animation takes 200ms
+			}).bind(this), 10);
 		};
 
 		/**
 		 * Handle the onWillHide event
 		 */
-		this.onWillHide = function(cb) {
+		ExplainBook.prototype.onWillHide = function(cb) {
 			this.hostDOM.removeClass("visible");
-			setTimeout(cb, 200); // The display animation takes 200ms
+			setTimeout((function() {
+				this.hostDOM.css("display", "none");
+				cb();
+			}).bind(this), 200); // The display animation takes 200ms
 		};
 
 		// Register home screen

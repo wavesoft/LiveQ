@@ -96,7 +96,7 @@ define(["core/util/event_base", "core/config"],
 		Component.prototype.show = function(cb) {
 			this.onWillShow((function() {
 				this.onShown();
-				cb();
+				if (cb) cb();
 			}).bind(this));
 		}
 
@@ -106,7 +106,7 @@ define(["core/util/event_base", "core/config"],
 		Component.prototype.hide = function(cb) {
 			this.onWillHide((function() {
 				this.onHidden();
-				cb();
+				if (cb) cb();
 			}).bind(this));
 		}
 

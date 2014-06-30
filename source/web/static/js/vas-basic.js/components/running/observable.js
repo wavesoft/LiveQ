@@ -62,7 +62,7 @@ define(
 		/**
 		 * Update tuning widget metadata
 		 */
-		DefaultObservableWidget.prototype.onMetadataUpdate = function(meta) {
+		DefaultObservableWidget.prototype.onMetaUpdate = function(meta) {
 			this.meta = meta;
 			this.element.text(meta['info']['short']);
 		}

@@ -244,13 +244,14 @@ define(
 				}
 			})(e).bind(this));
 			e.on('valueChanged', (function(value) {
+				this.statusWidget.onUpdate( Math.random() );
 				for (var i=0; i<this.obsElms.length; i++) {
 					this.obsElms[i].onUpdate(Math.random());
 				}
 			}).bind(this));
 
 			// Set default values
-			e.onMetadataUpdate( metadata );
+			e.onMetaUpdate( metadata );
 			e.onUpdate(0.000);
 
 			return e;
@@ -320,7 +321,7 @@ define(
 			})(e).bind(this));
 
 			// Set metadata and value
-			e.onMetadataUpdate( metadata );
+			e.onMetaUpdate( metadata );
 			e.onUpdate( undefined );
 
 			return e;
@@ -572,7 +573,7 @@ define(
 					}
 
 					// Update widget metadata
-					tunWidget.onMetadataUpdate( tun.meta );
+					tunWidget.onMetaUpdate( tun.meta );
 
 					// Reset to default
 					tunWidget.onUpdate( tun.def );
@@ -613,7 +614,7 @@ define(
 					}
 
 					// Update widget metadata
-					obsWidget.onMetadataUpdate( obs.meta );
+					obsWidget.onMetaUpdate( obs.meta );
 
 					// Reset to default
 					obsWidget.onUpdate( undefined );

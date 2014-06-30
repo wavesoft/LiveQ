@@ -104,7 +104,7 @@ define(
 		/**
 		 * Update tuning widget metadata
 		 */
-		DefaultStatusWidget.prototype.onMetadataUpdate = function(meta) {
+		DefaultStatusWidget.prototype.onMetaUpdate = function(meta) {
 			
 		}
 
