@@ -681,11 +681,18 @@
   height: 2px;
   width: 0;
 }
-.running .globe {
+.running * {
   position: absolute;
+}
+.running .globe {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
   display: block;
   width: 160px;
   height: 160px;
+  z-index: 70;
 }
 .running .progress {
   -webkit-transition: all 0.4s;
@@ -696,17 +703,51 @@
   -moz-border-radius: 200px;
   -o-border-radius: 200px;
   border-radius: 200px;
-  position: absolute;
   display: block;
   width: 200px;
   height: 200px;
-  background-color: #FFF;
-  border: solid 2px #34495e;
+  background-color: #ECF0F1;
+  border: solid 2px #95A5A6;
+}
+.running .progress a.button {
+  z-index: 72;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  width: 108px;
+  height: 50px;
+  cursor: pointer;
+  line-height: 50px;
+  overflow: hidden;
+  color: #FFFFFF;
+  text-decoration: none;
+  text-align: center;
+  font-size: 17px;
+  left: 45px;
+  top: -24px;
+}
+.running .progress a.button:before {
+  z-index: 71;
+  left: 0;
+  top: 0;
+  position: absolute;
+  display: block;
+  content: " ";
+  background: #C0392B;
+  -webkit-transform: rotateZ(180deg);
+  -moz-transform: rotateZ(180deg);
+  -o-transform: rotateZ(180deg);
+  transform: rotateZ(180deg);
+  -webkit-mask-image: url(../img/mask-tune.png);
+  mask-image: url(../img/mask-tune.png);
+  width: 108px;
+  height: 50px;
 }
 .running .progress .knob {
-  position: absolute;
   left: 5px;
   top: 5px;
+  z-index: 60;
 }
 .running .progress .knob input {
   display: none;
@@ -716,4 +757,5 @@
   -moz-filter: blur(5px);
   -o-filter: blur(5px);
   filter: blur(5px);
+  z-index: 59;
 }

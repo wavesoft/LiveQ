@@ -37,9 +37,13 @@ define(
 			this.progressGroup = $('<div class="progress"></div>');
 			hostDOM.append( this.progressGroup );
 
+			// Prepare abort button
+			this.startIcon = $('<a href="do:abort" class="button">Begin</a>');
+			this.progressGroup.append(this.startIcon);
+
 			// Prepare progress knob
-			this.progressKnobBlur = $('<input type="text" value="25" />');
 			this.progressKnob = $('<input type="text" value="25" />');
+			this.progressKnobBlur = $('<input type="text" value="25" />');
 			this.progressGroup.append(this.progressKnob);
 			this.progressGroup.append(this.progressKnobBlur);
 			this.progressKnob.knob({
@@ -52,7 +56,7 @@ define(
 				readOnly  	: true,
 				className 	: 'knob',
 				fgColor 	: "#FFCC00",
-				bgColor 	: "#EEEEEE",
+				bgColor 	: "#BDC3C7",
 			});
 			this.progressKnobBlur.knob({
 				min:0, max:100,
@@ -64,7 +68,7 @@ define(
 				readOnly  	: true,
 				className 	: 'knob blur',
 				fgColor 	: "#FFCC00",
-				bgColor 	: "#FFFFFF",
+				bgColor 	: "transparent",
 			});
 
 			// Create globe

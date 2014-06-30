@@ -27,12 +27,8 @@ define(
 			this.scene = new THREE.Scene();
 
 			// Initialize renderer
-			this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+			this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 			this.hostDOM.append(this.renderer.domElement);
-
-			// Prepare composer
-			this.renderer.autoClear = true;
-			this.renderer.sortObjects = true;
 
 			// ============================
 			//  Prepare lighting
@@ -52,7 +48,7 @@ define(
 			this.scene.add( this.globeHost );
 
 			// Prepare geometry
-			var globeGeom = new THREE.SphereGeometry( this.globeRadius, 20, 20 ),
+			var globeGeom = new THREE.SphereGeometry( this.globeRadius, 30, 20 ),
 				globeMat = new THREE.MeshBasicMaterial({
 					color: 0xffffff,
 					wireframe: false,
@@ -140,7 +136,7 @@ define(
 		 */
 		Globe3D.prototype.render = function() {
 
-			this.globeHost.rotation.y += 0.01;
+			this.globeHost.rotateY(0.01);
 
 			this.renderer.render( 
 				this.scene, 

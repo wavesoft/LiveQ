@@ -703,26 +703,60 @@
 
 .running {
 
+	* {
+		position: absolute;		
+	}
+
 	.globe {
-		position: absolute;
+		.transition(all 0.4s);
 		display: block;
 		width: 160px;
 		height: 160px;
-
+		z-index: 70;
 	}
 
 	.progress {
 		.transition(all 0.4s);
 		.border-radius(200px);
-		position: absolute;
 		display: block;
 		width: 200px; height: 200px;
-		background-color: #FFF;
-		border: solid 2px #34495e;
+		background-color: #ECF0F1;
+		border: solid 2px #95A5A6;
+
+		a.button {
+			z-index: 72;
+			.transition(all 0.4s);
+
+			width: 108px; height: 50px;
+			cursor: pointer;
+			line-height: 50px;
+			overflow: hidden;
+			color: #FFFFFF;
+			text-decoration: none;
+			text-align: center;
+			font-size: 17px;
+			left: 45px;
+			top: -24px;
+
+			&:before {
+				z-index: 71;
+				left: 0;
+				top: 0;
+				position: absolute;
+				display: block;
+				content: " ";
+
+				background: #C0392B;
+				.transform( rotateZ(180deg) );
+				.mask-image( url(../img/mask-tune.png) );
+				width: 108px; height: 50px;
+			}
+
+		}
 
 		.knob {
-			position: absolute;
 			left: 5px; top: 5px;
+			z-index: 60;
 
 			input {
 				display: none;
@@ -730,6 +764,7 @@
 
 			&.blur {
 				.filter( blur(5px) );
+				z-index: 59;
 			}
 		}
 
