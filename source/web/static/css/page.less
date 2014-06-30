@@ -40,7 +40,12 @@ h1 + p.subtitle {
 }
 
 .overlay {
-	z-index: 100;
+	z-index: 1000;
+	background-color: rgba(0,0,0,0.6);
+}
+
+.visualaid-focus {
+	z-index: 1010;
 }
 
 // ===============================
@@ -69,6 +74,49 @@ h1 + p.subtitle {
 	.vrow-10 { height: 83.33%; }
 	.vrow-11 { height: 91.66%; }
 	.vrow-12 { height: 100%; }
+
+}
+
+// ===============================
+//  TV-Head Explainations
+// ===============================
+
+.tvhead {
+	display: block;
+	position: absolute;
+	width: 415px;
+	height: 390px;
+
+	div.head {
+		background: url(../img/tvhead.png) no-repeat 0px 0px;
+		position: absolute;
+		overflow: hidden;
+		padding: 17px 27px;
+		width: 360px;
+		height: 203px;
+	}
+
+	div.body {
+		background: url(../img/tvhead.png) no-repeat;
+		position: absolute;
+		width: 290px;
+		height: 145px;
+		top: 241px;
+		left: 62px;
+		background-position: 0px -245px;
+	}
+
+	&.right {
+		div.body {
+			background-position: -290px -245px;
+		}
+	}
+
+	&.left {
+		div.body {
+			background-position: -580px -245px;
+		}
+	}
 
 }
 

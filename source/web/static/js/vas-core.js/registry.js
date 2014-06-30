@@ -82,8 +82,24 @@ define(["core/config", "core/base/component"],
 		 * This can be used for defining scenes, timelines and other overridable
 		 * objects in the game. Like with the components, the data dictionary
 		 * also contain a priority attribute.
+		 *
+		 * @type {object}
 		 */
 		registry.data = {};
+
+		/**
+		 * This dictionary keeps a reference of all the DOM objects that
+		 * are assisting the guided presentation of the interface through
+		 * a VisualAgent.
+		 *
+		 * Any DOM object of interest can be registered to be presented by
+		 * the current VisualAgent. Each object has a unique name, and if at any
+		 * time you try to re-register the object in the registry, only the latest
+		 * object will be reflected.
+		 *
+		 * @type {object}
+		 */
+		registry.visualAids = {};
 
 		/**
 		 * Register a component under the given name.
@@ -113,6 +129,19 @@ define(["core/config", "core/base/component"],
 			component.__weight = w;
 			registry.components[name] = component;
 			
+		}
+
+		/**
+		 * Register a component for visual aid
+		 *
+		 * This function is used to register an arbitrary DOM element for use by the VisualAgent
+		 * component which is introducing the user to the interface.
+		 *
+		 * @param {string} name - The name of the visual aid to register under.
+		 * @param {DOMElement} element - The DOM Element to focus when this visual aid is fired.
+		 */
+		registry.registerVisualAid = function(name, element) {
+			registry.visualAids[name] = element;
 		}
 
 		/**

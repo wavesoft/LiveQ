@@ -7,13 +7,6 @@ define(["jquery", "core/config", "core/registry"],
 		///////////////////////////////////////////////////////////////
 
 		/**
-		 * Initialize a tuning screen
-		 */
-		function init_tuning_screen(screen) {
-
-		}
-
-		/**
 		 * Find vendor suffix
 		 */
 		function get_vendor_suffix() {
@@ -168,6 +161,11 @@ define(["jquery", "core/config", "core/registry"],
 			UI.overlayDOM.hide();
 			UI.host.append(UI.overlayDOM);
 
+			// Initialize the main visual agent for the tutorials
+			UI.visualAgent = R.instanceComponent( 'tutorial.agent', UI.overlayDOM );
+			if (!UI.visualAgent)
+				console.warn("UI: Could not initialize tutorial agent!");
+
 			// Bind on window events
 			$(window).resize(function() {
 
@@ -177,7 +175,12 @@ define(["jquery", "core/config", "core/registry"],
 					return;
 
 				// Resize it
-				scr.onResize( scr.hostDOM.width(), scr.hostDOM.height() );
+				var w = scr.hostDOM.width(),
+					h = scr.hostDOM.height();
+				scr.onResize( w, h );
+
+				// Also resize some helper elements
+				UI.visualAgent.resize( )
 
 			});
 
@@ -191,6 +194,33 @@ define(["jquery", "core/config", "core/registry"],
 		 *
 		 */
 		UI.showOverlay = function(name, cb_ready) {
+
+			// Get preferred dimentions of the overlay
+
+		}
+
+		/**
+		 * Show an agent and start the specified tutorial sequence.
+		 *
+		 * @example <caption>Sample animation sequence</caption>
+		 * UI.showTutorial({
+		 *
+		 *    // The video source to use for the tutorial
+		 *    video : 'http://www.youtube.com/watch?v=ScMzIvxBSi4',
+		 *
+		 *    // The visual aids to focus on the paricular time locations
+		 *    aids : [
+		 *		{ at: 5,  duration: 1, focus: 'tune.tunables' },
+		 *		{ at: 10, duration: 2, focus: 'tune.begin' },
+		 *		{ at: 30, duration: 2, focus: 'tune.observables' },
+		 *    ]
+		 *
+		 * });
+		 * @param {object} sequence - The animation sequence to present
+		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 *
+		 */
+		UI.showTutorial = function( sequence, cb_ready ) {
 
 			// Get preferred dimentions of the overlay
 
