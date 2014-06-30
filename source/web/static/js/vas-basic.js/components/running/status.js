@@ -16,15 +16,20 @@ define(
 			DataWidget.call(this, hostDOM);
 
 			// Tunable parameters
-			this.diameter = 160;
+			this.diameter = 200;
 
 			// Prepare host
-			this.element = $('<div class="progress"></div>');
+			this.element = $('<div class="progress-widget"></div>');
 			hostDOM.append( this.element );
 
 			// Prepare abort button
-			this.startIcon = $('<a href="do:abort" class="button"><div>Abort</div></a>');
-			this.element.append(this.startIcon);
+			this.abortIcon = $('<a href="do:abort" class="button"><div>Abort</div></a>');
+			this.element.append(this.abortIcon);
+			this.abortIcon.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.trigger('abort');
+			}).bind(this));
 
 			// Prepare progress knob
 			this.progressKnob = $('<input type="text" value="25" />');
@@ -56,10 +61,36 @@ define(
 				bgColor 	: "transparent",
 			});
 
+			// Place a marker on the region where the user should reach
+			var self = this;
+			var prepareMarker = function(radius, name ) {
+				var marker = $('<div class="c-marker"></div>'),
+					label = $('<div class="label">'+name+'</div>');
+				marker.css({
+					'left'   			: (self.diameter/2)-radius,
+					'top'    			: (self.diameter/2)-radius,
+					'width'  			: 2*radius,
+					'height' 			: 2*radius,
+					'border-radius' 		: radius,
+					'-webkit-border-radius' : radius,
+					'-moz-border-radius' 	: radius,
+					'-o-border-radius'		: radius
+				});
+				marker.append(label);
+				return marker;
+			}
+			this.element.append( prepareMarker( 250, "Target" ) );
+
 			// Create globe
 			this.globeDOM = $('<div class="globe"></div>');
 			this.element.append( this.globeDOM );
 			this.globe = R.instanceComponent( "widget.globe3d", this.globeDOM );
+			if (!this.globe) {
+				console.warn("Unable to instantiate Glob3D widget");
+			} else {
+				this.forwardVisualEvents( this.globe );
+				this.globe.onResize( this.diameter, this.diameter );
+			}
 
 		};
 
@@ -82,9 +113,15 @@ define(
 		 */
 		DefaultStatusWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
-
+				this.progressKnob.val(0).trigger('change');
+				this.progressKnobBlur.val(0).trigger('change');
+				return;
 			}
-			this.update();
+
+			// Change configuration based on value
+			this.progressKnob.val(value*100).trigger('change');
+			this.progressKnobBlur.val(value*100).trigger('change');
+
 		}
 
 		////////////////////////////////////////////////////////////
@@ -115,13 +152,6 @@ define(
 				'left': x - this.diameter/2,
 				'top': y - this.diameter/2
 			});
-		}
-
-		/**
-		 * Update the visual representation of the element
-		 */
-		DefaultStatusWidget.prototype.update = function() {
-
 		}
 
 		// Store tuning widget component on registry

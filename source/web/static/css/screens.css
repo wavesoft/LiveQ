@@ -277,7 +277,6 @@
 .screen .pagepart {
   background-image: url(../img/pageparts.png);
   background-repeat: no-repeat;
-  overflow: hidden;
   position: absolute;
 }
 .screen .pagepart h1 {
@@ -294,10 +293,28 @@
 }
 .screen .pagepart.tune-tl {
   background-position: -435px 0px;
-  width: 145px;
+  width: 295px;
   height: 145px;
   top: 0;
   left: 0;
+}
+.screen .pagepart.tune-tl h1,
+.screen .pagepart.tune-tl p {
+  color: white;
+  text-align: left;
+}
+.screen .pagepart.tune-tl h1 {
+  width: 280px;
+  line-height: 32px;
+  left: 7px;
+  top: 7px;
+  font-size: 25px;
+}
+.screen .pagepart.tune-tl p {
+  width: 280px;
+  line-height: 18px;
+  left: 7px;
+  top: 35px;
 }
 .screen .pagepart.run-tl {
   background-position: 0px 0px;
@@ -377,6 +394,93 @@
 .screen.tuning .tuning-host {
   position: absolute;
 }
+.screen.tuning .tune-tl {
+  z-index: 200;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+}
+.screen.tuning .tune-tl .btn-taglike {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
+  -webkit-border-radius: 0px 0px 8px 8px;
+  -moz-border-radius: 0px 0px 8px 8px;
+  -o-border-radius: 0px 0px 8px 8px;
+  border-radius: 0px 0px 8px 8px;
+  cursor: pointer;
+  background-color: #16a085;
+  left: 0;
+  top: 145px;
+  position: absolute;
+  text-align: center;
+  color: white;
+  width: 70px;
+  height: 45px;
+  padding-top: 5px;
+}
+.screen.tuning .tune-tl .btn-taglike:hover {
+  padding-top: 15px;
+}
+.screen.tuning .details-view {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  z-index: 100;
+  background-color: white;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+.screen.tuning .details-view.expanded {
+  height: 150px;
+}
+.screen.tuning .details-view div.scroller {
+  border-top: solid 4px #16a085;
+  background-color: #4d4d4d;
+  width: 100%;
+  height: 150px;
+}
+.screen.tuning .details-view div.btn-taglike {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
+  -webkit-border-radius: 8px 8px 0px 0px;
+  -moz-border-radius: 8px 8px 0px 0px;
+  -o-border-radius: 8px 8px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
+  cursor: pointer;
+  background-color: #16a085;
+  left: 0;
+  top: -50px;
+  position: absolute;
+  text-align: center;
+  color: white;
+  width: 70px;
+  height: 45px;
+  padding-top: 5px;
+}
+.screen.tuning .details-view div.btn-taglike:hover {
+  top: -60px;
+  padding-bottom: 10px;
+}
 .screen.tuning .progress-widget {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
@@ -433,17 +537,20 @@
   mask-image: url(../img/mask-tune.png);
   width: 108px;
   height: 50px;
-  cursor: pointer;
   text-align: center;
   font-size: 17px;
   left: 24px;
   top: 106px;
+  cursor: not-allowed;
 }
-.screen.tuning .progress-widget a.button.active,
-.screen.tuning .progress-widget a.button:hover {
+.screen.tuning .progress-widget a.button.active {
+  cursor: pointer;
   top: 123px;
   background: #27ae60;
   color: white;
+}
+.screen.tuning .progress-widget a.button.active:hover {
+  background: #2ecc71;
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
@@ -472,6 +579,117 @@
 }
 .screen.explain {
   padding: 0;
+}
+.screen.explain .explain-book {
+  background-color: #3498db;
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  top: 10%;
+  bottom: 10%;
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  /* easeInBack */
+
+  -webkit-transform: scale(0.1);
+  -moz-transform: scale(0.1);
+  -o-transform: scale(0.1);
+  transform: scale(0.1);
+  opacity: 0;
+  z-index: -1;
+}
+.screen.explain .explain-book.visible {
+  z-index: 500;
+  opacity: 1;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  /* easeOutBack */
+
+}
+.screen.explain .explain-book.learn,
+.screen.explain .explain-book .learn {
+  background-color: #3498db;
+}
+.screen.explain .explain-book.understand,
+.screen.explain .explain-book .understand {
+  background-color: #8e44ad;
+}
+.screen.explain .explain-book.research,
+.screen.explain .explain-book .research {
+  background-color: #16a085;
+}
+.screen.explain .explain-book div.header {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+.screen.explain .explain-book div.header > span.bullet {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: #f1c40f;
+  margin-left: 6px;
+}
+.screen.explain .explain-book div.header > span.title {
+  color: white;
+  font-size: 14px;
+  line-height: 24px;
+  margin-left: 4px;
+}
+.screen.explain .explain-book div.header a.close {
+  width: 24px;
+  height: 24px;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  line-height: 24px;
+  text-align: center;
+}
+.screen.explain .explain-book div.body {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 24px;
+  bottom: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.screen.explain .explain-book div.footer {
+  background-color: #2c3e50;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  height: 24px;
+  overflow-x: hidden;
+}
+.screen.explain .explain-book div.footer a {
+  display: inline-block;
+  width: 100px;
+  padding: 2px;
+  height: 20px;
+  color: white;
+  text-decoration: none;
 }
 .screen.explain .explain-top {
   height: 65%;
@@ -783,10 +1001,70 @@
   height: 2px;
   width: 0;
 }
-.screen.running * {
+.screen.running div.c-marker {
   position: absolute;
+  border: dashed 1px #999999;
+}
+.screen.running div.c-marker .label {
+  position: absolute;
+  font-size: 12px;
+  color: #999999;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  bottom: -16px;
+}
+.screen.running .pagepart .btn-taglike {
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
+  -webkit-border-radius: 0px 0px 8px 8px;
+  -moz-border-radius: 0px 0px 8px 8px;
+  -o-border-radius: 0px 0px 8px 8px;
+  border-radius: 0px 0px 8px 8px;
+  position: absolute;
+  cursor: pointer;
+  background-color: #d35400;
+  text-align: center;
+  color: white;
+  width: 70px;
+  height: 45px;
+  padding-top: 5px;
+}
+.screen.running .pagepart.run-tl .btn-taglike {
+  left: 0;
+  top: 145px;
+}
+.screen.running .pagepart.run-tl .btn-taglike:hover {
+  padding-top: 15px;
+}
+.screen.running .pagepart.run-tr .btn-taglike {
+  right: 0;
+  top: 145px;
+}
+.screen.running .pagepart.run-tr .btn-taglike:hover {
+  padding-top: 15px;
+}
+.screen.running .pagepart.run-bl .btn-taglike {
+  -webkit-border-radius: 8px 8px 0px 0px;
+  -moz-border-radius: 8px 8px 0px 0px;
+  -o-border-radius: 8px 8px 0px 0px;
+  border-radius: 8px 8px 0px 0px;
+  left: 0;
+  top: -50px;
+}
+.screen.running .pagepart.run-bl .btn-taglike:hover {
+  top: -60px;
+  padding-bottom: 10px;
 }
 .screen.running .globe {
+  position: absolute;
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
@@ -796,7 +1074,8 @@
   height: 160px;
   z-index: 70;
 }
-.screen.running .progress {
+.screen.running .progress-widget {
+  position: absolute;
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
@@ -827,7 +1106,8 @@
   /* IE6-9 fallback on horizontal gradient */
 
 }
-.screen.running .progress a.button {
+.screen.running .progress-widget a.button {
+  position: absolute;
   z-index: 71;
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
@@ -838,9 +1118,10 @@
   cursor: pointer;
   overflow: hidden;
   left: 45px;
-  top: -24px;
+  top: -35px;
 }
-.screen.running .progress a.button div {
+.screen.running .progress-widget a.button div {
+  position: absolute;
   width: 108px;
   height: 52px;
   color: white;
@@ -850,10 +1131,10 @@
   font-size: 18px;
   cursor: pointer;
 }
-.screen.running .progress a.button:before {
+.screen.running .progress-widget a.button:before {
+  position: absolute;
   left: 0;
   top: 0;
-  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -866,18 +1147,22 @@
   width: 108px;
   height: 52px;
 }
-.screen.running .progress a.button:hover:before {
+.screen.running .progress-widget a.button:hover {
+  position: absolute;
+}
+.screen.running .progress-widget a.button:hover:before {
   background-color: #e74c3c;
 }
-.screen.running .progress .knob {
+.screen.running .progress-widget .knob {
+  position: absolute;
   left: 6px;
   top: 7px;
   z-index: 60;
 }
-.screen.running .progress .knob input {
+.screen.running .progress-widget .knob input {
   display: none;
 }
-.screen.running .progress .knob.blur {
+.screen.running .progress-widget .knob.blur {
   -webkit-filter: blur(5px);
   -moz-filter: blur(5px);
   -o-filter: blur(5px);

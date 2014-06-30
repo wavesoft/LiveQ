@@ -34,12 +34,26 @@ define(
 			// Prepare sub-components
 			var expTop = $('<div class="explain-top"></div>'),
 				expBottom = $('<div class="explain-bottom"></div>');
+				expBook = $('<div class="explain-book"></div>'),
 				this.foregroundDOM.append(expTop);
 				this.foregroundDOM.append(expBottom);
+				this.foregroundDOM.append(expBook);
 
 			// Prepare child components
 			this.comTop = R.instanceComponent( "explain.physics", expTop );
 			this.comBottom = R.instanceComponent( "explain.machine", expBottom );
+			this.comBook = R.instanceComponent( "explain.book", expBook );
+
+			window.ex = this;
+
+			// Forward events to the children
+			this.forwardVisualEvents(
+				[ this.comTop, this.comBottom ]
+			);
+			this.forwardEvents( 
+				[ this.comTop, this.comBottom, this.comBook ],
+				['onTunablesDefined', 'onObservablesDefined', 'onScenesDefined', 'onMachineLayoutDefined']
+			);
 
 			// Bind events
 			this.comBottom.on('focusProcess', function(process) {
@@ -52,43 +66,9 @@ define(
 		/**
 		 * Forward ExplainScreen events to our child components
 		 */
-		ExplainScreen.prototype.onWillShow = function(cb) {
-			var c=2;
-			if (this.comTop) this.comTop.onWillShow(function() { if (!--c) cb(); });
-			if (this.comBottom)  this.comBottom.onWillShow(function() { if (!--c) cb(); });
-		}
-		ExplainScreen.prototype.onWillHide = function(cb) {
-			var c=2;
-			if (this.comTop) this.comTop.onWillHide(function() { if (!--c) cb(); });
-			if (this.comBottom)  this.comBottom.onWillHide(function() { if (!--c) cb(); });
-		}
-		ExplainScreen.prototype.onShown = function() {
-			if (this.comTop) this.comTop.onShown();
-			if (this.comBottom)  this.comBottom.onShown();
-		}
-		ExplainScreen.prototype.onHidden = function() {
-			if (this.comTop) this.comTop.onHidden();
-			if (this.comBottom)  this.comBottom.onHidden();
-		}
 		ExplainScreen.prototype.onResize = function(w,h) {
 			if (this.comTop) this.comTop.onResize(w,h*0.65);
 			if (this.comBottom)  this.comBottom.onResize(w,h*0.35);
-		}
-		ExplainScreen.prototype.onTunablesDefined = function(tunables) {
-			if (this.comTop) this.comTop.onTunablesDefined(tunables);
-			if (this.comBottom)  this.comBottom.onTunablesDefined(tunables);
-		}
-		ExplainScreen.prototype.onObservablesDefined = function(observables) {
-			if (this.comTop) this.comTop.onObservablesDefined(observables);
-			if (this.comBottom)  this.comBottom.onObservablesDefined(observables);
-		}
-		ExplainScreen.prototype.onScenesDefined = function(scenes) {
-			if (this.comTop) this.comTop.onScenesDefined(scenes);
-			if (this.comBottom)  this.comBottom.onScenesDefined(scenes);
-		}
-		ExplainScreen.prototype.onMachineLayoutDefined = function(layout) {
-			if (this.comTop) this.comTop.onMachineLayoutDefined(layout);
-			if (this.comBottom)  this.comBottom.onMachineLayoutDefined(layout);
 		}
 
 		// Register home screen

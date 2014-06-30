@@ -17,7 +17,7 @@ body {
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 12px;
 
-	background-image: url(../img/background.jpg);
+	background-image: url(../img/white_abstract.jpg);
 	background-size: cover;
 	background-repeat: no-repeat;
 
@@ -71,6 +71,46 @@ h1 + p.subtitle {
 	.vrow-12 { height: 100%; }
 
 }
+
+// ===============================
+//  User interface icons
+// ===============================
+
+.uicon {
+	background-image: url(../img/uicons-24.png);
+	background-repeat: no-repeat;
+	display: inline-block;
+	vertical-align: middle;
+	width: 24px;
+	height: 24px;
+
+	&.uicon-explain {
+		background-position: 0px 0px;
+	}
+	&.uicon-gear {
+		background-position: -24px 0px;
+	}
+	&.uicon-eye {
+		background-position: -48px 0px;
+	}
+	&.uicon-pin {
+		background-position: -72px 0px;
+	}
+	&.uicon-x {
+		background-position: -96px 0px;
+	}
+	&.uicon-info {
+		background-position: -120px 0px;
+	}
+	&.uicon-game {
+		background-position: -144px 0px;
+	}
+	&.uicon-find {
+		background-position: -168px 0px;
+	}
+
+}
+
 
 // ===============================
 //  On-Screen Pop-Up Window
@@ -154,6 +194,47 @@ h1 + p.subtitle {
 		overflow-x: hidden;
 		overflow-y: auto;
 		color: #eee;
+	}
+
+	// Body with icon links
+	.body-more {
+		position: relative;
+		overflow: hidden;
+		width: 100%; height: 100%;
+
+		.body {
+			position: absolute;
+			overflow-x: hidden;
+			overflow-y: auto;
+			left: 0; right: 0; top: 0;
+			bottom: 36px;
+		}
+		.more {
+			background-color: rgba(0,0,0,0.4);
+			.border-radius( 0px 0px 8px 8px );
+			position: absolute;
+			left: 0; right: 0; bottom: 0;
+			padding: 2px;
+			height: 28px;
+
+			a {
+				font-size: 14px;
+				display: inline-block;
+				text-decoration: none;
+				color: #FFF;
+				line-height: 24px;
+				height: 24px;
+				padding: 2px;
+				margin: 0px 2px;
+				border-radius: 4px;
+
+				&:hover {
+					background: #666;
+				}
+
+			}
+		}
+
 	}
 
 }

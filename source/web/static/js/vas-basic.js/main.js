@@ -25,15 +25,18 @@ define([
 
 	// Running-related
 	"vas-basic/components/running/observable",
+	"vas-basic/components/running/status",
 
 	// Misc components
 	"vas-basic/components/onscreen",	
 
 	// Explain screen details
-	'vas-basic/components/explain_machine',
-	'vas-basic/components/explain_physics',
+	'vas-basic/components/explain/machine',
+	'vas-basic/components/explain/physics',
+	'vas-basic/components/explain/book',
 
 	// Information blocks
 	'vas-basic/infoblock/tunable',
+	'vas-basic/infoblock/observable',
 
 ]);

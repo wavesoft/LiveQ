@@ -25,8 +25,10 @@ define(["core/util/event_base", "core/config"],
 			// Keep reference of the host DOM element
 			this.hostDOM = hostDOM;
 
-			// The child components
-			this.childComponents = [];
+			// Helper arrays for keeping reference of the
+			// objects to forward events to.
+			this.__forwardVisualEventsComponents = [];
+			this.__forwardEventsMap = {};
 
 		}
 
@@ -89,28 +91,156 @@ define(["core/util/event_base", "core/config"],
 		};
 
 		/**
-		 * Add a child component wich is going to receive component events
-		 * and it's events will be propagated to this component.
-		 *
-		 * @param {Component} com - The component to handle
+		 * Fire the willshow/show sequence
 		 */
-		Component.prototype.addChild = function(com) {
-			this.childComponents.push(com);
+		Component.prototype.show = function(cb) {
+			this.onWillShow((function() {
+				this.onShown();
+				cb();
+			}).bind(this));
+		}
 
-			// Override all the onXXX functions
-			var self = this;
-			for (k in this) {
-				if ((k.substr(0,2) == "on") && (k.length > 2)) {
-					(function(key, comFn, comRef) {
-						console.log(key);
-						if (!comFn) return;
-						var originalFn = self[key];
-						self[key] = function() {
-							comFn.apply(comRef, arguments);
-							originalFn.apply(this, arguments);
-						}
-					})(k, com[k], com);
+		/**
+		 * Fire the willhide/hidden sequence
+		 */
+		Component.prototype.hide = function(cb) {
+			this.onWillHide((function() {
+				this.onHidden();
+				cb();
+			}).bind(this));
+		}
+
+		/**
+		 * Forward particular events to the given component.
+		 *
+		 * This function will forward all the events specified in the events
+		 * array, and it will optionally fire the specified helper function in order
+		 * to translate the arguments when needed.
+		 *
+		 * @example <caption>Map function example</caption>
+		 * myCom.forwardEvents( childCom, 'onResize', function(com,event,args) {
+		 *    // Return half dimentions to all HalfSized components
+		 *    if (com instanceof Components.HalfSized) {
+		 *       return [ args[0]/2, args[1]/2 ];
+		 *    } else {
+		 *       return args;
+		 *    }
+		 * });
+		 * @param {Component|array} com - The component to forward events to
+		 * @param {string|array} events - The names of the events to forward (ex. onResize)
+		 * @param {function} mapFunction - (Optional) The argument translation funtion
+		 */
+		Component.prototype.forwardEvents = function(com, events, mapFunction) {
+			if (!(events instanceof Array)) events = [events];
+			if (!(com instanceof Array)) com = [com];
+			var defaultMapFunction = function(com, event, args) { return args; };
+
+			for (var j=0; j<com.length; j++) {
+				var ccom = com[j];
+
+				for (var i=0; i<events.length; i++) {
+					var evName = events[i];
+
+					// Override the default function only once
+					if (this.__forwardEventsMap[evName] == undefined) {
+
+						this.__forwardEventsMap[evName] = [[ ccom, mapFunction || defaultMapFunction ]];
+
+						// Keep the original function
+						var origFunction = this[evName];
+
+						// Context wrapper
+						this[evName] = (function(evName,origFunction) {
+
+							// Function to replace with
+							return function() {
+								var args = Array.prototype.slice.call(arguments),
+									fwComs = this.__forwardEventsMap[evName];
+
+								// Loop over forwardable components
+								for (var i=0; i<fwComs.length; i++) {
+									var com = fwComs[i][0], mapFn = fwComs[i][1];
+									com[evName].apply( com, mapFn( fwComs[i], evName, args ) );
+								}
+
+								// Fire the origianl function
+								origFunction.apply( this, args );
+
+							}
+
+						}).bind(this)(evName, origFunction);
+
+					} else {
+
+						// Every next call, updates the __forwardEventsMap
+						this.__forwardEventsMap[evName].push([ ccom, mapFunction || defaultMapFunction ]);
+
+					}
 				}
+			}
+		}
+
+		/**
+		 * Forward visual events to the specified component.
+		 *
+		 * This function will forward and automatically manage the following events:
+		 *
+		 *  * onShown()
+		 *  * onHidden()
+		 *  * onWillShow()
+		 *  * onWillHide()
+		 *
+		 * @param {Component|array} com - The component to forward events to
+		 */
+		Component.prototype.forwardVisualEvents = function(com) {
+			if (!(com instanceof Array)) com=[com];
+			for (var j=0; j<com.length; j++) {
+
+				// Stack elements
+				this.__forwardVisualEventsComponents.push(com[j]);
+
+				// Override the appropriate onXX functions only once
+				if (this.__forwardVisualEventsComponents.length == 1) {
+					
+					// Keep reference of the originals
+					var self = this,
+						origOnShown = this.onShown,
+						origOnHidden = this.onHidden,
+						origOnWillShow = this.onWillShow,
+						origOnWillHide = this.onWillHide;
+
+					// Override
+					this.onShown = function() {
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							self.__forwardVisualEventsComponents[i].onShown();
+						}
+						origOnShown();
+					}
+					this.onHidden = function() {
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							self.__forwardVisualEventsComponents[i].onHidden();
+						}
+						origOnHidden();
+					}
+					this.onWillShow = function(cb) {
+						var c = self.__forwardVisualEventsComponents.length;
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							self.__forwardVisualEventsComponents[i].onWillShow(function() {
+								if (--c == 0) origOnWillShow(cb);
+							});
+						}
+					}
+					this.onWillHide = function(cb) {
+						var c = self.__forwardVisualEventsComponents.length;
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							self.__forwardVisualEventsComponents[i].onWillHide(function() {
+								if (--c == 0) origOnWillHide(cb);
+							});
+						}
+					}
+
+				}
+
 			}
 
 		};

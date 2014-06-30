@@ -37,18 +37,29 @@ define(
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
 			hostDOM.append(this.backdropDOM);
 			this.backdrop = R.instanceComponent("backdrop.tuning", this.backdropDOM);
+			this.forwardVisualEvents( this.backdrop );
 
 			// Create foreground
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append(this.foregroundDOM);
 
+			// Create the pagepart
+			this.ppTL = $('<div class="pagepart tune-tl"></div>');
+			this.foregroundDOM.append( this.ppTL );
+
+			// Fill-in pagepart fields
+			this.infoTitle = $('<h1>Level 1</h1>');
+			this.ppTL.append(this.infoTitle);
+			this.infoSubtitle = $('<p>A short description of this level</p>');
+			this.ppTL.append(this.infoSubtitle);
+
+			// Prepare pagepart buttons
+			var btnTutorial = $('<div class="btn-taglike"><span class="uicon uicon-explain"></span><br />Tutorial</div>');
+			this.ppTL.append( btnTutorial );
+
 			// Prepare host elements
 			this.hostTuning = $('<div class="tuning-host"></div>');
-			this.hostControls = $('<div class="tune-controls"></div>');
-			this.hostLevels = $('<div class="tune-levels"></div>');
 			this.foregroundDOM.append(this.hostTuning);
-			this.foregroundDOM.append(this.hostControls);
-			this.foregroundDOM.append(this.hostLevels);
 
 			// Prepare mouse events
 			this.mouse = { x:0 , y:0 };
@@ -60,7 +71,7 @@ define(
 				// Calculate mouse offset
 				mouseX = (e.clientX - self.width/2) / (self.width/2);
 				if (e.clientY > yPosition) {
-					mouseY = (e.clientY - yPosition) / (self.height - yPosition);
+					mouseY = (e.clientY - yPosition) / (self.height - yPosition - self.detailsViewHeight);
 				} else {
 					mouseY = 0.01;
 				}
@@ -93,8 +104,11 @@ define(
 			this.statusWidget = R.instanceComponent( "widget.tuning_status", this.hostTuning );
 			if (!this.statusWidget)
 				console.warn("Unable to instantiate tuning status widget!");
+			else
+				this.forwardVisualEvents( this.statusWidget );
 
 			// Bind widget events
+			this.statusWidget.onUpdate();
 			this.statusWidget.on('begin', (function() {
 				this.trigger('submitParameters', this.getValueMap());
 			}).bind(this));
@@ -103,6 +117,11 @@ define(
 			this.popupOnScreen = R.instanceComponent( "widget.onscreen", this.hostTuning );
 			if (!this.popupOnScreen)
 				console.warn("Unable to instantiate onscreen description element");
+			else
+				this.forwardVisualEvents( this.popupOnScreen );
+
+			// Prepare expanded view
+			this.prepareExpandedView();
 
 			// Prepare main screen
 			this.obsAngleSpan = Math.PI;
@@ -110,11 +129,12 @@ define(
 			this.obsMinDistance = 400;
 			this.obsMaxDistance = 600;
 
-			this.tunAngleSpan = Math.PI*3/2;
+			this.tunAngleSpan = Math.PI*4/3;
 			this.tunWideSpan = 0;
 			this.tunMinDistance = 150;
 			this.tunMaxDistance = 350;
 
+			// Prepare main screen
 			this.prepareMainScreen();
 
 			// Prepare fields
@@ -135,6 +155,41 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 
+		/**
+		 * Create expanded view screen
+		 */
+		TuningScreen.prototype.prepareExpandedView = function() {
+
+			// Prepare detailed observation screen
+			this.detailsViewHeight = 0;
+			this.detailsView = $('<div class="details-view"></div>');
+			this.detailsViewScroller = $('<div class="scroller"></div>');
+			this.detailsView.append( this.detailsViewScroller );
+			this.foregroundDOM.append( this.detailsView );
+
+			// Prepare details view expand buttion
+			var detailsExpandButton = $('<div class="btn-taglike"><span class="uicon uicon-pin"></span><br />Pinned</div>');
+			this.detailsView.append( detailsExpandButton );
+			detailsExpandButton.click( (function() {
+				var expanded = this.detailsView.hasClass("expanded");
+				if (expanded) {
+					this.detailsViewHeight = 0;
+					this.detailsView.removeClass("expanded");
+					this.onResize( this.width, this.height );
+				} else {
+					this.detailsViewHeight = 150;
+					this.detailsView.addClass("expanded");
+					this.onResize( this.width, this.height );
+				}
+			}).bind(this));
+
+			// Prohibit mouse events
+			this.detailsView.mousemove(function(e) {
+				e.stopPropagation();
+			});
+
+		}
+
 
 		/**
 		 * Create an tunable widget
@@ -147,6 +202,9 @@ define(
 				console.warn("Unable to instantiate a tuning widget!");
 				return undefined;
 			}
+
+			// Forward visual events
+			this.forwardVisualEvents( e );
 
 			// Set pivot configuration for doing this nice
 			// circular distribution
@@ -211,7 +269,8 @@ define(
 				return undefined;
 			}
 
-			console.log(this.pivotX, this.pivotY, angle);
+			// Forward visual events
+			this.forwardVisualEvents( e );
 
 			// Set pivot configuration for doing this nice
 			// circular distribution
@@ -233,10 +292,18 @@ define(
 					this.popupOnScreen.setBody(comBodyHost);
 					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
 
+					// Prepare a 'Pin this' button
+					var pinThisBtn = $('<a href="do:pin-this"><span class="uicon uicon-pin"></span> Pin this ...</a>');
+					pinThisBtn.click((function(e) {
+						e.stopPropagation();
+						e.preventDefault();
+						
+					}).bind(this));
+
 					// Prepare the body component
 					var comBody = R.instanceComponent("infoblock.observable", comBodyHost);
 					if (comBody) {
-						comBody.setWidget( e );
+						comBody.setWidget( e, [ pinThisBtn ] );
 					} else {
 						console.warn("Could not instantiate observable infoblock!");
 					}
@@ -575,14 +642,14 @@ define(
 			this.statusWidget.setPosition( this.pivotX, this.pivotY );
 
 			// Fire resize host on all children
-			this.statusWidget.onResize(width,height);
+			this.statusWidget.onResize(width,height-this.detailsViewHeight);
 			for (var i=0; i<this.obsElms.length; i++) {
 				this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
-				this.obsElms[i].onResize(width, height);
+				this.obsElms[i].onResize(width, height-this.detailsViewHeight);
 			}
 			for (var i=0; i<this.tunElms.length; i++) {
 				this.tunElms[i].setPivotConfig(this.pivotX, this.pivotY);
-				this.tunElms[i].onResize(width, height);
+				this.tunElms[i].onResize(width, height-this.detailsViewHeight);
 			}
 
 			// Update horizon
@@ -629,10 +696,10 @@ define(
 		TuningScreen.prototype.forwardHorizon = function() {
 			var vOffs = -parseInt( this.hostTuning.css("top") );
 			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].onHorizonTopChanged(vOffs + this.height);
+				this.obsElms[i].onHorizonTopChanged(vOffs + this.height - this.detailsViewHeight);
 			}
 			for (var i=0; i<this.tunElms.length; i++) {
-				this.tunElms[i].onHorizonTopChanged(vOffs + this.height);
+				this.tunElms[i].onHorizonTopChanged(vOffs + this.height - this.detailsViewHeight);
 			}
 		}
 

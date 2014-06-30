@@ -60,9 +60,6 @@ define(
 
 			}
 
-			// Create some generic screens
-			UI.initAndPlaceScreen("screen.running");
-
 			// Break down initialization process in individual chainable functions
 			var prog_db = progressAggregator.begin(5),
 				init_db = function(cb) {
@@ -126,6 +123,23 @@ define(
 					cb();
 				};
 
+			var prog_run = progressAggregator.begin(1),
+				init_run = function(cb) {
+					var scrHome = UI.initAndPlaceScreen("screen.running");
+					if (!scrHome) {
+						console.error("Core: Unable to initialize run screen!");
+						return;
+					}
+
+					// Bind events
+					scrHome.on('abortRun', function() {
+						UI.selectScreen("screen.tuning");
+					});
+
+					// Complete run
+					prog_run.ok("Run screen ready");
+					cb();
+				};
 
 			var prog_explain = progressAggregator.begin(1),
 				init_explain = function(cb) {
@@ -185,7 +199,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_home, init_explain, init_tune
+						init_db, init_home, init_explain, init_tune, init_run
 					],
 					runChain = function(cb, index) {
 						var i = index || 0,

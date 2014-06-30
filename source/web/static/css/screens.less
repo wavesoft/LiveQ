@@ -276,7 +276,6 @@
 .screen .pagepart {
 	background-image: url(../img/pageparts.png);
 	background-repeat: no-repeat;
-	overflow: hidden;
 	position: absolute;
 
 	h1 {
@@ -292,8 +291,22 @@
 
 	&.tune-tl {
 		background-position: -435px 0px;
-		width: 145px; height: 145px;
+		width: 295px; height: 145px;
 		top: 0; left: 0;
+
+		h1, p {
+			color: #FFF;
+			text-align: left;
+		}
+		h1 {
+			width: 280px; line-height: 32px;
+			left: 7px; top: 7px;
+			font-size: 25px;
+		}
+		p {
+			width: 280px; line-height: 18px;
+			left: 7px; top: 35px;
+		}
 
 	}
 
@@ -361,12 +374,86 @@
 // Tuning Screen
 ///////////////////////////////////////////////
 
+@tune-details-height: 150px;
+
 .screen.tuning {
 
 	a { text-decoration: none; }
 
 	.tuning-host {
 		position: absolute;
+	}
+
+	.tune-tl {
+		z-index: 200;
+		.pointer-events( none );
+
+		.btn-taglike {
+			.transition( all 0.5s );
+			.pointer-events( auto );
+			.border-radius( 0px 0px 8px 8px );
+			cursor: pointer;
+			background-color: #16a085;
+			left: 0; top: 145px;
+			position: absolute;
+			text-align: center;
+			color: #FFF;
+			width: 70px;
+			height: 45px;
+			padding-top: 5px;
+
+			&:hover {
+				padding-top: 15px;
+			}
+		}
+
+	}
+
+	//
+	// The expanded details view
+	// ==========================
+	//
+	.details-view {
+		.transition( all 0.5s );
+		z-index: 100;
+		background-color: #FFF;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 0;
+
+		&.expanded {
+			height: @tune-details-height;
+		}
+
+		div.scroller {
+			border-top: solid 4px #16a085;
+			background-color: #4d4d4d;
+			width: 100%;
+			height: @tune-details-height;
+		}
+
+		div.btn-taglike {
+			.transition( all 0.5s );
+			.pointer-events( auto );
+			.border-radius( 8px 8px 0px 0px );
+			cursor: pointer;
+			background-color: #16a085;
+			left: 0; top: -50px;
+			position: absolute;
+			text-align: center;
+			color: #FFF;
+			width: 70px;
+			height: 45px;
+			padding-top: 5px;
+
+			&:hover {
+				top: -60px;
+				padding-bottom: 10px;
+			}
+
+		}
 	}
 
 	//
@@ -426,17 +513,22 @@
 			.mask-image( url(../img/mask-tune.png) );
 			width: 108px; height: 50px;
 
-			cursor: pointer;
 			text-align: center;
 			font-size: 17px;
 			left: 24px;
 			top: 106px;
+			cursor: not-allowed;
 
-			&.active, &:hover {
+			&.active {
+				cursor: pointer;
 				top: 123px;
 				background: #27ae60;
 				color: #FFF;
+				&:hover {
+					background: #2ecc71;
+				}
 			}
+
 		}
 
 		div.c-marker {
@@ -494,6 +586,104 @@
 
 .screen.explain {
 	padding: 0;
+
+	.explain-book {
+
+		background-color: #3498db;
+		position: absolute;
+		left: 15%;
+		right: 15%;
+		top: 10%;
+		bottom: 10%;
+
+		// Animation for visibility
+		.easing-back-in();
+		.transform( scale(0.1) );
+		opacity: 0;
+
+		&.visible {
+			z-index: 500;
+			opacity: 1;
+			.transform( scale(1) );
+			.easing-back-out( );
+		}
+
+		// Colors applied both on body and on tab icons
+		&.learn, .learn {
+			background-color: #3498db;
+		}
+		&.understand, .understand {
+			background-color: #8e44ad;
+		}
+		&.research, .research {
+			background-color: #16a085;
+		}
+
+		// Title and close icon
+		div.header {
+			position: absolute;
+			left: 0; width: 100%; top: 0;
+			height: 24px;
+			background-color: rgba(0,0,0,0.4);
+
+			&>span.bullet {
+				.border-radius( 8px );
+				display: inline-block;
+				width: 10px;
+				height: 10px;
+				background: #f1c40f;
+				margin-left: 6px;
+			}
+
+			&>span.title {
+				color: #fff;
+				font-size: 14px;
+				line-height: 24px;
+				margin-left: 4px;
+			}
+
+			a.close {
+				width: 24px;
+				height: 24px;
+				display: block;
+				position: absolute;
+				right: 0; top: 0;
+				line-height: 24px;
+				text-align: center;
+			}
+
+		}
+
+		// Main body
+		div.body {
+			position: absolute;
+			left: 0; width: 100%;
+			top: 24px; bottom: 24px;
+			overflow-x: hidden;
+			overflow-y: auto;
+
+		}
+
+		// footer with tab icons
+		div.footer {
+			background-color: #2c3e50;
+			position: absolute;
+			left: 0; width: 100%; bottom: 0;
+			height: 24px;
+			overflow-x: hidden;
+
+			a {
+				display: inline-block;
+				width: 100px;
+				padding: 2px;
+				height: 20px;
+				color: #fff;
+				text-decoration: none;
+			}
+
+		}
+
+	}
 
 	.explain-top {
 		height: 65%;
@@ -794,15 +984,67 @@
 
 .screen.running {
 
-	* {
+	div.c-marker {
 		position: absolute;		
+		border: dashed 1px #999;
+
+		.label {
+			position: absolute;
+			font-size: 12px;
+			color: #999;
+			left: 0; width: 100%;
+			text-align: center;
+			bottom: -16px;
+		}
 	}
 
-	div.c-marker {
-		border: dashed 1px #999;
+	//
+	// Tag-like buttons on page parts
+	// --------------------------------
+	//
+	.pagepart {
+
+		.btn-taglike {
+			.transition( all 0.5s );
+			.pointer-events( auto );
+			.border-radius( 0px 0px 8px 8px );
+			position: absolute;
+			cursor: pointer;
+			background-color: #d35400;
+			text-align: center;
+			color: #FFF;
+			width: 70px;
+			height: 45px;
+			padding-top: 5px;
+		}
+
+		&.run-tl .btn-taglike {
+			left: 0; top: 145px;
+			&:hover {
+				padding-top: 15px;
+			}				
+		}
+
+		&.run-tr .btn-taglike {
+			right: 0; top: 145px;
+			&:hover {
+				padding-top: 15px;
+			}				
+		}
+
+		&.run-bl .btn-taglike {
+			.border-radius( 8px 8px 0px 0px );
+			left: 0; top: -50px;
+			&:hover {
+				top: -60px;
+				padding-bottom: 10px;
+			}				
+		}
+
 	}
 
 	.globe {
+		position: absolute;		
 		.transition(all 0.4s);
 		display: block;
 		width: 160px;
@@ -810,7 +1052,8 @@
 		z-index: 70;
 	}
 
-	.progress {
+	.progress-widget {
+		position: absolute;		
 		.transition(all 0.4s);
 		.border-radius(200px);
 		display: block;
@@ -827,6 +1070,7 @@
 		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bfbfbf', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 		a.button {
+			position: absolute;		
 			z-index: 71;
 			.transition(all 0.4s);
 
@@ -834,9 +1078,10 @@
 			cursor: pointer;
 			overflow: hidden;
 			left: 45px;
-			top: -24px;
+			top: -35px;
 
 			div {
+				position: absolute;		
 				width: 108px; height: 52px;
 				color: #FFFFFF;
 				line-height: 52px;
@@ -847,6 +1092,7 @@
 			}
 
 			&:before {
+				position: absolute;		
 				left: 0; top: 0;
 				position: absolute;
 				display: block;
@@ -859,6 +1105,7 @@
 			}
 
 			&:hover {
+				position: absolute;		
 				&:before {
 					background-color: #e74c3c;
 				}
@@ -867,6 +1114,7 @@
 		}
 
 		.knob {
+			position: absolute;		
 			left: 6px;
 			top: 7px;
 			z-index: 60;

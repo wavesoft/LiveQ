@@ -4,16 +4,16 @@ define(
 	["jquery", "core/registry","core/base/component" ], 
 
 	/**
-	 * This is the default component for displaying information regarding a tunable
+	 * This is the default component for displaying information regarding a observable
 	 *
- 	 * @exports vas-basic/infoblock/tunable
+ 	 * @exports vas-basic/infoblock/observable
 	 */
 	function(config, R, Component) {
 
 		/**
-		 * The default tunable body class
+		 * The default observable body class
 		 */
-		var TunableBody = function(hostDOM) {
+		var ObservableBody = function(hostDOM) {
 
 			// Initialize widget
 			Component.call(this, hostDOM);
@@ -28,13 +28,14 @@ define(
 		};
 
 		// Subclass from ObservableWidget
-		TunableBody.prototype = Object.create( Component.prototype );
+		ObservableBody.prototype = Object.create( Component.prototype );
 
 		/**
-		 * Set the widget which is hosting the tunable parameter information
-		 * @param {core/base/tuning_components~TunableWidget} widget - The tunable widget to display additional information for
+		 * Set the widget which is hosting the observable parameter information
+		 * @param {core/base/tuning_components~observableWidget} widget - The observable widget to display additional information for
+		 * @param {array} buttons - Array of <a> DOM elements that will be placed as buttons in the button bar
 		 */
-		TunableBody.prototype.setWidget = function( widget ) {
+		ObservableBody.prototype.setWidget = function( widget, buttons ) {
 
 			// Prepare body DOM
 			this.bodyDOM.empty();
@@ -47,10 +48,17 @@ define(
 			var l = $('<a href="do:show-more"><span class="uicon uicon-explain"></span> Explain this ...</a>');
 			this.moreLinks.append( l );
 
+			// Add more buttons
+			if (buttons) {
+				for (var i=0; i<buttons.length; i++) {
+					this.moreLinks.append(buttons[i]);
+				}
+			}
+
 		}
 
-		// Store tunable infoblock component on registry
-		R.registerComponent( 'infoblock.tunable', TunableBody, 1 );
+		// Store observable infoblock component on registry
+		R.registerComponent( 'infoblock.observable', ObservableBody, 1 );
 
 	}
 

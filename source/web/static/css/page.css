@@ -16,7 +16,7 @@ body {
 body {
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 12px;
-  background-image: url(../img/background.jpg);
+  background-image: url(../img/white_abstract.jpg);
   background-size: cover;
   background-repeat: no-repeat;
 }
@@ -92,6 +92,38 @@ h1 + p.subtitle {
 }
 .vrows .vrow-12 {
   height: 100%;
+}
+.uicon {
+  background-image: url(../img/uicons-24.png);
+  background-repeat: no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+.uicon.uicon-explain {
+  background-position: 0px 0px;
+}
+.uicon.uicon-gear {
+  background-position: -24px 0px;
+}
+.uicon.uicon-eye {
+  background-position: -48px 0px;
+}
+.uicon.uicon-pin {
+  background-position: -72px 0px;
+}
+.uicon.uicon-x {
+  background-position: -96px 0px;
+}
+.uicon.uicon-info {
+  background-position: -120px 0px;
+}
+.uicon.uicon-game {
+  background-position: -144px 0px;
+}
+.uicon.uicon-find {
+  background-position: -168px 0px;
 }
 .onscreen {
   position: absolute;
@@ -182,6 +214,48 @@ h1 + p.subtitle {
   overflow-x: hidden;
   overflow-y: auto;
   color: #eeeeee;
+}
+.onscreen .body-more {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+.onscreen .body-more .body {
+  position: absolute;
+  overflow-x: hidden;
+  overflow-y: auto;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 36px;
+}
+.onscreen .body-more .more {
+  background-color: rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: 0px 0px 8px 8px;
+  -moz-border-radius: 0px 0px 8px 8px;
+  -o-border-radius: 0px 0px 8px 8px;
+  border-radius: 0px 0px 8px 8px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  height: 28px;
+}
+.onscreen .body-more .more a {
+  font-size: 14px;
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  line-height: 24px;
+  height: 24px;
+  padding: 2px;
+  margin: 0px 2px;
+  border-radius: 4px;
+}
+.onscreen .body-more .more a:hover {
+  background: #666666;
 }
 #game-frame {
   -webkit-perspective: 1200px;

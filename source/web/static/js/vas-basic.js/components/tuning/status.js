@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/data_widget" ], 
+	["jquery", "core/registry", "core/base/data_widget", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, DataWidget) {
+	function(config, R, DataWidget, Config) {
 
 		var DefaultStatusWidget = function(hostDOM) {
 
@@ -23,9 +23,7 @@ define(
 			hostDOM.append(this.element);
 
 			// Prepare progress knob
-			this.progressKnob = $('<input type="text" value="25" />');
-			this.element.append(this.progressKnob);
-			this.progressKnob.knob({
+			this.knobConfig = {
 				min:0, max:100,
 				width 		: this.diameter - 12,
 				height 		: this.diameter - 12,
@@ -36,7 +34,10 @@ define(
 				className 	: 'knob',
 				fgColor 	: "#16a085",
 				bgColor 	: "#bdc3c7",
-			});
+			};
+			this.progressKnob = $('<input type="text" value="25" />');
+			this.element.append(this.progressKnob);
+			this.progressKnob.knob(this.knobConfig);
 
 			// Prepare marker regions
 			var self = this;
@@ -66,7 +67,9 @@ define(
 			this.startIcon.click((function(e) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.trigger('begin');
+				if (this.startIcon.hasClass("active")) {
+					this.trigger('begin');
+				}
 			}).bind(this));
 
 			// Prepare label & sublabel
@@ -96,9 +99,35 @@ define(
 		 */
 		DefaultStatusWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
-
+				this.progressKnob.val(0).trigger('change');
+				this.titleElm.html("---");
+				this.startIcon.removeClass("active");
+				return;
 			}
-			this.update();
+
+			// Change configuration based on value
+			if (value < Config.values['good-average']) {
+				this.knobConfig['fgColor'] = '#e74c3c';
+				this.progressKnob.trigger( 'configure', this.knobConfig );
+				this.titleElm.html("Bad");
+				this.startIcon.removeClass("active")
+			} else if (value < Config.values['average-bad']) {
+				this.knobConfig['fgColor'] = '#f39c12';
+				this.progressKnob.trigger( 'configure', this.knobConfig );
+				this.titleElm.html("Almost");
+				this.startIcon.removeClass("active")
+			} else {
+				this.knobConfig['fgColor'] = '#16a085';
+				this.progressKnob.trigger( 'configure', this.knobConfig );
+				this.titleElm.html("Good");
+				this.startIcon.addClass("active")
+			}
+
+			// Update progress bar
+			this.progressKnob
+				.val(100 * value)
+				.trigger('change');
+
 		}
 
 		////////////////////////////////////////////////////////////
@@ -129,13 +158,6 @@ define(
 				'left': x - this.diameter/2,
 				'top': y - this.diameter/2
 			});
-		}
-
-		/**
-		 * Update the visual representation of the element
-		 */
-		DefaultStatusWidget.prototype.update = function() {
-
 		}
 
 		// Store tuning widget component on registry

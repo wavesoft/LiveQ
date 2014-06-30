@@ -20,6 +20,7 @@ define(
 
 			// Prepare configuration
 			this.diameter = 200;
+			window.run = this;
 
 			// Prepare host
 			hostDOM.addClass("running");
@@ -41,6 +42,13 @@ define(
 			this.foregroundDOM.append( this.ppTR );
 			this.foregroundDOM.append( this.ppBL );
 
+			var btnTutorial = $('<div class="btn-taglike"><span class="uicon uicon-explain"></span><br />Tutorial</div>');
+			this.ppTL.append( btnTutorial );
+			var btnServerStatus = $('<div class="btn-taglike"><span class="uicon uicon-gear"></span><br />Status</div>');
+			this.ppTR.append( btnServerStatus );
+			var bytEventDetails = $('<div class="btn-taglike"><span class="uicon uicon-eye"></span><br />Details</div>');
+			this.ppBL.append( bytEventDetails );
+
 			// Fill-in information fields
 			this.infoEventRate = $('<h1>0</h1>');
 			this.ppTL.append(this.infoEventRate);
@@ -58,11 +66,23 @@ define(
 			this.hostObserving = $('<div class="observing-host"></div>');
 			this.foregroundDOM.append( this.hostObserving );
 
+			// Create status widget
+			this.statusWidget = R.instanceComponent( "widget.running_status", this.foregroundDOM );
+			if (!this.statusWidget)
+				console.warn("Unable to instantiate running screen status widget");
+			else {
+				this.forwardVisualEvents( this.statusWidget );
+				this.statusWidget.on('abort', (function() {
+					this.trigger('abortRun');
+				}).bind(this));
+			}
 
 			// Prepare pop-up drawer
-			this.popupOnScreen = R.instanceComponent( "widget.onscreen", this.hostObserving );
+			this.popupOnScreen = R.instanceComponent( "widget.onscreen", this.foregroundDOM );
 			if (!this.popupOnScreen)
 				console.warn("Unable to instantiate onscreen description element");
+			else
+				this.forwardVisualEvents( this.popupOnScreen );
 
 			// Prepare for observable elements
 			this.obsElms = [];
@@ -90,7 +110,7 @@ define(
 
 			// Create dummpy
 			var observables = [];
-			for (var i=0; i<100; i++) {
+			for (var i=0; i<5; i++) {
 				observables.push({
 					'info': {
 						'name': 'O'+i,
@@ -113,16 +133,6 @@ define(
 
 		}
 
-
-		/**
-		 * Create the status widget
-		 */
-		RunningScreen.prototype.createStatusWidget = function( hostDOM ) {
-
-
-
-		}
-
 		/**
 		 * Create an observable widget
 		 */
@@ -135,16 +145,14 @@ define(
 				return undefined;
 			}
 
-			console.log(this.pivotX, this.pivotY, angle);
-
 			// Set pivot configuration for doing this nice
 			// circular distribution
 			e.setPivotConfig( 
 				this.pivotX, 			// Pivot X
 				this.pivotY, 			// Pivot Y
 				angle,					// Angle around pivot
-				200, 					// Min distance
-				400						// Max distance
+				150, 					// Min distance
+				350						// Max distance
 			);
 
 			// Bind pop-up events
@@ -204,17 +212,22 @@ define(
 			this.pivotY = this.height / 2;
 
 			// Realign globe
-			this.globe.onResize( globeW, globeH );
+			/*
 			this.globeDOM.css({
 				'left': (this.width - globeW) / 2,
 				'top' : (this.height - globeH) / 2,
 			});
+			*/
+
+			this.statusWidget.setPosition( this.pivotX, this.pivotY );
 
 			// Realign background
+			/*
 			this.progressGroup.css({
 				'left': (this.width - this.diameter) / 2,
 				'top': (this.height - this.diameter) / 2,
 			});
+			*/
 
 			// Update observables
 			for (var i=0; i<this.obsElms.length; i++) {
@@ -223,36 +236,6 @@ define(
 				this.obsElms[i].onHorizonTopChanged(this.height);
 			}
 
-		}
-
-		/**
-		 * Forward onShow event to children
-		 */
-		RunningScreen.prototype.onShown = function() {
-			this.globe.onShown();
-		}
-
-		/**
-		 * Forward onWillShow event to children
-		 */
-		RunningScreen.prototype.onWillShow = function(cb) {
-			var vc=1;
-			this.globe.onWillShow(function() { if (--vc == 0) cb(); });
-		}
-
-		/**
-		 * Forward onHidden event to children
-		 */
-		RunningScreen.prototype.onHidden = function() {
-			this.globe.onHidden();
-		}
-
-		/**
-		 * Forward onWillHide event to children
-		 */
-		RunningScreen.prototype.onWillHide = function(cb) {
-			var vc=1;
-			this.globe.onWillHide(function() { if (--vc == 0) cb(); });
 		}
 
 		// Register home screen

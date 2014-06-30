@@ -1,22 +1,22 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/component" ], 
+	["jquery", "core/registry","core/base/data_widget" ], 
 
 	/**
-	 * This is the default component for displaying information regarding a tunable
+	 * This is the default data widget for visualizing a historgram
 	 *
- 	 * @exports vas-basic/infoblock/tunable
+ 	 * @exports vas-basic/dataviz/histogram
 	 */
-	function(config, R, Component) {
+	function(config, R, DataWidget) {
 
 		/**
-		 * The default tunable body class
+		 * The default observable body class
 		 */
-		var TunableBody = function(hostDOM) {
+		var DataVizHistogram = function(hostDOM) {
 
 			// Initialize widget
-			Component.call(this, hostDOM);
+			DataWidget.call(this, hostDOM);
 
 			// Prepare infoblock
 			hostDOM.addClass("body-more");
@@ -28,13 +28,13 @@ define(
 		};
 
 		// Subclass from ObservableWidget
-		TunableBody.prototype = Object.create( Component.prototype );
+		DataVizHistogram.prototype = Object.create( DataWidget.prototype );
 
 		/**
-		 * Set the widget which is hosting the tunable parameter information
-		 * @param {core/base/tuning_components~TunableWidget} widget - The tunable widget to display additional information for
+		 * Set the widget which is hosting the observable parameter information
+		 * @param {core/base/tuning_components~observableWidget} widget - The observable widget to display additional information for
 		 */
-		TunableBody.prototype.setWidget = function( widget ) {
+		DataVizHistogram.prototype.setWidget = function( widget ) {
 
 			// Prepare body DOM
 			this.bodyDOM.empty();
@@ -44,13 +44,13 @@ define(
 
 			// Prepare 'more' links
 			this.moreLinks.empty();
-			var l = $('<a href="do:show-more"><span class="uicon uicon-explain"></span> Explain this ...</a>');
+			var l = $('<a href="do:show-more"><span class="man explain"></span> Explain this ...</a>');
 			this.moreLinks.append( l );
 
 		}
 
-		// Store tunable infoblock component on registry
-		R.registerComponent( 'infoblock.tunable', TunableBody, 1 );
+		// Store histogram data visualization on registry
+		O.registerComponent( 'dataviz.histogram', DataVizHistogram, 1 );
 
 	}
 

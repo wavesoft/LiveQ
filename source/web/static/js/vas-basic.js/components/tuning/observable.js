@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/tuning_components" ], 
+	["jquery", "core/registry", "core/base/tuning_components", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, TC) {
+	function(config, R, TC, Config) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -197,11 +197,11 @@ define(
 			this.indicator.removeClass("val-gd");
 
 			// Append classes
-			if (v < obsValBounds[0]) {
+			if (v < Config.values['good-average']) {
 				this.element.addClass("val-bd");
 				this.indicator.addClass("val-bd");
 				this.diameter = 54;
-			} else if (v < obsValBounds[1]) {
+			} else if (v < Config.values['average-bad']) {
 				this.element.addClass("val-md");
 				this.indicator.addClass("val-md");
 				this.diameter = 50;

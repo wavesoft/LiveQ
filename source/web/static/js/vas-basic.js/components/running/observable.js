@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/tuning_components" ], 
+	["jquery", "core/registry", "core/base/tuning_components", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, TC) {
+	function(config, R, TC, Config) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -177,9 +177,18 @@ define(
 		 */
 		DefaultObservableWidget.prototype.update = function() {
 
+			// What's the maximum value we will render
+			var maxValid = 4.0;
+
 			// Calculate position around pivot
-			var v = this.getValue(),
-				r = this.getValue() * (this.maxDistance - this.minDistance);
+			var v = this.getValue(), midRange = (this.maxDistance - this.minDistance) / 2, r = 0;
+			if (v < 1.0) { // 0.0 -> 1.0 = minDistance -> mid
+				r = this.minDistance + (v*midRange);
+			} else { // 1.0 -> 4.0 = mid -> maxDistance
+				if (v > maxValid) v = maxValid;
+				v = (v-1.0) / (maxValid-1.0);
+				r = this.minDistance + midRange + (v*midRange);
+			}
 
 			// Update position
 			this.x = this.pivotX + Math.sin(this.angle) * (r+this.minDistance);
@@ -197,11 +206,11 @@ define(
 			this.indicator.removeClass("val-gd");
 
 			// Append classes
-			if (v < obsValBounds[0]) {
+			if (v < Config.values['good-average']) {
 				this.element.addClass("val-bd");
 				this.indicator.addClass("val-bd");
 				this.diameter = 54;
-			} else if (v < obsValBounds[1]) {
+			} else if (v < Config.values['average-bad']) {
 				this.element.addClass("val-md");
 				this.indicator.addClass("val-md");
 				this.diameter = 50;

@@ -29,6 +29,15 @@ define({
 		'backdrop'		: 'backdrop',
 		'foreground'	: 'foreground',
 		'error-screen' 	: 'error-screen',
+	},
+
+	/**
+	 * Color transition points between good-average-bad values,
+	 * normalized to 1.0.
+	 */
+	'values': {
+		'good-average'	: 0.2,
+		'average-bad'	: 0.5,
 	}
 
 });
