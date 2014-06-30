@@ -20,7 +20,7 @@ define(
 
 			// The screen backdrop is just black
 			hostDOM.css({
-				'background-color'  : '#FFF',
+				//'background-color'  : '#FFF',
 				/*
 				'background-image'  : 'url(static/img/particles.jpg)',
 				'background-size'   : 'cover',

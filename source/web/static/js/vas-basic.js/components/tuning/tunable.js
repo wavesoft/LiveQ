@@ -274,7 +274,7 @@ define(
 		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.tunable.default', DefaultTunableWidget, 1 );
+		R.registerComponent( 'widget.tunable.tuning', DefaultTunableWidget, 1 );
 
 	}
 

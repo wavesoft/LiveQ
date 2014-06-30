@@ -16,6 +16,9 @@ body {
 body {
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 12px;
+  background-image: url(../img/background.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 h1 + p.subtitle {
   margin-top: -15px;
@@ -181,7 +184,6 @@ h1 + p.subtitle {
   color: #eeeeee;
 }
 #game-frame {
-  background-color: white;
   -webkit-perspective: 1200px;
   -moz-perspective: 1200px;
   perspective: 1200px;

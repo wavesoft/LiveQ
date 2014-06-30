@@ -143,7 +143,7 @@ define(
 		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.onscreen.default', DefaultOnScreen, 1 );
+		R.registerComponent( 'widget.onscreen', DefaultOnScreen, 1 );
 
 	}
 

@@ -23,6 +23,9 @@ define([
 	"vas-basic/components/tuning/observable",
 	"vas-basic/components/tuning/status",
 
+	// Running-related
+	"vas-basic/components/running/observable",
+
 	// Misc components
 	"vas-basic/components/onscreen",	
 

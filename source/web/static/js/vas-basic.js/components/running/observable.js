@@ -223,7 +223,7 @@ define(
 		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.observable.tuning', DefaultObservableWidget, 1 );
+		R.registerComponent( 'widget.observable.running', DefaultObservableWidget, 1 );
 
 	}
 

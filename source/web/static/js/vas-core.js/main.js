@@ -171,6 +171,9 @@ define(
 						UI.selectScreen("screen.explain")
 							.onParameterFocus(parameter);
 					});
+					scrTuning.on('submitParameters', function(parameters) {
+						UI.selectScreen("screen.running", UI.Transitions.ZOOM_OUT);
+					});
 
 					// Complete tuning
 					prog_tune.ok("Tuning screen ready");

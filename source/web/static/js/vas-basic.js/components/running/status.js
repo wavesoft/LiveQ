@@ -19,61 +19,47 @@ define(
 			this.diameter = 160;
 
 			// Prepare host
-			this.element = $('<div class="progress-widget"></div>');
-			hostDOM.append(this.element);
+			this.element = $('<div class="progress"></div>');
+			hostDOM.append( this.element );
+
+			// Prepare abort button
+			this.startIcon = $('<a href="do:abort" class="button"><div>Abort</div></a>');
+			this.element.append(this.startIcon);
 
 			// Prepare progress knob
 			this.progressKnob = $('<input type="text" value="25" />');
+			this.progressKnobBlur = $('<input type="text" value="25" />');
 			this.element.append(this.progressKnob);
+			this.element.append(this.progressKnobBlur);
 			this.progressKnob.knob({
 				min:0, max:100,
 				width 		: this.diameter - 12,
 				height 		: this.diameter - 12,
-				thickness	: 0.35,
+				thickness	: 0.1,
 				angleArc 	: 270,
-				angleOffset : -135,
+				angleOffset : 45,
 				readOnly  	: true,
 				className 	: 'knob',
-				fgColor 	: "#16a085",
-				bgColor 	: "#bdc3c7",
+				fgColor 	: "#22b573",
+				bgColor 	: "#EFEFEF",
+			});
+			this.progressKnobBlur.knob({
+				min:0, max:100,
+				width 		: this.diameter - 12,
+				height 		: this.diameter - 12,
+				thickness	: 0.1,
+				angleArc 	: 270,
+				angleOffset : 45,
+				readOnly  	: true,
+				className 	: 'knob blur',
+				fgColor 	: "#22b573",
+				bgColor 	: "transparent",
 			});
 
-			// Prepare marker regions
-			var self = this;
-			var prepareMarker = function(radius, name ) {
-				var marker = $('<div class="c-marker"></div>');
-				marker.css({
-					'left'   			: (self.diameter/2)-radius,
-					'top'    			: (self.diameter/2)-radius,
-					'width'  			: 2*radius,
-					'height' 			: 2*radius,
-					'border-radius' 		: radius,
-					'-webkit-border-radius' : radius,
-					'-moz-border-radius' 	: radius,
-					'-o-border-radius'		: radius
-				});
-				return marker;
-			}
-			this.element.append( prepareMarker( 150, "Good" ) );
-			this.element.append( prepareMarker( 350, "Average" ) );
-			this.element.append( prepareMarker( 400, "Bad" ) );
-			this.element.append( prepareMarker( 533, "Acceptable" ) );
-			this.element.append( prepareMarker( 600, "Bad" ) );
-
-			// Prepare tunable icon
-			this.startIcon = $('<a href="do:begin" class="button">Begin</a>');
-			this.element.append(this.startIcon);
-			this.startIcon.click((function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				this.trigger('begin');
-			}).bind(this));
-
-			// Prepare label & sublabel
-			this.titleElm = $('<div class="title">Good</div>');
-			this.subtitleElm = $('<div class="subtitle">match</div>');
-			this.element.append(this.titleElm);
-			this.element.append(this.subtitleElm);
+			// Create globe
+			this.globeDOM = $('<div class="globe"></div>');
+			this.element.append( this.globeDOM );
+			this.globe = R.instanceComponent( "widget.globe3d", this.globeDOM );
 
 		};
 
@@ -139,7 +125,7 @@ define(
 		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.tuning_status', DefaultStatusWidget, 1 );
+		R.registerComponent( 'widget.running_status', DefaultStatusWidget, 1 );
 
 	}
 

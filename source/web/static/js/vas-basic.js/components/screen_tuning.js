@@ -94,8 +94,13 @@ define(
 			if (!this.statusWidget)
 				console.warn("Unable to instantiate tuning status widget!");
 
+			// Bind widget events
+			this.statusWidget.on('begin', (function() {
+				this.trigger('submitParameters', this.getValueMap());
+			}).bind(this));
+
 			// Prepare pop-up drawer
-			this.popupOnScreen = R.instanceComponent( "widget.onscreen.default", this.hostTuning );
+			this.popupOnScreen = R.instanceComponent( "widget.onscreen", this.hostTuning );
 			if (!this.popupOnScreen)
 				console.warn("Unable to instantiate onscreen description element");
 
@@ -137,7 +142,7 @@ define(
 		TuningScreen.prototype.createTunable = function( angle, level, metadata ) {
 
 			// Try to instantiate the observable component
-			var e = R.instanceComponent("widget.tunable.default", this.hostTuning );
+			var e = R.instanceComponent("widget.tunable.tuning", this.hostTuning );
 			if (!e) {
 				console.warn("Unable to instantiate a tuning widget!");
 				return undefined;
@@ -200,7 +205,7 @@ define(
 		TuningScreen.prototype.createObservable = function( angle, metadata ) {
 
 			// Try to instantiate the observable component
-			var e = R.instanceComponent("widget.observable.default", this.hostTuning );
+			var e = R.instanceComponent("widget.observable.tuning", this.hostTuning );
 			if (!e) {
 				console.warn("Unable to instantiate an observable widget!");
 				return undefined;
@@ -590,6 +595,19 @@ define(
 		////                    FUNCTIONALITY IMPLEMENTATION                       ////
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Build a key/value dictionary with the values of all of my tunables
+		 */
+		TuningScreen.prototype.getValueMap = function() {
+			var ans = {};
+			for (var i=0; i<this.tunElms.length; i++) {
+				var k = this.tunElms[i].meta['info']['name'],
+					v = this.tunElms[i].getValue();
+				ans[k] = v;
+			}
+			return ans;
+		}
 
 		/**
 		 * Activate a particlar track of tunables
