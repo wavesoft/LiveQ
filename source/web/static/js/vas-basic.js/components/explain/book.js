@@ -2,7 +2,7 @@
 define(
 
 	// Requirements
-	["jquery", "core/registry", "core/base/components"],
+	["jquery", "core/registry", "core/base/components", "core/db"],
 
 	/**
 	 * A pop-up book with explaination details regarding a parameter, an observable,
@@ -10,7 +10,7 @@ define(
 	 *
 	 * @exports basic/components/explain/book
 	 */
-	function($,R,C) {
+	function($,R,C,DB) {
 
 		/**
 		 * @class
@@ -54,7 +54,11 @@ define(
 		 * Update the book definitions
 		 */
 		ExplainBook.prototype.onBookDefined = function(bookID) {
-			
+			this.bookID = bookID;
+
+			// Query database and populate book information
+
+
 		}
 
 		////////////////////////////////////////////////////////////

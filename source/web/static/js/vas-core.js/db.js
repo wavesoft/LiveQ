@@ -44,12 +44,46 @@ define(["jquery", "core/config"],
 		}
 
 		/**
-		 * Helper function to perform arbitrary couchDB API requests
+		 * Helper function to perform arbitrary couchDB API GET requests
 		 */
-		function couchdb_api(url,callback, type) {
+		function couchdb_get(url,callback, type) {
 			$.ajax({
 				'url' 	 	: url,
 				'method' 	: 'GET',
+				'dataType'	: type || 'json',
+				'success'	: function(data, status) { callback(data); },
+				'error'		: function(jqXHR, status, error) { 
+					callback(null); 
+					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
+				}
+			})
+		}
+
+		/**
+		 * Helper function to perform arbitrary couchDB API POST requests
+		 */
+		function couchdb_post(url, payload, callback, type) {
+			$.ajax({
+				'url' 	 	: url,
+				'data' 		: payload,
+				'method' 	: 'POST',
+				'dataType'	: type || 'json',
+				'success'	: function(data, status) { callback(data); },
+				'error'		: function(jqXHR, status, error) { 
+					callback(null); 
+					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
+				}
+			})
+		}
+
+		/**
+		 * Helper function to perform arbitrary couchDB API PUT requests
+		 */
+		function cpuchdb_put(url, payload, callback, type) {
+			$.ajax({
+				'url' 	 	: url,
+				'data' 		: payload,
+				'method' 	: 'PUT',
 				'dataType'	: type || 'json',
 				'success'	: function(data, status) { callback(data); },
 				'error'		: function(jqXHR, status, error) { 
@@ -65,8 +99,103 @@ define(["jquery", "core/config"],
 		 * This class is used for organizing the database I/O operations
 		 * on the same database instance.
 		 */
-		var Database = function( name ) {
+		var Database = function( name, prefix ) {
 			this.db = name;
+			this.session = { };
+		}
+
+		/**
+		 * Create a new user  
+		 *
+		 * @param {string} username - The user's name
+		 * @param {string} password - The user's password
+		 * @param {object} callback - The function to call when completed
+		 *
+		 */
+		Database.prototype.createUser = function(username, password, callback) {
+
+			// Create a UUID role for this user
+			var uuid = "", chars="0123456789+abcdefghijklmnopqrstuvwxyz-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			for (var i=0; i<64; i++) {
+				uuid += chars[parseInt(Math.random() * chars.length)];
+			}
+
+			// Try to allocate space
+			cpuchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, {
+
+				"name" 		: username, 
+				"password" 	: password, 
+				"roles" 	: [ uuid ], 
+				"type" 		: "user"
+
+			}, function(data) {
+				if (data['ok']) {
+
+					// Open the user's database
+					var userDB = new Database("users");
+					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
+						if (status['ok']) {
+							// Return user record
+							callback(true, DB.cache['definitions']['new-user']);
+						} else {
+							console.error("DB: Could not allocate user record!", data['reason']);
+							callback(false);
+						}
+					});
+
+				} else {
+					console.error("DB: Could not authenticate user!", data['reason']);
+					callback(false);
+				}
+			});
+
+		}
+
+		/**
+		 * Authenticate to couch-DB and get authentication token 
+		 *
+		 * @param {string} username - The user's name
+		 * @param {string} password - The user's password
+		 * @param {object} callback - The function to call when completed
+		 *
+		 */
+		Database.prototype.authenticateUser = function(username, password, callback) {
+
+			// Reset session
+			this.session = {};
+
+			// Try to open session
+			couchdb_post( Config.db.url + "/_session", {
+				"name" 		: username,
+				"password" 	: password
+			}, (function(data) {
+
+				if (data['ok']) {
+
+					// Update session information
+					this.session['name'] = data['name'];
+					this.session['roles'] = data['roles'];
+
+					// Get user record
+					var userDB = new Database("users"),
+						recordID = this.session['roles'][0];
+						userDB.get(recordID, function(record) {
+							if (!record) {
+								console.error("DB: Could not fetch record entry!");
+								callback(false);
+							} else {
+								// Fire callback
+								callback(data['name'], record);
+							}
+						});
+
+				} else {
+					console.error("DB: Could not authenticate user!", data['reason']);
+					callback(false);
+				}
+
+			}).bind(this));
+
 		}
 
 		/**
@@ -84,7 +213,32 @@ define(["jquery", "core/config"],
 			var url = Config.db.url + "/" + this.db + "/" + doc;
 			if (rev) url += "?rev="+rev;
 			// Fire the API function
-			couchdb_api( url, couchdb_translate_single(callback) );
+			couchdb_get( url, couchdb_translate_single(callback) );
+
+		}
+
+		/**
+		 * Put a JSON document in the CouchDB database
+		 */
+		Database.prototype.put = function(doc, data, callback) {
+			
+			// Check for missing fields
+			if (typeof(rev) == 'function') {
+				callback = rev;
+				rev = false;
+			}
+
+			// Build API URL
+			var url = Config.db.url + "/" + this.db + "/" + doc;
+			if (rev) url += "?rev="+rev;
+			// Fire the API function
+			couchdb_put( url, data, function(response) {
+				if (!response['ok']) {
+					callback(false);
+				} else {
+					callback(data['id'], data['rev']);
+				}
+			});
 
 		}
 
@@ -95,7 +249,7 @@ define(["jquery", "core/config"],
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/_all_docs?include_docs=true";
 			// Fire the API function
-			couchdb_api( url, couchdb_translate_many(callback) );
+			couchdb_get( url, couchdb_translate_many(callback) );
 		}
 
 		/**
@@ -105,7 +259,7 @@ define(["jquery", "core/config"],
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/_design/" + view + "/all";
 			// Fire the API function
-			couchdb_api( url, couchdb_translate_many(callback) );
+			couchdb_get( url, couchdb_translate_many(callback) );
 		}
 
 		/**
@@ -123,7 +277,7 @@ define(["jquery", "core/config"],
 			if (rev) url += "?rev="+rev;
 
 			// Return plain-text response
-			couchdb_api( url, couchdb_translate_single(callback), 'text' );
+			couchdb_get( url, couchdb_translate_single(callback), 'text' );
 			
 		}
 
