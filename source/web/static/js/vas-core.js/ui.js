@@ -53,7 +53,6 @@ define(["jquery", "core/config", "core/registry"],
 
 		// Reposition masks to keep the specified rect clean
 		function overlaymasks_apply( x,y,w,h ) {
-			console.log("Putting on ",x,y,w,h);
 			var rhb = 3; // Ring half-border
 			if ((x === false) || (x === undefined)) {
 				overlayMasks[0].addClass("fullscreen").attr('style', '');
@@ -103,6 +102,7 @@ define(["jquery", "core/config", "core/registry"],
 			visualAidTimer = 0,
 			visualAidWasVisible = false,
 			visualAidClasses = "",
+			tutorialOriginalScreen = "",
 			tutorialCompleteListener = false,
 			tutorialActive = false;
 
@@ -321,9 +321,10 @@ define(["jquery", "core/config", "core/registry"],
 		 * @param {DOMElement|string} element - The element to focus or it's visual aid ID
 		 * @param {int} duration - (Optional) The duraton (in seconds) to keep the element focused. Infinite if ommited or 0
 		 * @param {string} classes - (Optional) Additional classes to add on the element
+		 * @param {function} cb_completed - (Optional) A callback function to fire when completed
 		 *
 		 */
-		UI.focusVisualAid = function( element, duration, classes ) {
+		UI.focusVisualAid = function( element, duration, classes, cb_completed ) {
 
 			// Check for visual aid ID
 			if (typeof(element) != 'string') {
@@ -336,6 +337,16 @@ define(["jquery", "core/config", "core/registry"],
 				return;
 			}
 
+			// Check for missing parameters
+			if (typeof(classes) == 'function') {
+				cb_completed = classes;
+				classes = "";
+			} else if (typeof(duration) == 'function') {
+				cb_completed = duration;
+				duration = 0;
+				classes = "";
+			}
+
 			// Wrap on jquery
 			var e = $(aid.element);
 
@@ -345,22 +356,40 @@ define(["jquery", "core/config", "core/registry"],
 			// Merge classes with the metadata from aid
 			var classStr = (classes || "") + " " + (aid.classes || "");
 
-			// Keep some state information
-			visualAidWasVisible = (e.css("display") != "none");
-			console.log(">>", visualAidWasVisible);
+			//
+			// Asynchronous function for waiting until a possible
+			// screen transition is completed.
+			//
+			var __continueVisualAidPresentation = function() {
 
-			visualAidClasses = e.attr("class");
-			if (!visualAidWasVisible) e.show();
-			if (classStr) e.addClass(classStr)
+				// Keep some state information
+				visualAidWasVisible = (e.css("display") != "none");
 
-			// Focus specified element
-			visualAidCurrent = e.addClass("visualaid-focus");
-			overlaymasks_apply_element(visualAidCurrent);
+				visualAidClasses = e.attr("class");
+				if (!visualAidWasVisible) e.show();
+				if (classStr) e.addClass(classStr)
 
-			// Set duration timeout if we have specified one
-			if (duration) {
-				visualAidTimer = setTimeout(function() { UI.blurVisualAid(); }, duration*1000);
+				// Focus specified element
+				visualAidCurrent = e.addClass("visualaid-focus");
+				overlaymasks_apply_element(visualAidCurrent);
+
+				// Set duration timeout if we have specified one
+				if (duration) {
+					visualAidTimer = setTimeout(function() { UI.blurVisualAid(); }, duration*1000);
+				}
+				
+				// Fire callback
+				if (cb_completed) cb_completed();
+
 			}
+
+			// Check if we should switch screen
+			if (aid['screen'] && (UI.activeScreen != aid['screen'])) {
+				UI.selectScreen( aid['screen'], UI.Transitions.ZOOM_OUT, __continueVisualAidPresentation );
+			} else {
+				__continueVisualAidPresentation();
+			}
+
 
 		}
 
@@ -435,6 +464,9 @@ define(["jquery", "core/config", "core/registry"],
 				// We have an active tutorial
 				tutorialActive = true;
 
+				// Keep the currently active screen
+				tutorialOriginalScreen = UI.activeScreen;
+
 				// Put overlay in loading mode
 				UI.overlayDOM.addClass("loading");
 
@@ -476,16 +508,29 @@ define(["jquery", "core/config", "core/registry"],
 			// Blur previous visual aids
 			UI.blurVisualAid();
 
-			// Hide visual agent
-			UI.visualAgent.hide(function() {
+			// Asynchronous function to wait until a screen transition
+			// has completed
+			var __continueHideTutorial = function() {
 
-				// Fade-out overlay DOM
-				UI.overlayDOM.fadeOut(500, function() {
-					if (cb_ready) cb_ready();
-					tutorialActive = false;
+				// Hide visual agent
+				UI.visualAgent.hide(function() {
+
+					// Fade-out overlay DOM
+					UI.overlayDOM.fadeOut(500, function() {
+						if (cb_ready) cb_ready();
+						tutorialActive = false;
+					});
+
 				});
 
-			});
+			}
+
+			// Check if screen has changed since the beginning of the tutorial
+			if (UI.activeScreen != tutorialOriginalScreen) {
+				UI.selectScreen( tutorialOriginalScreen, UI.Transitions.FLIP_LEFT, __continueHideTutorial );
+			} else {
+				__continueHideTutorial();
+			}
 
 		}
 
@@ -498,6 +543,10 @@ define(["jquery", "core/config", "core/registry"],
 		 *
 		 */
 		UI.selectScreen = function(name, transition, cb_ready) {
+
+			// Check for wrong values
+			if (UI.activeScreen == name)
+				return;
 
 			// Check for missing transition
 			if (transition == undefined) {
@@ -598,6 +647,14 @@ define(["jquery", "core/config", "core/registry"],
 
 					// Update
 					UI.activeScreen = name;
+
+					// Fire resize events on overlay masks & visualAgent
+					// (This is a hack to update visual agent's position after 
+					// a screen switch in the middle of the tutorial)
+					var w = eNext.hostDOM.width(),
+						h = eNext.hostDOM.height();
+					UI.visualAgent.onResize( w, h );
+					overlaymasks_apply_element(visualAidCurrent);
 
 					// Fire ready callback
 					if (cb_ready) cb_ready();

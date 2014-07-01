@@ -140,12 +140,13 @@ define(["core/config", "core/base/component"],
 		 * @param {string} name - The name of the visual aid to register under.
 		 * @param {DOMElement|Component} element - The DOM Element to focus when this visual aid is fired, or the hostDOM of the component.
 		 * @param {string} classes - (Optional) A list of classes to append to the element before focusing it
+		 * @param {string} screenID - (Optional) The screen name to switch to before focusing the element
 		 */
-		registry.registerVisualAid = function(name, element, classes) {
+		registry.registerVisualAid = function(name, element, classes, screenID) {
 			if (element instanceof Component) {
-				registry.visualAids[name] = { 'element': element.hostDOM, 'classes': classes || "", 'component': element };
+				registry.visualAids[name] = { 'element': element.hostDOM, 'classes': classes || "", 'component': element, 'screen': screenID };
 			} else {
-				registry.visualAids[name] = { 'element': element, 'classes': classes || "", 'component': null };
+				registry.visualAids[name] = { 'element': element, 'classes': classes || "", 'component': null, 'screen': screenID };
 			}
 		}
 

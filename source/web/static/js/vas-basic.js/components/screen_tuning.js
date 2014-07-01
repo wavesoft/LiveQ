@@ -372,7 +372,7 @@ define(
 
 					// First observable goes to visual helper
 					if (firstObservable) {
-						R.registerVisualAid( 'observable', o.element );
+						R.registerVisualAid( 'observable', o.element, '', 'screen.tuning' );
 						firstObservable = false;
 					}
 
@@ -430,7 +430,7 @@ define(
 
 					// First tunable goes to visual helper
 					if (firstTunable) {
-						R.registerVisualAid( 'tunable', o.element );
+						R.registerVisualAid( 'tunable', o.element, '', 'screen.tuning' );
 						firstTunable = false;
 					}
 

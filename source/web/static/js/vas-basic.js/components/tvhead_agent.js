@@ -73,6 +73,8 @@ define(
 
 			// Properties
 			this.activeAid = false;
+			this.lastAid = false;
+			this.lastSeed = Math.random();
 
 			// Prepare host dom
 			this.hostDOM.addClass("tvhead");
@@ -89,10 +91,22 @@ define(
 		 * Aligh with the visual aid
 		 */
 		VisualAgent.prototype.realign = function( aid ) {
+			this.activeAid = aid;
+
+			// Reset fancy classes
+			this.hostDOM.removeClass("left");
+			this.hostDOM.removeClass("right");
+
+			// Re-seed random number when aid changes
+			// (Used for picking a random side when showing the TV-Head)
+			if (aid != this.lastAid) {
+				this.lastSeed = Math.random();
+				this.lastAid = aid;
+			}
+
 			if (!aid) {
 
 				// When we have no element, center ourselves
-				this.activeAid = false;
 				this.hostDOM.css({
 					'left': (this.width - this.myWidth)/2,
 					'top': (this.height - this.myHeight)/2,
@@ -115,10 +129,6 @@ define(
 						'top': (this.height - this.myHeight)/2,
 					});
 
-					// Remove fancy classes
-					this.hostDOM.removeClass("left");
-					this.hostDOM.removeClass("right");
-
 					return;
 				}
 
@@ -127,12 +137,10 @@ define(
 					pad = 10;
 
 				// Get aid dimentions
-				this.activeAid= $(aid);
 				var aidOffset = $(aid).offset(),
 					aidW = $(aid).width(), aidH = $(aid).height();
 
 				// Align vertically
-				console.log(aid, aidOffset);
 				var tY = aidOffset.top + aidH/2 - this.myHandsOffset;
 				if (tY + tol_T < 0) {
 					tY = -tol_T;
@@ -149,7 +157,7 @@ define(
 
 				// If we have both choices, pick one
 				if (fitLeft && fitRight) {
-					if (Math.random() > 0.5) {
+					if (this.lastSeed > 0.5) {
 						tX = posRight;
 						this.hostDOM.addClass("left");
 					} else {

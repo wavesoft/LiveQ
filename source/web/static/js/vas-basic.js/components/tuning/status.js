@@ -79,8 +79,8 @@ define(
 			this.element.append(this.subtitleElm);
 
 			// Register visual aids
-			R.registerVisualAid( 'tuning.status', this.element );
-			R.registerVisualAid( 'tuning.start', this.startIcon, "active" );
+			R.registerVisualAid( 'tuning.status', this.element, "", 'screen.tuning' );
+			R.registerVisualAid( 'tuning.start', this.startIcon, "active", 'screen.tuning' );
 
 		};
 
