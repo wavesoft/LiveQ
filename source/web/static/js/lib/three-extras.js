@@ -2,7 +2,7 @@
 define(
 
 	[ 	// Three core
-		"THREE",
+		"three",
 		// Three extras
 		"three-extras/effect-composer",
 		"three-extras/pass-bloom",
