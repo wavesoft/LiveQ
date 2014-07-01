@@ -29,6 +29,74 @@ define(["jquery", "core/config", "core/registry"],
 		}
 
 		/**
+		 * Functions to makage a 4-segment black masks that can be used to hide/show
+		 * any arbitrary object on the UI, just by it's coorinates
+		 */
+		var overlayMasks = [];
+
+		// Prepare the 4 masks
+		function overlaymasks_prepare( host ) {
+			
+			// Put 4 masks
+			for (var i=0; i<4; i++) {
+				var elm = $('<div class="mask-part">');
+				host.append(elm);
+				overlayMasks.push(elm);
+			}
+
+			// And the mask ring
+			var elm = $('<div class="mask-ring"></div>');
+			host.append(elm);
+			overlayMasks.push(elm);
+
+		}
+
+		// Reposition masks to keep the specified rect clean
+		function overlaymasks_apply( x,y,w,h ) {
+			console.log("Putting on ",x,y,w,h);
+			var rhb = 3; // Ring half-border
+			if ((x === false) || (x === undefined)) {
+				overlayMasks[0].addClass("fullscreen").attr('style', '');
+				overlayMasks[1].hide();
+				overlayMasks[2].hide();
+				overlayMasks[3].hide();
+				overlayMasks[4].hide();
+			} else {
+				overlayMasks[0].removeClass("fullscreen").css({
+					'left': 0, 'top': 0,
+					'width': x, 'bottom': 0
+				});
+				overlayMasks[1].show().css({
+					'left': x+w, 'top': 0,
+					'right': 0, 'bottom': 0
+				});
+				overlayMasks[2].show().css({
+					'left': x, 'top': 0,
+					'width': w, 'height': y
+				});
+				overlayMasks[3].show().css({
+					'left': x, 'top': y+h,
+					'width': w, 'bottom': 0
+				});
+				overlayMasks[4].show().css({
+					'left': x-rhb, 'top': y-rhb,
+					'width': w-rhb, 'height': h-rhb
+				});
+			}
+		}
+
+		// The same as above but accepts an element as first argument
+		function overlaymasks_apply_element(e) {
+			if (!e) {
+				overlaymasks_apply( false );
+			} else {
+				var offset = $(e).offset(),
+					w = $(e).width(), h = $(e).height();
+				overlaymasks_apply( offset.left, offset.top, w, h );
+			}
+		}
+
+		/**
 		 * Local properties for visual aids
 		 */
 		var visualAidCurrent = false,
@@ -171,6 +239,8 @@ define(["jquery", "core/config", "core/registry"],
 			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
 			UI.overlayDOM.hide();
 			UI.host.append(UI.overlayDOM);
+			overlaymasks_prepare( UI.overlayDOM );
+			overlaymasks_apply( false );
 
 			// Initialize the main visual agent for the tutorials
 			UI.visualAgentDOM = $('<div class="visual-agent"></div>');
@@ -210,7 +280,19 @@ define(["jquery", "core/config", "core/registry"],
 
 				// Also resize some helper elements
 				UI.visualAgent.onResize( w, h );
+				overlaymasks_apply_element(visualAidCurrent);
 
+			});
+
+			// Always listen for ESC key, and if we have an active tutorial, quit it
+			$(window).keydown(function(e) {
+				if ((e.keyCode == 27) && (tutorialActive)) {
+					e.preventDefault();
+					e.stopPropagation();
+
+					// Stop tutorial
+					UI.hideTutorial();
+				}
 			});
 
 			window.ui = UI;
@@ -244,28 +326,36 @@ define(["jquery", "core/config", "core/registry"],
 		UI.focusVisualAid = function( element, duration, classes ) {
 
 			// Check for visual aid ID
-			if (typeof(element) == 'string') {
-				var vElm = R.visualAids[element];
-				if (!vElm) {
-					console.warn("UI: Could not find visual aid with ID '"+element+"'");
-				}
-				element = vElm;
+			if (typeof(element) != 'string') {
+				console.error("UI: Invalid visual aid ID!");
+				return;
+			}
+			var aid = R.getVisualAidMeta( element );
+			if (!aid) {
+				console.error("UI: Missing visual aid '"+element+"'");
+				return;
 			}
 
 			// Wrap on jquery
-			var e = $(element);
+			var e = $(aid.element);
 
 			// Reset previous entry
 			if (visualAidCurrent) blurVisualAid();
 
+			// Merge classes with the metadata from aid
+			var classStr = (classes || "") + " " + (aid.classes || "");
+
 			// Keep some state information
-			visualAidWasVisible = e.is(":visible");
+			visualAidWasVisible = (e.css("display") != "none");
+			console.log(">>", visualAidWasVisible);
+
 			visualAidClasses = e.attr("class");
 			if (!visualAidWasVisible) e.show();
-			if (classes) e.addClass(classes)
+			if (classStr) e.addClass(classStr)
 
 			// Focus specified element
 			visualAidCurrent = e.addClass("visualaid-focus");
+			overlaymasks_apply_element(visualAidCurrent);
 
 			// Set duration timeout if we have specified one
 			if (duration) {
@@ -290,6 +380,9 @@ define(["jquery", "core/config", "core/registry"],
 				// Reset attributes and configuration
 				if (!visualAidWasVisible) e.hide();
 				e.attr("class", visualAidClasses);
+
+				// Reset overlay mask
+				overlaymasks_apply_element(false);
 
 			}
 

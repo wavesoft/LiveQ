@@ -69,6 +69,7 @@ define(
 			// Hard-coded dimentions (from CSS)
 			this.myWidth = 415;
 			this.myHeight = 390;
+			this.myHandsOffset = 300;
 
 			// Properties
 			this.activeAid = false;
@@ -90,16 +91,96 @@ define(
 		VisualAgent.prototype.realign = function( aid ) {
 			if (!aid) {
 
+				// When we have no element, center ourselves
 				this.activeAid = false;
 				this.hostDOM.css({
 					'left': (this.width - this.myWidth)/2,
 					'top': (this.height - this.myHeight)/2,
 				});
 
+				// Remove fancy classes
+				this.hostDOM.removeClass("left");
+				this.hostDOM.removeClass("right");
+
 			} else {
 
-				var aidOffset = $(aid).offset();
+				// Fetch aid object if we have the ID
+				var aid = R.getVisualAid(aid);
+				if (!aid) {
+
+					// When no valid element is found, do the same as false
+					this.activeAid = false;
+					this.hostDOM.css({
+						'left': (this.width - this.myWidth)/2,
+						'top': (this.height - this.myHeight)/2,
+					});
+
+					// Remove fancy classes
+					this.hostDOM.removeClass("left");
+					this.hostDOM.removeClass("right");
+
+					return;
+				}
+
+				// Tollerances that might be hidden outside screen
+				var tol_L = 26, tol_R = 26, tol_T = 21, tol_B = 156,
+					pad = 10;
+
+				// Get aid dimentions
 				this.activeAid= $(aid);
+				var aidOffset = $(aid).offset(),
+					aidW = $(aid).width(), aidH = $(aid).height();
+
+				// Align vertically
+				console.log(aid, aidOffset);
+				var tY = aidOffset.top + aidH/2 - this.myHandsOffset;
+				if (tY + tol_T < 0) {
+					tY = -tol_T;
+				} else if (tY + this.myHeight - tol_B > this.height) {
+					tY = this.height - this.myHeight + tol_B;
+				}
+
+				// Align horizontally
+				var tX = aidOffset.left + pad + aidW,
+					posRight = aidOffset.left + pad + aidW,
+					fitRight = (aidOffset.left + pad + aidW + this.myWidth - tol_R < this.width),
+					posLeft = aidOffset.left - pad - this.myWidth,
+					fitLeft = (aidOffset.left - pad - this.myWidth + tol_L > 0);
+
+				// If we have both choices, pick one
+				if (fitLeft && fitRight) {
+					if (Math.random() > 0.5) {
+						tX = posRight;
+						this.hostDOM.addClass("left");
+					} else {
+						tX = posLeft;
+						this.hostDOM.addClass("right");
+					}
+				} else if (!fitLeft && fitRight) {
+					tX = posRight;
+					this.hostDOM.addClass("left");
+				} else if (fitLeft && !fitRight) {
+					tX = posLeft;
+					this.hostDOM.addClass("right");
+				} else {
+
+					// Check from which side we should squeeze
+					var worseLeft = -tol_L, worseRight = this.width - this.myWidth + tol_R,
+						distLeft = (worseLeft + this.myWidth) - aidOffset.left,
+						distRight = (aidOffset.left + aidW) - worseRight;
+
+					if (distLeft < distRight) {
+						tX = worseLeft;
+						this.hostDOM.addClass("right");
+					} else {
+						tX = worseRight;
+						this.hostDOM.addClass("left");
+					}
+
+				}
+
+				// Apply position
+				this.hostDOM.css({ 'left': tX, 'top': tY });				
 
 			}
 		}
@@ -205,10 +286,18 @@ define(
 		 * Put us in the middle of the screen upon display
 		 */
 		TVhead.prototype.onWillShow = function( cb ) {
+
+			// Remove fancy classes
+			this.hostDOM.removeClass("left");
+			this.hostDOM.removeClass("right");
+
+			// Center view
 			this.hostDOM.css({
 				'left': (this.width - this.myWidth)/2,
 				'top': (this.height - this.myHeight)/2,
 			});
+
+			// We are ready
 			cb();
 		}
 

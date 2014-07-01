@@ -78,6 +78,10 @@ define(
 			this.element.append(this.titleElm);
 			this.element.append(this.subtitleElm);
 
+			// Register visual aids
+			R.registerVisualAid( 'tuning.status', this.element );
+			R.registerVisualAid( 'tuning.start', this.startIcon, "active" );
+
 		};
 
 		// Subclass from DataWidget

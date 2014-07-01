@@ -342,6 +342,10 @@ define(
 			this.obsElms = [];
 			this.observablesLevelRings = [];
 
+			// Picker of first element
+			var firstTunable = true,
+				firstObservable = true;
+
 			// Create observables for 10 levels
 			for (var j=0; j<10; j++) {
 				var ring = [];
@@ -365,6 +369,12 @@ define(
 					// Store on observable elements
 					if (!o) continue;
 					this.obsElms.push( o );
+
+					// First observable goes to visual helper
+					if (firstObservable) {
+						R.registerVisualAid( 'observable', o.element );
+						firstObservable = false;
+					}
 
 					// Bind on tune rings
 					o.on('click', (function(ring) {
@@ -417,6 +427,12 @@ define(
 
 					// Activate the first level
 					o.setActive( j == 0 );
+
+					// First tunable goes to visual helper
+					if (firstTunable) {
+						R.registerVisualAid( 'tunable', o.element );
+						firstTunable = false;
+					}
 
 					this.tunElms.push( o );
 

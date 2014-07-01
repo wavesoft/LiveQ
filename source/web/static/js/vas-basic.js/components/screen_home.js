@@ -54,8 +54,6 @@ define(
 					})
 				);
 
-			R.registerVisualAid( 'screen.menu', this.menuFloater );
-
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
 

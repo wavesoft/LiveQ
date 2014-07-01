@@ -139,12 +139,13 @@ define(["core/config", "core/base/component"],
 		 *
 		 * @param {string} name - The name of the visual aid to register under.
 		 * @param {DOMElement|Component} element - The DOM Element to focus when this visual aid is fired, or the hostDOM of the component.
+		 * @param {string} classes - (Optional) A list of classes to append to the element before focusing it
 		 */
-		registry.registerVisualAid = function(name, element) {
+		registry.registerVisualAid = function(name, element, classes) {
 			if (element instanceof Component) {
-				registry.visualAids[name] = element.hostDOM;
+				registry.visualAids[name] = { 'element': element.hostDOM, 'classes': classes || "", 'component': element };
 			} else {
-				registry.visualAids[name] = element;
+				registry.visualAids[name] = { 'element': element, 'classes': classes || "", 'component': null };
 			}
 		}
 
@@ -155,7 +156,27 @@ define(["core/config", "core/base/component"],
 		 * @returns {DOMElement|undefined}
 		 */
 		registry.getVisualAid = function(name) {
-			return registry.visualAids[name];
+			if (!registry.visualAids[name]) {
+				console.warn("Registry: No visual aid with name '"+name+"' was registered!");
+				return undefined;
+			} else {
+				return registry.visualAids[name].element;
+			}
+		}
+
+		/**
+		 * Return the visual aid metadata record by it's ID
+		 *
+		 * @param {string} name - The name of the visual aid to fetch.
+		 * @returns {object|undefined}
+		 */
+		registry.getVisualAidMeta = function(name) {
+			if (!registry.visualAids[name]) {
+				console.warn("Registry: No visual aid with name '"+name+"' was registered!");
+				return undefined;
+			} else {
+				return registry.visualAids[name]
+			}
 		}
 
 		/**
