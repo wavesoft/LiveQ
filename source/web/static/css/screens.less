@@ -1132,3 +1132,91 @@
 	}
 
 }
+
+///////////////////////////////////////////////
+// Login Screen
+///////////////////////////////////////////////
+
+.screen.login {
+
+	.host {
+		width: 600px;
+		margin: 50px auto;
+	}
+
+	.header {
+
+		div.logo-icon {
+			float: left;
+			width: 125px; height: 125px;
+			background: url(../img/logo.png) no-repeat center center;
+			background-size: contain;
+		}
+		div.logo-text {
+			text-align: left;
+			width: 400px; height: 125px;
+			padding: 20px;
+			margin-left: 125px;
+
+			h1 {
+				padding: 0; margin: 0;
+				font-size: 34px;
+
+				color: #7f8c8d;
+				span {
+					color: #e67e22;
+				}
+			}
+			p {
+				padding: 0; margin: 0;
+				font-size: 20px;
+				color: #95a5a6;
+			}
+
+		}
+
+	}
+
+	.body {
+		background: rgba(255,255,255,0.3);
+		border-top: solid 1px #ccc;
+		border-bottom: solid 1px #ccc;
+
+		div.left {
+			float: left;
+			width: 300px; height: 280px;
+			padding: 5px;
+
+			a img {
+				border: none;
+			}
+		}
+		div.right {
+			text-align: right;
+			margin-left: 300px;
+			height: 280px;
+			padding: 5px;
+
+			table {
+				margin: 0 0 0 auto;
+				font-size: 14px;
+
+				td {
+					margin: 4px;
+				}
+			}
+
+			input {
+				border: solid 1px #b3b3b3;
+				background: transparent;
+				padding: 2px;
+
+				&[type=button] {
+					padding: 8px;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+
+}

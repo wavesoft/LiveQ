@@ -115,7 +115,22 @@ define(
 
 					// Bind events
 					scrLogin.on('login', function(user, password) {
-
+						DB.authenticateUser(user, password, function(status, more) {
+							if (!status) {
+								alert("Could not log-in! " + more);
+							} else {
+								UI.selectScreen("screen.home");
+							}
+						});
+					});
+					scrLogin.on('register', function(user, password) {
+						DB.createUser(user, password, function(status, more) {
+							if (!status) {
+								alert("Could not create account! " + more);
+							} else {
+								UI.selectScreen("screen.home");
+							}
+						});
 					});
 
 					// Complete login
@@ -220,8 +235,8 @@ define(
 						init_db, init_home, init_login, init_explain, init_tune, init_run
 					],
 					runChain = function(cb, index) {
-						var i = index || 0,
-							nextCB = cb;
+						var i = index || 0;
+						console.log("---",i);
 
 						// If we run out of chain, run callback
 						if (i >= chainRun.length) {

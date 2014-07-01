@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/config", "core/registry", "core/base/components"],
+	["core/config", "core/registry", "core/base/components", "core/ui"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports vas-basic/components/running_screen
 	 */
-	function(config,R,C) {
+	function(config,R,C,UI) {
 
 		/**
 		 * @class
@@ -30,54 +30,81 @@ define(
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append(this.foregroundDOM);
 
-			// Create progress bar element
-			this.elmBar = $('<div class="bar"></div>');
-			this.elmBarValue = $('<div class="bar-value"></div>');
-			this.elmBar.append(this.elmBarValue);
-			this.foregroundDOM.append(this.elmBar);
+			// Create the element which is hosting the entire screen
+			this.elmHost = $('<div class="host"></div>');
+			this.foregroundDOM.append( this.elmHost );
 
-			// Create text bar
-			this.elmStatus = $('<div class="bar-status"></div>');
-			this.elmProgress = $('<div class="bar-progress"></div>');
-			this.foregroundDOM.append(this.elmStatus);
-			this.foregroundDOM.append(this.elmProgress);
+			// Prepare logo header
+			this.elmHeader = $('<div class="header"></div>');
+			this.elmHost.append( this.elmHeader );
+			this.elmHeader.append( $('<div class="logo-icon"></div>') );
+			this.elmHeader.append( $('<div class="logo-text"><h1><span>Virtual</span> Atom Smasher</h1><p>Learn particle physics & help scientists at CERN</p></div>') );
 
-			// Create logo
-			this.elmLogo = $('<div class="logo"></div>');
-			this.foregroundDOM.append(this.elmLogo);
+			// Prepare main body
+			this.elmBody = $('<div class="body"></div>');
+			this.elmHost.append( this.elmBody );
+			this.elmLeftBody = $('<div class="left"></div>');
+			this.elmBody.append( this.elmLeftBody );
+			this.elmRightBody = $('<div class="right"></div>');
+			this.elmBody.append( this.elmRightBody );
 
-			// Set to initializing
-			this.onProgress(0, "Initializing");
+			// Prepare left body
+			this.elmLeftBody.append($("<h1>Welcome visitor!</h1>"));
+			this.elmLeftBody.append($("<p>Virtual Atom Smasher is a revolutionary educational game that brings you along with the theoretical physicists inside CERN!</p>"));
+			this.elmLeftBody.append($("<p>Playing this game you are not only learning about particle physics, but you are actively helping scientists with their research!</p>"));
+			var btnTour = $('<a href="do:tour"><img src="static/img/take-tour.png" /></a>')
+			btnTour.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.showTutorial("pub.welcome");
+			});
+			this.elmLeftBody.append( btnTour );
+
+			// Prepare right body
+			this.elmRightBody.append($("<h1>Welcome fellow scientist!</h1>"));
+			var fName = $('<input  id="login-username" type="text" />'),
+				fPassword = $('<input id="login-password" type="password" />');
+
+			var table = $('<table></table>'),
+				tr1 = $('<tr></tr'), tr2 = $('<tr></tr>'),
+				td11 = $('<th><label for="login-username">Username:</label></th>'),
+				td21 = $('<th><label for="login-password">Password:</label></th>'),
+				td12 = $('<td></td>'), td22 = $('<td></td>');
+
+			td12.append( fName ); td22.append( fPassword );
+			tr1.append(td11).append(td12);
+			tr2.append(td21).append(td22);
+			table.append(tr1).append(tr2);
+			this.elmRightBody.append(table);
+
+			var loginBtnHost = $('<div class="login"></div>');
+			this.elmRightBody.append( loginBtnHost );
+
+			// Prepare log-in button
+			var btnLogin = $('<input type="button" value="Login" />');
+			loginBtnHost.append(btnLogin);
+			btnLogin.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.trigger("login", fName.val(), fPassword.val() );
+			}).bind(this));
+
+			// Prepare register button
+			var btnRegister = $('<input type="button" value="Register" />');
+			loginBtnHost.append(btnRegister);
+			btnRegister.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.trigger("register", fName.val(), fPassword.val() );
+			}).bind(this));
 
 		}
 		LoginScreen.prototype = Object.create( C.LoginScreen.prototype );
 
 		/**
-		 * Update progress bar value
-		 */
-		LoginScreen.prototype.onProgress = function(progress, message) {
-			this.elmBarValue.css({
-				'width': progress*100 + '%'
-			})
-			this.elmProgress.text(  Math.round(progress*100) + "%" );
-			this.elmStatus.text( message );
-		}
-
-		/**
-		 * Fade-out animation
-		 */
-		LoginScreen.prototype.onWillHide = function(ready) {
-			//this.hostDOM.addClass("hidden");
-			//setTimeout(ready, 500);
-			ready();
-		}
-
-		/**
-		 * Fade-out animation
+		 * Reset/populate form on show
 		 */
 		LoginScreen.prototype.onWillShow = function(ready) {
-			//this.hostDOM.removeClass("hidden");
-			//setTimeout(ready, 500);
 			ready();
 		}
 

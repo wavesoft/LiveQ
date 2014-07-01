@@ -51,9 +51,11 @@ define(["jquery", "core/config"],
 				'url' 	 	: url,
 				'method' 	: 'GET',
 				'dataType'	: type || 'json',
-				'success'	: function(data, status) { callback(data); },
+				'success'	: function(data, status) { 
+					callback(data); 
+				},
 				'error'		: function(jqXHR, status, error) { 
-					callback(null); 
+					callback(null, error); 
 					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
 				}
 			})
@@ -68,9 +70,11 @@ define(["jquery", "core/config"],
 				'data' 		: payload,
 				'method' 	: 'POST',
 				'dataType'	: type || 'json',
-				'success'	: function(data, status) { callback(data); },
+				'success'	: function(data, status) { 
+					callback(data); 
+				},
 				'error'		: function(jqXHR, status, error) { 
-					callback(null); 
+					callback(null, error); 
 					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
 				}
 			})
@@ -85,9 +89,11 @@ define(["jquery", "core/config"],
 				'data' 		: payload,
 				'method' 	: 'PUT',
 				'dataType'	: type || 'json',
-				'success'	: function(data, status) { callback(data); },
+				'success'	: function(data, status) { 
+					callback(data); 
+				},
 				'error'		: function(jqXHR, status, error) { 
-					callback(null); 
+					callback(null, error); 
 					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
 				}
 			})
@@ -102,100 +108,6 @@ define(["jquery", "core/config"],
 		var Database = function( name, prefix ) {
 			this.db = name;
 			this.session = { };
-		}
-
-		/**
-		 * Create a new user  
-		 *
-		 * @param {string} username - The user's name
-		 * @param {string} password - The user's password
-		 * @param {object} callback - The function to call when completed
-		 *
-		 */
-		Database.prototype.createUser = function(username, password, callback) {
-
-			// Create a UUID role for this user
-			var uuid = "", chars="0123456789+abcdefghijklmnopqrstuvwxyz-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-			for (var i=0; i<64; i++) {
-				uuid += chars[parseInt(Math.random() * chars.length)];
-			}
-
-			// Try to allocate space
-			cpuchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, {
-
-				"name" 		: username, 
-				"password" 	: password, 
-				"roles" 	: [ uuid ], 
-				"type" 		: "user"
-
-			}, function(data) {
-				if (data['ok']) {
-
-					// Open the user's database
-					var userDB = new Database("users");
-					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
-						if (status['ok']) {
-							// Return user record
-							callback(true, DB.cache['definitions']['new-user']);
-						} else {
-							console.error("DB: Could not allocate user record!", data['reason']);
-							callback(false);
-						}
-					});
-
-				} else {
-					console.error("DB: Could not authenticate user!", data['reason']);
-					callback(false);
-				}
-			});
-
-		}
-
-		/**
-		 * Authenticate to couch-DB and get authentication token 
-		 *
-		 * @param {string} username - The user's name
-		 * @param {string} password - The user's password
-		 * @param {object} callback - The function to call when completed
-		 *
-		 */
-		Database.prototype.authenticateUser = function(username, password, callback) {
-
-			// Reset session
-			this.session = {};
-
-			// Try to open session
-			couchdb_post( Config.db.url + "/_session", {
-				"name" 		: username,
-				"password" 	: password
-			}, (function(data) {
-
-				if (data['ok']) {
-
-					// Update session information
-					this.session['name'] = data['name'];
-					this.session['roles'] = data['roles'];
-
-					// Get user record
-					var userDB = new Database("users"),
-						recordID = this.session['roles'][0];
-						userDB.get(recordID, function(record) {
-							if (!record) {
-								console.error("DB: Could not fetch record entry!");
-								callback(false);
-							} else {
-								// Fire callback
-								callback(data['name'], record);
-							}
-						});
-
-				} else {
-					console.error("DB: Could not authenticate user!", data['reason']);
-					callback(false);
-				}
-
-			}).bind(this));
-
 		}
 
 		/**
@@ -296,6 +208,100 @@ define(["jquery", "core/config"],
 		 * @type {Object}
 		 */
 		DB.cache = {};
+
+		/**
+		 * Create a new user  
+		 *
+		 * @param {string} username - The user's name
+		 * @param {string} password - The user's password
+		 * @param {object} callback - The function to call when completed
+		 *
+		 */
+		DB.createUser = function(username, password, callback) {
+
+			// Create a UUID role for this user
+			var uuid = "", chars="0123456789+abcdefghijklmnopqrstuvwxyz-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+			for (var i=0; i<64; i++) {
+				uuid += chars[parseInt(Math.random() * chars.length)];
+			}
+
+			// Try to allocate space
+			cpuchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, {
+
+				"name" 		: username, 
+				"password" 	: password, 
+				"roles" 	: [ uuid ], 
+				"type" 		: "user"
+
+			}, function(data, error) {
+				if (data && data['ok']) {
+
+					// Open the user's database
+					var userDB = new Database("users");
+					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
+						if (status['ok']) {
+							// Return user record
+							callback(true, DB.cache['definitions']['new-user']);
+						} else {
+							console.error("DB: Could not allocate user record!", data['reason']);
+							callback(false);
+						}
+					});
+
+				} else {
+					console.error("DB: Could not authenticate user!", error);
+					callback(false, error);
+				}
+			});
+
+		}
+
+		/**
+		 * Authenticate to couch-DB and get authentication token 
+		 *
+		 * @param {string} username - The user's name
+		 * @param {string} password - The user's password
+		 * @param {object} callback - The function to call when completed
+		 *
+		 */
+		DB.authenticateUser = function(username, password, callback) {
+
+			// Reset session
+			this.session = {};
+
+			// Try to open session
+			couchdb_post( Config.db.url + "/_session", {
+				"name" 		: username,
+				"password" 	: password
+			}, (function(data, error) {
+
+				if (data && data['ok']) {
+
+					// Update session information
+					this.session['name'] = data['name'];
+					this.session['roles'] = data['roles'];
+
+					// Get user record
+					var userDB = new Database("users"),
+						recordID = this.session['roles'][0];
+						userDB.get(recordID, function(record) {
+							if (!record) {
+								console.error("DB: Could not fetch record entry!");
+								callback(false, "Could not fetch record entry");
+							} else {
+								// Fire callback
+								callback(data['name'], record);
+							}
+						});
+
+				} else {
+					console.error("DB: Could not authenticate user!", error);
+					callback(false, error);
+				}
+
+			}).bind(this));
+
+		}
 
 		/**
 		 * Return an object for I/O operations on the specified database

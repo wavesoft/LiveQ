@@ -1170,3 +1170,72 @@
   filter: blur(5px);
   z-index: 59;
 }
+.screen.login .host {
+  width: 600px;
+  margin: 50px auto;
+}
+.screen.login .header div.logo-icon {
+  float: left;
+  width: 125px;
+  height: 125px;
+  background: url(../img/logo.png) no-repeat center center;
+  background-size: contain;
+}
+.screen.login .header div.logo-text {
+  text-align: left;
+  width: 400px;
+  height: 125px;
+  padding: 20px;
+  margin-left: 125px;
+}
+.screen.login .header div.logo-text h1 {
+  padding: 0;
+  margin: 0;
+  font-size: 34px;
+  color: #7f8c8d;
+}
+.screen.login .header div.logo-text h1 span {
+  color: #e67e22;
+}
+.screen.login .header div.logo-text p {
+  padding: 0;
+  margin: 0;
+  font-size: 20px;
+  color: #95a5a6;
+}
+.screen.login .body {
+  background: rgba(255, 255, 255, 0.3);
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
+}
+.screen.login .body div.left {
+  float: left;
+  width: 300px;
+  height: 280px;
+  padding: 5px;
+}
+.screen.login .body div.left a img {
+  border: none;
+}
+.screen.login .body div.right {
+  text-align: right;
+  margin-left: 300px;
+  height: 280px;
+  padding: 5px;
+}
+.screen.login .body div.right table {
+  margin: 0 0 0 auto;
+  font-size: 14px;
+}
+.screen.login .body div.right table td {
+  margin: 4px;
+}
+.screen.login .body div.right input {
+  border: solid 1px #b3b3b3;
+  background: transparent;
+  padding: 2px;
+}
+.screen.login .body div.right input[type=button] {
+  padding: 8px;
+  cursor: pointer;
+}
