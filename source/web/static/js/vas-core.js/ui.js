@@ -1,6 +1,6 @@
 
-define(["jquery", "core/config", "core/registry"], 
-	function($, config, R) {
+define(["jquery", "core/config", "core/registry", "core/db"], 
+	function($, config, R, DB) {
 
 		///////////////////////////////////////////////////////////////
 		//                     HELPER FUNCTIONS                      //
@@ -438,7 +438,7 @@ define(["jquery", "core/config", "core/registry"],
 		 *    ]
 		 *
 		 * });
-		 * @param {object} sequence - The animation sequence to present
+		 * @param {objects|string} sequence - The animation sequence to present or the ID of the tutorial to fetch from the database.
 		 * @param {function} cb_completed - The callback to fire when the tutorial has started
 		 *
 		 */
@@ -459,7 +459,7 @@ define(["jquery", "core/config", "core/registry"],
 			}
 
 			// Asynchronous callback for preparing the elements
-			var __prepareTutorial = function() {
+			var __prepareTutorial = function( sequence ) {
 
 				// We have an active tutorial
 				tutorialActive = true;
@@ -472,11 +472,9 @@ define(["jquery", "core/config", "core/registry"],
 
 				// Show agent
 				UI.visualAgent.show(function() {
-
-					// Fade-in & initialize in the same time
 					var vc = 2;
 
-					// Fade-in overlay DOM
+					// Fade-in & initialize in the same time
 					UI.overlayDOM.fadeIn(500, function() { if (--vc==0) __startTutorial(); } );
 					UI.visualAgent.onSequenceDefined( sequence, function() { if (--vc==0) __startTutorial(); } );
 
@@ -484,11 +482,36 @@ define(["jquery", "core/config", "core/registry"],
 
 			}
 
-			// Stop previous tutorial
-			if (tutorialActive) {
-				UI.hideTutorial( __prepareTutorial );
+			// Asynchronous function to stop previous tutorial and start this one
+			var __stopPrevStartThis = function(sequence) {
+				if (tutorialActive) {
+					UI.hideTutorial( __prepareTutorial );
+				} else {
+					__prepareTutorial(sequence);
+				}
+			}
+
+			// Asynchronous function to download (if required) the video sequence
+			var __downloadTutorial = function( name ) {
+				var db = DB.openDatabase("tutorials");
+				db.get(name, function(data) {
+					if (!name) {
+						console.error("UI: Could not find tutorial '"+name+"' in the database!");
+					} else {
+						if (!data['sequence']) {
+							console.error("UI: Invalid database structure for tutorial '"+name+"': Could not find 'sequence' field!");
+						} else{
+							__stopPrevStartThis(data['sequence']);
+						}
+					}
+				});
+			}
+
+			// If we were given a string, load the tutorial from the database
+			if (typeof(sequence) == 'string') {
+				__downloadTutorial( sequence );
 			} else {
-				__prepareTutorial();
+				__stopPrevStartThis( sequence );
 			}
 
 		}

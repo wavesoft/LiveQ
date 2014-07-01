@@ -183,7 +183,40 @@ define(["core/config", "core/base/component" ],
 		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
 		}
 
-		
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new LoginScreen Component.
+		 *
+		 * This component is displayed during application startup and it's used to log the user
+		 * in the game.
+		 *
+		 * @class
+		 * @classdesc User log-in screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var LoginScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		LoginScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * An error occured while trying to log the user in.
+		 *
+		 * @abstract
+		 * @param {int} status - The log-in status (0=idle, 1=logging-in, 2=failed)
+		 * @param {string} message - The reason behind this error.
+		 */
+		LoginScreen.prototype.onLoginStatus = function( status, message ) {
+		};
+
+
 		////////////////////////////////////////////////////////////
 		/**
 		 * Initializes a new RunningScreen Component.
@@ -533,6 +566,14 @@ define(["core/config", "core/base/component" ],
 		 * @event module:core/base/components~ExplainScreen#openURL		
 		 */
 
+		/**
+		 * This event should be fired by the LoginScreen when the usre attempts to log-in.
+		 *
+		 * @param {string} username - The user name
+		 * @param {string} password - The user password
+		 * @event module:core/base/components~LoginScreen#login		
+		 */
+
 		////////////////////////////////////////////////////////////
 
 		// Expose components
@@ -544,6 +585,7 @@ define(["core/config", "core/base/component" ],
 			'ProgressScreen'	: ProgressScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
+			'LoginScreen'		: LoginScreen
 		};
 
 		return components;
