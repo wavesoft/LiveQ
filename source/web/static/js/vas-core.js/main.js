@@ -4,7 +4,7 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/UI", "core/db", "core/base/components", "core/util/progress_aggregator"], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/base/components", "core/util/progress_aggregator"], 
 
 	function($, config, R, UI, DB, Components, ProgressAggregator) {
 		var VAS = { };
@@ -105,6 +105,24 @@ define(
 
 				};
 
+			var prog_login = progressAggregator.begin(1),
+				init_login = function(cb) {
+					var scrLogin = UI.initAndPlaceScreen("screen.login");
+					if (!scrLogin) {
+						console.error("Core: Unable to initialize login screen!");
+						return;
+					}
+
+					// Bind events
+					scrLogin.on('login', function(user, password) {
+
+					});
+
+					// Complete login
+					prog_login.ok("Home screen ready");
+					cb();
+				};
+
 			var prog_home = progressAggregator.begin(1),
 				init_home = function(cb) {
 					var scrHome = UI.initAndPlaceScreen("screen.home");
@@ -199,7 +217,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_home, init_explain, init_tune, init_run
+						init_db, init_home, init_login, init_explain, init_tune, init_run
 					],
 					runChain = function(cb, index) {
 						var i = index || 0,
@@ -236,7 +254,7 @@ define(
 		VAS.run = function() {
 
 			// Run main game
-			UI.selectScreen( "screen.home" );
+			UI.selectScreen( "screen.login" );
 
 		}
 

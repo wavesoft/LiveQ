@@ -44,6 +44,12 @@ define(
 
 			var btnTutorial = $('<div class="btn-taglike"><span class="uicon uicon-explain"></span><br />Tutorial</div>');
 			this.ppTL.append( btnTutorial );
+			btnTutorial.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.showTutorial("ui.running");
+			});
+
 			var btnServerStatus = $('<div class="btn-taglike"><span class="uicon uicon-gear"></span><br />Status</div>');
 			this.ppTR.append( btnServerStatus );
 			var bytEventDetails = $('<div class="btn-taglike"><span class="uicon uicon-eye"></span><br />Details</div>');

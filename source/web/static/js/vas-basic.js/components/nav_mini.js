@@ -41,10 +41,10 @@ define(
 		 * Hide mini-nav when we are on home
 		 */
 		NavMini.prototype.onPageWillChange = function(from, to) {
-			if ((to == "screen.home") || (to == "screen.progress")) {
-				this.hostDOM.fadeOut();
-			} else {
+			if ((to == "screen.tuning") || (to == "screen.running")) {
 				this.hostDOM.fadeIn();
+			} else {
+				this.hostDOM.fadeOut();
 			}
 		}
 

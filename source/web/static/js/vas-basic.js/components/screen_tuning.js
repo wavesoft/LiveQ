@@ -5,7 +5,7 @@ define(
 	/**
 	 * Dependencies
 	 */
-	["jquery", "core/config", "core/registry", "core/base/components", "core/db", 
+	["jquery", "core/config", "core/registry", "core/base/components", "core/db", "core/ui",
 
 	 // Self-registering dependencies
 	 "jquery-knob"], 
@@ -15,7 +15,7 @@ define(
 	 *
 	 * @exports vas-basic/components/tuning_screen
 	 */
-	function($, config, R, C, DB) {
+	function($, config, R, C, DB, UI) {
 
 		/**
 		 * Tuning dashboard screen
@@ -55,6 +55,11 @@ define(
 
 			// Prepare pagepart buttons
 			var btnTutorial = $('<div class="btn-taglike"><span class="uicon uicon-explain"></span><br />Tutorial</div>');
+			btnTutorial.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.showTutorial("ui.tuning");
+			});
 			this.ppTL.append( btnTutorial );
 
 			// Prepare host elements
@@ -470,7 +475,7 @@ define(
 
 			// Build the tunables-by ID lookup table
 			for (var i=0; i<tunables.length; i++) {
-				this.tunables[tunables[i].id] = tunables[i];
+				this.tunables[tunables[i]._id] = tunables[i];
 			}
 
 		}
@@ -485,7 +490,7 @@ define(
 
 			// Build the observables-by ID lookup table
 			for (var i=0; i<observables.length; i++) {
-				this.observables[observables[i].id] = observables[i];
+				this.observables[observables[i]._id] = observables[i];
 			}
 		}
 
@@ -498,7 +503,10 @@ define(
 
 			// Prepare level records
 			for (var i=0; i<levelInfo.length; i++) {
-				var level = Object.create(levelInfo[i]);
+				var level = {
+					'obs': (levelInfo[i]['obs'] || []).slice(0),
+					'tun': (levelInfo[i]['tun'] || []).slice(0)
+				};
 
 				// Replace tunable IDs with their references
 				var tunables = [];
