@@ -66,15 +66,22 @@ define(["core/base/component"],
 		 * interface must be focused.
 		 *
 		 * @param {string} key - The key of the visual element to focus
-		 * @event module:core/base/data_widget~VisualAgent#focusTarget		
+		 * @param {int} duration - How long shall we keep focus
+		 * @param {string} classes - A number of additional classes to put on the focused element
+		 * @event module:core/base/data_widget~VisualAgent#focusVisualAid		
 		 */
 
 		/**
 		 * This event is fired by the visual agent when a component of the user
 		 * interface must be focused.
 		 *
-		 * @param {object} value - The new value
-		 * @event module:core/base/data_widget~VisualAgent#blurTarget		
+		 * @event module:core/base/data_widget~VisualAgent#blurVisualAid		
+		 */
+
+		/**
+		 * This event is fired when the tutorial is completed.
+		 *
+		 * @event module:core/base/data_widget~VisualAgent#completed		
 		 */
 
 		// Return component

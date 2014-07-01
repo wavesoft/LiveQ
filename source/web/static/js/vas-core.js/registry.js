@@ -138,10 +138,24 @@ define(["core/config", "core/base/component"],
 		 * component which is introducing the user to the interface.
 		 *
 		 * @param {string} name - The name of the visual aid to register under.
-		 * @param {DOMElement} element - The DOM Element to focus when this visual aid is fired.
+		 * @param {DOMElement|Component} element - The DOM Element to focus when this visual aid is fired, or the hostDOM of the component.
 		 */
 		registry.registerVisualAid = function(name, element) {
-			registry.visualAids[name] = element;
+			if (element instanceof Component) {
+				registry.visualAids[name] = element.hostDOM;
+			} else {
+				registry.visualAids[name] = element;
+			}
+		}
+
+		/**
+		 * Return the visual aid DOM element by it's ID
+		 *
+		 * @param {string} name - The name of the visual aid to fetch.
+		 * @returns {DOMElement|undefined}
+		 */
+		registry.getVisualAid = function(name) {
+			return registry.visualAids[name];
 		}
 
 		/**
@@ -165,6 +179,11 @@ define(["core/config", "core/base/component"],
 			var inst = undefined;
 			//try {
 				inst = new componentClass(hostDOM);
+
+				// Prepare component
+				inst.onResize( $(hostDOM).width(), $(hostDOM).height() )
+				inst.hide();
+
 			//} catch (e) {
 			//	console.error("Registry: Could not instantiate component '"+name+"'. Exception: ",e);
 			//}

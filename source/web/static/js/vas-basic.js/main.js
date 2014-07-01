@@ -8,8 +8,9 @@ define([
 	'vas-basic/components/screen_tuning',
 	'vas-basic/components/screen_progress',
 
-	// Navigators
+	// Other components
 	'vas-basic/components/nav_mini',
+	'vas-basic/components/tvhead_agent',
 
 	// Backdrops
 	'vas-basic/components/backdrop_explain',

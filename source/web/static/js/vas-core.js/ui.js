@@ -28,6 +28,16 @@ define(["jquery", "core/config", "core/registry"],
 			return suff + txt[0].toUpperCase() + txt.substr(1);
 		}
 
+		/**
+		 * Local properties for visual aids
+		 */
+		var visualAidCurrent = false,
+			visualAidTimer = 0,
+			visualAidWasVisible = false,
+			visualAidClasses = "",
+			tutorialCompleteListener = false,
+			tutorialActive = false;
+
 		///////////////////////////////////////////////////////////////
 		//                       IMPLEMENTATION                      //
 		///////////////////////////////////////////////////////////////
@@ -155,16 +165,35 @@ define(["jquery", "core/config", "core/registry"],
 
 			// Initialize Virtual Atom Smasher Interface
 			UI.host = $(config['dom-host']);
+			UI.host.addClass("pt-main pt-perspective");
 
 			// Place an overlay DOM
-			UI.overlayDOM = $('<div class="'+config.css['overlay']+' pt-main pt-perspective"></div>');
+			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
 			UI.overlayDOM.hide();
 			UI.host.append(UI.overlayDOM);
 
 			// Initialize the main visual agent for the tutorials
-			UI.visualAgent = R.instanceComponent( 'tutorial.agent', UI.overlayDOM );
+			UI.visualAgentDOM = $('<div class="visual-agent"></div>');
+			UI.overlayDOM.append(UI.visualAgentDOM);
+			UI.visualAgent = R.instanceComponent( 'tutorial.agent', UI.visualAgentDOM );
 			if (!UI.visualAgent)
 				console.warn("UI: Could not initialize tutorial agent!");
+
+			// Initialize visual agent
+			UI.visualAgent.onResize( UI.host.width(), UI.host.height() );
+
+			// Bind visual agent events
+			UI.visualAgent.on('focusVisualAid', function(target, duration, classes) {
+				UI.focusVisualAid(target, duration, classes);
+			});
+			UI.visualAgent.on('blurVisualAid', function() {
+				UI.blurVisualAid();
+			});
+			UI.visualAgent.on('completed', function() {
+				UI.hideTutorial();
+				if (tutorialCompleteListener)
+					tutorialCompleteListener();
+			});
 
 			// Bind on window events
 			$(window).resize(function() {
@@ -180,9 +209,11 @@ define(["jquery", "core/config", "core/registry"],
 				scr.onResize( w, h );
 
 				// Also resize some helper elements
-				UI.visualAgent.resize( )
+				UI.visualAgent.onResize( w, h );
 
 			});
+
+			window.ui = UI;
 
 		}
 
@@ -198,6 +229,75 @@ define(["jquery", "core/config", "core/registry"],
 			// Get preferred dimentions of the overlay
 
 		}
+
+		/**
+		 * Focus a particular visual aid.
+		 *
+		 * This function will add the class 'visualaid-focus' to the specified DOM element for the
+		 * specified time or until the blurVisualAid function is called.
+		 *
+		 * @param {DOMElement|string} element - The element to focus or it's visual aid ID
+		 * @param {int} duration - (Optional) The duraton (in seconds) to keep the element focused. Infinite if ommited or 0
+		 * @param {string} classes - (Optional) Additional classes to add on the element
+		 *
+		 */
+		UI.focusVisualAid = function( element, duration, classes ) {
+
+			// Check for visual aid ID
+			if (typeof(element) == 'string') {
+				var vElm = R.visualAids[element];
+				if (!vElm) {
+					console.warn("UI: Could not find visual aid with ID '"+element+"'");
+				}
+				element = vElm;
+			}
+
+			// Wrap on jquery
+			var e = $(element);
+
+			// Reset previous entry
+			if (visualAidCurrent) blurVisualAid();
+
+			// Keep some state information
+			visualAidWasVisible = e.is(":visible");
+			visualAidClasses = e.attr("class");
+			if (!visualAidWasVisible) e.show();
+			if (classes) e.addClass(classes)
+
+			// Focus specified element
+			visualAidCurrent = e.addClass("visualaid-focus");
+
+			// Set duration timeout if we have specified one
+			if (duration) {
+				visualAidTimer = setTimeout(function() { UI.blurVisualAid(); }, duration*1000);
+			}
+
+		}
+
+		/**
+		 * Unfocus a previously focused visual aid element.
+		 */
+		UI.blurVisualAid = function() {
+
+			// Reset previous entry
+			clearTimeout(visualAidTimer);
+			if (visualAidCurrent) {
+				var e = $(visualAidCurrent);
+
+				// Reset previous visual aid
+				e.removeClass("visualaid-focus");
+
+				// Reset attributes and configuration
+				if (!visualAidWasVisible) e.hide();
+				e.attr("class", visualAidClasses);
+
+			}
+
+			// Reset visualAidCurrent
+			visualAidCurrent = false;
+
+		}
+
 
 		/**
 		 * Show an agent and start the specified tutorial sequence.
@@ -217,15 +317,84 @@ define(["jquery", "core/config", "core/registry"],
 		 *
 		 * });
 		 * @param {object} sequence - The animation sequence to present
-		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 * @param {function} cb_completed - The callback to fire when the tutorial has started
 		 *
 		 */
-		UI.showTutorial = function( sequence, cb_ready ) {
+		UI.showTutorial = function( sequence, cb_completed ) {
 
-			// Get preferred dimentions of the overlay
+			// Asynchronouos callback to start the sequence
+			var __startTutorial = function() {
+
+				// Remove overlay from loading mode
+				UI.overlayDOM.removeClass("loading");
+
+				// Start visual agent animation
+				UI.visualAgent.onStart();
+
+				// The tutorial has started
+				if (cb_completed) cb_completed();
+
+			}
+
+			// Asynchronous callback for preparing the elements
+			var __prepareTutorial = function() {
+
+				// We have an active tutorial
+				tutorialActive = true;
+
+				// Put overlay in loading mode
+				UI.overlayDOM.addClass("loading");
+
+				// Show agent
+				UI.visualAgent.show(function() {
+
+					// Fade-in & initialize in the same time
+					var vc = 2;
+
+					// Fade-in overlay DOM
+					UI.overlayDOM.fadeIn(500, function() { if (--vc==0) __startTutorial(); } );
+					UI.visualAgent.onSequenceDefined( sequence, function() { if (--vc==0) __startTutorial(); } );
+
+				});
+
+			}
+
+			// Stop previous tutorial
+			if (tutorialActive) {
+				UI.hideTutorial( __prepareTutorial );
+			} else {
+				__prepareTutorial();
+			}
 
 		}
 
+		/**
+		 * Abort a tutorial previously started with showTutorial()
+		 *
+		 * @param {function} cb_completed - The callback to fire when the previous tutorial is aborted
+		 *
+		 */
+		UI.hideTutorial = function( cb_ready ) {
+			if (!tutorialActive) return;
+
+			// Abort previous visual agent
+			UI.visualAgent.onStop();
+
+			// Blur previous visual aids
+			UI.blurVisualAid();
+
+			// Hide visual agent
+			UI.visualAgent.hide(function() {
+
+				// Fade-out overlay DOM
+				UI.overlayDOM.fadeOut(500, function() {
+					if (cb_ready) cb_ready();
+					tutorialActive = false;
+				});
+
+			});
+
+		}
 
 		/**
 		 * Activate a screen module with the given name.
