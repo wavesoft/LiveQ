@@ -1,4 +1,3 @@
-
 /**
  * [core/main] - Core initialization module
  */
@@ -68,7 +67,7 @@ define(["jquery", "core/config"],
 			$.ajax({
 				'url' 	 	: url,
 				'data' 		: payload,
-				'method' 	: 'POST',
+				'type ' 	: 'POST',
 				'dataType'	: type || 'json',
 				'success'	: function(data, status) { 
 					callback(data); 
@@ -85,14 +84,15 @@ define(["jquery", "core/config"],
 		 */
 		function cpuchdb_put(url, payload, callback, type) {
 			$.ajax({
-				'url' 	 	: url,
-				'data' 		: payload,
-				'method' 	: 'PUT',
-				'dataType'	: type || 'json',
-				'success'	: function(data, status) { 
+				'url' 	 		: url,
+				'data' 			: payload,
+				'type ' 		: 'PUT',
+				'dataType'		: type || 'json',
+				'contentType' 	: 'application/json',
+				'success'		: function(data, status) { 
 					callback(data); 
 				},
-				'error'		: function(jqXHR, status, error) { 
+				'error'			: function(jqXHR, status, error) { 
 					callback(null, error); 
 					console.warn("DB: CouchDB Error:", error, "("+status+")"); 
 				}
