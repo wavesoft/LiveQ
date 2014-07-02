@@ -280,17 +280,17 @@ define(["jquery", "sha1", "core/config"],
 				if (data && data['ok']) {
 
 					// Get the entire user record
-					var userDB = new Database("_users"),
-						userDB.get("org.couchdb.user"+username, function(record) {
-							if (!record) {
-								console.error("DB: Could not fetch record entry!");
-								callback(false, "Could not fetch record entry");
-							} else {
-								// Fire callback
-								callback(data['name'], record);
-								DB.userRecord = record;
-							}
-						});
+					var userDB = new Database("_users");
+					userDB.get("org.couchdb.user:"+username, function(record) {
+						if (!record) {
+							console.error("DB: Could not fetch record entry!");
+							callback(false, "Could not fetch record entry");
+						} else {
+							// Fire callback
+							callback(data['name'], record);
+							DB.userRecord = record;
+						}
+					});
 
 				} else {
 					console.error("DB: Could not authenticate user!", error);
