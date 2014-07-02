@@ -1,9 +1,9 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["jquery", "core/config"], 
+define(["jquery", "sha1", "core/config"], 
 
-	function($, Config) {
+	function($, SHA1, Config) {
 
 		/**
 		 * Helper function to translate response data of a single entry
@@ -82,7 +82,7 @@ define(["jquery", "core/config"],
 		/**
 		 * Helper function to perform arbitrary couchDB API PUT requests
 		 */
-		function cpuchdb_put(url, payload, callback, type) {
+		function couchdb_put(url, payload, callback, type) {
 			$.ajax({
 				'url' 	 		: url,
 				'data' 			: payload,
@@ -142,7 +142,6 @@ define(["jquery", "core/config"],
 
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/" + doc;
-			if (rev) url += "?rev="+rev;
 			// Fire the API function
 			couchdb_put( url, JSON.stringify(data), function(response) {
 				if (!response['ok']) {
@@ -225,20 +224,27 @@ define(["jquery", "core/config"],
 				uuid += chars[parseInt(Math.random() * chars.length)];
 			}
 
-			// Try to allocate space
-			cpuchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, JSON.stringify{
+			// Calculate salt
+			var salt = "", chars="0123456789abcdef";
+			for (var i=0; i<32; i++) {
+				salt += chars[parseInt(Math.random() * chars.length)];
+			}
 
-				"name" 		: username,
-				"uuid"		: uuid,
-				"password" 	: password,
-				"roles" 	: [],
-				"type" 		: "user"
+			// Try to allocate space
+			couchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, JSON.stringify({
+
+				"name" 			  : username,
+				"uuid"			  : uuid,
+				"password_sha" 	  : SHA1.hash( password + salt ),
+				"salt"			  : salt,
+				"roles" 		  : [],
+				"type" 			  : "user"
 
 			}), function(data, error) {
 				if (data && data['ok']) {
 
 					// Open the user's database
-					var userDB = new Database("users");
+					var userDB = new Database("userdata");
 					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
 						if (status['ok']) {
 							// Return user record
@@ -283,7 +289,7 @@ define(["jquery", "core/config"],
 					this.session['roles'] = data['roles'];
 
 					// Get user record
-					var userDB = new Database("users"),
+					var userDB = new Database("userdata"),
 						recordID = this.session['roles'][0];
 						userDB.get(recordID, function(record) {
 							if (!record) {
