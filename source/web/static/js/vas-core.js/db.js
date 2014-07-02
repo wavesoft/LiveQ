@@ -67,7 +67,7 @@ define(["jquery", "core/config"],
 			$.ajax({
 				'url' 	 	: url,
 				'data' 		: payload,
-				'type ' 	: 'POST',
+				'type'	 	: 'POST',
 				'dataType'	: type || 'json',
 				'success'	: function(data, status) { 
 					callback(data); 
@@ -86,7 +86,7 @@ define(["jquery", "core/config"],
 			$.ajax({
 				'url' 	 		: url,
 				'data' 			: payload,
-				'type ' 		: 'PUT',
+				'type' 			: 'PUT',
 				'dataType'		: type || 'json',
 				'contentType' 	: 'application/json',
 				'success'		: function(data, status) { 
@@ -144,7 +144,7 @@ define(["jquery", "core/config"],
 			var url = Config.db.url + "/" + this.db + "/" + doc;
 			if (rev) url += "?rev="+rev;
 			// Fire the API function
-			couchdb_put( url, data, function(response) {
+			couchdb_put( url, JSON.stringify(data), function(response) {
 				if (!response['ok']) {
 					callback(false);
 				} else {
@@ -228,9 +228,10 @@ define(["jquery", "core/config"],
 			// Try to allocate space
 			cpuchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, {
 
-				"name" 		: username, 
-				"password" 	: password, 
-				"roles" 	: [ uuid ], 
+				"name" 		: username,
+				"uuid"		: uuid,
+				"password" 	: password,
+				"roles" 	: [],
 				"type" 		: "user"
 
 			}, function(data, error) {
