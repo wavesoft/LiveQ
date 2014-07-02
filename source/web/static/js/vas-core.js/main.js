@@ -115,18 +115,18 @@ define(
 
 					// Bind events
 					scrLogin.on('login', function(user, password) {
-						DB.authenticateUser(user, password, function(status, more) {
+						DB.authenticateUser(user, password, function(status, data) {
 							if (!status) {
-								alert("Could not log-in! " + more);
+								alert("Could not log-in! " + data);
 							} else {
 								UI.selectScreen("screen.home");
 							}
 						});
 					});
 					scrLogin.on('register', function(user, password) {
-						DB.createUser(user, password, function(status, more) {
+						DB.createUser(user, password, function(status, data) {
 							if (!status) {
-								alert("Could not create account! " + more);
+								alert("Could not create account! " + data);
 							} else {
 								UI.selectScreen("screen.home");
 							}

@@ -224,7 +224,7 @@ define(["jquery", "sha1", "core/config"],
 		 */
 		DB.createUser = function(username, password, callback) {
 
-			// Create a UUID role for this user
+			// Create a UUID role for this user, used for various indexing purposes
 			var uuid = "", chars="0123456789+abcdefghijklmnopqrstuvwxyz-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 			for (var i=0; i<64; i++) {
 				uuid += chars[parseInt(Math.random() * chars.length)];
@@ -236,37 +236,28 @@ define(["jquery", "sha1", "core/config"],
 				salt += chars[parseInt(Math.random() * chars.length)];
 			}
 
-			// Try to allocate space
-			couchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, JSON.stringify({
-
+			// Prepare user record
+			var record = {
 				"name" 			  : username,
 				"uuid"			  : uuid,
 				"password_sha" 	  : SHA1.hash( password + salt ),
 				"salt"			  : salt,
 				"roles" 		  : [],
-				"type" 			  : "user"
+				"type" 			  : "user",
+				"data"			  : DB.cache['definitions']['new-user']
+			};
 
-			}), function(data, error) {
-				if (data && data['ok']) {
-
-					// Open the user's database
-					var userDB = new Database("userdata");
-					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
-						if (status !== false) {
-							// Return user record
-							callback(true, DB.cache['definitions']['new-user']);
-							DB.userRecord = DB.cache['definitions']['new-user'];
-						} else {
-							console.error("DB: Could not allocate user record!", data['reason']);
-							callback(false);
-						}
-					});
-
-				} else {
-					console.error("DB: Could not authenticate user!", error);
-					callback(false, error);
-				}
-			});
+			// Try to allocate space
+			couchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, JSON.stringify(record), 
+				function(data, error) {
+					if (data && data['ok']) {
+						callback(true, record );
+						DB.userRecord = record;
+					} else {
+						console.error("DB: Could not authenticate user!", error);
+						callback(false, error);
+					}
+				});
 
 		}
 
@@ -280,9 +271,6 @@ define(["jquery", "sha1", "core/config"],
 		 */
 		DB.authenticateUser = function(username, password, callback) {
 
-			// Reset session
-			DB.userRecord = {};
-
 			// Try to open session
 			couchdb_post( Config.db.url + "/_session", {
 				"name" 		: username,
@@ -291,20 +279,16 @@ define(["jquery", "sha1", "core/config"],
 
 				if (data && data['ok']) {
 
-					// Update session information
-					DB.userRecord['name'] = data['name'];
-					DB.userRecord['roles'] = data['roles'];
-
-					// Get user record
-					var userDB = new Database("userdata"),
-						recordID = this.session['roles'][0];
-						userDB.get(recordID, function(record) {
+					// Get the entire user record
+					var userDB = new Database("_users"),
+						userDB.get("org.couchdb.user"+username, function(record) {
 							if (!record) {
 								console.error("DB: Could not fetch record entry!");
 								callback(false, "Could not fetch record entry");
 							} else {
 								// Fire callback
 								callback(data['name'], record);
+								DB.userRecord = record;
 							}
 						});
 
