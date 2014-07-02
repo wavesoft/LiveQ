@@ -107,7 +107,6 @@ define(["jquery", "sha1", "core/config"],
 		 */
 		var Database = function( name, prefix ) {
 			this.db = name;
-			this.session = { };
 		}
 
 		/**
@@ -147,7 +146,7 @@ define(["jquery", "sha1", "core/config"],
 				if (!response['ok']) {
 					callback(false);
 				} else {
-					callback(data['id'], data['rev']);
+					callback(data['_id'], data['_rev']);
 				}
 			});
 
@@ -209,6 +208,13 @@ define(["jquery", "sha1", "core/config"],
 		DB.cache = {};
 
 		/**
+		 * The currently connected user session record
+		 *
+		 * @type {Object}
+		 */
+		DB.userRecord = null;
+
+		/**
 		 * Create a new user  
 		 *
 		 * @param {string} username - The user's name
@@ -246,9 +252,10 @@ define(["jquery", "sha1", "core/config"],
 					// Open the user's database
 					var userDB = new Database("userdata");
 					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
-						if (status['ok']) {
+						if (status !== false) {
 							// Return user record
 							callback(true, DB.cache['definitions']['new-user']);
+							DB.userRecord = DB.cache['definitions']['new-user'];
 						} else {
 							console.error("DB: Could not allocate user record!", data['reason']);
 							callback(false);
@@ -274,7 +281,7 @@ define(["jquery", "sha1", "core/config"],
 		DB.authenticateUser = function(username, password, callback) {
 
 			// Reset session
-			this.session = {};
+			DB.userRecord = {};
 
 			// Try to open session
 			couchdb_post( Config.db.url + "/_session", {
@@ -285,8 +292,8 @@ define(["jquery", "sha1", "core/config"],
 				if (data && data['ok']) {
 
 					// Update session information
-					this.session['name'] = data['name'];
-					this.session['roles'] = data['roles'];
+					DB.userRecord['name'] = data['name'];
+					DB.userRecord['roles'] = data['roles'];
 
 					// Get user record
 					var userDB = new Database("userdata"),
