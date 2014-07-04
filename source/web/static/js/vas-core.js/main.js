@@ -65,31 +65,50 @@ define(
 				init_db = function(cb) {
 					var c = 5;
 
-					DB.openDatabase("tunables").all(function(tunables) {
+					var dTunables = DB.openDatabase("tunables").all(function(tunables) {
 						prog_db.ok("Fetched tunable configuration");
 						DB.cache['tunables'] = tunables;
 						if (--c == 0) cb();
 					});
 
-					DB.openDatabase("observables").all(function(observables) {
+					var dObservables = DB.openDatabase("observables").all(function(observables) {
 						prog_db.ok("Fetched observable configuration");
 						DB.cache['observables'] = observables;
 						if (--c == 0) cb();
 					});
 
-					DB.openDatabase("levels").all(function(levels) {
+
+					var dLevels = DB.openDatabase("levels").all(function(levels) {
 						prog_db.ok("Fetched tunable parameters");
-						DB.cache['levels'] = levels;
+
+						// Build a lookup index
+						var keys={}, index=[];
+						for (var i=0; i<levels.length; i++) {
+							if (levels[i]['_id'] == "index") {
+								index = levels[i]['levels'];
+							} else {
+								keys[levels[i]['_id']] = levels[i];
+							}
+						}
+
+						// Get levels
+						var usableLevels = [];
+						for (var i=0; i<index.length; i++) {
+							usableLevels.push( keys[index[i]] );
+						}
+
+						// Cache levels
+						DB.cache['levels'] = usableLevels;
 						if (--c == 0) cb();
 					});
 
-					DB.openDatabase("scenes").all(function(scenes) {
+					var dScenes = DB.openDatabase("scenes").all(function(scenes) {
 						prog_db.ok("Fetched scene configuration");
 						DB.cache['scenes'] = scenes;
 						if (--c == 0) cb();
 					});
 
-					DB.openDatabase("definitions").all(function(definitions) {
+					var dDefinitions = DB.openDatabase("definitions").all(function(definitions) {
 						prog_db.ok("Fetched definitions");
 
 						// Convert definitions to key-based index

@@ -147,7 +147,7 @@ define(["core/util/event_base", "core/config"],
 						this.__forwardEventsMap[evName] = [[ ccom, mapFunction || defaultMapFunction ]];
 
 						// Keep the original function
-						var origFunction = this[evName];
+						var origFunction = this[evName].bind(this);
 
 						// Context wrapper
 						this[evName] = (function(evName,origFunction) {
@@ -204,10 +204,10 @@ define(["core/util/event_base", "core/config"],
 					
 					// Keep reference of the originals
 					var self = this,
-						origOnShown = this.onShown,
-						origOnHidden = this.onHidden,
-						origOnWillShow = this.onWillShow,
-						origOnWillHide = this.onWillHide;
+						origOnShown = this.onShown.bind(this),
+						origOnHidden = this.onHidden.bind(this),
+						origOnWillShow = this.onWillShow.bind(this),
+						origOnWillHide = this.onWillHide.bind(this);
 
 					// Override
 					this.onShown = function() {

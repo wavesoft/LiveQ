@@ -34,7 +34,7 @@ define(
 		 * Set the widget which is hosting the tunable parameter information
 		 * @param {core/base/tuning_components~TunableWidget} widget - The tunable widget to display additional information for
 		 */
-		TunableBody.prototype.setWidget = function( widget ) {
+		TunableBody.prototype.setWidget = function( widget, buttons ) {
 
 			// Prepare body DOM
 			this.bodyDOM.empty();
@@ -47,6 +47,13 @@ define(
 			var l = $('<a href="do:show-more"><span class="uicon uicon-explain"></span> Explain this ...</a>');
 			this.moreLinks.append( l );
 
+			// Add more buttons
+			if (buttons) {
+				for (var i=0; i<buttons.length; i++) {
+					this.moreLinks.append(buttons[i]);
+				}
+			}
+			
 		}
 
 		// Store tunable infoblock component on registry

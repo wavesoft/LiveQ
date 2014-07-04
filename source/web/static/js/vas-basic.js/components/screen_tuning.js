@@ -30,6 +30,32 @@ define(
 			this.height = 0;
 			window.ts = this;
 
+			// Configuration parameters
+			this.obsAngleSpan = Math.PI;
+			this.obsWideSpan = 0;
+			this.obsMinDistance = 400;
+			this.obsMaxDistance = 600;
+
+			this.tunAngleSpan = Math.PI*4/3;
+			this.tunWideSpan = 0;
+			this.tunMinDistance = 150;
+			this.tunMaxDistance = 350;
+
+			// Data fields
+			this.tunables = {};
+			this.observables = {};
+			this.parameters = {};
+
+			// Indexing for the UI widgets
+			this.tuneWidgets = {};
+			this.observeWidgets = {};
+
+			// Prepare observable parameters
+			this.obsElms = [];
+			this.tunElms = [];
+			this.observablesLevelRings = [];
+			this.tunablesLevelRings = [];
+
 			// Initialize host DOM
 			hostDOM.addClass("tuning");
 
@@ -128,28 +154,47 @@ define(
 			// Prepare expanded view
 			this.prepareExpandedView();
 
-			// Prepare main screen
-			this.obsAngleSpan = Math.PI;
-			this.obsWideSpan = 0;
-			this.obsMinDistance = 400;
-			this.obsMaxDistance = 600;
 
-			this.tunAngleSpan = Math.PI*4/3;
-			this.tunWideSpan = 0;
-			this.tunMinDistance = 150;
-			this.tunMaxDistance = 350;
 
-			// Prepare main screen
-			this.prepareMainScreen();
-
-			// Prepare fields
-			this.tunables = {};
-			this.observables = {};
-			this.parameters = {};
-
-			// Indexing for the UI widgets
-			this.tuneWidgets = {};
-			this.observeWidgets = {};
+			// Define main screen
+			var levels=[], obs=[], tun=[], ltid=0, loid=0;
+			for (var i=0; i< 10; i++) {
+				var l = {
+					'tun': [],
+					'obs': [],
+					'feats': [],
+					'train': []
+				};
+				for (var j=0; j<5; j++) {
+					var oid = "o"+(loid++);
+					obs[oid] = {
+						'info': {
+							'short': 'O'+oid,
+							'name' : 'Observable #'+oid,
+							'book' : 'book-'+oid
+						}
+					};
+					l.obs.push(oid);
+				}
+				for (var j=0; j<5; j++) {
+					var tid = "t"+(ltid++);
+					tun[tid] = {
+						'value': {
+							'min'  : 0,
+							'max'  : 10,
+							'dec'  : 2,
+						},
+						'info': {
+							'short': 'T'+tid,
+							'name' : 'Tunable #'+tid,
+							'book' : 'book-'+tid
+						}
+					};
+					l.tun.push(tid);
+				}
+				levels.push(l);
+			}
+			//this.defineMainScreen( levels, obs, tun );
 
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
@@ -168,9 +213,10 @@ define(
 			// Prepare detailed observation screen
 			this.detailsViewHeight = 0;
 			this.detailsView = $('<div class="details-view"></div>');
-			this.detailsViewScroller = $('<div class="scroller"></div>');
-			this.detailsView.append( this.detailsViewScroller );
 			this.foregroundDOM.append( this.detailsView );
+
+			// Prepare tuning component
+			this.pinViewComponent = R.instanceComponent("screen.tuning.pin", this.detailsView);
 
 			// Prepare details view expand buttion
 			var detailsExpandButton = $('<div class="btn-taglike"><span class="uicon uicon-pin"></span><br />Pinned</div>');
@@ -181,12 +227,15 @@ define(
 					this.detailsViewHeight = 0;
 					this.detailsView.removeClass("expanded");
 					this.onResize( this.width, this.height );
+					this.pinViewComponent.hide();
 				} else {
 					this.detailsViewHeight = 150;
 					this.detailsView.addClass("expanded");
 					this.onResize( this.width, this.height );
+					this.pinViewComponent.show();
 				}
 			}).bind(this));
+
 
 			// Prohibit mouse events
 			this.detailsView.mousemove(function(e) {
@@ -334,126 +383,119 @@ define(
 		}
 
 		/**
-		 * Design the main user interface
+		 * Define the main screen
 		 */
-		TuningScreen.prototype.prepareMainScreen = function() {
-			var self = this;
+		TuningScreen.prototype.defineMainScreen = function( levels, observables, tunables ) {
+			var self = this,
+				firstTunable = true,
+				firstObservable = true;
 
 			// Calculate pivot point
 			this.pivotX = this.width / 2;
 			this.pivotY = 150;
 
-			// Prepare observable parameters
+			// Reset observable parameters
 			this.obsElms = [];
+			this.tunElms = [];
 			this.observablesLevelRings = [];
+			this.tunablesLevelRings = [];
 
-			// Picker of first element
-			var firstTunable = true,
-				firstObservable = true;
+			// Tunable ring positions
+			var tRingRadius = this.tunMinDistance, 
+				tRingStep = (this.tunMaxDistance - this.tunMinDistance) / levels.length;
 
-			// Create observables for 10 levels
-			for (var j=0; j<10; j++) {
-				var ring = [];
+			// Calculate total number of observables
+			var oNum = 0;
+			for (var j=0; j<levels.length; j++)
+				oNum += levels[j].obs.length;
+			var oStep = this.obsAngleSpan / (oNum+1),
+				oVal = -this.obsAngleSpan / 2;
 
-				var aNum = parseInt(Math.random() * 10),
-					aStep = this.obsAngleSpan / (aNum+1),
-					aVal = -this.obsAngleSpan / 2;
+			// Process level definitions
+			for (var j=0; j<levels.length; j++) {
+				var level = levels[j],
+					tunRing = [], obsRing = [];
 
-				for (var i=0; i<aNum; i++) {
-					var o = this.createObservable(
-							(aVal += aStep),
-							{ 
-								'info': {
-									'short': 'O'+i,
-									'name' : 'Observable #'+i,
-									'book' : 'book-'+i
-								}
-							}
+				// Build observable rings
+				for (var i=0; i<oNum; i++) {
+					var o = this.createObservable( 
+							(oVal += oStep),
+							observables[ level['obs'][i] ]
 						);
 
 					// Store on observable elements
-					if (!o) continue;
+					if (!o) {
+						console.warn("TuningScreen: Could not create observable!");
+						continue;
+					}
 					this.obsElms.push( o );
 
 					// First observable goes to visual helper
 					if (firstObservable) {
-						R.registerVisualAid( 'observable', o.element, '', 'screen.tuning' );
+						R.registerVisualAid( 'observable', o, {'screen': 'screen.tuning' } );
 						firstObservable = false;
 					}
 
-					// Bind on tune rings
+					// Bind click to focus
 					o.on('click', (function(ring) {
 						return function() {
 							this.focusTunableRing( ring );
 						}
 					})(j).bind(this));
 
+					// Activate zero level
 					o.setActive( j == 0 );
-					ring.push( o );
+					obsRing.push( o );
 
 				}
 
-				this.observablesLevelRings.push(ring);
-			}
+				// Update observables level ring
+				this.observablesLevelRings.push(obsRing);
 
-			//////////////////////////////////////////////////////
+				/////////////////////////////////////////////
 
-			// Prepare tunable parameters
-			this.tunElms = [];
-			this.tunablesLevelRings = [];
+				// Prepare tunable rings
+				var tNum = level['tun'].length,
+					tStep = this.tunAngleSpan / (tNum+1);
+					tVal = -this.tunAngleSpan / 2;
 
-			// Create tunables
-			var tVal = this.tunMinDistance, tStep = (this.tunMaxDistance - this.tunMinDistance) / 10;
-			for (var j=0; j<10; j++) {
-
-				var levData = [],
-					aNum = parseInt(Math.random() * 10),
-					aStep = this.tunAngleSpan / (aNum+1);
-					aVal = -this.tunAngleSpan / 2;
-
-				for (var i=0; i<aNum; i++) {
+				// Build tunable rings
+				for (var i=0; i<tNum; i++) {
 					var o = this.createTunable(
-							(aVal += aStep),
-							tVal,
-							{
-								'value': {
-									'min'  : 0,
-									'max'  : 10,
-									'dec'  : 2,
-								},
-								'info': {
-									'short': 'T'+i,
-									'name' : 'Tunable #'+i,
-									'book' : 'book-'+i
-								}
-							}
+							(tVal += tStep),
+							tRingRadius,
+							tunables[ level['tun'][i] ]
 						);
-					if (!o) return;
 
-					// Activate the first level
-					o.setActive( j == 0 );
+					// Store on tunable elements
+					if (!o) {
+						console.warn("TuningScreen: Could not create tunable!");
+						continue;
+					}
+					this.tunElms.push( o );
 
 					// First tunable goes to visual helper
 					if (firstTunable) {
-						R.registerVisualAid( 'tunable', o.element, '', 'screen.tuning' );
+						R.registerVisualAid( 'tunable', o, {'screen': 'screen.tuning'} );
 						firstTunable = false;
 					}
 
-					this.tunElms.push( o );
-
 					// Bind on tune rings
-					levData.push(o);
 					o.on('click', (function(ring) {
 						return function() {
 							this.focusTunableRing( ring );
 						}
 					})(j).bind(this));
 
+					// Activate the first level
+					o.setActive( j == 0 );
+					tunRing.push(o);
+
 				}
 
-				// Update tunable level rings
-				this.tunablesLevelRings.push(levData);
-				tVal += tStep;
+				// Update tunables level ring
+				this.tunablesLevelRings.push(tunRing);
+				tRingRadius += tRingStep;
 
 			}
 
@@ -499,9 +541,10 @@ define(
 		 * (MUST be called after the setTunables/setObservables) function calls.
 		 */
 		TuningScreen.prototype.onLevelsDefined = function(levelInfo) {
-			this.levels = [];
+			this.levels = levelInfo;
 
 			// Prepare level records
+			/*
 			for (var i=0; i<levelInfo.length; i++) {
 				var level = {
 					'obs': (levelInfo[i]['obs'] || []).slice(0),
@@ -546,6 +589,7 @@ define(
 				this.levels.push(level);
 
 			}
+			*/
 
 		}
 
@@ -555,100 +599,13 @@ define(
 		 */
 		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
 
-			// Reset
-			this.hostLevels.empty();
-			this.parameters = {};
-			this.tuneWidgets = {};
-			this.observeWidgets = {};
+			// Get the levels to activate
+			var activeLevels = [];
+			for (var i=0; i<=targetLevel; i++)
+				activeLevels.push(this.levels[i]);
 
-			// Check for valid syntax
-			if (targetLevel >= this.levels.length) {
-				console.warn("Level #",targetLevel," is not defined! Falling back to",this.levels.length-1);
-				targetLevel = this.levels.length-1;
-			}
-
-			// Rebuild level objects
-			for (var i=targetLevel; i>=0; i--) {
-				var levelElm = $('<div class="tune-level"></div>'),
-					tunablesElm = $('<div class="tunables"></div>'),
-					observablesElm = $('<div class="observables"></div>'),
-					level = this.levels[i];
-
-				// Nest elements
-				this.hostLevels.append(levelElm);
-				levelElm.append(tunablesElm);
-				levelElm.append(observablesElm);
-
-				// Build tunable UI
-				for (var j=0; j<level.tun.length; j++) {
-					var  tun = level.tun[j],
-						 tunElm = $('<div class="tunable"></div>');
-
-					// Nest widget on DOM (required for widgets that require a DOM
-					// presence before initialization).
-					tunablesElm.append(tunElm);
-
-					// Try to create the widget for this tunable
-					var tunWidget = R.instanceComponent("widget.tune." + tun.type, tunElm );
-					if (tunWidget == undefined) {
-						console.warn("Missing widget component 'widget.tune."+tun.type+"'");
-						tunElm.remove();
-						continue;
-					}
-
-					// Update widget metadata
-					tunWidget.onMetaUpdate( tun.meta );
-
-					// Reset to default
-					tunWidget.onUpdate( tun.def );
-
-					// Register an event listener to update the parameters as required
-					tunWidget.on('valueChanged', 
-						(function(self, name) { // Wrap context for inline-function
-							return function(value) {
-								// Handle parameter update
-								self.handleParameterUpdate(name, value);
-							};
-						})(this, tun.id)
-					);
-
-					// Store default parameter value
-					this.parameters[ tun.id ] = tun.def;
-
-					// Keep reference
-					this.tuneWidgets[ tun.id ] = tunWidget;
-
-				}
-
-				// Build observable UI
-				for (var j=0; j<level.obs.length; j++) {
-					var  obs = level.obs[j],
-						 obsElm = $('<div class="observable"></div>');
-
-					// Nest widget on DOM (required for widgets that require a DOM
-					// presence before initialization).
-					observablesElm.append(obsElm);
-
-					// Try to create the widget for this tunable
-					var obsWidget = R.instanceComponent("widget.observe." + obs.type, obsElm );
-					if (obsWidget == undefined) {
-						console.warn("Missing widget component 'widget.observe."+obs.type+"'");
-						tunElm.remove();
-						continue;
-					}
-
-					// Update widget metadata
-					obsWidget.onMetaUpdate( obs.meta );
-
-					// Reset to default
-					obsWidget.onUpdate( undefined );
-
-					// Keep reference
-					this.observeWidgets[ tun.id ] = obsWidget;
-
-				}
-
-			}
+			// Redefine main screen
+			this.defineMainScreen( activeLevels, this.observables, this.tunables );
 
 		}
 
@@ -677,9 +634,20 @@ define(
 				this.tunElms[i].onResize(width, height-this.detailsViewHeight);
 			}
 
+			// Resize pin view
+			this.pinViewComponent.onResize(width, this.detailsViewHeight);
+
 			// Update horizon
 			this.forwardHorizon();
 
+		}
+
+		/**
+		 * Rebuild level screen before showing
+		 */
+		TuningScreen.prototype.onWillShow = function(cb) {
+			this.onSelectLevel( DB.userRecord.data.level || 0 );
+			cb();
 		}
 
 		///////////////////////////////////////////////////////////////////////////////

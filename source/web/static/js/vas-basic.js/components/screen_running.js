@@ -92,7 +92,9 @@ define(
 
 			// Prepare for observable elements
 			this.obsElms = [];
-			this.dummyBuild();
+
+			// Prepare observables
+			this.defineObservables();
 
 
 		}
@@ -108,11 +110,9 @@ define(
 		/**
 		 * Create observabe
 		 */
-		RunningScreen.prototype.dummyBuild = function() {
+		RunningScreen.prototype.defineObservables = function( observables ) {
 
-			// Reset elements
-			this.hostObserving.empty();
-			this.obsElms = [];
+			// ----- CUT HERE ------------------
 
 			// Create dummpy
 			var observables = [];
@@ -126,7 +126,13 @@ define(
 				});
 			}
 
-			// RENDER
+			// ----- TILL HERE -----------------
+
+			// Reset elements
+			this.hostObserving.empty();
+			this.obsElms = [];
+
+			// Render elements
 			var aNum = observables.length,
 				aStep = (Math.PI*2) / (aNum+1),
 				aVal = -Math.PI;

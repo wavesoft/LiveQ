@@ -25,6 +25,7 @@ define([
 	"vas-basic/components/tuning/tunable", 
 	"vas-basic/components/tuning/observable",
 	"vas-basic/components/tuning/status",
+	"vas-basic/components/tuning/pin",
 
 	// Running-related
 	"vas-basic/components/running/observable",
@@ -41,5 +42,8 @@ define([
 	// Information blocks
 	'vas-basic/infoblock/tunable',
 	'vas-basic/infoblock/observable',
+
+	// Data vizualization
+	'vas-basic/dataviz/histogram',
 
 ]);

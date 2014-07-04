@@ -19,8 +19,8 @@ define(
 			DataWidget.call(this, hostDOM);
 
 			// Prepare dummy histogram
-			var dummyHisto = $('<img src="static/demo/histo-2.png" />');
-			hostDOM.append( dummyHisto );
+			this.dummyHisto = $('<div style="background: url(static/img/demo/histo-2.png) no-repeat center center; background-size: contain;"></div>');
+			hostDOM.append( this.dummyHisto );
 
 		};
 
@@ -46,14 +46,17 @@ define(
 		/**
 		 * Resize histogram to fit container
 		 * @param {int} width - The width of the container
-		 
+		 * @param {int} height - The height of the container
 		 */
-		DataVizHistogram.prototype.onMetaUpdate = function( widget ) {
-
+		DataVizHistogram.prototype.onResize = function( width, height ) {
+			this.dummyHisto.css({
+				'width': width,
+				'height': height
+			})
 		}
 
 		// Store histogram data visualization on registry
-		O.registerComponent( 'dataviz.histogram', DataVizHistogram, 1 );
+		R.registerComponent( 'dataviz.histogram', DataVizHistogram, 1 );
 
 	}
 

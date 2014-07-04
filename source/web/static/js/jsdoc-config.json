@@ -5,11 +5,11 @@
     "source": {
         "include": [
 
-            "vas-core.js/components.js",
             "vas-core.js/registry.js",
             "vas-core.js/global.js",
             "vas-core.js/main.js",
             "vas-core.js/ui.js",
+            "vas-core.js/base/components.js",
             "vas-core.js/base/component.js",
             "vas-core.js/base/data_widget.js",
             "vas-core.js/base/tuning_components.js",
