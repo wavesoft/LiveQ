@@ -142,12 +142,29 @@ define(["core/config", "core/base/component"],
 		 * @param {string} classes - (Optional) A list of classes to append to the element before focusing it
 		 * @param {string} screenID - (Optional) The screen name to switch to before focusing the element
 		 */
-		registry.registerVisualAid = function(name, element, classes, screenID) {
+		registry.registerVisualAid = function(name, element, elmMeta) {
+			var config = elmMeta || {};
+
+			// Prepare config
+			config.classes = config.classes || "";
+			config.screen = config.screen || "";
+			config.onBeforeFocus = config.onBeforeFocus || function(cb) { cb(); };
+			config.onFocus = config.onFocus || function() {};
+			config.onBeforeBlur = config.onBeforeBlur || function(cb) { cb(); };
+			config.onBlur = config.onBlur || function() {};
+
+			// Prepare element
 			if (element instanceof Component) {
-				registry.visualAids[name] = { 'element': element.hostDOM, 'classes': classes || "", 'component': element, 'screen': screenID };
+				config['element'] = element.hostDOM;
+				config['component'] = element;
 			} else {
-				registry.visualAids[name] = { 'element': element, 'classes': classes || "", 'component': null, 'screen': screenID };
+				config['element'] = element;
+				config['component'] = false;
 			}
+
+			// Store on visual aids
+			registry.visualAids[name] = config;
+
 		}
 
 		/**

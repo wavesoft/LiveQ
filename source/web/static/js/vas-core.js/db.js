@@ -123,7 +123,8 @@ define(["jquery", "core/config"],
 
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/" + doc;
-			if (rev) url += "?rev="+rev;
+			if (rev != false)
+				if (rev) url += "?rev="+rev;
 			// Fire the API function
 			couchdb_get( url, couchdb_translate_single(callback) );
 
@@ -237,7 +238,7 @@ define(["jquery", "core/config"],
 				if (data && data['ok']) {
 
 					// Open the user's database
-					var userDB = new Database("users");
+					var userDB = new Database("_users");
 					userDB.put( uuid, DB.cache['definitions']['new-user'], function(status) {
 						if (status['ok']) {
 							// Return user record
@@ -282,17 +283,16 @@ define(["jquery", "core/config"],
 					this.session['roles'] = data['roles'];
 
 					// Get user record
-					var userDB = new Database("users"),
-						recordID = this.session['roles'][0];
-						userDB.get(recordID, function(record) {
-							if (!record) {
-								console.error("DB: Could not fetch record entry!");
-								callback(false, "Could not fetch record entry");
-							} else {
-								// Fire callback
-								callback(data['name'], record);
-							}
-						});
+					var userDB = new Database("_users");
+					userDB.get( "org.couchdb.user:"+username, false, function(record) {
+						if (!record) {
+							console.error("DB: Could not fetch record entry!");
+							callback(false, "Could not fetch record entry");
+						} else {
+							// Fire callback
+							callback(data['name'], record);
+						}
+					});
 
 				} else {
 					console.error("DB: Could not authenticate user!", error);

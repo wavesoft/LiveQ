@@ -18,7 +18,9 @@ define(
 			// Initialize widget
 			DataWidget.call(this, hostDOM);
 
-			// Prepare infoblock
+			// Prepare dummy histogram
+			var dummyHisto = $('<img src="static/demo/histo-2.png" />');
+			hostDOM.append( dummyHisto );
 
 		};
 
@@ -36,6 +38,15 @@ define(
 		/**
 		 * Update the histogram with the data given
 		 * @param {object} data - The new data to render on the histogram
+		 */
+		DataVizHistogram.prototype.onMetaUpdate = function( widget ) {
+
+		}
+
+		/**
+		 * Resize histogram to fit container
+		 * @param {int} width - The width of the container
+		 
 		 */
 		DataVizHistogram.prototype.onMetaUpdate = function( widget ) {
 
