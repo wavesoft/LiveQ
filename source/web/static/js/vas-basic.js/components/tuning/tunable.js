@@ -89,7 +89,8 @@ define(
 			this.meta = meta;
 
 			// Update spinner with the new metadata 
-			this.spinner = new Spinner(meta['value'], this.handleValueUpdate.bind(this));
+			this.spinner = new Spinner(meta['value'] || {}, 
+								this.handleValueUpdate.bind(this));
 
 			// Update labels
 			this.lblTitle.text(meta['info']['short']);
@@ -100,9 +101,17 @@ define(
 		 * Update tuning widget value
 		 */
 		DefaultTunableWidget.prototype.onUpdate = function(value) {
-			this.value = value;
-			this.spinner.value = value;
+
+			// Parse specified value wrapped on the decimals specified
+			var decimals = 2;
+			if (this.meta && this.meta['value'])
+				decimals = this.meta['value']['decimals'] || 2;
+			this.value = ( parseFloat( Number(value).toFixed(decimals) ) ) || 0;
+
+			// Update spinner & UI
+			this.spinner.value = this.value;
 			this.update();
+
 		}
 
 		////////////////////////////////////////////////////////////

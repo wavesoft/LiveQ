@@ -169,6 +169,13 @@ define(
 					scrHome.on('changeScreen', function(name) {
 						UI.selectScreen(name);
 					});
+					scrHome.on('playLevel', function(level) {
+
+						var userLevel = DB.userRecord.data.level || 0;
+
+						UI.selectScreen("screen.tuning")
+							.onSelectLevel(level);
+					});
 
 					// Complete home
 					prog_home.ok("Home screen ready");

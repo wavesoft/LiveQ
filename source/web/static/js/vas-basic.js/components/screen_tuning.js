@@ -306,7 +306,7 @@ define(
 
 			// Set default values
 			e.onMetaUpdate( metadata );
-			e.onUpdate(0.000);
+			e.onUpdate( parseFloat(metadata['def']) || 0 );
 
 			return e;
 
@@ -417,10 +417,17 @@ define(
 					tunRing = [], obsRing = [];
 
 				// Build observable rings
-				for (var i=0; i<oNum; i++) {
+				for (var i=0; i<level.obs.length; i++) {
+					var obsData = observables[ level['obs'][i] ];
+					if (!obsData) {
+						console.warn("TuningScreen: Unable to find observable", level['obs'][i] );
+						continue;
+					}
+
+					// Create observable
 					var o = this.createObservable( 
 							(oVal += oStep),
-							observables[ level['obs'][i] ]
+							obsData
 						);
 
 					// Store on observable elements
@@ -460,11 +467,18 @@ define(
 					tVal = -this.tunAngleSpan / 2;
 
 				// Build tunable rings
-				for (var i=0; i<tNum; i++) {
+				for (var i=0; i<level.tun.length; i++) {
+					var tunData = tunables[ level['tun'][i] ];
+					if (!tunData) {
+						console.warn("TuningScreen: Unable to find tunable", level['tun'][i] );
+						continue;
+					}
+
+					// Create tunable
 					var o = this.createTunable(
 							(tVal += tStep),
 							tRingRadius,
-							tunables[ level['tun'][i] ]
+							tunData
 						);
 
 					// Store on tunable elements
@@ -640,14 +654,6 @@ define(
 			// Update horizon
 			this.forwardHorizon();
 
-		}
-
-		/**
-		 * Rebuild level screen before showing
-		 */
-		TuningScreen.prototype.onWillShow = function(cb) {
-			this.onSelectLevel( DB.userRecord.data.level || 0 );
-			cb();
 		}
 
 		///////////////////////////////////////////////////////////////////////////////

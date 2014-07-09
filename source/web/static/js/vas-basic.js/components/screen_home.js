@@ -44,7 +44,7 @@ define(
 			this.menuFloater.append(
 					$('<a href="#" class="btn btn-default">Tuning Screen</a>')
 					.click(function() {
-						self.trigger("changeScreen", "screen.tuning");
+						self.trigger("playLevel", 1);
 					})
 				);
 			this.menuFloater.append(

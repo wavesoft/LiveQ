@@ -512,6 +512,14 @@ define(["core/config", "core/base/component" ],
 		 */
 
 		/**
+		 * This event is fired by the home screen in order to start playing
+		 * a level of a particular ID
+		 *
+		 * @param {int} level - A zero-based index of the level
+		 * @event module:core/base/components~HomeScreen#playLevel
+		 */
+
+		/**
 		 * This event should be fired when the user wants to abort the running
 		 * simulation.
 		 *
