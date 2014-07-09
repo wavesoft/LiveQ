@@ -264,9 +264,14 @@ h1 + p.subtitle {
   position: absolute;
   left: 22px;
   top: 5px;
+  right: 5px;
+  height: 16px;
+  overflow: hidden;
   color: white;
   font-weight: bold;
   font-size: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .onscreen .document {
   position: absolute;

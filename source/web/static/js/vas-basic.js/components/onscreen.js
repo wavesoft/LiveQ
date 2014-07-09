@@ -17,8 +17,9 @@ define(
 
 			// Prepare properties
 			this.anchor = {x:0, y:0};
-			this.width = 350;
-			this.height = 250;
+			this.offset = 0;
+			this.fixedWidth = 350;
+			this.fixedHeight = 250;
 			this.side = 0;
 			this.visible = false;
 			this.mouseOver = false;
@@ -40,7 +41,7 @@ define(
 			this.textContainer.append($("<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ullamcorper est at massa euismod sodales. In tincidunt mauris posuere, ornare sem ac, molestie diam. Maecenas ultrices ultricies purus, vel adipiscing leo ultrices vitae. Maecenas vestibulum, augue fermentum tincidunt tempus, diam libero cursus sem, ac vestibulum dui odio ut risus. Proin mi turpis, posuere et tristique pellentesque, condimentum sed lacus. Nulla at purus id leo vehicula mattis. Duis rhoncus mi at est lobortis hendrerit. Donec commodo accumsan mi a sodales. Vivamus cursus semper interdum.</p>"));
 
 			// Update cursor presence
-
+			this.mouseOutCallback = false;
 			this.element.mouseenter((function() {
 				this.mouseOver = true;
 			}).bind(this));
@@ -48,8 +49,16 @@ define(
 				this.mouseOver = false;
 
 				// Check for delayed hidding
-				if (!this.visible)
+				if (!this.visible) {
+
+					// Delay-hide
 					this.element.removeClass("visible");
+
+					// Fire the mouse out callback to complete the .onWillHide event
+					if (this.mouseOutCallback)
+						this.mouseOutCallback();
+
+				}
 
 			}).bind(this));
 
@@ -59,61 +68,67 @@ define(
 		DefaultOnScreen.prototype = Object.create( TC.TunableWidget.prototype );
 
 		/**
-		 * Set the anchor position
+		 * Update popup anchor
 		 */
-		DefaultOnScreen.prototype.setAnchor = function(x,y,offset,side) {
+		DefaultOnScreen.prototype.onAnchorUpdate = function(x, y) {
 			this.anchor.x = x;
 			this.anchor.y = y;
-			this.offset = offset || 50;
 
 			// Calculate side
-			if (side == undefined) {
-				var parentContainer = this.hostDOM.parent(),
-					pW = parentContainer.width(),
-					pH = parentContainer.height();
-
-				// Pick right side by default
-				side = 0;
-
-			} else {
-				this.side = side;
+			this.side = 1; // Default right side
+			if (this.anchor.x + this.offset + this.fixedWidth > this.width) {
+				this.side = 0; // Go to left side if overflow on right
 			}
 
+			// Check for overflows
+			if (this.anchor.y < 0) this.anchor.y = 0;
+			if (this.anchor.y + this.fixedHeight > this.height)
+				this.anchor.y = this.height - this.fixedHeight;
+
+			// Update position
 			this.update();
 		}
 
 		/**
-		 * Define the body contents
+		 * Update popup information
 		 */
-		DefaultOnScreen.prototype.setBody = function(body) {
-			this.textContainer.empty();
-			this.textContainer.append(body);
-		}
-
-		/**
-		 * Define the title
-		 */
-		DefaultOnScreen.prototype.setTitle = function(title) {
-			this.titleElm.text(title);
+		DefaultOnScreen.prototype.onPopupConfig = function(cfg) {
+			if (cfg['body']) {
+				this.textContainer.empty();
+				this.textContainer.append(cfg['body']);
+			}
+			if (cfg['title']) {
+				this.titleElm.html(cfg['title']);
+			}
+			if (cfg['offset']) this.offset = cfg['offset'];
 		}
 
 		/**
 		 * Set visibility
 		 */
-		DefaultOnScreen.prototype.setVisible = function(visible) {
-			if (visible) {
-				if (!this.visible) {
-					this.element.addClass("visible");
-					this.visible = true;
+		DefaultOnScreen.prototype.onWillShow = function(cb) {
+			if (!this.visible) {
+				this.element.addClass("visible");
+				this.visible = true;
+			}
+			cb();
+		}
+
+		/**
+		 * We are about to be hidden
+		 */
+		DefaultOnScreen.prototype.onWillHide = function(cb) {
+			if (this.visible) {
+				this.visible = false;
+				// Don't hide if we have a mouse presence
+				if (!this.mouseOver) {
+					this.element.removeClass("visible");
+					cb();
+				} else {
+					this.mouseOutCallback = cb;
 				}
 			} else {
-				if (this.visible) {
-					this.visible = false;
-					// Don't hide if we have a mouse presence
-					if (!this.mouseOver) 
-						this.element.removeClass("visible");
-				}
-
+				cb();
 			}
 		}
 
@@ -125,19 +140,19 @@ define(
 				this.element.removeClass("right");
 				this.element.addClass("left");
 				this.element.css({
-					'left'   : this.anchor.x - this.width - this.offset,
-					'top'    : this.anchor.y - this.height/2,
-					'width'  : this.width,
-					'height' : this.height
+					'left'   : this.anchor.x - this.fixedWidth - this.offset,
+					'top'    : this.anchor.y - this.fixedHeight/2,
+					'width'  : this.fixedWidth,
+					'height' : this.fixedHeight
 				});
 			} else { // Right side
 				this.element.removeClass("left");
 				this.element.addClass("right");
 				this.element.css({
 					'left'   : this.anchor.x + this.offset,
-					'top'    : this.anchor.y - this.height/2,
-					'width'  : this.width,
-					'height' : this.height
+					'top'    : this.anchor.y - this.fixedHeight/2,
+					'width'  : this.fixedWidth,
+					'height' : this.fixedHeight
 				})
 			}
 		}

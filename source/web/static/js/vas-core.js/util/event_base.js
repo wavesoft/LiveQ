@@ -92,7 +92,7 @@ define(
 		 *
 		 * @param {Object} receiver - The component to receive events
 		 */
-		EventBase.prototype.forwardEvents = function(receiver) {
+		EventBase.prototype.forwardAllEventsTo = function(receiver) {
 			this.__eventForwarders.push(receiver);
 		}
 

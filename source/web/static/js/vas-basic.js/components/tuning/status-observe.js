@@ -1,16 +1,16 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/data_widget", "core/config" ], 
+	["jquery", "core/registry", "core/ui", "core/base/data_widget", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, DataWidget, Config) {
+	function(config, R, UI, DataWidget, Config) {
 
-		var DefaultStatusWidget = function(hostDOM) {
+		var DefaultObserveStatusWidget = function(hostDOM) {
 
 			// Initialize widget
 			DataWidget.call(this, hostDOM);
@@ -42,7 +42,8 @@ define(
 			// Prepare marker regions
 			var self = this;
 			var prepareMarker = function(radius, name ) {
-				var marker = $('<div class="c-marker"></div>');
+				var marker = $('<div class="c-marker"></div>'),
+					label = $('<div class="label">'+name+'</div>');
 				marker.css({
 					'left'   			: (self.diameter/2)-radius,
 					'top'    			: (self.diameter/2)-radius,
@@ -53,6 +54,7 @@ define(
 					'-moz-border-radius' 	: radius,
 					'-o-border-radius'		: radius
 				});
+				marker.append(label);
 				return marker;
 			}
 			this.element.append( prepareMarker( 150, "Good" ) );
@@ -85,23 +87,23 @@ define(
 		};
 
 		// Subclass from DataWidget
-		DefaultStatusWidget.prototype = Object.create( DataWidget.prototype );
+		DefaultObserveStatusWidget.prototype = Object.create( DataWidget.prototype );
 
 		////////////////////////////////////////////////////////////
-		//         Implementation of the DataWidget            //
+		//           Implementation of the DataWidget             //
 		////////////////////////////////////////////////////////////
 
 		/**
 		 * Update tuning widget metadata
 		 */
-		DefaultStatusWidget.prototype.onMetaUpdate = function(meta) {
+		DefaultObserveStatusWidget.prototype.onMetaUpdate = function(meta) {
 			
 		}
 
 		/**
 		 * Update tuning widget value
 		 */
-		DefaultStatusWidget.prototype.onUpdate = function(value) {
+		DefaultObserveStatusWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
 				this.progressKnob.val(0).trigger('change');
 				this.titleElm.html("---");
@@ -134,38 +136,36 @@ define(
 
 		}
 
+		/**
+		 * The host element has changed it's dimentions
+		 */
+		DefaultObserveStatusWidget.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
+
+			// Calculate midpoint
+			var midX = this.left + this.width / 2,
+				midY = this.top + this.height / 2;
+
+			this.element.css({
+				'left': midX - this.diameter/2,
+				'top': midY - this.diameter/2
+			});
+		}
+
+		////////////////////////////////////////////////////////////
+		//         Implementation of the Tuning Widget            //
+		////////////////////////////////////////////////////////////
+
+
+
 		////////////////////////////////////////////////////////////
 		//            Implementation-specific functions           //
 		////////////////////////////////////////////////////////////
 
-		/**
-		 * This event is fired when the view is scrolled/resized and it
-		 * specifies the height coordinates of the bottom side of the screen.
-		 */
-		DefaultStatusWidget.prototype.onHorizonTopChanged = function(bottom) {
-			this.bottom = bottom;
-			if (this.y > this.bottom) {
-				this.indicator.css({
-					'top': bottom - 15
-				});	
-				this.indicator.fadeIn();
-			} else {
-				this.indicator.fadeOut();
-			}
-		}
-
-		/**
-		 * Update the widget position
-		 */
-		DefaultStatusWidget.prototype.setPosition = function(x,y) {
-			this.element.css({
-				'left': x - this.diameter/2,
-				'top': y - this.diameter/2
-			});
-		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.tuning_status', DefaultStatusWidget, 1 );
+		R.registerComponent( 'widget.tuning.status-observe', DefaultObserveStatusWidget, 1 );
 
 	}
 

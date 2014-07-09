@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/component" ], 
+	["jquery", "core/registry","core/base/data_widget" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a tunable
 	 *
  	 * @exports vas-basic/infoblock/tunable
 	 */
-	function(config, R, Component) {
+	function(config, R, DataWidget) {
 
 		/**
 		 * The default tunable body class
@@ -16,7 +16,7 @@ define(
 		var TunableBody = function(hostDOM) {
 
 			// Initialize widget
-			Component.call(this, hostDOM);
+			DataWidget.call(this, hostDOM);
 
 			// Prepare infoblock
 			hostDOM.addClass("body-more");
@@ -28,31 +28,28 @@ define(
 		};
 
 		// Subclass from ObservableWidget
-		TunableBody.prototype = Object.create( Component.prototype );
+		TunableBody.prototype = Object.create( DataWidget.prototype );
 
 		/**
-		 * Set the widget which is hosting the tunable parameter information
-		 * @param {core/base/tuning_components~TunableWidget} widget - The tunable widget to display additional information for
+		 * Define the metadata to use for description
 		 */
-		TunableBody.prototype.setWidget = function( widget, buttons ) {
+		TunableBody.prototype.onMetaUpdate = function( meta ) {
 
 			// Prepare body DOM
 			this.bodyDOM.empty();
-			this.bodyDOM.append($('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis laoreet, nibh quis tempor tempus, purus orci egestas metus, at convallis turpis magna in sapien. Aliquam mattis dolor ut tincidunt commodo. Nunc at nisi erat. Quisque pellentesque nisi vel aliquam consequat. Integer condimentum vehicula mattis. Cras molestie aliquam massa vitae cursus. Mauris vel ipsum sodales, sollicitudin est sit amet, porttitor nulla. Etiam pretium pretium tristique. Nunc scelerisque nibh sed imperdiet pharetra. Aenean facilisis pellentesque orci, quis fringilla libero. Praesent nisi mauris, aliquam ac interdum ac, cursus eu enim. Proin eros magna, hendrerit eget mauris ut, dictum rutrum diam. Vivamus consectetur lectus sit amet ante sollicitudin egestas. Quisque nec vestibulum urna. Morbi elementum ornare lacus, vel aliquam nisl feugiat at. Sed id ipsum dictum, blandit urna nec, ullamcorper lectus.</p>'));
-			this.bodyDOM.append($('<p>Sed tincidunt metus urna, fermentum accumsan magna tincidunt tempor. Maecenas ac mi enim. Nunc diam nulla, consectetur at erat a, gravida tristique erat. Suspendisse potenti. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nullam vitae dignissim nibh. Donec sagittis nunc eu mauris semper, ut feugiat lacus molestie.</p>'));
-			//this.hostDOM.append($('<p>'+"Information regarding "+JSON.stringify(widget.meta)+'</p>'));
+			this.bodyDOM.append($('<div>Book #'+meta['info']['book']+' will be loaded here</div>'));
 
 			// Prepare 'more' links
 			this.moreLinks.empty();
-			var l = $('<a href="do:show-more"><span class="uicon uicon-explain"></span> Explain this ...</a>');
-			this.moreLinks.append( l );
 
-			// Add more buttons
-			if (buttons) {
-				for (var i=0; i<buttons.length; i++) {
-					this.moreLinks.append(buttons[i]);
-				}
-			}
+			// Put an 'explain this' button which triggers the 'explain' event
+			var l = $('<a href="do:show-more"><span class="uicon uicon-explain"></span> Explain this ...</a>');
+			l.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.trigger('explain', meta['info']['name'] );
+			}).bind(this));
+			this.moreLinks.append( l );
 			
 		}
 

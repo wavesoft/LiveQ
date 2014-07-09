@@ -159,13 +159,7 @@ define(
 
 			// Set pivot configuration for doing this nice
 			// circular distribution
-			e.setPivotConfig( 
-				this.pivotX, 			// Pivot X
-				this.pivotY, 			// Pivot Y
-				angle,					// Angle around pivot
-				150, 					// Min distance
-				350						// Max distance
-			);
+			e.setRadialConfig( 150, 350, angle );
 
 			// Bind pop-up events
 			e.on('showDetails', (function(elm) {
@@ -243,9 +237,8 @@ define(
 
 			// Update observables
 			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
+				//this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
 				this.obsElms[i].onResize(this.width, this.height);
-				this.obsElms[i].onHorizonTopChanged(this.height);
 			}
 
 		}

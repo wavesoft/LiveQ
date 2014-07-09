@@ -25,6 +25,13 @@ define(["core/util/event_base", "core/config"],
 			// Keep reference of the host DOM element
 			this.hostDOM = hostDOM;
 
+			// Prepare properties
+			this.width = 0;
+			this.height = 0;
+			this.left = 0;
+			this.top = 0;
+			this.anchor = { 'left': 0, 'top': 0 };
+
 			// Helper arrays for keeping reference of the
 			// objects to forward events to.
 			this.__forwardVisualEventsComponents = [];
@@ -76,7 +83,28 @@ define(["core/util/event_base", "core/config"],
 		 * @param {integer} height - The new height of the component
 		 */
 		Component.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
 		};
+
+		/**
+		 * This function is called when the host DOM element is moved
+		 *
+		 * @param {integer} left - The new left position of the component
+		 * @param {integer} top - The new top position of the component
+		 */
+		Component.prototype.onMove = function(left, top) {
+			this.left = left;
+			this.top = top;
+		};
+
+		/**
+		 * This function is called when
+		 */
+		Component.prototype.onAnchorUpdate = function(left, top) {
+			this.anchor.left = left;
+			this.anchor.top = top;
+		}
 
 		/**
 		 * This function is used to provide a fixed-size dimentions for the
@@ -96,7 +124,10 @@ define(["core/util/event_base", "core/config"],
 		Component.prototype.show = function(cb) {
 			this.onWillShow((function() {
 				this.onShown();
-				if (cb) cb();
+				if (cb) {
+					cb();
+					this.trigger('shown');
+				}
 			}).bind(this));
 		}
 
@@ -106,8 +137,47 @@ define(["core/util/event_base", "core/config"],
 		Component.prototype.hide = function(cb) {
 			this.onWillHide((function() {
 				this.onHidden();
-				if (cb) cb();
+				if (cb) { 
+					cb();
+					this.trigger('hidden');
+				}
 			}).bind(this));
+		}
+
+		/**
+		 * Receive part or all events of the specified component and adopt them
+		 * as our own.
+		 *
+		 * @param {Component|array} com - The child component to receive events from
+		 * @param {string|array} events - (Optional) The names of the events to receive
+		 *
+		 */
+		Component.prototype.adoptEvents = function(com, events) {
+			if (events && !(events instanceof Array)) events = [events];
+			if (!(com instanceof Array)) com = [com];
+			for (var j=0; j<com.length; j++) {
+				var ccom = com[j];
+				if (!ccom) continue;
+
+				// Forward all events if no events are defined
+				if (!events) {
+					ccom.forwardAllEventsTo( this );
+				} 
+
+				// Otherwise explicitly forward part of the events
+				else {
+					for (var i=0; i<events.length; i++) {
+						ccom.on(events[i], (function(evName) {
+							return (function() {
+								var args = Array.prototype.slice.call(arguments);
+								args.unshift(evName);
+								this.trigger.apply( this, args );
+							}).bind(this);
+						}).bind(this)(events[i]) );
+					}
+				}
+
+			}
 		}
 
 		/**
@@ -137,6 +207,7 @@ define(["core/util/event_base", "core/config"],
 
 			for (var j=0; j<com.length; j++) {
 				var ccom = com[j];
+				if (!ccom) continue;
 
 				for (var i=0; i<events.length; i++) {
 					var evName = events[i];
@@ -160,7 +231,8 @@ define(["core/util/event_base", "core/config"],
 								// Loop over forwardable components
 								for (var i=0; i<fwComs.length; i++) {
 									var com = fwComs[i][0], mapFn = fwComs[i][1];
-									com[evName].apply( com, mapFn( fwComs[i], evName, args ) );
+									if (com[evName])
+										com[evName].apply( com, mapFn( fwComs[i], evName, args ) );
 								}
 
 								// Fire the origianl function
@@ -190,14 +262,84 @@ define(["core/util/event_base", "core/config"],
 		 *  * onWillShow()
 		 *  * onWillHide()
 		 *
+		 * This function can also calculate the dimentions of the child component and
+		 * automatically fire the onResize and onMove events accordingly. To do so, it requires
+		 * additional information regarding the component position. 
+		 *
+		 * Format of sizeInfo object:
+		 *  {
+		 *    'left' : 10,		// Left position in pixels if number is integer
+		 *    'top'  : '50%',	// Top position in percent if contains '%' symbol
+		 *
+		 *    // Either this:
+		 *    'right' : 10,
+		 *    'bottom': 10,
+		 *
+		 *    // Or this:
+		 *    'width' : '100%',
+		 *    'height': '50%',
+		 *
+		 *  }
+		 *
+		 *
 		 * @param {Component|array} com - The component to forward events to
+		 * @param {Object} - sizeInfo - (Optional) Alignment information to use for onResize
 		 */
-		Component.prototype.forwardVisualEvents = function(com) {
+		Component.prototype.forwardVisualEvents = function(com, sizeInfo) {
 			if (!(com instanceof Array)) com=[com];
+			if (sizeInfo) {
+				if (!(sizeInfo instanceof Array)) {
+					var si=sizeInfo; sizeInfo=[];
+					for (var i=0; i<com.length; i++)
+						sizeInfo.push(si);
+				} else {
+					if (sizeInfo.length != com.length) {
+						console.error("Mismatching array dimentions between components and size information!");
+						return;
+					}
+				}
+			}
+
+			// Utility function to convert relative scales to numers
+			var getValue = function( value, relValue, defValue ) {
+				if (!value) return defValue;
+				if (value.indexOf('%') < 0) {
+					return parseInt(value);
+				} else {
+					return parseInt(value) * relValue / 100;
+				}
+			}
+			var handleAnchorSizes = function( obj, length, kwA, kwB, kwT ) {
+				var vA = ( obj[kwA] == undefined ) ? false : getValue( obj[kwA], length, 0 ), // Left/Top
+					vB = ( obj[kwB] == undefined ) ? false : getValue( obj[kwB], length, 0 ), // Right/Bottom
+					vT = ( obj[kwT] == undefined ) ? false : getValue( obj[kwT], length, 0 ); // Width/Height
+
+				if ((vA === false) && (vB === false) && (vT === false)) { // Nothing
+					return [0, length];
+				} else if ((vA !== false) && (vB === false) && (vT === false)) { // Left only
+					return [vA, length-vA];
+				} else if ((vA === false) && (vB !== false) && (vT === false)) { // Right only
+					return [0, length-vB];
+				} else if ((vA === false) && (vB === false) && (vT !== false)) { // Width only
+					return [0, vT];
+				} else if ((vA !== false) && (vB !== false) && (vT === false)) { // Left+Right
+					return [vA, length-vA-vB];
+				} else if ((vA !== false) && (vB === false) && (vT !== false)) { // Left+Width
+					return [vA, vT];
+				} else if ((vA === false) && (vB !== false) && (vT !== false)) { // Right+Width
+					return [length-vT-vB, vT];
+				}
+			}
+
 			for (var j=0; j<com.length; j++) {
+				if (!com[j]) continue;
 
 				// Stack elements
-				this.__forwardVisualEventsComponents.push(com[j]);
+				if (sizeInfo) {
+					this.__forwardVisualEventsComponents.push({ 'com':com[j], 'sz': sizeInfo[j] });
+				} else {
+					this.__forwardVisualEventsComponents.push({ 'com':com[j], 'sz': null });
+				}
 
 				// Override the appropriate onXX functions only once
 				if (this.__forwardVisualEventsComponents.length == 1) {
@@ -207,25 +349,27 @@ define(["core/util/event_base", "core/config"],
 						origOnShown = this.onShown.bind(this),
 						origOnHidden = this.onHidden.bind(this),
 						origOnWillShow = this.onWillShow.bind(this),
-						origOnWillHide = this.onWillHide.bind(this);
+						origOnWillHide = this.onWillHide.bind(this),
+						origOnResize = this.onResize.bind(this),
+						origOnMove = this.onMove.bind(this);
 
 					// Override
 					this.onShown = function() {
 						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
-							self.__forwardVisualEventsComponents[i].onShown();
+							self.__forwardVisualEventsComponents[i].com.onShown();
 						}
 						origOnShown();
 					}
 					this.onHidden = function() {
 						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
-							self.__forwardVisualEventsComponents[i].onHidden();
+							self.__forwardVisualEventsComponents[i].com.onHidden();
 						}
 						origOnHidden();
 					}
 					this.onWillShow = function(cb) {
 						var c = self.__forwardVisualEventsComponents.length;
 						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
-							self.__forwardVisualEventsComponents[i].onWillShow(function() {
+							self.__forwardVisualEventsComponents[i].com.onWillShow(function() {
 								if (--c == 0) origOnWillShow(cb);
 							});
 						}
@@ -233,9 +377,39 @@ define(["core/util/event_base", "core/config"],
 					this.onWillHide = function(cb) {
 						var c = self.__forwardVisualEventsComponents.length;
 						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
-							self.__forwardVisualEventsComponents[i].onWillHide(function() {
+							self.__forwardVisualEventsComponents[i].com.onWillHide(function() {
 								if (--c == 0) origOnWillHide(cb);
 							});
+						}
+					}
+					this.onResize = function(w,h) {
+						this.width = w;
+						this.height = h;
+						origOnResize(w,h);
+						var c = self.__forwardVisualEventsComponents.length;
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							var r = self.__forwardVisualEventsComponents[i];
+							if (r.sz) {
+								var lw = handleAnchorSizes( r.sz, this.width, 'left', 'right', 'width' ),
+									th = handleAnchorSizes( r.sz, this.height, 'top', 'bottom', 'height' );
+								r.com.onMove(lw[0],th[0]);
+								r.com.onResize(lw[1],th[1]);
+							}
+						}
+					}
+					this.onMove = function(x,y) {
+						this.left = w;
+						this.top = h;
+						origOnMove(x,y);
+						var c = self.__forwardVisualEventsComponents.length;
+						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {
+							var r = self.__forwardVisualEventsComponents[i];
+							if (r.sz) {
+								var lw = handleAnchorSizes( r.sz, this.width, 'left', 'right', 'width' ),
+									th = handleAnchorSizes( r.sz, this.height, 'top', 'bottom', 'height' );
+								r.com.onMove(lw[0],th[0]);
+								r.com.onResize(lw[1],th[1]);
+							}
 						}
 					}
 

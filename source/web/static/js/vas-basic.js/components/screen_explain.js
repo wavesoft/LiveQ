@@ -48,7 +48,11 @@ define(
 
 			// Forward events to the children
 			this.forwardVisualEvents(
-				[ this.comTop, this.comBottom ]
+				[ this.comTop, this.comBottom ],
+				[ 
+					{ left: 0, right: 0, top: 0, height: '65%' }, 
+					{ left: 0, right: 0, bottom: 0, height: '35%' },
+				]
 			);
 			this.forwardEvents( 
 				[ this.comTop, this.comBottom, this.comBook ],
@@ -67,8 +71,8 @@ define(
 		 * Forward ExplainScreen events to our child components
 		 */
 		ExplainScreen.prototype.onResize = function(w,h) {
-			if (this.comTop) this.comTop.onResize(w,h*0.65);
-			if (this.comBottom)  this.comBottom.onResize(w,h*0.35);
+			//if (this.comTop) this.comTop.onResize(w,h*0.65);
+			//if (this.comBottom)  this.comBottom.onResize(w,h*0.35);
 		}
 
 		// Register home screen

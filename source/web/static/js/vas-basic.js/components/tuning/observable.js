@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/tuning_components", "core/config" ], 
+	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, TC, Config) {
+	function(config, R, UI, TC, Config) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -89,7 +89,33 @@ define(
 		DefaultObservableWidget.prototype.handleFocus = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "showDetails", this.meta );
+				
+				// Prepare the body
+				var comBodyHost = $('<div></div>'),
+					comBody = R.instanceComponent("infoblock.observable", comBodyHost);
+				if (comBody) {
+
+					// Update infoblock 
+					comBody.onMetaUpdate( this.meta );
+					comBody.onUpdate( this.getValue() );
+
+					// Adopt events from infoblock as ours
+					this.adoptEvents( comBody );
+
+				} else {
+					console.warn("Could not instantiate observable infoblock!");
+				}
+
+				UI.showPopup( 
+					"widget.onscreen", 
+					this.x, this.y,
+					{ 
+						'offset': 100,
+						'title' : this.meta['info']['name'],
+						'body'  : comBodyHost
+					}
+				);				
+
 			}).bind(this), 250);
 
 		}
@@ -100,7 +126,9 @@ define(
 		DefaultObservableWidget.prototype.handleBlur = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "hideDetails" );
+
+				UI.hidePopup();
+
 			}).bind(this), 100);
 		}
 
@@ -155,9 +183,7 @@ define(
 		/**
 		 * Set the pivot point for the rotation angle
 		 */
-		DefaultObservableWidget.prototype.setPivotConfig = function(x,y,angle,minD,maxD) {
-			if (x !== undefined) this.pivotX = x; 
-			if (y !== undefined) this.pivotY = y;
+		DefaultObservableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
 			if (minD !== undefined) this.minDistance = minD;
 			if (maxD !== undefined) this.maxDistance = maxD;
 			if (angle !== undefined) this.angle = angle || 0;
@@ -165,10 +191,16 @@ define(
 		}
 
 		/**
-		 * Update the widget position
+		 * This event is fired when the view is scrolled/resized and it
+		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultObservableWidget.prototype.setPosition = function(x,y) {
-			this.x = x; this.y = y;
+		DefaultObservableWidget.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
+
+			this.pivotX = width/2 + this.left;
+			this.pivotY = height/2 + this.top;
+
 			this.update();
 		}
 
@@ -179,7 +211,7 @@ define(
 
 			// Calculate position around pivot
 			var v = this.getValue(),
-				r = this.getValue() * (this.maxDistance - this.minDistance);
+				r = (1-v) * (this.maxDistance - this.minDistance);
 
 			// Update position
 			this.x = this.pivotX + Math.sin(this.angle) * (r+this.minDistance);

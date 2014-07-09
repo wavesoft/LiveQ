@@ -104,7 +104,8 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 			visualAidClasses = "",
 			tutorialOriginalScreen = "",
 			tutorialCompleteListener = false,
-			tutorialActive = false;
+			tutorialActive = false,
+			popupWidget = false;
 
 		///////////////////////////////////////////////////////////////
 		//                       IMPLEMENTATION                      //
@@ -145,6 +146,13 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 		 * @type {Object}
 		 */
 		UI.screens = {};
+
+		/**
+		 * The currently registered popup widgets
+		 *
+		 * @type {Object}
+		 */
+		UI.popupWidgets = {};
 
 		/**
 		 * Screen transitions
@@ -249,6 +257,10 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 			if (!UI.visualAgent)
 				console.warn("UI: Could not initialize tutorial agent!");
 
+			// Create a DOM Element for on-screen popups
+			UI.popupDOM = $('<div class="fullscreen popups"></div>');
+			UI.host.append(UI.popupDOM);
+
 			// Initialize visual agent
 			UI.visualAgent.onResize( UI.host.width(), UI.host.height() );
 
@@ -277,6 +289,10 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 				var w = scr.hostDOM.width(),
 					h = scr.hostDOM.height();
 				scr.onResize( w, h );
+
+				// Resize a possible active popup
+				if (popupWidget)
+					popupWidget.onResize(w,h);
 
 				// Also resize some helper elements
 				UI.visualAgent.onResize( w, h );
@@ -310,6 +326,80 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 
 			// Get preferred dimentions of the overlay
 
+		}
+
+		/**
+		 * Display a pop-up widget on the specified point on screen.
+		 *
+		 * @param {string} name - The name of the widget module.
+		 * @param {int|DOMElement} x - The left position on screen
+		 * @param {int} y - The top position on screen
+		 * @params {object} config - The widget configuration
+		 *
+		 */
+		UI.showPopup = function(name, x, y, config) {
+
+			// If x was a Dom element, update x/y accordingly
+			if ((x instanceof $) || (x instanceof Element)) {
+
+				// Replace config with y, whatever config was
+				config = y;
+
+				// Get element coordinates
+				var elm = $(x),
+					pos = elm.offset(), 
+					w = elm.width(), h = elm.height();
+
+				// Use center of the element as anchor
+				x = pos.left + w/2;
+				y = pos.top + h/2;
+
+			}
+
+			// Check if we already have an instance of this widget
+			var widget = UI.popupWidgets[name];
+			if (!widget) {
+				widget = UI.popupWidgets[name] = R.instanceComponent( name, UI.popupDOM );
+				if (!widget) {
+					console.error("UI: Unable to instantiate pop-up widget '"+name+"'");
+					return;
+				}
+			}
+
+			var __configAndShow = function() {
+				// Configure widget
+				widget.onResize( UI.host.width(), UI.host.height() );
+				if (widget['onPopupConfig']) {
+					var cfg = config || {};
+					cfg.left = x; cfg.top = y;
+					widget.onPopupConfig(cfg)
+				}
+				widget.onAnchorUpdate( x, y );
+
+				// Show widget
+				widget.show();
+			}
+
+			// Hide previous widget
+			if (popupWidget) {
+				popupWidget.hide( __configAndShow );
+			} else {
+				__configAndShow();
+			}
+
+			// Keep new reference
+			popupWidget = widget;
+
+		}
+
+		/**
+		 * Hide a pop-up previously shown with showPopup()
+		 *
+		 */
+		UI.hidePopup = function() {
+			if (popupWidget)
+				popupWidget.hide();
+			popupWidget = false;
 		}
 
 		/**

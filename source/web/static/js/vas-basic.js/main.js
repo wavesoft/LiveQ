@@ -24,7 +24,8 @@ define([
 	// Tuning-related
 	"vas-basic/components/tuning/tunable", 
 	"vas-basic/components/tuning/observable",
-	"vas-basic/components/tuning/status",
+	"vas-basic/components/tuning/status-tune",
+	"vas-basic/components/tuning/status-observe",
 	"vas-basic/components/tuning/pin",
 
 	// Running-related

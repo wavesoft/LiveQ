@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/tuning_components", "core/util/spinner" ], 
+	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/util/spinner" ], 
 
 	/**
 	 * This is the default tunable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/tunable
 	 */
-	function(config, R, TC, Spinner) {
+	function(config, R, UI, TC, Spinner) {
 
 		var DefaultTunableWidget = function(hostDOM) {
 
@@ -16,14 +16,16 @@ define(
 			TC.TunableWidget.call(this, hostDOM);
 
 			// Tunable parameters
-			this.height = 74;
-			this.width = 100;
+			this.fixedHeight = 74;
+			this.fixedWidth = 100;
 
 			// Prepare variables
 			this.active = true;
 			this.value = 0;
 			this.mouseOver = false;
 			this.focused = false;
+			this.pivotX = 0;
+			this.pivotY = 0;
 
 			// Local properties
 			this._triggerTimer = 0;
@@ -145,7 +147,33 @@ define(
 
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "showDetails", this.meta );
+
+				// Prepare the body
+				var comBodyHost = $('<div></div>'),
+					comBody = R.instanceComponent("infoblock.tunable", comBodyHost);
+				if (comBody) {
+
+					// Update infoblock 
+					comBody.onMetaUpdate( this.meta );
+					comBody.onUpdate( this.getValue() );
+
+					// Adopt events from infoblock as ours
+					this.adoptEvents( comBody );
+
+				} else {
+					console.warn("Could not instantiate tunable infoblock!");
+				}
+
+				UI.showPopup( 
+					"widget.onscreen", 
+					this.x, this.y,
+					{ 
+						'offset': 100,
+						'title' : this.meta['info']['name'],
+						'body'  : comBodyHost
+					}
+				);
+
 			}).bind(this), 500);
 
 			// Keep the value we wad when we were focuse
@@ -163,7 +191,9 @@ define(
 
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "hideDetails" );
+
+				UI.hidePopup();
+
 			}).bind(this), 100);
 
 			// Update the value if we were active and focused
@@ -210,8 +240,14 @@ define(
 		 * This event is fired when the view is scrolled/resized and it
 		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultTunableWidget.prototype.onHorizonTopChanged = function(bottom) {
-			this.bottom = bottom;
+		DefaultTunableWidget.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
+
+			this.pivotX = width/2 + this.left;
+			this.pivotY = height/2 + this.top;
+
+			this.update();
 		}
 
 		/**
@@ -238,23 +274,13 @@ define(
 		/**
 		 * Set the pivot point for the rotation angle
 		 */
-		DefaultTunableWidget.prototype.setPivotConfig = function(x,y,angle,trackOffset) {
-			if (x !== undefined) this.pivotX = x; 
-			if (y !== undefined) this.pivotY = y;
+		DefaultTunableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
+			if (minD !== undefined) this.minDistance = minD;
+			if (maxD !== undefined) this.maxDistance = maxD;
 			if (angle !== undefined) this.angle = angle || 0;
-			if (trackOffset !== undefined) this.trackOffset = trackOffset;
 			this.update();
 		}
 
-		/**
-		 * Update the widget position
-		 */
-		DefaultTunableWidget.prototype.setPosition = function(x,y) {
-			this.element.css({
-				'left': x - this.width/2,
-				'top' : y - this.height/2
-			});
-		}
 
 		/**
 		 * Update the visual representation of the element
@@ -271,13 +297,13 @@ define(
 			this.inpValue.val( v.toFixed(decimals) );
 
 			// Update position
-			this.x = this.pivotX + Math.sin(this.angle) * this.trackOffset;
-			this.y = this.pivotY + Math.cos(this.angle) * this.trackOffset;
+			this.x = this.pivotX + Math.sin(this.angle) * this.minDistance;
+			this.y = this.pivotY + Math.cos(this.angle) * this.minDistance;
 
 			// Update position
 			this.element.css({
-				'left': this.x - this.width/2,
-				'top' : this.y - this.height/2
+				'left': this.x - this.fixedWidth/2,
+				'top' : this.y - this.fixedHeight/2
 			});
 
 		}
