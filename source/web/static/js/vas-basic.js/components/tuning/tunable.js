@@ -293,12 +293,13 @@ define(
 				decimals = this.meta['value']['decimals'] || 2;
 
 			// Calculate position around pivot
-			var v = this.getValue();
+			var v = this.getValue(),
+				r = ( 1.0 * ( this.maxDistance - this.minDistance ) ) + this.minDistance;
 			this.inpValue.val( v.toFixed(decimals) );
 
 			// Update position
-			this.x = this.pivotX + Math.sin(this.angle) * this.minDistance;
-			this.y = this.pivotY + Math.cos(this.angle) * this.minDistance;
+			this.x = this.pivotX + Math.sin(this.angle) * r;
+			this.y = this.pivotY + Math.cos(this.angle) * r;
 
 			// Update position
 			this.element.css({

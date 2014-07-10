@@ -151,6 +151,7 @@ define(
 				'left': midX - this.diameter/2,
 				'top': midY - this.diameter/2
 			});
+
 		}
 
 		////////////////////////////////////////////////////////////

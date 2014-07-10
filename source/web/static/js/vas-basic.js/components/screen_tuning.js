@@ -30,11 +30,13 @@ define(
 
 			// Configuration parameters
 			this.obsAngleSpan = Math.PI*2;
+			this.obsAngleShift = 0;
 			this.obsWideSpan = 0;
 			this.obsMinDistance = 400;
 			this.obsMaxDistance = 600;
 
 			this.tunAngleSpan = Math.PI*2;
+			this.tunAngleShift = 0;
 			this.tunWideSpan = 0;
 			this.tunMinDistance = 150;
 			this.tunMaxDistance = 350;
@@ -155,36 +157,6 @@ define(
 		};
 
 		/**
-		 * Update tuning pivot position
-		 */
-		TuningScreen.prototype.updateTuningStatus = function() {
-
-			// Update tuning pivot coordinates
-			var l=0,t=0,w=this.width,h=this.height;
-			if (this.width > this.height) {
-				w = this.width/2;
-			} else {
-				h = this.height/2;
-			}
-
-			// Use the minimum distance for radius
-			var r = Math.min(w,h) - 50;
-
-			// Update tuning widget position
-			this.tuningWidget.onMove( l, t );
-			this.tuningWidget.onResize( w, h );
-
-			// Realign all the tunables
-			for (var i=0; i<this.tunElms.length; i++) {
-				this.tunElms[i].onMove( l, t );
-				this.tunElms[i].onResize( w, h );
-				this.tunElms[i].setRadialConfig( 160, r - 160 );
-			}
-
-
-		}
-
-		/**
 		 * Prepare the observing status widget and anchor
 		 */
 		TuningScreen.prototype.prepareObservingStatus = function() {
@@ -207,9 +179,40 @@ define(
 		/**
 		 * Update tuning pivot position
 		 */
-		TuningScreen.prototype.updateObservingStatus = function() {
+		TuningScreen.prototype.updateTuningStatus = function() {
 
 			// Update tuning pivot coordinates
+			var l=0,t=0,w=this.width,h=this.height;
+			if (this.width > this.height) {
+				w = this.width/2;
+			} else {
+				h = this.height/2;
+			}
+
+			// Use the minimum distance for radius
+			var r = Math.min(w,h) / 2;
+
+			// Update tuning widget position
+			this.tuningWidget.onMove( l, t );
+			this.tuningWidget.onResize( w, h );
+
+			// Realign all the tunables
+			var a = this.tunAngleShift, aStep = this.tunAngleSpan / this.tunElms.length;
+			for (var i=0; i<this.tunElms.length; i++) {
+				this.tunElms[i].setRadialConfig( 210, r - 50, a += aStep );
+				this.tunElms[i].onMove( l, t );
+				this.tunElms[i].onResize( w, h );
+			}
+
+
+		}
+
+		/**
+		 * Update observing pivot position
+		 */
+		TuningScreen.prototype.updateObservingStatus = function() {
+
+			// Update observing pivot coordinates
 			var l=0,t=0,w=this.width,h=this.height;
 			if (this.width > this.height) {
 				l = w = this.width/2;
@@ -218,17 +221,18 @@ define(
 			}
 
 			// Use the minimum distance for radius
-			var r = Math.min(w,h) - 50;
+			var r = Math.min(w,h) / 2;
 
 			// Update tuning widget position
 			this.observingWidget.onMove( l, t );
 			this.observingWidget.onResize( w, h );
 
 			// Realign all the tunables
+			var a = this.obsAngleShift, aStep = this.obsAngleSpan / this.obsElms.length;
 			for (var i=0; i<this.obsElms.length; i++) {
+				this.obsElms[i].setRadialConfig( 210, r - 50, a += aStep );
 				this.obsElms[i].onMove( l, t );
 				this.obsElms[i].onResize( w, h );
-				this.obsElms[i].setRadialConfig( 160, r - 160 );
 			}
 
 
@@ -513,14 +517,14 @@ define(
 			for (var j=0; j<levels.length; j++)
 				oNum += levels[j].obs.length;
 			var oStep = this.obsAngleSpan / (oNum+1),
-				oVal = -this.obsAngleSpan / 2;
+				oVal = this.obsAngleShift; //-this.obsAngleSpan / 2;
 
 			// Calculate total number of tunables
 			var tNum = 0;
 			for (var j=0; j<levels.length; j++)
 				tNum += levels[j].tun.length;
 			var tStep = this.tunAngleSpan / (tNum+1),
-				tVal = -this.tunAngleSpan / 2;
+				tVal = this.tunAngleShift; //-this.tunAngleSpan / 2;
 
 			// Process level definitions
 			for (var j=0; j<levels.length; j++) {
