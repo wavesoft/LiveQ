@@ -32,6 +32,12 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		// Subclass from DataWidget
 		TunableWidget.prototype = Object.create( DataWidget.prototype );
 
+		/**
+		 * Update the display of saved slots
+		 */
+		TunableWidget.prototype.onMarkersUpdated = function(slots) {
+		}
+
 		////////////////////////////////////////////////////////////
 		/**
 		 * Initializes a new Observable Widget Component.

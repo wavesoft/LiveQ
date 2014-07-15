@@ -106,7 +106,7 @@ define(
 						'value': {
 							'min'  : 0,
 							'max'  : 10,
-							'dec'  : 2,
+							'dec'  : 3,
 						},
 						'info': {
 							'short': 'T'+tid,
@@ -133,6 +133,8 @@ define(
 		 * Prepare the tuning status widget and anchor
 		 */
 		TuningScreen.prototype.prepareTuningStatus = function() {
+
+			// Create left and right side bar
 
 			// Prepare status widget
 			this.tuningWidget = R.instanceComponent( "widget.tuning.status-tune", this.hostTuning );
@@ -181,29 +183,6 @@ define(
 		 */
 		TuningScreen.prototype.updateTuningStatus = function() {
 
-			// Update tuning pivot coordinates
-			var l=0,t=0,w=this.width,h=this.height;
-			if (this.width > this.height) {
-				w = this.width/2;
-			} else {
-				h = this.height/2;
-			}
-
-			// Use the minimum distance for radius
-			var r = Math.min(w,h) / 2;
-
-			// Update tuning widget position
-			this.tuningWidget.onMove( l, t );
-			this.tuningWidget.onResize( w, h );
-
-			// Realign all the tunables
-			var a = this.tunAngleShift, aStep = this.tunAngleSpan / this.tunElms.length;
-			for (var i=0; i<this.tunElms.length; i++) {
-				this.tunElms[i].setRadialConfig( 210, r - 50, a += aStep );
-				this.tunElms[i].onMove( l, t );
-				this.tunElms[i].onResize( w, h );
-			}
-
 
 		}
 
@@ -213,15 +192,15 @@ define(
 		TuningScreen.prototype.updateObservingStatus = function() {
 
 			// Update observing pivot coordinates
-			var l=0,t=0,w=this.width,h=this.height;
-			if (this.width > this.height) {
-				l = w = this.width/2;
-			} else {
-				t = h = this.height/2;
-			}
+			var w=this.width,h=this.height,
+				l=w/2, t=h/2, r=0;
 
-			// Use the minimum distance for radius
-			var r = Math.min(w,h) / 2;
+			// Pick radius according to screen alignment
+			if (w > h) {
+				r = (h/2)-50;
+			} else {
+				r = (w/2)-50;
+			}
 
 			// Update tuning widget position
 			this.observingWidget.onMove( l, t );
@@ -366,42 +345,11 @@ define(
 			// Forward visual events
 			this.forwardVisualEvents( e );
 
-			// Update radial config
-			e.setRadialConfig( undefined, undefined, angle );
-
-			/*
-			// Bind pop-up events
-			e.on('showDetails', (function(elm) {
-				return function(metadata) {
-
-					// Prepare popup
-					var comBodyHost = $('<div></div>');
-					this.popupOnScreen.setAnchor( elm.x, elm.y, 80, (elm.x > this.pivotX) ? 0 : 1 );
-					this.popupOnScreen.setBody(comBodyHost);
-					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
-
-					// Prepare the body component
-					var comBody = R.instanceComponent("infoblock.tunable", comBodyHost);
-					if (comBody) {
-						comBody.setWidget( e );
-					} else {
-						console.warn("Could not instantiate tunable infoblock!");
-					}
-
-					// Display popup screen
-					this.popupOnScreen.setVisible(true);
-
-				}
-			})(e).bind(this));
-			e.on('hideDetails', (function(elm) {
-				return function(metadata) {
-					this.popupOnScreen.setVisible(false);
-				}
-			})(e).bind(this));
-			*/
-			e.on('explain', (function(id) {
-				alert('You will be relayed information regarding '+id); 
+			// Event: Request for explanation
+			e.on('explain', (function(book) {
+				alert('You will be relayed information regarding '+book); 
 			}).bind(this));
+			// Event: Notify value updated
 			e.on('valueChanged', (function(value) {
 				this.observingWidget.onUpdate( Math.random() );
 				for (var i=0; i<this.obsElms.length; i++) {
@@ -436,47 +384,11 @@ define(
 			// circular distribution
 			e.setRadialConfig( undefined, undefined, angle );
 
-			/*
-			// Bind pop-up events
-			e.on('showDetails', (function(elm) {
-				return function(metadata) {
-
-					// Prepare popup
-					var comBodyHost = $('<div></div>');
-					this.popupOnScreen.setAnchor( elm.x, elm.y, 80, (elm.x > this.pivotX) ? 0 : 1 );
-					this.popupOnScreen.setBody(comBodyHost);
-					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
-
-					// Prepare a 'Pin this' button
-					var pinThisBtn = $('<a href="do:pin-this"><span class="uicon uicon-pin"></span> Pin this ...</a>');
-					pinThisBtn.click((function(e) {
-						e.stopPropagation();
-						e.preventDefault();
-						
-					}).bind(this));
-
-					// Prepare the body component
-					var comBody = R.instanceComponent("infoblock.observable", comBodyHost);
-					if (comBody) {
-						comBody.setWidget( e, [ pinThisBtn ] );
-					} else {
-						console.warn("Could not instantiate observable infoblock!");
-					}
-
-					// Display popup screen
-					this.popupOnScreen.setVisible(true);
-
-				}
-			})(e).bind(this));
-			e.on('hideDetails', (function(elm) {
-				return function(metadata) {
-					this.popupOnScreen.setVisible(false);
-				}
-			})(e).bind(this));
-			*/
+			// Event: Request for explanation
 			e.on('explain', (function(id) {
 				alert('You will be relayed information regarding '+id); 
 			}).bind(this));
+			// Event: Pin the observable on screen
 			e.on('pin', (function(elm) {
 				return function() {
 					alert("Will pin element"+elm);
@@ -612,7 +524,7 @@ define(
 					})(j).bind(this));
 
 					// Activate the first level
-					o.setActive( j == 0 );
+					//o.setActive( j == 0 );
 					tunRing.push(o);
 
 				}

@@ -6,172 +6,119 @@
   @keyframes @name { @rules(); }; }
 */
 .screen .tunable {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  position: absolute;
   display: block;
-  width: 110px;
-  height: 74px;
-  cursor: pointer;
-  z-index: 100;
+  position: relative;
+  height: 48px;
+  width: 200px;
 }
-.screen .tunable .dial {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  position: absolute;
+.screen .tunable div.title {
   display: block;
-  width: 74px;
-  height: 74px;
-  -webkit-border-radius: 74px;
-  -moz-border-radius: 74px;
-  -o-border-radius: 74px;
-  border-radius: 74px;
-  background-color: #34495e;
-  left: 18px;
-  border-style: solid;
-  border-width: 0;
-  border-color: #34495e;
-}
-.screen .tunable .dial input,
-.screen .tunable .dial div.title {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
   position: absolute;
-  left: 10px;
-  right: 10px;
-  width: 52px;
+  left: 0px;
+  width: 36px;
+  top: 0;
+  height: 100%;
+  line-height: 48px;
   text-align: center;
-}
-.screen .tunable .dial input {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  border: none;
-  background-color: transparent;
-  color: white;
-  font-size: 1.2em;
-  top: 37px;
-}
-.screen .tunable .dial input:focus {
-  outline: none;
-}
-.screen .tunable .dial div.title {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  color: white;
-  font-size: 1.8em;
-  bottom: 37px;
+  font-size: 16px;
   font-weight: bold;
+  color: #7f8c8d;
 }
-.screen .tunable a.wing {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  -webkit-mask-image: url(../img/mask-wing.png);
-  mask-image: url(../img/mask-wing.png);
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-color: #2980b9;
+.screen .tunable div.slider {
+  display: block;
   position: absolute;
-  width: 37px;
-  height: 53px;
-  line-height: 53px;
-  cursor: pointer;
-  text-indent: 5px;
-  font-size: 1.9em;
+  left: 36px;
+  right: 0;
+  height: 100%;
+}
+.screen .tunable div.slider div.draghost {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+  overflow: hidden;
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background-color: #cccccc;
+}
+.screen .tunable div.slider div.draghost div.dragdealer {
+  position: absolute;
+  display: block;
+  left: 20px;
+  right: 20px;
+  height: 25px;
+}
+.screen .tunable div.slider div.draghost div.dragdealer div.handle {
+  display: block;
+  position: absolute;
+  background-color: #c0392b;
   color: white;
-  top: 10px;
-  opacity: 0;
-}
-.screen .tunable a.wing:hover {
-  background-color: #3498db;
-}
-.screen .tunable a.wing:active {
-  background-color: #71b7e6;
-}
-.screen .tunable a.wing.left {
-  left: 18px;
-}
-.screen .tunable a.wing.right {
-  left: 55px;
-  -webkit-transform: rotateZ(180deg);
-  -moz-transform: rotateZ(180deg);
-  -o-transform: rotateZ(180deg);
-  transform: rotateZ(180deg);
-}
-.screen .tunable.expanded {
-  z-index: 110;
-}
-.screen .tunable.expanded .dial {
-  border-width: 10px;
-  padding: -10px;
-  background-color: white;
-  width: 54px;
-  height: 54px;
-  -webkit-border-radius: 54px;
-  -moz-border-radius: 54px;
-  -o-border-radius: 54px;
-  border-radius: 54px;
-}
-.screen .tunable.expanded .dial input {
-  color: black;
-  left: 0px;
-  top: 14px;
-  font-size: 1.5em;
-}
-.screen .tunable.expanded .dial div.title {
-  color: #34495e;
-  left: 0px;
-  bottom: 27px;
-  opacity: 0;
-}
-.screen .tunable.expanded a.wing {
-  opacity: 1;
-}
-.screen .tunable.expanded a.wing.left {
-  left: 0px;
-}
-.screen .tunable.expanded a.wing.right {
-  left: 73px;
-}
-.screen .tunable.inactive {
-  -webkit-transform: scale(0.5);
-  -moz-transform: scale(0.5);
-  -o-transform: scale(0.5);
-  transform: scale(0.5);
-  z-index: 50;
-  opacity: 0.8;
-}
-.screen .tunable.inactive .dial {
-  background-color: #7f8c8d;
-}
-.screen .tunable.inactive a.wing {
-  display: none;
-}
-.screen .tunable.inactive input {
+  width: 40px;
+  line-height: 25px;
+  height: 25px;
+  text-align: center;
+  font-size: 14px;
   cursor: pointer;
 }
-.screen .tunable.inactive:hover {
-  -webkit-transform: scale(0.7);
-  -moz-transform: scale(0.7);
-  -o-transform: scale(0.7);
-  transform: scale(0.7);
-  opacity: 1;
-  z-index: 110;
+.screen .tunable div.slider div.draghost div.arrow {
+  position: absolute;
+  display: block;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #c0392b;
+}
+.screen .tunable div.slider div.draghost a {
+  display: block;
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  line-height: 30px;
+  background-color: #16a085;
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.screen .tunable div.slider div.draghost a.minus {
+  left: 0;
+}
+.screen .tunable div.slider div.draghost a.plus {
+  right: 0;
+}
+.screen .tunable div.markers {
+  left: 56px;
+  right: 20px;
+  height: 12px;
+  bottom: 2px;
+}
+.screen .tunable div.markers div.marker {
+  height: 12px;
+  width: 10px;
+}
+.screen .tunable div.markers div.marker div.arrow {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid;
+}
+.screen .tunable div.markers div.marker div.label {
+  position: absolute;
+  left: 0;
+  width: 10px;
+  top: 7px;
+  font-size: 9px;
 }
 .screen .line {
   width: 100px;

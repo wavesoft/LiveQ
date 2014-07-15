@@ -13,12 +13,27 @@
 @tuning-scr-c-bad		: #e74c3c;
 @tuning-scr-sz-bad		: 54px;
 
+@tuning-scr-drag-h	    : 30px;
+@tuning-scr-marker-h    : 12px;
+@tuning-scr-pad-v       : 2px;
+@tuning-scr-title-width : 36px;
+@tuning-scr-btn-width   : 20px;
+@tuning-scr-arrow-h     : 5px;
+@tuning-scr-slider-w    : 40px;
+@tuning-scr-c-back      : #CCC;
+@tuning-scr-c-slider-b  : #c0392b;
+@tuning-scr-c-slider-f  : #fff;
+@tuning-scr-c-button-b  : #16a085;
+@tuning-scr-c-button-f  : #fff;
+
 .screen {
 
 	// ========================
 	//  Tunable bubble element
 	// ========================
 
+	// Tunable bubble element
+	/*
 	.tunable {
 
 		.transition(all 0.2s);
@@ -160,6 +175,140 @@
 				.transform( scale(0.7) );
 				opacity: 1;
 				z-index: 110;
+			}
+
+		}
+
+	}
+	*/
+
+	.tunable {
+		display: block;
+		position: relative;
+		height: @tuning-scr-drag-h + @tuning-scr-marker-h + @tuning-scr-pad-v * 3;
+		width: 200px;
+
+		div.title {
+			display: block;
+			position: absolute;
+			left: 0px; width: @tuning-scr-title-width;
+			top: 0; height: 100%;
+
+			line-height: @tuning-scr-drag-h + @tuning-scr-marker-h + @tuning-scr-pad-v * 3;
+			text-align: center;
+
+			font-size: 16px;
+			font-weight: bold;
+			color: #7f8c8d;
+		}
+
+		div.slider {
+			display: block;
+			position: absolute;
+			left: @tuning-scr-title-width; right: 0; 
+			height: 100%;
+
+			div.draghost {
+				.border-radius( 4px );
+				overflow: hidden;
+				display: block;
+				position: absolute;
+				left: 0; right: 0; height: @tuning-scr-drag-h;
+				background-color: @tuning-scr-c-back;
+
+				div.dragdealer {
+					position: absolute;
+					display: block;
+					left: @tuning-scr-btn-width; 
+					right: @tuning-scr-btn-width;
+					height: @tuning-scr-drag-h - @tuning-scr-arrow-h;
+
+					div.handle {
+						display: block;
+						position: absolute;
+						background-color: @tuning-scr-c-slider-b;
+						color: @tuning-scr-c-slider-f;
+
+						width: @tuning-scr-slider-w;
+						line-height: @tuning-scr-drag-h - @tuning-scr-arrow-h;
+						height: @tuning-scr-drag-h - @tuning-scr-arrow-h;
+						text-align: center;
+						font-size: 14px;
+
+						cursor: pointer;
+					}
+
+				}
+
+				div.arrow {
+					position: absolute;
+					display: block;
+					bottom: 0;
+
+					width: 0; 
+					height: 0; 
+					border-left: @tuning-scr-arrow-h solid transparent;
+					border-right: @tuning-scr-arrow-h solid transparent;	
+					border-top: @tuning-scr-arrow-h solid @tuning-scr-c-slider-b;
+
+				}
+
+				a {
+					display: block;
+					position: absolute;
+					width: @tuning-scr-btn-width;
+					height: @tuning-scr-drag-h;
+					line-height: @tuning-scr-drag-h;
+					background-color: @tuning-scr-c-button-b;
+					color: @tuning-scr-c-button-f;
+					text-align: center;
+					font-size: 14px;
+					font-weight: bold;
+					cursor: pointer;
+
+					&.minus {
+						left: 0;
+					}
+					&.plus {
+						right: 0;
+					}
+
+				}
+
+			}
+
+		}
+
+		div.markers {
+			left: @tuning-scr-title-width + @tuning-scr-btn-width;
+			right: @tuning-scr-btn-width;
+			height: @tuning-scr-marker-h;
+			bottom: @tuning-scr-pad-v;
+
+			div.marker {
+				height: @tuning-scr-marker-h;
+				width: @tuning-scr-arrow-h*2;
+
+				div.arrow {
+					position: absolute;
+					display: block;
+					top: 0; left: 0;
+
+					width: 0; 
+					height: 0; 
+					border-left: @tuning-scr-arrow-h solid transparent;
+					border-right: @tuning-scr-arrow-h solid transparent;	
+					border-bottom: @tuning-scr-arrow-h solid;
+
+				}
+
+				div.label {
+					position: absolute;
+					left: 0; width: @tuning-scr-arrow-h*2;
+					top: @tuning-scr-arrow-h + 2px;
+					font-size: 9px;
+				}
+
 			}
 
 		}
