@@ -118,7 +118,7 @@ define(
 				}
 				levels.push(l);
 			}
-			this.defineMainScreen( levels, obs, tun );
+			//this.defineMainScreen( levels, obs, tun );
 
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
@@ -130,6 +130,13 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 
 		/**
+		 * Display a book
+		 */
+		TuningScreen.prototype.showBook = function(book) {
+			alert('You will be presented with book #'+book); 
+		}
+
+		/**
 		 * Prepare the tuning status widget and anchor
 		 */
 		TuningScreen.prototype.prepareTuningStatus = function() {
@@ -137,6 +144,7 @@ define(
 			// Create left and right side bar
 
 			// Prepare status widget
+			/*
 			this.tuningWidget = R.instanceComponent( "widget.tuning.status-tune", this.hostTuning );
 			if (!this.tuningWidget)
 				console.warn("Unable to instantiate tuning status widget!");
@@ -154,7 +162,16 @@ define(
 			this.tuningWidget.on('slotDisplay', (function(slot) {
 
 			}).bind(this));
+			*/
 
+			// Reset the tuning groups
+			this.tuningGroups = {};
+
+			// Prepare the tuning sidebars
+			this.tuningSB0 = $('<div class="sidebar sb0"></div>');
+			this.tuningSB1 = $('<div class="sidebar sb1"></div>');
+			this.foregroundDOM.append( this.tuningSB0 );
+			this.foregroundDOM.append( this.tuningSB1 );
 
 		};
 
@@ -183,7 +200,11 @@ define(
 		 */
 		TuningScreen.prototype.updateTuningStatus = function() {
 
-
+			// Realign all the tunables
+			for (var i=0; i<this.tunElms.length; i++) {
+				var hd = this.tunElms[i].hostDOM;
+				this.tunElms[i].onResize( hd.width(), hd.height() );
+			}
 		}
 
 		/**
@@ -193,13 +214,22 @@ define(
 
 			// Update observing pivot coordinates
 			var w=this.width,h=this.height,
-				l=w/2, t=h/2, r=0;
+				l=0, t=0;
+
+			// Calculate shift depending on the sidebars
+			if ($("body").hasClass('layout-compact')) {
+				l = 200; w -= l;
+			} else if ($("body").hasClass('layout-wide')) {
+				l = 230; w -= l*2;
+			} else if ($("body").hasClass('layout-vertical')) {
+			} else if ($("body").hasClass('layout-mobile')) {
+			}
 
 			// Pick radius according to screen alignment
 			if (w > h) {
-				r = (h/2)-50;
+				r = (h/2)-10;
 			} else {
-				r = (w/2)-50;
+				r = (w/2)-10;
 			}
 
 			// Update tuning widget position
@@ -269,7 +299,7 @@ define(
 		TuningScreen.prototype.preparePageParts = function() {
 
 			// Create the top-left pagepart
-			this.ppTL = $('<div class="pagepart tune-tl"></div>');
+			this.ppTL = $('<div class="floater f-header"></div>');
 			this.foregroundDOM.append( this.ppTL );
 
 			// Fill-in pagepart fields
@@ -335,8 +365,50 @@ define(
 		 */
 		TuningScreen.prototype.createTunable = function( angle, level, metadata ) {
 
+			// Prepare tunable group if required
+			var groupName = (metadata['info'] && metadata['info']['group']) ? metadata['info']['group'] : "general";
+
+			// Pick/Create group DOM
+			var groupDOM = this.tuningGroups[groupName];
+			if (!groupDOM) {
+
+				// Get group info
+				var groupInfo = { 'title': 'General', 'book': 'bok' },
+					groupDict = (DB.cache['definitions'] && DB.cache['definitions']['tunable-groups'] && DB.cache['definitions']['tunable-groups']['groups']) ?
+							DB.cache['definitions']['tunable-groups']['groups'] : {};
+
+				// Override group information
+				if (groupDict[groupName])
+					groupInfo = groupDict[groupName];
+
+				// Create title + help icon
+				var elmTitle = $('<h1>' + groupInfo['title'] + '</h1>');
+				if (groupInfo['book']) {
+					var elmInfo = $('<span class="help">?</span>');
+					elmTitle.append( elmInfo );
+					elmInfo.click((function(book) {
+						return function(e) {
+							e.preventDefault();
+							e.stopPropagation();
+							// Show book
+							this.showBook( book );
+						}
+					})(groupInfo['book']).bind(this))
+				}
+
+				// Create title
+				this.tuningSB0.append(elmTitle);
+				this.tuningSB0.append(groupDOM = $('<div class="group"></div>'));
+				this.tuningGroups[groupName] = groupDOM;
+
+			}
+
+			// Create DOM element for the tuanble
+			var tunDOM = $('<div class="tunable"></div>');
+			groupDOM.append(tunDOM);
+
 			// Try to instantiate the observable component
-			var e = R.instanceComponent("widget.tunable.tuning", this.hostTuning );
+			var e = R.instanceComponent("widget.tunable.tuning", tunDOM );
 			if (!e) {
 				console.warn("Unable to instantiate a tuning widget!");
 				return undefined;
@@ -347,7 +419,7 @@ define(
 
 			// Event: Request for explanation
 			e.on('explain', (function(book) {
-				alert('You will be relayed information regarding '+book); 
+				this.showBook( book );
 			}).bind(this));
 			// Event: Notify value updated
 			e.on('valueChanged', (function(value) {
@@ -385,8 +457,8 @@ define(
 			e.setRadialConfig( undefined, undefined, angle );
 
 			// Event: Request for explanation
-			e.on('explain', (function(id) {
-				alert('You will be relayed information regarding '+id); 
+			e.on('explain', (function(book) {
+				this.showBook( book );
 			}).bind(this));
 			// Event: Pin the observable on screen
 			e.on('pin', (function(elm) {
@@ -410,6 +482,11 @@ define(
 			var firstTunable = true,
 				firstObservable = true;
 
+			// Cleanup previous components
+			this.tuningSB0.empty();
+			this.tuningSB1.empty();
+			this.hostTuning.find(".observable").remove();
+
 			// Calculate pivot point
 			this.pivotX = this.width / 2;
 			this.pivotY = 150;
@@ -419,6 +496,7 @@ define(
 			this.tunElms = [];
 			this.observablesLevelRings = [];
 			this.tunablesLevelRings = [];
+			this.tuningGroups = {};
 
 			// Tunable ring positions
 			var tRingRadius = this.tunMinDistance, 
@@ -645,7 +723,7 @@ define(
 				activeLevels.push(this.levels[i]);
 
 			// Redefine main screen
-			//this.defineMainScreen( activeLevels, this.observables, this.tunables );
+			this.defineMainScreen( activeLevels, this.observables, this.tunables );
 
 		}
 
@@ -713,7 +791,7 @@ define(
 		TuningScreen.prototype.focusTunableRing = function(id) {
 			for (var j=0; j<this.tunablesLevelRings.length; j++) {
 				for (var i=0; i<this.tunablesLevelRings[j].length; i++) {
-					this.tunablesLevelRings[j][i].setActive( j == id );
+					//this.tunablesLevelRings[j][i].setActive( j == id );
 				}
 				for (var i=0; i<this.observablesLevelRings[j].length; i++) {
 					this.observablesLevelRings[j][i].setActive( j == id );

@@ -69,16 +69,11 @@ define(
 			this.startIcon.click((function(e) {
 				e.preventDefault();
 				e.stopPropagation();
-				if (this.startIcon.hasClass("active")) {
-					this.trigger('begin');
-				}
+				this.trigger('begin');
 			}).bind(this));
 
 			// Prepare label & sublabel
-			this.titleElm = $('<div class="title">Good</div>');
-			this.subtitleElm = $('<div class="subtitle">match</div>');
-			this.element.append(this.titleElm);
-			this.element.append(this.subtitleElm);
+			this.element.append('<div class="message"><span class="uicon uicon-warning"></span><br/>Results are estimated!</div>')
 
 			// Register visual aids
 			R.registerVisualAid( 'tuning.status', this.element, "", 'screen.tuning' );
@@ -106,8 +101,6 @@ define(
 		DefaultObserveStatusWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
 				this.progressKnob.val(0).trigger('change');
-				this.titleElm.html("---");
-				this.startIcon.removeClass("active");
 				return;
 			}
 
@@ -115,18 +108,12 @@ define(
 			if (value < Config.values['good-average']) {
 				this.knobConfig['fgColor'] = '#e74c3c';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
-				this.titleElm.html("Bad");
-				this.startIcon.removeClass("active")
 			} else if (value < Config.values['average-bad']) {
 				this.knobConfig['fgColor'] = '#f39c12';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
-				this.titleElm.html("Almost");
-				this.startIcon.removeClass("active")
 			} else {
 				this.knobConfig['fgColor'] = '#16a085';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
-				this.titleElm.html("Good");
-				this.startIcon.addClass("active")
 			}
 
 			// Update progress bar

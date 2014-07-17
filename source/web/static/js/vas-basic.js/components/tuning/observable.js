@@ -110,7 +110,7 @@ define(
 					"widget.onscreen", 
 					this.x, this.y,
 					{ 
-						'offset': 100,
+						'offset': 50,
 						'title' : this.meta['info']['name'],
 						'body'  : comBodyHost
 					}

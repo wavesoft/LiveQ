@@ -81,9 +81,10 @@ define(
 			}
 
 			// Check for overflows
-			if (this.anchor.y < 0) this.anchor.y = 0;
-			if (this.anchor.y + this.fixedHeight > this.height)
-				this.anchor.y = this.height - this.fixedHeight;
+			if (this.anchor.y - this.fixedHeight/2 < 0) 
+				this.anchor.y = this.fixedHeight/2;
+			if (this.anchor.y + this.fixedHeight/2 > this.height)
+				this.anchor.y = this.height - this.fixedHeight/2;
 
 			// Update position
 			this.update();

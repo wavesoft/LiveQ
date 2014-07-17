@@ -280,6 +280,19 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 			// Bind on window events
 			$(window).resize(function() {
 
+				// Update body classes
+				$("body").removeClass("layout-compact layout-wide layout-vertical layout-mobile");
+				var w = $(window).width(), h = $(window).height();
+				if (w > h) {
+					if (w <= 1024) {
+						$("body").addClass("layout-compact");
+					} else {
+						$("body").addClass("layout-wide");
+					}
+				} else {
+					$("body").addClass("layout-vertical");
+				}
+
 				// Get active screen
 				var scr = UI.screens[UI.activeScreen];
 				if (scr == undefined)
@@ -299,6 +312,7 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 				overlaymasks_apply_element(visualAidCurrent);
 
 			});
+			$(window).resize();
 
 			// Always listen for ESC key, and if we have an active tutorial, quit it
 			$(window).keydown(function(e) {
