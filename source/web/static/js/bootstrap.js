@@ -8,7 +8,7 @@ requirejs.config({
     // Explicit declaration of components
     paths: {
     	'core': 	'../vas-core.js',
-    	'io': 		'../liveq-io.js',
+    	'liveq': 	'../liveq.js',
     	'vas-3d':   '../vas-3d.js',
         'vas-basic':'../vas-basic.js',
     }
@@ -21,6 +21,7 @@ requirejs(
         // Core components required by bootstrap
         "jquery",
         "core/main",
+        "liveq/main",
 
         // Game modules
         "vas-basic/main",
