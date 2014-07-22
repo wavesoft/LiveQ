@@ -13,6 +13,9 @@
 @tuning-scr-c-bad		: #e74c3c;
 @tuning-scr-sz-bad		: 54px;
 
+@tuning-scr-sz-generic	: 45px;
+@tuning-scr-c-grey		: #CCC;
+
 @tuning-scr-drag-h	    : 30px;
 @tuning-scr-marker-h    : 16px;
 @tuning-scr-pad-v       : 2px;
@@ -46,6 +49,17 @@
 		text-align: center;
 		cursor: pointer;
 		z-index: 100;
+
+		&.grey {
+			width: @tuning-scr-sz-generic;
+			height: @tuning-scr-sz-generic;
+			line-height: @tuning-scr-sz-generic;
+			font-size: @tuning-scr-sz-generic/2;
+			.border-radius(@tuning-scr-sz-generic);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-grey, 10%);
+			background-color: @tuning-scr-c-grey;
+		}
 
 		&.val-bd {
 			width: @tuning-scr-sz-bad;

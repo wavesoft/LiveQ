@@ -131,7 +131,7 @@ define(
 		 * Render the value
 		 */
 		DefaultTunableWidget.prototype.renderValue = function() {
-			var v = this.getValue(), dec;
+			var v = this.getValue(), dec=0;
 			if (this.meta['value'] && (this.meta['value']['dec'] != undefined)) dec=this.meta['value']['dec'];
 			return v.toFixed(dec);
 		}
@@ -308,7 +308,7 @@ define(
 		 * HAndle the onWillShow event
 		 */
 		DefaultTunableWidget.prototype.onWillShow = function(ready) {
-			this.update();
+			setTimeout(this.update.bind(this), 100);
 			ready();
 		}
 

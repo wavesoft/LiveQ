@@ -20,12 +20,12 @@ define(
 			this.y = 0;
 			this.active = true;
 			this.value = 0;
-			this.diameter = 64;
+			this.diameter = 45;
 			this.mouseOver= false;
 			this._handleTimer = 0;
 
 			// Prepare host element
-			this.element = $('<div></div>');
+			this.element = $('<div class="grey"></div>');
 			hostDOM.append(this.element);
 
 			// Prepare an indicator when the element goes offscreen
@@ -221,6 +221,7 @@ define(
 			var obsValBounds = [0.33, 0.66];
 
 			// Remove previous classes
+			/*
 			this.element.removeClass("val-bd");
 			this.element.removeClass("val-md");
 			this.element.removeClass("val-gd");
@@ -242,6 +243,7 @@ define(
 				this.indicator.addClass("val-gd");
 				this.diameter = 24;
 			}
+			*/
 
 			// Update position
 			this.element.css({
