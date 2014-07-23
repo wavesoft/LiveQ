@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/ui", "core/base/data_widget", "core/config" ], 
+	["jquery", "core/registry", "core/ui", "core/base/data_widget", "core/config", "core/util/math" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, UI, DataWidget, Config) {
+	function(config, R, UI, DataWidget, Config, CMath) {
 
 		var DefaultObserveStatusWidget = function(hostDOM) {
 
@@ -17,10 +17,16 @@ define(
 
 			// Tunable parameters
 			this.diameter = 160;
+			this.minValue = 0.2;
+			this.maxValue = 1000;
 
 			// Prepare host
 			this.element = $('<div class="progress-widget"></div>');
 			hostDOM.append(this.element);
+
+			// Create radial marker for the target zone
+			this.element.append( this.elmChiGood = this.createRadialMarker( 1, "Target", "#2ecc71", "#2ecc71" ) );
+			this.element.append( this.elmChiAverage = this.createRadialMarker( 1, "&chi;<sup>2</sup> = " + Config['chi2-bounds']['average'] ) );
 
 			// Prepare progress knob
 			this.knobConfig = {
@@ -38,30 +44,6 @@ define(
 			this.progressKnob = $('<input type="text" value="25" />');
 			this.element.append(this.progressKnob);
 			this.progressKnob.knob(this.knobConfig);
-
-			// Prepare marker regions
-			var self = this;
-			var prepareMarker = function(radius, name ) {
-				var marker = $('<div class="c-marker"></div>'),
-					label = $('<div class="label">'+name+'</div>');
-				marker.css({
-					'left'   			: (self.diameter/2)-radius,
-					'top'    			: (self.diameter/2)-radius,
-					'width'  			: 2*radius,
-					'height' 			: 2*radius,
-					'border-radius' 		: radius,
-					'-webkit-border-radius' : radius,
-					'-moz-border-radius' 	: radius,
-					'-o-border-radius'		: radius
-				});
-				marker.append(label);
-				return marker;
-			}
-			this.element.append( prepareMarker( 150, "Good" ) );
-			this.element.append( prepareMarker( 350, "Average" ) );
-			this.element.append( prepareMarker( 400, "Bad" ) );
-			this.element.append( prepareMarker( 533, "Acceptable" ) );
-			this.element.append( prepareMarker( 600, "Bad" ) );
 
 			// Prepare tunable icon
 			this.startIcon = $('<a href="do:begin" class="button">Validate</a>');
@@ -85,6 +67,73 @@ define(
 		DefaultObserveStatusWidget.prototype = Object.create( DataWidget.prototype );
 
 		////////////////////////////////////////////////////////////
+		//                    Helper Functions                    //
+		////////////////////////////////////////////////////////////
+
+		/**
+		 * Create a new radial marker
+		 */
+		DefaultObserveStatusWidget.prototype.createRadialMarker = function(radius, name, borderColor, fillColor, borderWidth) {
+			var bw = borderWidth || 1,
+				marker = $('<div class="c-marker"></div>'),
+				label = $('<div class="label">'+name+'</div>');
+
+			// Prepare marker style
+			marker.css({
+				'left'   				: (this.diameter/2)-radius-bw/2,
+				'top'    				: (this.diameter/2)-radius-bw/2,
+				'width'  				: 2*radius-bw,
+				'height' 				: 2*radius-bw,
+				'border-radius' 		: radius+bw/2,
+				'-webkit-border-radius' : radius+bw/2,
+				'-moz-border-radius' 	: radius+bw/2,
+				'-o-border-radius'		: radius+bw/2,
+				'z-index'				: -1
+			});
+
+			// Prepare marker colors
+			if (borderColor) {
+				marker.css({
+					'border-color'		: borderColor
+				});
+				label.css({
+					'color'				: borderColor
+				});
+			}
+			if (fillColor) {
+				var r=0,g=0,b=0;
+				if (fillColor[0] == '#') {
+					r = parseInt(fillColor.substr(1,2),16);
+					g = parseInt(fillColor.substr(3,2),16);
+					b = parseInt(fillColor.substr(5,2),16);
+				}
+				marker.css({
+					'background-color'	: 'rgba('+r+','+g+','+b+',0.3)',
+				});
+			}
+
+			marker.append(label);
+			return marker;
+		}
+
+		/**
+		 * Update the given element to a radial element
+		 */
+		DefaultObserveStatusWidget.prototype.updateRadialMarker = function(marker, radius, borderWidth) {
+			var bw = borderWidth || 1;
+			marker.css({
+				'left'   				: (this.diameter/2)-radius-bw/2,
+				'top'    				: (this.diameter/2)-radius-bw/2,
+				'width'  				: 2*radius-bw,
+				'height' 				: 2*radius-bw,
+				'border-radius' 		: radius+bw/2,
+				'-webkit-border-radius' : radius+bw/2,
+				'-moz-border-radius' 	: radius+bw/2,
+				'-o-border-radius'		: radius+bw/2
+			});
+		}
+
+		////////////////////////////////////////////////////////////
 		//           Implementation of the DataWidget             //
 		////////////////////////////////////////////////////////////
 
@@ -105,10 +154,10 @@ define(
 			}
 
 			// Change configuration based on value
-			if (value < Config.values['good-average']) {
+			if (value < Config['chi2-bounds']['good']) {
 				this.knobConfig['fgColor'] = '#e74c3c';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
-			} else if (value < Config.values['average-bad']) {
+			} else if (value < Config['chi2-bounds']['average']) {
 				this.knobConfig['fgColor'] = '#f39c12';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 			} else {
@@ -140,16 +189,19 @@ define(
 			});
 
 		}
-
-		////////////////////////////////////////////////////////////
-		//         Implementation of the Tuning Widget            //
-		////////////////////////////////////////////////////////////
-
 		
 
 		////////////////////////////////////////////////////////////
 		//            Implementation-specific functions           //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * Update the configuration regarding the radial arrangement of the observable
+		 */
+		DefaultObserveStatusWidget.prototype.setRadialConfig = function(minD,maxD) {
+			this.updateRadialMarker( this.elmChiGood, CMath.mapChiSq( Config['chi2-bounds']['good'], minD, maxD ) );
+			this.updateRadialMarker( this.elmChiAverage, CMath.mapChiSq( Config['chi2-bounds']['average'], minD, maxD ) );
+		}
 
 
 		// Store tuning widget component on registry

@@ -267,6 +267,6 @@ define(
 
 		// Return buffer reader
 		return BufferReader;
-
-
-});
+	}
+	
+);

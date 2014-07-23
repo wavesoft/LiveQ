@@ -8,20 +8,18 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666;
+  border-top: solid 1px #666666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: #FFF;
+  color: white;
   position: absolute;
   text-align: center;
   cursor: pointer;
   z-index: 100;
-}
-.screen .observable.grey {
   width: 45px;
   height: 45px;
   line-height: 45px;
@@ -31,66 +29,72 @@
   -o-border-radius: 45px;
   border-radius: 45px;
   border: solid 2px;
+  /*
+		&.val-bd {
+			width: @tuning-scr-sz-bad;
+			height: @tuning-scr-sz-bad;
+			line-height: @tuning-scr-sz-bad;
+			font-size: @tuning-scr-sz-bad/2;
+			.border-radius(@tuning-scr-sz-bad);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-bad, 10%);
+			background-color: @tuning-scr-c-bad;
+		}
+		&.val-md {
+			width: @tuning-scr-sz-average;
+			height: @tuning-scr-sz-average;
+			line-height: @tuning-scr-sz-average;
+			font-size: @tuning-scr-sz-average/2;
+			.border-radius(@tuning-scr-sz-average);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-average, 10%);
+			background-color: @tuning-scr-c-average;
+		}
+		&.val-gd {
+			width: @tuning-scr-sz-good;
+			height: @tuning-scr-sz-good;
+			line-height: @tuning-scr-sz-good;
+			font-size: @tuning-scr-sz-good/2;
+			.border-radius(@tuning-scr-sz-good);
+			border: solid 2px;
+			border-color: darken(@tuning-scr-c-good, 10%);
+			background-color: @tuning-scr-c-good;
+		}
+		&.inactive {
+
+			// Scale down and put back
+			z-index: 50;
+			.transform( scale(0.5) );
+
+			// Dull the colors
+			&.val-bd {
+				@dull-bd: hsl( hue(@tuning-scr-c-bad), saturation(@tuning-scr-c-bad)-50, lightness(@tuning-scr-c-bad)+10 );
+				border-color: darken(@dull-bd, 10%);
+				background-color: @dull-bd;
+			}
+			&.val-md {
+				@dull-md: hsl( hue(@tuning-scr-c-average), saturation(@tuning-scr-c-average)-50, lightness(@tuning-scr-c-average)+10 );
+				border-color: darken(@dull-md, 10%);
+				background-color: @dull-md;
+			}
+			&.val-gd {
+				@dull-gd: hsl( hue(@tuning-scr-c-good), saturation(@tuning-scr-c-good)-50, lightness(@tuning-scr-c-good)+10 );
+				border-color: darken(@dull-gd, 10%);
+				background-color: @dull-gd;
+			}
+		}
+		*/
+
+}
+.screen .observable.grey {
+  color: #333333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
-.screen .observable.val-bd {
-  width: 54px;
-  height: 54px;
-  line-height: 54px;
-  font-size: 27px;
-  -webkit-border-radius: 54px;
-  -moz-border-radius: 54px;
-  -o-border-radius: 54px;
-  border-radius: 54px;
-  border: solid 2px;
-  border-color: #d62c1a;
-  background-color: #e74c3c;
-}
-.screen .observable.val-md {
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  font-size: 20px;
-  -webkit-border-radius: 40px;
-  -moz-border-radius: 40px;
-  -o-border-radius: 40px;
-  border-radius: 40px;
-  border: solid 2px;
-  border-color: #bf6516;
-  background-color: #e67e22;
-}
-.screen .observable.val-gd {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  font-size: 12px;
-  -webkit-border-radius: 24px;
-  -moz-border-radius: 24px;
-  -o-border-radius: 24px;
-  border-radius: 24px;
-  border: solid 2px;
+.screen .observable.green {
+  color: white;
   border-color: #25a25a;
   background-color: #2ecc71;
-}
-.screen .observable.inactive {
-  z-index: 50;
-  -webkit-transform: scale(0.5);
-  -moz-transform: scale(0.5);
-  -o-transform: scale(0.5);
-  transform: scale(0.5);
-}
-.screen .observable.inactive.val-bd {
-  border-color: #b07973;
-  background-color: #c29893;
-}
-.screen .observable.inactive.val-md {
-  border-color: #a98260;
-  background-color: #bb9c81;
-}
-.screen .observable.inactive.val-gd {
-  border-color: #6d8d7a;
-  background-color: #89a494;
 }
 .screen .observable:hover {
   z-index: 110;
@@ -145,7 +149,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -169,7 +173,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: #FFF;
+  color: white;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -193,7 +197,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -242,7 +246,7 @@
   top: 145px;
   position: absolute;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -263,7 +267,7 @@
 }
 .screen.tuning .floater.f-header h1,
 .screen.tuning .floater.f-header p {
-  color: #FFF;
+  color: white;
   text-align: left;
   margin: 2px 2px;
 }
@@ -306,14 +310,14 @@
   height: 18px;
   margin: 4px;
   font-size: 16px;
-  color: #CCC;
-  border: solid 1px #CCC;
+  color: #cccccc;
+  border: solid 1px #cccccc;
   text-align: center;
   line-height: 17px;
 }
 .screen.tuning .sidebar h1 span.help:hover {
-  color: #333;
-  border: solid 1px #333;
+  color: #333333;
+  border: solid 1px #333333;
 }
 .screen.tuning .tunable {
   -webkit-transition: background-color 0.25s;
@@ -372,7 +376,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: #ffffff;
+  color: white;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -397,7 +401,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: #ffffff;
+  color: white;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -458,7 +462,7 @@
   -o-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 100;
-  background-color: #FFF;
+  background-color: white;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -494,7 +498,7 @@
   top: -50px;
   position: absolute;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -516,7 +520,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: #FFF;
+  background-color: white;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.message {
@@ -558,7 +562,17 @@
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
+}
+.screen.tuning .progress-widget div.c-marker div.label {
+  padding-top: 5px;
+  position: absolute;
+  font-size: 12px;
+  color: #999999;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  bottom: -16px;
 }
 body.layout-compact .screen.tuning .sidebar.sb0 {
   display: block;
@@ -595,15 +609,15 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399FF;
+  background-color: #3399ff;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70B8FF;
+  background-color: #70b8ff;
 }
 .screen.explain {
   padding: 0;
@@ -622,6 +636,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   /* easeInBack */
+
   -webkit-transform: scale(0.1);
   -moz-transform: scale(0.1);
   -o-transform: scale(0.1);
@@ -642,6 +657,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   /* easeOutBack */
+
 }
 .screen.explain .explain-book.learn,
 .screen.explain .explain-book .learn {
@@ -675,7 +691,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   margin-left: 6px;
 }
 .screen.explain .explain-book div.header > span.title {
-  color: #fff;
+  color: white;
   font-size: 14px;
   line-height: 24px;
   margin-left: 4px;
@@ -713,7 +729,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100px;
   padding: 2px;
   height: 20px;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.explain .explain-top {
@@ -762,6 +778,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   /* easeInBack */
+
 }
 .screen.explain .explain-top .parameter h1 {
   margin: 0;
@@ -770,7 +787,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 40px;
   line-height: 40px;
   text-align: center;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-top .parameter div.title {
   display: none;
@@ -787,7 +804,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 0;
   position: absolute;
   pointer-events: none;
-  border-color: rgba(0, 0, 0, 0);
+  border-color: transparent;
   border-width: 30px;
   margin-top: -30px;
 }
@@ -818,6 +835,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   /* easeOutBack */
+
 }
 .screen.explain .explain-bottom {
   height: 35%;
@@ -836,7 +854,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .focus-bar {
   position: absolute;
-  background-color: #F1948A;
+  background-color: #f1948a;
   left: 0;
   top: 0;
   -webkit-transition: top 0.2s linear, left 0.2s linear;
@@ -902,7 +920,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   border-style: solid;
   border-color: transparent;
   border-width: 3px;
-  background-color: #FFF;
+  background-color: white;
   -webkit-border-radius: 24px;
   -moz-border-radius: 24px;
   -o-border-radius: 24px;
@@ -910,8 +928,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.focus {
-  background-color: #fcc;
-  border-color: #FFF;
+  background-color: #ffcccc;
+  border-color: white;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert {
   background-position-y: 0;
@@ -919,7 +937,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert.focus {
-  border-color: #FFF;
+  border-color: white;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.icon01 {
   background-position-x: 0;
@@ -967,6 +985,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   left: 50%;
   top: 40%;
@@ -984,12 +1003,13 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999;
+  color: #999999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -1005,8 +1025,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
-  background-color: #eee;
+  background-color: #eeeeee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -1017,7 +1038,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #FF9900;
+  background-color: #ff9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -1025,12 +1046,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999;
+  color: #999999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1054,7 +1075,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1109,23 +1130,24 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95A5A6;
+  border: solid 2px #95a5a6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
+
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -1145,7 +1167,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: #FFFFFF;
+  color: white;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -1153,9 +1175,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
+  position: absolute;
   left: 0;
   top: 0;
-  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1225,8 +1247,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
 }
 .screen.login .body div.left {
   float: left;

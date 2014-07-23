@@ -17,6 +17,8 @@ define(
 
 			// Tunable parameters
 			this.diameter = 200;
+			this.shootRadius = 200;
+			this.shootZoneWidth = 40;
 
 			// Prepare host
 			this.element = $('<div class="progress-widget"></div>');
@@ -61,25 +63,16 @@ define(
 				bgColor 	: "transparent",
 			});
 
-			// Place a marker on the region where the user should reach
-			var self = this;
-			var prepareMarker = function(radius, name ) {
-				var marker = $('<div class="c-marker"></div>'),
-					label = $('<div class="label">'+name+'</div>');
-				marker.css({
-					'left'   			: (self.diameter/2)-radius,
-					'top'    			: (self.diameter/2)-radius,
-					'width'  			: 2*radius,
-					'height' 			: 2*radius,
-					'border-radius' 		: radius,
-					'-webkit-border-radius' : radius,
-					'-moz-border-radius' 	: radius,
-					'-o-border-radius'		: radius
-				});
-				marker.append(label);
-				return marker;
-			}
-			this.element.append( prepareMarker( 250, "Target" ) );
+			// Shoot target is at this.shootTarget
+			this.shootTarget = 250;
+			this.element.append( this.elmShootZone = this.createRadialMarker( this.shootTarget, "", "#2ecc71", "", this.shootZoneWidth ) );
+			this.element.append( this.elmShootMin  = this.createRadialMarker( this.shootTarget - this.shootZoneWidth/2, "", "#2ecc71" ) );
+			this.element.append( this.elmShootMax  = this.createRadialMarker( this.shootTarget + this.shootZoneWidth/2, "Your target", "#2ecc71" ) );
+			this.elmShootZone.css({
+				'border-style': 'solid',
+				'border-width': this.shootZoneWidth,
+				'opacity'     : 0.3
+			});
 
 			// Create globe
 			this.globeDOM = $('<div class="globe"></div>');
@@ -98,7 +91,73 @@ define(
 		DefaultStatusWidget.prototype = Object.create( DataWidget.prototype );
 
 		////////////////////////////////////////////////////////////
-		//         Implementation of the DataWidget            //
+		//                    Helper Functions                    //
+		////////////////////////////////////////////////////////////
+
+		/**
+		 * Create a new radial marker
+		 */
+		DefaultStatusWidget.prototype.createRadialMarker = function(radius, name, borderColor, fillColor, borderWidth) {
+			var bw = borderWidth || 1,
+				marker = $('<div class="c-marker"></div>'),
+				label = $('<div class="label">'+name+'</div>');
+
+			// Prepare marker style
+			marker.css({
+				'left'   				: (this.diameter/2)-radius-bw/2,
+				'top'    				: (this.diameter/2)-radius-bw/2,
+				'width'  				: 2*radius-bw,
+				'height' 				: 2*radius-bw,
+				'border-radius' 		: radius+bw/2,
+				'-webkit-border-radius' : radius+bw/2,
+				'-moz-border-radius' 	: radius+bw/2,
+				'-o-border-radius'		: radius+bw/2
+			});
+
+			// Prepare marker colors
+			if (borderColor) {
+				marker.css({
+					'border-color'		: borderColor
+				});
+				label.css({
+					'color'				: borderColor
+				});
+			}
+			if (fillColor) {
+				var r=0,g=0,b=0;
+				if (fillColor[0] == '#') {
+					r = parseInt(fillColor.substr(1,2),16);
+					g = parseInt(fillColor.substr(3,2),16);
+					b = parseInt(fillColor.substr(5,2),16);
+				}
+				marker.css({
+					'background-color'	: 'rgba('+r+','+g+','+b+',0.3)',
+				});
+			}
+
+			marker.append(label);
+			return marker;
+		}
+
+		/**
+		 * Update the given element to a radial element
+		 */
+		DefaultStatusWidget.prototype.updateRadialMarker = function(marker, radius, borderWidth) {
+			var bw = borderWidth || 1;
+			marker.css({
+				'left'   				: (this.diameter/2)-radius-bw/2,
+				'top'    				: (this.diameter/2)-radius-bw/2,
+				'width'  				: 2*radius-bw,
+				'height' 				: 2*radius-bw,
+				'border-radius' 		: radius+bw/2,
+				'-webkit-border-radius' : radius+bw/2,
+				'-moz-border-radius' 	: radius+bw/2,
+				'-o-border-radius'		: radius+bw/2
+			});
+		}
+
+		////////////////////////////////////////////////////////////
+		//           Implementation of the DataWidget             //
 		////////////////////////////////////////////////////////////
 
 		/**

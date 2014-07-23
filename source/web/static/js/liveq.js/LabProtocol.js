@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	[ 'liveq/ReferenceData', 'liveq/HistogramData' ], 
+	[ 'core/util/event_base', 'liveq/ReferenceData', 'liveq/HistogramData' ], 
 
 	/**
 	 * This is the default data widget for visualizing a historgram
 	 *
  	 * @exports liveq/LabProtocol
 	 */
-	function( ReferenceData, HistogramData ) {
+	function( EventBase, ReferenceData, HistogramData ) {
 
 
 		/**
@@ -30,6 +30,9 @@ define(
 		 */
 		var LabProtocol = function( ) {
 
+			// Initialize subclass
+			EventBase.call(this);
+
 			/**
 			 * This object contains the mapping between the histogram name
 			 * and it's {@link LiveQ.ReferenceData} class.
@@ -50,197 +53,18 @@ define(
 			 */
 			this.initialized = false;
 
-			/**
-			 * Array of the callback functions to be fired when a histogram is updated
-			 * @private
-			 * @member {array}
-			 */
-			this._onHistogramUpdate = [];
-
-			/**
-			 * Array of the callback functions to be fired when a histogram is added
-			 * @private
-			 * @member {array}
-			 */
-			this._onHistogramAdded = [];
-
-			/**
-			 * Array of the callback functions to be fired when a histogram is removed
-			 * @private
-			 * @member {array}
-			 */
-			this._onHistogramRemoved = [];
-
-			/**
-			 * Array of the callback functions to be fired when the metadata for the simulation changes
-			 * @private
-			 * @member {array}
-			 */
-			this._onMetaUpdated = [];
-
-			/**
-			 * Array of the callback functions to be fired when the tunable configuration arrives
-			 * @private
-			 * @member {array}
-			 */
-			this._onTunablesUpdated = [];
-
-			/**
-			 * Array of the callback functions to be fired when data arrive from the server
-			 * @private
-			 * @member {array}
-			 */
-			this._onDataArrived = [];
-
-			/**
-			 * Array of the callback functions to be fired when the lab is initialized
-			 * (When the configuration frame arrives)
-			 * @private
-			 * @member {array}
-			 */
-			this._onReady = [];
-
 		}
 
-		/**
-		 * Register a callback to be notified when a histogram is updated
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onHistogramUpdate = function( cb ) {
-			this._onHistogramUpdate.push(cb);
-		}
+		// Subclass from LabProtocol
+		LabProtocol.prototype = Object.create( EventBase.prototype );
 
-		/**
-		 * Unregister a callback, previously registered with onUpdate
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offHistogramUpdate = function( cb ) {
-			var i = this._onHistogramUpdate.indexOf(cb);
-			this._onHistogramUpdate.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when a histogram is added
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onHistogramAdded = function( cb ) {
-			this._onHistogramAdded.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onHistogramAdded
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offHistogramAdded = function( cb ) {
-			var i = this._onHistogramAdded.indexOf(cb);
-			this._onHistogramAdded.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when a histogram is removed
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onHistogramRemoved = function( cb ) {
-			this._onHistogramRemoved.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onHistogramRemoved
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offHistogramRemoved = function( cb ) {
-			var i = this._onHistogramRemoved.indexOf(cb);
-			this._onHistogramRemoved.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the metadata of the current simulation changes
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onMetaUpdated = function( cb ) {
-			this._onMetaUpdated.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onMetaUpdated
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offMetadataUpdated = function( cb ) {
-			var i = this._onMetaUpdated.indexOf(cb);
-			this._onMetaUpdated.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the tunable information have arrived
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onTunablesUpdated = function( cb ) {
-			this._onTunablesUpdated.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onTunablesUpdated
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offTunablesUpdated = function( cb ) {
-			var i = this._onTunablesUpdated.indexOf(cb);
-			this._onTunablesUpdated.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when data arrive from the server
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onDataArrived = function( cb ) {
-			this._onDataArrived.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onDataArrived
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offDataArrived = function( cb ) {
-			var i = this._onDataArrived.indexOf(cb);
-			this._onDataArrived.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the lab socket is initialized
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.onReady = function( cb ) {
-			this._onReady.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onReady
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabProtocol.prototype.offReady = function( cb ) {
-			var i = this._onReady.indexOf(cb);
-			this._onReady.splice(i,1);
-		}
 		/**
 		 * Configure LabProtocol with the given configuration frame
 		 *
 		 * This function handles the incoming configuration frame and re-initializes
 		 * the reference and histogram data.
 		 * 
-		 * @param {LiveQ.BufferReader} reader - The incoming configuration frame reader from the WebSocket.
+		 * @param {module:liveq/BufferReader~BufferReader} reader - The incoming configuration frame reader from the WebSocket.
 		 */
 		LabProtocol.prototype.handleConfigFrame = function( configReader ) {
 
@@ -252,9 +76,7 @@ define(
 
 				// Fire removal callbacks
 				if ((histo != undefined) && (typeof(histo) != 'function')) {
-					for (var i=0; i<this._onHistogramRemoved.length; i++) {
-						this._onHistogramRemoved[i]( this.data[histoID], this.reference[histoID] );
-					}
+					this.trigger('histogramRemoved', this.data[histoID], this.reference[histoID]);
 				}
 
 			}
@@ -277,9 +99,7 @@ define(
 				var tunablesJSON = configReader.getJSON(),
 					linksJSON = configReader.getJSON();
 				if (tunablesJSON) {
-					for (var i=0; i<this._onTunablesUpdated.length; i++) {
-						this._onTunablesUpdated[i]( tunablesJSON, linksJSON );
-					}
+					this.trigger('tunablesUpdated', tunablesJSON, linksJSON);
 				}
 
 				// Read histograms
@@ -294,22 +114,18 @@ define(
 					this.data[histo.id] = new HistogramData( histo.reference.bins, histo.id );
 
 					// Fire histogram added callbacks
-					for (var i=0; i<this._onHistogramAdded.length; i++) {
-						this._onHistogramAdded[i]( this.data[histo.id], this.reference[histo.id] );
-					}
+					this.trigger('histogramAdded', this.data[histo.id], this.reference[histo.id]);
 
 				}
 
-				// If we are not initialized, fire onReady
+				// If we were not initialized, fire onReady
 				if (!this.initialized) {
 					this.initialized = true;
-					for (var i=0; i<this._onReady.length; i++) {
-						this._onReady[i]({
-							'protocol': 1,
-							'flags': flags,
-							'targetEvents': numEvents * 1000
-						});
-					}
+					this.trigger('ready', {
+						'protocol': 1,
+						'flags': flags,
+						'targetEvents': numEvents * 1000
+					});
 				}
 
 			} else {
@@ -329,7 +145,7 @@ define(
 		 * appropriate callback functions in order to visualize the 
 		 * data arrived.
 		 * 
-		 * @param {LiveQ.BufferReader} reader - The incoming data frame reader from the WebSocket.
+		 * @param {module:liveq/BufferReader~BufferReader} reader - The incoming data frame reader from the WebSocket.
 		 */
 		LabProtocol.prototype.handleFrame = function( reader ) {
 
@@ -348,6 +164,7 @@ define(
 				var fromInterpolation = ((flags & 0x01) != 0);
 
 				// Read histograms
+				var allHistos = [];
 				for (var j=0; j<numHistos; j++) {
 
 					// Get histogram name
@@ -368,9 +185,14 @@ define(
 							numEvents = histo.nevts;
 
 						// Fire histogram update callbacks
-						for (var i=0; i<this._onHistogramUpdate.length; i++) {
-							this._onHistogramUpdate[i]( histo, this.reference[histoID] );
-						}
+						this.trigger( 'histogramUpdated', histo, this.reference[histoID] );
+
+						// Keep the histogram data for the 'histogramsUpdated' event
+						allHistos.push({
+							'id': histoID,
+							'data': histo,
+							'ref': this.reference[histoID]
+						});
 
 					} else {
 						console.error("Histogram ", histoID, " was not defined in configuration!");
@@ -379,17 +201,16 @@ define(
 				}
 
 				// Fire metadata update histogram
-				for (var i=0; i<this._onMetaUpdated.length; i++) {
-					this._onMetaUpdated[i]({
-						'nevts': numEvents,
-						'interpolation': fromInterpolation
-					});
-				}
+				this.trigger( 'metadataUpdated', {
+					'nevts': numEvents,
+					'interpolation': fromInterpolation
+				});
 
 				// Let everybody know that data arrived
-				for (var i=0; i<this._onDataArrived.length; i++) {
-					this._onDataArrived[i]( fromInterpolation );
-				}
+				this.trigger( 'dataArrived', fromInterpolation );
+
+				// Fire an update callback regarding all histograms
+				this.trigger( 'histogramsUpdated', allHistos, fromInterpolation );
 
 
 			} else {
@@ -400,6 +221,67 @@ define(
 			}
 
 		}
+
+		/**
+		 * This event is fired when a histogram is added.
+		 *
+		 * @param {module:liveq/HistogramData~HistogramData} histogram - The histogram data
+		 * @param {module:liveq/ReferenceData~ReferenceData} reference - The reference data
+		 * @event module:liveq/LabProtocol~LabProtocol#histogramAdded		
+		 */
+
+		/**
+		 * This event is fired when a histogram data are updated.
+		 *
+		 * @param {module:liveq/HistogramData~HistogramData} histogram - The histogram data
+		 * @param {module:liveq/ReferenceData~ReferenceData} reference - The reference data
+		 * @event module:liveq/LabProtocol~LabProtocol#histogramUpdated
+		 */
+
+		/**
+		 * This event is fired when a histogram data are updated.
+		 *
+		 * @param {array} histograms - All the histograms as an object {id: .. , data: .. , ref: .. } format.
+		 * @event module:liveq/LabProtocol~LabProtocol#histogramsUpdated
+		 */
+
+		/**
+		 * This event is fired when a histogram is removed.
+		 *
+		 * @param {module:liveq/HistogramData~HistogramData} histogram - The histogram data
+		 * @param {module:liveq/ReferenceData~ReferenceData} reference - The reference data
+		 * @event module:liveq/LabProtocol~LabProtocol#histogramRemoved		
+		 */
+
+		/**
+		 * This event is fired when the tunables table has arrived.
+		 *
+		 * @param {object} tunables - Tunables dictionary
+		 * @param {object} correlation - Correlation information
+		 * @event module:liveq/LabProtocol~LabProtocol#tunablesUpdated		
+		 */
+
+		/**
+		 * This event is fired when the lab socket is initialized and the negotiation
+		 * phase has been completed.
+		 *
+		 * @param {object} state - State dictionary
+		 * @event module:liveq/LabProtocol~LabProtocol#ready		
+		 */
+
+		/**
+		 * This event is fired when the metadata regarding the current run has
+		 * updated.
+		 *
+		 * @param {object} meta - Metadata dictionary
+		 * @event module:liveq/LabProtocol~LabProtocol#metadataUpdated		
+		 */
+
+		/**
+		 * This event is fired when there are incoming data.
+		 *
+		 * @event module:liveq/LabProtocol~LabProtocol#dataArrived		
+		 */
 
 		// Return LabProtocol
 		return LabProtocol;

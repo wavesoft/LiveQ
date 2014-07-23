@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config" ], 
+	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config", "core/util/math" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, UI, TC, Config) {
+	function(config, R, UI, TC, Config, CMath) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -181,7 +181,7 @@ define(
 		}
 
 		/**
-		 * Set the pivot point for the rotation angle
+		 * Update the configuration regarding the radial arrangement of the observable
 		 */
 		DefaultObservableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
 			if (minD !== undefined) this.minDistance = minD;
@@ -198,8 +198,11 @@ define(
 			this.width = width;
 			this.height = height;
 
+			// Calculate pivot point
 			this.pivotX = width/2 + this.left;
 			this.pivotY = height/2 + this.top;
+
+			// 
 
 			this.update();
 		}
@@ -211,39 +214,20 @@ define(
 
 			// Calculate position around pivot
 			var v = this.getValue(),
-				r = (1-v) * (this.maxDistance - this.minDistance);
+				r = CMath.mapChiSq(v, this.minDistance, this.maxDistance);
 
 			// Update position
-			this.x = this.pivotX + Math.sin(this.angle) * (r+this.minDistance);
-			this.y = this.pivotY + Math.cos(this.angle) * (r+this.minDistance);
+			this.x = this.pivotX + Math.sin(this.angle) * r;
+			this.y = this.pivotY + Math.cos(this.angle) * r;
 
 			// Pick classes
-			var obsValBounds = [0.33, 0.66];
-
-			// Remove previous classes
-			/*
-			this.element.removeClass("val-bd");
-			this.element.removeClass("val-md");
-			this.element.removeClass("val-gd");
-			this.indicator.removeClass("val-bd");
-			this.indicator.removeClass("val-md");
-			this.indicator.removeClass("val-gd");
-
-			// Append classes
-			if (v < Config.values['good-average']) {
-				this.element.addClass("val-bd");
-				this.indicator.addClass("val-bd");
-				this.diameter = 54;
-			} else if (v < Config.values['average-bad']) {
-				this.element.addClass("val-md");
-				this.indicator.addClass("val-md");
-				this.diameter = 50;
+			if (v <= Config['chi2-bounds']['good']) {
+				this.element.removeClass('grey');
+				this.element.addClass('green');
 			} else {
-				this.element.addClass("val-gd");
-				this.indicator.addClass("val-gd");
-				this.diameter = 24;
+				this.element.removeClass('green');
+				this.element.addClass('grey');
 			}
-			*/
 
 			// Update position
 			this.element.css({

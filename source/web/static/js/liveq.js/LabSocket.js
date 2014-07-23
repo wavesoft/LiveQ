@@ -52,41 +52,6 @@ define(
 			this.url = "ws://" + location.host + "/vas/labsocket/" + id;
 
 			/**
-			 * Array of the callback functions to be fired when the socket is connected
-			 * @private
-			 * @member {array}
-			 */
-			this._onConnect = [];
-
-			/**
-			 * Array of the callback functions to be fired when the socket is disconnected
-			 * @private
-			 * @member {array}
-			 */
-			this._onDisconnect = [];
-
-			/**
-			 * Array of the callback functions to be fired when a log message is arrived
-			 * @private
-			 * @member {array}
-			 */
-			this._onLog = [];
-
-			/**
-			 * Array of the callback functions to be fired when an error has occured
-			 * @private
-			 * @member {array}
-			 */
-			this._onError = [];
-
-			/**
-			 * Array of the callback functions to be fired when the simulation is completed
-			 * @private
-			 * @member {array}
-			 */
-			this._onCompleted = [];
-
-			/**
 			 * The timer ID used for pinging the server
 			 * @private
 			 * @member {int}
@@ -107,104 +72,11 @@ define(
 		LabSocket.prototype = Object.create( LabProtocol.prototype );
 
 		/**
-		 * Register a callback to be notified when the socket is connected
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.onConnect = function( cb ) {
-			this._onConnect.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onConnect
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.offConnect = function( cb ) {
-			var i = this._onConnect.indexOf(cb);
-			this._onConnect.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the socket is disconnected
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.onDisconnect = function( cb ) {
-			this._onDisconnect.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onDisconnect
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.offDisconnect = function( cb ) {
-			var i = this._onDisconnect.indexOf(cb);
-			this._onDisconnect.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the socket is connected
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.onLog = function( cb ) {
-			this._onLog.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onLog
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.offLog = function( cb ) {
-			var i = this._onLog.indexOf(cb);
-			this._onLog.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when an error occured
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.onError = function( cb ) {
-			this._onError.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onError
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.offError = function( cb ) {
-			var i = this._onError.indexOf(cb);
-			this._onError.splice(i,1);
-		}
-
-		/**
-		 * Register a callback to be notified when the simulation is completed
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.onCompleted = function( cb ) {
-			this._onCompleted.push(cb);
-		}
-
-		/**
-		 * Unregister a callback, previously registered with onCompleted
-		 *
-		 * @param {function} cb - The callback function
-		 */
-		LabSocket.prototype.offCompleted = function( cb ) {
-			var i = this._onCompleted.indexOf(cb);
-			this._onCompleted.splice(i,1);
-		}
-		/**
 		 * Setup a new WebSocket on the given URL and bind on it's callbacks
 		 * @param {string} url - The Websocket URL to connect to
 		 */
 		LabSocket.prototype.setupSocket = function( url ) {
+			if (url) this.url = url;
 			var self = this;
 			try {
 
@@ -269,9 +141,7 @@ define(
 					self.connected = true;
 
 					// Fire callbacks
-					for (var i=0; i<self._onConnect.length; i++) {
-						self._onConnect[i](self);
-					}
+					this.trigger('connected', self);
 
 					// Start ping timer
 					if (self._pingTimer)
@@ -293,9 +163,7 @@ define(
 					self.connected = false;
 
 					// Fire callbacks
-					for (var i=0; i<self._onDisconnect.length; i++) {
-						self._onDisconnect[i](self);
-					}
+					this.trigger('disconnected', self);
 
 					// Clear timer
 					if (self._pingTimer)
@@ -315,12 +183,8 @@ define(
 						self.connected = false;
 
 						// Fire callbacks
-						for (var i=0; i<self._onError.length; i++) {
-							self._onError[i](self, "Socket Error", true);
-						}
-						for (var i=0; i<self._onDisconnect.length; i++) {
-							self._onDisconnect[i](self);
-						}
+						this.trigger('error', "Socket Error", true);
+						this.trigger('disconnected', self);
 					}
 
 				}).bind(this);
@@ -329,9 +193,7 @@ define(
 				console.error("Socket exception", e);
 
 				// Fire callbacks on exception
-				for (var i=0; i<self._onError.length; i++) {
-					self._onError[i](self, "Socket exception", true);
-				}
+				this.trigger('error', "Socket exception", true);
 
 			}
 
@@ -349,31 +211,28 @@ define(
 				console.log(data['message']);
 
 				// Fire callbacks
-				for (var i=0; i<this._onLog.length; i++) {
-					this._onLog[i](data['message'], data['vars']);
-				}
+				this.trigger('log', data['message'], data['vars']);
 
 			} else if (action == "error") { /* Error message */
 				console.error("I/O Error:",data['message']);
 
 				// Fire callbacks
-				for (var i=0; i<this._onError.length; i++) {
-					this._onError[i](data['message'], false);
-				}
+				this.trigger('error', data['message'], false);
 
 			} else if (action == "sim_completed") { /* Job completed */
 				console.log("Job completed");
 
 				// Fire callbacks
-				for (var i=0; i<this._onLog.length; i++) {
-					this._onCompleted[i]();
-				}
+				this.trigger('runCompleted');
 
 				// Simulation is completed
 				this.running = false;
 
 			} else if (action == "sim_failed") { /* Simulation failed */
 				console.error("Simulation error:", data['message']);
+
+				// Fire callbacks
+				this.trigger('runError', data['message']);
 
 				// Simulation is completed
 				this.running = false;
@@ -407,6 +266,27 @@ define(
 			}
 
 		};
+
+		/**
+		 * Disconnect socket
+		 */
+		LabSocket.prototype.close = function() {
+			console.log("Connection closed");
+
+			// Remove handler
+			this.socket.onclose = function() { };
+			this.socket.close();
+
+			// We are disconnected
+			this.connected = false;
+
+			// Fire callbacks
+			this.trigger('disconnected', this);
+
+			// Clear timer
+			if (this._pingTimer)
+				clearInterval(this._pingTimer);
+		}
 
 		/**
 		 * Send a command to the socket
@@ -458,6 +338,46 @@ define(
 			this.running = false;
 
 		}
+
+		/**
+		 * This event is fired when the socket is connected.
+		 *
+		 * @event module:liveq/LabSocket~LabSocket#connected		
+		 */
+
+		/**
+		 * This event is fired when the socket is disconnected.
+		 *
+		 * @event module:liveq/LabSocket~LabSocket#disconnected		
+		 */
+
+		/**
+		 * This event is fired when the socket is connected.
+		 *
+		 * @param {string} errorMessage - The error message
+		 * @param {boolean} recoverable - If true the error is recoverable
+		 * @event module:liveq/LabSocket~LabSocket#error		
+		 */
+
+		/**
+		 * This event is fired when there was a simulation error.
+		 *
+		 * @param {string} errorMessage - The error message
+		 * @event module:liveq/LabSocket~LabSocket#runError		
+		 */
+
+		/**
+		 * This event is fired when the simulation is completed.
+		 *
+		 * @event module:liveq/LabSocket~LabSocket#runCompleted		
+		 */
+
+		/**
+		 * A log message arrived from the server.
+		 *
+		 * @param {string} logMessage - The message to log
+		 * @event module:liveq/LabSocket~LabSocket#log		
+		 */
 
 		// Return LabSocket
 		return LabSocket;

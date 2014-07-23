@@ -50,17 +50,26 @@
 		cursor: pointer;
 		z-index: 100;
 
+		width: @tuning-scr-sz-generic;
+		height: @tuning-scr-sz-generic;
+		line-height: @tuning-scr-sz-generic;
+		font-size: @tuning-scr-sz-generic/2;
+		.border-radius(@tuning-scr-sz-generic);
+		border: solid 2px;
+
 		&.grey {
-			width: @tuning-scr-sz-generic;
-			height: @tuning-scr-sz-generic;
-			line-height: @tuning-scr-sz-generic;
-			font-size: @tuning-scr-sz-generic/2;
-			.border-radius(@tuning-scr-sz-generic);
-			border: solid 2px;
+			color: #333;
 			border-color: darken(@tuning-scr-c-grey, 10%);
 			background-color: @tuning-scr-c-grey;
 		}
 
+		&.green {
+			color: #FFF;
+			border-color: darken(@tuning-scr-c-good, 10%);
+			background-color: @tuning-scr-c-good;
+		}
+
+		/*
 		&.val-bd {
 			width: @tuning-scr-sz-bad;
 			height: @tuning-scr-sz-bad;
@@ -71,7 +80,6 @@
 			border-color: darken(@tuning-scr-c-bad, 10%);
 			background-color: @tuning-scr-c-bad;
 		}
-
 		&.val-md {
 			width: @tuning-scr-sz-average;
 			height: @tuning-scr-sz-average;
@@ -82,7 +90,6 @@
 			border-color: darken(@tuning-scr-c-average, 10%);
 			background-color: @tuning-scr-c-average;
 		}
-
 		&.val-gd {
 			width: @tuning-scr-sz-good;
 			height: @tuning-scr-sz-good;
@@ -93,7 +100,6 @@
 			border-color: darken(@tuning-scr-c-good, 10%);
 			background-color: @tuning-scr-c-good;
 		}
-
 		&.inactive {
 
 			// Scale down and put back
@@ -116,8 +122,8 @@
 				border-color: darken(@dull-gd, 10%);
 				background-color: @dull-gd;
 			}
-
 		}
+		*/
 
 		&:hover {
 			z-index: 110;
@@ -605,6 +611,16 @@
 		div.c-marker {
 			position: absolute;
 			border: dashed 1px #999;
+
+			div.label {
+				padding-top: 5px;
+				position: absolute;
+				font-size: 12px;
+				color: #999;
+				left: 0; width: 100%;
+				text-align: center;
+				bottom: -16px;
+			}
 		}
 
 	}

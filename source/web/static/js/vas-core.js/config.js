@@ -35,9 +35,11 @@ define({
 	 * Color transition points between good-average-bad values,
 	 * normalized to 1.0.
 	 */
-	'values': {
-		'good-average'	: 0.2,
-		'average-bad'	: 0.5,
+	'chi2-bounds': {
+		'min'		: 0.1,
+		'good'		: 1,
+		'average'	: 4,
+		'max'		: 500,
 	}
 
 });

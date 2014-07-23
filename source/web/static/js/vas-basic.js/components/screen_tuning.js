@@ -5,7 +5,7 @@ define(
 	/**
 	 * Dependencies
 	 */
-	["jquery", "core/config", "core/registry", "core/base/components", "core/db", "core/ui",
+	["jquery", "core/config", "core/registry", "core/base/components", "core/db", "core/ui", "liveq/core",
 
 	 // Self-registering dependencies
 	 "jquery-knob"], 
@@ -15,7 +15,7 @@ define(
 	 *
 	 * @exports vas-basic/components/tuning_screen
 	 */
-	function($, config, R, C, DB, UI) {
+	function($, config, R, C, DB, UI, LiveQ) {
 
 		/**
 		 * Tuning dashboard screen
@@ -70,7 +70,7 @@ define(
 			hostDOM.append(this.foregroundDOM);
 
 			// Prepare host elements
-			this.hostTuning = $('<div class="tuning-host"></div>');
+			this.hostTuning = $('<div class="tuning-host fullscreen"></div>');
 			this.foregroundDOM.append(this.hostTuning);
 
 			// Prepare Sub-components
@@ -122,6 +122,12 @@ define(
 
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
+
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
+		////                            HOOK HANDLERS                              ////
+		///////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////
 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
@@ -235,11 +241,14 @@ define(
 			// Update tuning widget position
 			this.observingWidget.onMove( l, t );
 			this.observingWidget.onResize( w, h );
+			if (this.observingWidget.setRadialConfig)
+				this.observingWidget.setRadialConfig( 104, r - 24 );
 
 			// Realign all the tunables
 			var a = this.obsAngleShift, aStep = this.obsAngleSpan / this.obsElms.length;
 			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].setRadialConfig( 210, r - 50, a += aStep );
+				if (this.obsElms[i].setRadialConfig)
+					this.obsElms[i].setRadialConfig( 104, r - 24, a += aStep );
 				this.obsElms[i].onMove( l, t );
 				this.obsElms[i].onResize( w, h );
 			}
@@ -423,10 +432,7 @@ define(
 			}).bind(this));
 			// Event: Notify value updated
 			e.on('valueChanged', (function(value) {
-				this.observingWidget.onUpdate( Math.random() );
-				for (var i=0; i<this.obsElms.length; i++) {
-					this.obsElms[i].onUpdate(Math.random());
-				}
+				this.requestInterpolation();
 			}).bind(this));
 
 			// Set default values
@@ -556,7 +562,7 @@ define(
 					})(j).bind(this));
 
 					// Activate zero level
-					o.setActive( j == 0 );
+					//o.setActive( j == 0 );
 					obsRing.push( o );
 
 				}
@@ -773,6 +779,28 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 
 		/**
+		 * Submit values and request interpolation
+		 */
+		TuningScreen.prototype.requestInterpolation = function(values) {
+
+			var values = this.getValueMap();
+			LiveQ.requestInterpolation( values, 
+				(function(histograms) {
+
+				}).bind(this),
+				(function(error) {
+
+				}).bind(this)
+			);
+
+			this.observingWidget.onUpdate( Math.random() );
+			for (var i=0; i<this.obsElms.length; i++) {
+				this.obsElms[i].onUpdate(Math.random() * 100);
+			}
+
+		}
+
+		/**
 		 * Build a key/value dictionary with the values of all of my tunables
 		 */
 		TuningScreen.prototype.getValueMap = function() {
@@ -794,7 +822,7 @@ define(
 					//this.tunablesLevelRings[j][i].setActive( j == id );
 				}
 				for (var i=0; i<this.observablesLevelRings[j].length; i++) {
-					this.observablesLevelRings[j][i].setActive( j == id );
+					//this.observablesLevelRings[j][i].setActive( j == id );
 				}
 			}
 		}

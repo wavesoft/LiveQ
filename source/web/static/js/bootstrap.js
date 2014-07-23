@@ -21,7 +21,7 @@ requirejs(
         // Core components required by bootstrap
         "jquery",
         "core/main",
-        "liveq/main",
+        "liveq/core",
 
         // Game modules
         "vas-basic/main",
