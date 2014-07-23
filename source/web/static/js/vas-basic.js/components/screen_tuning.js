@@ -55,6 +55,7 @@ define(
 			this.tunElms = [];
 			this.observablesLevelRings = [];
 			this.tunablesLevelRings = [];
+			this.observableByID = {};
 
 			// Initialize host DOM
 			hostDOM.addClass("tuning");
@@ -547,6 +548,7 @@ define(
 						continue;
 					}
 					this.obsElms.push( o );
+					this.observableByID[ obsData['_id'] ] = o;
 
 					// First observable goes to visual helper
 					if (firstObservable) {
@@ -787,16 +789,38 @@ define(
 			LiveQ.requestInterpolation( values, 
 				(function(histograms) {
 
+					var chiSum = 0, chiCount = 0;
+
+					// Update histogram data
+					for (var i=0; i<histograms.length; i++) {
+						var histo = histograms[i];
+
+						// Find the relative observable
+						if (this.observableByID[histo.id]) {
+
+							// Update histogram 
+							this.observableByID[histo.id].onUpdate( histo );
+
+							// Collect chi-squared average information
+							chiSum += this.observableByID[histo.id].getValue();
+							chiCount += 1;
+						}
+
+					}
+
+					// Update observing widget with the average chi square
+					if (chiCount > 0) {
+						this.observingWidget.onUpdate( chiSum / chiCount );
+					} else {
+						this.observingWidget.onUpdate( 1000 );
+					}
+
 				}).bind(this),
 				(function(error) {
 
+
 				}).bind(this)
 			);
-
-			this.observingWidget.onUpdate( Math.random() );
-			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].onUpdate(Math.random() * 100);
-			}
 
 		}
 
@@ -806,7 +830,7 @@ define(
 		TuningScreen.prototype.getValueMap = function() {
 			var ans = {};
 			for (var i=0; i<this.tunElms.length; i++) {
-				var k = this.tunElms[i].meta['info']['name'],
+				var k = this.tunElms[i].meta['_id'],
 					v = this.tunElms[i].getValue();
 				ans[k] = v;
 			}

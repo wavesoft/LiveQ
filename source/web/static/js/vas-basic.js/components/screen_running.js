@@ -139,7 +139,7 @@ define(
 
 			for (var i=0; i<aNum; i++) {
 				var o = this.createObservable( (aVal += aStep), observables[i] );
-				o.onUpdate( Math.random() );
+				//o.onUpdate( Math.random() );
 				this.obsElms.push(o);
 			}
 
@@ -151,7 +151,7 @@ define(
 		RunningScreen.prototype.createObservable = function( angle, metadata ) {
 
 			// Try to instantiate the observable component
-			var e = R.instanceComponent("widget.observable.tuning", this.hostObserving );
+			var e = R.instanceComponent("widget.observable.running", this.hostObserving );
 			if (!e) {
 				console.warn("Unable to instantiate an observable widget!");
 				return undefined;

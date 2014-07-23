@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/tuning_components", "core/config" ], 
+	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config", "core/util/math", "liveq/Calculate" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, TC, Config) {
+	function(config, R, UI, TC, Config, CMath, LiveQCalc) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -19,13 +19,13 @@ define(
 			this.x = 0;
 			this.y = 0;
 			this.active = true;
-			this.value = 0;
-			this.diameter = 64;
+			this.diameter = 45;
 			this.mouseOver= false;
 			this._handleTimer = 0;
+			this.value = null;
 
 			// Prepare host element
-			this.element = $('<div></div>');
+			this.element = $('<div class="grey"></div>');
 			hostDOM.append(this.element);
 
 			// Prepare an indicator when the element goes offscreen
@@ -72,7 +72,7 @@ define(
 		 */
 		DefaultObservableWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
-				this.value = 0;
+				this.value = null;
 			} else {
 				this.value = value;
 			}
@@ -89,7 +89,33 @@ define(
 		DefaultObservableWidget.prototype.handleFocus = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "showDetails", this.meta );
+				
+				// Prepare the body
+				var comBodyHost = $('<div></div>'),
+					comBody = R.instanceComponent("infoblock.observable", comBodyHost);
+				if (comBody) {
+
+					// Update infoblock 
+					comBody.onMetaUpdate( this.meta );
+					comBody.onUpdate( this.getValue() );
+
+					// Adopt events from infoblock as ours
+					this.adoptEvents( comBody );
+
+				} else {
+					console.warn("Could not instantiate observable infoblock!");
+				}
+
+				UI.showPopup( 
+					"widget.onscreen", 
+					this.x, this.y,
+					{ 
+						'offset': 50,
+						'title' : this.meta['info']['name'],
+						'body'  : comBodyHost
+					}
+				);				
+
 			}).bind(this), 250);
 
 		}
@@ -100,7 +126,9 @@ define(
 		DefaultObservableWidget.prototype.handleBlur = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
-				this.trigger( "hideDetails" );
+
+				UI.hidePopup();
+
 			}).bind(this), 100);
 		}
 
@@ -130,7 +158,13 @@ define(
 		 */
 		DefaultObservableWidget.prototype.getValue = function() {
 			//return Math.random();
-			return this.value;
+
+			// If we don't have yet histograms, return maximum chi-squared
+			if (!this.value) return Config['chi2-bounds']['max'];
+
+			// Calculate chi-squared between the data and the reference histogram
+			var chi2 = LiveQCalc.chi2WithError( this.value.data, this.value.ref );
+			return chi2[0];
 		}
 
 		/**
@@ -153,11 +187,9 @@ define(
 		}
 
 		/**
-		 * Set the pivot point for the rotation angle
+		 * Update the configuration regarding the radial arrangement of the observable
 		 */
-		DefaultObservableWidget.prototype.setPivotConfig = function(x,y,angle,minD,maxD) {
-			if (x !== undefined) this.pivotX = x; 
-			if (y !== undefined) this.pivotY = y;
+		DefaultObservableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
 			if (minD !== undefined) this.minDistance = minD;
 			if (maxD !== undefined) this.maxDistance = maxD;
 			if (angle !== undefined) this.angle = angle || 0;
@@ -165,10 +197,19 @@ define(
 		}
 
 		/**
-		 * Update the widget position
+		 * This event is fired when the view is scrolled/resized and it
+		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultObservableWidget.prototype.setPosition = function(x,y) {
-			this.x = x; this.y = y;
+		DefaultObservableWidget.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
+
+			// Calculate pivot point
+			this.pivotX = width/2 + this.left;
+			this.pivotY = height/2 + this.top;
+
+			// 
+
 			this.update();
 		}
 
@@ -177,47 +218,21 @@ define(
 		 */
 		DefaultObservableWidget.prototype.update = function() {
 
-			// What's the maximum value we will render
-			var maxValid = 4.0;
-
 			// Calculate position around pivot
-			var v = this.getValue(), midRange = (this.maxDistance - this.minDistance) / 2, r = 0;
-			if (v < 1.0) { // 0.0 -> 1.0 = minDistance -> mid
-				r = this.minDistance + (v*midRange);
-			} else { // 1.0 -> 4.0 = mid -> maxDistance
-				if (v > maxValid) v = maxValid;
-				v = (v-1.0) / (maxValid-1.0);
-				r = this.minDistance + midRange + (v*midRange);
-			}
+			var v = this.getValue(),
+				r = CMath.mapChiSq(v, this.minDistance, this.maxDistance);
 
 			// Update position
-			this.x = this.pivotX + Math.sin(this.angle) * (r+this.minDistance);
-			this.y = this.pivotY + Math.cos(this.angle) * (r+this.minDistance);
+			this.x = this.pivotX + Math.sin(this.angle) * r;
+			this.y = this.pivotY + Math.cos(this.angle) * r;
 
 			// Pick classes
-			var obsValBounds = [0.33, 0.66];
-
-			// Remove previous classes
-			this.element.removeClass("val-bd");
-			this.element.removeClass("val-md");
-			this.element.removeClass("val-gd");
-			this.indicator.removeClass("val-bd");
-			this.indicator.removeClass("val-md");
-			this.indicator.removeClass("val-gd");
-
-			// Append classes
-			if (v < Config.values['good-average']) {
-				this.element.addClass("val-bd");
-				this.indicator.addClass("val-bd");
-				this.diameter = 54;
-			} else if (v < Config.values['average-bad']) {
-				this.element.addClass("val-md");
-				this.indicator.addClass("val-md");
-				this.diameter = 50;
+			if (v <= Config['chi2-bounds']['good']) {
+				this.element.removeClass('grey');
+				this.element.addClass('green');
 			} else {
-				this.element.addClass("val-gd");
-				this.indicator.addClass("val-gd");
-				this.diameter = 24;
+				this.element.removeClass('green');
+				this.element.addClass('grey');
 			}
 
 			// Update position

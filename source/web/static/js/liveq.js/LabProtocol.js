@@ -111,7 +111,7 @@ define(
 					this.reference[histo.id] = histo;
 
 					// Use reference information to create new histogram
-					this.data[histo.id] = new HistogramData( histo.reference.bins, histo.id );
+					this.data[histo.id] = new HistogramData( histo.data.bins, histo.id );
 
 					// Fire histogram added callbacks
 					this.trigger('histogramAdded', this.data[histo.id], this.reference[histo.id]);

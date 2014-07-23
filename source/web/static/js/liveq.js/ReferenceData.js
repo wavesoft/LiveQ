@@ -95,7 +95,7 @@ define(
 				 * The reference histogram for the data set.
 				 * @member {LiveQ.HistogramData}
 				 */
-				this.reference = null;
+				this.data = null;
 
 			}
 
@@ -132,7 +132,7 @@ define(
 				hc.imgYLabel = reader.getData('image/png');
 
 				// Get reference histogram
-				hc.reference = HistogramData.fromReader( reader );
+				hc.data = HistogramData.fromReader( reader );
 
 				return hc;
 			}

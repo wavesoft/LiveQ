@@ -4,9 +4,9 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/base/components", "core/util/progress_aggregator"], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/base/components", "core/util/progress_aggregator", "liveq/core" ], 
 
-	function($, config, R, UI, DB, Components, ProgressAggregator) {
+	function($, config, R, UI, DB, Components, ProgressAggregator, LiveQCore) {
 		var VAS = { };
 
 		/**
@@ -138,7 +138,18 @@ define(
 							if (!status) {
 								alert("Could not log-in! " + data);
 							} else {
-								UI.selectScreen("screen.home");
+
+								// Connect to LabSocket
+								LiveQCore.openSocket(
+									'3e63661c13854de7a9bdeed71be16bb9', 
+									function(){
+										UI.selectScreen("screen.home");
+									},
+									function(message) {
+										alert('Could not connect to LiveQ! '+message);
+									}
+								);
+
 							}
 						});
 					});

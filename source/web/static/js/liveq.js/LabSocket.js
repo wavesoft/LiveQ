@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	[ "liveq/LabProtocol", "liveq/LiveQ", "liveq/BufferReader" ], 
+	[ "liveq/LabProtocol", "liveq/LiveQ", "liveq/BufferReader", "core/config" ], 
 
 	/**
 	 * This is the default data widget for visualizing a historgram
 	 *
  	 * @exports liveq/LabSocket
 	 */
-	function( LabProtocol, LiveQ, BufferReader ) {
+	function( LabProtocol, LiveQ, BufferReader, Config ) {
 
 		/**
 		 * Connect to a LiveQ Lab socket
@@ -49,7 +49,7 @@ define(
 			 * The URL where the WebSocket is connected
 			 * @member {string}
 			 */
-			this.url = "ws://" + location.host + "/vas/labsocket/" + id;
+			this.url = Config['liveq']['socket_url'] + id;
 
 			/**
 			 * The timer ID used for pinging the server
@@ -58,13 +58,9 @@ define(
 			 */
 			this._pingTimer = null;
 
-			// If we are browsing the website through SSL, use SSL also
-			// for the socket.
+			// If we are browsing the website through SSL, use SSL also for the socket.
 			if (String(window.location).substr(0,5) == "https")
-				this.url = "wss://" + location.host + "/vas/labsocket/" + id;
-
-			// Initialize connection
-			this.setupSocket();
+				this.url = this.url.replace("ws:", "wss:");
 
 		}
 
@@ -75,7 +71,7 @@ define(
 		 * Setup a new WebSocket on the given URL and bind on it's callbacks
 		 * @param {string} url - The Websocket URL to connect to
 		 */
-		LabSocket.prototype.setupSocket = function( url ) {
+		LabSocket.prototype.connect = function( url ) {
 			if (url) this.url = url;
 			var self = this;
 			try {
@@ -141,7 +137,7 @@ define(
 					self.connected = true;
 
 					// Fire callbacks
-					this.trigger('connected', self);
+					self.trigger('connected', self);
 
 					// Start ping timer
 					if (self._pingTimer)
@@ -163,7 +159,7 @@ define(
 					self.connected = false;
 
 					// Fire callbacks
-					this.trigger('disconnected', self);
+					self.trigger('disconnected', self);
 
 					// Clear timer
 					if (self._pingTimer)
@@ -271,6 +267,7 @@ define(
 		 * Disconnect socket
 		 */
 		LabSocket.prototype.close = function() {
+			if (!this.connected) return;
 			console.log("Connection closed");
 
 			// Remove handler

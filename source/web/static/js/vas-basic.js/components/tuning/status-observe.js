@@ -155,19 +155,19 @@ define(
 
 			// Change configuration based on value
 			if (value < Config['chi2-bounds']['good']) {
-				this.knobConfig['fgColor'] = '#e74c3c';
+				this.knobConfig['fgColor'] = '#16a085';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 			} else if (value < Config['chi2-bounds']['average']) {
 				this.knobConfig['fgColor'] = '#f39c12';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 			} else {
-				this.knobConfig['fgColor'] = '#16a085';
+				this.knobConfig['fgColor'] = '#e74c3c';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 			}
 
 			// Update progress bar
 			this.progressKnob
-				.val(100 * value)
+				.val( 100 - CMath.mapChiSq( value, 0, 100 ) )
 				.trigger('change');
 
 		}

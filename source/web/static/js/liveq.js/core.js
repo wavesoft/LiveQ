@@ -38,7 +38,7 @@ define(
 		 */
 		LiveQCore.openSocket = function( labID, cbCompleted, cbError ) {
 			if (this.socket) this.socket.close();
-			this.socket = LabSocket( labID );
+			this.socket = new LabSocket( labID );
 
 			// Error handler
 			var errorHandler = (function(message) {
@@ -67,6 +67,19 @@ define(
 				}
 
 			}).bind(this);
+
+			//
+			// 'connected' is fired when the socket is connected
+			//
+			this.socket.on('connected', (function() {
+			}).bind(this));
+
+			//
+			// 'ready' is fired when the negotiation is completed
+			//
+			this.socket.on('ready', (function(config) {
+				if (cbCompleted) cbCompleted();
+			}).bind(this));
 
 			//
 			// 'error' is fired when something goes wrong in the socket
@@ -130,6 +143,9 @@ define(
 			// 'runError' is fired when something goes wrong in the simulation run
 			//
 			this.socket.on('runError', errorHandler);
+
+			// We have all the listeners bound. Try to connect
+			this.socket.connect();
 
 		}
 

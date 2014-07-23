@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config", "core/util/math" ], 
+	["jquery", "core/registry", "core/ui", "core/base/tuning_components", "core/config", "core/util/math", "liveq/Calculate" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, UI, TC, Config, CMath) {
+	function(config, R, UI, TC, Config, CMath, LiveQCalc) {
 
 		var DefaultObservableWidget = function(hostDOM) {
 
@@ -19,10 +19,10 @@ define(
 			this.x = 0;
 			this.y = 0;
 			this.active = true;
-			this.value = 0;
 			this.diameter = 45;
 			this.mouseOver= false;
 			this._handleTimer = 0;
+			this.value = null;
 
 			// Prepare host element
 			this.element = $('<div class="grey"></div>');
@@ -72,7 +72,7 @@ define(
 		 */
 		DefaultObservableWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
-				this.value = 0;
+				this.value = null;
 			} else {
 				this.value = value;
 			}
@@ -158,7 +158,13 @@ define(
 		 */
 		DefaultObservableWidget.prototype.getValue = function() {
 			//return Math.random();
-			return this.value;
+
+			// If we don't have yet histograms, return maximum chi-squared
+			if (!this.value) return Config['chi2-bounds']['max'];
+
+			// Calculate chi-squared between the data and the reference histogram
+			var chi2 = LiveQCalc.chi2WithError( this.value.data, this.value.ref.data );
+			return chi2[0];
 		}
 
 		/**

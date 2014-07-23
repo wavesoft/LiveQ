@@ -8,6 +8,13 @@ define({
 	'dom-host' 			: '#game-frame',
 
 	/**
+	 * LiveQ-Specific configuration
+	 */
+	'liveq' : {
+		'socket_url'	: 'wss://test4theory.cern.ch/vas/labsocket/'
+	},
+
+	/**
 	 * CouchDB Database Configuration
 	 */
 	'db': {
