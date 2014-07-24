@@ -63,64 +63,99 @@ define(
 			// Break down initialization process in individual chainable functions
 			var prog_db = progressAggregator.begin(5),
 				init_db = function(cb) {
-					var c = 5;
+					var sequence = [
 
-					var dTunables = DB.openDatabase("tunables").all(function(tunables) {
-						prog_db.ok("Fetched tunable configuration");
-						DB.cache['tunables'] = tunables;
-						if (--c == 0) cb();
-					});
+							// It's not a good idea to saturate the bandwidth of CouchDB, therefore
+							// we are executing our fetches in sequence.
 
-					var dObservables = DB.openDatabase("observables").all(function(observables) {
-						prog_db.ok("Fetched observable configuration");
-						DB.cache['observables'] = observables;
-						if (--c == 0) cb();
-					});
+							function(cb) {
+
+								// Fetch tunables
+								var dTunables = DB.openDatabase("tunables").all(function(tunables) {
+									prog_db.ok("Fetched tunable configuration");
+									DB.cache['tunables'] = tunables;
+									cb();
+								});
+
+							},
+							function(cb) {
+
+								// Fetch observables
+								var dObservables = DB.openDatabase("observables").all(function(observables) {
+									prog_db.ok("Fetched observable configuration");
+									DB.cache['observables'] = observables;
+									cb();
+								});
+
+							},
+							function(cb) {
+
+								// Fetch level configuration
+								var dLevels = DB.openDatabase("levels").all(function(levels) {
+									prog_db.ok("Fetched tunable parameters");
+
+									// Build a lookup index
+									var keys={}, index=[];
+									for (var i=0; i<levels.length; i++) {
+										if (levels[i]['_id'] == "index") {
+											index = levels[i]['levels'];
+										} else {
+											keys[levels[i]['_id']] = levels[i];
+										}
+									}
+
+									// Get levels
+									var usableLevels = [];
+									for (var i=0; i<index.length; i++) {
+										usableLevels.push( keys[index[i]] );
+									}
+
+									// Cache levels
+									DB.cache['levels'] = usableLevels;
+									cb();
+								});
+
+							},
+							function(cb) {
+
+								var dScenes = DB.openDatabase("scenes").all(function(scenes) {
+									prog_db.ok("Fetched scene configuration");
+									DB.cache['scenes'] = scenes;
+									cb();
+								});
 
 
-					var dLevels = DB.openDatabase("levels").all(function(levels) {
-						prog_db.ok("Fetched tunable parameters");
+							},
+							function(cb) {
 
-						// Build a lookup index
-						var keys={}, index=[];
-						for (var i=0; i<levels.length; i++) {
-							if (levels[i]['_id'] == "index") {
-								index = levels[i]['levels'];
-							} else {
-								keys[levels[i]['_id']] = levels[i];
+								var dDefinitions = DB.openDatabase("definitions").all(function(definitions) {
+									prog_db.ok("Fetched definitions");
+
+									// Convert definitions to key-based index
+									var def = {};
+									for (var i=0; i<definitions.length; i++) {
+										def[definitions[i]._id] = definitions[i];
+									}
+
+									// Update definitions
+									DB.cache['definitions'] = def;
+									cb();
+								});
+
 							}
-						}
+						],
+						seq_index = 0,
+						seq_next = function() {
+							if (seq_index >= sequence.length) {
+								cb();
+							} else {
+								sequence[seq_index]( seq_next );
+								seq_index += 1;
+							}
+						};
 
-						// Get levels
-						var usableLevels = [];
-						for (var i=0; i<index.length; i++) {
-							usableLevels.push( keys[index[i]] );
-						}
-
-						// Cache levels
-						DB.cache['levels'] = usableLevels;
-						if (--c == 0) cb();
-					});
-
-					var dScenes = DB.openDatabase("scenes").all(function(scenes) {
-						prog_db.ok("Fetched scene configuration");
-						DB.cache['scenes'] = scenes;
-						if (--c == 0) cb();
-					});
-
-					var dDefinitions = DB.openDatabase("definitions").all(function(definitions) {
-						prog_db.ok("Fetched definitions");
-
-						// Convert definitions to key-based index
-						var def = {};
-						for (var i=0; i<definitions.length; i++) {
-							def[definitions[i]._id] = definitions[i];
-						}
-
-						// Update definitions
-						DB.cache['definitions'] = def;
-						if (--c == 0) cb();
-					});
+					// Start sequence
+					seq_next();
 
 				};
 

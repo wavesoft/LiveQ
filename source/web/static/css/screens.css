@@ -619,6 +619,87 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 .screen.home .home-menu a.btn:hover {
   background-color: #70b8ff;
 }
+.screen.home .topic-host {
+  width: 100%;
+}
+.screen.home .topic-host .topic {
+  display: none;
+  position: absolute;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+}
+.screen.home .topic-host .topic .header,
+.screen.home .topic-host .topic .tiles {
+  position: absolute;
+  opacity: 0;
+  background-color: rgba(255, 255, 255, 0.3);
+  left: 0;
+  right: 0;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+}
+.screen.home .topic-host .topic .header {
+  top: 0;
+  height: 40px;
+  z-index: 501;
+}
+.screen.home .topic-host .topic .tiles {
+  top: 40px;
+  bottom: 0;
+  padding: 10px;
+  z-index: 502;
+}
+.screen.home .topic-host .topic .tiles .tile {
+  float: left;
+}
+.screen.home .topic-host .topic .icon {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  z-index: 503;
+}
+.screen.home .topic-host .topic.next,
+.screen.home .topic-host .topic.prev {
+  width: 200px;
+  height: 200px;
+}
+.screen.home .topic-host .topic.active {
+  left: 20%;
+  right: 20%;
+  top: 20px;
+  bottom: 20px;
+}
+.screen.home .topic-host .topic.active .header {
+  opacity: 1;
+}
+.screen.home .topic-host .topic.active .tiles {
+  opacity: 1;
+}
+.screen.home .topic-host .topic.active .icon {
+  opacity: 0.3;
+  background-size: auto;
+  background-position: right bottom;
+  z-index: 500;
+}
+.screen.home .topic-host .topic.next {
+  left: 80%;
+}
+.screen.home .topic-host .topic.prev {
+  right: 80%;
+}
 .screen.explain {
   padding: 0;
 }

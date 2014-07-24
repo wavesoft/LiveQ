@@ -698,6 +698,95 @@ body {
 		}
 	}
 
+	.topic-host {
+		width: 100%;
+
+		.topic {
+			display: none;
+			position: absolute;
+			border-width: 4px;
+			background-color: #2ecc71;
+			border-color: #2ecc71;
+			.border-radius( 20px );
+
+			.header, .tiles {
+				position: absolute;
+				opacity: 0;
+				background-color: rgba(255,255,255,0.3);
+				left: 0; right: 0;
+				.transition(all 0.4s);
+			}
+
+			.header {
+				top: 0;
+				height: 40px;
+				z-index: 501;
+			}
+
+			.tiles {
+				top: 40px;
+				bottom: 0;
+				padding: 10px;
+				z-index: 502;
+
+				.tile {
+					float: left;
+				}
+			}
+
+			.icon {
+				.transition(all 0.4s);
+				position: absolute;
+				left: 0; right: 0;
+				bottom: 0; top: 0;
+				background-position: center center;
+				background-repeat: no-repeat;
+				background-size: contain;
+				z-index: 503;
+			}
+
+			&.next, &.prev {
+				width: 200px;
+				height: 200px;
+			}
+
+			// Focus topic is the one in the center
+			// ====================================
+			&.active {
+				left: 20%; right: 20%;
+				top: 20px; bottom: 20px;
+
+				.header {
+					opacity: 1;
+				}
+				.tiles {
+					opacity: 1;
+				}
+				.icon {
+					opacity: 0.3;
+					background-size: auto;
+					background-position: right bottom;
+					z-index: 500;
+				}
+
+			}
+
+			// Next topic is the one on the right
+			// ====================================
+			&.next {
+				left: 80%;
+			}
+
+			// Previous topic is the one on the left
+			// ====================================
+			&.prev {
+				right: 80%;
+			}
+
+		}
+
+	}
+
 }
 
 ///////////////////////////////////////////////
