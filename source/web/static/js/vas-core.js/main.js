@@ -61,7 +61,7 @@ define(
 			}
 
 			// Break down initialization process in individual chainable functions
-			var prog_db = progressAggregator.begin(5),
+			var prog_db = progressAggregator.begin(7),
 				init_db = function(cb) {
 					var sequence = [
 
@@ -121,6 +121,39 @@ define(
 								var dScenes = DB.openDatabase("scenes").all(function(scenes) {
 									prog_db.ok("Fetched scene configuration");
 									DB.cache['scenes'] = scenes;
+									cb();
+								});
+
+
+							},
+							function(cb) {
+
+								var dScenes = DB.openDatabase("topic_map").all(function(topic_map) {
+									prog_db.ok("Fetched topic map");
+
+									// Prepare topics
+									DB.cache['topics'] = topic_map;
+
+									// Prepare index
+									DB.cache['topic_index'] = { };
+									for (var i=0; i<topic_map.length; i++) {
+										DB.cache['topic_index'][ topic_map[i]['_id'] ] = topic_map[i];
+									}
+
+									cb();
+								});
+
+
+							},
+							function(cb) {
+
+								var dScenes = DB.openDatabase("tasks").all(function(tasks) {
+									prog_db.ok("Fetched tasks");
+
+									DB.cache['tasks'] = { };
+									for (var i=0; i<tasks.length; i++) {
+										DB.cache['tasks'][tasks[i]['_id']] = tasks[i];
+									}
 									cb();
 								});
 
@@ -342,6 +375,7 @@ define(
 
 			// Run main game
 			UI.selectScreen( "screen.login" );
+			//UI.selectScreen( "screen.home" );
 
 		}
 

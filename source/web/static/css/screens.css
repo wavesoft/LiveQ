@@ -8,14 +8,14 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666666;
+  border-top: solid 1px #666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: white;
+  color: #FFF;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -84,15 +84,14 @@
 			}
 		}
 		*/
-
 }
 .screen .observable.grey {
-  color: #333333;
+  color: #333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: white;
+  color: #FFF;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -149,7 +148,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -173,7 +172,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: white;
+  color: #FFF;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -197,7 +196,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -246,7 +245,7 @@
   top: 145px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -267,7 +266,7 @@
 }
 .screen.tuning .floater.f-header h1,
 .screen.tuning .floater.f-header p {
-  color: white;
+  color: #FFF;
   text-align: left;
   margin: 2px 2px;
 }
@@ -310,14 +309,14 @@
   height: 18px;
   margin: 4px;
   font-size: 16px;
-  color: #cccccc;
-  border: solid 1px #cccccc;
+  color: #CCC;
+  border: solid 1px #CCC;
   text-align: center;
   line-height: 17px;
 }
 .screen.tuning .sidebar h1 span.help:hover {
-  color: #333333;
-  border: solid 1px #333333;
+  color: #333;
+  border: solid 1px #333;
 }
 .screen.tuning .tunable {
   -webkit-transition: background-color 0.25s;
@@ -376,7 +375,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: white;
+  color: #ffffff;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -401,7 +400,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: white;
+  color: #ffffff;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -462,7 +461,7 @@
   -o-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 100;
-  background-color: white;
+  background-color: #FFF;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -498,7 +497,7 @@
   top: -50px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -520,7 +519,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: white;
+  background-color: #FFF;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.message {
@@ -562,13 +561,13 @@
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.tuning .progress-widget div.c-marker div.label {
   padding-top: 5px;
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -609,26 +608,35 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399ff;
+  background-color: #3399FF;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70b8ff;
+  background-color: #70B8FF;
 }
 .screen.home .topic-host {
+  position: absolute;
   width: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 100px;
 }
 .screen.home .topic-host .topic {
   display: none;
   position: absolute;
+  border-width: 4px;
+  background-color: #2ecc71;
+  border-color: #2ecc71;
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   -o-border-radius: 20px;
   border-radius: 20px;
+  overflow: hidden;
 }
 .screen.home .topic-host .topic .header,
 .screen.home .topic-host .topic .tiles {
@@ -655,6 +663,30 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.home .topic-host .topic .tiles .tile {
   float: left;
+  border-radius: 5px;
+  width: 120px;
+  height: 120px;
+  background-color: #27AE60;
+  margin: 4px;
+  cursor: pointer;
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+}
+.screen.home .topic-host .topic .tiles .tile:hover {
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -o-transform: scale(1.1);
+  transform: scale(1.1);
+}
+.screen.home .topic-host .topic .tiles .tile .label {
+  line-height: 120px;
+  width: 120px;
+  text-align: center;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 24px;
 }
 .screen.home .topic-host .topic .icon {
   -webkit-transition: all 0.4s;
@@ -677,10 +709,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   height: 200px;
 }
 .screen.home .topic-host .topic.active {
+  display: block;
   left: 20%;
   right: 20%;
   top: 20px;
   bottom: 20px;
+  background-color: transparent;
 }
 .screen.home .topic-host .topic.active .header {
   opacity: 1;
@@ -695,9 +729,11 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   z-index: 500;
 }
 .screen.home .topic-host .topic.next {
+  display: block;
   left: 80%;
 }
 .screen.home .topic-host .topic.prev {
+  display: block;
   right: 80%;
 }
 .screen.explain {
@@ -717,7 +753,6 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   /* easeInBack */
-
   -webkit-transform: scale(0.1);
   -moz-transform: scale(0.1);
   -o-transform: scale(0.1);
@@ -738,7 +773,6 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   /* easeOutBack */
-
 }
 .screen.explain .explain-book.learn,
 .screen.explain .explain-book .learn {
@@ -772,7 +806,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   margin-left: 6px;
 }
 .screen.explain .explain-book div.header > span.title {
-  color: white;
+  color: #fff;
   font-size: 14px;
   line-height: 24px;
   margin-left: 4px;
@@ -810,7 +844,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100px;
   padding: 2px;
   height: 20px;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.explain .explain-top {
@@ -859,7 +893,6 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
   /* easeInBack */
-
 }
 .screen.explain .explain-top .parameter h1 {
   margin: 0;
@@ -868,7 +901,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 40px;
   line-height: 40px;
   text-align: center;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-top .parameter div.title {
   display: none;
@@ -885,7 +918,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 0;
   position: absolute;
   pointer-events: none;
-  border-color: transparent;
+  border-color: rgba(0, 0, 0, 0);
   border-width: 30px;
   margin-top: -30px;
 }
@@ -916,7 +949,6 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
   /* easeOutBack */
-
 }
 .screen.explain .explain-bottom {
   height: 35%;
@@ -935,7 +967,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .focus-bar {
   position: absolute;
-  background-color: #f1948a;
+  background-color: #F1948A;
   left: 0;
   top: 0;
   -webkit-transition: top 0.2s linear, left 0.2s linear;
@@ -1001,7 +1033,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   border-style: solid;
   border-color: transparent;
   border-width: 3px;
-  background-color: white;
+  background-color: #FFF;
   -webkit-border-radius: 24px;
   -moz-border-radius: 24px;
   -o-border-radius: 24px;
@@ -1009,8 +1041,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.focus {
-  background-color: #ffcccc;
-  border-color: white;
+  background-color: #fcc;
+  border-color: #FFF;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert {
   background-position-y: 0;
@@ -1018,7 +1050,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert:hover,
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.invert.focus {
-  border-color: white;
+  border-color: #FFF;
 }
 .screen.explain .explain-bottom.machine-diagram .icons .icon > a.icon01 {
   background-position-x: 0;
@@ -1066,7 +1098,6 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   left: 50%;
   top: 40%;
@@ -1084,13 +1115,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999999;
+  color: #999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -1106,9 +1136,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
-  background-color: #eeeeee;
+  background-color: #eee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -1119,7 +1148,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #ff9900;
+  background-color: #FF9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -1127,12 +1156,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1156,7 +1185,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1211,24 +1240,23 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95a5a6;
+  border: solid 2px #95A5A6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -1248,7 +1276,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: white;
+  color: #FFFFFF;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -1256,9 +1284,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
-  position: absolute;
   left: 0;
   top: 0;
+  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1328,8 +1356,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #cccccc;
-  border-bottom: solid 1px #cccccc;
+  border-top: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
 }
 .screen.login .body div.left {
   float: left;

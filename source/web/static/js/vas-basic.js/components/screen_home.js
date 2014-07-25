@@ -54,8 +54,62 @@ define(
 					})
 				);
 
+
+			// Prepare topic host
+			this.elmTopicHost = $('<div class="topic-host"></div>');
+			this.foregroundDOM.append( this.elmTopicHost );
+
+			var t1 = this.prepareTopic({ 
+					'info': {
+						'icon': 'static/img/level-icons/remnants.png'
+					}, 
+					'tasks': [1,2,3,4,5,6,7] 
+				}),
+				t2 = this.prepareTopic({ 'tasks': [1,2,3,4] });
+
+			t1.addClass('active');
+			this.elmTopicHost.append(t1);
+			t2.addClass('next');
+			this.elmTopicHost.append(t2);
+
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
+
+
+		/**
+		 * Create a topic element
+		 */
+		HomeScreen.prototype.prepareTopic = function(data) {
+			var elmTopic = $('<div class="topic"></div>'),
+				elmHeader = $('<div class="header"></div>'),
+				elmTiles = $('<div class="tiles"></div>'),
+				elmIcon = $('<div class="icon"></div>');
+
+			// Nest elements
+			elmTopic.append( elmHeader );
+			elmTopic.append( elmTiles );
+			elmTopic.append( elmIcon );
+
+			// Setup elements
+			if (data['info'] != undefined) {
+				if (data['info']['name']) elmHeader.append($('<h1>'+data['info']['name']+'</h1>'));
+				if (data['info']['desc']) elmHeader.append($('<p>'+data['info']['desc']+'</p>'));
+				if (data['info']['icon']) elmIcon.css({ 'background-image': data['info']['icon'] });
+			}
+
+			// Prepare tasks
+			for (var i=0; i<data['tasks'].length; i++) {
+				var elmTile = $('<div class="tile"></div>'),
+					elmLabel = $('<div class="label"></div>'),
+					elmLock = $('<div class="lock"></div>');
+
+				elmTile.append( elmLabel );
+				elmTile.append( elmLock );
+				elmTiles.append( elmTile );
+			}
+
+			return elmTopic;
+		}
 
 		/**
 		 * Re-align menu on position

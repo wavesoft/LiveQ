@@ -699,7 +699,10 @@ body {
 	}
 
 	.topic-host {
+		position: absolute;
 		width: 100%;
+		left: 0; right: 0;
+		bottom: 0; top: 100px;
 
 		.topic {
 			display: none;
@@ -708,6 +711,7 @@ body {
 			background-color: #2ecc71;
 			border-color: #2ecc71;
 			.border-radius( 20px );
+			overflow: hidden;
 
 			.header, .tiles {
 				position: absolute;
@@ -731,6 +735,27 @@ body {
 
 				.tile {
 					float: left;
+					border-radius: 5px;
+					width: 120px;
+					height: 120px;
+					background-color: #27AE60;
+					margin: 4px;
+
+					cursor: pointer;
+					.transition(all 0.4s);
+
+					&:hover {
+						.transform( scale(1.1) );
+					}
+
+					.label {
+						line-height: 120px;
+						width: 120px;
+						text-align: center;
+						color: #FFF;
+						font-weight: bold;
+						font-size: 24px;
+					}
 				}
 			}
 
@@ -753,8 +778,10 @@ body {
 			// Focus topic is the one in the center
 			// ====================================
 			&.active {
+				display: block;
 				left: 20%; right: 20%;
 				top: 20px; bottom: 20px;
+				background-color: transparent;
 
 				.header {
 					opacity: 1;
@@ -774,12 +801,14 @@ body {
 			// Next topic is the one on the right
 			// ====================================
 			&.next {
+				display: block;
 				left: 80%;
 			}
 
 			// Previous topic is the one on the left
 			// ====================================
 			&.prev {
+				display: block;
 				right: 80%;
 			}
 
