@@ -501,6 +501,41 @@ define(["core/config", "core/base/component" ],
 		Backdrop.prototype = Object.create( Component.prototype );
 
 		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Popup Component.
+		 *
+		 * Such components can be shown on various screen coordinates using the UI.showPopup 
+		 * function.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining backdrop images.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var Popup = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		Popup.prototype = Object.create( Component.prototype );
+
+		/**
+		 * This function is called when the contents of the pop-up component should be
+		 * updated.
+		 *
+		 * @abstract
+		 * @param {object} config - The configuration information 
+		 * @param {function} bodyFn - A `function(hostDOM)` that should build the body in the hostDOM given.
+		 */
+		Popup.prototype.onPopupConfig = function(config, bodyFn) {
+
+		};
+
+		////////////////////////////////////////////////////////////
 		//             Event definitions for JSDoc                //
 		////////////////////////////////////////////////////////////
 
@@ -593,7 +628,8 @@ define(["core/config", "core/base/component" ],
 			'ProgressScreen'	: ProgressScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
-			'LoginScreen'		: LoginScreen
+			'LoginScreen'		: LoginScreen,
+			'Popup'				: Popup
 		};
 
 		return components;

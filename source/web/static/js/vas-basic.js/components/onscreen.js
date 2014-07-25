@@ -1,19 +1,20 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/tuning_components" ], 
+	["jquery", "core/registry","core/base/components" ], 
 
 	/**
-	 * This is the default tunable widget component for the base interface.
+	 * This is the default onscreen pop-up component for the tunables and
+	 * observables.
 	 *
- 	 * @exports base/components/tuning/tunable
+ 	 * @exports vas-basic/components/onscreen
 	 */
-	function(config, R, TC) {
+	function(config, R, Components) {
 
 		var DefaultOnScreen = function(hostDOM) {
 
 			// Initialize widget
-			TC.TunableWidget.call(this, hostDOM);
+			Components.Popup.call(this, hostDOM);
 
 			// Prepare properties
 			this.anchor = {x:0, y:0};
@@ -64,8 +65,8 @@ define(
 
 		};
 
-		// Subclass from TunableWidget
-		DefaultOnScreen.prototype = Object.create( TC.TunableWidget.prototype );
+		// Subclass from Components.Popup
+		DefaultOnScreen.prototype = Object.create( Components.Popup.prototype );
 
 		/**
 		 * Update popup anchor
@@ -93,14 +94,17 @@ define(
 		/**
 		 * Update popup information
 		 */
-		DefaultOnScreen.prototype.onPopupConfig = function(cfg) {
-			if (cfg['body']) {
+		DefaultOnScreen.prototype.onPopupConfig = function(cfg, bodyFn) {
+			// Create body contents using the body function
+			if (bodyFn) {
 				this.textContainer.empty();
-				this.textContainer.append(cfg['body']);
+				bodyFn( this.textContainer );
 			}
+			// Create title using title configuration
 			if (cfg['title']) {
 				this.titleElm.html(cfg['title']);
 			}
+			// Update offset using offset configuration
 			if (cfg['offset']) this.offset = cfg['offset'];
 		}
 

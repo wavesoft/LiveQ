@@ -191,6 +191,12 @@ h1 + p.subtitle {
 .uicon.uicon-warning {
   background-position: -192px 0px;
 }
+.uicon.uicon-plot-sideside {
+  background-position: -216px 0px;
+}
+.uicon.uicon-plot-ratio {
+  background-position: -240px 0px;
+}
 .onscreen {
   position: absolute;
   background: rgba(64, 64, 64, 0.9);
@@ -297,8 +303,8 @@ h1 + p.subtitle {
   overflow-x: hidden;
   overflow-y: auto;
   left: 0;
-  right: 0;
   top: 0;
+  width: 100%;
   bottom: 36px;
 }
 .onscreen .body-more .more {
@@ -327,6 +333,51 @@ h1 + p.subtitle {
 }
 .onscreen .body-more .more a:hover {
   background: #666666;
+}
+.tabs {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.tabs .tabs-body,
+.tabs .tabs-buttons {
+  position: absolute;
+  display: block;
+  overflow: hidden;
+}
+.tabs .tabs-body > .tab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+.tabs .tabs-body > .tab .tab-scroll {
+  overflow-y: auto;
+}
+.tabs .tabs-buttons > * {
+  display: inline-block;
+  margin: 0;
+  padding: 2px;
+  text-decoration: none;
+}
+.tabs .tabs-buttons > *:hover,
+.tabs .tabs-buttons > *.active {
+  background-color: rgba(255, 255, 255, 0.4);
+  color: black;
+}
+.tabs.tabs-right .tabs-body {
+  left: 0;
+  right: 28px;
+  top: 0;
+  bottom: 0;
+}
+.tabs.tabs-right .tabs-buttons {
+  right: 0;
+  width: 28px;
+  top: 0;
+  bottom: 0;
 }
 #game-frame {
   -webkit-perspective: 1200px;

@@ -186,20 +186,33 @@ define(
 			// Reset bounds
 			var vMin, vMax,
 				xMin=null, yMin=null,
-				xMax=null, yMax=null;
+				xMax=null, yMax=null,
+				ymin0Data=null;
 
 			// If the histogram is empty, return no bounds
 			if (this.empty)
 				return null;
 
 			// Run over bins and calculate bounds (including error bars)
+			// [y, y+, y-, x, x+, x-]
 			for (var i=0; i<this.bins; i++) {
+				if (this.values[i] == null) continue;
 
-				// Calculate the min/max for Y
-				vMax = this.values[i][0] + this.values[i][1];
-				vMin = this.values[i][0] - this.values[i][2];
+				// Calculate yhigh
+				vMax = Math.min( this.values[i][0]/10.0, this.values[i][0] + this.values[i][1] );
+				if ( this.values[i][0] >= 0.0 )
+					vMax = Math.min(this.values[i][0]*10.0, this.values[i][0] + this.values[i][1] );
 				if ((vMax>yMax) || (yMax==null)) yMax=vMax;
+
+				// Calculate ylow
+				vMin = Math.max( this.values[i][0]*10.0, this.values[i][0] - this.values[i][2] );
+				if ( this.values[i][0] >= 0.0 )
+					vMin = Math.max(this.values[i][0]/10.0, this.values[i][0] - this.values[i][2] );
 				if ((vMin<yMin) || (yMin==null)) yMin=vMin;
+
+	            // min Y value but above zero (for log plots)
+	            if ((this.values[i][0] > 0) && (this.values[i][0] < ymin0Data)) ymin0Data = this.values[i][0];
+	            if ((vMin > 0) && (vMin < ymin0Data)) ymin0Data = vMin;
 
 				// Calculate the min/max for X
 				vMax = this.values[i][3] + this.values[i][4];
@@ -214,7 +227,7 @@ define(
 				if (yMin<=0) yMin=0.000001;
 
 			// Return bounds
-			return [ xMin, xMax, yMin, yMax ];
+			return [ xMin, xMax, yMin, yMax, ymin0Data ];
 
 		}
 

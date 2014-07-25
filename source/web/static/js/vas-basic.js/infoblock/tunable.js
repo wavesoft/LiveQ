@@ -19,11 +19,12 @@ define(
 			DataWidget.call(this, hostDOM);
 
 			// Prepare infoblock
-			hostDOM.addClass("body-more");
+			this.element = $('<div class="body-more"></div>');
+			hostDOM.append(this.element);
 			this.bodyDOM = $('<div class="body"></div>');
 			this.moreLinks = $('<div class="more"></div>');
-			hostDOM.append(this.bodyDOM);
-			hostDOM.append(this.moreLinks);
+			this.element.append(this.bodyDOM);
+			this.element.append(this.moreLinks);
 
 		};
 

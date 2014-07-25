@@ -19,25 +19,85 @@ define(
 			DataWidget.call(this, hostDOM);
 
 			// Prepare infoblock
-			hostDOM.addClass("body-more");
+			this.element = $('<div class="body-more"></div>');
+			hostDOM.append(this.element);
 			this.bodyDOM = $('<div class="body"></div>');
 			this.moreLinks = $('<div class="more"></div>');
-			hostDOM.append(this.bodyDOM);
-			hostDOM.append(this.moreLinks);
+			this.element.append(this.bodyDOM);
+			this.element.append(this.moreLinks);
+
+			// Prepare tabular content
+			this.tabHost = $('<div class="tabs tabs-right"></div>');
+			this.tabBody = $('<div class="tabs-body"></div>');
+			this.tabButtons = $('<div class="tabs-buttons"></div>');
+			this.tabHost.append( this.tabBody );
+			this.tabHost.append( this.tabButtons );
+
+			// Prepare the tabular histogram information
+			this.histogramTabs = [];
+
+			// Prepare plot component on body
+			this.histogramTabs.push({
+
+			});
+			this.plotCom = R.instanceComponent("dataviz.histogram", this.tabBody);
+			this.forwardVisualEvents( this.plotCom );
+			this.adoptEvents( this.plotCom );
 
 		};
 
 		// Subclass from ObservableWidget
 		ObservableBody.prototype = Object.create( DataWidget.prototype );
 
+		///////////////////////////////////////////////////////////////////////////////
+		////                         UTILITY FUNCTIONS                             ////
+		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Register histogram handler
+		 */
+		ObservableBody.prototype.registerTab = function( className, uicon ) {
+
+			// Create button
+			var tabButton = $('<a href="do:'+className+'"><span class="uicon '+uicon+'"></span></a>'),
+				tabIndex = this.histogramTabs.length;
+			this.tabButtons.append( tabButton );
+
+			// Handle click
+			tabButton.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.selectTab(tabIndex);
+			}).bind(this));
+
+			// Create body
+			var tabBody = $('<div class="tab"></div>');
+			this.tabBody.append( tabBody );
+
+
+			// Store
+			this.histogramTabs.push({
+				'elmButton': tabButton
+			});
+
+			this.histogramTabs.push(record);
+		}
+
+		///////////////////////////////////////////////////////////////////////////////
+		////                          EVENT HANDLERS                               ////
+		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Forvward value update to the plot
+		 */
+		ObservableBody.prototype.onUpdate = function( value ) {
+			this.plotCom.onUpdate( value );
+		}
+
 		/**
 		 * Define the metadata to use for description
 		 */
 		ObservableBody.prototype.onMetaUpdate = function( meta ) {
-
-			// Prepare body DOM
-			this.bodyDOM.empty();
-			this.bodyDOM.append($('<div>Book #'+meta['info']['book']+' will be loaded here</div>'));
 
 			// Prepare 'more' links
 			this.moreLinks.empty();
@@ -60,6 +120,15 @@ define(
 			}).bind(this));
 			this.moreLinks.append( l );
 
+		}
+
+		/**
+		 * Forward the resize events
+		 */
+		ObservableBody.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
+			this.plotCom.onResize( this.bodyDOM.width()-18, this.bodyDOM.height()-20 );
 		}
 
 		// Store observable infoblock component on registry

@@ -56,30 +56,32 @@ define(
 			this.elmTitle.mouseenter((function() {
 				clearTimeout(hoverTimer);
 				hoverTimer = setTimeout((function() {
-					// Prepare the body
-					var comBodyHost = $('<div></div>'),
-						comBody = R.instanceComponent("infoblock.tunable", comBodyHost);
-					if (comBody) {
-
-						// Update infoblock 
-						comBody.onMetaUpdate( this.meta );
-						comBody.onUpdate( this.getValue() );
-
-						// Adopt events from infoblock as ours
-						this.adoptEvents( comBody );
-
-					} else {
-						console.warn("Could not instantiate tunable infoblock!");
-					}
 
 					// Show pop-up
 					UI.showPopup( 
 						"widget.onscreen", 
 						this.hostDOM,
+						(function(hostDOM) {
+
+							// Prepare the body
+							var comBody = R.instanceComponent("infoblock.tunable", hostDOM);
+							if (comBody) {
+
+								// Update infoblock 
+								comBody.onMetaUpdate( this.meta );
+								comBody.onUpdate( this.getValue() );
+
+								// Adopt events from infoblock as ours
+								this.adoptEvents( comBody );
+
+							} else {
+								console.warn("Could not instantiate tunable infoblock!");
+							}
+
+						}).bind(this),
 						{ 
 							'offset': $(this.hostDOM).width()/2+20,
-							'title' : this.meta['info']['name'],
-							'body'  : comBodyHost
+							'title' : this.meta['info']['name']
 						}
 					);
 

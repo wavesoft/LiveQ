@@ -220,7 +220,9 @@ define(["core/config", "core/base/component"],
 				inst = new componentClass(hostDOM);
 
 				// Prepare component
-				inst.onResize( $(hostDOM).width(), $(hostDOM).height() )
+				var ofs = $(hostDOM).offset();
+				inst.onResize( $(hostDOM).width(), $(hostDOM).height() );
+				inst.onMove( ofs.left, ofs.top );
 				inst.hide();
 
 			//} catch (e) {

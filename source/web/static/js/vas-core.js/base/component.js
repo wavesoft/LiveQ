@@ -149,7 +149,7 @@ define(["core/util/event_base", "core/config"],
 		 * as our own.
 		 *
 		 * @param {Component|array} com - The child component to receive events from
-		 * @param {string|array} events - (Optional) The names of the events to receive
+		 * @param {string|array} events - (Optional) The names of the events to receive. If not specified, all the events are forwarded.
 		 *
 		 */
 		Component.prototype.adoptEvents = function(com, events) {
@@ -398,8 +398,8 @@ define(["core/util/event_base", "core/config"],
 						}
 					}
 					this.onMove = function(x,y) {
-						this.left = w;
-						this.top = h;
+						this.left = x;
+						this.top = y;
 						origOnMove(x,y);
 						var c = self.__forwardVisualEventsComponents.length;
 						for (var i=0; i<self.__forwardVisualEventsComponents.length; i++) {

@@ -1,6 +1,6 @@
 
-define(["jquery", "core/config", "core/registry", "core/db"], 
-	function($, config, R, DB) {
+define(["jquery", "core/config", "core/registry", "core/db", "core/base/components"], 
+	function($, config, R, DB, Components) {
 
 		///////////////////////////////////////////////////////////////
 		//                     HELPER FUNCTIONS                      //
@@ -344,20 +344,52 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 
 		/**
 		 * Display a pop-up widget on the specified point on screen.
+		 * 
+		 * This function has a multi-call signature.
 		 *
+		 * @example <caption>Simple pop-up for an element</caption>
+		 * var targetElm = $('#hover-me');
+		 * targetElm.mouseOver(function() {
+		 *
+	     *    // Prepare the DOM element first
+	     *    var bodyDom = $('<div class="fancy-body">Some fancy text!</div>');
+	     *    
+	     *    // Pop-up the component 'popup.generic' next to
+	     *    // the element with ID 'hover-me'
+	     *    UI.showPop( 'popup.generic', targetElm, bodyDOM );
+	     *
+		 * });
+		 * @example <caption>Pop-up with body function</caption>
+		 * var targetElm = $('#hover-me');
+		 * targetElm.mouseOver(function() {
+		 *
+		 *    // Prepare the function to generate the body within
+		 *    // the host DOM element specified.
+		 *    var prepareBody = function( hostDOM ) {
+		 *       hostDOM.append( $('<h1>Header</h1>') );
+		 *       hostDOM.append( $('<p>This is a proceduraly generated body.</p>') );
+		 *    }
+		 *
+	     *    // Pop-up the component 'popup.generic' next to
+	     *    // the element with ID 'hover-me'. 
+	     *    UI.showPop( 'popup.generic', targetElm, bodyDOM );
+	     *
+		 * });
 		 * @param {string} name - The name of the widget module.
 		 * @param {int|DOMElement} x - The left position on screen
 		 * @param {int} y - The top position on screen
+		 * @param {function|DOMElement|String} body - the element to place in the body.
 		 * @params {object} config - The widget configuration
 		 *
 		 */
-		UI.showPopup = function(name, x, y, config) {
+		UI.showPopup = function(name, x, y, body, config) {
 
 			// If x was a Dom element, update x/y accordingly
 			if ((x instanceof $) || (x instanceof Element)) {
 
-				// Replace config with y, whatever config was
-				config = y;
+				// Shift parameters left
+				config = body;
+				body = y;
 
 				// Get element coordinates
 				var elm = $(x),
@@ -370,10 +402,26 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 
 			}
 
+			// If body is not a function, create one now
+			var bodyFn = body;
+			if ((body instanceof $) || (body instanceof Element)) {
+				bodyFn = (function(bodyElm) {
+					return function(hostDOM) {
+						hostDOM.append($(bodyElm));
+					};
+				})(body);
+			} else if (typeof(body) == 'string') {
+				bodyFn = (function(bodyText) {
+					return function(hostDOM) {
+						hostDOM.append($('<span>'+bodyText+'</span>'));
+					};
+				})(body);
+			}
+
 			// Check if we already have an instance of this widget
 			var widget = UI.popupWidgets[name];
 			if (!widget) {
-				widget = UI.popupWidgets[name] = R.instanceComponent( name, UI.popupDOM );
+				widget = UI.popupWidgets[name] = R.instanceComponent( name, UI.popupDOM, Components.Popup );
 				if (!widget) {
 					console.error("UI: Unable to instantiate pop-up widget '"+name+"'");
 					return;
@@ -381,13 +429,16 @@ define(["jquery", "core/config", "core/registry", "core/db"],
 			}
 
 			var __configAndShow = function() {
-				// Configure widget
+
+				// Adopt parent size
 				widget.onResize( UI.host.width(), UI.host.height() );
-				if (widget['onPopupConfig']) {
-					var cfg = config || {};
-					cfg.left = x; cfg.top = y;
-					widget.onPopupConfig(cfg)
-				}
+
+				// Configure
+				var cfg = config || {};
+				cfg.left = x; cfg.top = y;
+				widget.onPopupConfig(cfg, bodyFn);
+
+				// Update anchor
 				widget.onAnchorUpdate( x, y );
 
 				// Show widget

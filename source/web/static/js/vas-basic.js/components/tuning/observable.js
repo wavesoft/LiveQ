@@ -90,29 +90,30 @@ define(
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
 				
-				// Prepare the body
-				var comBodyHost = $('<div></div>'),
-					comBody = R.instanceComponent("infoblock.observable", comBodyHost);
-				if (comBody) {
-
-					// Update infoblock 
-					comBody.onMetaUpdate( this.meta );
-					comBody.onUpdate( this.getValue() );
-
-					// Adopt events from infoblock as ours
-					this.adoptEvents( comBody );
-
-				} else {
-					console.warn("Could not instantiate observable infoblock!");
-				}
-
 				UI.showPopup( 
 					"widget.onscreen", 
 					this.x, this.y,
+					(function(hostDOM) {
+
+						// Prepare the body
+						var comBody = R.instanceComponent("infoblock.observable", hostDOM);
+						if (comBody) {
+
+							// Update infoblock 
+							comBody.onMetaUpdate( this.meta );
+							comBody.onUpdate( this.value );
+
+							// Adopt events from infoblock as ours
+							this.adoptEvents( comBody );
+
+						} else {
+							console.warn("Could not instantiate observable infoblock!");
+						}
+
+					}).bind(this),
 					{ 
 						'offset': 50,
-						'title' : this.meta['info']['name'],
-						'body'  : comBodyHost
+						'title' : this.meta['info']['name']
 					}
 				);				
 
