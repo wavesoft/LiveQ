@@ -56,6 +56,7 @@ define(
 
 
 			// Prepare topic host
+			/*
 			this.elmTopicHost = $('<div class="topic-host"></div>');
 			this.foregroundDOM.append( this.elmTopicHost );
 
@@ -71,6 +72,8 @@ define(
 			this.elmTopicHost.append(t1);
 			t2.addClass('next');
 			this.elmTopicHost.append(t2);
+			*/
+			
 
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
@@ -79,6 +82,7 @@ define(
 		/**
 		 * Create a topic element
 		 */
+		/*
 		HomeScreen.prototype.prepareTopic = function(data) {
 			var elmTopic = $('<div class="topic"></div>'),
 				elmHeader = $('<div class="header"></div>'),
@@ -110,6 +114,7 @@ define(
 
 			return elmTopic;
 		}
+		*/
 
 		/**
 		 * Re-align menu on position

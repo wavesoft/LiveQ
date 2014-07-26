@@ -18,7 +18,8 @@ define(
 
 			// Prepare properties
 			this.anchor = {x:0, y:0};
-			this.offset = 0;
+			this.offsetX = 0;
+			this.offsetY = 0;
 			this.fixedWidth = 350;
 			this.fixedHeight = 250;
 			this.side = 0;
@@ -77,15 +78,15 @@ define(
 
 			// Calculate side
 			this.side = 1; // Default right side
-			if (this.anchor.x + this.offset + this.fixedWidth > this.width) {
+			if (this.anchor.x + this.offsetX + this.fixedWidth > this.width) {
 				this.side = 0; // Go to left side if overflow on right
 			}
 
 			// Check for overflows
-			if (this.anchor.y - this.fixedHeight/2 < 0) 
-				this.anchor.y = this.fixedHeight/2;
-			if (this.anchor.y + this.fixedHeight/2 > this.height)
-				this.anchor.y = this.height - this.fixedHeight/2;
+			if (this.anchor.y - this.offsetY - this.fixedHeight/2 < 0) 
+				this.anchor.y = this.fixedHeight/2 - this.offsetY;
+			if (this.anchor.y + this.offsetY + this.fixedHeight/2 > this.height)
+				this.anchor.y = this.height - this.fixedHeight/2 + this.offsetY;
 
 			// Update position
 			this.update();
@@ -105,7 +106,13 @@ define(
 				this.titleElm.html(cfg['title']);
 			}
 			// Update offset using offset configuration
-			if (cfg['offset']) this.offset = cfg['offset'];
+			if (cfg['offset']) this.offsetX = cfg['offset'];
+			if (cfg['offset-x']) this.offsetX = cfg['offset-x'];
+			if (cfg['offset-y']) this.offsetY = cfg['offset-y'];
+			// Update color
+			if (cfg['color']) {
+				this.bulletElm.css('background-color', cfg['color']);
+			}
 		}
 
 		/**
@@ -145,8 +152,8 @@ define(
 				this.element.removeClass("right");
 				this.element.addClass("left");
 				this.element.css({
-					'left'   : this.anchor.x - this.fixedWidth - this.offset,
-					'top'    : this.anchor.y - this.fixedHeight/2,
+					'left'   : this.anchor.x - this.fixedWidth - this.offsetX,
+					'top'    : this.anchor.y - this.fixedHeight/2 + this.offsetY,
 					'width'  : this.fixedWidth,
 					'height' : this.fixedHeight
 				});
@@ -154,8 +161,8 @@ define(
 				this.element.removeClass("left");
 				this.element.addClass("right");
 				this.element.css({
-					'left'   : this.anchor.x + this.offset,
-					'top'    : this.anchor.y - this.fixedHeight/2,
+					'left'   : this.anchor.x + this.offsetX,
+					'top'    : this.anchor.y - this.fixedHeight/2 + this.offsetY,
 					'width'  : this.fixedWidth,
 					'height' : this.fixedHeight
 				})

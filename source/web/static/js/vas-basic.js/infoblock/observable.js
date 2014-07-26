@@ -30,6 +30,7 @@ define(
 			this.tabHost = $('<div class="tabs tabs-right"></div>');
 			this.tabBody = $('<div class="tabs-body"></div>');
 			this.tabButtons = $('<div class="tabs-buttons"></div>');
+			this.bodyDOM.append( this.tabHost );
 			this.tabHost.append( this.tabBody );
 			this.tabHost.append( this.tabButtons );
 
@@ -37,12 +38,7 @@ define(
 			this.histogramTabs = [];
 
 			// Prepare plot component on body
-			this.histogramTabs.push({
-
-			});
-			this.plotCom = R.instanceComponent("dataviz.histogram", this.tabBody);
-			this.forwardVisualEvents( this.plotCom );
-			this.adoptEvents( this.plotCom );
+			this.registerTab("dataviz.histogram", "uicon-plot-sideside");
 
 		};
 
@@ -52,6 +48,24 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 		////                         UTILITY FUNCTIONS                             ////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Register histogram handler
+		 */
+		ObservableBody.prototype.selectTab = function( id ) {
+			for (var i=0; i<this.histogramTabs.length; i++) {
+				if (i == id) {
+					this.histogramTabs[i].com.show();
+					this.histogramTabs[i].elmButton.addClass("active");
+					this.histogramTabs[i].elmBody.show();
+				} else {
+					this.histogramTabs[i].com.hide();
+					this.histogramTabs[i].elmButton.removeClass("active");
+					this.histogramTabs[i].elmBody.hide();
+				}
+			}
+		}
+
 
 		/**
 		 * Register histogram handler
@@ -74,13 +88,37 @@ define(
 			var tabBody = $('<div class="tab"></div>');
 			this.tabBody.append( tabBody );
 
+			// Instantiate component
+			var com = R.instanceComponent( className, tabBody );
+			if (!com) {
+				tabBody.remove();
+				tabButton.remove();
+				console.error("ObservableBody: Could not instantiate histogram tab from component '"+className+"'");
+				return;
+			}
+
+			// Adopt component
+			this.forwardVisualEvents( com );
+			this.adoptEvents( com );
+
+			// Hide/show
+			if (this.histogramTabs.length == 0) {
+				tabBody.show();
+				tabButton.addClass("active");
+				com.show();
+			} else {
+				tabBody.hide();
+				com.hide();
+			}
+
 
 			// Store
 			this.histogramTabs.push({
-				'elmButton': tabButton
+				'elmButton': tabButton,
+				'elmBody'  : tabBody,
+				'com'	   : com
 			});
 
-			this.histogramTabs.push(record);
 		}
 
 		///////////////////////////////////////////////////////////////////////////////
@@ -91,7 +129,9 @@ define(
 		 * Forvward value update to the plot
 		 */
 		ObservableBody.prototype.onUpdate = function( value ) {
-			this.plotCom.onUpdate( value );
+			for (var i=0; i<this.histogramTabs.length; i++) {
+				this.histogramTabs[i].com.onUpdate( value );
+			}
 		}
 
 		/**
@@ -128,7 +168,9 @@ define(
 		ObservableBody.prototype.onResize = function(width, height) {
 			this.width = width;
 			this.height = height;
-			this.plotCom.onResize( this.bodyDOM.width()-18, this.bodyDOM.height()-20 );
+			for (var i=0; i<this.histogramTabs.length; i++) {
+				this.histogramTabs[i].com.onResize( this.tabBody.width()-18, this.tabBody.height()-20 );
+			}
 		}
 
 		// Store observable infoblock component on registry
