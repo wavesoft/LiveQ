@@ -739,6 +739,10 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 .screen.explain {
   padding: 0;
 }
+.screen.explain .explain-blackboard {
+  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
+  background-size: cover;
+}
 .screen.explain .explain-book {
   background-color: #3498db;
   position: absolute;
