@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Virtual Atom Smasher :: Sprite Editor</title>
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+		<style type="text/css">
+
+		#editor-frame {
+			width: 1075px;
+			height: 570px;
+			display: block;
+			background-color: #EFEFEF;
+			border-radius: 5px;
+			position: relative;
+			margin: 10px auto;
+		}
+
+		#editor-frame #editor-canvas {
+			background: url(static/img/blackboard.jpg) no-repeat center center;
+			position: absolute;
+			left: 10px; top: 60px; width: 800px; height: 450px;
+			border: solid 1px #eee;
+			overflow: hidden;
+		}
+
+		#editor-frame #editor-toolbar {
+			position: absolute;
+			top: 10px; left: 10px; right: 10px; height: 50px;
+		}
+
+		#editor-frame #editor-statusbar {
+			position: absolute;
+			bottom: 10px; left: 10px; right: 10px; height: 50px;
+		}
+
+		#editor-frame #editor-panels {
+			position: absolute;
+			left: 815px; width: 250px;
+			top: 60px; bottom: 60px;
+		}
+
+		#editor-frame #editor-panels > .tab-header {
+			position: absolute;
+			left: 0; top: 0; width: 250px; height: 42px;
+			padding: 0;
+		}
+
+
+ 		#editor-frame #editor-panels > .tab-body {
+ 			position: absolute;
+ 			left: 0; right: 0; top: 42px; bottom: 0;
+ 			background-color: #FFF;
+		}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="editor-frame">
+			<div id="editor-canvas">
+				<canvas width="800" height="450"></canvas>
+			</div>
+			<div id="editor-toolbar">
+			</div>
+			<div id="editor-statusbar">
+			</div>
+			<div id="editor-panels">
+				<div class="tab-header">
+					<ul class="nav nav-tabs" role="tablist">
+					  <li class="active"><a href="#">Home</a></li>
+					  <li><a href="#">Profile</a></li>
+					  <li><a href="#">Messages</a></li>
+					</ul>
+				</div>
+				<div class="tab-body">
+
+				</div>
+			</div>
+		</div>
+
+		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+        <script src="static/js/require.js"></script>
+		<script type="text/javascript">
+
+		// Where resources are located
+		requirejs.config({
+			// Base directory is the libraries folder
+		    baseUrl: 'static/js/lib',
+		    // Explicit declaration of components
+		    paths: {
+		    	'core'      : '../vas-core.js',
+		    	'liveq'     : '../liveq.js',
+		    	'vas-3d'    : '../vas-3d.js',
+		        'vas-basic' : '../vas-basic.js',
+		        'vas-editor': '../vas-editor.js'
+		    }
+		});
+
+		// Bootstrap LiveQ Engine
+		requirejs(
+		    [
+		        // Game modules
+		        'vas-editor/main-sprites'
+			], 
+		    function(main) {
+		        $(function() {
+		            // Initialize Editor 
+		            main.initialize(function() {
+		                // Wait until Editor is ready and run it
+		                main.run();
+		            });
+		        });
+		    }
+		);
+
+		</script>
+		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular.min.js"></script>	
+
+	</body>
+</html>
