@@ -7,7 +7,7 @@
 
 		#editor-frame {
 			width: 1075px;
-			height: 570px;
+			height: 775px;
 			display: block;
 			background-color: #EFEFEF;
 			border-radius: 5px;
@@ -28,15 +28,18 @@
 			top: 10px; left: 10px; right: 10px; height: 50px;
 		}
 
-		#editor-frame #editor-statusbar {
+		#editor-frame #editor-timline {
 			position: absolute;
-			bottom: 10px; left: 10px; right: 10px; height: 50px;
+			bottom: 10px; left: 10px; right: 10px; 
+			height: 250px;
+			background: #FFF;
+ 			border: solid 1px #ddd;
 		}
 
 		#editor-frame #editor-panels {
 			position: absolute;
 			left: 815px; width: 250px;
-			top: 60px; bottom: 60px;
+			top: 60px; height: 450px;
 		}
 
 		#editor-frame #editor-panels > .tab-header {
@@ -50,6 +53,9 @@
  			position: absolute;
  			left: 0; right: 0; top: 42px; bottom: 0;
  			background-color: #FFF;
+ 			border-color: #ddd;
+ 			border-width: 1px;
+ 			border-style: none solid solid solid;
 		}
 
 		</style>
@@ -62,7 +68,7 @@
 			</div>
 			<div id="editor-toolbar">
 			</div>
-			<div id="editor-statusbar">
+			<div id="editor-timline">
 			</div>
 			<div id="editor-panels">
 				<div class="tab-header">
