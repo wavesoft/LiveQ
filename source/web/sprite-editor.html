@@ -5,9 +5,62 @@
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 		<style type="text/css">
 
+
+		/* Common stuff */
+		.picker-wrapper, 
+		.slide-wrapper {
+		    position: relative;
+		    float: left;
+		}
+		.picker-indicator,
+		.slide-indicator {
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    pointer-events: none;
+		}
+		.picker,
+		.slide {
+		    cursor: crosshair;
+		    float: left;
+		}
+
+		/* Small skin */
+
+		.cp-small {
+		    padding: 5px;
+		    background-color: white;
+		    float: left;
+		    border-radius: 5px;
+		}
+		.cp-small .picker {
+		    width: 100px;
+		    height: 100px;
+		}
+		.cp-small .slide {
+		    width: 15px;
+		    height: 100px;
+		}
+		.cp-small .slide-wrapper {
+		    margin-left: 5px;
+		}
+		.cp-small .picker-indicator {
+		    width: 1px;
+		    height: 1px;
+		    border: 1px solid black;
+		    background-color: white;
+		}
+		.cp-small .slide-indicator {
+		    width: 100%;
+		    height: 2px;
+		    left: 0px;
+		    background-color: black;
+		}
+
+
 		#editor-frame {
 			width: 1075px;
-			height: 775px;
+			height: 765px;
 			display: block;
 			background-color: #EFEFEF;
 			border-radius: 5px;
@@ -18,17 +71,17 @@
 		#editor-frame #editor-canvas {
 			background: url(static/img/blackboard.jpg) no-repeat center center;
 			position: absolute;
-			left: 10px; top: 60px; width: 800px; height: 450px;
+			left: 10px; top: 50px; width: 800px; height: 450px;
 			border: solid 1px #eee;
 			overflow: hidden;
 		}
 
 		#editor-frame #editor-toolbar {
 			position: absolute;
-			top: 10px; left: 10px; right: 10px; height: 50px;
+			top: 10px; left: 10px; right: 10px; height: 40px;
 		}
 
-		#editor-frame #editor-timline {
+		#editor-frame #editor-timeline {
 			position: absolute;
 			bottom: 10px; left: 10px; right: 10px; 
 			height: 250px;
@@ -39,7 +92,7 @@
 		#editor-frame #editor-panels {
 			position: absolute;
 			left: 815px; width: 250px;
-			top: 60px; height: 450px;
+			top: 50px; height: 450px;
 		}
 
 		#editor-frame #editor-panels > .tab-header {
@@ -49,8 +102,10 @@
 		}
 
 
- 		#editor-frame #editor-panels > .tab-body {
+ 		#editor-frame #editor-panels > .tab-content {
  			position: absolute;
+ 			overflow-x: hidden;
+ 			overflow-y: auto;
  			left: 0; right: 0; top: 42px; bottom: 0;
  			background-color: #FFF;
  			border-color: #ddd;
@@ -58,29 +113,146 @@
  			border-style: none solid solid solid;
 		}
 
+ 		#editor-frame #properties > div.header {
+ 			margin: 0 4px 4px;
+ 			padding: 4px;
+ 			font-weight: bold;
+ 			border-bottom: solid 1px #ddd;
+ 			color: #666;
+ 		}
+
+ 		#editor-frame #properties .row {
+ 			margin: 1px 1px 0;
+ 		}
+
+		/*
+ 		#editor-frame #editor-timeline > .tl-header {
+ 			position: absolute;
+ 			left: 0; right: 0; top: 0; height: 24px;
+ 			background: #ddd;
+ 		}
+
+ 		#editor-frame #editor-timeline > .tl-footer {
+ 			position: absolute;
+ 			left: 0; right: 0; bottom: 0; height: 24px;
+ 			background: #ddd;
+ 		}
+
+  		#editor-frame #editor-timeline > .tl-body {
+ 			position: absolute;
+ 			left: 0; right: 0; top:24px; bottom: 24px;
+ 			overflow: scroll;
+ 		}
+
+  		#editor-frame #editor-timeline > .tl-body .tl-row {
+  			position: relative;
+  			height: 20px;
+  			word-wrap: none;
+  			overflow: visible;
+  			overflow-y: hidden;
+  		}
+
+   		#editor-frame #editor-timeline > .tl-body .tl-row:nth-child(2n) {
+   			background-color: #F0F0F0;
+   		}
+
+   		#editor-frame #editor-timeline > .tl-body .tl-row:nth-child(2n) > div.title {
+  			background-color: #D5D5D5;
+   		}
+
+  		#editor-frame #editor-timeline > .tl-body > .tl-row:hover, 
+  		#editor-frame #editor-timeline > .tl-body > .tl-row:hover > div.title {
+  			background-color: #FAFFCF;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.title {
+  			display: block;
+  			position: absolute;
+			left: 0;
+
+  			height: 20px;
+  			width: 200px;
+  			padding: 0 2px;
+
+  			background-color: #CCC;
+  			color: #666;
+
+  			cursor: pointer;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens {
+  			display: block;
+  			position: absolute;
+			left: 200px;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens > div.tween {
+  			position: absolute;
+  			display: block;
+  			background-color: #3498DB;	
+  			height: 20px;
+
+  			cursor: move;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens > div.tween > div.handle {
+  			display: block;
+  			position: absolute;
+
+  			width: 20px; height: 20px; top: 0;
+  			border: solid 1px #E67E22;
+  			background-color: #F39C12;
+  			-webkit-transform: translateX(-10px);
+  			-moz-transform: translateX(-10px);
+  			-o-transform: translateX(-10px);
+  			transform: translateX(-10px);
+
+  			-webkit-border-radius: 20px;
+  			-moz-border-radius: 20px;
+  			-o-border-radius: 20px;
+  			border-radius: 20px;
+
+  			cursor: col-resize;
+  		}
+  		*/
+
+
 		</style>
 	</head>
 	<body>
 
 		<div id="editor-frame">
+			<div id="editor-toolbar" class="btn-toolbar" role="toolbar">
+				<div class="btn-group">
+					<button id="editor-freehand" type="button" class="btn btn-default">
+					  <span class="glyphicon glyphicon-plus"></span> Free-Hand
+					</button>
+					<button id="editor-image" type="button" class="btn btn-default">
+					  Image
+					</button>
+					<button id="editor-shape" type="button" class="btn btn-default">
+					  Shape
+					</button>
+				</div>
+			</div>
 			<div id="editor-canvas">
 				<canvas width="800" height="450"></canvas>
-			</div>
-			<div id="editor-toolbar">
-			</div>
-			<div id="editor-timline">
 			</div>
 			<div id="editor-panels">
 				<div class="tab-header">
 					<ul class="nav nav-tabs" role="tablist">
-					  <li class="active"><a href="#">Home</a></li>
-					  <li><a href="#">Profile</a></li>
-					  <li><a href="#">Messages</a></li>
+					  <li class="active"><a href="#properties" role="tab" data-toggle="tab">Properties</a></li>
+					  <li><a href="#objects" role="tab" data-toggle="tab">Objects</a></li>
 					</ul>
 				</div>
-				<div class="tab-body">
-
+				<div class="tab-content">
+					<div class="tab-pane active" id="properties">
+					</div>
+					<div class="tab-pane" id="objects">
+					</div>
 				</div>
+			</div>
+			<div id="editor-timeline">
 			</div>
 		</div>
 
@@ -122,6 +294,7 @@
 		</script>
 		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular.min.js"></script>	
+		<script src="static/js/lib/colorpicker.min.js"></script>	
 
 	</body>
 </html>

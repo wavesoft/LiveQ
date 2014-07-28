@@ -1,14 +1,16 @@
 define(
 
-	["jquery", "core/db", "vas-editor/editor/sprite-canvas", "vas-editor/editor/sprite-store"],
+	["jquery", "core/db", "vas-editor/editor/editable-canvas", "vas-editor/editor/ui-properties",  "vas-editor/editor/ui-timeline" ],
 
-	function($, DB, SpriteCanvas, SpriteStore) {
+	function($, DB, EditableCanvas, PropertiesUI, TimelineUI ) {
 
 		var Main = { };
 
 		Main.initialize = function(cb) {
-			this.store = new SpriteStore();
-			this.canvas = new SpriteCanvas( this.store, $('#editor-canvas > canvas') );
+
+			this.propUI = new PropertiesUI( $("#properties") );
+			this.timelineUI = new TimelineUI( $("#editor-timeline"), this.propUI );
+			this.canvas = new EditableCanvas( $('#editor-canvas > canvas'), this.propUI, this.timelineUI );
 			cb();
 		}
 
