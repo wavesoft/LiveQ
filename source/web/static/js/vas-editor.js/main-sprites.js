@@ -12,6 +12,11 @@ define(
 			this.timelineUI = new TimelineUI( $("#editor-timeline"), this.propUI );
 			this.canvas = new EditableCanvas( $('#editor-canvas > canvas'), this.propUI, this.timelineUI );
 			cb();
+
+			// bind to events
+			$("#editor-freehand").click((function(e) {
+				this.canvas.startFreeDrawing();
+			}).bind(this));
 		}
 
 

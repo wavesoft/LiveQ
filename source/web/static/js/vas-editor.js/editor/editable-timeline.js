@@ -26,25 +26,22 @@ define(
 		EditableElement.prototype.updateReflection = function() {
 			
 			// Remove previous tween from runtime
-			if (this.__tweenRef)
+			if (this.__tweenRef) {
+				console.log("    - Removing previous tween" );				
 				this.__runtime.removeTween( this.__tweenRef );
-
-			// Keep 'at's because they get destructed
-			var ats = [];
-			for (var i=0; i<this.__keyframes.length; i++) {
-				ats.push( this.__keyframes[i].at );
+				createjs.Tween.removeTweens( this );
 			}
 
 			// Build a new tween
+			console.log("    - Building tween" );				
 			this.__tweenRef = this.__runtime.buildTween( this, this.__keyframes );
 
-			// Place 'at's back
-			for (var i=0; i<this.__keyframes.length; i++) {
-				this.__keyframes[i].at = ats[i];
-			}
-
 			// Place it back on the runtime
+			console.log("    - Adding tween" );				
 			this.__runtime.addTween( this.__tweenRef );
+
+			// Trigger UI update
+			this.__runtime.tick(0)
 
 		}
 
@@ -101,10 +98,35 @@ define(
 		var EditableTimeline = function( canvas ) {
 			Timeline.call(this, canvas );
 			this.editableObjects = [];
+			this.timeStep = 40; //ms (25 Fps)
 		};
 
 		// Subclass from Sprite Runtime
 		EditableTimeline.prototype = Object.create( Timeline.prototype );
+
+		/**
+		 * Update view in-position
+		 */
+		EditableTimeline.prototype.update = function() {
+			var d = this.position;
+			this.gotoAndStop(0);
+			this.gotoAndStop(d);
+		}
+
+		/**
+		 * Snap time into time step-wide segments
+		 */
+		EditableTimeline.prototype.snapTime = function( timePos ) {
+			return Math.floor( timePos / this.timeStep ) * this.timeStep;
+		}
+
+		/**
+		 * Update object's reflection on the runtime
+		 */
+		EditableTimeline.prototype.scrollPosition = function( pos ) {
+			this.gotoAndStop(0);
+			this.gotoAndStop(pos);
+		}
 
 		/**
 		 * Import a new tween.js object, wrap it and place it on timeline
@@ -119,6 +141,10 @@ define(
 
 			// Store on editable objects array
 			this.editableObjects.push( wrapObj );
+
+			// Put two keyframes
+			wrapObj.setKeyframe( this.snapTime( this.position ) );
+			wrapObj.setKeyframe( this.snapTime( this.position ) + this.timeStep * 4 );
 
 			// Return instance for further manipulation
 			return wrapObj;
@@ -139,8 +165,13 @@ define(
 		/**
 		 * Set keyframe for the given object (or all objects if missing)
 		 */
-		EditableTimeline.prototype.setKeyframe = function( obj ) {
-
+		EditableTimeline.prototype.setKeyframe = function( obj, pos ) {
+			var position = pos || this.snapTime( this.position );
+			for (var i=0; i<this.editableObjects.length; i++) {
+				if ((obj == undefined) || (this.editableObjects[i] == obj)) {
+					this.editableObjects[i].setKeyframe( position );
+				}
+			}
 		}
 
 		/**
@@ -149,10 +180,6 @@ define(
 		EditableTimeline.prototype.getJSONDefinition = function() {
 
 		}
-
-		/**
-		 * Regenerate timeline using the editable objects
-		 */
 
 		return EditableTimeline;
 

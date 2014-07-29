@@ -123,98 +123,100 @@
 
  		#editor-frame #properties .row {
  			margin: 1px 1px 0;
+ 			margin-right: 0 !important;
  		}
 
-		/*
+ 		#editor-frame #properties .row label {
+ 			font-size: 12px;
+ 			line-height: 22px;
+ 			text-align: right;
+ 			width: 100%;
+  		}
+
+		#editor-frame #properties .row .col-xs-4 {
+			padding-right: 2px;
+			padding-left: 2px;
+		}
+
+		#editor-frame #properties .row .col-xs-8 {
+			padding-left: 2px;
+		}
+
  		#editor-frame #editor-timeline > .tl-header {
  			position: absolute;
- 			left: 0; right: 0; top: 0; height: 24px;
- 			background: #ddd;
+ 			left: 0; right: 0; top: 0; height: 32px;
  		}
+
+ 		#editor-frame #editor-timeline .tl-controls {
+ 			padding: 4px;
+		}
+
+ 		#editor-frame #editor-timeline .tl-controls > .btn {
+ 			margin: 0 1px;
+		}
 
  		#editor-frame #editor-timeline > .tl-footer {
  			position: absolute;
- 			left: 0; right: 0; bottom: 0; height: 24px;
- 			background: #ddd;
+ 			left: 0; right: 0; bottom: 0; height: 32px;
+ 			border-top: solid 1px #ddd;
  		}
 
   		#editor-frame #editor-timeline > .tl-body {
  			position: absolute;
- 			left: 0; right: 0; top:24px; bottom: 24px;
- 			overflow: scroll;
+ 			left: 0; right: 0; top:32px; bottom: 32px;
+ 			overflow-y: scroll;
+ 			overflow-x: hidden;
  		}
 
-  		#editor-frame #editor-timeline > .tl-body .tl-row {
-  			position: relative;
-  			height: 20px;
-  			word-wrap: none;
-  			overflow: visible;
-  			overflow-y: hidden;
-  		}
+ 		#editor-frame #editor-timeline > .tl-header > div.tl-left,
+  		#editor-frame #editor-timeline > .tl-body > div.tl-left {
+  			width: 170px;
+  			float: left;
+  			height: 32px;
+ 		}
 
-   		#editor-frame #editor-timeline > .tl-body .tl-row:nth-child(2n) {
-   			background-color: #F0F0F0;
-   		}
+ 		#editor-frame #editor-timeline > .tl-header > div.tl-right,
+  		#editor-frame #editor-timeline > .tl-body > div.tl-right {
+  			margin-left: 170px;
+  			width: 100%;
+ 		}
 
-   		#editor-frame #editor-timeline > .tl-body .tl-row:nth-child(2n) > div.title {
-  			background-color: #D5D5D5;
-   		}
-
-  		#editor-frame #editor-timeline > .tl-body > .tl-row:hover, 
-  		#editor-frame #editor-timeline > .tl-body > .tl-row:hover > div.title {
-  			background-color: #FAFFCF;
-  		}
-
-  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.title {
-  			display: block;
-  			position: absolute;
-			left: 0;
-
-  			height: 20px;
-  			width: 200px;
-  			padding: 0 2px;
-
+  		#editor-frame #editor-timeline > .tl-body > div.tl-side {
+  			width: 170px;
+  			float: left;
   			background-color: #CCC;
-  			color: #666;
+  			min-height: 100%;
+  		}
 
+  		#editor-frame #editor-timeline > .tl-body > div.tl-canvas {
+  			margin-left: 170px;
+  			width: 100%;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-info {
+  			height: 32px;
+  			background-color: #FFF;
+  			border-bottom: solid 1px #DDD;
+  		}
+
+  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle {
+  			display: block;
+  			height: 24px;
+  			margin: 1px 0 1px 4px;
+  			padding: 2px;
+
+  			border-radius: 5px 0 0 5px;;
+  			border: 1px #999;
+  			background-color: #ddd;
+  			border-style: solid none solid solid;
+
+  			box-shadow: #eee 0px 1px 0px;
   			cursor: pointer;
   		}
 
-  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens {
-  			display: block;
-  			position: absolute;
-			left: 200px;
-  		}
-
-  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens > div.tween {
-  			position: absolute;
-  			display: block;
-  			background-color: #3498DB;	
-  			height: 20px;
-
-  			cursor: move;
-  		}
-
-  		#editor-frame #editor-timeline > .tl-body > .tl-row > div.tweens > div.tween > div.handle {
-  			display: block;
-  			position: absolute;
-
-  			width: 20px; height: 20px; top: 0;
-  			border: solid 1px #E67E22;
-  			background-color: #F39C12;
-  			-webkit-transform: translateX(-10px);
-  			-moz-transform: translateX(-10px);
-  			-o-transform: translateX(-10px);
-  			transform: translateX(-10px);
-
-  			-webkit-border-radius: 20px;
-  			-moz-border-radius: 20px;
-  			-o-border-radius: 20px;
-  			border-radius: 20px;
-
-  			cursor: col-resize;
-  		}
-  		*/
+  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle.active {
+			background-color: #FFFF99;
+		}
 
 
 		</style>

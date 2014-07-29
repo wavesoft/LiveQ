@@ -12,6 +12,7 @@ define(
 		var Timeline = function( canvas ) {
 			createjs.Timeline.call( this );
 			this.canvas = canvas;
+			this.gotoAndStop(0);
 		};
 
 		// Subclass from createjs.Timeline because we are using most of it's
@@ -22,8 +23,11 @@ define(
 		 * Helper function to build a tween using the given animation definition
 		 */
 		Timeline.prototype.buildTween = function(object, definition) {
-			var lastPos = 0,
-				tween = createjs.Tween.get(object);
+			console.log("      - Definition: ", definition );
+
+			var lastPos = 0, first = true,
+				tween = createjs.Tween.get(object, {override:true, paused:true, position:0});
+				console.log("      - Tween.get(",object,"){" );
 
 			for (var i=0; i<definition.length; i++) {
 				var d = definition[i],
@@ -39,23 +43,31 @@ define(
 					continue;
 				}
 
-				// Delete 'at' property
-				delete d['at'];
-
-				// The very first entry (if it's away from zero, we will add a delay-property set)
-				if ((at > 0) && (lastPos == 0)) {
-					tween.wait(at - lastPos);
+				// Very first node is just set
+				if (first) {
+					first = false;
 					tween.set(d);
-				} 
-				// Otherwise we have a property transition
-				else {
+					console.log("             .set(", d, ")");
+					// Check if first node has offset
+					if (at > 0) {
+						tween.wait(at);
+						console.log("             .wait(", at, ")");
+					}
+				} else {
+					// All other nodes are transitions
 					tween.to(d, at - lastPos);
+					console.log("             .to(", d, ",", at-lastPos ,")");
 				}
 
 				// Update last position
 				lastPos = at;
 
 			}
+
+			// As the last step on the tween, hide
+			//tween.wait(10)
+			//	 .set({"visible": false});
+			console.log("        }" );				
 
 			return tween;
 		}

@@ -11,12 +11,12 @@ define(
 			this.timelineUI = timelineUI;
 
 			// Initialize canvas
-			var canvas = this.canvas = new fabric.Canvas($(this.canvasElement)[0], {
-				isDrawingMode: true
-			});
+			var canvas = this.canvas = new fabric.Canvas($(this.canvasElement)[0]);
 
 			// Initialize timeline
 			this.timeline = new EditableTimeline( this.canvas );
+			timelineUI.setTimeline( this.timeline );
+			timelineUI.setCanvas( this );
 			window.c = this;
 
 			//fabric.Object.prototype.transparentCorners = false;
@@ -24,19 +24,29 @@ define(
 			canvas.freeDrawingBrush.color = '#FFF';
 			canvas.freeDrawingBrush.width = 4;
 
-			canvas.on('object:selected', (function(ev) {
+			// Redraw canvas on timeline change
+			this.timeline.addEventListener('change', (function() {
+				console.log("*** Timeline changed");
+				var activeElm = this.canvas.getActiveObject();
+				if (activeElm)
+					activeElm.setCoords();
+				this.canvas.renderAll();
+			}).bind(this));
 
+			canvas.on('mouse:down', (function(ev) {
+				if (this.canvas.getActiveObject() != null) {
+					this.__objectSelected( this.canvas.getActiveObject() );
+				}
+			}).bind(this));
+
+			canvas.on('object:modified', (function(ev) {
 				var timelineElement = this.timeline.elementFromFabricObject( ev.target );
-				this.propertiesUI.show( timelineElement, (function() {
+				this.timeline.setKeyframe( timelineElement );
+				console.log("Setting keyframe on ", timelineElement);
+			}).bind(this));
 
-					// Bugfix for aligning the controls
-					timelineElement.__object.setCoords();
-
-					// Update UI
-					this.canvas.renderAll();
-
-				}).bind(this) );
-
+			canvas.on('object:selected', (function(ev) {
+				this.__objectSelected( ev.target );
 			}).bind(this));
 
 			canvas.on('selection:cleared', (function(ev) {
@@ -47,7 +57,6 @@ define(
 
 			canvas.on('path:created', (function(obj) {
 
-				console.log(obj);
 				canvas.isDrawingMode = false;
 
 
@@ -56,31 +65,34 @@ define(
 				var ow = window.ow = this.timeline.importObject( obj.path );
 				this.timelineUI.add( ow );
 
-				//window.ow.onUpdate = function() { canvas.renderAll(); };
-
-				/*
-				window.doit = function() {
-					window.ow.progression = 0;
-
-					window.timeline = new createjs.Timeline();
-
-					var tween = createjs.Tween.get(window.ow)
-							.wait(500)
-							.to({progression:1}, 1000);
-
-					window.timeline.addTween(tween);
-					setInterval(function() {
-						window.timeline.tick(10);
-					}, 10);
-				}
-				*/
-
 			}).bind(this));
 
 		};
 
-		EditableCanvas.prototype.start = function() {
+		EditableCanvas.prototype.__objectSelected = function(o) {
 
+			var timelineElement = this.timeline.elementFromFabricObject( o );
+			this.propertiesUI.show( timelineElement, (function() {
+
+				// Bugfix for aligning the controls
+				timelineElement.__object.setCoords();
+
+				// Update UI
+				this.canvas.renderAll();
+
+				// Take keyframe
+				this.timeline.setKeyframe( timelineElement );
+
+			}).bind(this) );
+
+		}
+
+		EditableCanvas.prototype.startFreeDrawing = function() {
+			this.canvas.isDrawingMode = true;
+		}
+
+		EditableCanvas.prototype.play = function() {
+			this.timeline.gotoAndPlay(0);
 		}
 
 		return EditableCanvas;

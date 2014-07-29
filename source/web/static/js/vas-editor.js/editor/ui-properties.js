@@ -1,8 +1,8 @@
 define(
 
-	["jquery", "vas-editor/runtime/timeline" ],
+	["jquery", "vas-editor/runtime/timeline", "vas-editor/editor/ui-timeline" ],
 
-	function($, Timeline) {
+	function($, Timeline, TimelineUI) {
 
 		// Local property for creating unique IDs
 		var widgetID = 0;
@@ -73,6 +73,74 @@ define(
 							type: 'col'
 						},
 					]
+				},
+				{
+					classType	: TimelineUI.TweenPropertiesWrapper,
+					name 		: '<span class="glyphicon glyphicon-random"></span> Tween',
+					properties 	: [
+						{
+							prop: 'easing',
+							name: 'Easing',
+							type: 'opt',
+							vals: [
+								"backIn",
+								"backInOut",
+								"backOut",
+								"bounceIn",
+								"bounceInOut",
+								"bounceOut",
+								"circIn",
+								"circInOut",
+								"circOut",
+								"cubicIn",
+								"cubicInOut",
+								"cubicOut",
+								"elasticIn",
+								"elasticInOut",
+								"elasticOut",
+								"linear",
+								"none",
+								"quadIn",
+								"quadInOut",
+								"quadOut",
+								"quartIn",
+								"quartInOut",
+								"quartOut",
+								"quintIn",
+								"quintInOut",
+								"quintOut",
+								"sineIn",
+								"sineInOut",
+								"sineOut"
+							]
+						},
+						{
+							prop: 'duration',
+							name: 'Duration',
+							type: 'int'
+						},
+						{
+							prop: 'elm',
+							name: 'Show Properties',
+							type: 'sel'
+						}
+					]
+				},
+				{
+					classType 	: TimelineUI.KeyframeWrapper,
+					name		: '<span class="glyphicon glyphicon-screenshot"></span> Keyframe',
+					properties  : [
+						{
+							prop: 'position',
+							name: 'Position',
+							type: 'int'
+						},
+						{
+							prop: 'elm',
+							name: 'Show Properties',
+							type: 'sel'
+						}
+					]
 				}
 			];
 
@@ -104,7 +172,10 @@ define(
 			this.lastPropValues = { };
 			this.propMonitor = [];
 			this.bodyElm.empty();
-			this.updateCallback = updateCallback;
+
+			// If specified 'true', the callback remains the same
+			if (updateCallback !== true)
+				this.updateCallback = updateCallback;
 
 			// Show option
 			if (!obj) {
@@ -121,10 +192,16 @@ define(
 					for (var j=0; j<propInfo.properties.length; j++) {
 						var prop = propInfo.properties[j], elm;
 
-						if ((prop.type == 'int') || (prop.type == 'string')) {
+						if (prop.type == 'int') {
+							this.bodyElm.append( this.createTextWidget( obj, prop, true ) );
+						} else if (prop.type == 'string') {
 							this.bodyElm.append( this.createTextWidget( obj, prop ) );
 						} else if (prop.type == 'col') {
 							this.bodyElm.append( this.createColorWidget( obj, prop ) );
+						} else if (prop.type == 'opt') {
+							this.bodyElm.append( this.createOptionsWidget( obj, prop ) );
+						} else if (prop.type == 'sel') {
+							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
 						}
 
 					}
@@ -167,6 +244,48 @@ define(
 		}
 
 		/**
+		 * Create button widget
+		 */
+		PropertiesUI.prototype.createButtonWidget = function( obj, propInfo ) {
+			var btnInput = $('<button class="btn btn-sm btn-primary">'+propInfo.name+'</button>');
+			btnInput.click((function() {
+				this.show( obj[ propInfo.prop ], true );
+			}).bind(this));
+			return this.wrapWidgets( "", btnInput );
+		}
+
+		/**
+		 * Create options widget
+		 */
+		PropertiesUI.prototype.createOptionsWidget = function( obj, propInfo ) {
+			var selInput = $('<select class="form-control input-sm"></select>');
+			for (var i=0; i<propInfo.vals.length; i++) {
+				var e = $('<option></option>');
+				e.attr("value", propInfo.vals[i]);
+				e.text(propInfo.vals[i]);
+				selInput.append(e);
+			}
+
+			selInput.change((function() {
+
+				// Apply
+				obj[ propInfo.prop ] = selInput.val();
+
+				// Fire the change callback
+				if (this.updateCallback)
+					this.updateCallback();
+
+			}).bind(this));
+
+			this.monitorChange( obj, propInfo, function(v) {
+				selInput.val( v );
+			});
+
+			return this.wrapWidgets( propInfo.name, selInput );
+
+		}
+
+		/**
 		 * Create a new color property widget
 		 */
 		PropertiesUI.prototype.createColorWidget = function( obj, propInfo ) {
@@ -201,7 +320,7 @@ define(
 			elmInput.blur((function(e) {
 
 				// Apply
-				var v = intInput.val();
+				var v = elmInput.val();
 				obj[ propInfo.prop ] = v;
 				cp.setHex( v );
 
@@ -219,7 +338,7 @@ define(
 		/**
 		 * Create a new text property widget
 		 */
-		PropertiesUI.prototype.createTextWidget = function( obj, propInfo ) {
+		PropertiesUI.prototype.createTextWidget = function( obj, propInfo, numeric ) {
 			var intInput = $('<input type="text" class="form-control input-sm" />');
 
 			this.monitorChange( obj, propInfo, function(v) {
@@ -235,7 +354,11 @@ define(
 					intInput[0].setSelectionRange(0, intInput[0].value.length)
 
 					// Apply
-					obj[ propInfo.prop ] = intInput.val();
+					if (numeric) {
+						obj[ propInfo.prop ] = Number(intInput.val());
+					} else {
+						obj[ propInfo.prop ] = intInput.val();
+					}
 
 					// Fire the change callback
 					if (this.updateCallback)
@@ -247,7 +370,11 @@ define(
 			intInput.blur((function(e) {
 
 				// Apply
-				obj[ propInfo.prop ] = intInput.val();
+				if (numeric) {
+					obj[ propInfo.prop ] = Number(intInput.val());
+				} else {
+					obj[ propInfo.prop ] = intInput.val();
+				}
 
 				// Fire the change callback
 				if (this.updateCallback)
