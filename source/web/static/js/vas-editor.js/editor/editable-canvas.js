@@ -247,11 +247,13 @@ define(
 			// Create font
 			var obj = new fabric[shapeName]({
 				'stroke': '#FFF',
+				'fill': '',
 				'radius': 50,
 				'width': 100,
 				'height': 100,
 				'strokeWidth': 4,
-				'fill': ''
+				'originX': 'center',
+				'originY': 'center'
 			});
 
 			// Add to canvas
