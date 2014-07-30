@@ -105,6 +105,21 @@ define(
 		EditableTimeline.prototype = Object.create( Timeline.prototype );
 
 		/**
+		 * Export the timeline to JSON
+		 */
+		EditableTimeline.prototype.toJSON = function( canvas ) {
+			var tweens = [];
+			for (var i=0; i<this.editableObjects.length; i++) {
+				tweens.push(this.editableObjects[i].__keyframes);
+			}
+			// Return objects and tweens
+			return {
+				'canvas': canvas.toJSON(),
+				'tweens': tweens
+			};
+		}
+
+		/**
 		 * Update view in-position
 		 */
 		EditableTimeline.prototype.update = function() {
@@ -126,6 +141,26 @@ define(
 		EditableTimeline.prototype.scrollPosition = function( pos ) {
 			this.gotoAndStop(0);
 			this.gotoAndStop(pos);
+		}
+
+		/**
+		 * Remove an object
+		 */
+		EditableTimeline.prototype.remove = function( obj ) {
+
+			// Find the object in our list
+			var i = this.editableObjects.indexOf(obj);
+			if (i<0) return;
+
+			// Remove from list
+			this.editableObjects.splice(i,1);
+
+			// Remove tween ref
+			if (obj.__tweenRef) {
+				this.removeTween( obj.__tweenRef );
+				createjs.Tween.removeTweens( obj );
+			}
+
 		}
 
 		/**
@@ -175,10 +210,22 @@ define(
 		}
 
 		/**
-		 * Generate the JSON Definition of this runtime
+		 * Create editabl objects using the keyframes from the given timeline definition
 		 */
-		EditableTimeline.prototype.getJSONDefinition = function() {
+		EditableTimeline.prototype.initWithJSON = function( objects, elmDef ) {
+			for (var i=0; i<elmDef.length; i++) {
 
+				// Wrap object into a new editable element
+				var wrapObj = new EditableElement(objects[i], this);
+				wrapObj.__keyframes = elmDef[i];
+
+				// Update reflection (place it on timeline)
+				wrapObj.updateReflection();
+
+				// Store on editable objects array
+				this.editableObjects.push( wrapObj );
+
+			}
 		}
 
 		return EditableTimeline;

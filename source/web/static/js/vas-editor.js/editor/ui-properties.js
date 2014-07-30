@@ -293,9 +293,11 @@ define(
 				elmInput = $('<input type="text" class="form-control input-sm" />');
 				elmWrap = $('<div></div>');
 
-			var cp = new ColorPicker(
+			var lockUpdate = true,
+				cp = new ColorPicker(
 				elmCP[0],
 				(function(hex, hsv, rgb) {
+					if (lockUpdate) return;
 
 					// Apply
 					obj[ propInfo.prop ] = hex;
@@ -330,6 +332,7 @@ define(
 
 			}).bind(this));
 
+			lockUpdate = true;
 			elmWrap.append(elmInput);
 			elmWrap.append(elmCP);
 			return this.wrapWidgets( propInfo.name, elmWrap );

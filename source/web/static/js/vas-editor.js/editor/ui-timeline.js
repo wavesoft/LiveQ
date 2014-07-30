@@ -645,7 +645,29 @@ define(
 			return -1;
 		}
 
-		TimelineUI.prototype.selectRow = function( id ) {
+		TimelineUI.prototype.selectByCanvasObject = function( o ) {
+			for (var i=0; i<this.elements.length; i++) {
+				if (this.elements[i].__object == o) {
+					this.selectRow(i, false);
+					return;
+				}
+			}
+			this.selectRow(-1);
+			this.activeAnchor = -1;
+		}
+
+		TimelineUI.prototype.selectByElement = function( elm ) {
+			for (var i=0; i<this.elements.length; i++) {
+				if (this.elements[i] == elm) {
+					this.selectRow(i, true);
+					return;
+				}
+			}
+			this.selectRow(-1);
+			this.activeAnchor = -1;
+		}
+
+		TimelineUI.prototype.selectRow = function( id, focusCanvas ) {
 
 			// Activate DOM elements
 			for (var i=0; i<this.elements.length; i++) {
@@ -654,6 +676,11 @@ define(
 				} else {
 					this.elements[i].__timelineHandle.removeClass("active");
 				}
+			}
+
+			// Focus canvas object
+			if (this.canvas && (id>=0) && ((focusCanvas == undefined) || (focusCanvas == true))) {
+				this.canvas.selectObject( this.elements[id].__object );
 			}
 
 			// Activate canvas element
@@ -671,22 +698,40 @@ define(
 			this.canvas = canvas;
 		}
 
-		TimelineUI.prototype.add = function( obj ) {
+		TimelineUI.prototype.add = function( elm ) {
 
 			// Push element on the list
-			this.elements.push( obj );
+			this.elements.push( elm );
 
 			// Create handle
-			var elmHandle = obj.__timelineHandle =  $('<div class="tl-handle"></div>');
+			var elmHandle = elm.__timelineHandle =  $('<div class="tl-handle"></div>');
 			this.elmSide.append( elmHandle );
 
 			// Prepare handle
 			elmHandle.html('<span class="glyphicon glyphicon-picture"></span> Object');
-			elmHandle.click((function(index) {
+			elmHandle.click((function(elm) {
 				return function(e) {
-					this.selectRow( index );
+					this.selectByElement( elm );
 				};
-			})(this.elements.length-1).bind(this));
+			})(elm).bind(this));
+
+			// Redraw
+			this.redraw();
+
+		}
+
+		/**
+		 * Remove an object (Eleemen)
+		 */
+		TimelineUI.prototype.remove = function( elm ) {
+
+			// Remove element from list
+			var i = this.elements.indexOf( elm );
+			if (i<0) return;
+			this.elements.splice(i,1);
+
+			// Remove element
+			elm.__timelineHandle.remove();
 
 			// Redraw
 			this.redraw();
@@ -714,12 +759,12 @@ define(
 			this.kfIndex = keyframeIndex;
 
 			Object.defineProperties(this, {
-				'ease': {
+				'easing': {
 					get: (function() {
-						return this.elm.__keyframes[this.kfIndex]._easing || 'linear';
+						return this.elm.__keyframes[this.kfIndex].easing || 'linear';
 					}).bind(this),
 					set: (function(v) {
-						this.elm.__keyframes[this.kfIndex]._easing = v;
+						this.elm.__keyframes[this.kfIndex].easing = v;
 						this.elm.updateReflection();
 						tui.updateCanvas();
 						tui.redraw();

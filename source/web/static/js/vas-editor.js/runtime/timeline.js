@@ -55,7 +55,7 @@ define(
 					}
 				} else {
 					// All other nodes are transitions
-					tween.to(d, at - lastPos);
+					tween.to(d, at - lastPos, createjs.Ease[ d['easing'] || 'linear' ]);
 					console.log("             .to(", d, ",", at-lastPos ,")");
 				}
 
