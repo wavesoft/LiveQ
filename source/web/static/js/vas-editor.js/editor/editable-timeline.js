@@ -120,6 +120,22 @@ define(
 		}
 
 		/**
+		 * Clear everything
+		 */
+		EditableTimeline.prototype.clear = function() {
+
+			// Remove all tweens from timeline
+			for (var i=0; i<this.editableObjects.length; i++) {
+				this.removeTween( this.editableObjects[i].__tweenRef );
+				createjs.Tween.removeTweens( this.editableObjects[i] );				
+			}
+
+			// Remove all references
+			this.editableObjects = [];
+
+		}
+
+		/**
 		 * Update view in-position
 		 */
 		EditableTimeline.prototype.update = function() {
@@ -132,7 +148,7 @@ define(
 		 * Snap time into time step-wide segments
 		 */
 		EditableTimeline.prototype.snapTime = function( timePos ) {
-			return Math.floor( timePos / this.timeStep ) * this.timeStep;
+			return Math.round( timePos / this.timeStep ) * this.timeStep;
 		}
 
 		/**
@@ -179,7 +195,7 @@ define(
 
 			// Put two keyframes
 			wrapObj.setKeyframe( this.snapTime( this.position ) );
-			wrapObj.setKeyframe( this.snapTime( this.position ) + this.timeStep * 4 );
+			wrapObj.setKeyframe( this.snapTime( this.position ) + this.timeStep * 10 );
 
 			// Return instance for further manipulation
 			return wrapObj;

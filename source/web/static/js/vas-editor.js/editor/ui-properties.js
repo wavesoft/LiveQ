@@ -28,6 +28,11 @@ define(
 					name		: '<span class="glyphicon glyphicon-picture"></span> Scene Object',
 					properties  : [
 						{
+							prop: 'visible',
+							name: 'Visible',
+							type: 'bool'
+						},
+						{
 							prop: 'angle',
 							name: 'Angle',
 							type: 'int'
@@ -202,6 +207,8 @@ define(
 							this.bodyElm.append( this.createOptionsWidget( obj, prop ) );
 						} else if (prop.type == 'sel') {
 							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
+						} else if (prop.type == 'bool') {
+							this.bodyElm.append( this.createBooleanWidget( obj, prop ) );
 						}
 
 					}
@@ -252,6 +259,34 @@ define(
 				this.show( obj[ propInfo.prop ], true );
 			}).bind(this));
 			return this.wrapWidgets( "", btnInput );
+		}
+
+		/**
+		 * Crate a boolean widget
+		 */
+		PropertiesUI.prototype.createBooleanWidget = function( obj, propInfo ) {
+			var boolInput = $('<input type="checkbox">');
+
+			boolInput.change((function(e) {
+
+				// Apply
+				if (boolInput.is(":checked")) {
+					obj[ propInfo.prop ] = true;
+				} else {
+					obj[ propInfo.prop ] = false;
+				}
+
+				// Fire the change callback
+				if (this.updateCallback)
+					this.updateCallback();
+
+			}).bind(this));
+
+			this.monitorChange( obj, propInfo, function(v) {
+				boolInput.attr("checked", !!v);
+			});
+
+			return this.wrapWidgets( propInfo.name, boolInput );
 		}
 
 		/**

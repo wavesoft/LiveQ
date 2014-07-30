@@ -15,8 +15,10 @@ define(
 			// Configuration
 			this.config = {
 
-				lineHeight 		: 25,
 				padLeft			: 10,
+				padTop			: 10,
+
+				lineHeight 		: 25,
 				handleWidth		: 10,
 				handleTrim      : 5,
 				cursorHandleR	: 8,
@@ -49,55 +51,59 @@ define(
 			var elmControls = $('<div class="tl-left tl-controls"></div>');
 			this.elmHeader.append(elmControls);
 
-			var rewindBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-fast-backward"></span></button>');
-			elmControls.append( rewindBtn );
-			rewindBtn.click((function() {
-				if (!this.timeline) return;
-				this.timeline.gotoAndStop(0);
-			}).bind(this));
+				var rewindBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-fast-backward"></span></button>');
+				elmControls.append( rewindBtn );
+				rewindBtn.click((function() {
+					if (!this.timeline) return;
+					this.timeline.gotoAndStop(0);
+				}).bind(this));
 
-			var stepBackBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-step-backward"></span></button>');
-			elmControls.append( stepBackBtn );
-			stepBackBtn.click((function() {
-				if (!this.timeline) return;
-				var pos = this.timeline.snapTime( this.timeline.position - this.timeline.timeStep );
-				if (pos < 0) pos = 0;
-				this.timeline.gotoAndStop(pos);
-			}).bind(this));
-
-			var playBtn = $('<button class="btn btn-success btn-xs"><span class="glyphicon glyphicon-play"></span></button>');
-			elmControls.append( playBtn );
-			playBtn.click((function() {
-				if (!this.timeline) return;
-				if (this.timeline.position >= this.timeline.duration) {
-					this.timeline.gotoAndPlay(0);
-				} else {
-					this.timeline.setPaused(false);
-				}
-			}).bind(this));
-
-			var stopBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-stop"></span></button>');
-			elmControls.append( stopBtn );
-			stopBtn.click((function() {
-				if (!this.timeline) return;
-				this.timeline.setPaused(true);
-			}).bind(this));
-
-			var stepFwBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-step-forward"></span></button>');
-			elmControls.append( stepFwBtn );
-			stepFwBtn.click((function() {
-				if (!this.timeline) return;
-				var pos = this.timeline.snapTime( this.timeline.position + this.timeline.timeStep );
-				if (pos <= this.timeline.duration)
+				var stepBackBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-step-backward"></span></button>');
+				elmControls.append( stepBackBtn );
+				stepBackBtn.click((function() {
+					if (!this.timeline) return;
+					var pos = this.timeline.snapTime( this.timeline.position - this.timeline.timeStep );
+					if (pos < 0) pos = 0;
 					this.timeline.gotoAndStop(pos);
-			}).bind(this));
+				}).bind(this));
 
-			var rewindBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-fast-forward"></span></button>');
-			elmControls.append( rewindBtn );
-			rewindBtn.click((function() {
-				if (!this.timeline) return;
-				this.timeline.gotoAndStop(this.timeline.duration);
-			}).bind(this));
+				var playBtn = $('<button class="btn btn-success btn-xs"><span class="glyphicon glyphicon-play"></span></button>');
+				elmControls.append( playBtn );
+				playBtn.click((function() {
+					if (!this.timeline) return;
+					if (this.timeline.position >= this.timeline.duration) {
+						this.timeline.gotoAndPlay(0);
+					} else {
+						this.timeline.setPaused(false);
+					}
+				}).bind(this));
+
+				var stopBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-stop"></span></button>');
+				elmControls.append( stopBtn );
+				stopBtn.click((function() {
+					if (!this.timeline) return;
+					this.timeline.setPaused(true);
+				}).bind(this));
+
+				var stepFwBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-step-forward"></span></button>');
+				elmControls.append( stepFwBtn );
+				stepFwBtn.click((function() {
+					if (!this.timeline) return;
+					var pos = this.timeline.snapTime( this.timeline.position + this.timeline.timeStep );
+					if (pos <= this.timeline.duration)
+						this.timeline.gotoAndStop(pos);
+				}).bind(this));
+
+				var rewindBtn = $('<button class="btn btn-default btn-xs"><span class="glyphicon glyphicon-fast-forward"></span></button>');
+				elmControls.append( rewindBtn );
+				rewindBtn.click((function() {
+					if (!this.timeline) return;
+					this.timeline.gotoAndStop(this.timeline.duration);
+				}).bind(this));
+
+			// Prepare status bar elements
+			this.elmStatus = $('<div class="tl-left tl-status"></div>');
+			this.elmFooter.append(this.elmStatus);
 
 			// Prepare header/footer canvases
 			var canvasHost = $('<div class="tl-right"></div>');
@@ -107,12 +113,22 @@ define(
 			this.canvasHeadHeight = $(this.elmHeader).height();
 			this.canvasHead = $('<canvas></canvas>');
 			this.canvasHead.attr({
-				'class'	 : 'tl-right',
 				'width'  : this.canvasWidth,
 				'height' : this.canvasHeadHeight
 			});
 			canvasHost.append( this.canvasHead );
 			this.contextHead = this.canvasHead[0].getContext("2d");
+
+			var canvasHost = $('<div class="tl-right"></div>');
+			this.elmFooter.append(canvasHost);
+			this.canvasFooterHeight = $(this.elmFooter).height();
+			this.canvasFooter = $('<canvas></canvas>');
+			this.canvasFooter.attr({
+				'width'  : this.canvasWidth,
+				'height' : this.canvasFooterHeight
+			});
+			canvasHost.append( this.canvasFooter );
+			this.contextFooter = this.canvasFooter[0].getContext("2d");
 
 			// Prepare body canvas 
 			this.canvasMinHeight = $(this.elmBody).height();
@@ -141,6 +157,7 @@ define(
 			this.mouseDragValue = 0;
 
 			this.scrollX = 0;
+			this.maxX = 0;
 
 			// Setup header
 			this.canvasHead.mousemove((function(e) {
@@ -158,8 +175,6 @@ define(
 					if ((mouseX >= cursorPos-this.config.cursorHandleR) && (mouseX <= cursorPos+this.config.cursorHandleR)) {
 						// Possible to drag the time cursor
 						this.mousePossibleDragMode = 3;
-						this.mouseDragX = mouseX;
-						this.mouseDragValue = cursorPos;
 						this.canvasHead.css('cursor', 'pointer');
 					} else {
 						this.mousePossibleDragMode = 0;
@@ -184,8 +199,86 @@ define(
 			}).bind(this));
 
 			this.canvasHead.mousedown((function(e) {
-				// Just enable the possible drag mode
-				this.mouseDragMode = this.mousePossibleDragMode;
+				var mouseY = e.offsetY,
+					mouseX = e.offsetX;
+
+				// This only functions when we have a timeline
+				if (!this.timeline) return;
+
+				// Keep current drag values
+				this.mouseDragValue = this.snapPixels( mouseX, this.config.padLeft );
+				this.mouseDragX = mouseX;
+
+				// Update timeline position
+				this.timeline.scrollPosition( this.pixels2time( this.mouseDragValue ) );
+
+				// Switch to timeline drag
+				this.mouseDragMode = 3;
+
+			}).bind(this));
+
+			this.canvasFooter.mousemove((function(e) {
+				var mouseY = e.offsetY,
+					mouseX = e.offsetX;
+
+				// 
+				// NOT DRAGGING : Cursor & DraggingMode selection
+				//
+				if (this.mouseDragMode == 0) {
+
+					// Calculate position frame bounds					
+					var w = this.canvasFooter.width() - this.config.padLeft - this.config.handleWidth,
+						sceneWidthMs = Math.max(this.timeline.duration, w / this.timeScale),
+						sceneWidthPx = sceneWidthMs * this.timeScale,
+						wScalePx = w / sceneWidthPx,
+						pFrameLeft = -this.scrollX * wScalePx + this.config.padLeft,
+						pFrameWidth = w * wScalePx;
+						if (pFrameWidth+pFrameLeft > w) pFrameWidth = w-pFrameLeft;
+
+					// Change cursor accordingly
+					if ((mouseX >= pFrameLeft) && (mouseX <= pFrameLeft+pFrameWidth)) {
+						this.mousePossibleDragMode = 5;
+						this.mouseDragX = mouseX;
+						this.mouseDragValue = this.scrollX;
+						this.canvasFooter.css('cursor', 'move');
+					} else {
+						this.mousePossibleDragMode = 0;
+						this.canvasFooter.css('cursor', 'default');
+					}
+
+				//
+				// DRAGGING #3 : Dragging cursor
+				//
+				} else if (this.mouseDragMode == 3) {
+					var delta = (mouseX - this.mouseDragX),
+						pos = delta + this.mouseDragValue,
+						time = this.pixels2time( pos );
+
+					// Update position
+					if (!this.timeline) return;
+					this.timeline.scrollPosition( time );
+
+
+				//
+				// DRAGGING #5 : Sliding scroll frame
+				//
+				} else if (this.mouseDragMode == 5) {
+
+					this.scrollX = this.mouseDragValue - (mouseX - this.mouseDragX);
+					if (this.scrollX > 0) this.scrollX = 0;
+
+				}
+
+			}).bind(this));
+
+			this.canvasFooter.mousedown((function(e) {
+				var mouseY = e.offsetY,
+					mouseX = e.offsetX;
+
+				if (e.button == 0) {
+					this.mouseDragMode = this.mousePossibleDragMode;
+				}
+
 			}).bind(this));
 
 			// Setup mouse
@@ -197,6 +290,9 @@ define(
 				// NO DRAGGING : Lookup possible drag modes
 				//
 				if (!this.mouseDragMode) {
+
+					// Update mouse X position
+					this.mouseDragX = mouseX;
 
 					// Lookup hover element
 					var hoverElement = this.hoverElement = this.elementIndexFromY( mouseY );
@@ -227,7 +323,6 @@ define(
 
 							// Possible to drag the anchor
 							this.mousePossibleDragMode = 1;
-							this.mouseDragX = mouseX;
 							this.mouseDragValue = anchors[i];
 							this.canvasBody.css('cursor', 'pointer');
 
@@ -238,7 +333,6 @@ define(
 
 								// Possible to drag the entire row
 								this.mousePossibleDragMode = 2;
-								this.mouseDragX = mouseX;
 								this.mouseDragValue = anchors.slice(0);
 								this.canvasBody.css('cursor', 'move');
 
@@ -309,40 +403,95 @@ define(
 					// Redraw
 					this.redraw();
 
+				//
+				// DRAGGING #3 : Dragging cursor
+				//
+				} else if (this.mouseDragMode == 3) {
+					var delta = (mouseX - this.mouseDragX),
+						pos = delta + this.mouseDragValue,
+						time = this.pixels2time( pos );
+
+					// Update position
+					if (!this.timeline) return;
+					this.timeline.scrollPosition( time );
+
+
+				//
+				// DRAGGING #4 : Panning
+				//
+				} else if (this.mouseDragMode == 4) {
+
+					this.scrollX = this.snapPixels( this.mouseDragValue + (mouseX - this.mouseDragX) );
+					if (this.scrollX > 0) this.scrollX = 0;
+					this.redraw();
+
 				}
 
 
 			}).bind(this));
 
 			this.canvasBody.mousedown((function(e) {
-				// Just enable the possible drag mode
-				this.mouseDragMode = this.mousePossibleDragMode;
+				e.preventDefault();
+				e.stopPropagation();
 
-				// Select row on click
-				if ((this.mouseDragMode == 1) || (this.mouseDragMode == 2)) {
-					this.selectRow( this.hoverElement );
-				}
+				// On left click check for dragging
+				if (e.button == 0) {
 
-				// If we clicked an anchor, update timeline
-				if (this.mouseDragMode == 1) {
+					// Just enable the possible drag mode
+					this.mouseDragMode = this.mousePossibleDragMode;
 
-					// Update position
-					if (!this.timeline) return;
-					this.activeAnchor = -1;
-					this.timeline.scrollPosition( this.pixels2time( this.mouseDragValue ) );
-					this.propUI.show( new TimelineUI.KeyframeWrapper( this, this.elements[this.hoverElement], this.hoverAnchor ) );
+					// Select row on click
+					if ((this.mouseDragMode == 1) || (this.mouseDragMode == 2)) {
+						this.selectRow( this.hoverElement );
+					}
 
-				} else if (this.mouseDragMode == 2) {
+					// If we clicked an anchor, update timeline
+					if (this.mouseDragMode == 1) {
 
-					// Check in which anchor we are currently in
-					this.activeAnchor = -1;
-					for (var i=1; i<this.hoverElementAnchors.length; i++) {
-						if ((this.mouseDragX >= this.hoverElementAnchors[i-1]) && (this.mouseDragX <= this.hoverElementAnchors[i])) {
-							this.activeAnchor = i;
-							this.propUI.show( new TimelineUI.TweenPropertiesWrapper( this, this.elements[this.hoverElement], i ) );
-							break;
+						// Update position
+						if (!this.timeline) return;
+						this.activeAnchor = -1;
+						this.timeline.scrollPosition( this.pixels2time( this.mouseDragValue ) );
+						this.propUI.show( new TimelineUI.KeyframeWrapper( this, this.elements[this.hoverElement], this.hoverAnchor ) );
+
+					} else if (this.mouseDragMode == 2) {
+
+						// Check in which anchor we are currently in
+						this.activeAnchor = -1;
+						for (var i=1; i<this.hoverElementAnchors.length; i++) {
+							if ((this.mouseDragX >= this.hoverElementAnchors[i-1]) && (this.mouseDragX <= this.hoverElementAnchors[i])) {
+								this.activeAnchor = i;
+								this.propUI.show( new TimelineUI.TweenPropertiesWrapper( this, this.elements[this.hoverElement], i ) );
+								break;
+							}
 						}
 					}
+
+				}
+
+				// Middle click starts panning
+				else if (e.button == 1) {
+
+					// Switch directly to panning
+					this.mouseDragMode = 4;
+					this.mouseDragValue = this.scrollX;
+					this.canvasBody.css('cursor', 'move');
+
+				}
+
+			}).bind(this));
+
+			this.canvasBody.on('mousewheel', (function(e) {
+
+				var delta = -e.originalEvent.deltaY / 10000;
+				if (delta != 0) {
+					e.stopPropagation();
+					e.preventDefault();
+
+					this.timeScale += delta;
+					if (this.timeScale < 0.1) this.timeScale = 0.1;
+					if (this.timeScale > 1) this.timeScale = 1;
+					console.log(this.timeScale);
 				}
 
 			}).bind(this));
@@ -382,11 +531,11 @@ define(
 		}
 
 		TimelineUI.prototype.time2pixels = function( tValue ) {
-			return tValue * this.timeScale + this.config.padLeft;
+			return tValue * this.timeScale + this.config.padLeft + this.scrollX;
 		}
 
 		TimelineUI.prototype.pixels2time = function( pValue ) {
-			return (pValue - this.config.padLeft) / this.timeScale;
+			return (pValue - this.config.padLeft - this.scrollX) / this.timeScale;
 		}
 
 		TimelineUI.prototype.snapPixels = function( xPos, offset ) {
@@ -394,229 +543,6 @@ define(
 			if (offset === undefined) offset = 0;
 			var timePos = this.timeline.snapTime( (xPos - offset) / this.timeScale );
 			return (timePos * this.timeScale) + offset;
-		}
-
-		TimelineUI.prototype.redraw = function() {
-
-			// Update canvas maximum height
-			var elementHeight = this.config.lineHeight * this.elements.length + 1;
-			this.canvasBody.attr('height', Math.max(this.canvasMinHeight, elementHeight) );
-
-			// Redraw canvas components
-			this.drawGrid		( this.context );
-			this.drawElements	( this.context );
-			this.drawTimeline	( this.context );
-
-			this.drawHeader		( this.contextHead );
-
-		}
-
-		TimelineUI.prototype.drawGrid = function(ctx) {
-			if (!this.timeline) return;
-
-			// Calculate step
-			var step = this.timeline.timeStep * this.timeScale;
-
-			// Grid lines
-			ctx.strokeStyle = '#DDD';
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			for (var x=this.config.padLeft; x<this.canvasBody.width()+step; x+=step) {
-				ctx.moveTo(x,0);
-				ctx.lineTo(x,this.canvasBody.height());
-			}
-			ctx.stroke();
-	
-		}
-
-		TimelineUI.prototype.drawHeader = function(ctx) {
-
-			// Background
-			ctx.fillStyle = '#FFF';
-			ctx.fillRect(0,0,this.canvasWidth,this.canvasHeadHeight);
-
-			// Border line
-			ctx.strokeStyle = '#DDD';
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(0,this.canvasHeadHeight-0.5);
-			ctx.lineTo(this.canvasWidth,this.canvasHeadHeight-0.5);
-			ctx.stroke();
-
-			// Timeline bar background
-			ctx.strokeStyle = '#BDC3C7';
- 			ctx.lineCap="round";
- 			ctx.lineWidth = 10;
-			ctx.beginPath();
-			ctx.moveTo( this.config.padLeft ,this.canvasHeadHeight/2);
-			ctx.lineTo(this.canvasWidth-5,this.canvasHeadHeight/2);
-			ctx.stroke();
-
-			// Do not continue
-			if (!this.timeline) return;
-
-			// Get timeline cursor position
-			var cursorPos = this.snapPixels( this.time2pixels( this.timeline.position ), this.config.padLeft );
-
-			// Draw timeline
-			ctx.strokeStyle = '#F00';
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(cursorPos,this.canvasHeadHeight/2);
-			ctx.lineTo(cursorPos,this.canvasHeadHeight);
-			ctx.stroke();
-
-			// Timeline bar foreground
-			ctx.strokeStyle = '#2ECC71';
- 			ctx.lineCap="round";
- 			ctx.lineWidth = 10;
-			ctx.beginPath();
-			ctx.moveTo( this.config.padLeft, this.canvasHeadHeight/2);
-			ctx.lineTo( cursorPos, this.canvasHeadHeight/2);
-			ctx.stroke();
-
-			// Draw handle
-			ctx.strokeStyle = '#CCC';
-			ctx.fillStyle = '#FFF';
-			ctx.shadowColor = '#333';
-			ctx.shadowOffsetY = 2;
-			ctx.shadowBlur = 4;
-			ctx.lineWidth = 2;
-			ctx.beginPath();
-			ctx.arc(
-				cursorPos,
-				this.canvasHeadHeight/2,
-				this.config.cursorHandleR,
-				0,2*Math.PI)
-			ctx.fill();
-			ctx.shadowColor = '';
-			ctx.shadowBlur = 0;
-			ctx.shadowOffsetY = 0;
-			ctx.stroke();
-
-			// Draw inner part
-			ctx.fillStyle = '#2ECC71';
-			ctx.strokeStyle = '#AAA';
-			ctx.lineWidth = 2;
-			ctx.beginPath();
-			ctx.arc(
-				cursorPos,
-				this.canvasHeadHeight/2,
-				5,0,2*Math.PI)
-			ctx.fill();
-			ctx.stroke();
-		}
-
-		TimelineUI.prototype.drawTimeline = function(ctx) {
-		
-			// Do not continue
-			if (!this.timeline) return;
-
-			// Get timeline cursor position
-			var cursorPos = this.snapPixels( this.time2pixels( this.timeline.position ), this.config.padLeft );
-
-			// Draw timeline
-			ctx.strokeStyle = '#F00';
-			ctx.lineWidth = 1;
-			ctx.beginPath();
-			ctx.moveTo(cursorPos,0);
-			ctx.lineTo(cursorPos,this.canvasBody.height());
-			ctx.stroke();
-
-		}
-
-		TimelineUI.prototype.drawElements = function(ctx) {
-
-			ctx.strokeStyle = '#ddd';
- 			ctx.lineCap="butt";
- 			ctx.lineWidth = 1;
-
-			var y = 0, rowHeight = this.config.lineHeight;
-			for (var i=0; i<this.elements.length; i++) {
-
-				var elmBottom = y + rowHeight - 0.5,
-					elmTop = y + 1.5;
-
-				// Selected background
-				if (this.selectedRow == i) {
-					ctx.globalAlpha = 0.5;
-					ctx.fillStyle = this.config.selectionFill;
-					ctx.fillRect( 0, elmTop, this.canvasWidth, elmBottom-elmTop )
-					ctx.globalAlpha = 1;
-				}
-
-				// Lower & Upper background lines
-				ctx.strokeStyle = '#ddd';
-				ctx.beginPath();
-				ctx.moveTo(0, elmTop );
-				ctx.lineTo(this.canvasWidth, elmTop );
-				ctx.moveTo(0, elmBottom );
-				ctx.lineTo(this.canvasWidth, elmBottom );
-				ctx.stroke();
-
-				// Get anchor information
-				var anchors = this.getElementAnchors( this.elements[i] );
-				if (anchors.length > 0) {
-
-					// Overall Band
-					ctx.fillStyle = this.config.bandFill;
-					ctx.strokeStyle = this.config.bandStroke;
-					ctx.beginPath();
-					ctx.rect( 
-						anchors[0], 
-						elmTop, 
-						anchors[anchors.length-1] - anchors[0], 
-						elmBottom-elmTop 
-						);
-					ctx.fill();
-					ctx.stroke();
-
-					// Active anchor
-					if ((this.activeAnchor > -1) && (this.selectedRow == i)) {
-						var aBegin = anchors[this.activeAnchor-1],
-							aEnd = anchors[this.activeAnchor];
-
-						ctx.fillStyle = this.config.bandHoverFill;
-						ctx.strokeStyle = this.config.bandStroke;
-						ctx.beginPath();
-						ctx.rect( 
-							aBegin, 
-							elmTop, 
-							aEnd-aBegin, 
-							elmBottom-elmTop 
-							);
-						ctx.fill();
-						ctx.stroke();
-
-					}
-
-					// Align anchors
-					ctx.fillStyle = this.config.handleFill;
-					ctx.strokeStyle = this.config.handleStroke;
-					ctx.beginPath();
-					for (var j=0; j<anchors.length; j++) {
-
-						// Anchor vertical line
-						ctx.moveTo( anchors[j]+0.5, elmTop+0.5 );
-						ctx.lineTo( anchors[j], elmBottom );
-
-						// Anchor rect
-						ctx.rect( 
-							anchors[j]-this.config.handleWidth/2+0.5, 
-							elmTop+this.config.handleTrim+0.5, 
-							this.config.handleWidth, 
-							elmBottom-elmTop-this.config.handleTrim*2
-							);
-
-					}
-					ctx.fill();
-					ctx.stroke();
-
-				}
-
-				y += rowHeight;
-			}
-
 		}
 
 		/**
@@ -634,7 +560,7 @@ define(
 		 * Return the element on the given Y coordinates
 		 */
 		TimelineUI.prototype.elementIndexFromY = function( yPos ) {
-			var y = 0, rowHeight = this.config.lineHeight;
+			var y = this.config.padTop, rowHeight = this.config.lineHeight;
 			for (var i=0; i<this.elements.length; i++) {
 				var elmBottom = y + rowHeight - 0.5,
 					elmTop = y + 1.5;
@@ -750,6 +676,366 @@ define(
 			console.log("     - Calling renderAll()" );
 			this.canvas.canvas.renderAll();
 		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////
+		////                                                                                   ////
+		////                            RENDERING FUNCTIONS                                    ////
+		////                                                                                   ////
+		///////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Format ms to min/sec
+		 */
+		TimelineUI.prototype.formatTime = function(timeInMs) {
+			var ms = parseInt(timeInMs),
+				sec = Math.floor(ms/1000),
+				min = Math.floor(sec/60),
+				ms = ms % 1000;
+
+			// Add leading zeros
+			if (sec < 10) sec = "0"+sec;
+			if (min < 10) min = "0"+min;
+			ms = String(ms);
+
+			// Add leading zeros
+			var z = 3 - ms.length;
+			for (var i=0; i<z; i++)
+				ms = "0"+ms;
+
+			return min+":"+sec+"."+ms;
+		}
+
+		/**
+		 * Redraw all canvases
+		 */
+		TimelineUI.prototype.redraw = function() {
+
+			// Update canvas maximum height
+			var elementHeight = this.config.lineHeight * this.elements.length + 1;
+			this.canvasBody.attr('height', Math.max(this.canvasMinHeight, elementHeight) );
+
+			// Clear canvases
+			this.contextHead.clearRect( 0, 0, this.canvasHead.width(), this.canvasHead.height() );
+			this.contextFooter.clearRect( 0, 0, this.canvasFooter.width(), this.canvasFooter.height() );
+
+			// Redraw canvas components
+			this.drawGrid		( this.context );
+			this.drawElements	( this.context ); // <- maxX gets updated here
+			this.drawTimeline	( this.context );
+			this.drawHeader		( this.contextHead );
+			this.drawPreview 	( this.contextFooter );
+
+			// Update status label
+			if (this.timeline)
+				this.elmStatus.html( "<strong>"+this.formatTime(this.timeline.position) + "</strong> / " + this.formatTime(this.timeline.duration) );
+
+		}
+
+		/**
+		 * Draw the background gridlines
+		 */
+		TimelineUI.prototype.drawGrid = function(ctx) {
+			if (!this.timeline) return;
+
+			// Calculate step
+			var step = this.timeline.timeStep * this.timeScale;
+
+			// Grid lines
+			ctx.lineWidth = 1;
+			for (var x=this.config.padLeft; x<this.canvasBody.width()+step; x+=step) {
+
+				var t = this.pixels2time(x);
+				if (((t+this.timeScale) % 1000) <= this.timeScale*2) {
+					ctx.strokeStyle = '#6699FF';
+					ctx.fillStyle = '#6699FF';
+					ctx.font = "8px sans-serif";
+					ctx.fillText( parseInt((t+this.timeScale)/1000) + " sec", x+2, 8);
+
+				} else {
+					ctx.strokeStyle = '#DDD';
+					if (this.timeScale < 0.2) continue;
+				}
+
+				ctx.beginPath();
+				ctx.moveTo(x,0);
+				ctx.lineTo(x,this.canvasBody.height());
+				ctx.stroke();
+			}
+	
+		}
+
+		/**
+		 * Draw header timeline
+		 */
+		TimelineUI.prototype.drawHeader = function(ctx) {
+
+			// Background
+			ctx.fillStyle = '#FFF';
+			ctx.fillRect(0,0,this.canvasWidth,this.canvasHeadHeight);
+
+			// Border line
+			ctx.strokeStyle = '#DDD';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(0,this.canvasHeadHeight-0.5);
+			ctx.lineTo(this.canvasWidth,this.canvasHeadHeight-0.5);
+			ctx.stroke();
+
+			// Timeline bar background
+			ctx.strokeStyle = '#BDC3C7';
+ 			ctx.lineCap="round";
+ 			ctx.lineWidth = 10;
+			ctx.beginPath();
+			ctx.moveTo( this.config.padLeft ,this.canvasHeadHeight/2);
+			ctx.lineTo(this.canvasWidth-5,this.canvasHeadHeight/2);
+			ctx.stroke();
+
+			// Do not continue
+			if (!this.timeline) return;
+
+			// Get timeline cursor position
+			var cursorPos = this.snapPixels( this.time2pixels( this.timeline.position ), this.config.padLeft );
+
+			// Draw timeline
+			ctx.strokeStyle = '#F00';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(cursorPos,this.canvasHeadHeight/2);
+			ctx.lineTo(cursorPos,this.canvasHeadHeight);
+			ctx.stroke();
+
+			// Timeline bar foreground
+			ctx.strokeStyle = '#2ECC71';
+ 			ctx.lineCap="round";
+ 			ctx.lineWidth = 10;
+			ctx.beginPath();
+			ctx.moveTo( this.config.padLeft, this.canvasHeadHeight/2);
+			ctx.lineTo( cursorPos, this.canvasHeadHeight/2);
+			ctx.stroke();
+
+			// Draw handle
+			ctx.strokeStyle = '#CCC';
+			ctx.fillStyle = '#FFF';
+			ctx.shadowColor = '#333';
+			ctx.shadowOffsetY = 2;
+			ctx.shadowBlur = 4;
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(
+				cursorPos,
+				this.canvasHeadHeight/2,
+				this.config.cursorHandleR,
+				0,2*Math.PI)
+			ctx.fill();
+			ctx.shadowColor = '';
+			ctx.shadowBlur = 0;
+			ctx.shadowOffsetY = 0;
+			ctx.stroke();
+
+			// Draw inner part
+			ctx.fillStyle = '#2ECC71';
+			ctx.strokeStyle = '#AAA';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(
+				cursorPos,
+				this.canvasHeadHeight/2,
+				5,0,2*Math.PI)
+			ctx.fill();
+			ctx.stroke();
+
+		}
+
+		/**
+		 * Draw the cursor on the timeline
+		 */
+		TimelineUI.prototype.drawTimeline = function(ctx) {
+		
+			// Do not continue
+			if (!this.timeline) return;
+
+			// Get timeline cursor position
+			var cursorPos = this.snapPixels( this.time2pixels( this.timeline.position ), this.config.padLeft );
+
+			// Draw timeline
+			ctx.strokeStyle = '#F00';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.moveTo(cursorPos,0);
+			ctx.lineTo(cursorPos,this.canvasBody.height());
+			ctx.stroke();
+
+		}
+
+		/**
+		 * Draw elements
+		 */
+		TimelineUI.prototype.drawElements = function(ctx) {
+
+			ctx.strokeStyle = '#ddd';
+ 			ctx.lineCap="butt";
+ 			ctx.lineWidth = 1;
+
+ 			// Also calculate maxX
+ 			this.maxX = 0;
+
+			var y = this.config.padTop, rowHeight = this.config.lineHeight;
+			for (var i=0; i<this.elements.length; i++) {
+
+				var elmBottom = y + rowHeight - 0.5,
+					elmTop = y + 1.5;
+
+				// Selected background
+				if (this.selectedRow == i) {
+					ctx.globalAlpha = 0.5;
+					ctx.fillStyle = this.config.selectionFill;
+					ctx.fillRect( 0, elmTop, this.canvasWidth, elmBottom-elmTop )
+					ctx.globalAlpha = 1;
+				}
+
+				// Lower & Upper background lines
+				ctx.strokeStyle = '#ddd';
+				ctx.beginPath();
+				ctx.moveTo(0, elmTop );
+				ctx.lineTo(this.canvasWidth, elmTop );
+				ctx.moveTo(0, elmBottom );
+				ctx.lineTo(this.canvasWidth, elmBottom );
+				ctx.stroke();
+
+				// Get anchor information
+				var anchors = this.getElementAnchors( this.elements[i] );
+				if (anchors.length > 0) {
+
+					// Update maxX
+					if (anchors[anchors.length-1] > this.maxX)
+						this.maxX = anchors[anchors.length-1];
+
+					// Overall Band
+					ctx.fillStyle = this.config.bandFill;
+					ctx.strokeStyle = this.config.bandStroke;
+					ctx.beginPath();
+					ctx.rect( 
+						anchors[0], 
+						elmTop, 
+						anchors[anchors.length-1] - anchors[0], 
+						elmBottom-elmTop 
+						);
+					ctx.fill();
+					ctx.stroke();
+
+					// Active anchor
+					if ((this.activeAnchor > -1) && (this.selectedRow == i)) {
+						var aBegin = anchors[this.activeAnchor-1],
+							aEnd = anchors[this.activeAnchor];
+
+						ctx.fillStyle = this.config.bandHoverFill;
+						ctx.strokeStyle = this.config.bandStroke;
+						ctx.beginPath();
+						ctx.rect( 
+							aBegin, 
+							elmTop, 
+							aEnd-aBegin, 
+							elmBottom-elmTop 
+							);
+						ctx.fill();
+						ctx.stroke();
+
+					}
+
+					// Align anchors
+					ctx.fillStyle = this.config.handleFill;
+					ctx.strokeStyle = this.config.handleStroke;
+					ctx.beginPath();
+					for (var j=0; j<anchors.length; j++) {
+
+						// Anchor vertical line
+						ctx.moveTo( anchors[j]+0.5, elmTop+0.5 );
+						ctx.lineTo( anchors[j], elmBottom );
+
+						// Anchor rect
+						ctx.rect( 
+							anchors[j]-this.config.handleWidth/2+0.5, 
+							elmTop+this.config.handleTrim+0.5, 
+							this.config.handleWidth, 
+							elmBottom-elmTop-this.config.handleTrim*2
+							);
+
+					}
+					ctx.fill();
+					ctx.stroke();
+
+				}
+
+				y += rowHeight;
+			}
+
+		}
+
+		/**
+		 * Draw all elements as preview
+		 */
+		TimelineUI.prototype.drawPreview = function(ctx) {
+			if (!this.timeline) return;
+
+			var w = ctx.canvas.width - this.config.padLeft - this.config.handleWidth, 
+				h = ctx.canvas.height - 8,
+				sceneWidthMs = Math.max(this.timeline.duration, w / this.timeScale),
+				sceneWidthPx = sceneWidthMs * this.timeScale,
+				wScaleMs = w / sceneWidthMs,
+				wScalePx = w / sceneWidthPx;
+
+			// Draw elements preview
+			ctx.strokeStyle = '#333';
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			var y = 4;
+			for (var i=0; i<this.elements.length; i++) {
+				var a = this.elements[i];
+				if (a.__keyframes.length > 1) {
+					var t0 = a.__keyframes[0].at * wScaleMs,
+						t1 = a.__keyframes[a.__keyframes.length-1].at * wScaleMs;
+
+					ctx.moveTo( t0 + this.config.padLeft, y);
+					ctx.lineTo( t1 + this.config.padLeft, y );
+					y += 2;
+					if (y>h) break;
+				}
+			}
+			ctx.stroke();
+
+			// Draw position frame
+			var pFrameLeft = -this.scrollX * wScalePx + this.config.padLeft,
+				pFrameWidth = w * wScalePx;
+			if (pFrameWidth+pFrameLeft > w) pFrameWidth = w-pFrameLeft;
+
+			ctx.fillStyle = '#2ecc71';
+			ctx.strokeStyle = '#2ecc71';
+			ctx.globalAlpha = 0.4;
+			ctx.beginPath();
+			ctx.rect(pFrameLeft+0.5,2.5,pFrameWidth,h+2);
+			ctx.fill();
+			ctx.globalAlpha = 1;
+			ctx.stroke();
+
+			// Draw cursor
+			var cursorPos = this.timeline.position * wScaleMs + this.config.padLeft;
+			ctx.strokeStyle = '#F00';
+			ctx.beginPath();
+			ctx.moveTo(cursorPos+0.5,2.5);
+			ctx.lineTo(cursorPos+0.5,h+4);
+			ctx.stroke();
+
+		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////
+		////                                                                                   ////
+		////                      WRAPPER CLASSES USED FOR PROPERTY PAGES                      ////
+		////                                                                                   ////
+		///////////////////////////////////////////////////////////////////////////////////////////
+		///////////////////////////////////////////////////////////////////////////////////////////
 
 		/**
 		 * Tween properties wrapper, used by the property editor

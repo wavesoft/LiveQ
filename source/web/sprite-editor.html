@@ -142,6 +142,15 @@
 			padding-left: 2px;
 		}
 
+ 		#editor-frame #editor-timeline {
+			-webkit-touch-callout: none;
+			-webkit-user-select: none;
+			-khtml-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
+
  		#editor-frame #editor-timeline > .tl-header {
  			position: absolute;
  			left: 0; right: 0; top: 0; height: 32px;
@@ -150,6 +159,12 @@
  		#editor-frame #editor-timeline .tl-controls {
  			padding: 4px;
 		}
+
+ 		#editor-frame #editor-timeline .tl-status {
+ 			font-size: 12px;
+ 			text-align: center;
+ 			line-height: 32px;
+ 		}
 
  		#editor-frame #editor-timeline .tl-controls > .btn {
  			margin: 0 1px;
@@ -169,6 +184,7 @@
  		}
 
  		#editor-frame #editor-timeline > .tl-header > div.tl-left,
+ 		#editor-frame #editor-timeline > .tl-footer > div.tl-left,
   		#editor-frame #editor-timeline > .tl-body > div.tl-left {
   			width: 170px;
   			float: left;
@@ -176,6 +192,7 @@
  		}
 
  		#editor-frame #editor-timeline > .tl-header > div.tl-right,
+ 		#editor-frame #editor-timeline > .tl-footer > div.tl-right,
   		#editor-frame #editor-timeline > .tl-body > div.tl-right {
   			margin-left: 170px;
   			width: 100%;
@@ -186,6 +203,11 @@
   			float: left;
   			background-color: #CCC;
   			min-height: 100%;
+  			padding-top: 10px;
+
+			-moz-box-shadow:    inset -4px 0 14px -8px #000000;
+			-webkit-box-shadow: inset -4px 0 14px -8px #000000;
+			box-shadow:         inset -4px 0 14px -8px #000000;
   		}
 
   		#editor-frame #editor-timeline > .tl-body > div.tl-canvas {
@@ -238,7 +260,7 @@
 				</div>
 				<div class="btn-group">
 					<button id="editor-delete" type="button" class="btn btn-default">
-					  <span class="glyphicon glyphicon-trash"> Delete
+					  <span class="glyphicon glyphicon-trash"></span> Delete
 					</button>
 				</div>
 			</div>

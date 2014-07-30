@@ -61,20 +61,35 @@ define(
 
 			canvas.on('path:created', (function(obj) {
 
+				// A free-hand path created
 				canvas.isDrawingMode = false;
 
+				// Import path to timeline
+				var path = obj.path;
+				var element = this.timeline.importObject( path );
+				this.timelineUI.add( element );
 
-				window.p = obj.path;
-
-				var ow = window.ow = this.timeline.importObject( obj.path );
-				this.timelineUI.add( ow );
+				// Select
+				this.selectObject( path );
 
 			}).bind(this));
 
 		};
 
+		/**
+		 * Clear everything
+		 */
+		EditableCanvas.prototype.clear = function() {
+			this.timeline.clear();
+			this.canvas.clear();
+		}
+
+		/**
+		 * Load the stage information from a JSON object
+		 */
 		EditableCanvas.prototype.loadJSON = function( json ) {
 
+			// Helper function to initialize tweens
 			var initTweens = (function() {
 
 				// Initialize timeline with json
@@ -90,39 +105,68 @@ define(
 
 			}).bind(this);
 
-			// Initialize canvas using the canvas-part of the JSON
-			var initCanvas = (function() {
-				// Load canvas & then init tweens
-				this.canvas.loadFromJSON(json['canvas'], initTweens);
-			}).bind(this);
+			// Reset everything
+			this.clear();
 
-			// Start with canvas
-			initCanvas();
+			// Load canvas & then init tweens
+			this.canvas.loadFromJSON(json['canvas'], initTweens);
 
+		}
+
+		/**
+		 * Dump the canvas & timeline configuration to a reusable JSON object
+		 */
+		EditableCanvas.prototype.toJSON = function() {
+			return this.timeline.toJSON( this.canvas );
 		}
 
 		EditableCanvas.prototype.remove = function( elm ) {
 			if (!elm) return;
 
-			// Remove objects
-			elm.__object.remove();
-			this.timeline.remove(elm);
-
 			// If this was an active object, unselect properties
 			var ao = this.canvas.getActiveObject();
 			if (elm.__object == ao) {
 				this.propertiesUI.show( null );
+				this.canvas.discardActiveObject();
 			}
+
+			// If this was part of an active group, disband group
+			var ag = this.canvas.getActiveGroup();
+			if (ag != null) {
+				if (ag.objects.indexOf(elm.__object) > -1)
+					this.canvas.discardActiveGroup();
+			}
+
+			// Remove objects
+			elm.__object.remove();
+			this.timeline.remove(elm);
+
+			// Redraw
+			this.canvas.renderAll();
 
 		}
 
-		EditableCanvas.prototype.getSelectedElement = function() {
-			var ao = this.canvas.getActiveObject();
-			if (ao == null) return null;
-			return this.timeline.elementFromFabricObject( ao );
+		EditableCanvas.prototype.getSelection = function() {
+			var ag = this.canvas.getActiveGroup(),
+				ao = this.canvas.getActiveObject(),
+				list = [];
+
+			if (!ag && !ao) return [];
+			if (ag) list=ag.objects;
+			if (ao) list=[ao];
+
+			var elements = [];
+			for (var i=0; i<list.length; i++) {
+				var elm = this.timeline.elementFromFabricObject( list[i] );
+				if (elm) elements.push(elm);
+			}
+
+			return elements;
+
 		}
 
 		EditableCanvas.prototype.selectObject = function(o) {
+			this.canvas.setActiveGroup(null);
 			this.canvas.setActiveObject(o);
 			if (this.canvas.getActiveObject()) {
 				this.__objectSelected(o);

@@ -46,7 +46,7 @@ define(
 				// Very first node is just set
 				if (first) {
 					first = false;
-					tween.set(d);
+					tween.to(d,0);
 					console.log("             .set(", d, ")");
 					// Check if first node has offset
 					if (at > 0) {
@@ -65,8 +65,6 @@ define(
 			}
 
 			// As the last step on the tween, hide
-			//tween.wait(10)
-			//	 .set({"visible": false});
 			console.log("        }" );				
 
 			return tween;
