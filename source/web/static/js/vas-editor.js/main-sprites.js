@@ -6,8 +6,29 @@ define(
 
 		var Main = { };
 
-		Main.load = function() {
-			
+		Main.loadFromDB = function(filename, cb) {
+			var db = DB.openDatabase("animations");
+			db.get(filename, (function(doc, err) {
+				if (!doc) {
+					alert("Unable to load the specified file!");
+					if (cb) cb(false);
+				} else {
+					this.canvas.loadJSON(doc['data']);
+					if (cb) cb(true);
+				}
+			}).bind(this));
+		}
+
+		Main.saveToDB = function(filename, cb) {
+			var db = DB.openDatabase("animations");
+			db.put(filename, this.canvas.toJSON(), (function(doc) {
+				if (!doc) {
+					alert("Unable to save the specified file!");
+					if (cb) cb(false);
+				} else {
+					if (cb) cb(true);
+				}
+			}).bind(this));
 		}
 
 		Main.initialize = function(cb) {
@@ -17,6 +38,9 @@ define(
 			this.canvas = new EditableCanvas( $('#editor-canvas > canvas'), this.propUI, this.timelineUI );
 
 			// bind to events
+			$("#editor-new").click((function(e) {
+				this.canvas.clear();
+			}).bind(this));
 			$("#editor-freehand").click((function(e) {
 				this.canvas.startFreeDrawing();
 			}).bind(this));
@@ -27,6 +51,51 @@ define(
 					this.canvas.remove(sel[i]);
 				}
 			}).bind(this));
+			$("#editor-keyframe").click((function(e) {
+				var sel = this.canvas.getSelection();
+				if (sel.length == 0) {
+					this.canvas.timeline.setKeyframe();
+				} else {
+					for (var i=0; i<sel.length; i++) {
+						this.canvas.timeline.setKeyframe(sel[i]);
+					}
+				}
+			}).bind(this));
+			$("#editor-select-none").click((function(e) {
+				this.canvas.selectObject(null);
+			}).bind(this));
+
+			$("#editor-save").click((function(e) {
+				var file = $("#editor-save-filename").val();
+				this.saveToDB(file, function(ok) {
+					if (ok) $("#editor-modal-save").modal('hide');
+				});
+			}).bind(this));
+			$("#editor-open").click((function(e) {
+				var file = $("#editor-open-filename").val();
+				this.loadFromDB(file, function(ok) {
+					if (ok) $("#editor-modal-open").modal('hide');
+				});
+			}).bind(this));
+
+			$("#editor-add-image").click((function(e) {
+				var imageURL = $("#editor-image-url").val();
+				this.canvas.addImage( imageURL );
+				jQuery("#editor-modal-image").modal('hide');
+			}).bind(this));
+			$("#editor-add-text").click((function(e) {
+				var textString = $("#editor-text").val(),
+					textSize = parseInt($("#editor-text-size").val()),
+					textFamily = $("#editor-text-family").val();
+
+				this.canvas.addText( textString, textSize, textFamily );
+				jQuery("#editor-modal-text").modal('hide');
+			}).bind(this));
+
+
+			$("#editor-add-circle").click((function(e) { this.canvas.addShape( 'Circle' ); }).bind(this));
+			$("#editor-add-triangle").click((function(e) { this.canvas.addShape( 'Triangle' ); }).bind(this));
+			$("#editor-add-rect").click((function(e) { this.canvas.addShape( 'Rect' ); }).bind(this));
 
 			cb();
 

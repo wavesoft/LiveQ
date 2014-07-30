@@ -9,52 +9,52 @@
 		/* Common stuff */
 		.picker-wrapper, 
 		.slide-wrapper {
-		    position: relative;
-		    float: left;
+			position: relative;
+			float: left;
 		}
 		.picker-indicator,
 		.slide-indicator {
-		    position: absolute;
-		    left: 0;
-		    top: 0;
-		    pointer-events: none;
+			position: absolute;
+			left: 0;
+			top: 0;
+			pointer-events: none;
 		}
 		.picker,
 		.slide {
-		    cursor: crosshair;
-		    float: left;
+			cursor: crosshair;
+			float: left;
 		}
 
 		/* Small skin */
 
 		.cp-small {
-		    padding: 5px;
-		    background-color: white;
-		    float: left;
-		    border-radius: 5px;
+			padding: 5px;
+			background-color: white;
+			float: left;
+			border-radius: 5px;
 		}
 		.cp-small .picker {
-		    width: 100px;
-		    height: 100px;
+			width: 100px;
+			height: 100px;
 		}
 		.cp-small .slide {
-		    width: 15px;
-		    height: 100px;
+			width: 15px;
+			height: 100px;
 		}
 		.cp-small .slide-wrapper {
-		    margin-left: 5px;
+			margin-left: 5px;
 		}
 		.cp-small .picker-indicator {
-		    width: 1px;
-		    height: 1px;
-		    border: 1px solid black;
-		    background-color: white;
+			width: 1px;
+			height: 1px;
+			border: 1px solid black;
+			background-color: white;
 		}
 		.cp-small .slide-indicator {
-		    width: 100%;
-		    height: 2px;
-		    left: 0px;
-		    background-color: black;
+			width: 100%;
+			height: 2px;
+			left: 0px;
+			background-color: black;
 		}
 
 
@@ -86,7 +86,7 @@
 			bottom: 10px; left: 10px; right: 10px; 
 			height: 250px;
 			background: #FFF;
- 			border: solid 1px #ddd;
+			border: solid 1px #ddd;
 		}
 
 		#editor-frame #editor-panels {
@@ -102,36 +102,36 @@
 		}
 
 
- 		#editor-frame #editor-panels > .tab-content {
- 			position: absolute;
- 			overflow-x: hidden;
- 			overflow-y: auto;
- 			left: 0; right: 0; top: 42px; bottom: 0;
- 			background-color: #FFF;
- 			border-color: #ddd;
- 			border-width: 1px;
- 			border-style: none solid solid solid;
+		#editor-frame #editor-panels > .tab-content {
+			position: absolute;
+			overflow-x: hidden;
+			overflow-y: auto;
+			left: 0; right: 0; top: 42px; bottom: 0;
+			background-color: #FFF;
+			border-color: #ddd;
+			border-width: 1px;
+			border-style: none solid solid solid;
 		}
 
- 		#editor-frame #properties > div.header {
- 			margin: 0 4px 4px;
- 			padding: 4px;
- 			font-weight: bold;
- 			border-bottom: solid 1px #ddd;
- 			color: #666;
- 		}
+		#editor-frame #properties > div.header {
+			margin: 0 4px 4px;
+			padding: 4px;
+			font-weight: bold;
+			border-bottom: solid 1px #ddd;
+			color: #666;
+		}
 
- 		#editor-frame #properties .row {
- 			margin: 1px 1px 0;
- 			margin-right: 0 !important;
- 		}
+		#editor-frame #properties .row {
+			margin: 1px 1px 0;
+			margin-right: 0 !important;
+		}
 
- 		#editor-frame #properties .row label {
- 			font-size: 12px;
- 			line-height: 22px;
- 			text-align: right;
- 			width: 100%;
-  		}
+		#editor-frame #properties .row label {
+			font-size: 12px;
+			line-height: 22px;
+			text-align: right;
+			width: 100%;
+		}
 
 		#editor-frame #properties .row .col-xs-4 {
 			padding-right: 2px;
@@ -142,7 +142,7 @@
 			padding-left: 2px;
 		}
 
- 		#editor-frame #editor-timeline {
+		#editor-frame #editor-timeline {
 			-webkit-touch-callout: none;
 			-webkit-user-select: none;
 			-khtml-user-select: none;
@@ -151,92 +151,92 @@
 			user-select: none;
 		}
 
- 		#editor-frame #editor-timeline > .tl-header {
- 			position: absolute;
- 			left: 0; right: 0; top: 0; height: 32px;
- 		}
-
- 		#editor-frame #editor-timeline .tl-controls {
- 			padding: 4px;
+		#editor-frame #editor-timeline > .tl-header {
+			position: absolute;
+			left: 0; right: 0; top: 0; height: 32px;
 		}
 
- 		#editor-frame #editor-timeline .tl-status {
- 			font-size: 12px;
- 			text-align: center;
- 			line-height: 32px;
- 		}
-
- 		#editor-frame #editor-timeline .tl-controls > .btn {
- 			margin: 0 1px;
+		#editor-frame #editor-timeline .tl-controls {
+			padding: 4px;
 		}
 
- 		#editor-frame #editor-timeline > .tl-footer {
- 			position: absolute;
- 			left: 0; right: 0; bottom: 0; height: 32px;
- 			border-top: solid 1px #ddd;
- 		}
+		#editor-frame #editor-timeline .tl-status {
+			font-size: 12px;
+			text-align: center;
+			line-height: 32px;
+		}
 
-  		#editor-frame #editor-timeline > .tl-body {
- 			position: absolute;
- 			left: 0; right: 0; top:32px; bottom: 32px;
- 			overflow-y: scroll;
- 			overflow-x: hidden;
- 		}
+		#editor-frame #editor-timeline .tl-controls > .btn {
+			margin: 0 1px;
+		}
 
- 		#editor-frame #editor-timeline > .tl-header > div.tl-left,
- 		#editor-frame #editor-timeline > .tl-footer > div.tl-left,
-  		#editor-frame #editor-timeline > .tl-body > div.tl-left {
-  			width: 170px;
-  			float: left;
-  			height: 32px;
- 		}
+		#editor-frame #editor-timeline > .tl-footer {
+			position: absolute;
+			left: 0; right: 0; bottom: 0; height: 32px;
+			border-top: solid 1px #ddd;
+		}
 
- 		#editor-frame #editor-timeline > .tl-header > div.tl-right,
- 		#editor-frame #editor-timeline > .tl-footer > div.tl-right,
-  		#editor-frame #editor-timeline > .tl-body > div.tl-right {
-  			margin-left: 170px;
-  			width: 100%;
- 		}
+		#editor-frame #editor-timeline > .tl-body {
+			position: absolute;
+			left: 0; right: 0; top:32px; bottom: 32px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
 
-  		#editor-frame #editor-timeline > .tl-body > div.tl-side {
-  			width: 170px;
-  			float: left;
-  			background-color: #CCC;
-  			min-height: 100%;
-  			padding-top: 10px;
+		#editor-frame #editor-timeline > .tl-header > div.tl-left,
+		#editor-frame #editor-timeline > .tl-footer > div.tl-left,
+		#editor-frame #editor-timeline > .tl-body > div.tl-left {
+			width: 170px;
+			float: left;
+			height: 32px;
+		}
+
+		#editor-frame #editor-timeline > .tl-header > div.tl-right,
+		#editor-frame #editor-timeline > .tl-footer > div.tl-right,
+		#editor-frame #editor-timeline > .tl-body > div.tl-right {
+			margin-left: 170px;
+			width: 100%;
+		}
+
+		#editor-frame #editor-timeline > .tl-body > div.tl-side {
+			width: 170px;
+			float: left;
+			background-color: #CCC;
+			min-height: 100%;
+			padding-top: 10px;
 
 			-moz-box-shadow:    inset -4px 0 14px -8px #000000;
 			-webkit-box-shadow: inset -4px 0 14px -8px #000000;
 			box-shadow:         inset -4px 0 14px -8px #000000;
-  		}
+		}
 
-  		#editor-frame #editor-timeline > .tl-body > div.tl-canvas {
-  			margin-left: 170px;
-  			width: 100%;
-  		}
+		#editor-frame #editor-timeline > .tl-body > div.tl-canvas {
+			margin-left: 170px;
+			width: 100%;
+		}
 
-  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-info {
-  			height: 32px;
-  			background-color: #FFF;
-  			border-bottom: solid 1px #DDD;
-  		}
+		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-info {
+			height: 32px;
+			background-color: #FFF;
+			border-bottom: solid 1px #DDD;
+		}
 
-  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle {
-  			display: block;
-  			height: 24px;
-  			margin: 1px 0 1px 4px;
-  			padding: 2px;
+		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle {
+			display: block;
+			height: 24px;
+			margin: 1px 0 1px 4px;
+			padding: 2px;
 
-  			border-radius: 5px 0 0 5px;;
-  			border: 1px #999;
-  			background-color: #ddd;
-  			border-style: solid none solid solid;
+			border-radius: 5px 0 0 5px;;
+			border: 1px #999;
+			background-color: #ddd;
+			border-style: solid none solid solid;
 
-  			box-shadow: #eee 0px 1px 0px;
-  			cursor: pointer;
-  		}
+			box-shadow: #eee 0px 1px 0px;
+			cursor: pointer;
+		}
 
-  		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle.active {
+		#editor-frame #editor-timeline > .tl-body > div.tl-side > div.tl-handle.active {
 			background-color: #FFFF99;
 		}
 
@@ -248,21 +248,63 @@
 		<div id="editor-frame">
 			<div id="editor-toolbar" class="btn-toolbar" role="toolbar">
 				<div class="btn-group">
-					<button id="editor-freehand" type="button" class="btn btn-default">
+					<button id="editor-new" type="button" class="btn btn-sm btn-default">
+					  <span class="glyphicon glyphicon-file"></span> New
+					</button>
+					<button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#editor-modal-save">
+						<span class="glyphicon glyphicon-floppy-disk"></span> Save
+					</button>
+					<button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#editor-modal-open">
+					  <span class="glyphicon glyphicon-folder-open"></span> Open
+					</button>
+				</div>
+
+				<div class="btn-group">
+					<button id="editor-freehand" type="button" class="btn btn-sm btn-success">
 					  <span class="glyphicon glyphicon-plus"></span> Free-Hand
 					</button>
-					<button id="editor-image" type="button" class="btn btn-default">
-					  Image
+					<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#editor-modal-image">
+					  <span class="glyphicon glyphicon-plus"></span> Image
 					</button>
-					<button id="editor-shape" type="button" class="btn btn-default">
-					  Shape
+					<button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#editor-modal-text">
+					  <span class="glyphicon glyphicon-plus"></span> Text
 					</button>
+
+					<div class="btn-group">
+					  <button type="button" class="btn btn-sm btn-success dropdown-toggle" data-toggle="dropdown">
+						<span class="glyphicon glyphicon-plus"></span> Shape <span class="caret"></span>
+					  </button>
+					  <ul class="dropdown-menu" role="menu">
+						<li><a id="editor-add-circle" href="#">Circle</a></li>
+						<li><a id="editor-add-triangle" href="#">Triangle</a></li>
+						<li><a id="editor-add-rect" href="#">Rectangle</a></li>
+					  </ul>
+					</div>
+
+					<button id="editor-keyframe" type="button" class="btn btn-sm btn-primary">
+					  <span class="glyphicon glyphicon-record"></span> Keyframe
+					</button>
+
 				</div>
+
 				<div class="btn-group">
-					<button id="editor-delete" type="button" class="btn btn-default">
+					<button id="editor-delete" type="button" class="btn btn-sm btn-default">
 					  <span class="glyphicon glyphicon-trash"></span> Delete
 					</button>
+					<button id="editor-select-none" type="button" class="btn btn-sm btn-default">
+					  <span class="glyphicon glyphicon-ban-circle"></span> Deselect
+					</button>
 				</div>
+
+				<div class="btn-group">
+					<button id="editor-copy-prop" type="button" class="btn btn-sm btn-default">
+					  <span class="glyphicon glyphicon-log-out"></span> Copy Properties
+					</button>
+					<button id="editor-paste-prop" type="button" class="btn btn-sm btn-default">
+					  <span class="glyphicon glyphicon-log-in"></span>
+					</button>
+				</div>
+
 			</div>
 			<div id="editor-canvas">
 				<canvas width="800" height="450"></canvas>
@@ -285,43 +327,202 @@
 			</div>
 		</div>
 
+		<!-- Save Modal -->
+		<div class="modal fade" id="editor-modal-save" tabindex="-1" role="dialog" aria-labelledby="editor-modal-save-label" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editor-modal-save-label">Save Animation</h4>
+			  </div>
+			  <div class="modal-body">
+
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-save-filename">Filename:</label>
+					</div>
+					<div class="col-sm-8">
+						<input type="text" id="editor-save-filename" class="form-control" />
+					</div>
+				</div>
+
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="editor-save">Save</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<!-- Open Modal -->
+		<div class="modal fade" id="editor-modal-open" tabindex="-1" role="dialog" aria-labelledby="editor-modal-open-label" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editor-modal-open-label">Open Animation</h4>
+			  </div>
+			  <div class="modal-body">
+
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-open-filename">Filename:</label>
+					</div>
+					<div class="col-sm-8">
+						<input type="text" id="editor-open-filename" class="form-control" />
+					</div>
+				</div>
+
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="editor-open">Open</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<!-- Image Modal -->
+		<div class="modal fade" id="editor-modal-image" tabindex="-1" role="dialog" aria-labelledby="editor-modal-image-label" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editor-modal-image-label">Place Image</h4>
+			  </div>
+			  <div class="modal-body">
+
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-image-url">URL:</label>
+					</div>
+					<div class="col-sm-8">
+						<input type="text" id="editor-image-url" class="form-control" />
+					</div>
+				</div>
+				<hr />
+				<p>Or pick one from the gallery:</p>
+				<div class="well">
+
+				</div>
+
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="editor-add-image">Place</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<!-- Text Modal -->
+		<div class="modal fade" id="editor-modal-text" tabindex="-1" role="dialog" aria-labelledby="editor-modal-text-label" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editor-modal-text-label">Place Text</h4>
+			  </div>
+			  <div class="modal-body">
+
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-text">Text:</label>
+					</div>
+					<div class="col-sm-8">
+						<input type="text" id="editor-text" class="form-control" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-text-size">Font size:</label>
+					</div>
+					<div class="col-sm-8">
+						<select id="editor-text-size" class="form-control">
+							<option value="8">8 pt</option>
+							<option value="10">10 pt</option>
+							<option value="12">12 pt</option>
+							<option value="14">14 pt</option>
+							<option value="16">16 pt</option>
+							<option value="18">18 pt</option>
+							<option value="20">20 pt</option>
+							<option value="21">21 pt</option>
+							<option value="24">24 pt</option>
+							<option value="26">26 pt</option>
+							<option value="28">28 pt</option>
+							<option value="31">31 pt</option>
+							<option value="34">34 pt</option>
+							<option value="36" selected="selected">36 pt</option>
+							<option value="38">38 pt</option>
+							<option value="42">42 pt</option>
+							<option value="64">64 pt</option>
+							<option value="72">72 pt</option>
+							<option value="84">84 pt</option>
+							<option value="92">92 pt</option>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-text-size">Font size:</label>
+					</div>
+					<div class="col-sm-8">
+						<select id="editor-text-family" class="form-control">
+							<option value="cursive" selected="selected">Handwriting</option>
+							<option value="monospace">Monospace</option>
+							<option value="serif">Serif</option>
+							<option value="sans-serif">Sans-Serif</option>
+							<option value="fantasy">Impact</option>
+						</select>
+					</div>
+				</div>
+
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="editor-add-text">Place</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
 		<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-        <script src="static/js/require.js"></script>
+		<script src="static/js/require.js"></script>
 		<script type="text/javascript">
 
 		// Where resources are located
 		requirejs.config({
 			// Base directory is the libraries folder
-		    baseUrl: 'static/js/lib',
-		    // Explicit declaration of components
-		    paths: {
-		    	'core'      : '../vas-core.js',
-		    	'liveq'     : '../liveq.js',
-		    	'vas-3d'    : '../vas-3d.js',
-		        'vas-basic' : '../vas-basic.js',
-		        'vas-editor': '../vas-editor.js'
-		    }
+			baseUrl: 'static/js/lib',
+			// Explicit declaration of components
+			paths: {
+				'core'      : '../vas-core.js',
+				'liveq'     : '../liveq.js',
+				'vas-3d'    : '../vas-3d.js',
+				'vas-basic' : '../vas-basic.js',
+				'vas-editor': '../vas-editor.js'
+			}
 		});
 
 		// Bootstrap LiveQ Engine
 		requirejs(
-		    [
-		        // Game modules
-		        'vas-editor/main-sprites'
+			[
+				// Game modules
+				'vas-editor/main-sprites', 'bootstrap'
 			], 
-		    function(main) {
-		        $(function() {
-		            // Initialize Editor 
-		            main.initialize(function() {
-		                // Wait until Editor is ready and run it
-		                main.run();
-		            });
-		        });
-		    }
+			function(main) {
+				$(function() {
+					// Initialize Editor 
+					main.initialize(function() {
+						// Wait until Editor is ready and run it
+						main.run();
+					});
+				});
+			}
 		);
 
 		</script>
-		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.16/angular.min.js"></script>	
 		<script src="static/js/lib/colorpicker.min.js"></script>	
 

@@ -142,8 +142,16 @@ define(["jquery", "sha1", "core/config"],
 
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/" + doc;
+
+			// Place ID if missing
+			if (!data['_id']) data['_id'] = doc;
+
 			// Fire the API function
 			couchdb_put( url, JSON.stringify(data), function(response) {
+				if (!response) {
+					callback(false);
+					return;
+				}
 				if (!response['ok']) {
 					callback(false);
 				} else {

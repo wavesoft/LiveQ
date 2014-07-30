@@ -86,11 +86,12 @@ define(
 
 			// Initialize default property names if missing
 			if (!this.__propertyNames)
-				this.__propertyNames = [ "progression", "visible", "stroke", "strokeWidth", "opacity", "left", "top", "scaleX", "scaleY", "angle" ];
+				this.__propertyNames = [ "progression", "visible", "stroke", "fill", "strokeWidth", "opacity", "left", "top", "scaleX", "scaleY", "angle" ];
 
 			// Extract/create some additional properties
 			this.__object.__pathProgression = 1;
-			this.__object.__pathElements = this.__object.path.slice(0);
+			if (this.__object.path)
+				this.__object.__pathElements = this.__object.path.slice(0);
 
 			// OnUpdate handler
 			this.__onUpdate = null;
@@ -108,11 +109,14 @@ define(
 			config["progression"] = {
 				get: (function() {
 
+					if (!this.__object.path) return 0;
 					return this.__object.__pathProgression;
 
 				}).bind(this),
 				set: (function(v) {
 					
+					if (!this.__object.path) return;
+
 					// Wrap V in bounds
 					if (v<0) v=0;
 					if (v>1) v=1;

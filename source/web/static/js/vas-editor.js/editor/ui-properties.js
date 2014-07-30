@@ -77,6 +77,11 @@ define(
 							name: 'Stroke',
 							type: 'col'
 						},
+						{
+							prop: 'fill',
+							name: 'Fill',
+							type: 'col'
+						}
 					]
 				},
 				{
@@ -324,7 +329,7 @@ define(
 		 * Create a new color property widget
 		 */
 		PropertiesUI.prototype.createColorWidget = function( obj, propInfo ) {
-			var elmCP = $('<div class="cp-small"></div>'),
+			var elmCP = $('<div class="cp-small" id="widget'+(++widgetID)+'"></div>'),
 				elmInput = $('<input type="text" class="form-control input-sm" />');
 				elmWrap = $('<div></div>');
 
@@ -350,7 +355,10 @@ define(
 
 			console.log(window.cp = cp);
 			this.monitorChange( obj, propInfo, function(v) {
+				if (!v) return;
+				lockUpdate = true;
 				cp.setHex( v );
+				lockUpdate = false;
 				elmInput.val( v );
 			});
 
@@ -359,7 +367,9 @@ define(
 				// Apply
 				var v = elmInput.val();
 				obj[ propInfo.prop ] = v;
+				lockUpdate = true;
 				cp.setHex( v );
+				lockUpdate = false;
 
 				// Fire the change callback
 				if (this.updateCallback)
@@ -367,7 +377,7 @@ define(
 
 			}).bind(this));
 
-			lockUpdate = true;
+			lockUpdate = false;
 			elmWrap.append(elmInput);
 			elmWrap.append(elmCP);
 			return this.wrapWidgets( propInfo.name, elmWrap );

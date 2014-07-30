@@ -81,6 +81,7 @@ define(
 		 */
 		EditableCanvas.prototype.clear = function() {
 			this.timeline.clear();
+			this.timelineUI.clear();
 			this.canvas.clear();
 		}
 
@@ -166,11 +167,20 @@ define(
 		}
 
 		EditableCanvas.prototype.selectObject = function(o) {
-			this.canvas.setActiveGroup(null);
+
+			// Discard selection
+			this.canvas.discardActiveGroup();
+			if (o == null) {
+				this.canvas.discardActiveObject();
+				return;
+			}
+
+			// Select object
 			this.canvas.setActiveObject(o);
 			if (this.canvas.getActiveObject()) {
 				this.__objectSelected(o);
 			}
+
 		}
 
 		EditableCanvas.prototype.__objectSelected = function(o) {
@@ -193,6 +203,67 @@ define(
 
 		EditableCanvas.prototype.startFreeDrawing = function() {
 			this.canvas.isDrawingMode = true;
+		}
+
+		EditableCanvas.prototype.addImage = function(src) {
+			fabric.Image.fromURL(src, (function(obj) {
+
+				// Add to canvas
+				this.canvas.add( obj );
+
+				// Import path to timeline
+				var element = this.timeline.importObject( obj );
+				this.timelineUI.add( element );
+
+				// Select
+				this.selectObject( obj );
+
+			}).bind(this));
+		}
+
+		EditableCanvas.prototype.addText = function( text, size, family ) {
+
+			// Create font
+			var obj = new fabric.Text( text, {
+				'fontSize': size,
+				'fontFamily': family || "Comic Sans",
+				'fill': '#FFF'
+			});
+
+			// Add to canvas
+			this.canvas.add( obj );
+
+			// Import path to timeline
+			var element = this.timeline.importObject( obj );
+			this.timelineUI.add( element );
+
+			// Select
+			this.selectObject( obj );
+
+		}
+
+		EditableCanvas.prototype.addShape = function( shapeName ) {
+
+			// Create font
+			var obj = new fabric[shapeName]({
+				'stroke': '#FFF',
+				'radius': 50,
+				'width': 100,
+				'height': 100,
+				'strokeWidth': 4,
+				'fill': ''
+			});
+
+			// Add to canvas
+			this.canvas.add( obj );
+
+			// Import path to timeline
+			var element = this.timeline.importObject( obj );
+			this.timelineUI.add( element );
+
+			// Select
+			this.selectObject( obj );
+
 		}
 
 		EditableCanvas.prototype.play = function() {

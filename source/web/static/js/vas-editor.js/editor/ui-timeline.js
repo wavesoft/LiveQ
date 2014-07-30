@@ -221,19 +221,19 @@ define(
 				var mouseY = e.offsetY,
 					mouseX = e.offsetX;
 
+				// Calculate position frame bounds					
+				var w = this.canvasFooter.width() - this.config.padLeft - this.config.handleWidth,
+					sceneWidthMs = Math.max(this.timeline.duration, w / this.timeScale),
+					sceneWidthPx = sceneWidthMs * this.timeScale,
+					wScalePx = w / sceneWidthPx,
+					pFrameLeft = -this.scrollX * wScalePx + this.config.padLeft,
+					pFrameWidth = w * wScalePx;
+					if (pFrameWidth+pFrameLeft > w) pFrameWidth = w-pFrameLeft;
+
 				// 
 				// NOT DRAGGING : Cursor & DraggingMode selection
 				//
 				if (this.mouseDragMode == 0) {
-
-					// Calculate position frame bounds					
-					var w = this.canvasFooter.width() - this.config.padLeft - this.config.handleWidth,
-						sceneWidthMs = Math.max(this.timeline.duration, w / this.timeScale),
-						sceneWidthPx = sceneWidthMs * this.timeScale,
-						wScalePx = w / sceneWidthPx,
-						pFrameLeft = -this.scrollX * wScalePx + this.config.padLeft,
-						pFrameWidth = w * wScalePx;
-						if (pFrameWidth+pFrameLeft > w) pFrameWidth = w-pFrameLeft;
 
 					// Change cursor accordingly
 					if ((mouseX >= pFrameLeft) && (mouseX <= pFrameLeft+pFrameWidth)) {
@@ -264,7 +264,7 @@ define(
 				//
 				} else if (this.mouseDragMode == 5) {
 
-					this.scrollX = this.mouseDragValue - (mouseX - this.mouseDragX);
+					this.scrollX = this.mouseDragValue - (mouseX - this.mouseDragX) / wScalePx;
 					if (this.scrollX > 0) this.scrollX = 0;
 
 				}
@@ -521,6 +521,12 @@ define(
 
 			window.tui = this;
 
+		}
+
+		TimelineUI.prototype.clear = function() {
+			this.elements = [];
+			this.elmSide.empty();
+			this.redraw();
 		}
 
 		TimelineUI.prototype.animate = function() {
