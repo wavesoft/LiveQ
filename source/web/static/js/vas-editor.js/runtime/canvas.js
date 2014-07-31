@@ -24,6 +24,9 @@ define(
 
 			// Initialize timeline runtime
 			this.timeline = new Timeline( this.canvasFabric );
+			this.timeline.addEventListener('change', (function() {
+				this.canvasFabric.renderAll();
+			}).bind(this));
 			
 			// Initialize overlay DOM
 			this.hotspotsDOM = $('<div class="hotspots"></div>');
