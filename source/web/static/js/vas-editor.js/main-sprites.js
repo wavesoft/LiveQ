@@ -78,6 +78,13 @@ define(
 				});
 			}).bind(this));
 
+			$("#editor-copy-prop").click((function(e) {
+				this.canvas.copyProperties();
+			}).bind(this));
+			$("#editor-paste-prop").click((function(e) {
+				this.canvas.pasteProperties();
+			}).bind(this));
+
 			$("#editor-add-image").click((function(e) {
 				var imageURL = $("#editor-image-url").val();
 				this.canvas.addImage( imageURL );
@@ -92,6 +99,21 @@ define(
 				jQuery("#editor-modal-text").modal('hide');
 			}).bind(this));
 
+			var updateTextPreview = function() {
+				var textString = $("#editor-text").val(),
+					textSize = parseInt($("#editor-text-size").val()),
+					textFamily = $("#editor-text-family").val();
+
+				$("#editor-text-preview").css({
+					'font-family': textFamily,
+					'font-size': textSize
+				});
+				$("#editor-text-preview").text(textString || "Sample Text");
+			};
+			$("#editor-text").change(updateTextPreview);
+			$("#editor-text-size").change(updateTextPreview);
+			$("#editor-text-family").change(updateTextPreview);
+			updateTextPreview();
 
 			$("#editor-add-circle").click((function(e) { this.canvas.addShape( 'Circle' ); }).bind(this));
 			$("#editor-add-triangle").click((function(e) { this.canvas.addShape( 'Triangle' ); }).bind(this));

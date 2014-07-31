@@ -640,7 +640,8 @@ define(
 			this.elmSide.append( elmHandle );
 
 			// Prepare handle
-			elmHandle.html('<span class="glyphicon glyphicon-picture"></span> Object');
+			propInfo = this.propUI.getPropInfo( elm );
+			elmHandle.html( propInfo.name );
 			elmHandle.click((function(elm) {
 				return function(e) {
 					this.selectByElement( elm );

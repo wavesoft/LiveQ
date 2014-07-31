@@ -10,7 +10,8 @@ define(
 			this.propertiesUI = propertiesUI;
 			this.timelineUI = timelineUI;
 
-			// Initialize canvas
+			// Initialize fabric canvas
+			fabric.Object.prototype.transparentCorners = false;
 			var canvas = this.canvas = new fabric.Canvas($(this.canvasElement)[0]);
 
 			// Initialize timeline
@@ -19,7 +20,8 @@ define(
 			timelineUI.setCanvas( this );
 			window.c = this;
 
-			//fabric.Object.prototype.transparentCorners = false;
+			// Initialize variables
+			this.propertiesClipboard = [];
 
 			canvas.freeDrawingBrush.color = '#FFF';
 			canvas.freeDrawingBrush.width = 4;
@@ -141,6 +143,56 @@ define(
 			// Remove objects
 			elm.__object.remove();
 			this.timeline.remove(elm);
+
+			// Redraw
+			this.canvas.renderAll();
+
+		}
+
+		/**
+		 * Copy the current properties of the selected objects
+		 */
+		EditableCanvas.prototype.copyProperties = function()  {
+			this.propertiesClipboard = [];
+			var sel = this.getSelection();
+			for (var i=0; i<sel.length; i++) {
+
+				// Copy the properties of the selected object
+				var prop = {}, refObj = sel[i];
+				for (var j=0; j<refObj.__propertyNames.length; j++) {
+					prop[refObj.__propertyNames[j]] = refObj[refObj.__propertyNames[j]];
+				}
+
+				// Store it on the clipboard
+				this.propertiesClipboard.push(prop);
+			}
+
+		}
+
+		/**
+		 * Paste the current properties to the selected objects
+		 */
+		EditableCanvas.prototype.pasteProperties = function()  {
+			if (!this.propertiesClipboard) return;
+			var sel = this.getSelection();
+			var k=0;
+			for (var i=0; i<sel.length; i++) {
+
+				// Copy properties back to object
+				var prop = this.propertiesClipboard[k], refObj = sel[i];
+				for (var j=0; j<refObj.__propertyNames.length; j++) {
+					refObj[refObj.__propertyNames[j]] = prop[refObj.__propertyNames[j]];
+				}
+
+				// Set keyframe of that object
+				this.timeline.setKeyframe( refObj );
+
+				// Bugfix for aligning the controls
+				refObj.__object.setCoords();
+
+				// Increment & Wrap clipboard index
+				if (++k>=this.propertiesClipboard.length) k=0;
+			}
 
 			// Redraw
 			this.canvas.renderAll();

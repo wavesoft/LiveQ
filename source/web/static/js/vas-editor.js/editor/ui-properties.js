@@ -1,8 +1,8 @@
 define(
 
-	["jquery", "vas-editor/runtime/timeline", "vas-editor/editor/ui-timeline" ],
+	["jquery", "fabric", "vas-editor/runtime/timeline", "vas-editor/editor/ui-timeline" ],
 
-	function($, Timeline, TimelineUI) {
+	function($, fabric, Timeline, TimelineUI) {
 
 		// Local property for creating unique IDs
 		var widgetID = 0;
@@ -25,7 +25,8 @@ define(
 			this.propertyClasses = [
 				{
 					classType 	: Timeline.Element,
-					name		: '<span class="glyphicon glyphicon-picture"></span> Scene Object',
+					detectProp  : null,
+					name		: '<span class="glyphicon glyphicon-picture"></span> Object',
 					properties  : [
 						{
 							prop: 'visible',
@@ -61,31 +62,12 @@ define(
 							prop: 'opacity',
 							name: 'Opacity',
 							type: 'int'
-						},
-						{
-							prop: 'progression',
-							name: 'Progression',
-							type: 'int'
-						},
-						{
-							prop: 'strokeWidth',
-							name: 'Stroke Width',
-							type: 'int'
-						},
-						{
-							prop: 'stroke',
-							name: 'Stroke',
-							type: 'col'
-						},
-						{
-							prop: 'fill',
-							name: 'Fill',
-							type: 'col'
 						}
 					]
 				},
 				{
 					classType	: TimelineUI.TweenPropertiesWrapper,
+					detectProp  : null,
 					name 		: '<span class="glyphicon glyphicon-random"></span> Tween',
 					properties 	: [
 						{
@@ -138,6 +120,7 @@ define(
 				},
 				{
 					classType 	: TimelineUI.KeyframeWrapper,
+					detectProp  : null,
 					name		: '<span class="glyphicon glyphicon-screenshot"></span> Keyframe',
 					properties  : [
 						{
@@ -151,7 +134,155 @@ define(
 							type: 'sel'
 						}
 					]
+				},
+				{
+					classType 	: fabric.Text,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-font"></span> Font',
+					properties  : [
+						{
+							prop: 'strokeWidth',
+							name: 'Stroke Width',
+							type: 'int'
+						},
+						{
+							prop: 'stroke',
+							name: 'Stroke',
+							type: 'col'
+						},
+						{
+							prop: 'fill',
+							name: 'Fill',
+							type: 'col'
+						}
+					]
+				},
+				{
+					classType 	: fabric.Circle,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-star-empty"></span> Circle',
+					properties  : [
+						{
+							prop: 'strokeWidth',
+							name: 'Stroke Width',
+							type: 'int'
+						},
+						{
+							prop: 'stroke',
+							name: 'Stroke',
+							type: 'col'
+						},
+						{
+							prop: 'fill',
+							name: 'Fill',
+							type: 'col'
+						},
+						{
+							prop: 'width',
+							name: 'Width',
+							type: 'int'
+						},
+						{
+							prop: 'height',
+							name: 'Height',
+							type: 'int'
+						}
+					]
+				},
+				{
+					classType 	: fabric.Triangle,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-star-empty"></span> Triangle',
+					properties  : [
+						{
+							prop: 'strokeWidth',
+							name: 'Stroke Width',
+							type: 'int'
+						},
+						{
+							prop: 'stroke',
+							name: 'Stroke',
+							type: 'col'
+						},
+						{
+							prop: 'fill',
+							name: 'Fill',
+							type: 'col'
+						},
+						{
+							prop: 'width',
+							name: 'Width',
+							type: 'int'
+						},
+						{
+							prop: 'height',
+							name: 'Height',
+							type: 'int'
+						}
+					]
+				},
+				{
+					classType 	: fabric.Rect,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-star-empty"></span> Rectangle',
+					properties  : [
+						{
+							prop: 'strokeWidth',
+							name: 'Stroke Width',
+							type: 'int'
+						},
+						{
+							prop: 'stroke',
+							name: 'Stroke',
+							type: 'col'
+						},
+						{
+							prop: 'fill',
+							name: 'Fill',
+							type: 'col'
+						},
+						{
+							prop: 'width',
+							name: 'Width',
+							type: 'int'
+						},
+						{
+							prop: 'height',
+							name: 'Height',
+							type: 'int'
+						}
+					]
+				},
+				{
+					classType 	: fabric.Path,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-pencil"></span> Freehand',
+					properties  : [
+						{
+							prop: 'strokeWidth',
+							name: 'Stroke Width',
+							type: 'int'
+						},
+						{
+							prop: 'stroke',
+							name: 'Stroke',
+							type: 'col'
+						},
+						{
+							prop: 'progression',
+							name: 'Progression',
+							type: 'int'
+						}
+					]
+				},
+				{
+					classType 	: fabric.Image,
+					detectProp  : '__object',
+					name		: '<span class="glyphicon glyphicon-picture"></span> Image',
+					properties  : [
+					]
 				}
+
 			];
 
 			// Start the property monitor timer
@@ -171,6 +302,22 @@ define(
 
 		}
 
+		/**
+		 * Use the properties database to get information for the given object
+		 */
+		PropertiesUI.prototype.getPropInfo = function( obj ) {
+			var propInfo = null;
+			for (var i=0; i<this.propertyClasses.length; i++) {
+				var objInst = obj;
+				if (this.propertyClasses[i].detectProp)
+					objInst = obj[ this.propertyClasses[i].detectProp ];
+
+				// Keep matching until we reach the last one
+				if (objInst instanceof this.propertyClasses[i].classType)
+					propInfo = this.propertyClasses[i];
+			}
+			return propInfo;
+		}
 
 		/**
 		 * Display/Manage the properties of the specified object
@@ -195,7 +342,11 @@ define(
 
 			// Pick property configuration according to class
 			for (var i=0; i<this.propertyClasses.length; i++) {
-				if (obj instanceof this.propertyClasses[i].classType) {
+				var objInst = obj;
+				if (this.propertyClasses[i].detectProp)
+					objInst = obj[ this.propertyClasses[i].detectProp ];
+
+				if (objInst instanceof this.propertyClasses[i].classType) {
 					var propInfo = this.propertyClasses[i];
 
 					this.headerElm.html( propInfo.name );
