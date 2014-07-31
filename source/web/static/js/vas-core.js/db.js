@@ -164,7 +164,7 @@ define(["jquery", "sha1", "core/config"],
 					if (!response['ok']) {
 						callback(false);
 					} else {
-						callback(data['_id'], data['_rev']);
+						callback(data['_id'] || doc, data['_rev']);
 					}
 				});
 
