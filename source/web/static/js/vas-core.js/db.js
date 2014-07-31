@@ -11,23 +11,6 @@ define(["jquery", "sha1", "core/config"],
 		var dbRevIndex = 0;
 
 		/**
-		 * Helper function to calculate a new revision number
-		 */
-		function new_rev_number() {
-			var d = new Date();
-			function zeropad(v,n){ var s=String(v); while(s.length<n) s="0"+s; return s; };
-
-			// Return a number wich always get incremented with time
-			return zeropad( d.getFullYear(), 4 ) +
-				   zeropad( d.getMonth(), 2 ) +
-				   zeropad( d.getDate(), 2) +
-				   zeropad( d.getHours(), 2 ) +
-				   zeropad( d.getSeconds(), 2 ) +
-				   zeropad( d.getMilliseconds(), 4 ) +
-				   zeropad( dbRevIndex++, 4 );
-		}
-
-		/**
 		 * Helper function to translate response data of a single entry
 		 */
 		function couchdb_translate_single(callback) {
@@ -165,21 +148,39 @@ define(["jquery", "sha1", "core/config"],
 			// Build API URL
 			var url = Config.db.url + "/" + this.db + "/" + doc;
 
-			// Place ID if missing
-			if (!data['_id']) data['_id'] = doc;
-			if (!data['_rev']) data['_rev'] = new_rev_number();
-			console.log("Saving", data);
+			// The commit process is a different function
+			var commitSeq = function(rev) {
 
-			// Fire the API function
-			couchdb_put( url, JSON.stringify(data), function(response) {
-				if (!response) {
-					callback(false);
-					return;
-				}
-				if (!response['ok']) {
-					callback(false);
+				// Place revision ID if specified
+				if (rev) data['_rev'] = rev;
+				console.log("Saving", data);
+
+				// Fire the API function
+				couchdb_put( url, JSON.stringify(data), function(response) {
+					if (!response) {
+						callback(false);
+						return;
+					}
+					if (!response['ok']) {
+						callback(false);
+					} else {
+						callback(data['_id'], data['_rev']);
+					}
+				});
+
+			}
+
+			// Get the revision information
+			couchdb_get( url+"?revs_info=true", function(data, error) {
+				if (!data && (error == "Object Not Found")) {
+					// First commit
+					commitSeq("");
+				} else if (!data || (data['_revs_info'] == undefined)) {
+					// Error
+					callback(false, "Could not list revisions");
 				} else {
-					callback(data['_id'], data['_rev']);
+					// Replace last version
+					commitSeq( data['_revs_info'][0].rev );
 				}
 			});
 
