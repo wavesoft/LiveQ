@@ -288,6 +288,11 @@ define(
 					name		: '<span class="glyphicon glyphicon-pencil"></span> Freehand',
 					properties  : [
 						{
+							prop: 'progression',
+							name: 'Progression',
+							type: 'int'
+						},
+						{
 							prop: 'strokeWidth',
 							name: 'Stroke Width',
 							type: 'int'
@@ -296,11 +301,6 @@ define(
 							prop: 'stroke',
 							name: 'Stroke',
 							type: 'col'
-						},
-						{
-							prop: 'progression',
-							name: 'Progression',
-							type: 'int'
 						}
 					]
 				},
