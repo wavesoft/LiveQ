@@ -16,7 +16,7 @@ define(
 		/**
 		 * Initialize hotspot information from JSON
 		 */
-		Hotspots.prototype.fromJSON = function(json) {
+		Hotspots.prototype.loadJSON = function(json) {
 			for (var i=0; i<json.length; i++) {
 				this.addHotspot( json[i] );
 			}
