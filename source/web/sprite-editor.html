@@ -76,6 +76,41 @@
 			overflow: hidden;
 		}
 
+		#editor-frame #editor-canvas > .hotspots {
+			display: block;
+			position: absolute;
+			left: 0; top: 0;
+			width: 100%; height: 100%;
+		}
+
+		#editor-frame #editor-canvas > .hotspots.disabled {
+			pointer-events: none;
+		}
+
+		#editor-frame #editor-canvas > .hotspots > div.hotspot {
+			display: block;
+			position: absolute;
+			width: 32px; height: 32px;
+			background-color: #3498db;
+			border-radius: 32px;
+		}
+
+		#editor-frame #editor-canvas > .hotspots > div.hotspot > h1 {
+			position: absolute;
+			display: block;
+			margin: 0; padding: 0;
+			width: 32px; height: 32px;
+			left: 0; top: 0;
+			line-height: 32px;
+			text-align: center;
+			color: #FFF;
+			font-size: 14px;
+		}
+
+		#editor-frame #editor-canvas > .hotspots.disabled > div.hotspot {
+			opacity: 0.25;
+		}
+
 		#editor-frame #editor-toolbar {
 			position: absolute;
 			top: 10px; left: 10px; right: 10px; height: 40px;
@@ -113,7 +148,7 @@
 			border-style: none solid solid solid;
 		}
 
-		#editor-frame #properties > div.header {
+		#editor-frame div.header {
 			margin: 0 4px 4px;
 			padding: 4px;
 			font-weight: bold;
@@ -121,25 +156,25 @@
 			color: #666;
 		}
 
-		#editor-frame #properties .row {
-			margin: 1px 1px 0;
-			margin-right: 0 !important;
-		}
-
-		#editor-frame #properties .row label {
+		#editor-frame .row label {
 			font-size: 12px;
 			line-height: 22px;
 			text-align: right;
 			width: 100%;
 		}
 
-		#editor-frame #properties .row .col-xs-4 {
+		#editor-frame .row .col-xs-4 {
 			padding-right: 2px;
 			padding-left: 2px;
 		}
 
-		#editor-frame #properties .row .col-xs-8 {
+		#editor-frame .row .col-xs-8 {
 			padding-left: 2px;
+		}
+
+		#editor-frame .row {
+			margin: 1px 1px 0;
+			margin-right: 0 !important;
 		}
 
 		#editor-frame #editor-timeline {
@@ -240,6 +275,49 @@
 			background-color: #FFFF99;
 		}
 
+		#editor-frame #hotspots > ul.items {
+			height: 220px;
+			border: solid 1px #ddd;
+			overflow-y: scroll;
+			overflow-x: hidden;
+			list-style: none;
+			padding: 0;
+			margin: 0 4px 5px;
+		}
+
+		#editor-frame #hotspots > ul.items > li {
+			display: block;
+			height: 24px;
+			margin: 0;
+			padding: 4px;
+			cursor: pointer;
+		}
+
+		#editor-frame #hotspots > ul.items > li > span.s-short {
+			float: right;
+			color: #34495e;
+			font-weight: bold;
+		}
+
+		#editor-frame #hotspots > ul.items > li.active {
+			background-color: #2980b9;
+			color: #FFF;
+		}
+
+		#editor-frame #hotspots > ul.items > li.active > span.s-short {
+			color: #FFF;
+		}
+
+
+		#editor-frame #hotspots .btn-host {
+			margin: 4px;
+			padding-top: 4px;
+			border-top: solid 1px #ddd;
+		}
+
+		#editor-frame #hotspots .btn-host .btn {
+			margin: 0 2px 0 0;
+		}
 
 		</style>
 	</head>
@@ -308,12 +386,13 @@
 			</div>
 			<div id="editor-canvas">
 				<canvas width="800" height="450"></canvas>
+				<div class="hotspots disabled"></div>
 			</div>
 			<div id="editor-panels">
 				<div class="tab-header">
 					<ul class="nav nav-tabs" role="tablist">
-					  <li class="active"><a href="#properties" role="tab" data-toggle="tab">Properties</a></li>
-					  <li><a href="#hotspots" role="tab" data-toggle="tab">Hotspots</a></li>
+					  <li class="active"><a id="editor-btn-properties" href="#properties" role="tab" data-toggle="tab">Properties</a></li>
+					  <li><a id="editor-btn-hotspots" href="#hotspots" role="tab" data-toggle="tab">Hotspots</a></li>
 					</ul>
 				</div>
 				<div class="tab-content">

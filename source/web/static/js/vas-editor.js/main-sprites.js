@@ -1,8 +1,8 @@
 define(
 
-	["jquery", "core/db", "vas-editor/editor/editable-canvas", "vas-editor/editor/ui-properties",  "vas-editor/editor/ui-timeline" ],
+	["jquery", "core/db", "vas-editor/editor/editable-canvas", "vas-editor/editor/ui-properties",  "vas-editor/editor/ui-timeline", "vas-editor/editor/editable-hotspots" ],
 
-	function($, DB, EditableCanvas, PropertiesUI, TimelineUI ) {
+	function($, DB, EditableCanvas, PropertiesUI, TimelineUI, EditableHotspots ) {
 
 		var Main = { };
 
@@ -14,6 +14,7 @@ define(
 					if (cb) cb(false);
 				} else {
 					this.canvas.loadJSON(doc['scene']);
+					this.hotspots.loadJSON(doc['spots']);
 					if (cb) cb(true);
 				}
 			}).bind(this));
@@ -24,8 +25,10 @@ define(
 
 			// Prepare save record
 			var record = {
-				'scene': this.canvas.toJSON()
+				'scene': this.canvas.toJSON(),
+				'spots': this.hotspots.toJSON()
 			};
+			console.log("Saving:", JSON.stringify(record));
 
 			db.put(filename, record, (function(doc) {
 				if (!doc) {
@@ -42,6 +45,7 @@ define(
 			this.propUI = new PropertiesUI( $("#properties") );
 			this.timelineUI = new TimelineUI( $("#editor-timeline"), this.propUI );
 			this.canvas = new EditableCanvas( $('#editor-canvas > canvas'), this.propUI, this.timelineUI );
+			this.hotspots = new EditableHotspots( $('#editor-canvas > .hotspots'), $('#hotspots') );
 
 			// bind to events
 			$("#editor-new").click((function(e) {
@@ -124,6 +128,9 @@ define(
 			$("#editor-add-circle").click((function(e) { this.canvas.addShape( 'Circle' ); }).bind(this));
 			$("#editor-add-triangle").click((function(e) { this.canvas.addShape( 'Triangle' ); }).bind(this));
 			$("#editor-add-rect").click((function(e) { this.canvas.addShape( 'Rect' ); }).bind(this));
+
+			$("#editor-btn-properties").click((function(e) { this.hotspots.setActive(false); }).bind(this));
+			$("#editor-btn-hotspots").click((function(e) { this.hotspots.setActive(true); }).bind(this));
 
 			cb();
 

@@ -64,10 +64,20 @@ define(
 		}
 
 		/**
-		 * Load scene & animation definition from the JSON object specified
+		 * Create tween objects using the keyframes from the given timeline definition
 		 */
-		Timeline.prototype.fromJSON = function() {
-			
+		Timeline.prototype.initWithJSON = function( objects, elmDef ) {
+
+			// Import elements from their definition
+			for (var i=0; i<elmDef.length; i++) {
+
+				// Create the animation-helper wrapping element
+				var animObject = new Timeline.Element(objects[i]);
+
+				// Build and store the new tween
+				this.addTween( this.buildTween(animObject, elmDef[i]) );
+
+			}
 
 		}
 

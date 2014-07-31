@@ -356,7 +356,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 	     *    
 	     *    // Pop-up the component 'popup.generic' next to
 	     *    // the element with ID 'hover-me'
-	     *    UI.showPop( 'popup.generic', targetElm, bodyDOM );
+	     *    UI.showPopup( 'popup.generic', targetElm, bodyDOM );
 	     *
 		 * });
 		 * @example <caption>Pop-up with body function</caption>
@@ -372,7 +372,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 *
 	     *    // Pop-up the component 'popup.generic' next to
 	     *    // the element with ID 'hover-me'. 
-	     *    UI.showPop( 'popup.generic', targetElm, bodyDOM );
+	     *    UI.showPopup( 'popup.generic', targetElm, bodyDOM );
 	     *
 		 * });
 		 * @param {string} name - The name of the widget module.
