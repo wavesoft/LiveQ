@@ -201,6 +201,16 @@ define(
 		EditableHotspots.prototype = Object.create( Hotspots.prototype );
 
 		/**
+		 * Clear everything
+		 */
+		EditableHotspots.prototype.clear = function() {
+			this.hsConfig = [];
+			this.hotspotElms = [];
+			this.elmList.empty();
+			this.hostDOM.empty();
+		}
+
+		/**
 		 * Select item
 		 */
 		EditableHotspots.prototype.focusItem = function( elm ) {

@@ -50,6 +50,7 @@ define(
 			// bind to events
 			$("#editor-new").click((function(e) {
 				this.canvas.clear();
+				this.hotspots.clear();
 			}).bind(this));
 			$("#editor-freehand").click((function(e) {
 				this.canvas.startFreeDrawing();

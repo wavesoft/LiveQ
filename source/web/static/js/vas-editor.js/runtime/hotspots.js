@@ -14,6 +14,14 @@ define(
 		}
 
 		/**
+		 * Clear all elements
+		 */
+		Hotspots.prototype.clear = function(json) {
+			this.hotspotElms = [];
+			this.hostDOM.empty();
+		}
+
+		/**
 		 * Initialize hotspot information from JSON
 		 */
 		Hotspots.prototype.loadJSON = function(json) {
