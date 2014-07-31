@@ -1,0 +1,155 @@
+
+///////////////////////////////////////////////
+// Running screen
+///////////////////////////////////////////////
+
+.screen.running {
+
+	div.c-marker {
+		position: absolute;		
+		border: dashed 1px #999;
+
+		.label {
+			position: absolute;
+			font-size: 12px;
+			color: #999;
+			left: 0; width: 100%;
+			text-align: center;
+			bottom: -16px;
+		}
+	}
+
+	//
+	// Tag-like buttons on page parts
+	// --------------------------------
+	//
+	.pagepart {
+
+		.btn-taglike {
+			.transition( all 0.5s );
+			.pointer-events( auto );
+			.border-radius( 0px 0px 8px 8px );
+			position: absolute;
+			cursor: pointer;
+			background-color: #d35400;
+			text-align: center;
+			color: #FFF;
+			width: 70px;
+			height: 45px;
+			padding-top: 5px;
+		}
+
+		&.run-tl .btn-taglike {
+			left: 0; top: 145px;
+			&:hover {
+				padding-top: 15px;
+			}				
+		}
+
+		&.run-tr .btn-taglike {
+			right: 0; top: 145px;
+			&:hover {
+				padding-top: 15px;
+			}				
+		}
+
+		&.run-bl .btn-taglike {
+			.border-radius( 8px 8px 0px 0px );
+			left: 0; top: -50px;
+			&:hover {
+				top: -60px;
+				padding-bottom: 10px;
+			}				
+		}
+
+	}
+
+	.globe {
+		position: absolute;		
+		.transition(all 0.4s);
+		display: block;
+		width: 160px;
+		height: 160px;
+		z-index: 70;
+	}
+
+	.progress-widget {
+		position: absolute;		
+		.transition(all 0.4s);
+		.border-radius(200px);
+		display: block;
+		width: 200px; height: 200px;
+		border: solid 2px #95A5A6;
+
+		background: #bfbfbf; /* Old browsers */
+		background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%); /* FF3.6+ */
+		background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#bfbfbf), color-stop(100%,#ffffff)); /* Chrome,Safari4+ */
+		background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%,#ffffff 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%,#ffffff 100%); /* Opera 12+ */
+		background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%,#ffffff 100%); /* IE10+ */
+		background: radial-gradient(ellipse at center, #bfbfbf 0%,#ffffff 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#bfbfbf', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+		a.button {
+			position: absolute;		
+			z-index: 71;
+			.transition(all 0.4s);
+
+			width: 108px; height: 52px;
+			cursor: pointer;
+			overflow: hidden;
+			left: 45px;
+			top: -35px;
+
+			div {
+				position: absolute;		
+				width: 108px; height: 52px;
+				color: #FFFFFF;
+				line-height: 52px;
+				text-decoration: none;
+				text-align: center;
+				font-size: 18px;
+				cursor: pointer;
+			}
+
+			&:before {
+				position: absolute;		
+				left: 0; top: 0;
+				position: absolute;
+				display: block;
+				content: " ";
+
+				background: #c0392b;
+				.transform( rotateZ(180deg) );
+				.mask-image( url(../img/mask-tune.png) );
+				width: 108px; height: 52px;
+			}
+
+			&:hover {
+				position: absolute;		
+				&:before {
+					background-color: #e74c3c;
+				}
+			}
+
+		}
+
+		.knob {
+			position: absolute;		
+			left: 6px;
+			top: 7px;
+			z-index: 60;
+
+			input {
+				display: none;
+			}
+
+			&.blur {
+				.filter( blur(5px) );
+				z-index: 59;
+			}
+		}
+
+	}
+
+}

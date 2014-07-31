@@ -56,7 +56,7 @@ define(
 		}
 
 		/**
-		 * 
+		 * Utility function to build a home node
 		 */
 		function homeNode(sel) {
 

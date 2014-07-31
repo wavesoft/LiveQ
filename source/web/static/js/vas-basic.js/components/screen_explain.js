@@ -27,8 +27,12 @@ define(
 			this.backdrop = R.instanceComponent("backdrop.explain", this.backdropDOM);
 
 			// Create foreground
-			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
+			this.foregroundDOM = $('<div class="'+config.css['foreground']+' fullscreen"></div>');
 			hostDOM.append(this.foregroundDOM);
+
+			// Create host element where to place the explain screen
+			this.elmWindow = $('<div class="window"></div>');
+			this.elmTitle = $('<h1></h1>');
 
 		}
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
