@@ -13,7 +13,7 @@ define(
 					alert("Unable to load the specified file!");
 					if (cb) cb(false);
 				} else {
-					this.canvas.loadJSON(doc['data']);
+					this.canvas.loadJSON(doc['scene']);
 					if (cb) cb(true);
 				}
 			}).bind(this));
@@ -21,7 +21,13 @@ define(
 
 		Main.saveToDB = function(filename, cb) {
 			var db = DB.openDatabase("animations");
-			db.put(filename, this.canvas.toJSON(), (function(doc) {
+
+			// Prepare save record
+			var record = {
+				'scene': this.canvas.toJSON()
+			};
+
+			db.put(filename, record, (function(doc) {
 				if (!doc) {
 					alert("Unable to save the specified file!");
 					if (cb) cb(false);

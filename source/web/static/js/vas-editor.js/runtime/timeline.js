@@ -66,7 +66,23 @@ define(
 		/**
 		 * Load scene & animation definition from the JSON object specified
 		 */
-		Timeline.prototype.loadJSON = function() {
+		Timeline.prototype.fromJSON = function() {
+			
+
+		}
+
+		/**
+		 * Clear timeline
+		 */
+		Timeline.prototype.clear = function() {
+
+			// Remove all tweens from timeline
+			for (var i=0; i<this._tweens.length; i++) {
+				this.removeTween( this._tweens[i] );
+			}
+
+			// Rewind
+			this.gotoAndStop(0);
 
 		}
 
