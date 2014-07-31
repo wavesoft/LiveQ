@@ -20,6 +20,9 @@ define(
 			timelineUI.setCanvas( this );
 			window.c = this;
 
+			// Initialize properties
+			this.propertiesUI.setCanvas( this );
+
 			// Initialize variables
 			this.propertiesClipboard = [];
 
@@ -28,7 +31,6 @@ define(
 
 			// Redraw canvas on timeline change
 			this.timeline.addEventListener('change', (function() {
-				console.log("*** Timeline changed");
 				var activeElm = this.canvas.getActiveObject();
 				if (activeElm)
 					activeElm.setCoords();
@@ -36,22 +38,25 @@ define(
 			}).bind(this));
 
 			canvas.on('mouse:down', (function(ev) {
-				console.log("### Mouse Down");
 				if (this.canvas.getActiveObject() != null) {
-					console.log("### ... on selected");
 					this.__objectSelected( this.canvas.getActiveObject() );
 				}
 			}).bind(this));
 
 			canvas.on('object:modified', (function(ev) {
-				console.log("### Modified");
-				var timelineElement = this.timeline.elementFromFabricObject( ev.target );
-				this.timeline.setKeyframe( timelineElement );
-				console.log("Setting keyframe on ", timelineElement);
+				var targets = [ev.target];
+				if (ev.target.objects != undefined)
+					targets = ev.target.objects;
+
+				for (var i=0; i<targets.length; i++) {
+					var timelineElement = this.timeline.elementFromFabricObject( targets[i] );
+					if (timelineElement)
+						this.timeline.setKeyframe( timelineElement );
+				}
+
 			}).bind(this));
 
 			canvas.on('object:selected', (function(ev) {
-				console.log("### Object Selected");
 				this.timelineUI.selectByCanvasObject( ev.target );
 				this.__objectSelected( ev.target );
 			}).bind(this));

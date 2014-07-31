@@ -18,6 +18,7 @@ define(
 			this.hostDOM.append( this.headerElm );
 			this.hostDOM.append( this.bodyElm );
 
+			this.canvasRef = null;
 			this.lastPropValues = { };
 			this.propMonitor = [ ];
 			this.updateCallback = null;
@@ -130,8 +131,36 @@ define(
 						},
 						{
 							prop: 'elm',
+							name: 'Delete Keyframe',
+							type: 'btn',
+							cls : 'btn-danger',
+							click: (function(kfw) {
+								if ( ((kfw.kfIndex > 0) && (kfw.kfIndex < kfw.elm.__keyframes.length-1)) || (kfw.elm.__keyframes.length>2) ) {
+									
+									// Delete keyframe
+									kfw.elm.__keyframes.splice( kfw.kfIndex, 1 );
+									kfw.elm.updateReflection();
+
+									// Update views
+									kfw.tui.updateCanvas();
+									kfw.tui.redraw();
+
+									// Clear selection
+									this.show(null);
+
+								} else {
+									alert("Cannot delete the last two keyframes!");
+								}
+							}).bind(this)
+						},
+						{
+							prop: 'elm',
 							name: 'Show Properties',
-							type: 'sel'
+							type: 'btn',
+							click: (function(kfw) {
+								if (this.canvasRef)
+									this.canvasRef.selectObject(kfw.elm.__object);
+							}).bind(this)
 						}
 					]
 				},
@@ -305,6 +334,13 @@ define(
 		/**
 		 * Use the properties database to get information for the given object
 		 */
+		PropertiesUI.prototype.setCanvas = function( canvasRef ) {
+			this.canvasRef = canvasRef;
+		}
+
+		/**
+		 * Use the properties database to get information for the given object
+		 */
 		PropertiesUI.prototype.getPropInfo = function( obj ) {
 			var propInfo = null;
 			for (var i=0; i<this.propertyClasses.length; i++) {
@@ -363,6 +399,8 @@ define(
 							this.bodyElm.append( this.createOptionsWidget( obj, prop ) );
 						} else if (prop.type == 'sel') {
 							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
+						} else if (prop.type == 'btn') {
+							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
 						} else if (prop.type == 'bool') {
 							this.bodyElm.append( this.createBooleanWidget( obj, prop ) );
 						}
@@ -410,9 +448,14 @@ define(
 		 * Create button widget
 		 */
 		PropertiesUI.prototype.createButtonWidget = function( obj, propInfo ) {
-			var btnInput = $('<button class="btn btn-sm btn-primary">'+propInfo.name+'</button>');
+			var btnClass = propInfo.cls || 'btn-primary';
+			var btnInput = $('<button class="btn btn-sm '+btnClass+'">'+propInfo.name+'</button>');
 			btnInput.click((function() {
-				this.show( obj[ propInfo.prop ], true );
+				if (propInfo.click == undefined) {
+					this.show( obj[ propInfo.prop ], true );
+				} else {
+					propInfo.click( obj );
+				}
 			}).bind(this));
 			return this.wrapWidgets( "", btnInput );
 		}
@@ -492,7 +535,6 @@ define(
 
 					// Apply
 					obj[ propInfo.prop ] = hex;
-					console.log(hex, obj[ propInfo.prop ], propInfo.prop);
 
 					// Update text
 					elmInput.val( hex );
@@ -504,7 +546,6 @@ define(
 				}).bind(this)
 			);
 
-			console.log(window.cp = cp);
 			this.monitorChange( obj, propInfo, function(v) {
 				if (!v) return;
 				lockUpdate = true;

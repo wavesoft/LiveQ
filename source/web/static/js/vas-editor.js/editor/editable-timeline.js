@@ -27,17 +27,14 @@ define(
 			
 			// Remove previous tween from runtime
 			if (this.__tweenRef) {
-				console.log("    - Removing previous tween" );				
 				this.__runtime.removeTween( this.__tweenRef );
 				createjs.Tween.removeTweens( this );
 			}
 
 			// Build a new tween
-			console.log("    - Building tween" );				
 			this.__tweenRef = this.__runtime.buildTween( this, this.__keyframes );
 
 			// Place it back on the runtime
-			console.log("    - Adding tween" );				
 			this.__runtime.addTween( this.__tweenRef );
 
 			// Trigger UI update
@@ -132,6 +129,9 @@ define(
 
 			// Remove all references
 			this.editableObjects = [];
+
+			// Rewind
+			this.gotoAndStop(0);
 
 		}
 

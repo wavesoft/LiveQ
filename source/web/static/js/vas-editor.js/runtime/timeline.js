@@ -23,11 +23,9 @@ define(
 		 * Helper function to build a tween using the given animation definition
 		 */
 		Timeline.prototype.buildTween = function(object, definition) {
-			console.log("      - Definition: ", definition );
 
 			var lastPos = 0, first = true,
 				tween = createjs.Tween.get(object, {override:true, paused:true, position:0});
-				console.log("      - Tween.get(",object,"){" );
 
 			for (var i=0; i<definition.length; i++) {
 				var d = definition[i],
@@ -47,16 +45,13 @@ define(
 				if (first) {
 					first = false;
 					tween.to(d,0);
-					console.log("             .set(", d, ")");
 					// Check if first node has offset
 					if (at > 0) {
 						tween.wait(at);
-						console.log("             .wait(", at, ")");
 					}
 				} else {
 					// All other nodes are transitions
 					tween.to(d, at - lastPos, createjs.Ease[ d['easing'] || 'linear' ]);
-					console.log("             .to(", d, ",", at-lastPos ,")");
 				}
 
 				// Update last position
@@ -65,8 +60,6 @@ define(
 			}
 
 			// As the last step on the tween, hide
-			console.log("        }" );				
-
 			return tween;
 		}
 

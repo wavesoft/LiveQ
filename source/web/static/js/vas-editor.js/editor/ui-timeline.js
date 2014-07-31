@@ -356,8 +356,6 @@ define(
 						delta = (mouseX - this.mouseDragX),
 						pos = delta + this.mouseDragValue;
 
-					console.log(delta);
-
 					// Prohibit invalid positions of anchor
 					var minPos = 0;
 					if ( this.hoverAnchor > 0 ) {
@@ -370,13 +368,8 @@ define(
 					}
 
 					// Update item keyframes
-					console.log("=== Element: ", elm, "===");
-					console.log("  - Updating anchor #" + this.hoverAnchor + " from", elm.__keyframes[ this.hoverAnchor ].at );
 					elm.__keyframes[ this.hoverAnchor ].at = this.pixels2time( this.snapPixels(pos, this.config.padLeft) );
-					console.log("  - To ", elm.__keyframes[ this.hoverAnchor ].at );
-					console.log("  - Updating reflection" );
 					elm.updateReflection();
-					console.log("  - Updating canvas" );
 					this.updateCanvas();
 
 					// Redraw
@@ -491,7 +484,6 @@ define(
 					this.timeScale += delta;
 					if (this.timeScale < 0.1) this.timeScale = 0.1;
 					if (this.timeScale > 1) this.timeScale = 1;
-					console.log(this.timeScale);
 				}
 
 			}).bind(this));
@@ -676,11 +668,7 @@ define(
 		 */
 		TimelineUI.prototype.updateCanvas = function() {
 			if (!this.canvas) return;
-
-			console.log("     - Calling timeline.update()" );
 			this.timeline.update();
-
-			console.log("     - Calling renderAll()" );
 			this.canvas.canvas.renderAll();
 		}
 
@@ -1094,6 +1082,7 @@ define(
 		 */
 		TimelineUI.KeyframeWrapper = function( tui, elm, keyframeIndex ) {
 			this.elm = elm;
+			this.tui = tui;
 			this.kfIndex = keyframeIndex;
 
 			Object.defineProperties(this, {
