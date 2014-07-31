@@ -33,7 +33,7 @@ define(
 		/**
 		 * Initialize everything from JSON
 		 */
-		Canvas.prototype.fromJSON = function(json) {
+		Canvas.prototype.loadJSON = function(json) {
 
 			// Helper function to initialize tweens
 			var initTweens = (function() {
