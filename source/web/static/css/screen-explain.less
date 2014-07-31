@@ -3,6 +3,78 @@
 // Explaination Screen
 ///////////////////////////////////////////////
 
+.screen.explain {
+	padding: 0;
+
+	.explain-blackboard {
+		background: #000 url(../img/blackboard.jpg) no-repeat center center;
+		background-size: cover;
+	}
+
+	.explain-window {
+		position: absolute;
+		width: 800px;
+		height: 530px;
+		border-radius: 8px;
+		padding: 10px;
+		background-color: #34495e;
+
+		div.explain-header {
+
+			div.icon {
+				float: left;
+				width: 64px;
+				height: 64px;
+				background: no-repeat center center;
+				background-size: contain;
+			}
+			h1 {
+				margin: 0 0 0 75px;
+				font-size: 32px;
+				color: #fff;
+			}
+			p.subtitle {
+				margin: -5px 0 0 75px;
+				font-style: normal;
+				font-size: 14px;
+				color: #3498db;
+				word-break: break-all;
+				height: 36px;
+				overflow: hidden;
+			}
+
+		}
+
+		div.explain-screen {
+			position: relative;
+			width: 800px;
+			height: 450px;
+			margin-top: 8px;
+
+			> div {
+				width: 800px;
+				height: 450px;
+
+				.hotspots {
+					position: absolute;
+					left: 0; top: 0;
+					width: 800px;
+					height: 450px;
+				}
+
+			}
+
+			&.blackboard {
+				background: #000 url(../img/blackboard.jpg) no-repeat center center;
+				background-size: cover;
+			}
+		}
+
+	}
+
+}
+
+/*
 // Definitions for explain screen
 @game-scr-nav-iconset-size   : 64px;
 @game-scr-nav-iconset-a-size : 42px;
@@ -337,3 +409,5 @@
 	}
 
 }
+
+*/

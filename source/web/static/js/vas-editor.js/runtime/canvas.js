@@ -7,12 +7,16 @@ define(
 		/**
 		 * Runtime canvas for rendering animation & level info
 		 */
-		var Canvas = function() {
+		var Canvas = function( hostDOM ) {
 			this.hostDOM = hostDOM;
 
 			// Prepare canvas DOM
 			this.canvasDOM = $('<canvas></canvas>');
 			this.hostDOM.append( this.canvasDOM );
+			this.canvasDOM.attr({
+				'width': 800,
+				'height': 450
+			});
 
 			// Prepare canvas fabric
 			fabric.Object.prototype.transparentCorners = false;
@@ -39,7 +43,7 @@ define(
 			var initTweens = (function() {
 
 				// Initialize timeline with json
-				this.timeline.initWithJSON( this.canvas.getObjects(), json['scene']['tweens'] );
+				this.timeline.initWithJSON( this.canvasFabric.getObjects(), json['scene']['tweens'] );
 
 				// Redraw canvas
 				this.canvasFabric.renderAll();
@@ -55,7 +59,7 @@ define(
 			this.canvasFabric.loadFromJSON(json['scene']['canvas'], initTweens);
 
 			// Load hotspot information from JSON
-			this.hotspots.fromJSON( json['hotspots'] );
+			this.hotspots.loadJSON( json['spots'] );
 
 		}
 

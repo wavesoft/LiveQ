@@ -36,6 +36,7 @@ define([
 	"vas-basic/components/onscreen",	
 
 	// Explain screen details
+	'vas-basic/components/explain/blackboard',
 	'vas-basic/components/explain/machine',
 	'vas-basic/components/explain/physics',
 	'vas-basic/components/explain/book',

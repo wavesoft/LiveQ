@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, UI, config, R,C) {
+	function($, d3, DB, UI, config, R,C) {
 
 		/**
 		 * @class
@@ -31,11 +31,69 @@ define(
 			hostDOM.append(this.foregroundDOM);
 
 			// Create host element where to place the explain screen
-			this.elmWindow = $('<div class="window"></div>');
-			this.elmTitle = $('<h1></h1>');
+			this.elmWindow = $('<div class="explain-window"></div>').appendTo(this.foregroundDOM);
+			var elmHeader = $('<div class="explain-header">').appendTo(this.elmWindow);
+			this.elmIcon = $('<div class="icon" style="background-image: url(static/img/level-icons/pdfs.png);"></div>').appendTo(elmHeader);
+			this.elmTitle = $('<h1>Level Title</h1>').appendTo(elmHeader);
+			this.elmSubtitle = $('<p class="subtitle">Level Title</p>').appendTo(elmHeader);
+			this.elmScreen = $('<div class="explain-screen"></div>').appendTo(this.elmWindow);
+			this.elmFooter = $('<div class="explain-footer"></div>');//.appendTo(this.elmWindow);
+
+			// Create buttons on footer
+			this.btnExplain = $('<div class="footer-btn"><span class="uicon uicon-explain"></span> Explain</div>').appendTo(this.elmFooter);
+			this.btnLearn = $('<div class="footer-btn"><span class="uicon uicon-info"></span> Learn</div>').appendTo(this.elmFooter);
+			this.btnUnderstand = $('<div class="footer-btn"><span class="uicon uicon-game"></span> Understand</div>').appendTo(this.elmFooter);
+			this.btnResearch = $('<div class="footer-btn"><span class="uicon uicon-find"></span> Research</div>').appendTo(this.elmFooter);
+
+			// Initialize explain screen
+			this.createExplainScreen();
+			this.loadScene("test");
 
 		}
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
+
+		/**
+		 * Load explain scene
+		 */
+		ExplainScreen.prototype.loadScene = function(id) {
+
+			// Load animations for the explain scene
+			var db = DB.openDatabase("animations");
+			db.get(id, (function(doc, err) {
+				if (!doc) {
+					// TODO: Show error
+				} else {
+					this.explainComponent.onAnimationUpdated( doc );
+				}
+			}).bind(this));
+			
+		}
+
+		/**
+		 * Setup screen
+		 */
+		ExplainScreen.prototype.createExplainScreen = function() {
+			this.elmScreen.addClass("blackboard");
+
+			var explainBlackboard = $('<div></div>').appendTo(this.elmScreen),
+				com = R.instanceComponent("explain.blackboard", explainBlackboard);
+
+			if (!com) {
+				console.warn("ExplainScreen: Unable to ininitalize explain blackboard!");
+				explainBlackboard.remove();
+				return;
+			} else {
+
+				// Initialize component
+				this.explainComponent = com;
+
+				// Adopt & Forward events
+				this.forwardVisualEvents( com );
+				this.adoptEvents( com );
+
+			}
+
+		}
 
 		/**
 		 * Forward ExplainScreen events to our child components
@@ -44,6 +102,14 @@ define(
 			this.width = w;
 			this.height = h;
 
+			var winW = $(this.elmWindow).width(),
+				winH = $(this.elmWindow).height();
+
+			// Realign window
+			this.elmWindow.css({
+				'left': (w - winW) / 2,
+				'top': (h - winH) / 2
+			});
 		}
 
 		/**

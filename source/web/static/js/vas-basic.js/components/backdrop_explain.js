@@ -18,9 +18,6 @@ define(
 		var ExplainBackdrop = function( hostDOM ) {
 			C.Backdrop.call(this, hostDOM);
 
-			// The screen backdrop is just a blackboard
-			hostDOM.addClass('explain-blackboard');			
-
 		}
 		ExplainBackdrop.prototype = Object.create( C.Backdrop.prototype );
 
