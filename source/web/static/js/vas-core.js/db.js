@@ -6,6 +6,28 @@ define(["jquery", "sha1", "core/config"],
 	function($, SHA1, Config) {
 
 		/**
+		 * Database-wide revision index
+		 */
+		var dbRevIndex = 0;
+
+		/**
+		 * Helper function to calculate a new revision number
+		 */
+		function new_rev_number() {
+			var d = new Date();
+			function zeropad(v,n){ var s=String(v); while(s.length<n) s="0"+s; return s; };
+
+			// Return a number wich always get incremented with time
+			return zeropad( d.getFullYear(), 4 ) +
+				   zeropad( d.getMonth(), 2 ) +
+				   zeropad( d.getDate(), 2) +
+				   zeropad( d.getHours(), 2 ) +
+				   zeropad( d.getSeconds(), 2 ) +
+				   zeropad( d.getMilliseconds(), 4 ) +
+				   zeropad( dbRevIndex++, 4 );
+		}
+
+		/**
 		 * Helper function to translate response data of a single entry
 		 */
 		function couchdb_translate_single(callback) {
@@ -145,6 +167,8 @@ define(["jquery", "sha1", "core/config"],
 
 			// Place ID if missing
 			if (!data['_id']) data['_id'] = doc;
+			if (!data['_rev']) data['_rev'] = new_rev_number();
+			console.log("Saving", data);
 
 			// Fire the API function
 			couchdb_put( url, JSON.stringify(data), function(response) {
