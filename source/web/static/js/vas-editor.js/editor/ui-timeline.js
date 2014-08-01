@@ -264,8 +264,11 @@ define(
 				//
 				} else if (this.mouseDragMode == 5) {
 
-					this.scrollX = this.mouseDragValue - (mouseX - this.mouseDragX) / wScalePx;
+					this.scrollX = this.snapPixels( this.mouseDragValue - (mouseX - this.mouseDragX) / wScalePx );
 					if (this.scrollX > 0) this.scrollX = 0;
+
+					// Redraw
+					this.redraw();
 
 				}
 
@@ -357,18 +360,18 @@ define(
 						pos = delta + this.mouseDragValue;
 
 					// Prohibit invalid positions of anchor
-					var minPos = 0;
+					var minPos = this.hoverElementAnchors[0];
 					if ( this.hoverAnchor > 0 ) {
 						minPos = this.hoverElementAnchors[ this.hoverAnchor - 1 ];
 					}
-					if (pos+this.config.padLeft < minPos) pos = minPos-this.config.padLeft;
+					if (pos < minPos) pos = minPos;
 					if ( this.hoverAnchor < this.hoverElementAnchors.length-1 ) {
 						var maxPos = this.hoverElementAnchors[ this.hoverAnchor + 1 ];
-						if (pos+this.config.padLeft > maxPos) pos = maxPos-this.config.padLeft;
+						if (pos > maxPos) pos = maxPos;
 					}
 
 					// Update item keyframes
-					elm.__keyframes[ this.hoverAnchor ].at = this.pixels2time( this.snapPixels(pos, this.config.padLeft) );
+					elm.__keyframes[ this.hoverAnchor ].at = this.timeline.snapTime( this.pixels2time(pos) );
 					elm.updateReflection();
 					this.updateCanvas();
 
@@ -500,6 +503,12 @@ define(
 							break; // There can be onl 1 collision
 						}
 					}
+
+				}
+
+				// If we are dragging the timeline cursor, snap to time
+				else if (this.mouseDragMode == 3) {
+					this.timeline.scrollPosition( this.timeline.snapTime( this.timeline.position ) );					
 				}
 
 				// Stop dragging

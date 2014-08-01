@@ -8,14 +8,14 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666666;
+  border-top: solid 1px #666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: white;
+  color: #FFF;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -31,12 +31,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333333;
+  color: #333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: white;
+  color: #FFF;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -93,7 +93,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -117,7 +117,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: white;
+  color: #FFF;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -141,7 +141,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -160,7 +160,7 @@
   padding: 0;
 }
 .screen.explain .explain-blackboard {
-  background: black url(../img/blackboard.jpg) no-repeat center center;
+  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window {
@@ -181,7 +181,7 @@
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0 0 0 75px;
   font-size: 32px;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-window div.explain-header p.subtitle {
   margin: -5px 0 0 75px;
@@ -209,8 +209,97 @@
   width: 800px;
   height: 450px;
 }
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot {
+  -webkit-transition: all 0.4s;
+  -moz-transition: all 0.4s;
+  -o-transition: all 0.4s;
+  transition: all 0.4s;
+  position: absolute;
+  display: none;
+  width: 40px;
+  height: 40px;
+  -webkit-border-radius: 40px;
+  -moz-border-radius: 40px;
+  -o-border-radius: 40px;
+  border-radius: 40px;
+  background-color: #2980b9;
+  cursor: pointer;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot:after {
+  content: " ";
+  display: block;
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 48px;
+  height: 48px;
+  border: solid 4px;
+  border-color: #2980b9;
+  -webkit-border-radius: 48px;
+  -moz-border-radius: 48px;
+  -o-border-radius: 48px;
+  border-radius: 48px;
+  opacity: 0;
+  -webkit-transform: scale(0.1);
+  -moz-transform: scale(0.1);
+  -o-transform: scale(0.1);
+  transform: scale(0.1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, 0, 0.735, 0.045), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 0.2s;
+  /* easeInBack */
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.4em;
+  width: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: #fff;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot:hover,
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active {
+  background-color: #3498db;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot:hover:after,
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active:after {
+  opacity: 1.0;
+  border-color: #3498db;
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1), opacity 0.2s;
+  /* older webkit */
+  -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -moz-transition: -moz-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  -o-transition: -o-transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+  /* easeOutBack */
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.visible {
+  display: block;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active {
+  background-color: #e67e22;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active:after {
+  border-color: #e67e22;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active:hover,
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active.active {
+  background-color: #f39c12;
+}
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active:hover:after,
+.screen.explain .explain-window div.explain-screen > div .hotspots div.hotspot.active.active:after {
+  border-color: #f39c12;
+}
 .screen.explain .explain-window div.explain-screen.blackboard {
-  background: black url(../img/blackboard.jpg) no-repeat center center;
+  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 /*
@@ -218,9 +307,6 @@
 @game-scr-nav-iconset-size   : 64px;
 @game-scr-nav-iconset-a-size : 42px;
 @game-scr-nav-iconset-border : 3px;
-@game-scr-parameter-size	 : 40px;
-@game-scr-parameter-color	 : #2980b9;
-@game-scr-parameter-hover-c	 : #3498db;
 
 .screen.explain {
 	padding: 0;
@@ -550,7 +636,6 @@
 }
 
 */
-
 .screen.home .home-menu {
   position: absolute;
   display: block;
@@ -562,15 +647,15 @@
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399ff;
+  background-color: #3399FF;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70b8ff;
+  background-color: #70B8FF;
 }
 .screen.home .topic-host {
   position: absolute;
@@ -620,7 +705,7 @@
   border-radius: 5px;
   width: 120px;
   height: 120px;
-  background-color: #27ae60;
+  background-color: #27AE60;
   margin: 4px;
   cursor: pointer;
   -webkit-transition: all 0.4s;
@@ -638,7 +723,7 @@
   line-height: 120px;
   width: 120px;
   text-align: center;
-  color: white;
+  color: #FFF;
   font-weight: bold;
   font-size: 24px;
 }
@@ -725,8 +810,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #cccccc;
-  border-bottom: solid 1px #cccccc;
+  border-top: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -778,7 +863,6 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   left: 50%;
   top: 40%;
@@ -796,13 +880,12 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999999;
+  color: #999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -818,9 +901,8 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
-  background-color: #eeeeee;
+  background-color: #eee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -831,7 +913,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #ff9900;
+  background-color: #FF9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -871,7 +953,7 @@
   top: 145px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -892,7 +974,7 @@
 }
 .screen.tuning .floater.f-header h1,
 .screen.tuning .floater.f-header p {
-  color: white;
+  color: #FFF;
   text-align: left;
   margin: 2px 2px;
 }
@@ -935,14 +1017,14 @@
   height: 18px;
   margin: 4px;
   font-size: 16px;
-  color: #cccccc;
-  border: solid 1px #cccccc;
+  color: #CCC;
+  border: solid 1px #CCC;
   text-align: center;
   line-height: 17px;
 }
 .screen.tuning .sidebar h1 span.help:hover {
-  color: #333333;
-  border: solid 1px #333333;
+  color: #333;
+  border: solid 1px #333;
 }
 .screen.tuning .tunable {
   -webkit-transition: background-color 0.25s;
@@ -1001,7 +1083,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: white;
+  color: #ffffff;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -1026,7 +1108,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: white;
+  color: #ffffff;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -1087,7 +1169,7 @@
   -o-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 100;
-  background-color: white;
+  background-color: #FFF;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1123,7 +1205,7 @@
   top: -50px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1145,7 +1227,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: white;
+  background-color: #FFF;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.message {
@@ -1187,13 +1269,13 @@
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.tuning .progress-widget div.c-marker div.label {
   padding-top: 5px;
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1225,12 +1307,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1254,7 +1336,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1309,24 +1391,23 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95a5a6;
+  border: solid 2px #95A5A6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -1346,7 +1427,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: white;
+  color: #FFFFFF;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -1354,9 +1435,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
-  position: absolute;
   left: 0;
   top: 0;
+  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;

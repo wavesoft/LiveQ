@@ -28,16 +28,35 @@ define(
 		 * This event is fired when animation information has updated
 		 */
 		ExplainBlackboard.prototype.onAnimationUpdated = function( doc ) {
-			this.canvas.loadJSON( doc );
+			this.canvas.loadJSON( doc, (function(e){
+				this.canvas.hotspots.setProgression(1);
+			}).bind(this) );
 		}
 
 		/**
 		 * Start animation when shown
 		 */
 		ExplainBlackboard.prototype.onShown = function() {
+			this.canvas.timeline.setPaused(false);
 			this.canvas.timeline.gotoAndPlay(0);
 		}
 
+		/**
+		 * Start animation when shown
+		 */
+		ExplainBlackboard.prototype.onWillShow = function(cb) {
+			this.canvas.timeline.gotoAndStop(10);
+			this.canvas.timeline.gotoAndStop(0);
+			cb();
+		}
+
+		/**
+		 * Stop animation when hiding
+		 */
+		ExplainBlackboard.prototype.onWillHide = function(cb) {
+			this.canvas.timeline.setPaused(true);
+			cb();
+		}
 
 		// Register home screen
 		R.registerComponent( "explain.blackboard", ExplainBlackboard, 1 );

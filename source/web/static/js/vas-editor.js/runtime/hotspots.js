@@ -43,14 +43,14 @@ define(
 		Hotspots.prototype.setProgression = function(num) {
 			for (var i=0; i<this.hotspotElms.length; i++) {
 				if ((num==null) || (i<num))  {
-					this.hotspotElms[i].elm.removeClass("active");
-					this.hotspotElms[i].elm.addClass("visible");
+					this.hotspotElms[i].removeClass("active");
+					this.hotspotElms[i].addClass("visible");
 				} else if (i==num) {
-					this.hotspotElms[i].elm.addClass("active");
-					this.hotspotElms[i].elm.addClass("visible");
+					this.hotspotElms[i].addClass("active");
+					this.hotspotElms[i].addClass("visible");
 				} else {
-					this.hotspotElms[i].elm.removeClass("active");
-					this.hotspotElms[i].elm.removeClass("visible");
+					this.hotspotElms[i].removeClass("active");
+					this.hotspotElms[i].removeClass("visible");
 				}
 			}
 		}

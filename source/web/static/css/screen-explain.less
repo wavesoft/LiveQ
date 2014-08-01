@@ -3,6 +3,12 @@
 // Explaination Screen
 ///////////////////////////////////////////////
 
+@game-scr-parameter-size	 : 40px;
+@game-scr-parameter-color	 : #2980b9;
+@game-scr-parameter-hover-c	 : #3498db;
+@game-scr-active-color	 	 : #E67E22;
+@game-scr-active-hover-c	 : #F39C12;
+
 .screen.explain {
 	padding: 0;
 
@@ -60,6 +66,78 @@
 					left: 0; top: 0;
 					width: 800px;
 					height: 450px;
+
+					div.hotspot {
+
+						.transition(all 0.4s);
+						position: absolute;
+						display: none;
+						width: @game-scr-parameter-size;
+						height: @game-scr-parameter-size;
+						.border-radius( @game-scr-parameter-size );
+						background-color: @game-scr-parameter-color;
+						cursor: pointer;
+
+						&:after {
+							content: " ";
+							display: block;
+							position: absolute;
+							left: -8px; top: -8px;
+							width: @game-scr-parameter-size + 8px;
+							height: @game-scr-parameter-size + 8px;
+							border: solid 4px;
+							border-color: @game-scr-parameter-color;
+							.border-radius( @game-scr-parameter-size + 8px );
+
+							opacity: 0;
+							.transform( scale(0.1) );
+							.easing-back-in( );
+						}
+
+						h1 {
+							margin: 0;
+							padding: 0;
+							font-size: 1.4em;
+							width: @game-scr-parameter-size;
+							line-height: @game-scr-parameter-size;
+							text-align: center;
+							color: #fff;
+						}
+
+						&:hover, &.active {
+
+							background-color: @game-scr-parameter-hover-c;
+
+							&:after {
+								opacity: 1.0;
+								border-color: @game-scr-parameter-hover-c;
+								.transform( scale(1.0) );
+								.easing-back-out( );
+							}
+
+						}
+
+						&.visible {
+							display: block;
+						}
+
+						&.active {
+							background-color: @game-scr-active-color;
+							&:after {
+								border-color: @game-scr-active-color;
+							}
+							&:hover, &.active {
+								background-color: @game-scr-active-hover-c;
+								&:after {
+									border-color: @game-scr-active-hover-c;
+								}
+							}
+						}
+
+					}
+
+
+
 				}
 
 			}
@@ -79,9 +157,6 @@
 @game-scr-nav-iconset-size   : 64px;
 @game-scr-nav-iconset-a-size : 42px;
 @game-scr-nav-iconset-border : 3px;
-@game-scr-parameter-size	 : 40px;
-@game-scr-parameter-color	 : #2980b9;
-@game-scr-parameter-hover-c	 : #3498db;
 
 .screen.explain {
 	padding: 0;

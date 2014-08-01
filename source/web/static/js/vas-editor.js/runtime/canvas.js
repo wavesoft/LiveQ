@@ -40,7 +40,7 @@ define(
 		/**
 		 * Initialize everything from JSON
 		 */
-		Canvas.prototype.loadJSON = function(json) {
+		Canvas.prototype.loadJSON = function(json, onReady) {
 
 			// Helper function to initialize tweens
 			var initTweens = (function() {
@@ -51,6 +51,9 @@ define(
 				// Redraw canvas
 				this.canvasFabric.renderAll();
 
+				// Fire ready
+				if (onReady) onReady();
+
 			}).bind(this);
 
 			// Reset everything
@@ -58,11 +61,11 @@ define(
 			this.timeline.clear();
 			this.hotspots.clear();
 
-			// Load canvas objects & then init tweens
-			this.canvasFabric.loadFromJSON(json['scene']['canvas'], initTweens);
-
 			// Load hotspot information from JSON
 			this.hotspots.loadJSON( json['spots'] );
+
+			// Load canvas objects & then init tweens
+			this.canvasFabric.loadFromJSON(json['scene']['canvas'], initTweens);
 
 		}
 
