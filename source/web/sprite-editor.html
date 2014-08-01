@@ -383,6 +383,12 @@
 					</button>
 				</div>
 
+				<div class="btn-group">
+					<button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#editor-modal-speech">
+						<span class="glyphicon glyphicon-volume-up"></span> Narration
+					</button>
+				</div>
+
 			</div>
 			<div id="editor-canvas">
 				<canvas width="800" height="450"></canvas>
@@ -457,6 +463,234 @@
 			  <div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 				<button type="button" class="btn btn-primary" id="editor-open">Open</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<!-- Speech Modal -->
+		<div class="modal fade" id="editor-modal-speech" tabindex="-1" role="dialog" aria-labelledby="editor-modal-speech-label" aria-hidden="true">
+		  <div class="modal-dialog">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="editor-modal-speech-label">speech Animation</h4>
+			  </div>
+			  <div class="modal-body">
+
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-speech-text">Voices:</label>
+					</div>
+					<div class="col-sm-8">
+						<select id="editor-speech-voice" class="form-control">
+							<optgroup label="Arabic (Saudi Arabia)">
+								<option value="leila22k">Leila (F)</option>
+								<option value="mehdi22k">Mehdi (M)</option>
+								<option value="nizar22k">Nizar (M)</option>
+								<option value="salma22k">Salma (F)</option>
+								<option value="leila_hmm_22k">LeilaHMM (F)</option>
+								<option value="nizar_hmm_22k">NizarHMM (M)</option>
+							</optgroup>
+							<optgroup label="French (France)">
+								<option value="alice22k">Alice (F)</option>
+								<option value="antoine22k">Antoine (M)</option>
+								<option value="antoinefromafar22k">AntoineFromAfar (M)</option>
+								<option value="antoinehappy22k">AntoineHappy (M)</option>
+								<option value="antoinesad22k">AntoineSad (M)</option>
+								<option value="antoineupclose22k">AntoineUpClose (M)</option>
+								<option value="bruno22k">Bruno (M)</option>
+								<option value="claire22k">Claire (F)</option>
+								<option value="julie22k">Julie (F)</option>
+								<option value="margaux22k">Margaux (F)</option>
+								<option value="margauxhappy22k">MargauxHappy (F)</option>
+								<option value="margauxsad22k">MargauxSad (F)</option>
+								<option value="bruno_hmm_22k">BrunoHMM (M)</option>
+								<option value="margaux_hmm_22k">MargauxHMM (F)</option>
+							</optgroup>
+							<optgroup label="Finnish">
+								<option value="sanna22k">Sanna (F)</option>
+								<option value="sanna_hmm_22k">SannaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Portuguese (Portugal)">
+								<option value="celia22k">Celia (F)</option>
+								<option value="celia_hmm_22k">CeliaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Italian">
+								<option value="chiara22k">chiara (F)</option>
+								<option value="fabiana22k">fabiana (F)</option>
+								<option value="vittorio22k">vittorio (M)</option>
+								<option value="vittorio_hmm_22k">vittorioHMM (M)</option>
+								<option value="fabiana_hmm_22k">fabianaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Dutch (Belgium)">
+								<option value="jeroen22k">Jeroen (M)</option>
+								<option value="jeroenhappy22k">JeroenHappy (M)</option>
+								<option value="jeroensad22k">JeroenSad (M)</option>
+								<option value="sofie22k">Sofie (F)</option>
+								<option value="zoe22k">Zoe (F)</option>
+								<option value="jeroen_hmm_22k">JeroenHMM (M)</option>
+								<option value="zoe_hmm_22k">ZoeHMM (F)</option>
+							</optgroup>
+							<optgroup label="Norwegian">
+								<option value="bente22k">Bente (F)</option>
+								<option value="kari22k">Kari (F)</option>
+								<option value="olav22k">Olav (M)</option>
+								<option value="bente_hmm_22k">BenteHMM (F)</option>
+								<option value="olav_hmm_22k">OlavHMM (M)</option>
+							</optgroup>
+							<optgroup label="Dutch (Netherlands)">
+								<option value="daan22k">Daan (M)</option>
+								<option value="femke22k">Femke (F)</option>
+								<option value="jasmijn22k">Jasmijn (F)</option>
+								<option value="max22k">Max (M)</option>
+								<option value="daan_hmm_22k">DaanHMM (M)</option>
+								<option value="jasmijn_hmm_22k">JasmijnHMM (F)</option>
+							</optgroup>
+							<optgroup label="English (USA)">
+								<option value="ella22k">Ella (F)</option>
+								<option value="heather22k" selected="selected">Heather (F)</option>
+								<option value="josh22k">Josh (M)</option>
+								<option value="kenny22k">Kenny (M)</option>
+								<option value="laura22k">Laura (F)</option>
+								<option value="micah22k">Micah (M)</option>
+								<option value="nelly22k">Nelly (F)</option>
+								<option value="ryan22k">Ryan (M)</option>
+								<option value="saul22k">Saul (M)</option>
+								<option value="tracy22k">Tracy (F)</option>
+								<option value="will22k">Will (M)</option>
+								<option value="willbadguy22k">WillBadGuy (M)</option>
+								<option value="willfromafar22k">WillFromAfar (M)</option>
+								<option value="willhappy22k">WillHappy (M)</option>
+								<option value="willlittlecreature22k">WillLittleCreature (M)</option>
+								<option value="willoldman22k">WillOldMan (M)</option>
+								<option value="willsad22k">WillSad (M)</option>
+								<option value="willupclose22k">WillUpClose (M)</option>
+								<option value="heather_hmm_22k">HeatherHMM (F)</option>
+								<option value="ryan_hmm_22k">RyanHMM (M)</option>
+							</optgroup>
+							<optgroup label="Swedish - Gothenburg (Sweden)">
+								<option value="kal22k">Kal (M)</option>
+							</optgroup>
+							<optgroup label="Greek">
+								<option value="dimitris22k">Dimitris (M)</option>
+								<option value="dimitrishappy22k">DimitrisHappy (M)</option>
+								<option value="dimitrissad22k">DimitrisSad (M)</option>
+								<option value="dimitris_hmm_22k">DimitrisHMM (M)</option>
+							</optgroup>
+							<optgroup label="French (Belgium)">
+								<option value="justine22k">Justine (F)</option>
+							</optgroup>
+							<optgroup label="Catalan (Spain)">
+								<option value="laia22k">Laia (F)</option>
+								<option value="laia_hmm_22k">LaiaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Swedish (Finland)">
+								<option value="samuel22k">Samuel (M)</option>
+								<option value="samuel_hmm_22k">SamuelHMM (M)</option>
+							</optgroup>
+							<optgroup label="English (Australia)">
+								<option value="tyler22k">Tyler (M)</option>
+								<option value="tyler_hmm_22k">TylerHMM (M)</option>
+							</optgroup>
+							<optgroup label="Japanese">
+								<option value="sakura22k">Sakura (F)</option>
+								<option value="sakura_hmm_22k">SakuraHMM (F)</option>
+							</optgroup>
+							<optgroup label="Spanish (Spain)">
+								<option value="antonio22k">Antonio (M)</option>
+								<option value="ines22k">Ines (F)</option>
+								<option value="maria22k">Maria (F)</option>
+								<option value="antonio_hmm_22k">AntonioHMM (M)</option>
+								<option value="ines_hmm_22k">InesHMM (F)</option>
+							</optgroup>
+							<optgroup label="Spanish (USA)">
+								<option value="rosa22k">Rosa (F)</option>
+								<option value="rosa_hmm_22k">RosaHMM (F)</option>
+							</optgroup>
+							<optgroup label="English (UK)">
+								<option value="graham22k">Graham (M)</option>
+								<option value="harry22k">Harry (M)</option>
+								<option value="lucy22k">Lucy (F)</option>
+								<option value="nizareng22k">Nizareng (M)</option>
+								<option value="peter22k">Peter (M)</option>
+								<option value="peterhappy22k">PeterHappy (M)</option>
+								<option value="petersad22k">PeterSad (M)</option>
+								<option value="queenelizabeth22k">QueenElizabeth (F)</option>
+								<option value="rachel22k">Rachel (F)</option>
+								<option value="nizareng_hmm_22k">NizarengHMM (M)</option>
+								<option value="peter_hmm_22k">PeterHMM (M)</option>
+								<option value="rachel_hmm_22k">RachelHMM (F)</option>
+							</optgroup>
+							<optgroup label="Russian">
+								<option value="alyona22k">Alyona (F)</option>
+								<option value="alyona_hmm_22k">AlyonaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Portuguese (Brazil)">
+								<option value="marcia22k">Marcia (F)</option>
+								<option value="marcia_hmm_22k">MarciaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Danish">
+								<option value="mette22k">Mette (F)</option>
+								<option value="rasmus22k">Rasmus (M)</option>
+								<option value="mette_hmm_22k">MetteHMM (F)</option>
+								<option value="rasmus_hmm_22k">RasmusHMM (M)</option>
+							</optgroup>
+							<optgroup label="Czech">
+								<option value="eliska22k">Eliska (F)</option>
+								<option value="eliska_hmm_22k">EliskaHMM (F)</option>
+							</optgroup>
+							<optgroup label="Turkish">
+								<option value="ipek22k">Ipek (F)</option>
+								<option value="ipek_hmm_22k">IpekHMM (F)</option>
+							</optgroup>
+							<optgroup label="German">
+								<option value="andreas22k">Andreas (M)</option>
+								<option value="julia22k">Julia (F)</option>
+								<option value="klaus22k">Klaus (M)</option>
+								<option value="sarah22k">Sarah (F)</option>
+								<option value="julia_hmm_22k">JuliaHMM (F)</option>
+								<option value="klaus_hmm_22k">KlausHMM (M)</option>
+							</optgroup>
+							<optgroup label="English (India)">
+								<option value="deepa22k">Deepa (F)</option>
+								<option value="deepa_hmm_22k">DeepaHMM (F)</option>
+							</optgroup>
+							<optgroup label="French (Canada)">
+								<option value="louise22k">Louise (F)</option>
+								<option value="louise_hmm_22k">LouiseHMM (F)</option>
+							</optgroup>
+							<optgroup label="Scanian (Sweden)">
+								<option value="mia22k">Mia (F)</option>
+							</optgroup>
+							<optgroup label="Swedish">
+								<option value="elin22k">Elin (F)</option>
+								<option value="emil22k">Emil (M)</option>
+								<option value="emma22k">Emma (F)</option>
+								<option value="erik22k">Erik (M)</option>
+								<option value="elin_hmm_22k">ElinHMM (F)</option>
+								<option value="erik_hmm_22k">ErikHMM (M)</option>
+							</optgroup>
+							<optgroup label="Polish">
+								<option value="ania22k">Ania (F)</option>
+								<option value="ania_hmm_22k">AniaHMM (F)</option>
+							</optgroup>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4 text-right">
+						<label for="editor-speech-text">Text to speak:</label>
+					</div>
+					<div class="col-sm-8">
+						<textarea id="editor-speech-text" class="form-control" rows="10"></textarea>
+					</div>
+				</div>
+
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary" id="editor-speech">Update narration</button>
 			  </div>
 			</div>
 		  </div>

@@ -47,6 +47,17 @@ define({
 		'good'		: 1,
 		'average'	: 4,
 		'max'		: 500,
+	},
+
+	/**
+	 * Acapela VAAS
+	 */
+	'acapela': {
+		'baseURL'	: "http://vaas.acapela-group.com/Services/Synthesizer",
+		'login'     : "EVAL_VAAS",
+		'app'       : "EVAL_6221618",
+		'password'  : "vuzullyh",
+		'soundType' : "WAV"
 	}
 
 });

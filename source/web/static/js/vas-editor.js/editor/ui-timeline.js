@@ -1,8 +1,8 @@
 define(
 
-	["jquery", "vas-editor/runtime/timeline" ],
+	["jquery", "vas-editor/runtime/timeline", "core/config" ],
 
-	function($, Timeline) {
+	function($, Timeline, Config) {
 
 		/**
 		 * Interface component for editing the properties of an object
@@ -11,12 +11,14 @@ define(
 			this.hostDOM = $(hostDOM);
 			this.propUI = propUI;
 			this.scale = 0.1; // 100 pixels -> 1 sec
+			window.tui = this;
 
 			// Configuration
 			this.config = {
 
 				padLeft			: 10,
 				padTop			: 10,
+				audioHeight		: 25,
 
 				lineHeight 		: 25,
 				handleWidth		: 10,
@@ -158,6 +160,9 @@ define(
 
 			this.scrollX = 0;
 			this.maxX = 0;
+
+			// Setup audio
+			this.setupNarration();
 
 			// Setup header
 			this.canvasHead.mousemove((function(e) {
@@ -527,7 +532,51 @@ define(
 		TimelineUI.prototype.clear = function() {
 			this.elements = [];
 			this.elmSide.empty();
+			this.setupNarration();
 			this.redraw();
+		}
+
+		TimelineUI.prototype.setupNarration = function() {
+			// Create handle
+			this.elmAudioHandle = $('<div class="tl-handle"><span class="glyphicon glyphicon-volume-up"></span> Narration</div>');
+			this.elmSide.append( this.elmAudioHandle );
+		}
+
+		TimelineUI.prototype.regenNarration = function(text, voice, cb) {
+
+			// Prepare parameters
+			var urlParams = {
+				'prot_vers' 	: 2,
+				'cl_env' 		: 'PHP_APACHE_2.2.15_CENTOS',
+				'cl_vers' 		: '1-30',
+				'cl_login' 		: Config['acapela'].login,
+				'cl_app' 		: Config['acapela'].app,
+				'cl_pwd' 		: Config['acapela'].password,
+				'req_type' 		: 'NEW',
+				'req_snd_type' 	: Config['acapela'].soundType,
+				'req_voice' 	: voice,
+				'req_text' 		: text,
+				'req_asw_type' 	: 'INFO',
+
+				// Word sync info
+				'req_wp' 		: 'ON'
+			};
+
+			// 
+			$.ajax({
+				type: "POST",
+				url: Config['acapela'].baseURL,
+				data: urlParams
+			})
+			.done((function( data, textStatus, jqXHR ) {
+				
+				console.log(data);
+
+			}).bind(this))
+			.fail((function( jqXHR, textStatus, errorThrown ) {
+				if (cb) cb(false);
+			}).bind(this));
+
 		}
 
 		TimelineUI.prototype.animate = function() {
@@ -567,7 +616,7 @@ define(
 		 * Return the element on the given Y coordinates
 		 */
 		TimelineUI.prototype.elementIndexFromY = function( yPos ) {
-			var y = this.config.padTop, rowHeight = this.config.lineHeight;
+			var y = this.config.padTop + this.config.audioHeight, rowHeight = this.config.lineHeight;
 			for (var i=0; i<this.elements.length; i++) {
 				var elmBottom = y + rowHeight - 0.5,
 					elmTop = y + 1.5;
@@ -885,7 +934,7 @@ define(
  			// Also calculate maxX
  			this.maxX = 0;
 
-			var y = this.config.padTop, rowHeight = this.config.lineHeight;
+			var y = this.config.padTop + this.config.audioHeight, rowHeight = this.config.lineHeight;
 			for (var i=0; i<this.elements.length; i++) {
 
 				var elmBottom = y + rowHeight - 0.5,

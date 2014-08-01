@@ -133,6 +133,21 @@ define(
 			$("#editor-btn-properties").click((function(e) { this.hotspots.setActive(false); }).bind(this));
 			$("#editor-btn-hotspots").click((function(e) { this.hotspots.setActive(true); }).bind(this));
 
+
+			$("#editor-speech").click((function(e) {
+				$("#editor-speech").prop("disabled", "disabled")
+								   .html("Updating ...");
+
+				this.timelineUI.regenNarration( $("#editor-speech-text").val(), $("#editor-speech-voice").val(), function(status) {
+					if (status) {
+						$("#editor-speech").prop("disabled", "")
+										   .html("Update narration");
+						$("#editor-modal-speech").modal('hide');
+					}
+				})
+
+			}).bind(this));
+
 			cb();
 
 		}
