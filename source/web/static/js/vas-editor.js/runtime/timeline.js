@@ -1,8 +1,8 @@
 define(
 
-	["jquery", "fabric", "tweenjs", "core/db"],
+	["jquery", "fabric", "tweenjs", "core/db", "core/config"],
 
-	function($, fabric, createjs, DB) {
+	function($, fabric, createjs, DB, Config) {
 
 		/**
 		 * Initialize the sprite animation runtime
@@ -12,12 +12,57 @@ define(
 		var Timeline = function( canvas ) {
 			createjs.Timeline.call( this );
 			this.canvas = canvas;
+			this.audioElement = null;
 			this.gotoAndStop(0);
 		};
 
 		// Subclass from createjs.Timeline because we are using most of it's
 		// properties as-is.
 		Timeline.prototype = Object.create( createjs.Timeline.prototype );
+
+		/**
+		 * Overload gotoAndPlay in order to forward the audio element too
+		 */
+		Timeline.prototype.gotoAndPlay = function( pos ) {
+			createjs.Timeline.prototype.gotoAndPlay.call( this, pos );
+			if (!this.audioElement) return;
+
+			// Seek and play audio
+			this.audioElement.pause();
+			this.audioElement.currentTime = pos/1000;
+			this.audioElement.play();
+
+		}
+
+		/**
+		 * Overload gotoAndStop in order to seek the audio element too
+		 */
+		Timeline.prototype.gotoAndStop = function( pos ) {
+			createjs.Timeline.prototype.gotoAndStop.call( this, pos );
+			if (!this.audioElement) return;
+
+			// Seek & Stop audio
+			this.audioElement.pause();
+			this.audioElement.currentTime = pos/1000;
+
+		}
+
+		/**
+		 * Overload setPaused in order to pause/resume the audio element too
+		 */
+		Timeline.prototype.setPaused = function( paused ) {
+			createjs.Timeline.prototype.setPaused.call( this, paused );
+			if (!this.audioElement) return;
+
+			// Pause/resume audio
+			this.audioElement.currentTime = this.position/1000;
+			if (paused) {
+				this.audioElement.play();
+			} else {
+				this.audioElement.pause();
+			}
+	
+		}
 
 		/**
 		 * Helper function to build a tween using the given animation definition
@@ -61,6 +106,52 @@ define(
 
 			// As the last step on the tween, hide
 			return tween;
+		}
+
+		/**
+		 * Helper function to setup the audio element with various audio sources
+		 */
+		Timeline.prototype.setupAudio = function(baseURL, cbReady) {
+
+			// Remove previous instance
+			if (!this.audioElement) {
+				this.audioElement = document.createElement('audio');
+				window.document.body.appendChild( this.audioElement );
+			}
+
+			// If we don't have a baseURL, reset audio
+			if (!baseURL) {
+				this.audioElement.src = "";
+				this.audioElement = null;
+				return;
+			}
+
+			// Regen the audio element
+			this.audioElement = document.createElement('audio');
+
+			// Lookup the appropriate audio source
+			var src = document.createElement('source');
+			if (this.audioElement.canPlayType("audio/mpeg;")) {
+				src.type = 'audio/mpeg';
+				src.src = baseURL + '.mp3';
+			} else {
+				src.type = 'audio/ogg';
+				src.src = baseURL + '.ogg';
+			}
+			this.audioElement.appendChild(src);
+
+			// Start preloading
+			this.audioElement.addEventListener('canplaythrough', (function(e) {
+				if (cbReady) cbReady(true);
+			}).bind(this));
+			this.audioElement.addEventListener('error', (function(e) {
+				if (cbReady) cbReady(false);
+			}).bind(this));
+			this.audioElement.load();
+
+			// Pause audio
+			this.audioElement.pause();
+
 		}
 
 		/**

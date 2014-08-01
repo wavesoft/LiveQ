@@ -50,14 +50,11 @@ define({
 	},
 
 	/**
-	 * Acapela VAAS
+	 * Voice API
 	 */
-	'acapela': {
-		'baseURL'	: "http://vaas.acapela-group.com/Services/Synthesizer",
-		'login'     : "EVAL_VAAS",
-		'app'       : "EVAL_6221618",
-		'password'  : "vuzullyh",
-		'soundType' : "WAV"
+	'voiceapi': {
+		'baseURL'	: "//test4theory.cern.ch/voiceapi",
+		'api_key'	: "9b7b04b2ebc87af8723d09b4123f1c8fe62dad75"
 	}
 
 });

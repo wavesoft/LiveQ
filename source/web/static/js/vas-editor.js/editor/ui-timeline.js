@@ -162,7 +162,12 @@ define(
 			this.maxX = 0;
 
 			// Setup audio
-			this.setupNarration();
+			this.narration = {
+				'available' : false,
+				'duration'  : 0,
+				'words'     : []
+			};
+			this.resetNarration();
 
 			// Setup header
 			this.canvasHead.mousemove((function(e) {
@@ -532,48 +537,91 @@ define(
 		TimelineUI.prototype.clear = function() {
 			this.elements = [];
 			this.elmSide.empty();
-			this.setupNarration();
+			this.resetNarration();
 			this.redraw();
 		}
 
-		TimelineUI.prototype.setupNarration = function() {
+		TimelineUI.prototype.resetNarration = function() {
 			// Create handle
 			this.elmAudioHandle = $('<div class="tl-handle"><span class="glyphicon glyphicon-volume-up"></span> Narration</div>');
 			this.elmSide.append( this.elmAudioHandle );
+
+			// Reset narration data
+			this.narration = {
+				'available' : false,
+				'duration'  : 0,
+				'words'     : []
+			};
 		}
+
+		TimelineUI.prototype.setupNarration = function( data ) {
+
+			// Reset if no data
+			if (!data) {
+				// Remove audio from timeline
+				this.timeline.setupAudio(null);
+				// Narration is not available
+				this.narration.available = false;
+				this.redraw();
+				return;				
+			}
+
+			// Update narration record
+			this.narration.words = data['words'];
+			this.narration.duration = data['duration'];
+			this.narration.available = true;
+
+			// Setup audio on timeline
+			this.timeline.setupAudio(data['base_url']);
+
+			// Redraw
+			this.redraw();
+
+		}
+
+		TimelineUI.prototype.loadNarration = function(id, cb) {
+
+			// Fetch narration record by ID
+			$.ajax({
+				type: "GET",
+				url: Config['voiceapi'].baseURL+"/index.php",
+				dataType: 'json',
+				data: {
+					'get': id,
+					'api_key': Config['voiceapi'].api_key
+				}
+			})
+			.done((function( data, textStatus, jqXHR ) {
+				this.setupNarration(data);
+				if (cb) cb(true);
+			}).bind(this))
+			.fail((function( jqXHR, textStatus, errorThrown ) {
+				this.setupNarration(false);
+				if (cb) cb(false);
+			}).bind(this));
+
+		}
+
 
 		TimelineUI.prototype.regenNarration = function(text, voice, cb) {
 
-			// Prepare parameters
-			var urlParams = {
-				'prot_vers' 	: 2,
-				'cl_env' 		: 'PHP_APACHE_2.2.15_CENTOS',
-				'cl_vers' 		: '1-30',
-				'cl_login' 		: Config['acapela'].login,
-				'cl_app' 		: Config['acapela'].app,
-				'cl_pwd' 		: Config['acapela'].password,
-				'req_type' 		: 'NEW',
-				'req_snd_type' 	: Config['acapela'].soundType,
-				'req_voice' 	: voice,
-				'req_text' 		: text,
-				'req_asw_type' 	: 'INFO',
-
-				// Word sync info
-				'req_wp' 		: 'ON'
-			};
-
-			// 
+			// Request narration through VoiceAPI
 			$.ajax({
-				type: "POST",
-				url: Config['acapela'].baseURL,
-				data: urlParams
+				type: "GET",
+				url: Config['voiceapi'].baseURL+"/index.php",
+				dataType: 'json',
+				data: {
+					'text': text,
+					'voice': voice,
+					'api_key': Config['voiceapi'].api_key
+				}
 			})
 			.done((function( data, textStatus, jqXHR ) {
-				
-				console.log(data);
-
+				this.setupNarration(data);
+				if (cb) cb(true);
 			}).bind(this))
 			.fail((function( jqXHR, textStatus, errorThrown ) {
+				this.setupNarration(false);
 				if (cb) cb(false);
 			}).bind(this));
 
@@ -776,6 +824,7 @@ define(
 			// Redraw canvas components
 			this.drawGrid		( this.context );
 			this.drawElements	( this.context ); // <- maxX gets updated here
+			this.drawNarration	( this.context );
 			this.drawTimeline	( this.context );
 			this.drawHeader		( this.contextHead );
 			this.drawPreview 	( this.contextFooter );
@@ -783,6 +832,67 @@ define(
 			// Update status label
 			if (this.timeline)
 				this.elmStatus.html( "<strong>"+this.formatTime(this.timeline.position) + "</strong> / " + this.formatTime(this.timeline.duration) );
+
+		}
+
+		/**
+		 * Draw the narration information
+		 */
+		TimelineUI.prototype.drawNarration = function(ctx) {
+			if (!this.narration.available) return;
+
+			// Draw chunk
+			var colors = [ '#9b59b6', '#8e44ad' ], c = 0;
+			var drawChunk = (function(tStart, tEnd, text) {
+				var pxStart = this.time2pixels( tStart ),
+					pxEnd = this.time2pixels( tEnd ),
+					cBack = colors[c],
+					cBorder = '#8e44ad',
+					cFront = '#999';
+
+				if ((this.timeline.position >= startX) && (this.timeline.position <= endX)) {
+					cBack = '#f39c12';
+					cBorder = '#e67e22';
+					cFront = '#FFF';
+				}
+
+				// Draw rect
+				ctx.fillStyle = cBack;
+				ctx.strokeStyle = cBorder;
+				ctx.beginPath();
+				ctx.rect(pxStart, this.config.padTop, pxEnd - pxStart, this.config.audioHeight );
+				ctx.fill();
+				ctx.stroke();
+
+				// Draw text
+				ctx.fillStyle = cFront;
+				ctx.font = "10px sans-serif";
+				ctx.fillText( text, pxStart+2, this.config.padTop+this.config.audioHeight-4 );
+
+				// Iterate colors
+				if (++c>1) c=0;
+
+			}).bind(this);
+
+			// Draw the Narration word chunks
+			var startX=0, endX=0, first=true, lastWord="";
+			for (var i=0; i<this.narration.words.length; i++) {
+				var w = this.narration.words[i];
+					endX = parseInt(w[0]);
+
+				if (first) {
+					first = false;
+				} else {
+					drawChunk(startX, endX, lastWord);
+					startX = endX;
+				}
+
+				lastWord = w[1];
+
+			}
+
+			// Draw last word
+			drawChunk(startX, this.narration.duration-startX, lastWord);
 
 		}
 

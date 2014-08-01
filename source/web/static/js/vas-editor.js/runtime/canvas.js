@@ -51,8 +51,14 @@ define(
 				// Redraw canvas
 				this.canvasFabric.renderAll();
 
-				// Fire ready
-				if (onReady) onReady();
+				// Initialize timeline audio
+				if (json['audio_url']) {
+					// Setup audio and fire onReady when audio is loaded
+					this.timeline.setupAudio( json['audio_url'], onReady );
+				} else {
+					// Fire ready
+					if (onReady) onReady();
+				}
 
 			}).bind(this);
 
