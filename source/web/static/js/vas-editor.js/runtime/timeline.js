@@ -294,7 +294,8 @@ define(
 							this.__object['set'+propName]( value );
 							if (this.__onUpdate) this.__onUpdate();
 						}
-					})(ccName).bind(this)
+					})(ccName).bind(this),
+					configurable: true
 				};
 			}
 

@@ -38,30 +38,29 @@ define(
 			}).bind(this));
 
 			canvas.on('mouse:down', (function(ev) {
-				if (this.canvas.getActiveObject() != null) {
-					this.__objectSelected( this.canvas.getActiveObject() );
-				}
+				var sel = this.getSelection();
+				if (sel.length > 0) 
+					this.__selectionChanged( sel );
 			}).bind(this));
 
 			canvas.on('object:modified', (function(ev) {
-				var targets = [ev.target];
-				if (ev.target.objects != undefined)
-					targets = ev.target.objects;
-
+				var targets = this.getSelection();
 				for (var i=0; i<targets.length; i++) {
-					var timelineElement = this.timeline.elementFromFabricObject( targets[i] );
-					if (timelineElement)
-						this.timeline.setKeyframe( timelineElement );
+					this.timeline.setKeyframe( targets[i] );
 				}
 
 			}).bind(this));
 
 			canvas.on('object:selected', (function(ev) {
-				this.timelineUI.selectByCanvasObject( ev.target );
-				this.__objectSelected( ev.target );
+				this.__selectionChanged( this.getSelection() );
+			}).bind(this));
+
+			canvas.on('selection:created', (function(ev) {
+				this.__selectionChanged( this.getSelection() );
 			}).bind(this));
 
 			canvas.on('selection:cleared', (function(ev) {
+				this.timeline.releaseGroup();
 				this.timelineUI.selectByCanvasObject( null );
 				this.propertiesUI.show( null );
 			}).bind(this));
@@ -131,7 +130,7 @@ define(
 		EditableCanvas.prototype.remove = function( elm ) {
 			if (!elm) return;
 
-			// If this was an active object, unselect properties
+			// If this was an active object, unselect propertiesf
 			var ao = this.canvas.getActiveObject();
 			if (elm.__object == ao) {
 				this.propertiesUI.show( null );
@@ -210,12 +209,12 @@ define(
 				list = [];
 
 			if (!ag && !ao) return [];
-			if (ag) list=ag.objects;
+			if (ag) list=ag._objects;
 			if (ao) list=[ao];
 
 			var elements = [];
 			for (var i=0; i<list.length; i++) {
-				var elm = this.timeline.elementFromFabricObject( list[i] );
+				var elm = this.timeline.elementFromFabricObject( list[i], ag );
 				if (elm) elements.push(elm);
 			}
 
@@ -226,6 +225,7 @@ define(
 		EditableCanvas.prototype.selectObject = function(o) {
 
 			// Discard selection
+			this.timeline.releaseGroup();
 			this.canvas.discardActiveGroup();
 			if (o == null) {
 				this.canvas.discardActiveObject();
@@ -235,24 +235,35 @@ define(
 			// Select object
 			this.canvas.setActiveObject(o);
 			if (this.canvas.getActiveObject()) {
-				this.__objectSelected(o);
+				this.__selectionChanged( this.timeline.elementFromFabricObject(o) );
 			}
 
 		}
 
-		EditableCanvas.prototype.__objectSelected = function(o) {
+		EditableCanvas.prototype.__selectionChanged = function(o) {
+			
+			// Make sure selection is an array
+			var selection = o;
+			if (!(selection instanceof Array)) selection = [o];
 
-			var timelineElement = this.timeline.elementFromFabricObject( o );
-			this.propertiesUI.show( timelineElement, (function() {
+			// Select objects
+			this.timelineUI.selectByElement( selection[0], false );
+
+			// Show properties
+			this.propertiesUI.show( selection, (function() {
 
 				// Bugfix for aligning the controls
-				timelineElement.__object.setCoords();
+				for (var i=0; i<selection.length; i++) {
+					selection[i].__object.setCoords();
+				}
 
 				// Update UI
 				this.canvas.renderAll();
 
 				// Take keyframe
-				this.timeline.setKeyframe( timelineElement );
+				for (var i=0; i<selection.length; i++) {
+					this.timeline.setKeyframe( selection[i] );
+				}
 
 			}).bind(this) );
 

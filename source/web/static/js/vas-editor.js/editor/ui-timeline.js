@@ -11,6 +11,7 @@ define(
 			this.hostDOM = $(hostDOM);
 			this.propUI = propUI;
 			this.scale = 0.1; // 100 pixels -> 1 sec
+			this.lockUpdate = false;
 			window.tui = this;
 
 			// Configuration
@@ -204,7 +205,9 @@ define(
 
 					// Update position
 					if (!this.timeline) return;
-					this.timeline.scrollPosition( time );
+					this.lockUpdate = true;
+					this.timeline.gotoAndStop( time );
+					this.redraw();
 
 				}
 
@@ -225,7 +228,8 @@ define(
 				this.mouseDragX = mouseX;
 
 				// Update timeline position
-				this.timeline.scrollPosition( this.pixels2time( this.mouseDragValue ) );
+				this.lockUpdate = true;
+				this.timeline.gotoAndStop( this.pixels2time( this.mouseDragValue ) );
 
 				// Switch to timeline drag
 				this.mouseDragMode = 3;
@@ -273,7 +277,8 @@ define(
 
 					// Update position
 					if (!this.timeline) return;
-					this.timeline.scrollPosition( time );
+					this.lockUpdate = true;
+					this.timeline.gotoAndStop( time );
 
 
 				//
@@ -430,7 +435,8 @@ define(
 
 					// Update position
 					if (!this.timeline) return;
-					this.timeline.scrollPosition( time );
+					this.lockUpdate = true;
+					this.timeline.gotoAndStop( time );
 
 
 				//
@@ -468,7 +474,8 @@ define(
 						// Update position
 						if (!this.timeline) return;
 						this.activeAnchor = -1;
-						this.timeline.scrollPosition( this.pixels2time( this.mouseDragValue ) );
+						this.lockUpdate = true;
+						this.timeline.gotoAndStop( this.pixels2time( this.mouseDragValue ) );
 						this.propUI.show( new TimelineUI.KeyframeWrapper( this, this.elements[this.hoverElement], this.hoverAnchor ) );
 
 					} else if (this.mouseDragMode == 2) {
@@ -529,7 +536,8 @@ define(
 
 				// If we are dragging the timeline cursor, snap to time
 				else if (this.mouseDragMode == 3) {
-					this.timeline.scrollPosition( this.timeline.snapTime( this.timeline.position ) );					
+					this.lockUpdate = true;
+					this.timeline.gotoAndStop( this.timeline.snapTime( this.timeline.position ) );					
 				}
 
 				// Stop dragging
@@ -697,10 +705,10 @@ define(
 			this.activeAnchor = -1;
 		}
 
-		TimelineUI.prototype.selectByElement = function( elm ) {
+		TimelineUI.prototype.selectByElement = function( elm, fireUpdate ) {
 			for (var i=0; i<this.elements.length; i++) {
 				if (this.elements[i] == elm) {
-					this.selectRow(i, true);
+					this.selectRow(i, (fireUpdate==undefined) ? true : fireUpdate );
 					return;
 				}
 			}
@@ -730,8 +738,44 @@ define(
 
 		}
 
+		TimelineUI.prototype.wrapView = function(wrapPos) {
+
+			// Calculate position frame bounds					
+			var w = this.canvasFooter.width() - this.config.padLeft - this.config.handleWidth,
+				sceneWidthMs = Math.max(this.timeline.duration, w / this.timeScale),
+				sceneWidthPx = sceneWidthMs * this.timeScale,
+				wScaleMs = w / sceneWidthMs,
+				wScalePx = w / sceneWidthPx,
+				pFrameLeft = -this.scrollX * wScalePx + this.config.padLeft,
+				pFrameWidth = w * wScalePx;
+				if (pFrameWidth+pFrameLeft > w) pFrameWidth = w-pFrameLeft;
+
+			// Check if we have gone out of frame
+			var currLeft = this.timeline.position * wScaleMs,
+				wrapLeft = pFrameLeft + pFrameWidth * wrapPos;
+				wrapRight = pFrameLeft + pFrameWidth * (1-wrapPos);
+			if ((currLeft > wrapLeft) || (currLeft < wrapRight)) {
+				this.scrollX = (this.config.padLeft - currLeft + pFrameWidth * (1-wrapPos)) / wScalePx;
+				if (this.scrollX > 0) this.scrollX = 0;
+			}
+
+
+		}
+
 		TimelineUI.prototype.setTimeline = function( timeline ) {
 			this.timeline = timeline;
+			this.timeline.addEventListener('change', (function() {
+
+				// Ignore changes that we triggered
+				if (this.lockUpdate) {
+					this.lockUpdate = false;
+				} else {
+					// If timeline has gone out of view, wrap it
+					this.wrapView(0.5);
+				}
+
+			}).bind(this));
+
 			this.redraw();
 		}
 
@@ -863,7 +907,7 @@ define(
 					cBorder = '#8e44ad',
 					cFront = '#999';
 
-				if ((this.timeline.position >= startX) && (this.timeline.position <= endX)) {
+				if ((this.timeline.position >= tStart) && (this.timeline.position <= tEnd)) {
 					cBack = '#f39c12';
 					cBorder = '#e67e22';
 					cFront = '#FFF';
@@ -905,7 +949,7 @@ define(
 			}
 
 			// Draw last word
-			drawChunk(startX, this.narration.duration-startX, lastWord);
+			drawChunk(startX, this.narration.duration, lastWord);
 
 		}
 
@@ -1219,6 +1263,7 @@ define(
 		TimelineUI.TweenPropertiesWrapper = function( tui, elm, keyframeIndex ) {
 			this.elm = elm;
 			this.kfIndex = keyframeIndex;
+			this.__object = this;
 
 			Object.defineProperties(this, {
 				'easing': {
@@ -1265,6 +1310,7 @@ define(
 			this.elm = elm;
 			this.tui = tui;
 			this.kfIndex = keyframeIndex;
+			this.__object = this;
 
 			Object.defineProperties(this, {
 				'position': {

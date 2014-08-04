@@ -359,7 +359,6 @@ define(
 		 * Display/Manage the properties of the specified object
 		 */
 		PropertiesUI.prototype.show = function( obj, updateCallback ) {
-			window.o = obj;
 
 			// Reset
 			this.lastPropValues = { };
@@ -376,11 +375,22 @@ define(
 				return;
 			}
 
+			// Check if all objects selected derrive from the same class
+			var selection = obj;
+			if (!(selection instanceof Array)) selection = [obj];
+			var firstObject = selection[0];
+			for (var i=0; i<selection.length; i++) {
+				if (!(selection[i].__object instanceof firstObject.__object.constructor)) {
+					this.headerElm.text('<Different Objects>');
+					return;
+				}
+			}
+
 			// Pick property configuration according to class
 			for (var i=0; i<this.propertyClasses.length; i++) {
-				var objInst = obj;
+				var objInst = selection[0];
 				if (this.propertyClasses[i].detectProp)
-					objInst = obj[ this.propertyClasses[i].detectProp ];
+					objInst = objInst[ this.propertyClasses[i].detectProp ];
 
 				if (objInst instanceof this.propertyClasses[i].classType) {
 					var propInfo = this.propertyClasses[i];
@@ -390,19 +400,19 @@ define(
 						var prop = propInfo.properties[j], elm;
 
 						if (prop.type == 'int') {
-							this.bodyElm.append( this.createTextWidget( obj, prop, true ) );
+							this.bodyElm.append( this.createTextWidget( selection, prop, true ) );
 						} else if (prop.type == 'string') {
-							this.bodyElm.append( this.createTextWidget( obj, prop ) );
+							this.bodyElm.append( this.createTextWidget( selection, prop ) );
 						} else if (prop.type == 'col') {
-							this.bodyElm.append( this.createColorWidget( obj, prop ) );
+							this.bodyElm.append( this.createColorWidget( selection, prop ) );
 						} else if (prop.type == 'opt') {
-							this.bodyElm.append( this.createOptionsWidget( obj, prop ) );
+							this.bodyElm.append( this.createOptionsWidget( selection, prop ) );
 						} else if (prop.type == 'sel') {
-							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
+							this.bodyElm.append( this.createButtonWidget( selection, prop ) );
 						} else if (prop.type == 'btn') {
-							this.bodyElm.append( this.createButtonWidget( obj, prop ) );
+							this.bodyElm.append( this.createButtonWidget( selection, prop ) );
 						} else if (prop.type == 'bool') {
-							this.bodyElm.append( this.createBooleanWidget( obj, prop ) );
+							this.bodyElm.append( this.createBooleanWidget( selection, prop ) );
 						}
 
 					}
@@ -463,16 +473,18 @@ define(
 		/**
 		 * Crate a boolean widget
 		 */
-		PropertiesUI.prototype.createBooleanWidget = function( obj, propInfo ) {
+		PropertiesUI.prototype.createBooleanWidget = function( sel, propInfo ) {
 			var boolInput = $('<input type="checkbox">');
 
 			boolInput.change((function(e) {
 
 				// Apply
-				if (boolInput.is(":checked")) {
-					obj[ propInfo.prop ] = true;
-				} else {
-					obj[ propInfo.prop ] = false;
+				for (var i=0; i<sel.length; i++) {
+					if (boolInput.is(":checked")) {
+						sel[i][ propInfo.prop ] = true;
+					} else {
+						sel[i][ propInfo.prop ] = false;
+					}
 				}
 
 				// Fire the change callback
@@ -481,7 +493,7 @@ define(
 
 			}).bind(this));
 
-			this.monitorChange( obj, propInfo, function(v) {
+			this.monitorChange( sel[0], propInfo, function(v) {
 				boolInput.attr("checked", !!v);
 			});
 
@@ -491,7 +503,7 @@ define(
 		/**
 		 * Create options widget
 		 */
-		PropertiesUI.prototype.createOptionsWidget = function( obj, propInfo ) {
+		PropertiesUI.prototype.createOptionsWidget = function( sel, propInfo ) {
 			var selInput = $('<select class="form-control input-sm"></select>');
 			for (var i=0; i<propInfo.vals.length; i++) {
 				var e = $('<option></option>');
@@ -503,7 +515,8 @@ define(
 			selInput.change((function() {
 
 				// Apply
-				obj[ propInfo.prop ] = selInput.val();
+				for (var i=0; i<sel.length; i++)
+					sel[i][ propInfo.prop ] = selInput.val();
 
 				// Fire the change callback
 				if (this.updateCallback)
@@ -511,7 +524,7 @@ define(
 
 			}).bind(this));
 
-			this.monitorChange( obj, propInfo, function(v) {
+			this.monitorChange( sel[0], propInfo, function(v) {
 				selInput.val( v );
 			});
 
@@ -522,7 +535,7 @@ define(
 		/**
 		 * Create a new color property widget
 		 */
-		PropertiesUI.prototype.createColorWidget = function( obj, propInfo ) {
+		PropertiesUI.prototype.createColorWidget = function( sel, propInfo ) {
 			var elmCP = $('<div class="cp-small" id="widget'+(++widgetID)+'"></div>'),
 				elmInput = $('<input type="text" class="form-control input-sm" />');
 				elmWrap = $('<div></div>');
@@ -534,7 +547,8 @@ define(
 					if (lockUpdate) return;
 
 					// Apply
-					obj[ propInfo.prop ] = hex;
+					for (var i=0; i<sel.length; i++)
+						sel[i][ propInfo.prop ] = hex;
 
 					// Update text
 					elmInput.val( hex );
@@ -546,7 +560,7 @@ define(
 				}).bind(this)
 			);
 
-			this.monitorChange( obj, propInfo, function(v) {
+			this.monitorChange( sel[0], propInfo, function(v) {
 				if (!v) return;
 				lockUpdate = true;
 				cp.setHex( v );
@@ -558,7 +572,8 @@ define(
 
 				// Apply
 				var v = elmInput.val();
-				obj[ propInfo.prop ] = v;
+				for (var i=0; i<sel.length; i++)
+					sel[i][ propInfo.prop ] = v;
 				lockUpdate = true;
 				cp.setHex( v );
 				lockUpdate = false;
@@ -578,10 +593,10 @@ define(
 		/**
 		 * Create a new text property widget
 		 */
-		PropertiesUI.prototype.createTextWidget = function( obj, propInfo, numeric ) {
+		PropertiesUI.prototype.createTextWidget = function( sel, propInfo, numeric ) {
 			var intInput = $('<input type="text" class="form-control input-sm" />');
 
-			this.monitorChange( obj, propInfo, function(v) {
+			this.monitorChange( sel[0], propInfo, function(v) {
 				intInput.val( v );
 			});
 
@@ -594,10 +609,12 @@ define(
 					intInput[0].setSelectionRange(0, intInput[0].value.length)
 
 					// Apply
-					if (numeric) {
-						obj[ propInfo.prop ] = Number(intInput.val());
-					} else {
-						obj[ propInfo.prop ] = intInput.val();
+					for (var i=0; i<sel.length; i++) {
+						if (numeric) {
+							sel[i][ propInfo.prop ] = Number(intInput.val());
+						} else {
+							sel[i][ propInfo.prop ] = intInput.val();
+						}
 					}
 
 					// Fire the change callback
@@ -610,10 +627,12 @@ define(
 			intInput.blur((function(e) {
 
 				// Apply
-				if (numeric) {
-					obj[ propInfo.prop ] = Number(intInput.val());
-				} else {
-					obj[ propInfo.prop ] = intInput.val();
+				for (var i=0; i<sel.length; i++) {
+					if (numeric) {
+						sel[i][ propInfo.prop ] = Number(intInput.val());
+					} else {
+						sel[i][ propInfo.prop ] = intInput.val();
+					}
 				}
 
 				// Fire the change callback

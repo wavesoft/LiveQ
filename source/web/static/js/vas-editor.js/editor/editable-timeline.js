@@ -15,10 +15,66 @@ define(
 			this.__keyframes = [ ];
 			this.__tweenRef = null;
 			this.__runtime = runtime;
+			this.__group = null;
+
+			// Properties where we should add group properties
+			this.__groupProperties = ['Left','Top'];
+
+			//
+			// Redefine passthrough properties in order to include group support
+			//
+			var config = { };
+			for (var i=0; i<this.__propertyNames.length; i++) {
+				
+				// Skip dynamic properties
+				if (this.__propertyNames[i] == "progression")
+					continue;
+
+				// Convert to camel case
+				var ccName = this.__propertyNames[i][0].toUpperCase() +
+							 this.__propertyNames[i].substr(1);
+
+				// Pass-through the reset
+				config[this.__propertyNames[i]] = {
+					get: (function(propName) { 
+						return function() {
+							if (!this.__group) {
+								return this.__object['get'+propName]();
+							} else {
+								var n = this.__object['get'+propName]();
+								if (this.__groupProperties.indexOf(propName) > -1)
+									n += this.__group['get'+propName]();
+								return n;
+							}
+						}
+					})(ccName).bind(this),
+					set: (function(propName) { 
+						return function(value) {
+							if (!this.__group) {
+								this.__object['set'+propName]( value );
+							} else {
+								if (this.__groupProperties.indexOf(propName) > -1)
+									value -= this.__group['get'+propName]();
+								this.__object['set'+propName]( value );
+							}
+							if (this.__onUpdate) this.__onUpdate();
+						}
+					})(ccName).bind(this)
+				};
+			}
+			Object.defineProperties(this, config);
+
 		}
 
 		// Subclass from Timeline.SpriteObject
 		EditableElement.prototype = Object.create( Timeline.Element.prototype );
+
+		/**
+		 * Update object's group
+		 */
+		EditableElement.prototype.setGroup = function(g) {
+			this.__group = g;
+		}
 
 		/**
 		 * Update object's reflection on the runtime
@@ -203,12 +259,23 @@ define(
 		}
 
 		/**
+		 * Release group information from all objects
+		 */
+		EditableTimeline.prototype.releaseGroup = function() {
+			for (var i=0; i<this.editableObjects.length; i++) {
+				this.editableObjects[i].__group = null;
+			}
+		}
+
+		/**
 		 * Lookup element from the fabric.js object
 		 */
-		EditableTimeline.prototype.elementFromFabricObject = function( obj ) {
+		EditableTimeline.prototype.elementFromFabricObject = function( obj, group ) {
 			for (var i=0; i<this.editableObjects.length; i++) {
-				if (this.editableObjects[i].__object == obj)
+				if (this.editableObjects[i].__object == obj) {
+					this.editableObjects[i].setGroup(group);
 					return this.editableObjects[i];
+				}
 			}
 			return null;
 		}
