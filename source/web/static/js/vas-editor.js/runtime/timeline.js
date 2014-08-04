@@ -13,6 +13,7 @@ define(
 			createjs.Timeline.call( this );
 			this.canvas = canvas;
 			this.audioElement = null;
+			this.audioTween = null;
 			this.gotoAndStop(0);
 		};
 
@@ -28,9 +29,8 @@ define(
 			if (!this.audioElement) return;
 
 			// Seek and play audio
-			this.audioElement.pause();
 			this.audioElement.currentTime = pos/1000;
-			this.audioElement.play();
+			if (this.audioElement.paused) this.audioElement.play();
 
 		}
 
@@ -42,7 +42,7 @@ define(
 			if (!this.audioElement) return;
 
 			// Seek & Stop audio
-			this.audioElement.pause();
+			if (!this.audioElement.paused) this.audioElement.pause();
 			this.audioElement.currentTime = pos/1000;
 
 		}
@@ -55,11 +55,11 @@ define(
 			if (!this.audioElement) return;
 
 			// Pause/resume audio
-			this.audioElement.currentTime = this.position/1000;
+			//this.audioElement.currentTime = this.position/1000;
 			if (paused) {
-				this.audioElement.play();
-			} else {
 				this.audioElement.pause();
+			} else {
+				this.audioElement.play();
 			}
 	
 		}
@@ -113,21 +113,29 @@ define(
 		 */
 		Timeline.prototype.setupAudio = function(baseURL, cbReady) {
 
-			// Remove previous instance
-			if (!this.audioElement) {
-				this.audioElement = document.createElement('audio');
-				window.document.body.appendChild( this.audioElement );
+			// Remove previous instances
+			if (this.audioElement) {
+				this.audioElement.src = "";
+				this.canvas.wrapperEl.removeChild( this.audioElement );
+				this.removeTween( this.audioTween );
 			}
 
 			// If we don't have a baseURL, reset audio
 			if (!baseURL) {
 				this.audioElement.src = "";
 				this.audioElement = null;
+				if (this.audioTween) {
+					this.removeTween( this.audioTween );
+					this.audioTween = null;
+				}
 				return;
 			}
 
 			// Regen the audio element
 			this.audioElement = document.createElement('audio');
+			this.audioElement.loop = true;
+			this.audioElement.preload = "auto";
+			this.canvas.wrapperEl.appendChild( this.audioElement );
 
 			// Lookup the appropriate audio source
 			var src = document.createElement('source');
@@ -142,7 +150,17 @@ define(
 
 			// Start preloading
 			this.audioElement.addEventListener('canplaythrough', (function(e) {
+
+				// Create new empty audio tween (for definining the minimal timeline length)
+				var duration = Math.round(this.audioElement.duration * 1000);
+				this.audioTween = createjs.Tween.get({}, {override:true, paused:true, position:0})
+										.wait(duration)
+										.to({}, 0);
+				this.addTween( this.audioTween );
+
+				// Fire callback
 				if (cbReady) cbReady(true);
+
 			}).bind(this));
 			this.audioElement.addEventListener('error', (function(e) {
 				if (cbReady) cbReady(false);

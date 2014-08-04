@@ -171,8 +171,10 @@ define(
 
 			// Setup header
 			this.canvasHead.mousemove((function(e) {
-				var mouseY = e.offsetY,
-					mouseX = e.offsetX;
+				var target = e.target || e.srcElement,
+					rect = target.getBoundingClientRect(),
+					mouseX = e.clientX - rect.left,
+					mouseY = e.clientY - rect.top;
 
 				// This only functions when we have a timeline
 				if (!this.timeline) return;
@@ -209,8 +211,11 @@ define(
 			}).bind(this));
 
 			this.canvasHead.mousedown((function(e) {
-				var mouseY = e.offsetY,
-					mouseX = e.offsetX;
+				var target = e.target || e.srcElement,
+					rect = target.getBoundingClientRect(),
+					mouseX = e.clientX - rect.left,
+					mouseY = e.clientY - rect.top;
+
 
 				// This only functions when we have a timeline
 				if (!this.timeline) return;
@@ -228,8 +233,10 @@ define(
 			}).bind(this));
 
 			this.canvasFooter.mousemove((function(e) {
-				var mouseY = e.offsetY,
-					mouseX = e.offsetX;
+				var target = e.target || e.srcElement,
+					rect = target.getBoundingClientRect(),
+					mouseX = e.clientX - rect.left,
+					mouseY = e.clientY - rect.top;
 
 				// Calculate position frame bounds					
 				var w = this.canvasFooter.width() - this.config.padLeft - this.config.handleWidth,
@@ -285,8 +292,10 @@ define(
 			}).bind(this));
 
 			this.canvasFooter.mousedown((function(e) {
-				var mouseY = e.offsetY,
-					mouseX = e.offsetX;
+				var target = e.target || e.srcElement,
+					rect = target.getBoundingClientRect(),
+					mouseX = e.clientX - rect.left,
+					mouseY = e.clientY - rect.top;
 
 				if (e.button == 0) {
 					this.mouseDragMode = this.mousePossibleDragMode;
@@ -296,8 +305,10 @@ define(
 
 			// Setup mouse
 			this.canvasBody.mousemove((function(e) {
-				var mouseY = e.offsetY,
-					mouseX = e.offsetX;
+				var target = e.target || e.srcElement,
+					rect = target.getBoundingClientRect(),
+					mouseX = e.clientX - rect.left,
+					mouseY = e.clientY - rect.top;
 
 				//
 				// NO DRAGGING : Lookup possible drag modes
@@ -812,27 +823,29 @@ define(
 		 * Redraw all canvases
 		 */
 		TimelineUI.prototype.redraw = function() {
+			setTimeout((function() {
 
-			// Update canvas maximum height
-			var elementHeight = this.config.lineHeight * this.elements.length + 1;
-			this.canvasBody.attr('height', Math.max(this.canvasMinHeight, elementHeight) );
+				// Update canvas maximum height
+				var elementHeight = this.config.lineHeight * this.elements.length + 1;
+				this.canvasBody.attr('height', Math.max(this.canvasMinHeight, elementHeight) );
 
-			// Clear canvases
-			this.contextHead.clearRect( 0, 0, this.canvasHead.width(), this.canvasHead.height() );
-			this.contextFooter.clearRect( 0, 0, this.canvasFooter.width(), this.canvasFooter.height() );
+				// Clear canvases
+				this.contextHead.clearRect( 0, 0, this.canvasHead.width(), this.canvasHead.height() );
+				this.contextFooter.clearRect( 0, 0, this.canvasFooter.width(), this.canvasFooter.height() );
 
-			// Redraw canvas components
-			this.drawGrid		( this.context );
-			this.drawElements	( this.context ); // <- maxX gets updated here
-			this.drawNarration	( this.context );
-			this.drawTimeline	( this.context );
-			this.drawHeader		( this.contextHead );
-			this.drawPreview 	( this.contextFooter );
+				// Redraw canvas components
+				this.drawGrid		( this.context );
+				this.drawElements	( this.context ); // <- maxX gets updated here
+				this.drawNarration	( this.context );
+				this.drawTimeline	( this.context );
+				this.drawHeader		( this.contextHead );
+				this.drawPreview 	( this.contextFooter );
 
-			// Update status label
-			if (this.timeline)
-				this.elmStatus.html( "<strong>"+this.formatTime(this.timeline.position) + "</strong> / " + this.formatTime(this.timeline.duration) );
+				// Update status label
+				if (this.timeline)
+					this.elmStatus.html( "<strong>"+this.formatTime(this.timeline.position) + "</strong> / " + this.formatTime(this.timeline.duration) );
 
+			}).bind(this), 1);
 		}
 
 		/**
@@ -948,8 +961,8 @@ define(
 
 			// Timeline bar background
 			ctx.strokeStyle = '#BDC3C7';
- 			ctx.lineCap="round";
- 			ctx.lineWidth = 10;
+			ctx.lineCap="round";
+			ctx.lineWidth = 10;
 			ctx.beginPath();
 			ctx.moveTo( this.config.padLeft ,this.canvasHeadHeight/2);
 			ctx.lineTo(this.canvasWidth-5,this.canvasHeadHeight/2);
@@ -971,8 +984,8 @@ define(
 
 			// Timeline bar foreground
 			ctx.strokeStyle = '#2ECC71';
- 			ctx.lineCap="round";
- 			ctx.lineWidth = 10;
+			ctx.lineCap="round";
+			ctx.lineWidth = 10;
 			ctx.beginPath();
 			ctx.moveTo( this.config.padLeft, this.canvasHeadHeight/2);
 			ctx.lineTo( cursorPos, this.canvasHeadHeight/2);
@@ -1038,11 +1051,11 @@ define(
 		TimelineUI.prototype.drawElements = function(ctx) {
 
 			ctx.strokeStyle = '#ddd';
- 			ctx.lineCap="butt";
- 			ctx.lineWidth = 1;
+			ctx.lineCap="butt";
+			ctx.lineWidth = 1;
 
- 			// Also calculate maxX
- 			this.maxX = 0;
+			// Also calculate maxX
+			this.maxX = 0;
 
 			var y = this.config.padTop + this.config.audioHeight, rowHeight = this.config.lineHeight;
 			for (var i=0; i<this.elements.length; i++) {
