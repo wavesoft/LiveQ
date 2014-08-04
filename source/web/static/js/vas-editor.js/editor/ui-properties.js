@@ -134,23 +134,28 @@ define(
 							name: 'Delete Keyframe',
 							type: 'btn',
 							cls : 'btn-danger',
-							click: (function(kfw) {
-								if ( ((kfw.kfIndex > 0) && (kfw.kfIndex < kfw.elm.__keyframes.length-1)) || (kfw.elm.__keyframes.length>2) ) {
-									
-									// Delete keyframe
-									kfw.elm.__keyframes.splice( kfw.kfIndex, 1 );
-									kfw.elm.updateReflection();
+							click: (function(kfws) {
+								var doAlert = false;
+								for (var i=0; i<kfws.length; i++) {
+									var kfw = kfws[0];
+									if ( ((kfw.kfIndex > 0) && (kfw.kfIndex < kfw.elm.__keyframes.length-1)) || (kfw.elm.__keyframes.length>2) ) {
+										
+										// Delete keyframe
+										kfw.elm.__keyframes.splice( kfw.kfIndex, 1 );
+										kfw.elm.updateReflection();
 
-									// Update views
-									kfw.tui.updateCanvas();
-									kfw.tui.redraw();
+										// Update views
+										kfw.tui.updateCanvas();
+										kfw.tui.redraw();
 
-									// Clear selection
-									this.show(null);
+										// Clear selection
+										this.show(null);
 
-								} else {
-									alert("Cannot delete the last two keyframes!");
+									} else {
+										doAlert = true;
+									}
 								}
+								if (doAlert) alert("Cannot delete the last two keyframes!");
 							}).bind(this)
 						},
 						{
@@ -159,7 +164,7 @@ define(
 							type: 'btn',
 							click: (function(kfw) {
 								if (this.canvasRef)
-									this.canvasRef.selectObject(kfw.elm.__object);
+									this.canvasRef.selectObject(kfw[0].elm.__object);
 							}).bind(this)
 						}
 					]
