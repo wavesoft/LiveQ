@@ -569,11 +569,15 @@ define(
 			this.narration = {
 				'available' : false,
 				'duration'  : 0,
-				'words'     : []
+				'words'     : [],
+
+				'id'		: null,
+				'voice'		: null,
+				'text'		: null
 			};
 		}
 
-		TimelineUI.prototype.setupNarration = function( data ) {
+		TimelineUI.prototype.setupNarration = function( data, text, voice ) {
 
 			// Reset if no data
 			if (!data) {
@@ -590,11 +594,47 @@ define(
 			this.narration.duration = data['duration'];
 			this.narration.available = true;
 
+			// Update additional info
+			this.narration.id = data['id'];
+			if (voice) this.narration.voice = voice;
+			if (text) this.narration.text = text;
+
 			// Setup audio on timeline
 			this.timeline.setupAudio(data['base_url']);
 
 			// Redraw
 			this.redraw();
+
+		}
+
+		TimelineUI.prototype.narrationToJSON = function() {
+			if (this.narration.available) {
+				return {
+					'id' : this.narration.id,
+					'voice' : this.narration.voice,
+					'text' : this.narration.text,
+				};
+			} else {
+				return null;
+			}
+		}
+
+		/** 
+		 * Setup narration from JSON
+		 */
+		TimelineUI.prototype.narrationFromJSON = function(json, cb) {
+			if (!id) {
+				this.narration.available = false;
+				return;
+			}
+
+			// Setup local info parameters
+			this.narration.id = json['id'];
+			this.narration.voice = json['voice'];
+			this.narration.text = json['text'];
+
+			// Load narration (will populate the rest)
+			this.loadNarration( json['id'], cb );
 
 		}
 
@@ -636,7 +676,7 @@ define(
 				}
 			})
 			.done((function( data, textStatus, jqXHR ) {
-				this.setupNarration(data);
+				this.setupNarration(data, text, voice);
 				if (cb) cb(true);
 			}).bind(this))
 			.fail((function( jqXHR, textStatus, errorThrown ) {

@@ -13,8 +13,19 @@ define(
 					alert("Unable to load the specified file!");
 					if (cb) cb(false);
 				} else {
+					
+					// Populate objects
 					this.canvas.loadJSON(doc['scene']);
 					this.hotspots.loadJSON(doc['spots']);
+					this.timelineUI.narrationFromJSON(doc['narration']);
+
+					// Update narration UI
+					var narration = doc['narration'];
+					if (narration) {
+						$("#editor-speech-text").val( narration['text'] );
+						$("#editor-speech-voice").val( narration['voice'] );
+					}
+
 					if (cb) cb(true);
 				}
 			}).bind(this));
@@ -25,8 +36,9 @@ define(
 
 			// Prepare save record
 			var record = {
-				'scene': this.canvas.toJSON(),
-				'spots': this.hotspots.toJSON()
+				'scene' 	: this.canvas.toJSON(),
+				'spots' 	: this.hotspots.toJSON(),
+				'narration'	: this.timelineUI.narrationToJSON()
 			};
 			console.log("Saving:", JSON.stringify(record));
 
