@@ -596,6 +596,7 @@ define(
 
 			// Update additional info
 			this.narration.id = data['id'];
+			this.narration.base_url = data['base_url'];
 			if (voice) this.narration.voice = voice;
 			if (text) this.narration.text = text;
 
@@ -610,9 +611,10 @@ define(
 		TimelineUI.prototype.narrationToJSON = function() {
 			if (this.narration.available) {
 				return {
-					'id' : this.narration.id,
-					'voice' : this.narration.voice,
-					'text' : this.narration.text,
+					'id' 		: this.narration.id,
+					'voice' 	: this.narration.voice,
+					'text' 		: this.narration.text,
+					'audio_url' : this.narration.base_url
 				};
 			} else {
 				return null;

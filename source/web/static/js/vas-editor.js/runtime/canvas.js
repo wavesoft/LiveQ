@@ -52,9 +52,9 @@ define(
 				this.canvasFabric.renderAll();
 
 				// Initialize timeline audio
-				if (json['audio_url']) {
+				if (json['narration']) {
 					// Setup audio and fire onReady when audio is loaded
-					this.timeline.setupAudio( json['audio_url'], onReady );
+					this.timeline.setupAudio( json['narration']['audio_url'], onReady );
 				} else {
 					// Fire ready
 					if (onReady) onReady();
