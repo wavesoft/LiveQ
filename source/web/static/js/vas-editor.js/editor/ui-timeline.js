@@ -631,7 +631,7 @@ define(
 		 * Setup narration from JSON
 		 */
 		TimelineUI.prototype.narrationFromJSON = function(json, cb) {
-			if (!id) {
+			if (!json) {
 				this.narration.available = false;
 				return;
 			}
