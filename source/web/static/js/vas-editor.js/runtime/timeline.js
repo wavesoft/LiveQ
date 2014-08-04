@@ -139,12 +139,15 @@ define(
 
 			// Lookup the appropriate audio source
 			var src = document.createElement('source');
-			if (this.audioElement.canPlayType("audio/mpeg;")) {
+			if (this.audioElement.canPlayType("audio/ogg;")) {
+				src.type = 'audio/ogg';
+				src.src = baseURL + '.ogg';
+			} else if (this.audioElement.canPlayType("audio/mpeg;")) {
 				src.type = 'audio/mpeg';
 				src.src = baseURL + '.mp3';
 			} else {
-				src.type = 'audio/ogg';
-				src.src = baseURL + '.ogg';
+				src.type = 'audio/x-wav';
+				src.src = baseURL + '.wav';
 			}
 			this.audioElement.appendChild(src);
 

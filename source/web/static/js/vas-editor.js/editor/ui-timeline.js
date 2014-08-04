@@ -505,10 +505,16 @@ define(
 
 			}).bind(this));
 
-			this.canvasBody.on('mousewheel', (function(e) {
+			this.canvasBody.on('mousewheel DOMMouseScroll', (function(e) {
 
-				var delta = -e.originalEvent.deltaY / 10000;
+				var delta = e.originalEvent.deltaY || e.originalEvent.detail;
 				if (delta != 0) {
+					if (delta > 0) {
+						delta = -0.01;
+					} else {
+						delta = 0.01;
+					}
+
 					e.stopPropagation();
 					e.preventDefault();
 
