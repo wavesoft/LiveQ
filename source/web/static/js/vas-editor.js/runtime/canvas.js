@@ -1,8 +1,8 @@
 define(
 
-	[ "jquery", "fabric", "vas-editor/runtime/timeline", "vas-editor/runtime/hotspots" ],
+	[ "jquery", "fabric", "tweenjs", "vas-editor/runtime/timeline", "vas-editor/runtime/hotspots" ],
 
-	function($, fabric, Timeline, Hotspots) {
+	function($, fabric, tweenjs, Timeline, Hotspots) {
 		
 		/**
 		 * Runtime canvas for rendering animation & level info
@@ -22,6 +22,9 @@ define(
 			fabric.Object.prototype.transparentCorners = false;
 			this.canvasFabric = new fabric.StaticCanvas($(this.canvasDOM)[0]);
 
+			// Disable ticker
+			tweenjs.Ticker.setPaused(true);
+
 			// Initialize timeline runtime
 			this.timeline = new Timeline( this.canvasFabric );
 			this.timeline.addEventListener('change', (function() {
@@ -34,6 +37,22 @@ define(
 
 			// Initialize hotspots runtime
 			this.hotspots = new Hotspots( this.hotspotsDOM );
+
+			// Setup in-house ticker
+			var self = this,
+				t = Date.now(),
+				animate = function() {
+					setTimeout(function() {
+						requestAnimationFrame(function() {
+							var t2 = Date.now(),
+								delta = t2 - t;
+							t = t2;
+							self.timeline.tick(delta);
+							animate();
+						});
+					}, 25);
+				};
+			animate();
 
 		}
 
