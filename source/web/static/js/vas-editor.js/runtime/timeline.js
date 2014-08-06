@@ -116,7 +116,7 @@ define(
 			// Remove previous instances
 			if (this.audioElement) {
 				this.audioElement.src = "";
-				this.canvas.wrapperEl.removeChild( this.audioElement );
+				this.canvas.getElement().parentNode.removeChild( this.audioElement );
 				this.removeTween( this.audioTween );
 			}
 
@@ -135,7 +135,7 @@ define(
 			this.audioElement = document.createElement('audio');
 			this.audioElement.loop = true;
 			this.audioElement.preload = "auto";
-			this.canvas.wrapperEl.appendChild( this.audioElement );
+			this.canvas.getElement().parentNode.appendChild( this.audioElement );
 
 			// Lookup the appropriate audio source
 			var src = document.createElement('source');
