@@ -62,7 +62,7 @@ define(
 
 			// Initialize explain screen
 			this.createExplainScreen();
-			this.loadScene("test");
+			this.loadScene("level-1-1");
 
 		}
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
