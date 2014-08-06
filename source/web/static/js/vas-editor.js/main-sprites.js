@@ -131,7 +131,7 @@ define(
 				var imageURL = $("#editor-image-url").val();
 
 				$.ajax({
-					'url'       : 'imageapi.php?a=import&url='+escape(imageURL),
+					'url'       : '/voiceapi/imageapi.php?a=import&url='+escape(imageURL),
 					'method' 	: 'GET',
 					'dataType'	: 'json',				
 					success: (function(data) {
@@ -192,7 +192,7 @@ define(
 
 			// Populate images
 			$.ajax({
-				'url'       : 'imageapi.php?a=list',
+				'url'       : '/voiceapi/imageapi.php?a=list',
 				'method' 	: 'GET',
 				'dataType'	: 'json',				
 				success: function(data) {
