@@ -950,7 +950,7 @@ define(
 			setTimeout((function() {
 
 				// Update canvas maximum height
-				var elementHeight = this.config.lineHeight * this.elements.length + 1;
+				var elementHeight = this.config.padTop + this.config.audioHeight + this.config.lineHeight * this.elements.length + 1;
 				this.canvasBody.attr('height', Math.max(this.canvasMinHeight, elementHeight) );
 
 				// Clear canvases
