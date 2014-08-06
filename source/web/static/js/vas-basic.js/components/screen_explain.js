@@ -31,19 +31,34 @@ define(
 			hostDOM.append(this.foregroundDOM);
 
 			// Create host element where to place the explain screen
-			this.elmWindow = $('<div class="explain-window"></div>').appendTo(this.foregroundDOM);
+			this.elmWindow = $('<div class="explain-window cs-green"></div>').appendTo(this.foregroundDOM);
 			var elmHeader = $('<div class="explain-header">').appendTo(this.elmWindow);
 			this.elmIcon = $('<div class="icon" style="background-image: url(static/img/level-icons/pdfs.png);"></div>').appendTo(elmHeader);
 			this.elmTitle = $('<h1>Level Title</h1>').appendTo(elmHeader);
 			this.elmSubtitle = $('<p class="subtitle">Level Title</p>').appendTo(elmHeader);
 			this.elmScreen = $('<div class="explain-screen"></div>').appendTo(this.elmWindow);
-			this.elmFooter = $('<div class="explain-footer"></div>');//.appendTo(this.elmWindow);
+			this.elmFooter = $('<div class="explain-footer"></div>').appendTo(this.elmWindow);
+			this.elmPopup = $('<div class="explain-popup"></div>').appendTo(this.elmWindow);
+			this.elmPopupFooter = $('<div class="btn-host"></div>').appendTo(this.elmPopup);
 
 			// Create buttons on footer
+			/*
 			this.btnExplain = $('<div class="footer-btn"><span class="uicon uicon-explain"></span> Explain</div>').appendTo(this.elmFooter);
 			this.btnLearn = $('<div class="footer-btn"><span class="uicon uicon-info"></span> Learn</div>').appendTo(this.elmFooter);
 			this.btnUnderstand = $('<div class="footer-btn"><span class="uicon uicon-game"></span> Understand</div>').appendTo(this.elmFooter);
 			this.btnResearch = $('<div class="footer-btn"><span class="uicon uicon-find"></span> Research</div>').appendTo(this.elmFooter);
+			*/
+
+			// Level buttons
+			var levelBtn;
+			levelBtn = $('<a href="#" class="btn-level">1</a>').appendTo(this.elmFooter);
+			levelBtn = $('<a href="#" class="btn-level">2</a>').appendTo(this.elmFooter);
+			levelBtn = $('<a href="#" class="btn-level">3</a>').appendTo(this.elmFooter);
+
+			// Action buttons
+			var actionBtn;
+			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-gear"></span></a>').appendTo(this.elmPopupFooter);
+
 
 			// Initialize explain screen
 			this.createExplainScreen();
@@ -73,7 +88,7 @@ define(
 		 * Setup screen
 		 */
 		ExplainScreen.prototype.createExplainScreen = function() {
-			this.elmScreen.addClass("blackboard");
+			this.elmScreen.addClass("cs-blackboard");
 
 			var explainBlackboard = $('<div></div>').appendTo(this.elmScreen),
 				com = R.instanceComponent("explain.blackboard", explainBlackboard);

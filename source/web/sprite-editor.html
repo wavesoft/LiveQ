@@ -319,6 +319,24 @@
 			margin: 0 2px 0 0;
 		}
 
+		#editor-modal-image #editor-modal-images-host {
+			height: 400px;
+			overflow-y: scroll;
+			overflow-x: hidden;
+		}
+
+		#editor-modal-image #editor-modal-images-host a {
+			border: none;
+			display: block;
+			float; left;
+			width: 128px;
+			height: 128px;
+			background-position: center center;
+			background-repeat: no-repeat;
+			background-size: contain;
+			margin: 4px;
+		}
+
 		</style>
 	</head>
 	<body>
@@ -716,7 +734,7 @@
 				</div>
 				<hr />
 				<p>Or pick one from the gallery:</p>
-				<div class="well">
+				<div id="editor-modal-images-host" class="well">
 
 				</div>
 

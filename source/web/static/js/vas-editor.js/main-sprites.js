@@ -47,6 +47,10 @@ define(
 					alert("Unable to save the specified file!");
 					if (cb) cb(false);
 				} else {
+
+					// Prohibit narration from being deleted
+					this.timelineUI.preserveNarrationRevision();
+
 					if (cb) cb(true);
 				}
 			}).bind(this));
@@ -58,6 +62,21 @@ define(
 			this.timelineUI = new TimelineUI( $("#editor-timeline"), this.propUI );
 			this.canvas = new EditableCanvas( $('#editor-canvas > canvas'), this.propUI, this.timelineUI );
 			this.hotspots = new EditableHotspots( $('#editor-canvas > .hotspots'), $('#hotspots') );
+
+			// Helper to create icon
+			var createIcon = (function(url) {
+				var a = $('<a href="javascript:;"></a>');
+				a.css({
+					'background-image': 'url(' + url + ')'
+				});
+				a.click((function(imageURL) {
+					return function() {
+						this.canvas.addImage( imageURL );
+						jQuery("#editor-modal-image").modal('hide');
+					}
+				})(url).bind(this));
+				$("#editor-modal-images-host").append(a);
+			}).bind(this);
 
 			// bind to events
 			$("#editor-new").click((function(e) {
@@ -110,8 +129,20 @@ define(
 
 			$("#editor-add-image").click((function(e) {
 				var imageURL = $("#editor-image-url").val();
-				this.canvas.addImage( imageURL );
-				jQuery("#editor-modal-image").modal('hide');
+
+				$.ajax({
+					'url'       : 'imageapi.php?a=import&url='+escape(imageURL),
+					'method' 	: 'GET',
+					'dataType'	: 'json',				
+					success: (function(data) {
+						if (data['res'] == 'ok') {
+							createIcon( data['file'] );
+							this.canvas.addImage( data['file'] );
+							jQuery("#editor-modal-image").modal('hide');
+						}
+					}).bind(this)
+				});
+
 			}).bind(this));
 			$("#editor-add-text").click((function(e) {
 				var textString = $("#editor-text").val(),
@@ -145,7 +176,6 @@ define(
 			$("#editor-btn-properties").click((function(e) { this.hotspots.setActive(false); }).bind(this));
 			$("#editor-btn-hotspots").click((function(e) { this.hotspots.setActive(true); }).bind(this));
 
-
 			$("#editor-speech").click((function(e) {
 				$("#editor-speech").prop("disabled", "disabled")
 								   .html("Updating ...");
@@ -159,6 +189,21 @@ define(
 				})
 
 			}).bind(this));
+
+			// Populate images
+			$.ajax({
+				'url'       : 'imageapi.php?a=list',
+				'method' 	: 'GET',
+				'dataType'	: 'json',				
+				success: function(data) {
+					if (data['res'] == 'ok') {
+						var files = data['files'];
+						for (var i=0; i<files.length; i++) {
+							createIcon(files[i]);
+						}
+					}
+				}
+			});
 
 			cb();
 

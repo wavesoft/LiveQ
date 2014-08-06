@@ -192,6 +192,34 @@ function acapellaGet($id) {
 
 }
 
+/**
+ * Delete previous revision
+ */
+function del_previous($id) {
+
+	// If we have a missing ID do nothing
+	if (!isset($id)) return;
+
+	// Check if we have such file
+	$del_base = dirname(__FILE__)."/cache/".$id;
+	if (is_file("${del_base}.php")) {
+
+		// Load information
+		$info = include("${del_base}.php");
+
+		// Delete base files
+		if (is_file("${del_base}.wav")) unlink("${del_base}.wav");
+		if (is_file("${del_base}.mp3")) unlink("${del_base}.mp3");
+		if (is_file("${del_base}.ogg")) unlink("${del_base}.ogg");
+		if (is_file("${del_base}.php")) unlink("${del_base}.php");
+
+		// Delete link file
+		if (is_file($info['link_file'])) unlink($info['link_file']);
+
+	}
+
+}
+
 // Check if we just need to fetch the cached info
 if (isset($_GET['get'])) {
 
@@ -235,21 +263,35 @@ else if (isset($_GET['text'])) {
 		$link_file = dirname(__FILE__)."/cache/".sha1($text)."-".$voice.".lnk";
 		if (is_file($link_file)) {
 			$id = file_get_contents($link_file);
+			if (is_file(dirname(__FILE__)."/cache/".$id.".php")) {
 
-			// Build response
-			$info = include(dirname(__FILE__)."/cache/".$id.".php");
+				// If we have a delete request do not proceed with deleting
+				// ONLY if the file to delete is the same with this
+				if (isset($_GET['del']) && ($_GET['del'] != $id))
+					del_previous( $_GET['del'] );
 
-			// Echo cached response & exit
-			die(json_encode(array(
-					'res'		=> 'ok',
-					'id'		=> $id,
-					'base_url'	=> $aCacheURL."/".$id,
-					'formats'	=> array("wav", "mp3", "ogg"),
-					'duration'	=> $info['duration'],
-					'words'		=> $info['words'],
-				)));
+				// Build response
+				$info = include(dirname(__FILE__)."/cache/".$id.".php");
+
+				// Echo cached response & exit
+				die(json_encode(array(
+						'res'		=> 'ok',
+						'id'		=> $id,
+						'base_url'	=> $aCacheURL."/".$id,
+						'formats'	=> array("wav", "mp3", "ogg"),
+						'duration'	=> $info['duration'],
+						'words'		=> $info['words'],
+					)));
+
+			} else {
+				// Link file points to invalid data, remove
+				unlink( $link_file );
+			}
 
 		}
+
+		// Delete previous version if asked by the user
+		del_previous( $_GET['del'] );
 
 		// Create new text
 		$info = acapellaNew($text, $voice);
@@ -309,15 +351,16 @@ else if (isset($_GET['text'])) {
 						)));
 			}
 
+			// Cache lookup link
+			$info['link_file'] = $link_file;
+			file_put_contents(
+				$link_file, $id
+			);
+
 			// Cache the result
 			file_put_contents(
 				$file_base.".php", 
 				"<"."?php return " .var_export($info,true) . "\n?".">"
-			);
-
-			// Cache lookup link
-			file_put_contents(
-				$link_file, $id
 			);
 
 			// Build response

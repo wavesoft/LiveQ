@@ -20,7 +20,7 @@ define(
 
 			// Prepare canvas fabric
 			fabric.Object.prototype.transparentCorners = false;
-			this.canvasFabric = new fabric.Canvas($(this.canvasDOM)[0]);
+			this.canvasFabric = new fabric.StaticCanvas($(this.canvasDOM)[0]);
 
 			// Initialize timeline runtime
 			this.timeline = new Timeline( this.canvasFabric );

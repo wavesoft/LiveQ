@@ -50,3 +50,4 @@ liveq-webserver/static/js/out*
 
 source/web/doc/jsdoc
 source/web/static/js/node_modules
+source/web/dat
