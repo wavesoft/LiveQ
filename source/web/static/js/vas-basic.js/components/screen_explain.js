@@ -60,7 +60,9 @@ define(
 
 			// Action buttons
 			var actionBtn;
-			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-gear"></span></a>').appendTo(this.elmPopupFooter);
+			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>').appendTo(this.elmPopupFooter);
+			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-play-media"></span></a>').appendTo(this.elmPopupFooter);
+			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-play"></span></a>').appendTo(this.elmPopupFooter);
 
 
 			// Initialize explain screen
