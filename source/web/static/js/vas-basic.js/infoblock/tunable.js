@@ -38,7 +38,7 @@ define(
 
 			// Prepare body DOM
 			this.bodyDOM.empty();
-			this.bodyDOM.append($('<div>Book #'+meta['info']['book']+' will be loaded here</div>'));
+			this.bodyDOM.append($('<div>'+meta['info']['desc']+'</div>'));
 
 			// Prepare 'more' links
 			this.moreLinks.empty();

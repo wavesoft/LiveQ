@@ -56,6 +56,7 @@ Contains information regarding the tunables in the tuning system.
            name: '...',  //   The visible name for this parameter
           short: 'N01',  //   A short (iconic) name for this parameter
            book: 'r-01', //   Reference ID for providing more explaination 
+          group: '...'   //   The group name where this parameter belongs
          },
          corr: {         // Correlation information
             obs: [       // Correlation to objservables 

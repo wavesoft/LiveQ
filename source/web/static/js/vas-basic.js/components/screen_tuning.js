@@ -383,7 +383,7 @@ define(
 			if (!groupDOM) {
 
 				// Get group info
-				var groupInfo = { 'title': 'General', 'book': 'bok' },
+				var groupInfo = { 'title': groupName, 'book': '' },
 					groupDict = (DB.cache['definitions'] && DB.cache['definitions']['tunable-groups'] && DB.cache['definitions']['tunable-groups']['groups']) ?
 							DB.cache['definitions']['tunable-groups']['groups'] : {};
 

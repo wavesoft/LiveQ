@@ -64,7 +64,7 @@ define(
 						(function(hostDOM) {
 
 							// Prepare the body
-							var comBody = R.instanceComponent("infoblock.book", hostDOM);
+							var comBody = R.instanceComponent("infoblock.tunable", hostDOM);
 							if (comBody) {
 
 								// Update infoblock 

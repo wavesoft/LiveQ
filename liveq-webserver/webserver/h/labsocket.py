@@ -50,6 +50,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         self.lab = None
         self.jobid = None
 
+        # Tunable/Observable Trim
+        self.trimObs = []
+        self.trimTun = []
+
         # Open logger
         self.logger = logging.getLogger("LabSocket")
 
@@ -302,6 +306,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         tunables = self.lab.getTunables()
         for t in tunables:
 
+            # Skip untrimmed tunables 
+            if (len(self.trimTun) > 0) and (not t in self.trimTun):
+                continue
+
             # Collect tunable names
             l_tunables.append(t.name)
 
@@ -327,6 +335,10 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
         histo_ids = self.lab.getHistograms()
         histoBuffers = []
         for hid in histo_ids:
+
+            # Skip untrimmed histograms 
+            if (len(self.trimObs) > 0) and (not hid in self.trimObs):
+                continue
 
             # Fetch histogram information from file
             descRecord = self.histodesc.describeHistogram( hid )
@@ -436,7 +448,12 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
 
             # Pack histograms
             histoBuffers = []
-            for h in histos.values():
+            for hid, h in histos.iteritems():
+
+                # Skip untrimmed histograms 
+                if (len(self.trimObs) > 0) and (not hid in self.trimObs):
+                    continue
+
                 # Pack buffers
                 histoBuffers.append( js.packHistogram(h) )
 
@@ -566,6 +583,16 @@ class LabSocketHandler(tornado.websocket.WebSocketHandler):
             # We have a handshake with the agent.
             # Fetch configuration and send configuration frame
             self.logger.info("Handshake with client API v%s" % self.cversion)
+
+            # Check if we have trim parameters
+            if 'tunables' in param:
+                self.trimTun = parm['tunables']
+            else:
+                self.trimTun = []
+            if 'observables' in param:
+                self.trimObs = parm['observables']
+            else:
+                self.trimObs = []
 
             # Send configuration frame
             self.sendConfigurationFrame()

@@ -220,6 +220,7 @@ def analyzeRivetRef(baseDir):
 			plotTitle = plotMeta['Title']
 			plotXLabel = plotMeta['XLabel']
 			plotYLabel = plotMeta['YLabel']
+			logY = plotMeta['LogY']
 
 			# Ensure it's a REF file
 			if not hname.startswith("/REF"):
@@ -230,6 +231,7 @@ def analyzeRivetRef(baseDir):
 				'title': plotTitle,
 				'xlabel': plotXLabel,
 				'ylabel': plotYLabel,
+				'logy': logY,
 				'ref': rf
 			}
 
@@ -356,6 +358,9 @@ out_dir = "ref.local"
 # Get histogram keys
 hkeys = histos.keys()
 
+# Prepare CouchDB json records
+couch_obs = []
+
 # Start processing histograms
 for name in hkeys:
 
@@ -396,18 +401,38 @@ for name in hkeys:
 
 		# Render title, x-label and y-label to images
 		print "TeX Title...",
-		renderTEX( "{\\large\\textbf{%s}}" % meta['title'], "%s.png" % histoTeXBase)
+		#renderTEX( "{\\large\\textbf{%s}}" % meta['title'], "%s.png" % histoTeXBase)
 		print "TeX XLabel...",
-		renderTEX( meta['xlabel'], "%s-x.png" % histoTeXBase )
+		#renderTEX( meta['xlabel'], "%s-x.png" % histoTeXBase )
 		print "TeX YLablel...",
-		renderTEX( meta['ylabel'], "%s-y.png" % histoTeXBase )
+		#renderTEX( meta['ylabel'], "%s-y.png" % histoTeXBase )
 
 		# Put histogrm title and texBase name under this observable
 		histos[name][idx] += [
-				abbrInfo[0], # Group name
-				abbrInfo[1], # HTML Name
-				histoTeXName # Histogam base ID
+				abbrInfo[0],  # Group name
+				abbrInfo[1],  # HTML Name
+				histoTeXName, # Histogam base ID
+				meta['logy']  # Logarithmic scale on Y axis
 			]
+
+		# Store on CouchDB record for later commission
+		couch_obs.append({
+				'_id': name,
+				'type': "h2",
+				'meta': {
+					'logY': bool(int(meta['logy'])),
+					'group': abbrInfo[0]
+				},
+				'info': {
+					'name': abbrInfo[1],
+					'tex_img': histoTeXName,
+					'short': histos[name][idx][0]
+				},
+				'corr': {
+					'obs': [],
+					'tun': []
+				}
+			})
 
 		hasSomething = True
 		idx += 1
@@ -417,10 +442,18 @@ for name in hkeys:
 	if not hasSomething:
 		del histos[name]
 
-
 	print " ok"
 
 # Now we have all the extra info, dump description to file
 with open("%s/description.json" % out_dir, "w") as f:
 	f.write(json.dumps(histos, sort_keys=True, indent=2, separators=(',', ': ')))
 
+# Submit observable CouchDB
+if False:
+	import couchdb
+	couch = couchdb.Server('http://test4theory.cern.ch/vas/db/')
+	db_obs = couch['observables']
+
+	for obj in couch_obs:
+		print "Commiting %s..." % obj['_id']
+		db_obs.save(obj)

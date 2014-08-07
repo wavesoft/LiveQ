@@ -86,7 +86,7 @@ define(
 			if (this.anchor.y - this.offsetY - this.fixedHeight/2 < 0) 
 				this.anchor.y = this.fixedHeight/2 - this.offsetY;
 			if (this.anchor.y + this.offsetY + this.fixedHeight/2 > this.height)
-				this.anchor.y = this.height - this.fixedHeight/2 + this.offsetY;
+				this.anchor.y = this.height - this.fixedHeight/2 - this.offsetY;
 
 			// Update position
 			this.update();

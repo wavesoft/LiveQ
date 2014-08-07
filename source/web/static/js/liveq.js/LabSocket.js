@@ -71,9 +71,10 @@ define(
 		 * Setup a new WebSocket on the given URL and bind on it's callbacks
 		 * @param {string} url - The Websocket URL to connect to
 		 */
-		LabSocket.prototype.connect = function( url ) {
+		LabSocket.prototype.connect = function( url, config ) {
 			if (url) this.url = url;
-			var self = this;
+			var self = this,
+				cfg = config || {};
 			try {
 
 				// Create new WebSocket to the given url
@@ -130,8 +131,17 @@ define(
 				this.socket.onopen = function() {
 					console.log("Connection open")
 
-					// Handshake
-					self.send("handshake", { "version": LiveQ.version });
+					// Prepare handshake frame
+					var handshakeFrame = {
+						"version": LiveQ.version
+					};
+
+					// Append tunables/observables if specified
+					if (cfg.tunables) handshakeFrame['tunables'] = cfg.tunables;
+					if (cfg.observables) handshakeFrame['observables'] = cfg.observables;
+
+					// Do handshake
+					self.send("handshake", handshakeFrame);
 
 					// We are connected
 					self.connected = true;
