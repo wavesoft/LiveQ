@@ -152,7 +152,7 @@ define(
 						'color'	: '#ECF0F1',
 						'radius': 50,
 						'click' : (function() {
-							this.trigger("explainTask", "ea662db6a205b19ae791d95da0023042");
+							this.trigger("explainTopic", "ea662db6a205b19ae791d95da0021429");
 						}).bind(this)
 					},
 					{

@@ -407,11 +407,10 @@ define(
 		}
 
 		/**
-		 * Check user's configuration and display the appropriate task
-		 * screen
+		 * Check user's configuration and display the appropriate topic screen
 		 */
 		VAS.displayExplainTopic = function( topic_id ) {
-			if (!task) return;
+			if (!topic_id) return;
 
 			// Setup explain screen
 			VAS.scrExplain.onTopicUpdated( User.getTopicDetails(topic_id) );

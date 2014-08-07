@@ -263,9 +263,6 @@ h1 + p.subtitle {
   right: 100%;
   border-right-color: rgba(64, 64, 64, 0.9);
 }
-.onscreen .title {
-  height: 18px;
-}
 .onscreen .bullet {
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
@@ -283,7 +280,7 @@ h1 + p.subtitle {
   left: 22px;
   top: 5px;
   right: 5px;
-  height: 16px;
+  height: 18px;
   overflow: hidden;
   color: white;
   font-weight: bold;
