@@ -353,6 +353,17 @@ define(["core/config", "core/base/component" ],
 			
 		};
 
+		/**
+		 * This function is called when the topic information this explain screen is
+		 * displaying for has changed.
+		 *
+		 * @abstract
+		 * @param {object} details - The details regarding this topic
+		 */
+		ExplainScreen.prototype.onTopicUpdated = function(details) {
+			
+		};
+
 		////////////////////////////////////////////////////////////
 		/**
 		 * Initializes a new HomeScreen Component.
@@ -383,6 +394,15 @@ define(["core/config", "core/base/component" ],
 		 * @param {array} tunables - A list of Tunable classes, one for each tunable.
 		 */
 		HomeScreen.prototype.onUserStatistics = function(tunables) {
+		};
+
+		/**
+		 * This function is fired when the topic information have changed
+		 *
+		 * @abstract
+		 * @param {object} topicsData - An object that contains the current topic tree.
+		 */
+		HomeScreen.prototype.onTopicTreeUpdated = function(topicsData) {
 		};
 
 		////////////////////////////////////////////////////////////

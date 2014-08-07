@@ -41,8 +41,17 @@ define(
 			this.elmPopup = $('<div class="explain-popup"></div>').appendTo(this.elmWindow);
 			this.elmPopupFooter = $('<div class="btn-host"></div>').appendTo(this.elmPopup);
 
-			// Hide footer by default
-			this.elmPopupFooter.hide();
+			// Setup click handlers to hide when clicking on empty space
+			this.elmWindow.click((function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			}).bind(this));
+			this.foregroundDOM.click((function(e) {
+				this.trigger('hideExplain');
+			}).bind(this));
+
+			// Hide popup by default
+			this.elmPopup.hide();
 
 			// Create buttons on footer
 			/*
@@ -143,6 +152,13 @@ define(
 		 */
 		ExplainScreen.prototype.onWillShow = function(cb) {
 			cb();
+		}
+
+		/**
+		 * Update topic information
+		 */
+		ExplainScreen.prototype.onTopicUpdated = function(task_info) {
+
 		}
 
 

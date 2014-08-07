@@ -15,6 +15,7 @@ define(
 			this.audioElement = null;
 			this.audioTween = null;
 			this.gotoAndStop(0);
+			window.t = this;
 		};
 
 		// Subclass from createjs.Timeline because we are using most of it's
@@ -25,12 +26,22 @@ define(
 		 * Overload gotoAndPlay in order to forward the audio element too
 		 */
 		Timeline.prototype.gotoAndPlay = function( pos ) {
-			createjs.Timeline.prototype.gotoAndPlay.call( this, pos );
-			if (!this.audioElement) return;
+			var gotoAndPlayFn = (function() {
+				createjs.Timeline.prototype.gotoAndPlay.call( this, pos );
+				if (!this.audioElement) return;
 
-			// Seek and play audio
-			this.audioElement.currentTime = pos/1000;
-			if (this.audioElement.paused) this.audioElement.play();
+				// Seek and play audio
+				this.audioElement.currentTime = pos/1000;
+				if (this.audioElement.paused) this.audioElement.play();
+
+			}).bind(this);
+
+			// If position is 0, do audio rewind first
+			if (pos == 0) {
+				this.rewindAudio(gotoAndPlayFn);
+			} else {
+				gotoAndPlayFn();
+			}
 
 		}
 
@@ -38,12 +49,21 @@ define(
 		 * Overload gotoAndStop in order to seek the audio element too
 		 */
 		Timeline.prototype.gotoAndStop = function( pos ) {
-			createjs.Timeline.prototype.gotoAndStop.call( this, pos );
-			if (!this.audioElement) return;
+			var gotoAndStopFn = (function() {
+				createjs.Timeline.prototype.gotoAndStop.call( this, pos );
+				if (!this.audioElement) return;
 
-			// Seek & Stop audio
-			if (!this.audioElement.paused) this.audioElement.pause();
-			this.audioElement.currentTime = pos/1000;
+				// Seek & Stop audio
+				if (!this.audioElement.paused) this.audioElement.pause();
+				this.audioElement.currentTime = pos/1000;
+			}).bind(this);
+
+			// If position is 0, do audio rewind first
+			if (pos == 0) {
+				this.rewindAudio(gotoAndStopFn);
+			} else {
+				gotoAndStopFn();
+			}
 
 		}
 
@@ -62,6 +82,32 @@ define(
 				this.audioElement.play();
 			}
 	
+		}
+
+		/**
+		 * Rewind audio by forcing a reload
+		 */
+		Timeline.prototype.rewindAudio = function(callback) {
+			if (this.audioElement) {
+				
+				// Wait until we can play through
+				var cb = (function(e) {
+					this.audioElement.removeEventListener('canplaythrough', cb);
+					if (callback) callback();
+				}).bind(this);
+
+				// Add event listener
+				this.audioElement.addEventListener('canplaythrough', cb);
+
+				// Reload audio
+				this.audioElement.load();
+
+			} else {
+
+				// If there is no audio element, fire it right away
+				if (callback) callback();
+				
+			}
 		}
 
 		/**
@@ -152,7 +198,7 @@ define(
 			this.audioElement.appendChild(src);
 
 			// Start preloading
-			this.audioElement.addEventListener('canplaythrough', (function(e) {
+			var okCB = (function(e) {
 
 				// Create new empty audio tween (for definining the minimal timeline length)
 				var duration = Math.round(this.audioElement.duration * 1000);
@@ -164,7 +210,12 @@ define(
 				// Fire callback
 				if (cbReady) cbReady(true);
 
-			}).bind(this));
+				// Remove listener
+				this.audioElement.removeEventListener('canplaythrough', okCB);
+
+			}).bind(this);
+			this.audioElement.addEventListener('canplaythrough', okCB);
+
 			this.audioElement.addEventListener('error', (function(e) {
 				if (cbReady) cbReady(false);
 			}).bind(this));

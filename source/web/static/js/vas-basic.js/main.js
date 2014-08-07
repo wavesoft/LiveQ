@@ -44,6 +44,7 @@ define([
 	// Information blocks
 	'vas-basic/infoblock/tunable',
 	'vas-basic/infoblock/observable',
+	'vas-basic/infoblock/book',
 
 	// Data vizualization
 	'vas-basic/dataviz/histogram',

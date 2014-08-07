@@ -255,7 +255,7 @@ h1 + p.subtitle {
 	}
 
 	.title {
-
+		height: 18px;
 	}
 
 	.bullet {
@@ -307,6 +307,50 @@ h1 + p.subtitle {
 			left: 0; top: 0;
 			width: 100%;
 			bottom: 36px;
+
+			&.tabular {
+				overflow: hidden;
+				> div {
+					position: absolute;
+					left: 0; width: 100%;
+					top: 0; height: 100%;
+					overflow-x: hidden;
+					overflow-y: auto;
+				}
+			}
+
+			a.tile-row {
+				display: block;
+				position: relative;
+				height: 45px;
+				color: #fff;
+				overflow: hidden;
+				text-align: left;
+				margin: 2px;
+
+				div.icon {
+					background-color: #666;
+					position: absolute;
+					left: 6px; top: 6px;
+					height: 32px; width: 32px;
+					background-position: center center;
+					background-repeat: no-repeat;
+					background-size: contain;
+				}
+
+				div.text {
+					display: block;
+					font-size: 14px;
+					position: absolute;
+					left: 45px; top: 11px;
+					text-align: left;
+				}
+
+				&:hover {
+					background-color: #666;
+				}
+
+			}
 		}
 		.more {
 			background-color: rgba(0,0,0,0.4);
@@ -327,7 +371,7 @@ h1 + p.subtitle {
 				margin: 0px 2px;
 				border-radius: 4px;
 
-				&:hover {
+				&:hover, &.active {
 					background: #666;
 				}
 

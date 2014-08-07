@@ -4,9 +4,9 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/base/components", "core/util/progress_aggregator", "liveq/core" ], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/base/components", "core/util/progress_aggregator", "liveq/core" ], 
 
-	function($, config, R, UI, DB, Components, ProgressAggregator, LiveQCore) {
+	function($, config, R, UI, DB, User, Components, ProgressAggregator, LiveQCore) {
 		var VAS = { };
 
 		/**
@@ -64,7 +64,7 @@ define(
 			}
 
 			// Break down initialization process in individual chainable functions
-			var prog_db = progressAggregator.begin(7),
+			var prog_db = progressAggregator.begin(6),
 				init_db = function(cb) {
 					var sequence = [
 
@@ -121,26 +121,34 @@ define(
 							},
 							function(cb) {
 
-								var dScenes = DB.openDatabase("scenes").all(function(scenes) {
-									prog_db.ok("Fetched scene configuration");
-									DB.cache['scenes'] = scenes;
-									cb();
-								});
-
-
-							},
-							function(cb) {
-
 								var dScenes = DB.openDatabase("topic_map").all(function(topic_map) {
 									prog_db.ok("Fetched topic map");
 
 									// Prepare topics
 									DB.cache['topics'] = topic_map;
+									DB.cache['topic_root'] = null;
 
 									// Prepare index
 									DB.cache['topic_index'] = { };
 									for (var i=0; i<topic_map.length; i++) {
-										DB.cache['topic_index'][ topic_map[i]['_id'] ] = topic_map[i];
+										var o = topic_map[i];
+
+										// Prepare children array
+										o.children = [];
+
+										// Store on lookup index
+										DB.cache['topic_index'][ o['_id'] ] = o;
+
+										// Lookup root
+										if (!o['parent']) DB.cache['topic_root'] = o;
+									}
+
+									// Traverse again the topics map and populate
+									// children array for forward tree tranversal
+									for (var i=0; i<topic_map.length; i++) {
+										var o = topic_map[i];
+										if (o['parent'])
+											DB.cache['topic_index'][o['_id']].children.push( o );
 									}
 
 									cb();
@@ -205,31 +213,26 @@ define(
 
 					// Bind events
 					scrLogin.on('login', function(user, password) {
-						DB.authenticateUser(user, password, function(status, data) {
+						User.login({
+							'username' : user,
+							'password' : password
+						}, function(status, errorMsg) {
 							if (!status) {
-								alert("Could not log-in! " + data);
+								alert("Could not log-in! "+errorMsg)
 							} else {
-
-								// Connect to LabSocket
-								LiveQCore.openSocket(
-									'3e63661c13854de7a9bdeed71be16bb9', 
-									function(){
-										UI.selectScreen("screen.home");
-									},
-									function(message) {
-										alert('Could not connect to LiveQ! '+message);
-									}
-								);
-
+								VAS.displayHome();
 							}
 						});
 					});
 					scrLogin.on('register', function(user, password) {
-						DB.createUser(user, password, function(status, data) {
+						User.register({
+							'username' : user,
+							'password' : password
+						}, function(status, errorMsg) {
 							if (!status) {
-								alert("Could not create account! " + data);
+								alert("Could not register the user! "+errorMsg)
 							} else {
-								UI.selectScreen("screen.home");
+								VAS.displayHome();
 							}
 						});
 					});
@@ -241,7 +244,7 @@ define(
 
 			var prog_home = progressAggregator.begin(1),
 				init_home = function(cb) {
-					var scrHome = UI.initAndPlaceScreen("screen.home");
+					var scrHome = VAS.scrHome = UI.initAndPlaceScreen("screen.home");
 					if (!scrHome) {
 						console.error("Core: Unable to initialize home screen!");
 						return;
@@ -250,6 +253,9 @@ define(
 					// Bind events
 					scrHome.on('changeScreen', function(name) {
 						UI.selectScreen(name);
+					});
+					scrHome.on('explainTopic', function(topic_id) {
+						VAS.displayExplainTopic(topic_id);
 					});
 					scrHome.on('playLevel', function(level) {
 
@@ -286,7 +292,7 @@ define(
 				init_explain = function(cb) {
 
 					// Create explain screen
-					var scrExplain = UI.initAndPlaceScreen("screen.explain", Components.ExplainScreen);
+					var scrExplain = VAS.scrExplain = UI.initAndPlaceScreen("screen.explain", Components.ExplainScreen);
 					if (!scrExplain) {
 						console.error("Core: Unable to initialize explaination screen!");
 						return;
@@ -300,6 +306,11 @@ define(
 					// Check for machine layout
 					var diagram = DB.cache['definitions']['machine-diagram'] || { layout: [] };
 					scrExplain.onMachineLayoutDefined( diagram.layout );
+
+					// Handle events
+					scrExplain.on('hideExplain', function() {
+						VAS.displayHome(true);
+					});
 
 					// Complete explain
 					prog_explain.ok("Explaination screen ready");
@@ -374,33 +385,39 @@ define(
 		}
 
 		/**
-		 * Return the level status of the user
-		 */
-		VAS.getLevelStatus = function() {
-			/*
-
-			{
-				
-			}
-
-			*/
-		}
-
-		/**
 		 * Check user's record and show the appropriate home screen
 		 * configuration.
 		 */
-		VAS.displayHome = function() {
+		VAS.displayHome = function( animateBackwards ) {
 
-			// Fetch 
+			// Connect to LabSocket
+			LiveQCore.openSocket(
+				'3e63661c13854de7a9bdeed71be16bb9', 
+				function(){
+					UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
+				},
+				function(message) {
+					alert('Could not connect to LiveQ! '+message);
+				}
+			);
+
+			// Setup home screen
+			VAS.scrHome.onTopicTreeUpdated( User.getTopicTree() );
 
 		}
 
 		/**
-		 * Check user's record and show the appropriate home screen
-		 * configuration.
+		 * Check user's configuration and display the appropriate task
+		 * screen
 		 */
-		VAS.prepareAndDisplayHome = function() {
+		VAS.displayExplainTopic = function( topic_id ) {
+			if (!task) return;
+
+			// Setup explain screen
+			VAS.scrExplain.onTopicUpdated( User.getTopicDetails(topic_id) );
+
+			// Switch screen
+			UI.selectScreen("screen.explain");
 
 		}
 

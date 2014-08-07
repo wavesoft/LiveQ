@@ -164,7 +164,7 @@ define(["jquery", "sha1", "core/config"],
 					if (!response['ok']) {
 						callback(false);
 					} else {
-						callback(data['_id'] || doc, data['_rev']);
+						callback(data['_id'] || doc, response['rev']);
 					}
 				});
 
@@ -256,7 +256,7 @@ define(["jquery", "sha1", "core/config"],
 		 * @param {object} callback - The function to call when completed
 		 *
 		 */
-		DB.createUser = function(username, password, callback) {
+		DB.createUser = function(data, callback) {
 
 			// Create a UUID role for this user, used for various indexing purposes
 			var uuid = "", chars="0123456789+abcdefghijklmnopqrstuvwxyz-ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -270,6 +270,10 @@ define(["jquery", "sha1", "core/config"],
 				salt += chars[parseInt(Math.random() * chars.length)];
 			}
 
+			// Prepare fields
+			var username = data['username'] || "",
+				password = data['password'] || "";
+
 			// Prepare user record
 			var record = {
 				"name" 			  : username,
@@ -278,6 +282,8 @@ define(["jquery", "sha1", "core/config"],
 				"salt"			  : salt,
 				"roles" 		  : [],
 				"type" 			  : "user",
+				"email"			  : data['email'] || "",
+				"displayName"	  : data['displayName'] || "",
 				"data"			  : DB.cache['definitions']['new-user']
 			};
 
@@ -285,11 +291,11 @@ define(["jquery", "sha1", "core/config"],
 			couchdb_put( Config.db.url + "/_users/org.couchdb.user:" + username, JSON.stringify(record), 
 				function(data, error) {
 					if (data && data['ok']) {
-						callback(true, record );
 						DB.userRecord = record;
+						if (callback) callback(true, record );
 					} else {
 						console.error("DB: Could not authenticate user!", error);
-						callback(false, error);
+						if (callback) callback(false, error);
 					}
 				});
 
@@ -319,22 +325,56 @@ define(["jquery", "sha1", "core/config"],
 
 						if (!record) {
 							console.error("DB: Could not fetch record entry!");
-							callback(false, "Could not fetch record entry");
+							if (callback) callback(false, "Could not fetch record entry");
 						} else {
 							// Fire callback
-							callback(data['name'], record);
 							DB.userRecord = record;
+							if (callback) callback(data['name'], record);
 						}
 					});
 
 				} else {
 					console.error("DB: Could not authenticate user!", error);
-					callback(false, error);
+					if (callback) callback(false, error);
 				}
 
 			}).bind(this));
 
 		}
+
+		/**
+		 * Commit to couch-DB the locally-cached user record
+		 *
+		 * @param {object} callback - The function to call when completed
+		 *
+		 */
+		DB.commitUserRecord = function(callback) {
+
+			// If we don't have a user record, quit
+			if (!DB.userRecord) return;
+
+			// Put the entire user record
+			var url = Config.db.url + "/_users/" + this.userRecord['_id'];
+			couchdb_put( url, JSON.stringify(this.userRecord), (function(response) {
+				if (!response) {
+					if (callback) callback(false);
+					return;
+				}
+				if (!response['ok']) {
+					if (callback) callback(false);
+				} else {
+
+					// Update user record revision
+					this.userRecord['_rev'] = response['rev'];
+
+					// Fire success callback
+					if (callback) callback(true);
+				}
+
+			}).bind(this));
+
+		}
+
 
 		/**
 		 * Return an object for I/O operations on the specified database

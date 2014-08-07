@@ -24,12 +24,17 @@ define(
 			'__cbSimData'	: null,
 			'__cbSimError' 	: null,
 			'__pendingSim'  : false,
+			'__lastLabID'	: null,
 
 			// Data from last run
 			'__lastSimHist'	: [],
 
+			// Data for secondary run socket
+			'__simSocket'	: null,
+			'__simSocketDel': false,
+
 			// Socket instance
-			'socket'		: null
+			'socket'		: null,
 
 		};
 
@@ -37,7 +42,27 @@ define(
 		 * Connect, initialize and return a lab socket instance
 		 */
 		LiveQCore.openSocket = function( labID, cbCompleted, cbError ) {
-			if (this.socket) this.socket.close();
+
+			// If trying to open the same socket, fire completed
+			if (this.__lastLabID == labID) {
+				if (cbCompleted) cbCompleted();
+				return;
+			} else {
+				this.__lastLabID = labID;
+			}
+
+			// Close previous sicket
+			if (this.socket) {
+				if (this.__pendingSim) {
+					// Mark sim socket to be released when done with it
+					this.__simSocketDel = true;
+				} else {
+					// Release socket immediately
+					this.socket.close();
+				}
+			}
+
+			// Create new lab socket instance
 			this.socket = new LabSocket( labID );
 
 			// Error handler
@@ -64,6 +89,12 @@ define(
 					this.__cbSimError = null;
 					this.__cbSimData = null;
 					this.__cbSimOk = null;
+					// Check if we should delete the sim socket
+					if (this.__simSocketDel) {
+						this.__simSocketDel = false;
+						this.__simSocket.close();
+						this.__simSocket = null;
+					}
 				}
 
 			}).bind(this);
@@ -137,6 +168,13 @@ define(
 				this.__cbSimData = null;
 				this.__cbSimOk = null;
 
+				// Check if we should delete the sim socket
+				if (this.__simSocketDel) {
+					this.__simSocketDel = false;
+					this.__simSocket.close();
+					this.__simSocket = null;
+				}
+
 			}).bind(this));
 
 			//
@@ -181,8 +219,8 @@ define(
 		LiveQCore.requestRun = function( values, cbIntermediate, cbCompleted, cbError ) {
 			
 			// Abort previous run
-			if (this.__pendingIpol) {
-				if (this.__cbIpolError) this.__cbIpolError("Aborted");
+			if (this.__pendingSim) {
+				if (this.__cbSimError) this.__cbSimError("Aborted");
 			}
 
 			// Validate socket state
@@ -196,6 +234,9 @@ define(
 			this.__cbSimOk = cbCompleted;
 			this.__cbSimError = cbError;
 			this.__pendingSim = true;
+
+			// Keep a reference of the simulation socket
+			this.__simSocket = this.socket;
 
 			// Request real simulation
 			this.socket.beginSimulation( values, false );

@@ -152,7 +152,7 @@ define(
 						'color'	: '#ECF0F1',
 						'radius': 50,
 						'click' : (function() {
-							this.trigger("changeScreen", "screen.explain");
+							this.trigger("explainTask", "ea662db6a205b19ae791d95da0023042");
 						}).bind(this)
 					},
 					{
@@ -319,6 +319,38 @@ define(
 			cb();
 		}
 
+		/**
+		 * Update level status 
+		 */
+		HomeScreen.prototype.onWillShow = function(cb) {
+			this.updateScene();
+			cb();
+		}
+
+		/**
+		 * Topic information has updated 
+		 */
+		HomeScreen.prototype.onTopicTreeUpdated = function(tree) {
+			console.log(tree);
+			window.tree =tree;
+			return;
+
+			// Setup graph nodes and links
+			this.graph.nodes = tree.nodes;
+			this.graph.links = tree.links;
+
+			// Override root node icon/radius
+			this.graph.nodes[0].radius = 50;
+			this.graph.nodes[0].color = '#ECF0F1';
+			this.graph.nodes[0].icon = 'static/img/logo.png';
+
+			// Update graph with additional details required
+			// by the d3 library to work
+			for (var i=0; i<this.graph.nodes.length; i++) {
+				var n = this.graph.nodes[i];
+
+			}
+		}
 
 		// Register home screen
 		R.registerComponent( "screen.home", HomeScreen, 1 );
