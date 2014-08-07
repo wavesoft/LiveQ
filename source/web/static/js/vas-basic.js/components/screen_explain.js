@@ -41,6 +41,9 @@ define(
 			this.elmPopup = $('<div class="explain-popup"></div>').appendTo(this.elmWindow);
 			this.elmPopupFooter = $('<div class="btn-host"></div>').appendTo(this.elmPopup);
 
+			// Hide footer by default
+			this.elmPopupFooter.hide();
+
 			// Create buttons on footer
 			/*
 			this.btnExplain = $('<div class="footer-btn"><span class="uicon uicon-explain"></span> Explain</div>').appendTo(this.elmFooter);

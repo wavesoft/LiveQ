@@ -17,6 +17,9 @@ define(
 			// Absolutely minimum UI initializations
 			UI.initialize();
 
+			// Prepare properties
+			VAS.alertUnload = false;
+
 			// Prepare progress screen
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
 			if (!scrProgress) {
@@ -263,14 +266,14 @@ define(
 
 			var prog_run = progressAggregator.begin(1),
 				init_run = function(cb) {
-					var scrHome = UI.initAndPlaceScreen("screen.running");
-					if (!scrHome) {
+					var scrRunning = UI.initAndPlaceScreen("screen.running");
+					if (!scrRunning) {
 						console.error("Core: Unable to initialize run screen!");
 						return;
 					}
 
 					// Bind events
-					scrHome.on('abortRun', function() {
+					scrRunning.on('abortRun', function() {
 						UI.selectScreen("screen.tuning");
 					});
 
@@ -358,13 +361,46 @@ define(
 
 					// We are initialized, register an away alerter
 					$(window).bind('beforeunload', function() {
-						return "Navigating away will stop your current game session.";
+						if (VAS.alertUnload) {
+							return "Navigating away will stop your current game session.";
+						}
 					});
 
 				});
 
 			}, 500)
 
+
+		}
+
+		/**
+		 * Return the level status of the user
+		 */
+		VAS.getLevelStatus = function() {
+			/*
+
+			{
+				
+			}
+
+			*/
+		}
+
+		/**
+		 * Check user's record and show the appropriate home screen
+		 * configuration.
+		 */
+		VAS.displayHome = function() {
+
+			// Fetch 
+
+		}
+
+		/**
+		 * Check user's record and show the appropriate home screen
+		 * configuration.
+		 */
+		VAS.prepareAndDisplayHome = function() {
 
 		}
 
