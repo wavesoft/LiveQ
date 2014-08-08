@@ -179,7 +179,7 @@ define(
 
 			// Regen the audio element
 			this.audioElement = document.createElement('audio');
-			this.audioElement.loop = true;
+			this.audioElement.loop = "";
 			this.audioElement.preload = "auto";
 			this.canvas.getElement().parentNode.appendChild( this.audioElement );
 

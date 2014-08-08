@@ -21,6 +21,14 @@ define(
 			// Initialize a new canvas
 			this.canvas = new Canvas( hostDOM );
 
+			// Forward canvas events
+			this.canvas.on('animationCompleted', (function() {
+				this.trigger('animationCompleted');
+			}).bind(this));
+			this.canvas.on('animationStarted', (function() {
+				this.trigger('animationStarted');
+			}).bind(this));
+
 		}
 		ExplainBlackboard.prototype = Object.create( C.ExplainScreen.prototype );
 

@@ -21,6 +21,7 @@ define(
 			// Local properties
 			this.topicInfo = null;
 			this.taskBtn = [];
+			this.activeTask = 0;
 
 			// Prepare host
 			hostDOM.addClass("explain");
@@ -141,6 +142,23 @@ define(
 				this.forwardVisualEvents( com );
 				this.adoptEvents( com );
 
+				// Handle events
+				com.on('animationCompleted', (function() {
+
+					// Show pop-up
+					this.elmPopup.fadeIn();
+
+					// Let database know that the user has seen this animation
+					if (!this.topicInfo.taskDetails[this.activeTask].seen_intro) {
+
+						// Mark as seen & update DB
+						this.topicInfo.taskDetails[this.activeTask].seen_intro = true;
+						User.setTaskAnimationAsSeen( this.topicInfo.taskDetails[this.activeTask]['_id'] );
+
+					}
+
+				}).bind(this));
+
 			}
 
 		}
@@ -190,13 +208,13 @@ define(
 			// Regenerate task buttons
 			this.elmFooter.empty();
 			this.taskBtn = [];
-			var activeTask = 0;
-			for (var i=0; i<topic.taskDetails.length; i++) {
-				var task = topic.taskDetails[i],
+			this.activeTask = 0;
+			for (var i=0; i<topic_info.taskDetails.length; i++) {
+				var task = topic_info.taskDetails[i],
 					taskBtn = $('<a href="#" class="btn-level">'+(i+1)+'</a>');
 
 				// Stop creating buttons when we reached a disabled task
-				activeTask = i;
+				this.activeTask = i;
 				if (!task.enabled) return;
 
 				// Setup hooks
@@ -213,7 +231,7 @@ define(
 			}
 
 			// Select active task
-			this.selectTask( activeTask );
+			this.selectTask( this.activeTask );
 
 		}
 
@@ -225,13 +243,13 @@ define(
 			// Activate/blur buttons
 			for (var i=0; i<this.taskBtn.length; i++) {
 				if (i < index) {
-					this.taskBtn.removeClass("active");
-					this.taskBtn.addClass("blur");
+					this.taskBtn[i].removeClass("active");
+					this.taskBtn[i].addClass("blur");
 				} else if (i == index) {
-					this.taskBtn.removeClass("blur");
-					this.taskBtn.addClass("active");
+					this.taskBtn[i].removeClass("blur");
+					this.taskBtn[i].addClass("active");
 				} else {
-					this.taskBtn.removeClass("blur active");
+					this.taskBtn[i].removeClass("blur active");
 				}
 			}
 
@@ -246,14 +264,12 @@ define(
 
 			// Create pop-up window buttons
 			this.elmPopupFooter.empty();
-			var btnReplay = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>')
+			var btnReplay = $('<a href="#" class="btn-do"><span class="uicon uicon-play-media"></span></a>')
 								.appendTo(this.elmPopupFooter)
 								.click((function(e) {
-									this.loadAnimation( task['info']['animation'], (function() {
-										this.playAnimation();
-									}).bind(this));
+									this.playAnimation();
 								}).bind(this));
-			var btnStart = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>')
+			var btnStart = $('<a href="#" class="btn-do"><span class="uicon uicon-play"></span></a>')
 								.appendTo(this.elmPopupFooter)
 								.click((function(e) {
 									this.trigger("startTask", task['_id']);

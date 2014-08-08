@@ -317,7 +317,7 @@ define(
 				init_tune = function(cb) {
 
 					// Create tuning screen
-					var scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.TuningScreen);
+					var scrTuning = VAS.scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.TuningScreen);
 					if (!scrTuning) {
 						console.error("Core: Unable to initialize explaination screen!");
 						return;

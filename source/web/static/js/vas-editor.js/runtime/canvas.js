@@ -33,12 +33,13 @@ define(
 				this.canvasFabric.renderAll();
 				if (this.timeline.position >= this.timeline.duration) {
 					if (isPlaying) {
-						this.trigger('completed');
+						this.trigger('animationCompleted');
+						this.timeline.setPaused(true);
 						isPlaying = false;
 					}
 				} else {
 					if (!isPlaying) {
-						this.trigger('started');
+						this.trigger('animationStarted');
 						isPlaying = true;
 					}
 				}

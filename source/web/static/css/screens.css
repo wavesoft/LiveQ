@@ -245,6 +245,12 @@
   background-color: #34495e;
   color: #fff;
 }
+.screen.explain .explain-window.cs-green a.btn-level.blur {
+  background-color: #7F8C8D;
+}
+.screen.explain .explain-window.cs-green a.btn-level.active {
+  background-color: #E67E22;
+}
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
   background-color: #3498db;

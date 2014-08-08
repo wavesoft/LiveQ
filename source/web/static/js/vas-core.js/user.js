@@ -105,6 +105,7 @@ define(["core/config", "core/db"],
 
 			// Update db_task fields
 			db_task['enabled'] = u_task['enabled'];
+			db_task['seen_intro'] = u_task['seen_intro'];
 			db_task['save'] = u_task['save'];
 
 			// Return data
@@ -123,7 +124,7 @@ define(["core/config", "core/db"],
 			var taskDetails = [];
 			for (var i=0; i<topic.tasks.length; i++) {
 				// Collect task details
-				taskDetails.push( User.getTaskDetails(node.tasks[i]) );
+				taskDetails.push( User.getTaskDetails(topic.tasks[i]) );
 				// The first one is always enabled
 				if (i==0) taskDetails[0].enabled = true;
 			}
