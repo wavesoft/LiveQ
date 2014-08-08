@@ -21,6 +21,7 @@ define(
 			// Prepare configuration
 			this.diameter = 200;
 			this.machines = [];
+			this.lastWorkers = 0;
 			window.run = this;
 
 			// Prepare host
@@ -84,6 +85,11 @@ define(
 					this.trigger('abortRun');
 				}).bind(this));
 			}
+
+			// Register visual aids
+			R.registerVisualAid("running.label.workers", this.infoWorkers, { "screen": "screen.running" });
+			R.registerVisualAid("running.label.events", this.infoEventRate, { "screen": "screen.running" });
+			R.registerVisualAid("running.label.percent", this.infoPercent, { "screen": "screen.running" });
 
 			// Prepare for observable elements
 			this.obsElms = [];
@@ -194,6 +200,10 @@ define(
 		 */
 		RunningScreen.prototype.onWorkerAdded = function( id, info ) {
 
+			// If that's our first worker, show first-time aid
+			if (this.machines.length == 0)
+				UI.showFirstTimeAid( "running.label.workers" );				
+
 			// Update the machines
 			info['id'] = id;
 			this.machines.push(info);
@@ -216,7 +226,15 @@ define(
 		 * Update histogram data
 		 */
 		RunningScreen.prototype.onUpdate = function( histograms ) {
-			
+			console.log(histograms);
+			window.h = histograms;
+		}
+
+		/**
+		 * When shown, show first-time aids
+		 */
+		RunningScreen.prototype.onShown = function() {
+
 		}
 
 		/**

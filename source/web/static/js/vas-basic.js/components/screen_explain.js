@@ -22,6 +22,7 @@ define(
 			this.topicInfo = null;
 			this.taskBtn = [];
 			this.activeTask = 0;
+			this.disableAnimation = true;
 
 			// Prepare host
 			hostDOM.addClass("explain");
@@ -134,6 +135,7 @@ define(
 
 				// Handle events
 				com.on('animationCompleted', (function() {
+					if (this.disableAnimation) return;
 
 					// Show pop-up
 					this.elmPopup.fadeIn();
@@ -184,6 +186,15 @@ define(
 		 * Update level status 
 		 */
 		ExplainScreen.prototype.onWillShow = function(cb) {
+			this.disableAnimation = false;
+			cb();
+		}
+
+		/**
+		 * Disable firing completion events 
+		 */
+		ExplainScreen.prototype.onWillHide = function(cb) {
+			this.disableAnimation = true;
 			cb();
 		}
 

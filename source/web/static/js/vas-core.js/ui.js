@@ -437,6 +437,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			if (!visualAid) return;
 			if (!userAids[aid_id]) return;
 			if (userAids[aid_id].shown) return;
+			if ((visualAid.screen != "") && (visualAid.screen != UI.activeScreen)) return;
 
 			// We got everything, prepare display
 			var popup = $('<div class="newitem-popup"></div>'),
@@ -882,6 +883,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			if (UI.activeScreen == name)
 				return;
 
+			// Switch screen
+			var prevScreen = UI.activeScreen;
+			UI.activeScreen = name;
+
 			// Check for missing transition
 			if (transition == undefined) {
 				transition = UI.Transitions.ZOOM_IN;
@@ -894,10 +899,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			UI.hideAllfirstTimeAids();
 
 			// Get prev/next screen
-			var ePrev = UI.screens[UI.activeScreen],
+			var ePrev = UI.screens[prevScreen],
 				eNext = UI.screens[name];
 
-			console.log(UI.activeScreen," -> ",name);
+			console.log(prevScreen," -> ",name);
 
 			// Concurrent cross-fade
 			var pageTransition = function(cb) {
@@ -969,7 +974,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 				// Inform page transition
 				if (UI.mininav)
-					UI.mininav.onPageWillChange( UI.activeScreen, name );
+					UI.mininav.onPageWillChange( prevScreen, name );
 
 				// And cross-fade simultanously
 				pageTransition(function() {
@@ -980,10 +985,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 					// Change page
 					if (UI.mininav)
-						UI.mininav.onPageChanged( UI.activeScreen, name );
-
-					// Update
-					UI.activeScreen = name;
+						UI.mininav.onPageChanged( prevScreen, name );
 
 					// Fire resize events on overlay masks & visualAgent
 					// (This is a hack to update visual agent's position after 

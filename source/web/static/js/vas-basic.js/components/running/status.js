@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/data_widget" ], 
+	["jquery", "core/registry", "core/ui", "core/base/data_widget" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, DataWidget) {
+	function(config, R, UI, DataWidget) {
 
 		var DefaultStatusWidget = function(hostDOM) {
 
@@ -86,6 +86,9 @@ define(
 				this.globe.onResize( this.diameter, this.diameter );
 			}
 
+			// Register visual aid 
+			R.registerVisualAid("running.button.abort", this.abortIcon, { "screen": "screen.running" });
+
 		};
 
 		// Subclass from DataWidget
@@ -160,6 +163,16 @@ define(
 		////////////////////////////////////////////////////////////
 		//           Implementation of the DataWidget             //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * When shown, show first-time aids
+		 */
+		DefaultStatusWidget.prototype.onShown = function() {
+
+			// Show first-time aids
+			UI.showFirstTimeAid( "running.button.abort" );
+
+		}
 
 		/**
 		 * Fired when a worker node is added to the job

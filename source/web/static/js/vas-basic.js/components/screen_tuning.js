@@ -202,7 +202,7 @@ define(
 				UI.showTutorial("ui.tuning");
 			});
 
-			R.registerVisualAid("tuning.button.tutorial", btnTutorial, { "screen": "screen.explain" });
+			R.registerVisualAid("tuning.button.tutorial", btnTutorial, { "screen": "screen.tuning" });
 
 			// Populate save buttons (in reverse order because they are float:right)
 			for (var i=3; i>=0; i--) {
@@ -219,7 +219,7 @@ define(
 
 				// Mark last one for visual aid
 				if (i == 3)
-					R.registerVisualAid("tuning.button.save", btnSave, { "screen": "screen.explain" });
+					R.registerVisualAid("tuning.button.save", btnSave, { "screen": "screen.tuning" });
 
 				this.saveButtons.unshift(btnSave);
 				if (this.activeSaveSlot == i)

@@ -59,9 +59,9 @@ define(
 			this.element.append('<div class="message"><span class="uicon uicon-warning"></span><br/>Results are estimated!</div>')
 
 			// Register visual aids
-			R.registerVisualAid("tuning.status", this.element, { "screen": "screen.explain" });
-			R.registerVisualAid("tuning.button.begin", this.startIcon, { "screen": "screen.explain" });
-			R.registerVisualAid("tuning.marker.target", this.elmChiGood, { "screen": "screen.explain" });
+			R.registerVisualAid("tuning.status", this.element, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.button.begin", this.startIcon, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.marker.target", this.elmChiGood, { "screen": "screen.tuning" });
 
 		};
 

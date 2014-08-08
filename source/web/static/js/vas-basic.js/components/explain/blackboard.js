@@ -70,7 +70,7 @@ define(
 		 * Stop animation when hiding
 		 */
 		ExplainBlackboard.prototype.onWillHide = function(cb) {
-			this.canvas.timeline.setPaused(true);
+			this.canvas.timeline.gotoAndStop(0);
 			cb();
 		}
 

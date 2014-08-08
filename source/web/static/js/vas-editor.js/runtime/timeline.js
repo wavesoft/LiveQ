@@ -93,6 +93,7 @@ define(
 				// Wait until we can play through
 				var cb = (function(e) {
 					this.audioElement.removeEventListener('canplaythrough', cb);
+					this.audioElement.pause();
 					if (callback) callback();
 				}).bind(this);
 
