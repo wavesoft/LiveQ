@@ -72,12 +72,14 @@ define(
 			this.pinLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
 			this.pins = [];
 
+			/*
 			this.addPin( 40.547200, 23.049316 );
 			this.addPin( 43.197167, 12.128906 );
 			this.addPin( -26.588527, -70.664063 );
 			for (var i=0; i<10; i++) {
 				this.addPin( Math.random() * 180 - 90, Math.random() * 180 );
 			}
+			*/
 
 		};
 
@@ -112,6 +114,33 @@ define(
 			this.globeHost.add( mesh );
 			this.globeHost.add( line );
 			this.pins.push( mesh );
+
+			// Return pin
+			mesh._line = line;
+			return mesh;
+		}
+
+		/**
+		 * Remove a previously added pin
+		 */
+		Globe3D.prototype.removePin = function( pin ) {
+			var i = this.pins.indexof(pin);
+			if (i<0) return;
+
+			this.pins.splice(i,1);
+			this.globeHost.remove(pin._line);
+			this.globeHost.remove(pin);
+		}
+
+		/**
+		 * Remove all pins
+		 */
+		Globe3D.prototype.removeAllPins = function() {
+			for (var i=0;i<this.pins.length; i++) {
+				this.globeHost.remove(this.pins[i]._line);
+				this.globeHost.remove(this.pins[i]);
+			}
+			this.pins = [];
 		}
 
 		/**

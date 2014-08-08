@@ -840,6 +840,39 @@ define(
 
 		}
 
+		/**
+		 * Histogram data updated
+		 */
+		TuningScreen.prototype.onUpdate = function(histograms) {
+
+			var chiSum = 0, chiCount = 0;
+
+			// Update histogram data
+			for (var i=0; i<histograms.length; i++) {
+				var histo = histograms[i];
+
+				// Find the relative observable
+				if (this.observableByID[histo.id]) {
+
+					// Update histogram 
+					this.observableByID[histo.id].onUpdate( histo );
+
+					// Collect chi-squared average information
+					chiSum += this.observableByID[histo.id].getValue();
+					chiCount += 1;
+				}
+
+			}
+
+			// Update observing widget with the average chi square
+			if (chiCount > 0) {
+				this.observingWidget.onUpdate( chiSum / chiCount );
+			} else {
+				this.observingWidget.onUpdate( 1000 );
+			}
+
+		}
+
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 		////                    FUNCTIONALITY IMPLEMENTATION                       ////
@@ -891,6 +924,15 @@ define(
 			// Save active save data
 			this.taskData['save'][this.activeSaveSlot] = vals;
 			User.setTaskSaveSlot( this.taskData['_id'], this.activeSaveSlot, vals );
+
+		}
+
+		/**
+		 * Submit values and request interpolation
+		 */
+		TuningScreen.prototype.getReferenceHistos = function(values) {
+
+			var values = this.getValueMap();
 
 		}
 

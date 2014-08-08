@@ -19,6 +19,7 @@ define(
 
 			// Prepare properties
 			VAS.alertUnload = false;
+			VAS.referenceHistograms = null;
 
 			// Prepare progress screen
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
@@ -58,7 +59,11 @@ define(
 
 				// Bind events
 				UI.mininav.on("changeScreen", function(to) {
-					UI.selectScreen(to, UI.Transitions.ZOOM_OUT);
+					if (to == "screen.home") {
+						VAS.displayHome(true);
+					} else {
+						UI.selectScreen(to, UI.Transitions.ZOOM_OUT);
+					}
 				});
 
 			}
@@ -148,7 +153,7 @@ define(
 									for (var i=0; i<topic_map.length; i++) {
 										var o = topic_map[i];
 										if (o['parent'])
-											DB.cache['topic_index'][o['_id']].children.push( o );
+											DB.cache['topic_index'][o['parent']].children.push( o );
 									}
 
 									cb();
@@ -265,7 +270,7 @@ define(
 
 			var prog_run = progressAggregator.begin(1),
 				init_run = function(cb) {
-					var scrRunning = UI.initAndPlaceScreen("screen.running");
+					var scrRunning = VAS.scrRunning = UI.initAndPlaceScreen("screen.running");
 					if (!scrRunning) {
 						console.error("Core: Unable to initialize run screen!");
 						return;
@@ -273,7 +278,13 @@ define(
 
 					// Bind events
 					scrRunning.on('abortRun', function() {
-						UI.selectScreen("screen.tuning");
+
+						// Abort run
+						LiveQCore.abortRun();
+
+						// Display tuning screen
+						UI.selectScreen("screen.tuning")
+
 					});
 
 					// Complete run
@@ -333,8 +344,20 @@ define(
 						UI.selectScreen("screen.explain")
 							.onParameterFocus(parameter);
 					});
-					scrTuning.on('submitParameters', function(parameters) {
-						UI.selectScreen("screen.running", UI.Transitions.ZOOM_OUT);
+					scrTuning.on('submitParameters', function(values) {
+						VAS.displayRunningScreen( values, VAS.referenceHistograms );
+					});
+					scrTuning.on('interpolateParameters', function(values) {
+						LiveQCore.requestInterpolation( values, 
+							function(histograms) {
+								scrTuning.onUpdate(histograms);
+								VAS.referenceHistograms = histograms;
+							},
+							function(error) {
+								alert("Could not request interpolation! "+error);
+							}
+						);
+
 					});
 
 					// Complete tuning
@@ -418,6 +441,45 @@ define(
 
 			// Display tuning screen
 			UI.selectScreen("screen.tuning")
+
+		}
+
+		/**
+		 * Check user's configuration and display the appropriate tuning screen
+		 */
+		VAS.displayRunningScreen = function( values, referenceHistograms ) {
+
+			// Start task
+			VAS.scrRunning.onStartRun( values, referenceHistograms );
+
+			// Start Lab Socket
+			LiveQCore.requestRun(values,
+				function(histograms) { // Data Arrived
+					VAS.scrRunning.onUpdate( histograms );
+				},
+				function(histograms) { // Completed
+					VAS.scrRunning.onUpdate( histograms );
+				},
+				function(errorMsg) { // Error
+					if (errorMsg == "Aborted") return;
+					alert("Simulation Error: "+errorMsg);
+					VAS.displayHome();
+				},
+				function(logLine, telemtryData) { // Log/Telemetry
+					if (telemtryData['agent_added']) {
+						VAS.scrRunning.onWorkerAdded(telemtryData['agent_added'],
+						{
+							'lat' : Math.random() * 180 - 90,
+							'lng' : Math.random() * 180
+						});
+					} else if (telemtryData['agent_removed']) {
+						VAS.scrRunning.onWorkerRemoved(telemtryData['agent_removed']);
+					}
+					console.log(">>> ",logLine,telemtryData);
+				});
+
+			// Display tuning screen
+			UI.selectScreen("screen.running")
 
 		}
 

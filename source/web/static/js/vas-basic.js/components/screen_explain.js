@@ -280,6 +280,8 @@ define(
 			if (task.seen_intro) {
 				// If yes, show the pop-up window
 				this.elmPopup.show();
+				// Yet still load the animation if the user clicks play
+				this.loadAnimation( task['info']['animation'] );
 			} else {
 				// If no, start the animation
 				this.loadAnimation( task['info']['animation'], (function() {

@@ -148,7 +148,7 @@ define(["core/config", "core/db"],
 			var traverse_node = function(node, parent) {
 
 				// Skip invisible nodes
-				if ((parent != null) && DB.userRecord['data']['enabled_topics'][node['_id']])
+				if ((parent != null) && !DB.userRecord['data']['enabled_topics'][node['_id']])
 					return;
 
 				// Store to nodes & it's lookup
@@ -159,7 +159,7 @@ define(["core/config", "core/db"],
 				// Check if we should make a link
 				if (parent != null) {
 					var parent_id = node_id[parent['_id']];
-					links.push({ 'source': parent_id, 'target': curr_node_id });
+					links.push({ 'source': curr_node_id, 'target': parent_id });
 				}
 
 				// Traverse child nodes

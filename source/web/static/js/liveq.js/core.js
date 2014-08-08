@@ -23,6 +23,7 @@ define(
 			'__cbSimOk' 	: null,
 			'__cbSimData'	: null,
 			'__cbSimError' 	: null,
+			'__cbSimLog'	: null,
 			'__pendingSim'  : false,
 			'__lastLabID'	: null,
 
@@ -89,6 +90,7 @@ define(
 					this.__cbSimError = null;
 					this.__cbSimData = null;
 					this.__cbSimOk = null;
+					this.__cbSimLog = null;
 					// Check if we should delete the sim socket
 					if (this.__simSocketDel) {
 						this.__simSocketDel = false;
@@ -110,6 +112,13 @@ define(
 			//
 			this.socket.on('ready', (function(config) {
 				if (cbCompleted) cbCompleted();
+			}).bind(this));
+			
+			//
+			// 'log' is fired when a server log or telemetry data arrives
+			//
+			this.socket.on('log', (function(text, telemetry) {
+				if (this.__cbSimLog) this.__cbSimLog(text, telemetry);
 			}).bind(this));
 
 			//
@@ -167,6 +176,7 @@ define(
 				this.__cbSimError = null;
 				this.__cbSimData = null;
 				this.__cbSimOk = null;
+				this.__cbSimLog = null;
 
 				// Check if we should delete the sim socket
 				if (this.__simSocketDel) {
@@ -216,7 +226,7 @@ define(
 		/**
 		 * Request an interpolation simulation
 		 */
-		LiveQCore.requestRun = function( values, cbIntermediate, cbCompleted, cbError ) {
+		LiveQCore.requestRun = function( values, cbIntermediate, cbCompleted, cbError, cbLog ) {
 			
 			// Abort previous run
 			if (this.__pendingSim) {
@@ -233,6 +243,7 @@ define(
 			this.__cbSimData = cbIntermediate;
 			this.__cbSimOk = cbCompleted;
 			this.__cbSimError = cbError;
+			this.__cbSimLog = cbLog;
 			this.__pendingSim = true;
 
 			// Keep a reference of the simulation socket
@@ -243,6 +254,34 @@ define(
 
 		};
 
+		/**
+		 * Abort a currently running simulation
+		 */
+		LiveQCore.abortRun = function() {
+
+			// Abort previous run
+			if (!this.__pendingSim) return;
+
+			// Fire abort callback
+			if (this.__cbSimError) this.__cbSimError("Aborted");
+
+			// Stop simulation
+			this.socket.abortSimulation();
+
+			// Reset simulation
+			this.__pendingSim = false;
+			this.__cbSimError = null;
+			this.__cbSimData = null;
+			this.__cbSimOk = null;
+			this.__cbSimLog = null;
+
+			// Check if we should delete the sim socket
+			if (this.__simSocketDel) {
+				this.__simSocketDel = false;
+				this.__simSocket.close();
+				this.__simSocket = null;
+			}
+		}
 
 		// Return LiveQCore class
 		return LiveQCore;

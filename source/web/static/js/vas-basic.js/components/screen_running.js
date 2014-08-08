@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	[ "jquery", "core/config", "core/registry", "core/base/components"],
+	[ "jquery", "core/config", "core/registry", "core/base/components", "core/ui"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports vas-basic/components/running_screen
 	 */
-	function($, config,R,C) {
+	function($, config,R,C,UI) {
 
 		/**
 		 * @class
@@ -78,17 +78,11 @@ define(
 				console.warn("Unable to instantiate running screen status widget");
 			else {
 				this.forwardVisualEvents( this.statusWidget );
+				this.forwardEvents( this.statusWidget, [ 'onWorkerAdded', 'onWorkerRemoved', 'onStartRun' ] );
 				this.statusWidget.on('abort', (function() {
 					this.trigger('abortRun');
 				}).bind(this));
 			}
-
-			// Prepare pop-up drawer
-			this.popupOnScreen = R.instanceComponent( "widget.onscreen", this.foregroundDOM );
-			if (!this.popupOnScreen)
-				console.warn("Unable to instantiate onscreen description element");
-			else
-				this.forwardVisualEvents( this.popupOnScreen );
 
 			// Prepare for observable elements
 			this.obsElms = [];
@@ -161,35 +155,6 @@ define(
 			// circular distribution
 			e.setRadialConfig( 150, 350, angle );
 
-			// Bind pop-up events
-			e.on('showDetails', (function(elm) {
-				return function(metadata) {
-
-					// Prepare popup
-					var comBodyHost = $('<div></div>');
-					this.popupOnScreen.setAnchor( elm.x, elm.y, 80, (elm.x > this.pivotX) ? 0 : 1 );
-					this.popupOnScreen.setBody(comBodyHost);
-					this.popupOnScreen.setTitle("Details for " + metadata['info']['name']);
-
-					// Prepare the body component
-					var comBody = R.instanceComponent("infoblock.observable", comBodyHost);
-					if (comBody) {
-						comBody.setWidget( e );
-					} else {
-						console.warn("Could not instantiate observable infoblock!");
-					}
-
-					// Display popup screen
-					this.popupOnScreen.setVisible(true);
-
-				}
-			})(e).bind(this));
-			e.on('hideDetails', (function(elm) {
-				return function(metadata) {
-					this.popupOnScreen.setVisible(false);
-				}
-			})(e).bind(this));
-
 			// Set metadata and value
 			e.onMetaUpdate( metadata );
 			e.onUpdate( undefined );
@@ -204,6 +169,34 @@ define(
 		////                          MAIN HOOK HANDLERS                           ////
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		RunningScreen.prototype.onWorkerRemoved = function( id ) {
+
+		}
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		RunningScreen.prototype.onWorkerAdded = function( id, info ) {
+
+		}
+
+		/**
+		 * Reisze canvas & engine dimentions to fit host
+		 */
+		RunningScreen.prototype.onStartRun = function( values, referenceHistograms ) {
+
+		}
+
+		/**
+		 * Update histogram data
+		 */
+		RunningScreen.prototype.onUpdate = function( histograms ) {
+
+		}
 
 		/**
 		 * Reisze canvas & engine dimentions to fit host

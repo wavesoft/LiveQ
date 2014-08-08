@@ -10,7 +10,7 @@ define(
 	 */
 	function(config, R, UI, TC, Config, CMath, LiveQCalc) {
 
-		var DefaultObservableWidget = function(hostDOM) {
+		var DefaultRunningObservableWidget = function(hostDOM) {
 
 			// Initialize widget
 			TC.ObservableWidget.call(this, hostDOM);
@@ -53,7 +53,7 @@ define(
 		};
 
 		// Subclass from ObservableWidget
-		DefaultObservableWidget.prototype = Object.create( TC.ObservableWidget.prototype );
+		DefaultRunningObservableWidget.prototype = Object.create( TC.ObservableWidget.prototype );
 
 		////////////////////////////////////////////////////////////
 		//         Implementation of the ObservableWidget         //
@@ -62,7 +62,7 @@ define(
 		/**
 		 * Update tuning widget metadata
 		 */
-		DefaultObservableWidget.prototype.onMetaUpdate = function(meta) {
+		DefaultRunningObservableWidget.prototype.onMetaUpdate = function(meta) {
 			this.meta = meta;
 			this.element.text(meta['info']['short']);
 		}
@@ -70,7 +70,7 @@ define(
 		/**
 		 * Update tuning widget value
 		 */
-		DefaultObservableWidget.prototype.onUpdate = function(value) {
+		DefaultRunningObservableWidget.prototype.onUpdate = function(value) {
 			if (value == undefined) { // Reset
 				this.value = null;
 			} else {
@@ -86,7 +86,7 @@ define(
 		/**
 		 * Take appropriate actions to focus this element
 		 */
-		DefaultObservableWidget.prototype.handleFocus = function() {
+		DefaultRunningObservableWidget.prototype.handleFocus = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
 				
@@ -101,7 +101,7 @@ define(
 
 							// Update infoblock 
 							comBody.onMetaUpdate( this.meta );
-							comBody.onUpdate( this.getValue() );
+							comBody.onUpdate( this.value );
 
 							// Adopt events from infoblock as ours
 							this.adoptEvents( comBody );
@@ -124,7 +124,7 @@ define(
 		/**
 		 * Take appropriate actions to blur this element
 		 */
-		DefaultObservableWidget.prototype.handleBlur = function() {
+		DefaultRunningObservableWidget.prototype.handleBlur = function() {
 			clearTimeout(this._handleTimer);
 			this._handleTimer = setTimeout((function() {
 
@@ -136,7 +136,7 @@ define(
 		/**
 		 * Activate/deactivate tunable
 		 */
-		DefaultObservableWidget.prototype.setActive = function(active) {
+		DefaultRunningObservableWidget.prototype.setActive = function(active) {
 			this.active = active;
 			if (active) {
 				this.element.removeClass("inactive");
@@ -157,14 +157,19 @@ define(
 		/**
 		 * Analyze histogram and try return a goodness of fit value between 0.0 (bad) and 1.0 (perfect)
 		 */
-		DefaultObservableWidget.prototype.getValue = function() {
+		DefaultRunningObservableWidget.prototype.getValue = function() {
 			//return Math.random();
 
 			// If we don't have yet histograms, return maximum chi-squared
-			if (!this.value) return Config['chi2-bounds']['max'];
+			if (!this.value) return 0;
+
+			// Calculate bin ratio
+			for (var i=0; i<this.value.data.bins.length; i++) {
+
+			}
 
 			// Calculate chi-squared between the data and the reference histogram
-			var chi2 = LiveQCalc.chi2WithError( this.value.data, this.value.ref );
+			var chi2 = LiveQCalc.chi2WithError( this.value.data, this.value.ref.data );
 			return chi2[0];
 		}
 
@@ -172,7 +177,7 @@ define(
 		 * This event is fired when the view is scrolled/resized and it
 		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultObservableWidget.prototype.onHorizonTopChanged = function(bottom) {
+		DefaultRunningObservableWidget.prototype.onHorizonTopChanged = function(bottom) {
 			this.bottom = bottom;
 
 			// Update indicator position only if active
@@ -190,7 +195,7 @@ define(
 		/**
 		 * Update the configuration regarding the radial arrangement of the observable
 		 */
-		DefaultObservableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
+		DefaultRunningObservableWidget.prototype.setRadialConfig = function(minD,maxD,angle) {
 			if (minD !== undefined) this.minDistance = minD;
 			if (maxD !== undefined) this.maxDistance = maxD;
 			if (angle !== undefined) this.angle = angle || 0;
@@ -201,7 +206,7 @@ define(
 		 * This event is fired when the view is scrolled/resized and it
 		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultObservableWidget.prototype.onResize = function(width, height) {
+		DefaultRunningObservableWidget.prototype.onResize = function(width, height) {
 			this.width = width;
 			this.height = height;
 
@@ -217,7 +222,7 @@ define(
 		/**
 		 * Update the visual representation of the element
 		 */
-		DefaultObservableWidget.prototype.update = function() {
+		DefaultRunningObservableWidget.prototype.update = function() {
 
 			// Calculate position around pivot
 			var v = this.getValue(),
@@ -248,7 +253,7 @@ define(
 		}
 
 		// Store tuning widget component on registry
-		R.registerComponent( 'widget.observable.running', DefaultObservableWidget, 1 );
+		R.registerComponent( 'widget.observable.running', DefaultRunningObservableWidget, 1 );
 
 	}
 

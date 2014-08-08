@@ -19,6 +19,7 @@ define(
 			this.diameter = 200;
 			this.shootRadius = 200;
 			this.shootZoneWidth = 40;
+			this.pinIDs = {};
 
 			// Prepare host
 			this.element = $('<div class="progress-widget"></div>');
@@ -159,6 +160,31 @@ define(
 		////////////////////////////////////////////////////////////
 		//           Implementation of the DataWidget             //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		DefaultStatusWidget.prototype.onWorkerRemoved = function( id ) {
+			this.globe.removePin( this.pinIDs[id] );
+			delete this.pinIDs[id];
+		}
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		DefaultStatusWidget.prototype.onWorkerAdded = function( id, info ) {
+			var lat = info['lat'] || Math.random() * 180 - 90,
+				lng = info['lng'] || Math.random() * 180;
+			this.pinIDs[id] = this.globe.addPin( lat, lng );
+		}
+
+		/**
+		 * Reisze canvas & engine dimentions to fit host
+		 */
+		DefaultStatusWidget.prototype.onStartRun = function( values, referenceHistograms ) {
+			this.pinIDs = {};
+			this.globe.removeAllPins();
+		}
 
 		/**
 		 * Update tuning widget metadata
