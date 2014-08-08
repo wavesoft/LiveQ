@@ -5,11 +5,11 @@ svg.dv-plot {
 svg.dv-plot .axis path,
 svg.dv-plot .axis line {
   fill: none;
-  stroke: #000;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 svg.dv-plot .tick text {
-  fill: #000;
+  fill: black;
 }
 svg.dv-plot path.plot-line {
   fill: none;
@@ -18,7 +18,10 @@ svg.dv-plot path.plot-area {
   stroke: none;
 }
 svg.dv-plot path.plot-bullet {
-  fill: #fff;
+  fill: white;
+}
+svg.dv-plot g.legend-entry text {
+  fill: white;
 }
 svg.dv-plot.dv-invert .axis path,
 svg.dv-plot.dv-invert .axis line {
@@ -28,13 +31,13 @@ svg.dv-plot.dv-invert .tick text {
   fill: #95a5a6;
 }
 svg.dv-home .node {
-  stroke: #fff;
+  stroke: white;
   stroke-width: 3.5px;
   cursor: pointer;
 }
 svg.dv-home .node text {
   stroke: none;
-  fill: #333;
+  fill: #333333;
 }
 svg.dv-home .link {
   stroke-width: 3;
