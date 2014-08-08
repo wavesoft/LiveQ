@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/user"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, DB, UI, config, R,C) {
+	function($, d3, DB, UI, config, R,C, User) {
 
 		/**
 		 * @class
@@ -17,6 +17,10 @@ define(
 		 */
 		var ExplainScreen = function( hostDOM ) {
 			C.ExplainScreen.call(this, hostDOM);
+
+			// Local properties
+			this.topicInfo = null;
+			this.taskBtn = [];
 
 			// Prepare host
 			hostDOM.addClass("explain");
@@ -39,6 +43,7 @@ define(
 			this.elmScreen = $('<div class="explain-screen"></div>').appendTo(this.elmWindow);
 			this.elmFooter = $('<div class="explain-footer"></div>').appendTo(this.elmWindow);
 			this.elmPopup = $('<div class="explain-popup"></div>').appendTo(this.elmWindow);
+			this.elmPopupBody = $('<div></div>').appendTo(this.elmPopup);
 			this.elmPopupFooter = $('<div class="btn-host"></div>').appendTo(this.elmPopup);
 
 			// Setup click handlers to hide when clicking on empty space
@@ -76,7 +81,6 @@ define(
 
 			// Initialize explain screen
 			this.createExplainScreen();
-			this.loadScene("level-1-1");
 
 		}
 		ExplainScreen.prototype = Object.create( C.ExplainScreen.prototype );
@@ -84,7 +88,7 @@ define(
 		/**
 		 * Load explain scene
 		 */
-		ExplainScreen.prototype.loadScene = function(id) {
+		ExplainScreen.prototype.loadAnimation = function(id, cb) {
 
 			// Load animations for the explain scene
 			var db = DB.openDatabase("animations");
@@ -92,10 +96,27 @@ define(
 				if (!doc) {
 					// TODO: Show error
 				} else {
-					this.explainComponent.onAnimationUpdated( doc );
+					this.explainComponent.onAnimationUpdated( doc, cb );
 				}
 			}).bind(this));
 			
+		}
+
+		/**
+		 * Start screen animation
+		 */
+		ExplainScreen.prototype.playAnimation = function() {
+			// Hide popup
+			this.elmPopup.fadeOut();
+			// Start animation
+			this.explainComponent.onAnimationStart();
+		}
+
+		/**
+		 * Stop screen animation
+		 */
+		ExplainScreen.prototype.stopAnimation = function() {
+			this.explainComponent.onAnimationStop();
 		}
 
 		/**
@@ -157,10 +178,100 @@ define(
 		/**
 		 * Update topic information
 		 */
-		ExplainScreen.prototype.onTopicUpdated = function(task_info) {
+		ExplainScreen.prototype.onTopicUpdated = function(topic_info) {
+
+			// Store topic info
+			this.topicInfo = topic_info;
+
+			// Update title
+			this.elmTitle.text(topic_info['info']['title']);
+			this.elmSubtitle.html(topic_info['info']['desc']);
+
+			// Regenerate task buttons
+			this.elmFooter.empty();
+			this.taskBtn = [];
+			var activeTask = 0;
+			for (var i=0; i<topic.taskDetails.length; i++) {
+				var task = topic.taskDetails[i],
+					taskBtn = $('<a href="#" class="btn-level">'+(i+1)+'</a>');
+
+				// Stop creating buttons when we reached a disabled task
+				activeTask = i;
+				if (!task.enabled) return;
+
+				// Setup hooks
+				taskBtn.click((function(index) {
+					return function(e) {
+						this.selectTask(index);
+					}
+				})(i).bind(this));
+
+				// Put button on footer
+				this.elmFooter.append( taskBtn );
+				this.taskBtn.push( taskBtn );
+
+			}
+
+			// Select active task
+			this.selectTask( activeTask );
 
 		}
 
+		/**
+		 * Select a task
+		 */
+		ExplainScreen.prototype.selectTask = function(index) {
+
+			// Activate/blur buttons
+			for (var i=0; i<this.taskBtn.length; i++) {
+				if (i < index) {
+					this.taskBtn.removeClass("active");
+					this.taskBtn.addClass("blur");
+				} else if (i == index) {
+					this.taskBtn.removeClass("blur");
+					this.taskBtn.addClass("active");
+				} else {
+					this.taskBtn.removeClass("blur active");
+				}
+			}
+
+			// Get task details
+			var task = this.topicInfo.taskDetails[index];
+			if (!task) return;
+
+			// Populate pop-up window
+			this.elmPopupBody.empty();
+			this.elmPopupBody.append($('<h2>'+task['info']['title']+'</h2>'));
+			this.elmPopupBody.append($('<div>'+task['info']['desc']+'</div>'));
+
+			// Create pop-up window buttons
+			this.elmPopupFooter.empty();
+			var btnReplay = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>')
+								.appendTo(this.elmPopupFooter)
+								.click((function(e) {
+									this.loadAnimation( task['info']['animation'], (function() {
+										this.playAnimation();
+									}).bind(this));
+								}).bind(this));
+			var btnStart = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>')
+								.appendTo(this.elmPopupFooter)
+								.click((function(e) {
+									this.trigger("startTask", task['_id']);
+								}).bind(this));
+
+
+			// Check if we have seen the animation
+			if (task.seen_intro) {
+				// If yes, show the pop-up window
+				this.elmPopup.show();
+			} else {
+				// If no, start the animation
+				this.loadAnimation( task['info']['animation'], (function() {
+					this.playAnimation();
+				}).bind(this));
+			}
+
+		}
 
 		// Register home screen
 		R.registerComponent( "screen.explain", ExplainScreen, 1 );

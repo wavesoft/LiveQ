@@ -5,7 +5,7 @@ define(
 	/**
 	 * Dependencies
 	 */
-	["jquery", "core/config", "core/registry", "core/base/components", "core/db", "core/ui", "liveq/core",
+	["jquery", "core/config", "core/registry", "core/base/components", "core/db", "core/ui", "core/user", "liveq/core",
 
 	 // Self-registering dependencies
 	 "jquery-knob"], 
@@ -15,7 +15,7 @@ define(
 	 *
 	 * @exports vas-basic/components/tuning_screen
 	 */
-	function($, config, R, C, DB, UI, LiveQ) {
+	function($, config, R, C, DB, UI, User, LiveQCore) {
 
 		/**
 		 * Tuning dashboard screen
@@ -40,6 +40,13 @@ define(
 			this.tunWideSpan = 0;
 			this.tunMinDistance = 150;
 			this.tunMaxDistance = 350;
+
+			// Save slots
+			this.saveButtons = [];
+			this.activeSaveSlot = 0;
+
+			// Task info
+			this.taskData = null;
 
 			// Data fields
 			this.tunables = {};
@@ -180,6 +187,39 @@ define(
 			this.foregroundDOM.append( this.tuningSB0 );
 			this.foregroundDOM.append( this.tuningSB1 );
 
+			// Place buttons on the tuning sidebars
+			this.sidebarButtonsDOM = $('<div class="sidebar-buttons"></div>').appendTo(this.tuningSB0);
+
+			// Prepare bodies
+			this.tuningBodySB0 = $('<div></div>').appendTo( this.tuningSB0 );
+			this.tuningBodySB1 = $('<div></div>').appendTo( this.tuningSB1 );
+
+			// Add tutorial button
+			var btnTutorial = $('<div class="btn-tutorial"><span class="uicon uicon-explain"></span><br />Tutorial</div>').appendTo( this.sidebarButtonsDOM );
+			btnTutorial.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.showTutorial("ui.tuning");
+			});
+
+			// Populate save buttons (in reverse order because they are float:right)
+			for (var i=3; i>=0; i--) {
+				var btnSave = $('<div class="btn-save"><div class="led"></div><div class="text">'+(i+1)+'</div></div></div>')
+								.appendTo(this.sidebarButtonsDOM);
+
+				btnSave.click((function(slot) {
+					return function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						this.activateSave(slot);
+					}
+				})(i).bind(this));
+
+				this.saveButtons.unshift(btnSave);
+				if (this.activeSaveSlot == i)
+					btnSave.addClass("active");
+			}
+
 		};
 
 		/**
@@ -318,15 +358,6 @@ define(
 			this.infoSubtitle = $('<p>A short description of this level</p>');
 			this.ppTL.append(this.infoSubtitle);
 
-			// Prepare pagepart buttons
-			var btnTutorial = $('<div class="btn-taglike"><span class="uicon uicon-explain"></span><br />Tutorial</div>');
-			btnTutorial.click(function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				UI.showTutorial("ui.tuning");
-			});
-			this.ppTL.append( btnTutorial );
-
 		}
 
 		/**
@@ -407,8 +438,8 @@ define(
 				}
 
 				// Create title
-				this.tuningSB0.append(elmTitle);
-				this.tuningSB0.append(groupDOM = $('<div class="group"></div>'));
+				this.tuningBodySB0.append(elmTitle);
+				this.tuningBodySB0.append(groupDOM = $('<div class="group"></div>'));
 				this.tuningGroups[groupName] = groupDOM;
 
 			}
@@ -434,11 +465,24 @@ define(
 			// Event: Notify value updated
 			e.on('valueChanged', (function(value) {
 				this.requestInterpolation();
+				this.commitSaveChanges();
 			}).bind(this));
 
 			// Set default values
 			e.onMetaUpdate( metadata );
 			e.onUpdate( parseFloat(metadata['def']) || 0 );
+
+			// Get save slot information
+			if (this.taskData) {
+				var saveData = this.taskData['save'];
+				for (var i=0; i<saveData.length; i++) {
+					if (!saveData[i]) {
+						e.onSaveSlotUpdate( i, null );
+					} else {
+						e.onSaveSlotUpdate( i, saveData[i][metadata['_id']] || null );
+					}
+				}
+			}
 
 			return e;
 
@@ -490,8 +534,8 @@ define(
 				firstObservable = true;
 
 			// Cleanup previous components
-			this.tuningSB0.empty();
-			this.tuningSB1.empty();
+			this.tuningBodySB0.empty();
+			this.tuningBodySB1.empty();
 			this.hostTuning.find(".observable").remove();
 
 			// Calculate pivot point
@@ -601,13 +645,6 @@ define(
 						R.registerVisualAid( 'tunable', o, {'screen': 'screen.tuning'} );
 						firstTunable = false;
 					}
-
-					// Bind on tune rings
-					o.on('click', (function(ring) {
-						return function() {
-							this.focusTunableRing( ring );
-						}
-					})(j).bind(this));
 
 					// Activate the first level
 					//o.setActive( j == 0 );
@@ -723,15 +760,44 @@ define(
 		/**
 		 * Select an enable interface controls for the specified level
 		 */
-		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
+		TuningScreen.prototype.onStartTask = function( taskData ) {
 
+			/*
 			// Get the levels to activate
 			var activeLevels = [];
 			for (var i=0; i<=targetLevel; i++)
 				activeLevels.push(this.levels[i]);
 
 			// Redefine main screen
-			this.defineMainScreen( activeLevels, this.observables, this.tunables );
+			*/
+
+			// Fetch task data from user record
+			this.taskData = taskData;
+
+			// Update titles
+			this.infoTitle.text(this.taskData['info']['title'] || "Untitled Task");
+			this.infoSubtitle.text(this.taskData['info']['subtitle'] || "");
+
+			// Define main screen
+			this.defineMainScreen( [this.taskData], this.observables, this.tunables );
+
+		}
+
+		/**
+		 * Connect to lab before showing
+		 */
+		TuningScreen.prototype.onWillShow = function(cb) {
+
+			// Connect to LabSocket
+			LiveQCore.openSocket(
+				this.taskData['lab'], 
+				function(){
+					cb();
+				},
+				function(message) {
+					alert('Could not connect to LiveQ! '+message);
+				}
+			);
 
 		}
 
@@ -781,12 +847,60 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 
 		/**
+		 * Activate save group
+		 */
+		TuningScreen.prototype.activateSave = function(index) {
+			this.saveButtons[this.activeSaveSlot].removeClass("active");
+			this.activeSaveSlot = index;
+			this.saveButtons[this.activeSaveSlot].addClass("active");
+
+			// Load save states
+			var saveData = this.taskData['save'][this.activeSaveSlot];
+			if (saveData) {
+				for (var i=0; i<this.tunElms.length; i++) {
+					var k = this.tunElms[i].meta['_id'];
+
+					// Update from saved slot value
+					if (saveData[k] != undefined) {
+						this.tunElms[i].onUpdate( saveData[k] );
+					}
+				}
+			}
+
+		}
+
+		/**
+		 * Commit changes to the current save slot
+		 */
+		TuningScreen.prototype.commitSaveChanges = function() {
+
+			// Update save slots on each tunable & prepare tunables data map
+			var vals = {};
+			for (var i=0; i<this.tunElms.length; i++) {
+				var k = this.tunElms[i].meta['_id'],
+					v = this.tunElms[i].getValue();
+
+				// Update save slot value
+				this.tunElms[i].onSaveSlotUpdate( this.activeSaveSlot, v );
+
+				// Save 
+				vals[k] = v;
+
+			}
+
+			// Save active save data
+			this.taskData['save'][this.activeSaveSlot] = vals;
+			User.setTaskSaveSlot( this.taskData['_id'], this.activeSaveSlot, vals );
+
+		}
+
+		/**
 		 * Submit values and request interpolation
 		 */
 		TuningScreen.prototype.requestInterpolation = function(values) {
 
 			var values = this.getValueMap();
-			LiveQ.requestInterpolation( values, 
+			LiveQCore.requestInterpolation( values, 
 				(function(histograms) {
 
 					var chiSum = 0, chiCount = 0;

@@ -175,12 +175,12 @@ define(["core/config", "core/base/component" ],
 		};
 
 		/**
-		 * Select and enable interface controls for the specified level
+		 * Select and enable interface controls for the specified task
 		 *
 		 * @abstract
-		 * @param {int} targetLevel - A zero-based index of the level to activate
+		 * @param {int} taskID - The UUID of the task to start working on
 		 */
-		TuningScreen.prototype.onSelectLevel = function( targetLevel ) {
+		TuningScreen.prototype.onStartTask = function( taskID ) {
 		}
 
 		////////////////////////////////////////////////////////////

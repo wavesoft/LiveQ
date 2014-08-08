@@ -19,6 +19,7 @@ define(
 			this.value = 0;
 			this.meta = {};
 			this.markers = [];
+			this.lastMarkerInfo = {};
 			this.idleTimer = 0;
 
 			// Delay-initialized components
@@ -94,6 +95,9 @@ define(
 				}).bind(this), 100);
 			}).bind(this));
 
+			// Create the default 4 blank markers
+			this.updateMarkers([null, null, null, null]);
+
 
 		};
 
@@ -152,6 +156,7 @@ define(
 		 * Convert mapped value (between metadata[min] till metadata[max]) to normalized this.value
 		 */
 		DefaultTunableWidget.prototype.unmapValue = function( value ) {
+			if ((value == undefined) || (value == null)) return value;
 			if (!this.meta['value']) return this.value = value;
 			return (value - this.meta['value']['min']) / (this.meta['value']['max'] - this.meta['value']['min']);
 		}
@@ -173,6 +178,15 @@ define(
 
 			// Update marker positions
 			for (var i=0; i<this.markers.length; i++) {
+				
+				// Hide/show marker
+				if (!this.markers[i].v) {
+					this.markers[i].e.hide();
+				} else {
+					this.markers[i].e.show();
+				}
+
+				// Update marker info
 				this.markers[i].e.css({
 					'left': arrSpan * this.markers[i].v,
 				});
@@ -186,14 +200,10 @@ define(
 
 		}
 
-		////////////////////////////////////////////////////////////
-		//           Implementation of the TuningWidget           //
-		////////////////////////////////////////////////////////////
-
 		/**
 		 * Update markers
 		 */
-		DefaultTunableWidget.prototype.onMarkersUpdated = function(markers) {
+		DefaultTunableWidget.prototype.updateMarkers = function(markers) {
 			this.elmMarkers.empty();
 			this.markers = [ ];
 
@@ -212,13 +222,13 @@ define(
 
 				// Populate
 				eLabel.text(i+1);
-				eMarker.click( (function(v){
+				eMarker.click( (function(index){
 					return function(e) {
 						e.preventDefault();
 						e.stopPropagation();
-						this.dragdealer.setValue( v, 0 );
+						this.dragdealer.setValue( this.markers[index].v, 0 );
 					};
-				})(v).bind(this));
+				})(this.markers.length).bind(this));
 
 				// Store on markers array
 				this.markers.push({
@@ -227,11 +237,40 @@ define(
 					'eLabel': eLabel,
 					'v': v
 				});
+
+				// If 0 or null, hide
+				if (!v) {
+					eMarker.hide();
+				}
+
 			}
 
 			// Realign markers
 			this.update();
 
+		}
+
+		////////////////////////////////////////////////////////////
+		//           Implementation of the TuningWidget           //
+		////////////////////////////////////////////////////////////
+
+		/**
+		 * Update saved slot value
+		 */
+		DefaultTunableWidget.prototype.onSaveSlotUpdate = function(slot, value) {
+			// Update markers 
+			this.markers[slot].v = this.unmapValue( value );
+			this.update();
+		}
+
+		/**
+		 * Update tuning widget value
+		 */
+		DefaultTunableWidget.prototype.onUpdate = function(value) {
+			this.value = this.unmapValue( value );
+
+			if (this.dragdealer == null) return;
+			this.dragdealer.setValue( this.value, 0 );
 		}
 
 		/**
@@ -276,24 +315,6 @@ define(
 				this.spinner.stop();
 			}).bind(this));
 
-
-
-			// DEBUG
-			var a = [];
-			a.push(0);
-			for (var i=0; i<2; i++) {
-				a.push(Math.random());
-			}
-			a.push(1);
-			this.onMarkersUpdated(a);
-
-		}
-
-		/**
-		 * Update tuning widget value
-		 */
-		DefaultTunableWidget.prototype.onUpdate = function(value) {
-
 		}
 
 		/**
@@ -331,6 +352,7 @@ define(
 				vertical   : false,
 				slide      : false,
 				requestAnimationFrame : true,
+				value : this.value,
 
 				// Handle value change
 				animationCallback: (function(x,y) {

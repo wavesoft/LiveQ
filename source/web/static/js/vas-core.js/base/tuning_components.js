@@ -35,7 +35,7 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		/**
 		 * Update the display of saved slots
 		 */
-		TunableWidget.prototype.onMarkersUpdated = function(slots) {
+		TunableWidget.prototype.onSaveSlotUpdate = function(slots) {
 		}
 
 		////////////////////////////////////////////////////////////

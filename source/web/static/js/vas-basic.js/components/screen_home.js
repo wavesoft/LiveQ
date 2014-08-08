@@ -331,25 +331,43 @@ define(
 		 * Topic information has updated 
 		 */
 		HomeScreen.prototype.onTopicTreeUpdated = function(tree) {
-			console.log(tree);
-			window.tree =tree;
-			return;
 
-			// Setup graph nodes and links
-			this.graph.nodes = tree.nodes;
+			// Deset graph and import links
+			this.graph.nodes = [];
 			this.graph.links = tree.links;
+
+			// Color schemes to hex colors
+			var color_sceme = {
+				'green': '#2ECC71'
+			};
+
+			// Update graph with additional details required
+			// by the d3 library to work
+			for (var i=0; i<tree.nodes.length; i++) {
+				var n = tree.nodes[i],
+					d3_node = {
+						'name'	: n.info.name || "",
+						'desc'  : n.info.desc || "",
+						'icon'	: n.info.icon || 'static/img/level-icons/hard.png',
+						'color' : color_sceme[n.info.color || 'green'],
+						'radius': 20,
+						'click' : (function(record) {
+							return function(e) {
+								this.trigger("explainTopic", n['_id']);
+							};
+						})(n).bind(this)
+					};
+				this.graph.nodes.push(d3_node);
+			}
 
 			// Override root node icon/radius
 			this.graph.nodes[0].radius = 50;
 			this.graph.nodes[0].color = '#ECF0F1';
 			this.graph.nodes[0].icon = 'static/img/logo.png';
 
-			// Update graph with additional details required
-			// by the d3 library to work
-			for (var i=0; i<this.graph.nodes.length; i++) {
-				var n = this.graph.nodes[i];
+			// Regen UI
+			this.updateScene();
 
-			}
 		}
 
 		// Register home screen

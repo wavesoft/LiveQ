@@ -27,18 +27,25 @@ define(
 		/**
 		 * This event is fired when animation information has updated
 		 */
-		ExplainBlackboard.prototype.onAnimationUpdated = function( doc ) {
+		ExplainBlackboard.prototype.onAnimationUpdated = function( doc, cb ) {
 			this.canvas.loadJSON( doc, (function(e){
 				this.canvas.hotspots.setProgression(1);
+				if (cb) cb();
 			}).bind(this) );
 		}
 
 		/**
-		 * Start animation when shown
+		 * This event is fired when animation should start
 		 */
-		ExplainBlackboard.prototype.onShown = function() {
-			this.canvas.timeline.setPaused(false);
+		ExplainBlackboard.prototype.onAnimationStart = function( ) {
 			this.canvas.timeline.gotoAndPlay(0);
+		}
+
+		/**
+		 * This event is fired when animation should stop
+		 */
+		ExplainBlackboard.prototype.onAnimationStop = function( ) {
+			this.canvas.timeline.gotoAndStop(this.canvas.timeline.duration);
 		}
 
 		/**

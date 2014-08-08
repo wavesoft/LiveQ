@@ -111,6 +111,61 @@
 			}
 		}
 
+		.sidebar-buttons {
+			height: 45px;
+			background-color: #1ABC9C;
+
+			.btn-tutorial {
+				position: absolute;
+				left: 0; top: 0;
+				height: 45px;
+				cursor: pointer;
+				color: #fff;
+				text-align: center;
+			}
+
+			.btn-save {
+				position: relative;
+				width: 37px;
+				height: 45px;
+				background-color: #16a085;
+				border-left: solid 1px #1ABC9C;
+				float: right;
+				color: #fff;
+				cursor: pointer;
+
+				.led {
+					position: absolute;
+					left: 3.5px; top: 6px;
+					width: 30px;
+					height: 6px;
+					background-color: #1ABC9C;
+				}
+
+				.text {
+					position: absolute;
+					left: 7px; top: 15px;
+					width: 24px;
+					height: 24px;
+
+					line-height: 24px;
+					font-size: 18px;
+					font-weight: bold;
+					text-align: center;
+
+					background: url(../img/uicons-24.png) no-repeat -312px 0px;
+
+				}
+
+				&.active {
+					.led {
+						background-color: #F1C40F;
+					}
+				}
+
+			}
+		}
+
 	}
 
 	// (See body-based customizations in the end of this block)
@@ -401,6 +456,9 @@ body {
 				display: block;
 				width: 200px;
 				left: 0; top: 75px; bottom: 0;
+				.btn-tutorial {
+					width: 49px;
+				}
 			}
 			.sidebar.sb1 {
 				display: none;
@@ -414,6 +472,9 @@ body {
 				width: 240px;
 				top: 75px; bottom: 0;
 				left: 0;
+				.btn-tutorial {
+					width: 88px;
+				}
 			}
 			.sidebar.sb1 {
 				display: block;

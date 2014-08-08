@@ -211,7 +211,7 @@ define(["core/config", "core/db"],
 		/**
 		 * Update the save slot of a particular task
 		 */
-		User.setTaskSaveSlot = function(task, slot, data) {
+		User.setTaskSaveSlot = function(task_id, slot, data) {
 			
 			// Make sure data exist
 			if (!DB.userRecord['data']['task_details'][task_id])

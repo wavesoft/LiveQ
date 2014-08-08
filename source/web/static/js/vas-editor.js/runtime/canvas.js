@@ -1,13 +1,14 @@
 define(
 
-	[ "jquery", "fabric", "tweenjs", "vas-editor/runtime/timeline", "vas-editor/runtime/hotspots" ],
+	[ "jquery", "fabric", "tweenjs", "core/util/event_base", "vas-editor/runtime/timeline", "vas-editor/runtime/hotspots" ],
 
-	function($, fabric, tweenjs, Timeline, Hotspots) {
+	function($, fabric, tweenjs, EventBase, Timeline, Hotspots) {
 		
 		/**
 		 * Runtime canvas for rendering animation & level info
 		 */
 		var Canvas = function( hostDOM ) {
+			EventBase.call(this);
 			this.hostDOM = hostDOM;
 
 			// Prepare canvas DOM
@@ -26,9 +27,21 @@ define(
 			tweenjs.Ticker.setPaused(true);
 
 			// Initialize timeline runtime
+			var isPlaying = false;
 			this.timeline = new Timeline( this.canvasFabric );
 			this.timeline.addEventListener('change', (function() {
 				this.canvasFabric.renderAll();
+				if (this.timeline.position >= this.timeline.duration) {
+					if (isPlaying) {
+						this.trigger('completed');
+						isPlaying = false;
+					}
+				} else {
+					if (!isPlaying) {
+						this.trigger('started');
+						isPlaying = true;
+					}
+				}
 			}).bind(this));
 			
 			// Initialize overlay DOM
@@ -55,6 +68,9 @@ define(
 			animate();
 
 		}
+
+		// Subclass from EventBase
+		Canvas.prototype = Object.create( EventBase.prototype );
 
 		/**
 		 * Initialize everything from JSON

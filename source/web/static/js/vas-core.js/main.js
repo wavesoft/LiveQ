@@ -257,13 +257,6 @@ define(
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
 					});
-					scrHome.on('playLevel', function(level) {
-
-						var userLevel = DB.userRecord.data.level || 0;
-
-						UI.selectScreen("screen.tuning")
-							.onSelectLevel(level);
-					});
 
 					// Complete home
 					prog_home.ok("Home screen ready");
@@ -310,6 +303,9 @@ define(
 					// Handle events
 					scrExplain.on('hideExplain', function() {
 						VAS.displayHome(true);
+					});
+					scrExplain.on('startTask', function(task_id) {
+						VAS.displayTuningScreen(task_id);
 					});
 
 					// Complete explain
@@ -390,19 +386,11 @@ define(
 		 */
 		VAS.displayHome = function( animateBackwards ) {
 
-			// Connect to LabSocket
-			LiveQCore.openSocket(
-				'3e63661c13854de7a9bdeed71be16bb9', 
-				function(){
-					UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
-				},
-				function(message) {
-					alert('Could not connect to LiveQ! '+message);
-				}
-			);
-
 			// Setup home screen
 			VAS.scrHome.onTopicTreeUpdated( User.getTopicTree() );
+
+			// Select home screen
+			UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 
@@ -417,6 +405,19 @@ define(
 
 			// Switch screen
 			UI.selectScreen("screen.explain");
+
+		}
+
+		/**
+		 * Check user's configuration and display the appropriate tuning screen
+		 */
+		VAS.displayTuningScreen = function( task_id ) {
+
+			// Start task
+			VAS.scrTuning.onStartTask( User.getTaskDetails( task_id ) );
+
+			// Display tuning screen
+			UI.selectScreen("screen.tuning")
 
 		}
 

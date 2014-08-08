@@ -110,7 +110,7 @@ This database contains reference information for the user. Each book contains a 
         "_id": "..",            // The book indexing key
         "info": {
             "title": "...",     // The book title
-            "description": "",  // The short description of the book topic
+            "desc": "",         // The short description of the book topic
         },
         "games": [              // List of games-in-game for this book
             {
@@ -162,7 +162,8 @@ This database contains the list of tasks the user can run. They are refered from
         "lab": "...",           // The LiveQ lab ID related to this task
         "info": {
             "title": "..",      // The title of this task
-            "description": "",  // A short description for this task
+            "subtitle": "..",   // The subtitle for this task
+            "desc": "",         // A long description for this task
             "animation": "",    // The related canvas animation for this project
             "book": "...",      // The related book for this task
             "tutorial": ".."    // The tutorial ID to display when the user enters the level
