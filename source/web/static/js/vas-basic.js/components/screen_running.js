@@ -20,6 +20,7 @@ define(
 
 			// Prepare configuration
 			this.diameter = 200;
+			this.machines = [];
 			window.run = this;
 
 			// Prepare host
@@ -175,6 +176,17 @@ define(
 		 */
 		RunningScreen.prototype.onWorkerRemoved = function( id ) {
 
+			// Remove machine from list
+			for (var i=0; i<this.machines.length; i++) {
+				if (this.machines[i].id == id) {
+					this.machines.splice(i,1);
+					break;
+				}
+			}
+
+			// Update text
+			this.infoWorkers.text(this.machines.length);
+
 		}
 
 		/**
@@ -182,20 +194,29 @@ define(
 		 */
 		RunningScreen.prototype.onWorkerAdded = function( id, info ) {
 
+			// Update the machines
+			info['id'] = id;
+			this.machines.push(info);
+
+			// Update text
+			this.infoWorkers.text(this.machines.length);
+
 		}
 
 		/**
 		 * Reisze canvas & engine dimentions to fit host
 		 */
 		RunningScreen.prototype.onStartRun = function( values, referenceHistograms ) {
-
+			// Reset run
+			this.machines = [];
+			this.infoWorkers.text("0");
 		}
 
 		/**
 		 * Update histogram data
 		 */
 		RunningScreen.prototype.onUpdate = function( histograms ) {
-
+			
 		}
 
 		/**
