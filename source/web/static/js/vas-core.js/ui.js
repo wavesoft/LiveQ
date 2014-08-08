@@ -448,12 +448,12 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				pos = elm.offset(), 
 				w = parseInt(elm.attr("width")) || elm.width(), 
 				h = parseInt(elm.attr("height")) || elm.height(), 
-				x = pos.left + w + 5,
+				x = pos.left + w*2/3 + 5,
 				y = pos.top + h/2 - popup.height();
 
 			// Check flipping
 			if (x + popup.width() > UI.host.width()) {
-				x = pos.left - 5;
+				x = pos.left + w/3 - popup.width() - 5;
 				popup.addClass("flip-x");
 			}
 			if (y < 0) {

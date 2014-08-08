@@ -168,7 +168,7 @@ define(
 			}
 
 			// Change configuration based on value
-			if (value < Config['chi2-bounds']['good']) {
+			if (value <= Config['chi2-bounds']['good']) {
 				this.knobConfig['fgColor'] = '#16a085';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 
@@ -177,8 +177,8 @@ define(
 					this.shownVisualAid = true;
 					UI.showFirstTimeAid("tuning.button.begin");
 				}
-				
-			} else if (value < Config['chi2-bounds']['average']) {
+
+			} else if (value <= Config['chi2-bounds']['average']) {
 				this.knobConfig['fgColor'] = '#f39c12';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
 			} else {
