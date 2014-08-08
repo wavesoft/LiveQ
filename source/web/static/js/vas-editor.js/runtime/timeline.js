@@ -242,6 +242,9 @@ define(
 
 			}
 
+			// Stop
+			this.gotoAndStop(0);
+
 		}
 
 		/**
