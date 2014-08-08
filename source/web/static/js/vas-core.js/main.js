@@ -10,6 +10,37 @@ define(
 		var VAS = { };
 
 		/**
+		 * Helper dummy progress updater
+		 */
+		var _DummyRunner_ = function() {
+			this.onUpdate = null;
+			this.onCompleted = null;
+			this.progress = 0;
+			this.started = false;
+			this.data = null;
+
+			// Progress step
+			this.step = function() {
+				this.progress += 0.01;
+				if (this.progress>=1) {
+					this.progress = 1;
+					if (this.onCompleted) this.onCompleted();
+				} else {
+					setTimeout(this.step.bind(this), 100);
+				}
+				if (this.onUpdate) this.onUpdate( this.data, this.progress );
+			}
+
+			// Progress start
+			this.start = function() {
+				if (this.started) return;
+				this.started = true;
+				this.step();
+			}
+
+		};
+
+		/**
 		 * Initialize VAS to the given DOM element
 		 */
 		VAS.initialize = function( readyCallback ) {
@@ -440,10 +471,15 @@ define(
 			// Start task
 			VAS.scrRunning.onStartRun( values, referenceHistograms );
 
+			var _dummyRunner_ = new _DummyRunner_();
+			_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
+
 			// Start Lab Socket
 			LiveQCore.requestRun(values,
 				function(histograms) { // Data Arrived
-					VAS.scrRunning.onUpdate( histograms );
+					_dummyRunner_.data = histograms;
+					_dummyRunner_.start();
+					//VAS.scrRunning.onUpdate( histograms );
 				},
 				function(histograms) { // Completed
 					VAS.scrRunning.onUpdate( histograms );
