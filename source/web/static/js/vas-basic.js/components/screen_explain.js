@@ -305,7 +305,15 @@ define(
 				// If yes, show the pop-up window
 				this.elmPopup.show();
 				// Yet still load the animation if the user clicks play
-				this.loadAnimation( task['info']['animation'] );
+				this.loadAnimation( task['info']['animation'], (function() {
+					// Stop animation
+					this.stopAnimation();
+					// And be forceful
+					setTimeout((function() {
+						this.stopAnimation();
+					}).bind(this), 500);
+				}).bind(this));
+
 			} else {
 				// If no, start the animation
 				this.loadAnimation( task['info']['animation'], (function() {
