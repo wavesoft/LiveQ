@@ -12,6 +12,13 @@ define(
 	function($, config,R,C,UI) {
 
 		/**
+		 * Helper function to format thousands
+		 */
+		function numberWithCommas(x) {
+		    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+
+		/**
 		 * @class
 		 * @classdesc The basic home screen
 		 */
@@ -22,6 +29,9 @@ define(
 			this.diameter = 200;
 			this.machines = [];
 			this.lastWorkers = 0;
+			this.rateLastTime = 0;
+			this.rateLastNevts = 0;
+			this.rateAvgBuffer = [];
 			window.run = this;
 
 			// Prepare host
@@ -219,13 +229,68 @@ define(
 		RunningScreen.prototype.onStartRun = function( values, referenceHistograms ) {
 			// Reset run
 			this.machines = [];
+			this.rateAvgBuffer = [];
+			this.rateLastTime = 0;
+			this.rateLastNevts = 0;
+
 			this.infoWorkers.text("0");
+			this.infoEventRate.text("0");
+
 		}
 
 		/**
 		 * Update histogram data
 		 */
-		RunningScreen.prototype.onUpdate = function( histograms ) {
+		RunningScreen.prototype.onUpdate = function( histograms, _tmpFakeProgress_ ) {
+			if (histograms.length == 0) return;
+
+			// Calculate event rate
+			var nevts = histograms[0].data.nevts,
+				eventRate = 0;
+
+			if (this.rateLastNevts != 0) {
+				var deltaEvents = nevts - this.rateLastNevts,
+					deltaTime = (Date.now() - this.rateLastTime) / 1000,
+					rate = deltaEvents/ deltaTime;
+
+				// Put event rate in buffer
+				this.rateAvgBuffer.push( rate );
+				for (var i=0; i<this.rateAvgBuffer.length; i++) {
+					eventRate += this.rateAvgBuffer[i];
+				}
+
+				// Apply ring buffer to average values
+				if (this.rateAvgBuffer.length > 5)
+					this.rateAvgBuffer.splice(0,1);
+				eventRate = Math.round(eventRate / this.rateAvgBuffer.length);
+
+			}
+			this.rateLastNevts = nevts;
+			this.rateLastTime = Date.now();
+
+			// Update event rates
+			if (eventRate > 0) {
+				this.infoEventRate.text( numberWithCommas(eventRate) );
+				UI.showFirstTimeAid( "running.label.events" );
+			}
+
+			// Calculate progress
+			var totalEvents = this.machines.length * 200000,
+				progress = nevts / totalEvents;
+
+			////////////////////////////////////////
+				progress = _tmpFakeProgress_;
+			////////////////////////////////////////
+
+			// Update progress on the status widget
+			this.statusWidget.onUpdate( progress );
+			this.infoPercent.text( Math.round( progress * 100 ) + "%" )
+
+			// Show first-time percent widget
+			if (progress > 0.25)
+				UI.showFirstTimeAid( "running.label.percent" );
+
+
 			console.log(histograms);
 			window.h = histograms;
 		}
