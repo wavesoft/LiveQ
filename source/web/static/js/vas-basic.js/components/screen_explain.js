@@ -67,19 +67,6 @@ define(
 			this.btnResearch = $('<div class="footer-btn"><span class="uicon uicon-find"></span> Research</div>').appendTo(this.elmFooter);
 			*/
 
-			// Level buttons
-			var levelBtn;
-			levelBtn = $('<a href="#" class="btn-level">1</a>').appendTo(this.elmFooter);
-			levelBtn = $('<a href="#" class="btn-level">2</a>').appendTo(this.elmFooter);
-			levelBtn = $('<a href="#" class="btn-level">3</a>').appendTo(this.elmFooter);
-
-			// Action buttons
-			var actionBtn;
-			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-find"></span></a>').appendTo(this.elmPopupFooter);
-			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-play-media"></span></a>').appendTo(this.elmPopupFooter);
-			actionBtn = $('<a href="#" class="btn-do"><span class="uicon uicon-play"></span></a>').appendTo(this.elmPopupFooter);
-
-
 			// Initialize explain screen
 			this.createExplainScreen();
 
@@ -98,6 +85,7 @@ define(
 					// TODO: Show error
 				} else {
 					this.explainComponent.onAnimationUpdated( doc, cb );
+					this.explainComponent.onAnimationStop();
 				}
 			}).bind(this));
 			
@@ -111,6 +99,8 @@ define(
 			this.elmPopup.fadeOut();
 			// Start animation
 			this.explainComponent.onAnimationStart();
+			// Hide all first-time aids previously shown
+			UI.hideAllfirstTimeAids();
 		}
 
 		/**
@@ -147,6 +137,10 @@ define(
 
 					// Show pop-up
 					this.elmPopup.fadeIn();
+
+					// Show pop-up visual aids
+					UI.showFirstTimeAid( "explain.button.replay" );
+					UI.showFirstTimeAid( "explain.button.start" );
 
 					// Let database know that the user has seen this animation
 					if (!this.topicInfo.taskDetails[this.activeTask].seen_intro) {
@@ -194,6 +188,22 @@ define(
 		}
 
 		/**
+		 * When shown, show first-time aids
+		 */
+		ExplainScreen.prototype.onShown = function() {
+
+			// Show first-time aids
+			UI.showFirstTimeAid( "explain.button.nextLevel" );
+
+			// If popup is visible, display first-time aids
+			if (this.elmPopup.is(":visible")) {
+				UI.showFirstTimeAid( "explain.button.replay" );
+				UI.showFirstTimeAid( "explain.button.start" );
+			}
+
+		}
+
+		/**
 		 * Update topic information
 		 */
 		ExplainScreen.prototype.onTopicUpdated = function(topic_info) {
@@ -216,6 +226,10 @@ define(
 				// Stop creating buttons when we reached a disabled task
 				this.activeTask = i;
 				if (!task.enabled) return;
+
+				// Register the second button on visual aids
+				if (i == 1)
+					R.registerVisualAid("explain.button.nextLevel", taskBtn, { "screen": "screen.explain" });
 
 				// Setup hooks
 				taskBtn.click((function(index) {
@@ -275,7 +289,6 @@ define(
 									this.trigger("startTask", task['_id']);
 								}).bind(this));
 
-
 			// Check if we have seen the animation
 			if (task.seen_intro) {
 				// If yes, show the pop-up window
@@ -288,6 +301,10 @@ define(
 					this.playAnimation();
 				}).bind(this));
 			}
+
+			// Register buttons for visual aids
+			R.registerVisualAid("explain.button.replay", btnReplay, { "screen": "screen.explain" });
+			R.registerVisualAid("explain.button.start", btnStart, { "screen": "screen.explain" });
 
 		}
 

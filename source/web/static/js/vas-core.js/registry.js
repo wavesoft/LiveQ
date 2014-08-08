@@ -139,8 +139,7 @@ define(["core/config", "core/base/component"],
 		 *
 		 * @param {string} name - The name of the visual aid to register under.
 		 * @param {DOMElement|Component} element - The DOM Element to focus when this visual aid is fired, or the hostDOM of the component.
-		 * @param {string} classes - (Optional) A list of classes to append to the element before focusing it
-		 * @param {string} screenID - (Optional) The screen name to switch to before focusing the element
+		 * @param {object} elmMeta - (Optional) Additional metadata for this element such as classes to add, the screen it belongs, callbacks etc.
 		 */
 		registry.registerVisualAid = function(name, element, elmMeta) {
 			var config = elmMeta || {};

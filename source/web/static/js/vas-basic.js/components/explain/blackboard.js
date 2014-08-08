@@ -38,6 +38,7 @@ define(
 		ExplainBlackboard.prototype.onAnimationUpdated = function( doc, cb ) {
 			this.canvas.loadJSON( doc, (function(e){
 				this.canvas.hotspots.setProgression(1);
+				this.canvas.timeline.setPaused(true);
 				if (cb) cb();
 			}).bind(this) );
 		}

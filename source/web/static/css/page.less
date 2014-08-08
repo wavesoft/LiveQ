@@ -150,6 +150,58 @@ h1 + p.subtitle {
 }
 
 // ===============================
+//  Popup description for an item
+// ===============================
+
+.newitem-popup {
+	position: absolute;
+	display: block;
+	width: 214px;
+	height: 119px;
+	background: url(../img/info-popup.png) center center no-repeat;
+	color: #fff;
+	font-size: 14px;
+	cursor: pointer;
+
+	div.text {
+		position: absolute;
+		left: 32px; top: 16px;
+		width: 160px; height: 80px;
+	}
+
+	&:after {
+		position: absolute;
+		width: 10px;
+		height: 10px;
+		color: #FFF;
+		font-size: 20px;
+		font-weight: bold;
+		content: "x";
+		right: 11px;
+		top: 4px;
+	}
+
+	&.flip-x {
+		.transform( scaleX(-1) );
+		div.text {
+			.transform( scaleX(-1) );
+		}
+	}
+	&.flip-y {
+		.transform( scaleY(-1) );
+		div.text {
+			.transform( scaleY(-1) );
+		}
+	}
+	&.flip-x.flip-y {
+		.transform( scaleX(-1) scaleY(-1) );
+		div.text {
+			.transform( scaleX(-1) scaleY(-1) );
+		}
+	}
+}
+
+// ===============================
 //  User interface icons
 // ===============================
 

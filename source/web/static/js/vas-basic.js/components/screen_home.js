@@ -116,6 +116,12 @@ define(
 				if (d.click) d.click();
 			});
 
+			// Tag visual aid if asked to do so
+			sel.each(function(d,i) {
+				if (d.tagAid)
+					R.registerVisualAid(d.tagAid, $(this).find("image"), { "screen": "screen.home" });
+			})
+
 		}
 
 		/**
@@ -320,11 +326,11 @@ define(
 		}
 
 		/**
-		 * Update level status 
+		 * When shown, show first-time aids
 		 */
-		HomeScreen.prototype.onWillShow = function(cb) {
-			this.updateScene();
-			cb();
+		HomeScreen.prototype.onShown = function() {
+			UI.showFirstTimeAid( "home.begin" );
+			UI.showFirstTimeAid( "home.firstBranch" );
 		}
 
 		/**
@@ -364,6 +370,11 @@ define(
 			this.graph.nodes[0].radius = 50;
 			this.graph.nodes[0].color = '#ECF0F1';
 			this.graph.nodes[0].icon = 'static/img/logo.png';
+			this.graph.nodes[0].tagAid = "home.begin";
+
+			// Tag first branch if we have it
+			if (this.graph.nodes.length > 1) 
+				this.graph.nodes[1].tagAid = "home.firstBranch";
 
 			// Regen UI
 			this.updateScene();

@@ -98,34 +98,6 @@ define(
 							},
 							function(cb) {
 
-								// Fetch level configuration
-								var dLevels = DB.openDatabase("levels").all(function(levels) {
-									prog_db.ok("Fetched tunable parameters");
-
-									// Build a lookup index
-									var keys={}, index=[];
-									for (var i=0; i<levels.length; i++) {
-										if (levels[i]['_id'] == "index") {
-											index = levels[i]['levels'];
-										} else {
-											keys[levels[i]['_id']] = levels[i];
-										}
-									}
-
-									// Get levels
-									var usableLevels = [];
-									for (var i=0; i<index.length; i++) {
-										usableLevels.push( keys[index[i]] );
-									}
-
-									// Cache levels
-									DB.cache['levels'] = usableLevels;
-									cb();
-								});
-
-							},
-							function(cb) {
-
 								var dScenes = DB.openDatabase("topic_map").all(function(topic_map) {
 									prog_db.ok("Fetched topic map");
 
@@ -173,6 +145,23 @@ define(
 									cb();
 								});
 
+
+							},
+							function(cb) {
+
+								var dDefinitions = DB.openDatabase("first_time").all(function(definitions) {
+									prog_db.ok("Fetched first-time definitions");
+
+									// Convert definitions to key-based index
+									var def = {};
+									for (var i=0; i<definitions.length; i++) {
+										def[definitions[i]._id] = definitions[i];
+									}
+
+									// Update definitions
+									DB.cache['first_time'] = def;
+									cb();
+								});
 
 							},
 							function(cb) {
@@ -337,7 +326,6 @@ define(
 					// Initialize tuning screen
 					scrTuning.onTunablesDefined( DB.cache['tunables'] );
 					scrTuning.onObservablesDefined( DB.cache['observables'] );
-					scrTuning.onLevelsDefined( DB.cache['levels'] );
 
 					// Bind events
 					scrTuning.on('explainParameter', function(parameter) {

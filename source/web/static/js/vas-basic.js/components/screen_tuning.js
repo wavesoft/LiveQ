@@ -202,6 +202,8 @@ define(
 				UI.showTutorial("ui.tuning");
 			});
 
+			R.registerVisualAid("tuning.button.tutorial", btnTutorial, { "screen": "screen.explain" });
+
 			// Populate save buttons (in reverse order because they are float:right)
 			for (var i=3; i>=0; i--) {
 				var btnSave = $('<div class="btn-save"><div class="led"></div><div class="text">'+(i+1)+'</div></div></div>')
@@ -214,6 +216,10 @@ define(
 						this.activateSave(slot);
 					}
 				})(i).bind(this));
+
+				// Mark last one for visual aid
+				if (i == 3)
+					R.registerVisualAid("tuning.button.save", btnSave, { "screen": "screen.explain" });
 
 				this.saveButtons.unshift(btnSave);
 				if (this.activeSaveSlot == i)
@@ -596,7 +602,7 @@ define(
 
 					// First observable goes to visual helper
 					if (firstObservable) {
-						R.registerVisualAid( 'observable', o, {'screen': 'screen.tuning' } );
+						R.registerVisualAid( 'tuning.observable', o, {'screen': 'screen.tuning' } );
 						firstObservable = false;
 					}
 
@@ -642,7 +648,7 @@ define(
 
 					// First tunable goes to visual helper
 					if (firstTunable) {
-						R.registerVisualAid( 'tunable', o, {'screen': 'screen.tuning'} );
+						R.registerVisualAid( 'tuning.tunable', o, {'screen': 'screen.tuning'} );
 						firstTunable = false;
 					}
 
@@ -799,6 +805,18 @@ define(
 				}
 			);
 
+		}
+
+		/**
+		 * When shown, show first-time aids
+		 */
+		TuningScreen.prototype.onShown = function() {
+
+			// Show first-time aids
+			UI.showFirstTimeAid( "tuning.tunable" );
+			UI.showFirstTimeAid( "tuning.observable" );
+			UI.showFirstTimeAid( "tuning.button.save" );
+			
 		}
 
 		/**

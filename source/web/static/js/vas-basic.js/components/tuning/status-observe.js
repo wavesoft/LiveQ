@@ -19,6 +19,7 @@ define(
 			this.diameter = 160;
 			this.minValue = 0.2;
 			this.maxValue = 1000;
+			this.shownVisualAid = false;
 
 			// Prepare host
 			this.element = $('<div class="progress-widget"></div>');
@@ -58,8 +59,9 @@ define(
 			this.element.append('<div class="message"><span class="uicon uicon-warning"></span><br/>Results are estimated!</div>')
 
 			// Register visual aids
-			R.registerVisualAid( 'tuning.status', this.element, "", 'screen.tuning' );
-			R.registerVisualAid( 'tuning.start', this.startIcon, "active", 'screen.tuning' );
+			R.registerVisualAid("tuning.status", this.element, { "screen": "screen.explain" });
+			R.registerVisualAid("tuning.button.begin", this.startIcon, { "screen": "screen.explain" });
+			R.registerVisualAid("tuning.marker.target", this.elmChiGood, { "screen": "screen.explain" });
 
 		};
 
@@ -138,6 +140,18 @@ define(
 		////////////////////////////////////////////////////////////
 
 		/**
+		 * When shown, show first-time aids
+		 */
+		DefaultObserveStatusWidget.prototype.onShown = function() {
+
+			// Show first-time aids
+			UI.showFirstTimeAid( "tuning.status" );
+			UI.showFirstTimeAid( "tuning.marker.target" );
+
+		}
+
+
+		/**
 		 * Update tuning widget metadata
 		 */
 		DefaultObserveStatusWidget.prototype.onMetaUpdate = function(meta) {
@@ -157,6 +171,13 @@ define(
 			if (value < Config['chi2-bounds']['good']) {
 				this.knobConfig['fgColor'] = '#16a085';
 				this.progressKnob.trigger( 'configure', this.knobConfig );
+
+				// First time we reach a good value show visual aid
+				if (!this.shownVisualAid) {
+					this.shownVisualAid = true;
+					UI.showFirstTimeAid("tuning.button.begin");
+				}
+				
 			} else if (value < Config['chi2-bounds']['average']) {
 				this.knobConfig['fgColor'] = '#f39c12';
 				this.progressKnob.trigger( 'configure', this.knobConfig );

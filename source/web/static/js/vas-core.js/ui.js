@@ -1,6 +1,6 @@
 
-define(["jquery", "core/config", "core/registry", "core/db", "core/base/components"], 
-	function($, config, R, DB, Components) {
+define(["jquery", "core/config", "core/registry", "core/db", "core/base/components", "core/user"], 
+	function($, config, R, DB, Components, User) {
 
 		///////////////////////////////////////////////////////////////
 		//                     HELPER FUNCTIONS                      //
@@ -325,6 +325,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				}
 			});
 
+			// Prepare properties
+			UI.firstTimeAids = [];
+			UI.firstTimeAidsPending = [];
+
 			window.ui = UI;
 
 		}
@@ -339,6 +343,157 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		UI.showOverlay = function(name, cb_ready) {
 
 			// Get preferred dimentions of the overlay
+
+		}
+
+
+		/**
+		 * Hide all the first-time aids.
+		 */
+		UI.hideAllfirstTimeAids = function() {
+			for (var i=0; i<UI.firstTimeAids.length; i++) {
+				// Fade out & remove element
+				UI.firstTimeAids[i].fadeOut((function(aid) {
+					return function() { aid.remove(); }
+				})(UI.firstTimeAids[i]));
+			}
+
+			// Remove non-visible aids
+			for (var i=0; i<UI.firstTimeAidsPending.length; i++) {
+				UI.firstTimeAidsPending[i].remove();
+			}
+
+			// Empty first time aids
+			UI.firstTimeAids = [];
+			UI.firstTimeAidsPending = [];
+		}
+
+		/**
+		 * Check colliding first-time aids and display if they are good to be shown.
+		 */
+		UI.testCollidingFirstTimeAids = function(aid_id) {
+			function check_collision(x1,y1,w1,h1,x2,y2,w2,h2) {
+				return  ( ((x1 >= x2) && (x1 <= x2+w2)  && (y1 >= y2) && (y1 <= y2+h2)) || 
+						  ((x1+w1 >= x2) && (x1+w1 <= x2+w2)  && (y1 >= y2) && (y1 <= y2+h2)) || 
+						  ((x1 >= x2) && (x1 <= x2+w2)  && (y1+h1 >= y2) && (y1+h1 <= y2+h2)) || 
+						  ((x1+w1 >= x2) && (x1+w1 <= x2+w2)  && (y1+h1 >= y2) && (y1+h1 <= y2+h2)) 
+						);
+			}
+
+			for (var i=0; i<UI.firstTimeAidsPending.length; i++) {
+				var aPending = UI.firstTimeAidsPending[i],
+					collides = false;
+
+				for (var j=0; j<UI.firstTimeAids.length; j++) {
+					var aVisible = UI.firstTimeAids[j],
+						// Get pending rect
+						w1 = aPending.width(),
+						h1 = aPending.height(),
+						x1 = parseInt(aPending.css("left")),
+						y1 = parseInt(aPending.css("top")),
+						// Get visible rect
+						w2 = aVisible.width(),
+						h2 = aVisible.height(),
+						x2 = parseInt(aVisible.css("left")),
+						y2 = parseInt(aVisible.css("top"));
+
+					// Check if we have no collision
+					if ( check_collision(x1,y1,w1,h1,x2,y2,w2,h2) || check_collision(x2,y2,w2,h2,x1,y1,w1,h1) ) {
+						collides = true;
+						break;
+					}
+				}
+
+				// If we don't collide, show
+				if (!collides) {
+
+					// Show first time aid
+					UI.firstTimeAids.push( aPending );
+					setTimeout(function() {
+						aPending.fadeIn();
+					}, 1000 * Math.random());
+
+					// Remove first time aid and rewind
+					UI.firstTimeAidsPending.splice(i,1);
+					i = 0;
+
+				}
+
+			}
+		}
+
+		/**
+		 * Show first-time pop-up on a visual aid.
+		 *
+		 * @param {string} aid_id - The visual aid to pop-up something upon.
+		 *
+		 */
+		UI.showFirstTimeAid = function(aid_id) {
+			var popup = $('<div class="newitem-popup"></div>'),
+				visualAid = R.getVisualAidMeta(aid_id),
+				userAids = User.getFirstTimeDetails();
+
+			// Skip missing visual aid definitions
+			if (!visualAid) return;
+			if (!userAids[aid_id]) return;
+			if (userAids[aid_id].shown) return;
+
+			// We got everything, prepare display
+			var popup = $('<div class="newitem-popup"></div>'),
+				popupBody = $('<div class="text"></div>').appendTo(popup);
+			UI.host.append(popup);
+
+			// Get element coordinates
+			var elm = $(visualAid.element),
+				pos = elm.offset(), 
+				w = parseInt(elm.attr("width")) || elm.width(), 
+				h = parseInt(elm.attr("height")) || elm.height(), 
+				x = pos.left + w + 5,
+				y = pos.top + h/2 - popup.height();
+
+			// Check flipping
+			if (x + popup.width() > UI.host.width()) {
+				x = pos.left - 5;
+				popup.addClass("flip-x");
+			}
+			if (y < 0) {
+				y = pos.top + h/2;
+				popup.addClass("flip-y");
+			}
+
+			// Update content
+			popupBody.html( userAids[aid_id].text );
+			popup.css({
+				'left': x,
+				'top': y
+			});
+
+			// Add click handler
+			popup.click(function() {
+
+				// Fadeout and remove aid
+				popup.fadeOut(function() {
+					popup.remove();
+				});
+
+				// Remove from firstTimeAids
+				var i = UI.firstTimeAids.indexOf(popup);
+				UI.firstTimeAids.splice(i,1);
+
+				// Mark as seen
+				User.markFirstTimeAsSeen( aid_id );
+
+				// Update collided aids
+				UI.testCollidingFirstTimeAids();
+
+			});
+
+			// Fade-in with a random delay
+			popup.hide();
+
+			// Store on pending & show the ones not colliding
+			UI.firstTimeAidsPending.push( popup );
+			UI.testCollidingFirstTimeAids();
 
 		}
 
@@ -394,7 +549,8 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				// Get element coordinates
 				var elm = $(x),
 					pos = elm.offset(), 
-					w = elm.width(), h = elm.height();
+					w = parseInt(elm.attr("width")) || elm.width(), 
+					h = parseInt(elm.attr("height")) || elm.height();
 
 				// Use center of the element as anchor
 				x = pos.left + w/2;
@@ -733,6 +889,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				cb_ready = transition;
 				transition = UI.Transitions.ZOOM_IN;
 			}
+
+			// Hide all first-time aids previously shown
+			UI.hideAllfirstTimeAids();
 
 			// Get prev/next screen
 			var ePrev = UI.screens[UI.activeScreen],

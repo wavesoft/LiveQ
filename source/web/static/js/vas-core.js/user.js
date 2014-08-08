@@ -82,6 +82,10 @@ define(["core/config", "core/db"],
 			if (!DB.userRecord['data']['task_details'])
 				DB.userRecord['data']['task_details'] = {};
 
+			// Create first-time pop-up status
+			if (!DB.userRecord['data']['first_time'])
+				DB.userRecord['data']['first_time'] = {};
+
 		}
 
 		/**
@@ -264,6 +268,43 @@ define(["core/config", "core/db"],
 
 			// Grant access to the given task
 			DB.userRecord['data']['task_details'][task_id]['enabled'] = 1;
+
+			// Commit changes
+			DB.commitUserRecord();
+
+		}
+
+		/**
+		 * Get first-time aids detail
+		 */
+		User.getFirstTimeDetails = function() {
+			if (!DB.cache['first_time']) return [];
+
+			var details = {};
+			for (var k in DB.cache['first_time']) {
+				var ft = DB.cache['first_time'][k];
+
+				// Check if this first-time is shown
+				if (!DB.userRecord['data']['first_time'][k]) {
+					ft.shown = false;
+				} else {
+					ft.shown = DB.userRecord['data']['first_time'][k];
+				}
+
+				// Store details
+				details[k] = ft;
+			}
+
+			return details;
+		}
+
+		/**
+		 * Mark a first-time aid as seen
+		 */
+		User.markFirstTimeAsSeen = function(aid_id) {
+
+			// Update first_time aid status
+			DB.userRecord['data']['first_time'][aid_id] = 1;
 
 			// Commit changes
 			DB.commitUserRecord();
