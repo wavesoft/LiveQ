@@ -267,6 +267,24 @@ define(
 					cb();
 				};
 
+			var prog_results = progressAggregator.begin(1),
+				init_results = function(cb) {
+					var scrResults = VAS.scrResults = UI.initAndPlaceScreen("screen.results");
+					if (!scrResults) {
+						console.error("Core: Unable to initialize results screen!");
+						return;
+					}
+
+					// Bind events
+					scrResults.on('hideResults', function() {
+						UI.selectPreviousScreen()
+					});
+
+					// Complete login
+					prog_results.ok("Results screen ready");
+					cb();
+				};				
+
 			var prog_home = progressAggregator.begin(1),
 				init_home = function(cb) {
 					var scrHome = VAS.scrHome = UI.initAndPlaceScreen("screen.home");
@@ -295,6 +313,10 @@ define(
 						console.error("Core: Unable to initialize run screen!");
 						return;
 					}
+
+					// Initialize running screen
+					scrRunning.onTunablesDefined( DB.cache['tunables'] );
+					scrRunning.onObservablesDefined( DB.cache['observables'] );
 
 					// Bind events
 					scrRunning.on('abortRun', function() {
@@ -325,7 +347,6 @@ define(
 					// Initialize explain screen
 					scrExplain.onTunablesDefined( DB.cache['tunables'] );
 					scrExplain.onObservablesDefined( DB.cache['observables'] );
-					scrExplain.onScenesDefined( DB.cache['scenes'] );
 
 					// Check for machine layout
 					var diagram = DB.cache['definitions']['machine-diagram'] || { layout: [] };
@@ -363,8 +384,8 @@ define(
 						UI.selectScreen("screen.explain")
 							.onParameterFocus(parameter);
 					});
-					scrTuning.on('submitParameters', function(values) {
-						VAS.displayRunningScreen( values, VAS.referenceHistograms );
+					scrTuning.on('submitParameters', function(values, taskData) {
+						VAS.displayRunningScreen( values, VAS.referenceHistograms, taskData );
 					});
 					scrTuning.on('interpolateParameters', function(values) {
 						LiveQCore.requestInterpolation( values, 
@@ -389,7 +410,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_home, init_login, init_explain, init_tune, init_run
+						init_db, init_home, init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;
@@ -466,13 +487,28 @@ define(
 		/**
 		 * Check user's configuration and display the appropriate tuning screen
 		 */
-		VAS.displayRunningScreen = function( values, referenceHistograms ) {
+		VAS.displayRunningScreen = function( values, referenceHistograms, taskData ) {
 
 			// Start task
-			VAS.scrRunning.onStartRun( values, referenceHistograms );
+			VAS.scrRunning.onStartRun( values, taskData.obs, referenceHistograms );
 
 			var _dummyRunner_ = new _DummyRunner_();
 			_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
+
+			// Function to handle completion of the run
+			var cb_completed = function( histograms ) {
+
+				var chiAvg = 0;
+				for (var i=0; i<histograms.length; i++) {
+					// Calculate chi-squared between the data and the reference histogram
+					chiAvg += LiveQCalc.chi2WithError( histograms[i].data, histograms[i].ref.data );
+				}
+				chiAvg /= histograms.length;
+
+				// Show results screen
+				UI.displayResultsScreen( chiAvg );
+
+			};
 
 			// Start Lab Socket
 			LiveQCore.requestRun(values,
@@ -504,6 +540,26 @@ define(
 
 			// Display tuning screen
 			UI.selectScreen("screen.running")
+
+		}
+
+		/**
+		 * Display the results screen
+		 */
+		VAS.displayResultsScreen = function( values ) {
+
+			VAS.scrResults.onUpdate( values );
+
+			UI.selectScreen("screen.results");
+
+			if (values <= Config['chi2-bounds']['good']) {
+
+			} else if (values <= Config['chi2-bounds']['average']) {
+
+			} else {
+
+			}
+
 
 		}
 

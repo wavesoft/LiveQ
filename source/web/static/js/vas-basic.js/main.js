@@ -8,6 +8,7 @@ define([
 	'vas-basic/components/screen_tuning',
 	'vas-basic/components/screen_progress',
 	'vas-basic/components/screen_login',
+	'vas-basic/components/screen_results',
 
 	// Other components
 	'vas-basic/components/nav_mini',
@@ -20,6 +21,7 @@ define([
 	'vas-basic/components/backdrop_tuning',
 	'vas-basic/components/backdrop_progress',
 	'vas-basic/components/backdrop_login',
+	'vas-basic/components/backdrop_results',
 
 	// Tuning-related
 	"vas-basic/components/tuning/tunable", 

@@ -243,7 +243,7 @@ define(
 			// Bind widget events
 			this.observingWidget.onUpdate();
 			this.observingWidget.on('begin', (function() {
-				this.trigger('submitParameters', this.getValueMap());
+				this.trigger('submitParameters', this.getValueMap(), this.taskData);
 			}).bind(this));
 
 		}
@@ -706,76 +706,9 @@ define(
 		}
 
 		/**
-		 * Define the level structure information
-		 * (MUST be called after the setTunables/setObservables) function calls.
-		 */
-		TuningScreen.prototype.onLevelsDefined = function(levelInfo) {
-			this.levels = levelInfo;
-
-			// Prepare level records
-			/*
-			for (var i=0; i<levelInfo.length; i++) {
-				var level = {
-					'obs': (levelInfo[i]['obs'] || []).slice(0),
-					'tun': (levelInfo[i]['tun'] || []).slice(0)
-				};
-
-				// Replace tunable IDs with their references
-				var tunables = [];
-				for (var j=0; j<level.tun.length; j++) {
-
-					// Locate tunable structure
-					var tun = this.tunables[level.tun[j]];
-					if (tun == undefined) {
-						console.warn("Undefined tunable '"+level.tun[j]+"' for level #"+i);
-						continue;
-					}
-
-					// Update tunables record
-					tunables.push( tun );
-
-				}
-				level.tun = tunables;
-
-				// Pick observables
-				var observables = [];
-				for (var j=0; j<level.obs.length; j++) {
-
-					// Locate observable structure
-					var obs = this.observables[level.obs[j]];
-					if (obs == undefined) {
-						console.warn("Undefined observable '"+level.obs[j]+"' for level #"+i);
-						continue;
-					}
-
-					// Update observables record
-					observables.push( obs );
-
-				}
-				level.obs = observables;
-
-				// Store level record on registry
-				this.levels.push(level);
-
-			}
-			*/
-
-		}
-
-
-		/**
 		 * Select an enable interface controls for the specified level
 		 */
 		TuningScreen.prototype.onStartTask = function( taskData ) {
-
-			/*
-			// Get the levels to activate
-			var activeLevels = [];
-			for (var i=0; i<=targetLevel; i++)
-				activeLevels.push(this.levels[i]);
-
-			// Redefine main screen
-			*/
 
 			// Fetch task data from user record
 			this.taskData = taskData;
@@ -829,33 +762,8 @@ define(
 			this.updateTuningStatus();
 			this.updateObservingStatus();
 
-			/*
-			// Calculate new pivot position
-			this.pivotX = this.width / 2;
-			this.pivotY = 150;
-
-			// Place status widget on pivot
-			this.statusWidget.setPosition( this.pivotX, this.pivotY );
-
-			// Fire resize host on all children
-			this.statusWidget.onResize(width,height-this.detailsViewHeight);
-			for (var i=0; i<this.obsElms.length; i++) {
-				this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
-				this.obsElms[i].onResize(width, height-this.detailsViewHeight);
-			}
-			for (var i=0; i<this.tunElms.length; i++) {
-				this.tunElms[i].setPivotConfig(this.pivotX, this.pivotY);
-				this.tunElms[i].onResize(width, height-this.detailsViewHeight);
-			}
-
-			// Update horizon
-			this.forwardHorizon();
-			*/
-
 			// Resize pin view
 			this.pinViewComponent.onResize(width, this.detailsViewHeight);
-
-
 		}
 
 		/**

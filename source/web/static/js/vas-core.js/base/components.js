@@ -276,6 +276,15 @@ define(["core/config", "core/base/component" ],
 		RunningScreen.prototype.onMachineRemoved = function(machine) {
 		};
 
+		/**
+		 * This event is fired when run starts.
+		 *
+		 * @abstract
+		 * @param {Object} values - The values submitted to the workers.
+		 * @param {Array} observables - A list of observable IDs this run will observe.
+		 */
+		RunningScreen.prototype.onStartRun = function(values, observables) {
+		};
 
 		////////////////////////////////////////////////////////////
 		/**
@@ -404,6 +413,50 @@ define(["core/config", "core/base/component" ],
 		 */
 		HomeScreen.prototype.onTopicTreeUpdated = function(topicsData) {
 		};
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Results Screen.
+		 *
+		 * This component is used when the user has completed the simulation.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining backdrop images.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var ResultsScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		ResultsScreen.prototype = Object.create( Component.prototype );
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Book Screen.
+		 *
+		 * This component is used when the user has completed the simulation.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining backdrop images.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var BookScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		BookScreen.prototype = Object.create( Component.prototype );
 
 		////////////////////////////////////////////////////////////
 		/**
@@ -646,6 +699,7 @@ define(["core/config", "core/base/component" ],
 			'ExplainScreen' 	: ExplainScreen,
 			'HomeScreen'		: HomeScreen,
 			'ProgressScreen'	: ProgressScreen,
+			'ResultsScreen'		: ResultsScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,

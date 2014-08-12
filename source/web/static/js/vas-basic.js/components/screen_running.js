@@ -32,10 +32,19 @@ define(
 			this.rateLastTime = 0;
 			this.rateLastNevts = 0;
 			this.rateAvgBuffer = [];
+			this.observableByID= {};
+			this.observables = {};
 			window.run = this;
 
 			// Prepare host
 			hostDOM.addClass("running");
+
+			// Observable configuration
+			this.obsAngleSpan = Math.PI*2;
+			this.obsAngleShift = 0;
+			this.obsWideSpan = 0;
+			this.obsMinDistance = 400;
+			this.obsMaxDistance = 600;
 
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
@@ -68,15 +77,15 @@ define(
 			this.ppBL.append( bytEventDetails );
 
 			// Fill-in information fields
-			this.infoEventRate = $('<h1>0</h1>');
-			this.ppTL.append(this.infoEventRate);
-			this.ppTL.append($('<p>Events/sec</p>'));
-
 			this.infoWorkers = $('<h1>0</h1>');
 			this.ppTR.append(this.infoWorkers);
 			this.ppTR.append($('<p>Connected machines</p>'));
 
-			this.infoPercent = $('<h1>25%</h1>');
+			this.infoEventRate = $('<h1>0</h1>');
+			this.ppTL.append(this.infoEventRate);
+			this.ppTL.append($('<p>Events/sec</p>'));
+
+			this.infoPercent = $('<h1>0%</h1>');
 			this.ppBL.append(this.infoPercent);
 			this.ppBL.append($('<p>Completed</p>'));
 
@@ -104,10 +113,6 @@ define(
 			// Prepare for observable elements
 			this.obsElms = [];
 
-			// Prepare observables
-			this.defineObservables();
-
-
 		}
 		RunningScreen.prototype = Object.create( C.RunningScreen.prototype );
 
@@ -117,42 +122,42 @@ define(
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 
-
 		/**
 		 * Create observabe
 		 */
 		RunningScreen.prototype.defineObservables = function( observables ) {
 
-			// ----- CUT HERE ------------------
-
-			// Create dummpy
-			var observables = [];
-			for (var i=0; i<5; i++) {
-				observables.push({
-					'info': {
-						'name': 'O'+i,
-						'short': 'O'+i,
-						'book': 'more-'+i
-					}
-				});
-			}
-
-			// ----- TILL HERE -----------------
-
 			// Reset elements
 			this.hostObserving.empty();
+			this.observableByID = {};
 			this.obsElms = [];
 
 			// Render elements
-			var aNum = observables.length,
+			var firstObservable = true,
+				aNum = observables.length,
 				aStep = (Math.PI*2) / (aNum+1),
 				aVal = -Math.PI;
 
+			// Populate observables
 			for (var i=0; i<aNum; i++) {
 				var o = this.createObservable( (aVal += aStep), observables[i] );
-				//o.onUpdate( Math.random() );
-				this.obsElms.push(o);
+
+				// Store on observable elements
+				if (!o) {
+					console.warn("TuningScreen: Could not create observable!");
+					continue;
+				}
+				this.obsElms.push( o );
+				this.observableByID[ observables[i]['_id'] ] = o;
+
+				// First observable goes to visual helper
+				if (firstObservable) {
+					R.registerVisualAid( 'running.observable', o, {'screen': 'screen.running' } );
+					firstObservable = false;
+				}
+
 			}
+
 
 		}
 
@@ -168,9 +173,17 @@ define(
 				return undefined;
 			}
 
+			// Forward visual events
+			this.forwardVisualEvents( e );
+
 			// Set pivot configuration for doing this nice
 			// circular distribution
-			e.setRadialConfig( 150, 350, angle );
+			e.setRadialConfig( undefined, undefined, angle );
+
+			// Event: Request for explanation
+			e.on('explain', (function(book) {
+				this.showBook( book );
+			}).bind(this));
 
 			// Set metadata and value
 			e.onMetaUpdate( metadata );
@@ -180,12 +193,62 @@ define(
 
 		}
 
+		/**
+		 * Update observing pivot position
+		 */
+		RunningScreen.prototype.updateObservingStatus = function() {
+
+			// Update observing pivot coordinates
+			var w=this.width,h=this.height,
+				l=0, t=0;
+
+			// Calculate shift depending on the sidebars
+			if ($("body").hasClass('layout-compact')) {
+				l = 200; w -= l;
+			} else if ($("body").hasClass('layout-wide')) {
+				l = 230; w -= l*2;
+			} else if ($("body").hasClass('layout-vertical')) {
+			} else if ($("body").hasClass('layout-mobile')) {
+			}
+
+			// Pick radius according to screen alignment
+			if (w > h) {
+				r = (h/2)-10;
+			} else {
+				r = (w/2)-10;
+			}
+
+			// Realign all the tunables
+			var a = this.obsAngleShift, aStep = this.obsAngleSpan / this.obsElms.length;
+			for (var i=0; i<this.obsElms.length; i++) {
+				if (this.obsElms[i].setRadialConfig)
+					this.obsElms[i].setRadialConfig( 104, r - 24, a += aStep );
+				this.obsElms[i].onMove( l, t );
+				this.obsElms[i].onResize( w, h );
+			}
+
+
+		}
 
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
 		////                          MAIN HOOK HANDLERS                           ////
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Define the observable configuration
+		 *
+		 * @param {array} observables - A list of Observable classes, one for each observable.
+		 */
+		RunningScreen.prototype.onObservablesDefined = function(observables) {
+			this.observables = {};
+
+			// Build the observables-by ID lookup table
+			for (var i=0; i<observables.length; i++) {
+				this.observables[observables[i]._id] = observables[i];
+			}
+		}
 
 		/**
 		 * Fired when a worker node is added to the job
@@ -226,15 +289,29 @@ define(
 		/**
 		 * Reisze canvas & engine dimentions to fit host
 		 */
-		RunningScreen.prototype.onStartRun = function( values, referenceHistograms ) {
+		RunningScreen.prototype.onStartRun = function( values, observableIDs ) {
+
 			// Reset run
 			this.machines = [];
 			this.rateAvgBuffer = [];
 			this.rateLastTime = 0;
 			this.rateLastNevts = 0;
 
+			// Reset text fields
 			this.infoWorkers.text("0");
 			this.infoEventRate.text("0");
+			this.infoPercent.text("0%");
+			this.statusWidget.onUpdate(0);
+
+			// Prepare observables
+			var obs = [];
+			for (var i=0; i<observableIDs.length; i++) {
+				var obsRef = this.observables[ observableIDs[i] ];
+				if (obsRef) obs.push( obsRef );
+			}
+
+			// Define observables
+			this.defineObservables(obs);
 
 		}
 
@@ -290,7 +367,25 @@ define(
 			if (progress > 0.25)
 				UI.showFirstTimeAid( "running.label.percent" );
 
+			// Update observables
+			var chiSum = 0, chiCount = 0;
 
+			// Update histogram data
+			for (var i=0; i<histograms.length; i++) {
+				var histo = histograms[i];
+
+				// Find the relative observable
+				if (this.observableByID[histo.id]) {
+
+					// Update histogram 
+					this.observableByID[histo.id].onUpdate( histo );
+
+					// Collect chi-squared average information
+					chiSum += this.observableByID[histo.id].getValue();
+					chiCount += 1;
+				}
+
+			}
 			console.log(histograms);
 			window.h = histograms;
 		}
@@ -333,10 +428,7 @@ define(
 			*/
 
 			// Update observables
-			for (var i=0; i<this.obsElms.length; i++) {
-				//this.obsElms[i].setPivotConfig(this.pivotX, this.pivotY);
-				this.obsElms[i].onResize(this.width, this.height);
-			}
+			this.updateObservingStatus();
 
 		}
 

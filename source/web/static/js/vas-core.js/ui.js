@@ -138,7 +138,15 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 *
 		 * @type {MiniNavComponent}
 		 */
-		UI.activeScreen = "";
+		UI.mininav = "";
+
+		/**
+		 * The ID of the previous screen
+		 * (Used by the selectPreviousScreen)
+		 *
+		 * @type {string}
+		 */
+		UI.previousScreen = "";
 
 		/**
 		 * The currently registered screens
@@ -153,6 +161,34 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * @type {Object}
 		 */
 		UI.popupWidgets = {};
+
+		/**
+		 * First-time aids
+		 *
+		 * @type {Object}
+		 */
+		UI.popupWidgets = {};
+
+		/**
+		 * List of visible first-time aids
+		 *
+		 * @type {Array}
+		 */
+		UI.firstTimeAids = [];
+
+		/**
+		 * List of pending first-time aids for display
+		 *
+		 * @type {Array}
+		 */
+		UI.firstTimeAidsPending = [];
+
+		/**
+		 * First-time aids already shown
+		 *
+		 * @type {Object}
+		 */
+		UI.firstTimeAidsShown = {};
 
 		/**
 		 * Screen transitions
@@ -325,10 +361,6 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				}
 			});
 
-			// Prepare properties
-			UI.firstTimeAids = [];
-			UI.firstTimeAidsPending = [];
-
 			window.ui = UI;
 
 		}
@@ -413,6 +445,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 						aPending.fadeIn();
 					}, 1000 * Math.random());
 
+					// Mark as shown
+					var aid_id = aPending.prop("aid_id");
+					UI.firstTimeAidsShown[aid_id] = true;
+
 					// Remove first time aid and rewind
 					UI.firstTimeAidsPending.splice(i,1);
 					i = 0;
@@ -438,6 +474,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			if (!userAids[aid_id]) return;
 			if (userAids[aid_id].shown) return;
 			if ((visualAid.screen != "") && (visualAid.screen != UI.activeScreen)) return;
+
+			// Show first-time aids only once
+			if (UI.firstTimeAidsShown[aid_id]) return;
 
 			// We got everything, prepare display
 			var popup = $('<div class="newitem-popup"></div>'),
@@ -493,6 +532,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			popup.hide();
 
 			// Store on pending & show the ones not colliding
+			popup.prop("aid_id", aid_id);
 			UI.firstTimeAidsPending.push( popup );
 			UI.testCollidingFirstTimeAids();
 
@@ -870,6 +910,17 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		}
 
 		/**
+		 * Activate the screen which was previously active before someone called selectScreen()
+		 *
+		 * @param {function} cb_ready - (Optional) The callback to fire when the screen has changed
+		 *
+		 */
+		UI.selectPreviousScreen = function( cb_ready) {
+			if (!UI.previousScreen) return;
+			UI.selectScreen( UI.previousScreen, UI.Transitions.ZOOM_OUT, cb_ready )
+		}
+
+		/**
 		 * Activate a screen module with the given name.
 		 *
 		 * @param {string} name - The name of the module to focus.
@@ -882,6 +933,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			// Check for wrong values
 			if (UI.activeScreen == name)
 				return;
+
+			// Preserve previous screen ID
+			UI.previousScreen = UI.activeScreen;
 
 			// Switch screen
 			var prevScreen = UI.activeScreen;
