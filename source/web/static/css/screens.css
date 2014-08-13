@@ -8,14 +8,14 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666;
+  border-top: solid 1px #666666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: #FFF;
+  color: white;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -31,12 +31,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333;
+  color: #333333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: #FFF;
+  color: white;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -93,7 +93,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -117,7 +117,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: #FFF;
+  color: white;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -141,7 +141,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -171,7 +171,7 @@
   border-radius: 20px;
   padding: 12px;
   margin: 12px;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0;
@@ -185,7 +185,7 @@
   top: 250px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: white;
   padding: 10px 10px 0;
 }
 .screen.explain .explain-window div.explain-popup div.btn-host {
@@ -230,7 +230,7 @@
   margin: 30px 0 0 30px;
 }
 .screen.explain .explain-window div.explain-screen.cs-blackboard {
-  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
+  background: black url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window.cs-green {
@@ -245,13 +245,13 @@
 }
 .screen.explain .explain-window.cs-green a.btn-level {
   background-color: #34495e;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window.cs-green a.btn-level.blur {
-  background-color: #7F8C8D;
+  background-color: #7f8c8d;
 }
 .screen.explain .explain-window.cs-green a.btn-level.active {
-  background-color: #E67E22;
+  background-color: #e67e22;
 }
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
@@ -268,15 +268,21 @@
   width: 100%;
   height: 32px;
   margin: 5px 0;
-  background-color: #3399FF;
+  background-color: #3399ff;
   line-height: 32px;
   text-indent: 10px;
   font-size: 1.2em;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.home .home-menu a.btn:hover {
-  background-color: #70B8FF;
+  background-color: #70b8ff;
+}
+.screen.home .side-buttons {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  height: 45px;
 }
 .screen.home .topic-host {
   position: absolute;
@@ -326,7 +332,7 @@
   border-radius: 5px;
   width: 120px;
   height: 120px;
-  background-color: #27AE60;
+  background-color: #27ae60;
   margin: 4px;
   cursor: pointer;
   -webkit-transition: all 0.4s;
@@ -344,7 +350,7 @@
   line-height: 120px;
   width: 120px;
   text-align: center;
-  color: #FFF;
+  color: white;
   font-weight: bold;
   font-size: 24px;
 }
@@ -431,8 +437,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -484,6 +490,7 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   left: 50%;
   top: 40%;
@@ -501,12 +508,13 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999;
+  color: #999999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -522,8 +530,9 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
-  background-color: #eee;
+  background-color: #eeeeee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -534,7 +543,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #FF9900;
+  background-color: #ff9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -574,7 +583,7 @@
   top: 145px;
   position: absolute;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -595,7 +604,7 @@
 }
 .screen.tuning .floater.f-header h1,
 .screen.tuning .floater.f-header p {
-  color: #FFF;
+  color: white;
   text-align: left;
   margin: 2px 2px;
 }
@@ -638,18 +647,18 @@
   height: 18px;
   margin: 4px;
   font-size: 16px;
-  color: #CCC;
-  border: solid 1px #CCC;
+  color: #cccccc;
+  border: solid 1px #cccccc;
   text-align: center;
   line-height: 17px;
 }
 .screen.tuning .sidebar h1 span.help:hover {
-  color: #333;
-  border: solid 1px #333;
+  color: #333333;
+  border: solid 1px #333333;
 }
 .screen.tuning .sidebar .sidebar-buttons {
   height: 45px;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-tutorial {
   position: absolute;
@@ -657,7 +666,7 @@
   top: 0;
   height: 45px;
   cursor: pointer;
-  color: #fff;
+  color: white;
   text-align: center;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save {
@@ -665,9 +674,9 @@
   width: 37px;
   height: 45px;
   background-color: #16a085;
-  border-left: solid 1px #1ABC9C;
+  border-left: solid 1px #1abc9c;
   float: right;
-  color: #fff;
+  color: white;
   cursor: pointer;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save .led {
@@ -676,7 +685,7 @@
   top: 6px;
   width: 30px;
   height: 6px;
-  background-color: #1ABC9C;
+  background-color: #1abc9c;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save .text {
   position: absolute;
@@ -691,7 +700,7 @@
   background: url(../img/uicons-24.png) no-repeat -312px 0px;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save.active .led {
-  background-color: #F1C40F;
+  background-color: #f1c40f;
 }
 .screen.tuning .tunable {
   -webkit-transition: background-color 0.25s;
@@ -750,7 +759,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: #ffffff;
+  color: white;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -775,7 +784,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: #ffffff;
+  color: white;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -836,7 +845,7 @@
   -o-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 100;
-  background-color: #FFF;
+  background-color: white;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -872,7 +881,7 @@
   top: -50px;
   position: absolute;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -894,7 +903,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: #FFF;
+  background-color: white;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.message {
@@ -936,13 +945,13 @@
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.tuning .progress-widget div.c-marker div.label {
   padding-top: 5px;
   position: absolute;
   font-size: 12px;
-  color: #999;
+  color: #999999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -980,12 +989,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999;
+  color: #999999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1009,7 +1018,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1064,23 +1073,24 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95A5A6;
+  border: solid 2px #95a5a6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
+
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -1100,7 +1110,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: #FFFFFF;
+  color: white;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -1108,9 +1118,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
+  position: absolute;
   left: 0;
   top: 0;
-  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1142,6 +1152,146 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -webkit-filter: blur(5px);
   -moz-filter: blur(5px);
   -o-filter: blur(5px);
+  -ms-filter: blur(5px);
   filter: blur(5px);
   z-index: 59;
+}
+.screen.results div.results-host {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  top: 5%;
+  left: 5%;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 10px;
+}
+.screen.overlay-book {
+  overflow: hidden;
+}
+.screen.overlay-book > div {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+}
+.screen.overlay-book > div .book-body {
+  position: absolute;
+  top: 0;
+  bottom: 40px;
+  left: 0;
+  width: 100%;
+}
+.screen.overlay-book > div .book-body .tab {
+  font-size: 14px;
+  padding: 10px;
+  color: white;
+}
+.screen.overlay-book > div .book-body .tab.tab-error {
+  padding: 34px 0 0 160px;
+  background: url(../img/exclamation.png) no-repeat 20px 20px;
+}
+.screen.overlay-book > div .book-tabs {
+  position: absolute;
+  bottom: 0;
+  height: 40px;
+  left: 0;
+  width: 100%;
+}
+.screen.overlay-book > div .book-tabs a {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 10px;
+  font-size: 16px;
+  color: white;
+  text-decoration: none;
+}
+.screen.overlay-book > div .book-tabs a.cs-blue {
+  background-color: #2980b9;
+}
+.screen.overlay-book > div .book-tabs a.cs-blue:hover,
+.screen.overlay-book > div .book-tabs a.cs-blue.active {
+  background-color: #3498db;
+}
+.screen.overlay-book > div .book-tabs a.cs-green {
+  background-color: #16a085;
+}
+.screen.overlay-book > div .book-tabs a.cs-green:hover,
+.screen.overlay-book > div .book-tabs a.cs-green.active {
+  background-color: #1abc9c;
+}
+.screen.overlay-book > div .book-tabs a.cs-purple {
+  background-color: #8e44ad;
+}
+.screen.overlay-book > div .book-tabs a.cs-purple:hover,
+.screen.overlay-book > div .book-tabs a.cs-purple.active {
+  background-color: #9b59b6;
+}
+.screen.overlay-book > div .book-tabs a.cs-orange {
+  background-color: #d35400;
+}
+.screen.overlay-book > div .book-tabs a.cs-orange:hover,
+.screen.overlay-book > div .book-tabs a.cs-orange.active {
+  background-color: #e67e22;
+}
+.screen.overlay-book > div .book-tabs a.cs-red {
+  background-color: #c0392b;
+}
+.screen.overlay-book > div .book-tabs a.cs-red:hover,
+.screen.overlay-book > div .book-tabs a.cs-red.active {
+  background-color: #e74c3c;
+}
+.screen.overlay-book > div .book-tabs a.cs-yellow {
+  background-color: #f39c12;
+}
+.screen.overlay-book > div .book-tabs a.cs-yellow:hover,
+.screen.overlay-book > div .book-tabs a.cs-yellow.active {
+  background-color: #f1c40f;
+}
+.screen.overlay-book > div.cs-blue .book-body {
+  background-color: #3498db;
+}
+.screen.overlay-book > div.cs-blue .book-tabs {
+  background-color: #2980b9;
+}
+.screen.overlay-book > div.cs-green .book-body {
+  background-color: #1abc9c;
+}
+.screen.overlay-book > div.cs-green .book-tabs {
+  background-color: #16a085;
+}
+.screen.overlay-book > div.cs-purple .book-body {
+  background-color: #9b59b6;
+}
+.screen.overlay-book > div.cs-purple .book-tabs {
+  background-color: #8e44ad;
+}
+.screen.overlay-book > div.cs-orange .book-body {
+  background-color: #e67e22;
+}
+.screen.overlay-book > div.cs-orange .book-tabs {
+  background-color: #d35400;
+}
+.screen.overlay-book > div.cs-red .book-body {
+  background-color: #e74c3c;
+}
+.screen.overlay-book > div.cs-red .book-tabs {
+  background-color: #c0392b;
+}
+.screen.overlay-book > div.cs-yellow .book-body {
+  background-color: #f1c40f;
+}
+.screen.overlay-book > div.cs-yellow .book-tabs {
+  background-color: #f39c12;
 }

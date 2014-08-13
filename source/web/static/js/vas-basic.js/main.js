@@ -50,5 +50,9 @@ define([
 
 	// Data vizualization
 	'vas-basic/dataviz/histogram',
+	'vas-basic/dataviz/histogram_ratio',
+
+	// Overlays
+	'vas-basic/overlays/book',
 
 ]);

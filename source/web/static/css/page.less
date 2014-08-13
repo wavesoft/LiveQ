@@ -72,6 +72,66 @@ h1 + p.subtitle {
 }
 
 // ===============================
+// Round buttons
+// ===============================
+
+.btn-round {
+	width: 45px;
+	height: 45px;
+	border-style: solid;
+	border-width: 2px;
+	line-height: 45px;
+	text-align: center;
+	cursor: pointer;
+	.border-radius( 45px );
+
+	-webkit-transition: -webkit-transform 0.25s;
+	   -moz-transition: -moz-transform 0.25s;
+	   -o-transition: -o-transform 0.25s;
+	      transition: transform 0.25s;
+
+	&.btn-red {
+		background-color: #e74c3c;
+		border-color: #c0392b;
+	}
+	&.btn-green {
+		background-color: #2ecc71;
+		border-color: #27ae60;
+	}
+	&.btn-blue {
+		background-color: #3498db;
+		border-color: #2980b9;
+	}
+	&.btn-orange {
+		background-color: #e67e22;
+		border-color: #d35400;
+	}
+	&.btn-yellow {
+		background-color: #f1c40f;
+		border-color: #f39c12;
+	}
+	&.btn-darkblue {
+		background-color: #34495e;
+		border-color: #2c3e50;
+	}
+	&.btn-purple {
+		background-color: #9b59b6;
+		border-color: #8e44ad;
+	}
+	&.btn-grey {
+		background-color: #ecf0f1;
+		border-color: #bdc3c7;
+	}
+
+	&:hover {
+		.transform( scale(1.1) );
+	}
+
+}
+
+
+
+// ===============================
 //  Vertical grid system
 // ===============================
 
@@ -535,8 +595,23 @@ h1 + p.subtitle {
 			overflow: hidden;
 		}
 
-
 	}
+
+	.host-main {
+		.transition( all 0.25s );
+		&.fx-blur {
+			.filter( blur(5px) );
+		}
+	}
+
+	.host-overlay {
+		.overlay-window {
+			position: absolute;
+			left: 10%; top: 10%;
+			width: 80%; height: 80%;
+		}
+	}
+
 
 	.nav-mini {
 		position: absolute;

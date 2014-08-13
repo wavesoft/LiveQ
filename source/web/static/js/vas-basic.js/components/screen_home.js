@@ -148,50 +148,34 @@ define(
 						.append("svg")
 						.attr("class", "dv-home");
 
+			// Prepare button host
+			this.sideButtonHost = $('<div class="side-buttons"></div>').appendTo(this.foregroundDOM);
+
+			// Prepare buttons
+			this.btnActiveRunBtn = $('<div class="btn-round btn-darkblue"><span class="uicon uicon-gear"></span></div>').appendTo(this.sideButtonHost);
+			this.btnActiveRunBtn.click((function(e){
+				this.trigger('changeScreen', 'screen.running');
+			}).bind(this));
+			this.btnActiveRunBtn.hide();
+
+			// Prepare buttons
+			this.btbTest = $('<div class="btn-round btn-darkblue"><span class="uicon uicon-eye"></span></div>').appendTo(this.sideButtonHost);
+			this.btbTest.click((function(e){
+				this.trigger('test');
+			}).bind(this));
+
+			// Register visual aids
+			R.registerVisualAid( "home.run", this.btnActiveRunBtn, { "screen": "screen.home" });
+
 			// Create a directed graph
 			this.graph = {
 				'nodes': [
-					{
-						'name'	: 'Introduction to the game',
-						'desc'  : 'Learn about the Virtual Atom Smasher interface and purpose.',
-						'icon'	: 'static/img/logo.png',
-						'color'	: '#ECF0F1',
-						'radius': 50,
-						'click' : (function() {
-							this.trigger("explainTopic", "ea662db6a205b19ae791d95da0021429");
-						}).bind(this)
-					},
-					{
-						'name'	: 'Collision Elementary',
-						'desc'  : 'Your first task to the world of particle physics! Collide two electron-electron beams!',
-						'icon'	: 'static/img/level-icons/hard.png',
-						'color' : '#2ECC71',
-						'radius': 20,
-						'click' : (function() {
-							this.trigger("playLevel", 1);
-						}).bind(this)
-					}
 				],
 				'links': [
-					{'source':1, 'target':0}
 				]
 			};
 
-			/*
-			var color = d3.scale.category20();
-			this.foregroundDOM.click((function() {
-				var i = this.graph.nodes.length,
-					c = color(i),
-					n = {'name': 'Node '+i, 'color':c, 'radius': 20},
-					l1 = parseInt( Math.random() * i );
-
-				this.graph.nodes.push(n);
-				this.graph.links.push({ 'source':i,'target':l1,'value':1 });
-				this.updateScene();
-
-			}).bind(this))
-			*/
-
+			// Setup initial scene
 			this.setupScene();
 			this.updateScene();
 
@@ -306,7 +290,8 @@ define(
 					.attr('height', h);
 
 			// Resize force dimentions
-			this.force.size([w,h]);
+			this.force.size([w,h])
+					  .start();			
 
 		}
 
@@ -331,6 +316,10 @@ define(
 		HomeScreen.prototype.onShown = function() {
 			UI.showFirstTimeAid( "home.begin" );
 			UI.showFirstTimeAid( "home.firstBranch" );
+
+			// Button helpers
+			if (this.btnActiveRunBtn.is(":visible"))
+				UI.showFirstTimeAid( "home.run" );
 		}
 
 		/**
@@ -379,6 +368,21 @@ define(
 			// Regen UI
 			this.updateScene();
 
+		}
+
+		/**
+		 * Update running screen status
+		 */
+		HomeScreen.prototype.onStateChanged = function( stateID, stateValue ) {
+			if (stateID == "simulating") {
+
+				// Show/hide the simulating button
+				if (stateValue) {
+					this.btnActiveRunBtn.fadeIn();
+				} else {
+					this.btnActiveRunBtn.fadeOut();
+				}
+			}
 		}
 
 		// Register home screen

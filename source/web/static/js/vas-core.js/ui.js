@@ -7,6 +7,49 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		///////////////////////////////////////////////////////////////
 
 		/**
+		 * Cross-transition between two CSS elements with callback
+		 */
+		function pageTransition(elmPrev, elmNext, transition, cb) {
+
+			// Find the event name for the 'animation completed' event
+			var animEndEventNames = {
+					'webkitAnimation' : 'webkitAnimationEnd',
+					'oAnimation' : 'oAnimationEnd',
+					'msAnimation' : 'MSAnimationEnd',
+					'animation' : 'animationend'
+				},
+				animEndEventName = animEndEventNames[ with_vendor_suffix('animation') ];
+
+			// Add page-transitions for moving out
+			elmPrev.addClass( transition[0] );
+			elmNext.addClass( transition[1] + " pt-page-ontop pt-current");
+
+			// Local function to finalize animation
+			var finalizeAnimation = function() {
+
+				// Remove all the page transition classes from both pages
+				elmNext.attr("class", elmNext.data("originalClasses") + " pt-current" );
+				elmPrev.attr("class", elmPrev.data("originalClasses") );
+
+				// Fire callback
+				cb();
+
+			}
+
+			// Listen for CSS 'animation completed' events
+			var vc = 0; 
+			elmPrev.on( animEndEventName, function() {
+				elmPrev.off( animEndEventName );
+				if (++vc == 2) finalizeAnimation();
+			} );
+			elmNext.on( animEndEventName, function() {
+				elmNext.off( animEndEventName );
+				if (++vc == 2) finalizeAnimation();
+			} );
+
+		}
+
+		/**
 		 * Find vendor suffix
 		 */
 		function get_vendor_suffix() {
@@ -205,6 +248,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			FLIP_LEFT		: [ 'pt-page-flipOutLeft', 'pt-page-flipInRight pt-page-delay500' ],
 			FLIP_TOP		: [ 'pt-page-flipOutTop', 'pt-page-flipInBottom pt-page-delay500' ],
 			FLIP_BOTTOM		: [ 'pt-page-flipOutBottom', 'pt-page-flipInTop pt-page-delay500' ],
+			PULL_RIGHT		: [ 'pt-page-rotatePushLeft', 'pt-page-rotatePullRight pt-page-delay180' ],
+			PULL_LEFT		: [ 'pt-page-rotatePushRight', 'pt-page-rotatePullLeft pt-page-delay180' ],
+			PULL_BOTTOM		: [ 'pt-page-rotatePushTop', 'pt-page-rotatePullBottom pt-page-delay180' ],
+			PULL_TOP		: [ 'pt-page-rotatePushBottom', 'pt-page-rotatePullTop pt-page-delay180' ],
 		};
 
 		/**
@@ -276,8 +323,35 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		UI.initialize = function() {
 
 			// Initialize Virtual Atom Smasher Interface
-			UI.host = $(config['dom-host']);
-			UI.host.addClass("pt-main pt-perspective");
+			UI.gameFrame = $(config['dom-host']);
+
+			// Prepare host
+			UI.host = $('<div></div>').appendTo(UI.gameFrame);
+			UI.host.addClass("fullscreen host-main pt-main pt-perspective");
+
+			// Prepare overlay host
+			UI.activeOverlayComponent = null;
+			UI.hostOverlay = $('<div></div>').appendTo(UI.gameFrame);
+			UI.hostOverlay.addClass("fullscreen host-overlay");
+			UI.hostOverlay.hide();
+			UI.hostOverlay.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.hideOverlay();
+			});
+
+			// Prepare overlay window
+			UI.hostOverlayWindow = $('<div class="pt-main pt-perspective"></div>').appendTo(UI.hostOverlay);
+			UI.hostOverlayWindow.addClass('overlay-window');
+			UI.hostOverlayWindow.click(function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+			});
+
+			// Prepare dummy blank screen for the overlay
+			UI.blankOverlayScreen = $('<div class="pt-current pt-page-ontop"></div>').appendTo(UI.hostOverlayWindow);
+			UI.blankOverlayScreen.addClass(config.css['screen']);
+			UI.blankOverlayScreen.data("originalClasses", config.css['screen']);
 
 			// Place an overlay DOM
 			UI.overlayDOM = $('<div class="'+config.css['overlay']+'"></div>');
@@ -288,6 +362,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			// Initialize the main visual agent for the tutorials
 			UI.visualAgentDOM = $('<div class="visual-agent"></div>');
+			UI.visualAgentDOM.hide();
 			UI.overlayDOM.append(UI.visualAgentDOM);
 			UI.visualAgent = R.instanceComponent( 'tutorial.agent', UI.visualAgentDOM );
 			if (!UI.visualAgent)
@@ -372,12 +447,100 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * @param {function} cb_ready - The callback to fire when the screen has changed
 		 *
 		 */
-		UI.showOverlay = function(name, cb_ready) {
+		UI.showOverlay = function(name, transition, cb_ready) {
 
-			// Get preferred dimentions of the overlay
+			// Check for missing arguments
+			if (typeof(transition) == 'function') {
+				cb_ready = transition; transition = null;
+			}
+			if (!transition) {
+				transition = UI.Transitions.ZOOM_IN;
+			}
+
+			// Create host DOM for the component
+			var comDOM = $('<div class="'+config.css['screen']+'"></div>');
+			UI.hostOverlayWindow.append(comDOM);
+
+			// Create screen instance
+			var s = R.instanceComponent(name, comDOM), valid = true;
+			if (!s) {
+				console.error("[Overlay] Unable to load overlay '"+name+"'");
+				comDOM.remove();
+				return;
+			}
+
+			// Perserve the original classes
+			comDOM.data("originalClasses", comDOM.attr("class"));
+
+			// Delay-execute showOverlay if required
+			var doShowOverlay = function() {
+
+				// Select active overlay
+				UI.activeOverlayComponent = s;
+
+				// Blur background & show overlay
+				UI.host.addClass("fx-blur");
+				UI.hostOverlay.show();
+
+				// Transition between blank screen and current
+				setTimeout(function() {
+					s.onWillShow(function() {
+						pageTransition( UI.blankOverlayScreen, comDOM, transition, function() {
+							s.onShown();
+							if (cb_ready) cb_ready(s);
+						});
+					});
+				},200);
+
+			}
+
+			// If we have a previous overlay screen, hide it
+			UI.hideOverlay(doShowOverlay);
+
+			// Return component instance
+			return s;
 
 		}
 
+		/**
+		 * Hide the overlay module from screen
+		 */
+		UI.hideOverlay = function( transition, cb_ready ) {
+
+			// Check for missing arguments
+			if (typeof(transition) == 'function') {
+				cb_ready = transition; transition = null;
+			}
+			if (!transition) {
+				transition = UI.Transitions.ZOOM_OUT;
+			}
+
+			// If we are already hidden don't do anything
+			if (!UI.activeOverlayComponent) {
+				if (cb_ready) cb_ready();
+				return;
+			}
+
+			// Unblur background
+			UI.host.removeClass("fx-blur");
+
+			// Transition current screen and blank
+			UI.activeOverlayComponent.onWillHide(function() {
+				pageTransition( UI.activeOverlayComponent.hostDOM, UI.blankOverlayScreen, transition, function() {
+					UI.activeOverlayComponent.onHidden();
+					
+					// Reset overlay
+					UI.activeOverlayComponent.hostDOM.remove();
+					UI.activeOverlayComponent = null;
+					UI.hostOverlay.hide();
+
+					// Fire callback
+					if (cb_ready) cb_ready();
+				});
+			});
+
+
+		}
 
 		/**
 		 * Hide all the first-time aids.
@@ -429,7 +592,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 						x2 = parseInt(aVisible.css("left")),
 						y2 = parseInt(aVisible.css("top"));
 
-					// Check if we have no collision
+					// Check if we a collision
 					if ( check_collision(x1,y1,w1,h1,x2,y2,w2,h2) || check_collision(x2,y2,w2,h2,x1,y1,w1,h1) ) {
 						collides = true;
 						break;
@@ -651,6 +814,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			// Keep new reference
 			popupWidget = widget;
+			return widget;
 
 		}
 
@@ -827,6 +991,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 					var vc = 2;
 
 					// Fade-in & initialize in the same time
+					UI.visualAgentDOM.show();
 					UI.overlayDOM.fadeIn(500, function() { if (--vc==0) __startTutorial(); } );
 					UI.visualAgent.onSequenceDefined( sequence, function() { if (--vc==0) __startTutorial(); } );
 
@@ -893,6 +1058,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 					// Fade-out overlay DOM
 					UI.overlayDOM.fadeOut(500, function() {
 						if (cb_ready) cb_ready();
+						UI.visualAgentDOM.hide();
 						tutorialActive = false;
 					});
 
@@ -958,46 +1124,26 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			console.log(prevScreen," -> ",name);
 
-			// Concurrent cross-fade
-			var pageTransition = function(cb) {
-
-				// Find the event name for the 'animation completed' event
-				var animEndEventNames = {
-						'webkitAnimation' : 'webkitAnimationEnd',
-						'oAnimation' : 'oAnimationEnd',
-						'msAnimation' : 'MSAnimationEnd',
-						'animation' : 'animationend'
-					},
-					animEndEventName = animEndEventNames[ with_vendor_suffix('animation') ];
-
-				// Add page-transitions for moving out
-				ePrev.hostDOM.addClass( transition[0] );
-				eNext.hostDOM.addClass( transition[1] + " pt-page-ontop pt-current");
-
-				// Local function to finalize animation
-				var finalizeAnimation = function() {
-
-					// Remove all the page transition classes from both pages
-					eNext.hostDOM.attr("class", eNext.hostDOM.data("originalClasses") + " pt-current" );
-					ePrev.hostDOM.attr("class", ePrev.hostDOM.data("originalClasses") );
-
-					// Fire callback
-					cb();
-
+			// Helper to display a waiting screen untless cancelled
+			var loadingTimer = 0,
+				loadingShown = false,
+				showLoadingAfter = function(waitMs) {
+					loadingTimer = setTimeout(function() {
+						if (tutorialActive) return;
+						loadingShown = true;
+						UI.overlayDOM.addClass("loading");
+						UI.overlayDOM.fadeIn(250);
+					}, waitMs);
+				},
+				abortShowLoading = function() {
+					clearTimeout(loadingTimer);
+					if (loadingShown) {
+						loadingShown = false;
+						UI.overlayDOM.fadeOut(250, function() {
+							UI.overlayDOM.removeClass("loading");
+						});
+					}
 				}
-
-				// Listen for CSS 'animation completed' events
-				var vc = 0; 
-				ePrev.hostDOM.on( animEndEventName, function() {
-					ePrev.hostDOM.off( animEndEventName );
-					if (++vc == 2) finalizeAnimation();
-				} );
-				eNext.hostDOM.on( animEndEventName, function() {
-					eNext.hostDOM.off( animEndEventName );
-					if (++vc == 2) finalizeAnimation();
-				} );
-
-			};
 
 			// Prepare previous hide
 			var preparePrev = function(cb) {
@@ -1017,6 +1163,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 					// the component will have the appropriate dimentions
 					eNext.onResize( eNext.hostDOM.width(), eNext.hostDOM.height() );
 
+					// If callback takes too much time to reply, show loading
+					showLoadingAfter( 500 );
+
 					// Inform new screen that will be shown
 					eNext.onWillShow(cb);
 
@@ -1026,12 +1175,17 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			// Prepare both first
 			preparePrev(function() { prepareNext(function() {
 
+				// We got the OK From the screen to be shown, hide 
+				// any possible loading screen that came-up while waiting
+				// in onWillShow
+				abortShowLoading();
+
 				// Inform page transition
 				if (UI.mininav)
 					UI.mininav.onPageWillChange( prevScreen, name );
 
 				// And cross-fade simultanously
-				pageTransition(function() {
+				pageTransition(ePrev.hostDOM, eNext.hostDOM, transition, function() {
 
 					// Fire shown/hidden
 					if (ePrev !== undefined) ePrev.onHidden();

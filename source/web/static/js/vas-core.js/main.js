@@ -300,6 +300,12 @@ define(
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
 					});
+					scrHome.on('test', function() {
+						UI.showOverlay("overlay.book");
+					});
+
+					// Fire the basic state change events
+					scrHome.onStateChanged( 'simulating', false );
 
 					// Complete home
 					prog_home.ok("Home screen ready");
@@ -383,6 +389,9 @@ define(
 					scrTuning.on('explainParameter', function(parameter) {
 						UI.selectScreen("screen.explain")
 							.onParameterFocus(parameter);
+					});
+					scrTuning.on('showBook', function(bookID) {
+						VAS.displayBook(bookID);
 					});
 					scrTuning.on('submitParameters', function(values, taskData) {
 						VAS.displayRunningScreen( values, VAS.referenceHistograms, taskData );
@@ -489,11 +498,14 @@ define(
 		 */
 		VAS.displayRunningScreen = function( values, referenceHistograms, taskData ) {
 
-			// Start task
-			VAS.scrRunning.onStartRun( values, taskData.obs, referenceHistograms );
-
 			var _dummyRunner_ = new _DummyRunner_();
 			_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
+
+			// Let running screen know that simulation has started
+			VAS.scrRunning.onStartRun( values, taskData.obs, referenceHistograms );
+
+			// Let home screen know that we started the simulation
+			VAS.scrHome.onStateChanged( 'simulating', true );
 
 			// Function to handle completion of the run
 			var cb_completed = function( histograms ) {
@@ -519,10 +531,20 @@ define(
 				},
 				function(histograms) { // Completed
 					VAS.scrRunning.onUpdate( histograms );
+					// Update state variables
+					VAR.scrHome.onStateChanged( 'simulating', false );
+
 				},
 				function(errorMsg) { // Error
+
+					// Update state variables
+					VAR.scrHome.onStateChanged( 'simulating', false );
+
+					// "Aborted" is not an error ;)
 					if (errorMsg == "Aborted") return;
 					alert("Simulation Error: "+errorMsg);
+
+					// Go to the home screen					
 					VAS.displayHome();
 				},
 				function(logLine, telemtryData) { // Log/Telemetry
@@ -560,6 +582,19 @@ define(
 
 			}
 
+
+		}
+
+		/**
+		 * Display the results screen
+		 */
+		VAS.displayBook = function( bookID ) {
+
+			// Display book
+			var comBook = UI.showOverlay("overlay.book");
+
+			// Update metadata
+			comBook.onMetaUpdate({ 'info': { 'book': bookID } });
 
 		}
 

@@ -414,6 +414,16 @@ define(["core/config", "core/base/component" ],
 		HomeScreen.prototype.onTopicTreeUpdated = function(topicsData) {
 		};
 
+		/**
+		 * This function is fire when a named state variable changes it's value.
+		 *
+		 * @abstract
+		 * @param {string} stateName - The name of the state variable
+		 * @param {any} stateValue - The value of the state variable
+		 */
+		HomeScreen.prototype.onStateChanged = function(stateName, stateValue) {
+		}
+
 		////////////////////////////////////////////////////////////
 		/**
 		 * Initializes a new Results Screen.

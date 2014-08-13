@@ -28,6 +28,9 @@ define(
 			this.width = 0;
 			this.height = 0;
 
+			// Prepare host
+			hostDOM.addClass("results");
+
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
 			hostDOM.append(this.backdropDOM);
@@ -38,6 +41,9 @@ define(
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append(this.foregroundDOM);
 
+			// Preapre elements
+			this.resultsHost = $('<div class="results-host"></div>').appendTo(this.foregroundDOM);
+
 		}
 		ResultsScreen.prototype = Object.create( C.ResultsScreen.prototype );
 
@@ -46,6 +52,13 @@ define(
 		////                            HOOK HANDLERS                              ////
 		///////////////////////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Setup screen
+		 */
+		ResultsScreen.prototype.setScreen = function() {
+
+		}
 
 		// Register screen component on the registry
 		R.registerComponent( 'screen.results', ResultsScreen, 1 );

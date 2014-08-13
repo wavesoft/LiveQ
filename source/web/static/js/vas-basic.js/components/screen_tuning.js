@@ -147,7 +147,7 @@ define(
 		 * Display a book
 		 */
 		TuningScreen.prototype.showBook = function(book) {
-			alert('You will be presented with book #'+book); 
+			this.trigger('showBook', book);
 		}
 
 		/**

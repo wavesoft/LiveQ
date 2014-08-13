@@ -10,6 +10,9 @@ define(
 	 */
 	function(config, R, DataWidget) {
 
+		// Keep in memory the last active tab
+		var lastActiveTab = 0;
+
 		/**
 		 * The default observable body class
 		 */
@@ -39,6 +42,10 @@ define(
 
 			// Prepare plot component on body
 			this.registerTab("dataviz.histogram", "uicon-plot-sideside");
+			this.registerTab("dataviz.histogram_ratio", "uicon-plot-ratio");
+
+			// Select the last active tab
+			this.selectTab(lastActiveTab);
 
 		};
 
@@ -53,6 +60,7 @@ define(
 		 * Register histogram handler
 		 */
 		ObservableBody.prototype.selectTab = function( id ) {
+			lastActiveTab = id;
 			for (var i=0; i<this.histogramTabs.length; i++) {
 				if (i == id) {
 					this.histogramTabs[i].com.show();
