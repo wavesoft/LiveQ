@@ -273,13 +273,15 @@ define(
 				// ------------------------------------------
 
 				// Create the X and Y axis
-				this.xAxisGraphic = this.svgPlot.append("g")
-				    .attr("class", "x axis")
-				    .attr("transform", "translate(0,"+height+")")
-				    .call(this.xAxis);
-				this.yAxisGraphic = this.svgPlot.append("g")
-				    .attr("class", "y axis")
-				    .call(this.yAxis);
+				if (!this.xAxisGraphic)
+					this.xAxisGraphic = this.svgPlot.append("g")
+					    .attr("class", "x axis")
+					    .attr("transform", "translate(0,"+height+")")
+					    .call(this.xAxis);
+				if (!this.yAxisGraphic)
+					this.yAxisGraphic = this.svgPlot.append("g")
+					    .attr("class", "y axis")
+					    .call(this.yAxis);
 
 				// Render them
 				this.xAxisGraphic.call(this.xAxis);

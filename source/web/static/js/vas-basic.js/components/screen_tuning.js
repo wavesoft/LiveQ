@@ -373,10 +373,14 @@ define(
 		TuningScreen.prototype.expandPinView = function() {
 			var expanded = this.detailsView.hasClass("expanded");
 			if (expanded) return;
-			this.detailsViewHeight = 200;
-			this.detailsView.addClass("expanded");
-			this.onResize( this.width, this.height );
-			this.pinViewComponent.show();
+			this.pinViewComponent.onWillShow((function() {
+				this.detailsView.addClass("expanded");
+				this.detailsViewHeight = 200;
+				this.onResize( this.width, this.height );
+				setTimeout((function() {
+					this.pinViewComponent.onShown();
+				}).bind(this), 250);
+			}).bind(this));
 		}
 
 		/**
@@ -385,10 +389,14 @@ define(
 		TuningScreen.prototype.collapsePinView = function() {
 			var expanded = this.detailsView.hasClass("expanded");
 			if (!expanded) return;
-			this.detailsViewHeight = 0;
-			this.detailsView.removeClass("expanded");
-			this.onResize( this.width, this.height );
-			this.pinViewComponent.hide();
+			this.pinViewComponent.onWillHide((function() {
+				this.detailsView.removeClass("expanded");
+				this.detailsViewHeight = 0;
+				this.onResize( this.width, this.height );
+				setTimeout((function() {
+					this.pinViewComponent.onHidden();
+				}).bind(this), 250);
+			}).bind(this));
 		}
 
 		/**
@@ -410,15 +418,9 @@ define(
 			detailsExpandButton.click( (function() {
 				var expanded = this.detailsView.hasClass("expanded");
 				if (expanded) {
-					this.detailsViewHeight = 0;
-					this.detailsView.removeClass("expanded");
-					this.onResize( this.width, this.height );
-					this.pinViewComponent.hide();
+					this.collapsePinView();
 				} else {
-					this.detailsViewHeight = 200;
-					this.detailsView.addClass("expanded");
-					this.onResize( this.width, this.height );
-					this.pinViewComponent.show();
+					this.expandPinView();
 				}
 			}).bind(this));
 

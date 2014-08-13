@@ -152,7 +152,7 @@ define(
 			this.sideButtonHost = $('<div class="side-buttons"></div>').appendTo(this.foregroundDOM);
 
 			// Prepare buttons
-			this.btnActiveRunBtn = $('<div class="btn-round btn-darkblue"><span class="uicon uicon-gear"></span></div>').appendTo(this.sideButtonHost);
+			this.btnActiveRunBtn = $('<div class="btn-round btn-red"><span class="uicon uicon-gear"></span></div>').appendTo(this.sideButtonHost);
 			this.btnActiveRunBtn.click((function(e){
 				this.trigger('changeScreen', 'screen.running');
 			}).bind(this));
@@ -309,7 +309,7 @@ define(
 		 */
 		HomeScreen.prototype.onShown = function() {
 			UI.showFirstTimeAid( "home.begin" );
-			UI.showFirstTimeAid( "home.firstBranch" );
+			UI.showFirstTimeAid( "home.firstbranch" );
 
 			// Button helpers
 			if (this.btnActiveRunBtn.is(":visible"))
@@ -357,7 +357,7 @@ define(
 
 			// Tag first branch if we have it
 			if (this.graph.nodes.length > 1) 
-				this.graph.nodes[1].tagAid = "home.firstBranch";
+				this.graph.nodes[1].tagAid = "home.firstbranch";
 
 			// Regen UI
 			this.updateScene();

@@ -168,6 +168,10 @@ This database contains the list of tasks the user can run. They are refered from
             "book": "...",      // The related book for this task
             "tutorial": ".."    // The tutorial ID to display when the user enters the level
         },
+        "validate": {           // Validation configuration
+          "accept": 1,          // The minimum acceptable chi-square value
+          "perfect": 0.2,       // The perfect chi-square value
+        },
         "tunables": [           // The list of tunable IDs to display to the user
             "..", ...
         ],

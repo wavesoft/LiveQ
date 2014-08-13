@@ -4,9 +4,9 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/base/components", "core/util/progress_aggregator", "liveq/core" ], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/base/components", "core/util/progress_aggregator", "liveq/core", "liveq/Calculate" ], 
 
-	function($, config, R, UI, DB, User, Components, ProgressAggregator, LiveQCore) {
+	function($, config, R, UI, DB, User, Components, ProgressAggregator, LiveQCore, LiveQCalc) {
 		var VAS = { };
 
 		/**
@@ -51,6 +51,10 @@ define(
 			// Prepare properties
 			VAS.alertUnload = false;
 			VAS.referenceHistograms = null;
+			VAS.activeTask = "";
+			VAS.activeTopic = "";
+			VAS.runningTask = "";
+			VAS.runningTopic = "";
 
 			// Prepare progress screen
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
@@ -471,6 +475,7 @@ define(
 
 			// Setup explain screen
 			VAS.scrExplain.onTopicUpdated( User.getTopicDetails(topic_id) );
+			VAS.activeTopic = topic_id;
 
 			// Switch screen
 			UI.selectScreen("screen.explain");
@@ -484,6 +489,7 @@ define(
 
 			// Start task
 			VAS.scrTuning.onStartTask( User.getTaskDetails( task_id ) );
+			VAS.activeTask = task_id;
 
 			// Display tuning screen
 			UI.selectScreen("screen.tuning")
@@ -498,26 +504,15 @@ define(
 			//var _dummyRunner_ = new _DummyRunner_();
 			//_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
 
+			// Keep the task and the topic for reference
+			VAS.runningTask = VAS.activeTask;
+			VAS.runningTopic = VAS.activeTopic;
+
 			// Let running screen know that simulation has started
 			VAS.scrRunning.onStartRun( values, taskData.obs, referenceHistograms );
 
 			// Let home screen know that we started the simulation
 			VAS.scrHome.onStateChanged( 'simulating', true );
-
-			// Function to handle completion of the run
-			var cb_completed = function( histograms ) {
-
-				var chiAvg = 0;
-				for (var i=0; i<histograms.length; i++) {
-					// Calculate chi-squared between the data and the reference histogram
-					chiAvg += LiveQCalc.chi2WithError( histograms[i].data, histograms[i].ref.data );
-				}
-				chiAvg /= histograms.length;
-
-				// Show results screen
-				UI.displayResultsScreen( chiAvg );
-
-			};
 
 			// Start Lab Socket
 			LiveQCore.requestRun(values,
@@ -527,7 +522,13 @@ define(
 					VAS.scrRunning.onUpdate( histograms );
 				},
 				function(histograms) { // Completed
+					
+					// Update running screen
 					VAS.scrRunning.onUpdate( histograms );
+
+					// Handle simulation completion
+					VAS.handleSimulationCompletion( histograms );
+
 					// Update state variables
 					VAS.scrHome.onStateChanged( 'simulating', false );
 
@@ -593,6 +594,40 @@ define(
 			// Update metadata
 			comBook.onMetaUpdate({ 'info': { 'book': bookID } });
 
+		}
+
+		/**
+		 * Check the completed results and continue as required
+		 */
+		VAS.handleSimulationCompletion = function(histograms) {
+
+			// Calcualte chi-squared average
+			var chiAvg = 0;
+			for (var i=0; i<histograms.length; i++) {
+				// Calculate chi-squared between the data and the reference histogram
+				chiAvg += LiveQCalc.chi2WithError( histograms[i].data, histograms[i].ref.data );
+			}
+			chiAvg /= histograms.length;
+
+			// Get task details & validation minimum
+			var taskDetails = DB.cache['tasks'][VAS.runningTask],
+				minChi = 1;
+				if (taskDetails && taskDetails['validate'] && taskDetails['validate']['accept'])
+					minChi = taskDetails['validate']['accept'];
+
+			// Show results screen
+			UI.displayResultsScreen( chiAvg, taskDetails['validate'] );
+
+			// Check if we accept this value
+			if (chiAvg <= minChi) {
+				// Activate next tasks/topics
+				User.markTaskCompleted( VAS.runningTask, VAS.runningTopic );
+			}
+
+		}
+
+		window.markCompleted = function() {
+				User.markTaskCompleted( VAS.runningTask, VAS.runningTopic );
 		}
 
 		/**

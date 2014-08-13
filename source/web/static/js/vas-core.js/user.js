@@ -187,10 +187,14 @@ define(["core/config", "core/db"],
 		/**
 		 * Grant user access to the specified topic
 		 */
-		User.enableTopic = function(id) {
+		User.enableChildTopics = function(topic_id) {
 
-			// Grant access to the given topic
-			DB.userRecord['data']['enabled_topics'][id] = 1;
+			// Lookup children
+			var topic = DB.cache['topic_index'][topic_id];
+			for (var i=0; i<topic.children.length; i++) {
+				// Grant access to the given topic
+				DB.userRecord['data']['enabled_topics'][topic.children[i]['_id']] = 1;
+			}
 
 			// Commit changes
 			DB.commitUserRecord();
@@ -271,6 +275,55 @@ define(["core/config", "core/db"],
 
 			// Commit changes
 			DB.commitUserRecord();
+
+		}
+
+		/**
+		 * Mark a task as completed, by selecting the next one
+		 */
+		User.markTaskCompleted = function(task_id, topic_id) {
+
+			// Fetch topic information
+			var topic = User.getTopicDetails(topic_id);
+
+			// Check which tasks are handled by the user
+			for (var i=0; i<topic.taskDetails.length; i++) {
+				var task = topic.taskDetails[i];
+				if (task['_id'] == task_id) {
+					// Did we reach the end?
+					if (i == topic.taskDetails.length-1) {
+						// Enable next topic
+						this.enableChildTopics(topic_id);
+						return;
+					} else {
+						// Enable next task
+						this.enableTask(topic.taskDetails[i+1]['_id']);
+						return;
+					}
+				}
+			}
+
+		}
+
+
+		/**
+		 * Check if a topic is complete
+		 */
+		User.hasCompletedTopic = function(topic_id) {
+
+			// Fetch topic information
+			var topic = DB.cache['topic_index'][topic_id];
+
+			// Check which tasks are handled by the user
+			for (var i=0; i<topic.tasks.length; i++) {
+				var task = DB.userRecord['data']['task_details'][topic.tasks[i]];
+				// Found at least one not completed
+				if (!task || !task.enabled)
+					return false;
+			}
+
+			// Everything was completed!
+			return true;
 
 		}
 
