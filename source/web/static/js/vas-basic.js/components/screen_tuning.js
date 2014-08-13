@@ -52,6 +52,7 @@ define(
 			this.tunables = {};
 			this.observables = {};
 			this.parameters = {};
+			this.histogramData = {};
 
 			// Indexing for the UI widgets
 			this.tuneWidgets = {};
@@ -369,6 +370,30 @@ define(
 		/**
 		 * Create expanded view screen
 		 */
+		TuningScreen.prototype.expandPinView = function() {
+			var expanded = this.detailsView.hasClass("expanded");
+			if (expanded) return;
+			this.detailsViewHeight = 200;
+			this.detailsView.addClass("expanded");
+			this.onResize( this.width, this.height );
+			this.pinViewComponent.show();
+		}
+
+		/**
+		 * Create expanded view screen
+		 */
+		TuningScreen.prototype.collapsePinView = function() {
+			var expanded = this.detailsView.hasClass("expanded");
+			if (!expanded) return;
+			this.detailsViewHeight = 0;
+			this.detailsView.removeClass("expanded");
+			this.onResize( this.width, this.height );
+			this.pinViewComponent.hide();
+		}
+
+		/**
+		 * Create expanded view screen
+		 */
 		TuningScreen.prototype.preparePinView = function() {
 
 			// Prepare detailed observation screen
@@ -390,7 +415,7 @@ define(
 					this.onResize( this.width, this.height );
 					this.pinViewComponent.hide();
 				} else {
-					this.detailsViewHeight = 150;
+					this.detailsViewHeight = 200;
 					this.detailsView.addClass("expanded");
 					this.onResize( this.width, this.height );
 					this.pinViewComponent.show();
@@ -470,7 +495,7 @@ define(
 			}).bind(this));
 			// Event: Notify value updated
 			e.on('valueChanged', (function(value) {
-				this.requestInterpolation();
+				this.trigger('interpolateParameters', this.getValueMap());
 				this.commitSaveChanges();
 			}).bind(this));
 
@@ -520,7 +545,9 @@ define(
 			// Event: Pin the observable on screen
 			e.on('pin', (function(elm) {
 				return function() {
-					alert("Will pin element"+elm);
+					this.pinViewComponent.onHistogramPin( metadata['_id'], metadata );
+					this.pinViewComponent.onHistogramUpdate( metadata['_id'], this.histogramData[metadata['_id']] );
+					this.expandPinView();
 				}
 			})(e).bind(this));
 
@@ -554,6 +581,10 @@ define(
 			this.observablesLevelRings = [];
 			this.tunablesLevelRings = [];
 			this.tuningGroups = {};
+			this.histogramData = {};
+
+			// Cleanup in screen
+			this.pinViewComponent.onUnpinAll();
 
 			// Tunable ring positions
 			var tRingRadius = this.tunMinDistance, 
@@ -788,6 +819,12 @@ define(
 					chiCount += 1;
 				}
 
+				// Update data reference
+				this.histogramData[histo.id] = histo;
+
+				// Update pinned histograms				
+				this.pinViewComponent.onHistogramUpdate( histo.id, histo );
+
 			}
 
 			// Update observing widget with the average chi square
@@ -859,50 +896,6 @@ define(
 		TuningScreen.prototype.getReferenceHistos = function(values) {
 
 			var values = this.getValueMap();
-
-		}
-
-		/**
-		 * Submit values and request interpolation
-		 */
-		TuningScreen.prototype.requestInterpolation = function(values) {
-
-			var values = this.getValueMap();
-			LiveQCore.requestInterpolation( values, 
-				(function(histograms) {
-
-					var chiSum = 0, chiCount = 0;
-
-					// Update histogram data
-					for (var i=0; i<histograms.length; i++) {
-						var histo = histograms[i];
-
-						// Find the relative observable
-						if (this.observableByID[histo.id]) {
-
-							// Update histogram 
-							this.observableByID[histo.id].onUpdate( histo );
-
-							// Collect chi-squared average information
-							chiSum += this.observableByID[histo.id].getValue();
-							chiCount += 1;
-						}
-
-					}
-
-					// Update observing widget with the average chi square
-					if (chiCount > 0) {
-						this.observingWidget.onUpdate( chiSum / chiCount );
-					} else {
-						this.observingWidget.onUpdate( 1000 );
-					}
-
-				}).bind(this),
-				(function(error) {
-
-
-				}).bind(this)
-			);
 
 		}
 

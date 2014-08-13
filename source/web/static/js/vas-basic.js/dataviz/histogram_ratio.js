@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "d3", "core/registry","core/base/data_widget" ], 
+	["jquery", "d3", "core/registry","core/base/data_widget", "liveq/Calculate" ], 
 
 	/**
 	 * This is the default data widget for visualizing a historgram
 	 *
  	 * @exports vas-basic/dataviz/histogram
 	 */
-	function(config, d3, R, DataWidget) {
+	function(config, d3, R, DataWidget, LiveQCalc) {
 
 		/**
 		 * The default observable body class
@@ -129,18 +129,15 @@ define(
 
 				// Calculate bounds
 				var bounds = this.data.getBounds(),
-					refBounds = this.ref.data.getBounds(),
-					xMin  = Math.min( bounds[0], refBounds[0] ),
-					xMax  = Math.max( bounds[1], refBounds[1] ),
-					yMin  = Math.min( bounds[2], refBounds[2] ),
-					yMax  = Math.max( bounds[3], refBounds[3] ),
-					yZero = Math.min( bounds[4], refBounds[4] ),
+					xMin  = bounds[0], xMax  = bounds[1],
+					yMin  = 0.5, yMax  = 1.5,
+					yZero = bounds[4],
 					width = this.width - this.margin.left - this.margin.right,
 					height = this.height - this.margin.top - this.margin.bottom;
 
 				// Check what kind of scale do we use
 				var xScaleClass = d3.scale.linear,
-					yScaleClass = d3.scale.log;
+					yScaleClass = d3.scale.linear;
 
 				// Prepare X Axis
 				this.xScale = xScaleClass()
@@ -163,15 +160,9 @@ define(
 				// Prepare plot configuration
 				var plots = [
 					{
-						'id'	 : 'plot-ref',
-						'legend' : 'Reference Data',
-						'color'  : '#00ffff',
-						'data'   : this.ref.data.values
-					},
-					{
 						'id'	 : 'plot-sim',
-						'legend' : 'Simulation Data',
-						'color'  : '#ff0000',
+						'legend' : 'Ratio',
+						'color'  : '#ffff00',
 						'data'   : this.data.values
 					}
 				];
@@ -250,21 +241,15 @@ define(
 										"L"+bs+","+bs+
 										"L"+(-bs)+","+bs+
 										"Z";
-
-							// Calculate error bar sizes
-							var e_up = self.yScaleNonZero(d[0]) - self.yScaleNonZero(d[0]+d[1]),
-								e_dn = self.yScaleNonZero(d[0]-d[2]) - self.yScaleNonZero(d[0]);
-
-							// Draw upper error bar
-							var D_YEUP = "M"+(-bs)+","+(-e_up)+"L"+bs+","+(-e_up)+"Z" +
-										 "M0,"+(-e_up)+"L0,"+(-bs)+"Z";
-							var D_YEDN = "M"+(-bs)+","+e_dn+"L"+bs+","+e_dn+"Z" +
-										 "M0,"+e_dn+"L0,"+bs+"Z";
-
-							return  D_YEUP+D_YEDN + D_RECT;
+							return  D_RECT;
 
 						})
 						.attr("stroke", plot.color);
+
+					// =============
+					//  Error bars
+					// =============
+					
 
 				}
 
@@ -275,7 +260,7 @@ define(
 				// Create the X and Y axis
 				this.xAxisGraphic = this.svgPlot.append("g")
 				    .attr("class", "x axis")
-				    .attr("transform", "translate(0,"+height+")")
+				    .attr("transform", "translate(0,"+this.yScale(1)+")")
 				    .call(this.xAxis);
 				this.yAxisGraphic = this.svgPlot.append("g")
 				    .attr("class", "y axis")
@@ -402,10 +387,8 @@ define(
 			// Prepare data variables
 			if (!data) {
 				this.data = null;
-				this.ref = null;
 			} else {
-				this.data = data['data'];
-				this.ref = data['ref'];
+				this.data = LiveQCalc.calculateRatioHistogram( data['data'], data['ref'].data );
 			}
 
 			// Regen plot

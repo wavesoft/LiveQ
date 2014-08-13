@@ -325,6 +325,92 @@ h1 + p.subtitle {
 .uicon.uicon-sd {
   background-position: -312px 0px;
 }
+.body-more {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+.body-more .body {
+  position: absolute;
+  overflow-x: hidden;
+  overflow-y: auto;
+  left: 0;
+  top: 0;
+  width: 100%;
+  bottom: 36px;
+}
+.body-more .body.tabular {
+  overflow: hidden;
+}
+.body-more .body.tabular > div {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.body-more .body a.tile-row {
+  display: block;
+  position: relative;
+  height: 45px;
+  color: white;
+  overflow: hidden;
+  text-align: left;
+  margin: 2px;
+}
+.body-more .body a.tile-row div.icon {
+  background-color: #666666;
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  height: 32px;
+  width: 32px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.body-more .body a.tile-row div.text {
+  display: block;
+  font-size: 14px;
+  position: absolute;
+  left: 45px;
+  top: 11px;
+  text-align: left;
+}
+.body-more .body a.tile-row:hover {
+  background-color: #666666;
+}
+.body-more .more {
+  background-color: rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: 0px 0px 8px 8px;
+  -moz-border-radius: 0px 0px 8px 8px;
+  -o-border-radius: 0px 0px 8px 8px;
+  border-radius: 0px 0px 8px 8px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2px;
+  height: 28px;
+}
+.body-more .more a {
+  font-size: 14px;
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  line-height: 24px;
+  height: 24px;
+  padding: 2px;
+  margin: 0px 2px;
+  border-radius: 4px;
+}
+.body-more .more a:hover,
+.body-more .more a.active {
+  background: #666666;
+}
 .onscreen {
   position: absolute;
   background: rgba(64, 64, 64, 0.9);
@@ -419,92 +505,6 @@ h1 + p.subtitle {
   overflow-x: hidden;
   overflow-y: auto;
   color: #eeeeee;
-}
-.onscreen .body-more {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-}
-.onscreen .body-more .body {
-  position: absolute;
-  overflow-x: hidden;
-  overflow-y: auto;
-  left: 0;
-  top: 0;
-  width: 100%;
-  bottom: 36px;
-}
-.onscreen .body-more .body.tabular {
-  overflow: hidden;
-}
-.onscreen .body-more .body.tabular > div {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  top: 0;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-.onscreen .body-more .body a.tile-row {
-  display: block;
-  position: relative;
-  height: 45px;
-  color: white;
-  overflow: hidden;
-  text-align: left;
-  margin: 2px;
-}
-.onscreen .body-more .body a.tile-row div.icon {
-  background-color: #666666;
-  position: absolute;
-  left: 6px;
-  top: 6px;
-  height: 32px;
-  width: 32px;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-.onscreen .body-more .body a.tile-row div.text {
-  display: block;
-  font-size: 14px;
-  position: absolute;
-  left: 45px;
-  top: 11px;
-  text-align: left;
-}
-.onscreen .body-more .body a.tile-row:hover {
-  background-color: #666666;
-}
-.onscreen .body-more .more {
-  background-color: rgba(0, 0, 0, 0.4);
-  -webkit-border-radius: 0px 0px 8px 8px;
-  -moz-border-radius: 0px 0px 8px 8px;
-  -o-border-radius: 0px 0px 8px 8px;
-  border-radius: 0px 0px 8px 8px;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 2px;
-  height: 28px;
-}
-.onscreen .body-more .more a {
-  font-size: 14px;
-  display: inline-block;
-  text-decoration: none;
-  color: white;
-  line-height: 24px;
-  height: 24px;
-  padding: 2px;
-  margin: 0px 2px;
-  border-radius: 4px;
-}
-.onscreen .body-more .more a:hover,
-.onscreen .body-more .more a.active {
-  background: #666666;
 }
 .tabs {
   width: 100%;

@@ -29,6 +29,7 @@ define([
 	"vas-basic/components/tuning/status-tune",
 	"vas-basic/components/tuning/status-observe",
 	"vas-basic/components/tuning/pin",
+	"vas-basic/components/tuning/pin_widget",
 
 	// Running-related
 	"vas-basic/components/running/observable",

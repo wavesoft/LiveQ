@@ -853,13 +853,23 @@
   height: 0;
 }
 .screen.tuning .details-view.expanded {
-  height: 150px;
+  height: 200px;
 }
 .screen.tuning .details-view div.scroller {
   border-top: solid 4px #16a085;
   background-color: #4d4d4d;
   width: 100%;
-  height: 150px;
+  height: 200px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+.screen.tuning .details-view div.scroller div.histogram {
+  display: inline-block;
+  height: 180px;
+  width: 290px;
+  padding: 0;
+  margin: 0 2px;
+  background-color: #333333;
 }
 .screen.tuning .details-view div.btn-taglike {
   -webkit-transition: all 0.5s;

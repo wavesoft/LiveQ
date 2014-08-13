@@ -1,7 +1,7 @@
 define(
 
 	// Dependencies
-	[ ], 
+	[ 'liveq/HistogramData' ], 
 
 	/**
 	 * This class contains the math functions that are used to calculate
@@ -9,7 +9,7 @@ define(
 	 *
  	 * @exports liveq/Calculate
 	 */
-	function() {
+	function( HistogramData ) {
 
 		/**
 		 * This namespace contains the math functions that are used to calculate
@@ -209,6 +209,54 @@ define(
 			// Return Chi2 and Chi2-Error
 			return [chi2, chi2err];
 		}
+
+
+		/**
+		 * Calculate a ratio histogram values between the theoretical an data histogram
+		 *
+		 * @param {LiveQ.HistogramData} histoTheory - First histogram
+		 * @param {LiveQ.HistogramData} histoData - Second histogram (reference)
+		 */
+		Calculate.calculateRatioHistogram = function(histoTheory, histoData) {
+
+			// If either empty, return empty histogram
+			if (histoTheory.empty || histoData.empty) 
+				return new HistogramData();
+
+			// Go through the values and calculate the ratio
+			var values = [];
+			for (var i=0; i<histoTheory.values.length; i++) {
+
+				// Values are an array of: [y, y+, y-, x, x+, x-]
+				var b = histoTheory.values[i],
+					r = histoData.values[i],
+					x = 0, xErrPlus = 0, xErrMinus = 0,
+					y = 0, yErrPlus = 0, yErrMinus = 0;
+
+				if (!b[0] || !r[0]) continue; // skip empty bins
+
+				// Calculate values
+				x = b[3]; y = b[0] / r[0];
+				yErrPlus = Math.abs( b[1] / r[0] );
+				yErrMinus = Math.abs( b[2] / r[0] );
+				xErrPlus = 0; xErrMinus = 0;
+
+				// Store values
+				values.push([
+					y, yErrPlus, yErrMinus,
+					x, xErrPlus, xErrMinus
+				]);
+
+			}
+
+			// Create a new HistogramData
+			var histo = new HistogramData(histoTheory.bins, histoTheory.id);
+			histo.values = values;
+			histo.empty = false;
+			return histo;
+
+		}
+
 
 		// Return calculation namespace
 		return Calculate

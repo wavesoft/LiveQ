@@ -3,7 +3,8 @@
 // Tuning Screen
 ///////////////////////////////////////////////
 
-@tune-details-height: 150px;
+@tune-histogram-height: 180px;
+@tune-histogram-width: 290px;
 
 .screen.tuning {
 
@@ -340,14 +341,24 @@
 		height: 0;
 
 		&.expanded {
-			height: @tune-details-height;
+			height: @tune-histogram-height+20px;
 		}
 
 		div.scroller {
 			border-top: solid 4px #16a085;
 			background-color: #4d4d4d;
 			width: 100%;
-			height: @tune-details-height;
+			height: @tune-histogram-height+20px;
+			overflow-x: scroll;
+			overflow-y: hidden;
+
+			div.histogram {
+				display: inline-block;
+				height: @tune-histogram-height;
+				width: @tune-histogram-width;
+				padding: 0; margin: 0 2px;
+				background-color: #333;
+			}
 		}
 
 		div.btn-taglike {
