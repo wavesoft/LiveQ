@@ -758,6 +758,9 @@ define(
 		 */
 		TuningScreen.prototype.onWillShow = function(cb) {
 
+			// Collapse pin view
+			this.collapsePinView();
+
 			// Connect to LabSocket
 			LiveQCore.openSocket(
 				this.taskData['lab'], 

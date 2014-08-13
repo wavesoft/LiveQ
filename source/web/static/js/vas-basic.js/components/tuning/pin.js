@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry", "core/base/component", "core/config" ], 
+	["jquery", "core/ui", "core/registry", "core/base/component", "core/config" ], 
 
 	/**
 	 * This is the default observable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/observable
 	 */
-	function(config, R, Component, Config) {
+	function(config, UI, R, Component, Config) {
 
 		var DefaultPinScreen = function(hostDOM) {
 
@@ -20,6 +20,7 @@ define(
 			this.hostDOM.append( this.scrollerView );
 
 			this.pinnedHistos = {};
+			this.firstHistogram = true;
 
 		};
 
@@ -36,6 +37,7 @@ define(
 		DefaultPinScreen.prototype.onUnpinAll = function() {
 			this.pinnedHistos = {};
 			this.scrollerView.empty();
+			this.firstHistogram = true;
 		}
 
 		/**
@@ -55,6 +57,12 @@ define(
 				console.error("[PinScreen] Unable to instance component 'screen.tuning.pin_widget' required for showing the pinned histogram");
 				histoHost.remove();
 				return;
+			}
+
+			// Add first histogram to visual aids
+			if (this.firstHistogram) {
+				this.firstHistogram = false;
+				R.registerVisualAid( 'tuning.firstpin', histoHost, {'screen': 'screen.tuning' } );				
 			}
 
 			// Register
@@ -86,6 +94,14 @@ define(
 		DefaultPinScreen.prototype.onHistogramUpdate = function( id, histoRef ) {
 			if (!this.pinnedHistos[id]) return;
 			this.pinnedHistos[id].onUpdate( histoRef );
+		}
+
+		/**
+		 * Display first-time aids
+		 */
+		DefaultPinScreen.prototype.onShown = function() {
+			// Show first-time aids
+			UI.showFirstTimeAid( "tuning.firstpin" );
 		}
 
 		// Store tuning widget component on registry

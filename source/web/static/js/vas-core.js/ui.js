@@ -490,7 +490,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 							if (cb_ready) cb_ready(s);
 						});
 					});
-				},200);
+				},100);
 
 			}
 
