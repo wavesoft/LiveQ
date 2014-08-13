@@ -158,19 +158,25 @@ define(
 		 * Analyze histogram and try return a goodness of fit value between 0.0 (bad) and 1.0 (perfect)
 		 */
 		DefaultRunningObservableWidget.prototype.getValue = function() {
-			//return Math.random();
 
 			// If we don't have yet histograms, return maximum chi-squared
 			if (!this.value) return 0;
 
+			// Get the ratio histogram
+			var ratioHisto = LiveQCalc.calculateRatioHistogram( this.value.data, this.value.ref.data );
+
 			// Calculate bin ratio
-			for (var i=0; i<this.value.data.bins.length; i++) {
+			var avg = 0;
+			for (var i=0; i<ratioHisto.values.length; i++) { avg += ratioHisto.values[i][0]; };
+			avg /= ratioHisto.values.length;
 
-			}
+			// Wrap to bounds
+			if (avg < 0.5) avg=0.5;
+			if (avg > 1.5) avg=1.5;
 
-			// Calculate chi-squared between the data and the reference histogram
-			var chi2 = LiveQCalc.chi2WithError( this.value.data, this.value.ref.data );
-			return chi2[0];
+			// Change bounds
+			return avg - 0.5;
+
 		}
 
 		/**
@@ -233,7 +239,7 @@ define(
 			this.y = this.pivotY + Math.cos(this.angle) * r;
 
 			// Pick classes
-			if (v <= Config['chi2-bounds']['good']) {
+			if ((v>=0.49) && (v<=0.51)) {
 				this.element.removeClass('grey');
 				this.element.addClass('green');
 			} else {

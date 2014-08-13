@@ -300,9 +300,6 @@ define(
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
 					});
-					scrHome.on('test', function() {
-						UI.showOverlay("overlay.book");
-					});
 
 					// Fire the basic state change events
 					scrHome.onStateChanged( 'simulating', false );
@@ -498,8 +495,8 @@ define(
 		 */
 		VAS.displayRunningScreen = function( values, referenceHistograms, taskData ) {
 
-			var _dummyRunner_ = new _DummyRunner_();
-			_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
+			//var _dummyRunner_ = new _DummyRunner_();
+			//_dummyRunner_.onUpdate = VAS.scrRunning.onUpdate.bind( VAS.scrRunning );
 
 			// Let running screen know that simulation has started
 			VAS.scrRunning.onStartRun( values, taskData.obs, referenceHistograms );
@@ -525,20 +522,20 @@ define(
 			// Start Lab Socket
 			LiveQCore.requestRun(values,
 				function(histograms) { // Data Arrived
-					_dummyRunner_.data = histograms;
-					_dummyRunner_.start();
-					//VAS.scrRunning.onUpdate( histograms );
+					//_dummyRunner_.data = histograms;
+					//_dummyRunner_.start();
+					VAS.scrRunning.onUpdate( histograms );
 				},
 				function(histograms) { // Completed
 					VAS.scrRunning.onUpdate( histograms );
 					// Update state variables
-					VAR.scrHome.onStateChanged( 'simulating', false );
+					VAS.scrHome.onStateChanged( 'simulating', false );
 
 				},
 				function(errorMsg) { // Error
 
 					// Update state variables
-					VAR.scrHome.onStateChanged( 'simulating', false );
+					VAS.scrHome.onStateChanged( 'simulating', false );
 
 					// "Aborted" is not an error ;)
 					if (errorMsg == "Aborted") return;

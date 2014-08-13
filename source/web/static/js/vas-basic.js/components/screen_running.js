@@ -222,11 +222,13 @@ define(
 			var a = this.obsAngleShift, aStep = this.obsAngleSpan / this.obsElms.length;
 			for (var i=0; i<this.obsElms.length; i++) {
 				if (this.obsElms[i].setRadialConfig)
-					this.obsElms[i].setRadialConfig( 104, r - 24, a += aStep );
+					this.obsElms[i].setRadialConfig( 160, r - 24, a += aStep );
 				this.obsElms[i].onMove( l, t );
 				this.obsElms[i].onResize( w, h );
 			}
 
+			// Update the status widget
+			this.statusWidget.setShootTarget( (r-184)/2 + 160 );
 
 		}
 
@@ -354,10 +356,6 @@ define(
 			// Calculate progress
 			var totalEvents = this.machines.length * 200000,
 				progress = nevts / totalEvents;
-
-			////////////////////////////////////////
-				progress = _tmpFakeProgress_;
-			////////////////////////////////////////
 
 			// Update progress on the status widget
 			this.statusWidget.onUpdate( progress );

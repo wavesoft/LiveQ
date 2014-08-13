@@ -158,12 +158,6 @@ define(
 			}).bind(this));
 			this.btnActiveRunBtn.hide();
 
-			// Prepare buttons
-			this.btbTest = $('<div class="btn-round btn-darkblue"><span class="uicon uicon-eye"></span></div>').appendTo(this.sideButtonHost);
-			this.btbTest.click((function(e){
-				this.trigger('test');
-			}).bind(this));
-
 			// Register visual aids
 			R.registerVisualAid( "home.run", this.btnActiveRunBtn, { "screen": "screen.home" });
 

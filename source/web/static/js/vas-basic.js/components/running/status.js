@@ -230,19 +230,14 @@ define(
 		////////////////////////////////////////////////////////////
 
 		/**
-		 * This event is fired when the view is scrolled/resized and it
-		 * specifies the height coordinates of the bottom side of the screen.
+		 * Set target radius
 		 */
-		DefaultStatusWidget.prototype.onHorizonTopChanged = function(bottom) {
-			this.bottom = bottom;
-			if (this.y > this.bottom) {
-				this.indicator.css({
-					'top': bottom - 15
-				});	
-				this.indicator.fadeIn();
-			} else {
-				this.indicator.fadeOut();
-			}
+		DefaultStatusWidget.prototype.setShootTarget = function(target) {
+
+			this.shootTarget = target;			
+			this.updateRadialMarker( this.elmShootZone, this.shootTarget, this.shootZoneWidth );
+			this.updateRadialMarker( this.elmShootMin,  this.shootTarget - this.shootZoneWidth/2 );
+			this.updateRadialMarker( this.elmShootMax,  this.shootTarget + this.shootZoneWidth/2 );
 		}
 
 		/**
