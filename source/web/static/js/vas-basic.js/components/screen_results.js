@@ -43,6 +43,12 @@ define(
 
 			// Preapre elements
 			this.resultsHost = $('<div class="results-host"></div>').appendTo(this.foregroundDOM);
+			this.elmImage = $('<div class="image"></div>').appendTo(this.resultsHost);
+			this.elmText = $('<div class="text"></div>').appendTo(this.resultsHost);
+			this.buttonsBar = $('<div class="buttonbar"></div>').appendTo(this.resultsHost);
+
+			this.elmRetryBtn = $('<a class="btn-retry"><span class="uicon uicon-"></span> Retry</a>').appendTo(this.buttonsBar);
+			this.elmContinueBtn = $('<a class="btn-continue"><span class="uicon uicon-"></span> Continue</a>').appendTo(this.buttonsBar);
 
 		}
 		ResultsScreen.prototype = Object.create( C.ResultsScreen.prototype );
