@@ -207,6 +207,9 @@ class XMPPBus(Bus, ClientXMPP):
 		Bus.__init__(self)
 		ClientXMPP.__init__(self, "%s@%s/%s" % (config.USERNAME, config.DOMAIN, config.RESOURCE), config.PASSWORD)
 
+		# Enable unencrypted plain authentication
+		self['feature_mechanisms'].unencrypted_plain = True
+
 		# Setup logging
 		self.logger = logging.getLogger("xmpp-bus")
 
