@@ -18,7 +18,7 @@ define({
 	 * CouchDB Database Configuration
 	 */
 	'db': {
-		'url' 			: 'http://test4theory.cern.ch/vas/db',
+		'url' 			: '//test4theory.cern.ch/vas/db',
 		'databases'		: {
 			'tunables'		: 'tunables',
 			'observables'	: 'observables',

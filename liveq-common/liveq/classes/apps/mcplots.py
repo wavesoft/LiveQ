@@ -210,8 +210,12 @@ class MCPlots(JobApplication):
 		if type(config["histograms"]) != list:
 			raise JobConfigException("Parameter 'histograms' has an incompatible format")
 
-		# Create/Check-out the appropriate software
+		# Check if the software directory is not properly populated
 		swDir = os.path.join( self.config.WORKDIR, self.jobconfig['repoTag'] )
+		if not os.path.isfile( "%s/ready.flag" % swDir ):
+			os.system("rm -rf '%s'" % swDir)
+
+		# Create/Check-out the appropriate software
 		if not os.path.isdir( swDir ):
 
 			# Make directory
@@ -229,6 +233,10 @@ class MCPlots(JobApplication):
 				# Check for success
 				if p.returncode != 0:
 					raise JobRuntimeException("Unable to export SVN tag %s from %s" % (self.jobconfig['repoTag'], self.jobconfig['repoURL']))
+
+				# Checkout was successful, create ready.flag
+				with open("%s/ready.flag" % swDir, "w") as f:
+					pass
 
 			elif self.jobconfig['repoType'] == 'git':
 
@@ -249,6 +257,10 @@ class MCPlots(JobApplication):
 				# Check for success
 				if p.returncode != 0:
 					raise JobRuntimeException("Unable to clone GIT repository %s" % self.jobconfig['repoURL'])
+
+				# Checkout was successful, create ready.flag
+				with open("%s/ready.flag" % swDir, "w") as f:
+					pass
 
 			else:
 				raise JobInternalException("Unknown repository type '%s'" % self.jobconfig['repoType'])
