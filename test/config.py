@@ -18,47 +18,26 @@
 ################################################################
 
 import ConfigParser
-import os.path
 from liveq.config import configexceptions
-from liveq.config.core import CoreConfig, StaticConfig
-from liveq.config.externalbus import ExternalBusConfig
-from liveq.config.apps import AppConfig
-
-"""
-Local configuration for the agent
-"""
-class AgentConfig:
-
-	SERVER_CHANNEL = ""
-	AGENT_SLOTS = 1
-	AGENT_GROUP = []
-
-	@staticmethod
-	def fromConfig(config, runtimeConfig):
-
-		AgentConfig.SERVER_CHANNEL = config.get("agent", "server")
-		AgentConfig.AGENT_GROUP = config.get("agent", "group")
-		AgentConfig.AGENT_SLOTS = config.get("agent", "slots")
+from liveq.config.core import CoreConfig
+from liveq.config.internalbus import InternalBusConfig
 
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, ExternalBusConfig, StaticConfig, AppConfig, AgentConfig,):
+class Config(CoreConfig, InternalBusConfig):
 
 	"""
 	Update class variables by reading the config file
 	contents of the specified filename
 	"""
 	@staticmethod
-	def fromFile(confFile, runtimeConfig):
+	def fromFile(files, runtimeConfig):
 
 		# Read config file(s)
 		config = ConfigParser.SafeConfigParser()
-		config.read(confFile)
+		config.read(files)
 
 		# Initialize subclasses
-		StaticConfig.initialize( os.path.dirname(confFile) + "/static.conf.local" )
 		CoreConfig.fromConfig( config, runtimeConfig )
-		ExternalBusConfig.fromConfig( config, runtimeConfig )
-		AppConfig.fromConfig( config, runtimeConfig )
-		AgentConfig.fromConfig( config, runtimeConfig )
+		InternalBusConfig.fromConfig( config, runtimeConfig )

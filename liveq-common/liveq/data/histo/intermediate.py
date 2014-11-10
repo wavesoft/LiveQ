@@ -220,7 +220,7 @@ class IntermediateHistogramCollection(dict):
 					histo.crosssection,
 					len(histo.name)
 				)
-			buf += histo.name
+			buf += str( histo.name )
 
 			# Put histogram data
 			npbuf = numpy.concatenate([

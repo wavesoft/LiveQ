@@ -19,31 +19,31 @@
 
 import ConfigParser
 import os.path
+
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig, StaticConfig
-from liveq.config.externalbus import ExternalBusConfig
-from liveq.config.apps import AppConfig
+from liveq.config.internalbus import InternalBusConfig
+from liveq.config.database import DatabaseConfig
+from liveq.data.histo.description import HistoDescription
+from liveq.models import createBaseTables
 
 """
-Local configuration for the agent
+Local configuration for the stress-test agent
 """
-class AgentConfig:
+class StressTestConfig:
 
-	SERVER_CHANNEL = ""
-	AGENT_SLOTS = 1
-	AGENT_GROUP = []
+	#: The lab from which to submit dummy jobs
+	LAB_ID = None
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
+		StressTestConfig.LAB_ID = str(config.get("stresstest", "lab"))
 
-		AgentConfig.SERVER_CHANNEL = config.get("agent", "server")
-		AgentConfig.AGENT_GROUP = config.get("agent", "group")
-		AgentConfig.AGENT_SLOTS = config.get("agent", "slots")
 
 """
-Create a configuration for the JOB MANAGER based on the core config
+Create a configuration for the STRESS TEST AGENT based on the core config
 """
-class Config(CoreConfig, ExternalBusConfig, StaticConfig, AppConfig, AgentConfig,):
+class Config(CoreConfig, InternalBusConfig, StressTestConfig, DatabaseConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -57,8 +57,11 @@ class Config(CoreConfig, ExternalBusConfig, StaticConfig, AppConfig, AgentConfig
 		config.read(confFile)
 
 		# Initialize subclasses
-		StaticConfig.initialize( os.path.dirname(confFile) + "/static.conf.local" )
 		CoreConfig.fromConfig( config, runtimeConfig )
-		ExternalBusConfig.fromConfig( config, runtimeConfig )
-		AppConfig.fromConfig( config, runtimeConfig )
-		AgentConfig.fromConfig( config, runtimeConfig )
+		InternalBusConfig.fromConfig( config, runtimeConfig )
+		DatabaseConfig.fromConfig( config, runtimeConfig )
+		StressTestConfig.fromConfig( config, runtimeConfig )
+
+		# Ensure base tables exist
+		createBaseTables()
+

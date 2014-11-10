@@ -318,6 +318,7 @@ class JobManagers:
 
 			# Open channel and send data
 			outputChannel = Config.EBUS.openChannel(target_jid)
+			self.logger.info("Sending payload for action '%s' to '%s'" % (emsg[0], target_jid))
 			outputChannel.send(emsg[0], emsg[1])
 
 		except Queue.Empty:

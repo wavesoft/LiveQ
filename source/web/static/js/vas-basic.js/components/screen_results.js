@@ -66,6 +66,10 @@ define(
 
 		}
 
+		ResultsScreen.prototype.onUpdateResults = function( score, histograms ) {
+			
+		}
+
 		// Register screen component on the registry
 		R.registerComponent( 'screen.results', ResultsScreen, 1 );
 

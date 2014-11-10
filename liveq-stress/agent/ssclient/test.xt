@@ -1,0 +1,189 @@
+#!/usr/bin/python
+
+# ----------
+import sys
+sys.path.append("../../../liveq-common")
+# ----------
+
+import random
+import numpy as np
+import math
+
+from liveq.data.histo.intermediate import IntermediateHistogram,IntermediateHistogramCollection
+from liveq.data.histo.sum import intermediateMerge
+
+class RandomHisto:
+
+	@staticmethod
+	def fromNumber(name, number):
+		"""
+		Decompose number
+		"""
+
+		# Get random seed
+		seed = number & 0xffff
+
+		# Calculate standard deviation and mean
+		s =  float((number & 0xff0000) >> 16) / 0xff
+		m = (float((number & 0xff000000) >> 24) / 0xff)*2 - 1
+
+		# Calculate the number of bins
+		bins =   (((number & 0xf00000000) >> 28) + 1) * 5
+
+		# Calculate x range
+		rnum =     (number & 0xf000000000) >> 32
+		xmin = 0.0
+		xmax = 1.0
+		if (rnum & 0x08) != 0:
+			xmin = (-14 * ((rnum & 0x7)+1)) / 100
+			xmax = 0
+		else:
+			xmin = 0
+			xmax = (14 * (rnum+1)) / 100
+
+		# Return new random histogram
+		return RandomHisto(name, m, s, bins, xmin, xmax, seed)
+
+	def __init__(self, name, m=0, s=0.2, bins=20, xmin=0.0, xmax=10.0, seed=None):
+		"""
+		Initialize random histogram
+		"""
+		# Initialize properties
+		self.name = name
+		self.s = s
+		self.m = m
+		self.xmin = xmin
+		self.xmax = xmax
+		self.bins = bins
+		self.seed = seed
+		self.nevts = 0
+
+		# Generate random seed if missing
+		if self.seed == None:
+			self.seed = random.random() * 0xffffffff
+
+		# Populate xlow,xhigh,xfocus
+		binedges = np.concatenate([ np.arange(xmin, xmax, float(xmax-xmin)/float(bins)), [xmax] ])
+		self.xlow = binedges[0:bins]
+		self.xhigh = binedges[1:bins+1]
+		self.xfocus = ((self.xhigh - self.xlow)/2.0) + self.xlow
+
+		# Find maximum probability value
+		self.propabMax = 0
+		for i in np.arange(-1,1,0.01):
+			v = self.propabFn(i)
+			if v > self.propabMax:
+				self.propabMax = v
+
+		# Initialize histogram data
+		self.bvalues = np.zeros(bins)
+		self.entries = np.zeros(bins)
+		self.sumw = np.zeros(bins)
+		self.sumxw = np.zeros(bins)
+		self.sumx2w = np.zeros(bins)
+		self.sumw2 = np.zeros(bins)
+
+		# Iteration index
+		self.iter = 0
+
+	def propabFn(self, x):
+		"""
+		Propability function (in this case gaussian)
+		"""
+		# Gaussian function to use for tweaking
+		# the random number generator
+		a = 1/(self.s*math.sqrt(2*math.pi))
+		b = self.m; c = self.s; d = 0
+		return a*math.exp(-(pow(x-b,2)/(2*pow(c,2))))+d
+
+	def addSamples(self, numSamples=1000, weight=1.0):
+		"""
+		Add that number of samples in the bins
+		"""
+
+		# Seed engine
+		random.seed( self.seed + self.iter )
+		self.iter += 1
+
+		# Increment total number of samples
+		self.nevts += numSamples
+
+		# Populate bins with samples
+		for i in range(0,numSamples):
+
+			# Get a random X point and the probability
+			# of a dataset to appear there
+			x = (random.random()*2) - 1.0
+			y = self.propabFn(x) / self.propabMax
+
+			# Map x value to the appropriate bin index
+			j = int( ((x+1)/2) * self.bins )
+
+			# Put sample on bin
+			if random.random() < y:
+				self.bvalues[j] += 1
+				self.entries[j] += 1
+				self.sumw[j] += weight
+				self.sumxw[j] += x*weight
+				self.sumx2w[j] += x*x*weight
+				self.sumw2[j] += weight*weight
+
+	def asIntermediate(self):
+		"""
+		Return current data as intermediate histogram
+		"""
+
+		# Extract parts and build histogram
+		return IntermediateHistogram(
+				name=self.name,
+				bins=self.bins,
+				meta={
+					'nevts': self.nevts,
+					'crosssection': 1.0
+				},
+				xlow=self.xlow,
+				xfocus=self.xfocus,
+				xhigh=self.xhigh,
+				Entries=self.entries,
+				SumW=self.sumw,
+				SumW2=self.sumw2,
+				SumXW=self.sumxw,
+				SumX2W=self.sumx2w
+			)
+
+
+import matplotlib.pyplot as plt
+
+r = RandomHisto("Gaussian Engine #1,2,3", -0.2, 0.1, 20, seed=100)
+r.addSamples(300000)
+
+print "Mean: %f" % np.std(r.bvalues)
+
+# r1 = RandomHisto("Gaussian Engine #1", 0, 0.24, 20, seed=100)
+# r1.addSamples(100000)
+
+# r2 = RandomHisto("Gaussian Engine #2", 0, 0.24, 20, seed=101)
+# r2.addSamples(100000)
+
+# r3 = RandomHisto("Gaussian Engine #3", 0, 0.24, 20, seed=102)
+# r3.addSamples(100000)
+
+# # Get intermediate histograms
+# im  = r.asIntermediate()
+# im1 = r1.asIntermediate()
+# im2 = r2.asIntermediate()
+# im3 = r3.asIntermediate()
+
+# # Combine 1,2,3 to imc
+# imc = intermediateMerge([ im1, im2, im3 ])
+
+# # Convert im & imc to histograms
+# h1 = im.toHistogram()
+# h1 = h1.normalize()
+# h2 = imc.toHistogram()
+# h2 = h2.normalize()
+
+# #plt.bar( r.xfocus, r.bvalues )
+# plt.plot( h1.x, h1.y )
+# plt.plot( h2.x, h2.y )
+# plt.show()

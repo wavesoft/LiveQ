@@ -45,8 +45,7 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunables, Observables, TunableToObservable,
-					PostMortems ]:
+					Tutorials, Tunables, Observables, TunableToObservable ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)

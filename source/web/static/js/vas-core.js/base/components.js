@@ -443,6 +443,17 @@ define(["core/config", "core/base/component" ],
 
 		}
 
+		/**
+		 * This function is fired when a task is completed and the results are
+		 * received.
+		 *
+		 * @abstract
+		 * @param {int} score - A value between 0 and 5, where 0=Worst, 5=Perfect
+		 * @param {array} histograms - The result histograms
+		 */
+		ResultsScreen.prototype.onUpdateResults = function( score, histograms ) {
+		}
+
 		// Subclass from Component
 		ResultsScreen.prototype = Object.create( Component.prototype );
 

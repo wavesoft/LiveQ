@@ -7,49 +7,6 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		///////////////////////////////////////////////////////////////
 
 		/**
-		 * Cross-transition between two CSS elements with callback
-		 */
-		function pageTransition(elmPrev, elmNext, transition, cb) {
-
-			// Find the event name for the 'animation completed' event
-			var animEndEventNames = {
-					'webkitAnimation' : 'webkitAnimationEnd',
-					'oAnimation' : 'oAnimationEnd',
-					'msAnimation' : 'MSAnimationEnd',
-					'animation' : 'animationend'
-				},
-				animEndEventName = animEndEventNames[ with_vendor_suffix('animation') ];
-
-			// Add page-transitions for moving out
-			elmPrev.addClass( transition[0] );
-			elmNext.addClass( transition[1] + " pt-page-ontop pt-current");
-
-			// Local function to finalize animation
-			var finalizeAnimation = function() {
-
-				// Remove all the page transition classes from both pages
-				elmNext.attr("class", elmNext.data("originalClasses") + " pt-current" );
-				elmPrev.attr("class", elmPrev.data("originalClasses") );
-
-				// Fire callback
-				cb();
-
-			}
-
-			// Listen for CSS 'animation completed' events
-			var vc = 0; 
-			elmPrev.on( animEndEventName, function() {
-				elmPrev.off( animEndEventName );
-				if (++vc == 2) finalizeAnimation();
-			} );
-			elmNext.on( animEndEventName, function() {
-				elmNext.off( animEndEventName );
-				if (++vc == 2) finalizeAnimation();
-			} );
-
-		}
-
-		/**
 		 * Find vendor suffix
 		 */
 		function get_vendor_suffix() {
@@ -69,6 +26,61 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			var suff = get_vendor_suffix();
 			if (!suff) return txt;
 			return suff + txt[0].toUpperCase() + txt.substr(1);
+		}
+
+		/**
+		 * Cross-transition between two CSS elements with callback
+		 */
+		function pageTransition(elmPrev, elmNext, transition, cb) {
+
+			// Find the event name for the 'animation completed' event
+			var animEndEventNames = {
+					'webkitAnimation' : 'webkitAnimationEnd',
+					'oAnimation' : 'oAnimationEnd',
+					'msAnimation' : 'MSAnimationEnd',
+					'animation' : 'animationend',
+					'mozAnimation': 'mozAnimation'
+				},
+				animEndEventName = animEndEventNames[ with_vendor_suffix('animation') ];
+
+			// Add page-transitions for moving out
+			elmPrev.addClass( transition[0] );
+			elmNext.addClass( transition[1] + " pt-page-ontop pt-current");
+
+			// Local function to finalize animation
+			var finalizeAnimation = function() {
+
+				// Remove all the page transition classes from both pages
+				elmNext.attr("class", elmNext.data("originalClasses") + " pt-current" );
+				elmPrev.attr("class", elmPrev.data("originalClasses") );
+
+				// Fire callback
+				cb();
+
+			}
+
+			// Callbacks as functions
+			var prevOk = false, nextOk = false,
+				fnPrevComplete = function() {
+					if (prevOk) return; prevOk = true;
+					elmPrev.off( animEndEventName );
+					if (++vc == 2) finalizeAnimation();
+				},
+				fnNextComplete = function() {
+					if (nextOk) return; nextOk = true;
+					elmNext.off( animEndEventName );
+					if (++vc == 2) finalizeAnimation();
+				};
+
+			// Listen for CSS 'animation completed' events
+			var vc = 0; 
+			elmPrev.on( animEndEventName, fnPrevComplete );
+			elmNext.on( animEndEventName, fnNextComplete );
+
+			// Fire failover callbacks with timeouts
+			setTimeout( fnPrevComplete, 800 );
+			setTimeout( fnNextComplete, 800 );
+
 		}
 
 		/**

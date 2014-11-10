@@ -99,9 +99,12 @@ class StaticConfig:
 		if not parser.has_option("static", "uuid"):
 			parser.set("static", "uuid", uuid.uuid4().hex )
 
-		# Read parameters
+		# Read parameters & Override from enviroment if required
 		# -----------------------
-		StaticConfig.UUID = parser.get("static", "uuid")
+		if 'LIVEQ_STATIC_UUID' in os.environ:
+			StaticConfig.UUID = os.environ['LIVEQ_STATIC_UUID']
+		else:
+			StaticConfig.UUID = parser.get("static", "uuid")
 		# -----------------------
 
 		# Save the parser

@@ -572,9 +572,10 @@ define(
 
 			UI.selectScreen("screen.results");
 
-			if (values <= Config['chi2-bounds']['good']) {
-
-			} else if (values <= Config['chi2-bounds']['average']) {
+			var score = 0;
+			if (values <= Config['validate']['good']) {
+				score = 5;
+			} else if (values <= Config['validate']['average']) {
 
 			} else {
 

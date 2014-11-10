@@ -261,6 +261,8 @@ def handleLoss( agent ):
 
 	# Return a job instance
 	job = jobs.getJob(job_id)
+	if not job:
+		return
 
 	# Let the job know that it lost an agent
 	job.removeAgentInfo(agent)
