@@ -98,7 +98,7 @@ class ProducerClass:
 		if expect == data['checksum']:
 			logging.info("------ [%i] Succsesful checksum ------" % self.index)
 		else:
-			logging.error("++++++ [%i] Invalid checksum ++++++" % self.index)
+			logging.error("++++++ [%i] Invalid checksum ++++++" % self.index)		
 
 
 class ProducerComponent(Component):
@@ -110,7 +110,7 @@ class ProducerComponent(Component):
 		Component.__init__(self)
 
 		# Create a couple of producer classes
-		self.numChannels = 100
+		self.numChannels = 1000
 		self.channels = []
 
 	def onChecksum(self, pkg):
@@ -133,6 +133,7 @@ class ProducerComponent(Component):
 		# Open target channel just to overload
 		c = Config.IBUS.openChannel(pkg['channel'])
 		c.send(frame)
+		c.close()
 
 	def run(self):
 		"""
@@ -155,6 +156,6 @@ class ProducerComponent(Component):
 			self.channels.append(ProducerClass( self.channel ))
 			self.numChannels -= 1
 
-		time.sleep(0.5)
+		time.sleep(0.1)
 
 ProducerComponent.runThreaded()

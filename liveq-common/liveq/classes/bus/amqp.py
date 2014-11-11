@@ -40,6 +40,7 @@ import Queue
 import pika
 import logging
 import threading
+import traceback
 import time
 import json
 import cPickle as pickle
@@ -114,11 +115,15 @@ class AMQPBusChannel(BusChannel):
 		self.reply_consumer_tag = None
 		self.reply_queue = None
 		self.wait_queue = {}
+		self.closing = False
 
 		self.last_reply_queue = None
 		self.last_reply_uuid = None
 
 		self.egress = Queue.Queue()
+
+		# Thread lock for synchronization
+		self.egress_lock = threading.Lock()
 
 		# Configuration
 		self.routing_key = ""
@@ -162,19 +167,23 @@ class AMQPBusChannel(BusChannel):
 		self.channel.add_on_close_callback(self._channelClosed)
 
 		# Declare/connect to the core exchange
-		self.channel.exchange_declare(
-					 callback=self._exchange_declared,
-					 exchange=self.EXCHANGE['name'],
-				exchange_type=self.EXCHANGE['type'],
-					  durable=self.EXCHANGE['durable'],
-				  auto_delete=self.EXCHANGE['auto_delete']
-			)
+		self.bus.declare_exchange(
+				  channel=self.channel,
+				 callback=self._exchange_declared,
+				 exchange=self.EXCHANGE['name'],
+			exchange_type=self.EXCHANGE['type'],
+				  durable=self.EXCHANGE['durable'],
+			  auto_delete=self.EXCHANGE['auto_delete']
+		)
 
 	def _channelClosed(self, channel, reply_code, reply_text):
 		"""
 		Callback from the AMQPBus when the channel is lost
 		because of a connection failure.
 		"""
+
+		# Acquire lock for egress sync
+		self.egress_lock.acquire()
 
 		# Clenaup channel
 		self.trigger('close')
@@ -184,7 +193,7 @@ class AMQPBusChannel(BusChannel):
 		self.channel_ready = False
 
 		# Handle cases where this was not caused by the channel
-		if channel != None:
+		if (channel != None) and not self.closing:
 			self.logger.warning("Channel closed unexpectidly (%s) %s" % (reply_code, reply_text))
 
 			# Try to serve a new channel to ourselves
@@ -193,21 +202,33 @@ class AMQPBusChannel(BusChannel):
 		else:
 			self.logger.info("Channel closed")
 
-	def _channelCleanup(self):
+		# Acquire lock for egress sync
+		self.egress_lock.release()
+
+	def _channelCleanup(self, fast=False):
 		"""
 		Callback from the AMQPBus when the channel should be
 		gracefully stopped
 		"""
+		self.logger.info("Cleaning-up channel")
 
 		# Channel is not ready
 		self.channel_ready = False
 
+		# Interrupt any blocking wait operation
+		for k,v in self.wait_queue.iteritems():
+			v['data'] = None
+			v['event'].set()
+
 		# Cancel both consumers upon cleanup request
-		if self.channel:
+		if self.channel and not fast:
+			self.logger.info("Cancelling tags")
 			if self.primary_consumer_tag:
 				self.channel.basic_cancel(consumer_tag=self.primary_consumer_tag)
 			if self.reply_consumer_tag:
 				self.channel.basic_cancel(consumer_tag=self.reply_consumer_tag)
+
+		self.logger.info("Clearerd")
 
 	def _exchange_declared(self, frame):
 		"""
@@ -218,21 +239,22 @@ class AMQPBusChannel(BusChannel):
 		# Declare main queue
 		# (Even if we are consumers we need this in order
 		#  to have the queue ready before binding)
-		self.channel.queue_declare(
-				   callback=self._queue_primary_declared,
-					  queue=self.QUEUE['name'],
-				auto_delete=self.QUEUE['auto_delete'],
-					durable=self.QUEUE['durable'],
-				  arguments={
-				  		'x-message-ttl': self.QUEUE['ttl']
-				  	}
-			)
+		self.bus.declare_queue(
+ 				channel=self.channel,
+			   callback=self._queue_primary_declared,
+				  queue=self.QUEUE['name'],
+			auto_delete=self.QUEUE['auto_delete'],
+				durable=self.QUEUE['durable'],
+			  arguments={
+			  		'x-message-ttl': self.QUEUE['ttl']
+			  	}
+		)
 
-	def _queue_primary_declared(self, method_frame):
+	def _queue_primary_declared(self, queue):
 		"""
 		Callback when the main queue was declared
 		"""
-		self.logger.info("Primary queue (%s) declared" % method_frame.method.queue)
+		self.logger.info("Primary queue (%s) declared" % queue)
 
 		# Bind exchange messages targeting this queue on the queue
 		self.channel.queue_bind(
@@ -249,23 +271,24 @@ class AMQPBusChannel(BusChannel):
 		self.logger.info("Primary queue (%s) bound to exchange (%s)" % (self.QUEUE['name'], self.EXCHANGE['name']))
 
 		# Declare an anonymous reply queue
-		self.channel.queue_declare(
-				   callback=self._queue_reply_declared,
-				  exclusive=True,
-				auto_delete=True,
-				  arguments={
-				  		'x-message-ttl': self.QUEUE['ttl']
-				  	}
-			)
+		self.bus.declare_queue(
+ 				channel=self.channel,
+			   callback=self._queue_reply_declared,
+			  exclusive=True,
+			auto_delete=True,
+			  arguments={
+			  		'x-message-ttl': self.QUEUE['ttl']
+			  	}
+		)
 
-	def _queue_reply_declared(self, method_frame):
+	def _queue_reply_declared(self, queue):
 		"""
 		Callback when the main queue was declared
 		"""
-		self.logger.info("Reply queue (%s) declared" % method_frame.method.queue)
+		self.logger.info("Reply queue (%s) declared" % queue)
 
 		# Keep reference of the anonymous reply queue
-		self.reply_queue = method_frame.method.queue
+		self.reply_queue = queue
 
 		# Place a reply consumer on the reply queue
 		self.reply_consumer_tag = self.channel.basic_consume(
@@ -294,10 +317,8 @@ class AMQPBusChannel(BusChannel):
 		# Channel is ready for use
 		self.channel_ready = True
 
-		# Drain any pending egress messages
-		while not self.egress.empty():
-			self._send_frame( self.egress.get() )
-
+		# Drain any pending egress messages & start flush pool
+		self._scheduled_flush()
 
 	def _on_message(self, channel, method, properties, body):
 		"""
@@ -329,8 +350,8 @@ class AMQPBusChannel(BusChannel):
 		Callback when a message arrives from reply queue
 		"""		
 		reply_uuid = properties.correlation_id
-		self.logger.info("Reply arrived (uuid=%s)" % reply_uuid)
-		
+		self.logger.info("Reply arrived (uuid=%s) (%r)" % (reply_uuid, body))
+	
 		# Check if we have somebody in the wait queue under this correlation ID
 		if reply_uuid in self.wait_queue:
 
@@ -417,6 +438,54 @@ class AMQPBusChannel(BusChannel):
 			 properties=properties
 			)
 
+	def _flush_egress(self):
+		"""
+		Flush the egress queue
+		"""
+
+		# Acquire lock for egress sync
+		self.egress_lock.acquire()
+
+		# Flush the egress queue
+		while not self.egress.empty():
+			self._send_frame( self.egress.get() )
+
+		# Release lock
+		self.egress_lock.release()
+
+	def _scheduled_flush(self):
+		"""
+		Flush and schedule next flush
+		"""
+
+		# Flush egress queue
+		self._flush_egress()
+
+		# If queue is empty and we requested close, do it now
+		if self.closing:
+			self._close()
+			return
+
+		# Only if we have a valid channel, fire next ioloop tick
+		if self.channel and self.channel.is_open and self.bus.connection:
+			self.bus.connection.add_timeout(0.01, self._scheduled_flush)
+
+	def _close(self):
+		"""
+		Fired by the close() functino when the channel is safe to be closed
+		"""
+		self.logger.info("Closing channel '%s' NOW" % self.name)
+
+		# Remove from cache
+		del self.bus.channels[self.name]
+
+		# Close channel
+		if self.channel:
+			# Clenaup channel
+			self._channelCleanup()
+			# Close channel
+			self.channel.close()
+
 	#####################################
 	# Bus Channel Interface
 	#####################################
@@ -458,11 +527,17 @@ class AMQPBusChannel(BusChannel):
 			}
 			self.wait_queue[reply_uuid] = reply_record
 
+		# Acquire lock for egress sync
+		self.egress_lock.acquire()
+
 		# Send right-away or schedule event submission
-		if self.channel_ready:
-			self._send_frame(frame)
-		else:
-			self.egress.put(frame)
+		#if self.channel_ready:
+		#	self._send_frame(frame)
+		#else:
+		self.egress.put(frame)
+
+		# Release lock
+		self.egress_lock.release()
 
 		# If we are waiting for reply, wait for the event to arrive
 		if waitReply:
@@ -478,6 +553,8 @@ class AMQPBusChannel(BusChannel):
 
 			# Otherwise return the data received
 			del self.wait_queue[frame['uuid']]
+			if not ('data' in reply_record) or not reply_record['data']:
+				return None
 			return reply_record['data']['data']
 
 
@@ -509,22 +586,31 @@ class AMQPBusChannel(BusChannel):
 			'uuid'		: self.last_reply_uuid,
 		}
 
+		# Acquire lock for egress sync
+		self.egress_lock.acquire()
+
 		# Send right-away or schedule event submission
-		if self.channel_ready:
-			self._send_frame(frame)
-		else:
-			self.egress.put(frame)
+		#if self.channel_ready:
+		#	self._send_frame(frame)
+		#else:
+		#	print "#### QUEUED #####"
+		self.egress.put(frame)
+
+		# Acquire lock for egress sync
+		self.egress_lock.release()
 	
 	def close(self):
 		"""
 		Close the specified channel
 		"""
-		if self.channel:
+		self.logger.info("Will close channel")
 
-			# Clenaup channel
-			self._channelCleanup()
-			# Close channel
-			self.channel.close()
+		# We are closing
+		self.closing = True
+
+		# If we have egress pending, don't close
+		if self.egress.empty():
+			self._close()
 
 
 class AMQPBus(Bus, threading.Thread):
@@ -549,6 +635,12 @@ class AMQPBus(Bus, threading.Thread):
 		self.connection = None
 		self.shutdownFlag = False
 
+		# Name of exchanges 
+		self.cacheFlags = {
+			'exchange' 	: {},
+			'queue' 	: {}
+		}
+
 		# Create logger
 		self.logger = logging.getLogger("bus.amqp")
 
@@ -567,7 +659,7 @@ class AMQPBus(Bus, threading.Thread):
 		# Gracefully disconnect all channels
 		for c in self.channels.values():
 			# Asynchronously open a channel for the given bus channel
-			c._channelCleanup()
+			c._channelCleanup(True)
 
 		# Start connection ioloop in this thread until it exists
 		if self.connection:
@@ -594,6 +686,12 @@ class AMQPBus(Bus, threading.Thread):
 		[AMQP Callback] Connection lost
 		"""
 
+		# Deset cache 
+		self.cacheFlags = {
+			'exchange' 	: {},
+			'queue' 	: {}
+		}
+
 		# Let all channels know that we are down
 		for c in self.channels.values():
 			c._channelClosed(None, reply_code, reply_text)
@@ -615,8 +713,12 @@ class AMQPBus(Bus, threading.Thread):
 
 		# If we have a connection, which is valid, place a connection request
 		if (self.connection != None) and (self.connection.is_open):
+			self.logger.info("Openning channel...")
 			# Asynchronously open a channel for the given bus channel
 			self.connection.channel(on_open_callback=busChannel._channelOpen)
+		else:
+			self.logger.warn("Connection is not open in order to open channel. Will do when connected")
+
 
 	def reconnect(self):
 		"""
@@ -663,8 +765,63 @@ class AMQPBus(Bus, threading.Thread):
 				time.sleep(5)
 
 			except Exception as e:
-				self.logger.error("AMQP Error: %s (%s)" % str(e))
+				traceback.print_exc()
+				self.logger.error("AMQP Error: %s (%s)" % (str(e), e.__class__.__name__))
 				time.sleep(5)
+
+	def declare_exchange(self, channel=None, callback=None, exchange=None, exchange_type=None, durable=None, auto_delete=False):
+		"""
+		Cache function to declare exchange only once and just resume any
+		simmilar requests from cache
+		"""
+
+		# Check if this entry is cached
+		if exchange in self.cacheFlags['exchange']:
+			callback(None)
+			return
+
+		# Don't call this again
+		self.cacheFlags['exchange'][exchange] = True
+
+		# Declare/connect to the core exchange
+		channel.exchange_declare(
+				 callback=callback,
+				 exchange=exchange,
+			exchange_type=exchange_type,
+				  durable=durable,
+			  auto_delete=auto_delete
+		)
+
+	def declare_queue(self, channel=None, callback=None, exclusive=False, queue="", auto_delete=False, durable=False, arguments={}):
+		"""
+		Cache function to declare exchange only once and just resume any
+		simmilar requests from cache
+		"""
+
+		# Check if this entry is cached
+		if queue and queue in self.cacheFlags['queue']:
+			callback(self.cacheFlags['queue'][queue])
+			return
+
+		# Helper callback
+		def queue_callback(method_frame):
+			# Get declared queue name
+			queue_ref = method_frame.method.queue
+			# Store on cache if not anonymous
+			if queue:
+				self.cacheFlags['queue'][queue] = queue_ref
+			# Callback
+			callback(queue_ref)
+
+		# Declare/connect to the queue
+		channel.queue_declare(
+			   callback=queue_callback,
+				  queue=queue,
+		      exclusive=exclusive,
+			auto_delete=auto_delete,
+				durable=durable,
+			  arguments=arguments
+		)
 
 	#####################################
 	# Bus Interface

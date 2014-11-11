@@ -59,7 +59,7 @@ class ConsumerComponent(Component):
 
 		# Prepare reponse 
 		salt = uuid.uuid4().hex
-		logging.info("--- Received job %s ---" % salt)
+		logging.info("############ Received job %s ############" % salt)
 		frame = {
 			"salt": salt,
 			"checksum": hashlib.sha512("%s:%s" % (salt, pkg['data'])).hexdigest()
@@ -73,6 +73,8 @@ class ConsumerComponent(Component):
 		self.channel.reply({
 			'result': 'ok'
 		})
+
+		c.close()
 
 	def run(self):
 		"""
