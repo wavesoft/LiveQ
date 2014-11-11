@@ -122,8 +122,9 @@ class AMQPBusChannel(BusChannel):
 
 		self.egress = Queue.Queue()
 
-		# Thread lock for synchronization
+		# Synchronization helpers
 		self.egress_lock = threading.Lock()
+		self.processing_flag = False
 
 		# Configuration
 		self.routing_key = ""
@@ -324,9 +325,16 @@ class AMQPBusChannel(BusChannel):
 		"""
 		Callback when a message arrives from primary queue
 		"""
-
 		self.logger.info("Message arrived (type=%s, reply_to=%s, correlation=%s)" % (properties.content_type, properties.reply_to, properties.correlation_id))
-		
+
+		# Don't accept messages when closing
+		if self.closing:
+			self.logger.warn("Ignoring incoming message because channel is closing")
+			return
+
+		# Mark that we are under processing
+		self.processing_flag = True
+
 		# Store last reply info
 		self.last_reply_queue = properties.reply_to
 		self.last_reply_uuid = properties.correlation_id
@@ -344,6 +352,9 @@ class AMQPBusChannel(BusChannel):
 		# Reset reply info
 		self.last_reply_queue = None
 		self.last_reply_uuid = None
+
+		# Reset processing flag
+		self.processing_flag = False
 
 	def _on_reply(self, channel, method, properties, body):
 		"""
@@ -461,9 +472,10 @@ class AMQPBusChannel(BusChannel):
 		# Flush egress queue
 		self._flush_egress()
 
-		# If queue is empty and we requested close, do it now
+		# If queue is empty and we requested close, close it now
 		if self.closing:
-			self._close()
+			self.bus.connection.add_timeout(0.01, self._close)
+			# Prohibit re-scheduling
 			return
 
 		# Only if we have a valid channel, fire next ioloop tick
@@ -477,7 +489,8 @@ class AMQPBusChannel(BusChannel):
 		self.logger.info("Closing channel '%s' NOW" % self.name)
 
 		# Remove from cache
-		del self.bus.channels[self.name]
+		if self.name in self.bus.channels:
+			del self.bus.channels[self.name]
 
 		# Close channel
 		if self.channel:
@@ -527,16 +540,9 @@ class AMQPBusChannel(BusChannel):
 			}
 			self.wait_queue[reply_uuid] = reply_record
 
-		# Acquire lock for egress sync
+		# Place packet on egress queue
 		self.egress_lock.acquire()
-
-		# Send right-away or schedule event submission
-		#if self.channel_ready:
-		#	self._send_frame(frame)
-		#else:
 		self.egress.put(frame)
-
-		# Release lock
 		self.egress_lock.release()
 
 		# If we are waiting for reply, wait for the event to arrive
@@ -586,17 +592,9 @@ class AMQPBusChannel(BusChannel):
 			'uuid'		: self.last_reply_uuid,
 		}
 
-		# Acquire lock for egress sync
+		# Stack frame on egress queue
 		self.egress_lock.acquire()
-
-		# Send right-away or schedule event submission
-		#if self.channel_ready:
-		#	self._send_frame(frame)
-		#else:
-		#	print "#### QUEUED #####"
 		self.egress.put(frame)
-
-		# Acquire lock for egress sync
 		self.egress_lock.release()
 	
 	def close(self):
@@ -609,9 +607,8 @@ class AMQPBusChannel(BusChannel):
 		self.closing = True
 
 		# If we have egress pending, don't close
-		if self.egress.empty():
-			self._close()
-
+		if self.egress.empty() and not self.processing_flag:
+			self.bus.connection.add_timeout(0.01, self._close)
 
 class AMQPBus(Bus, threading.Thread):
 	"""

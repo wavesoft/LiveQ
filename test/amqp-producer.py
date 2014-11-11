@@ -64,7 +64,7 @@ class ProducerClass:
 
 		# Create random payload
 		self.data = ""
-		for i in range(0,128):
+		for i in range(0,3584):
 			self.data += chr(32+int(random.random()*64))
 
 		# Open a channel where to receive data from
@@ -100,6 +100,9 @@ class ProducerClass:
 		else:
 			logging.error("++++++ [%i] Invalid checksum ++++++" % self.index)		
 
+		# Close channel
+		self.inChannel.close()
+
 
 class ProducerComponent(Component):
 
@@ -133,7 +136,6 @@ class ProducerComponent(Component):
 		# Open target channel just to overload
 		c = Config.IBUS.openChannel(pkg['channel'])
 		c.send(frame)
-		c.close()
 
 	def run(self):
 		"""
