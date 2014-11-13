@@ -51,7 +51,11 @@ define([
 
 	// Data vizualization
 	'vas-basic/dataviz/histogram',
+	'vas-basic/dataviz/histogram_plain',
 	'vas-basic/dataviz/histogram_ratio',
+
+	// Data
+	'vas-basic/data/trainhisto',
 
 	// Overlays
 	'vas-basic/overlays/book',

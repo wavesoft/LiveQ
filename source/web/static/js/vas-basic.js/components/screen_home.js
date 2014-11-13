@@ -161,6 +161,7 @@ define(
 			// Register visual aids
 			R.registerVisualAid( "home.run", this.btnActiveRunBtn, { "screen": "screen.home" });
 
+
 			// Create a directed graph
 			this.graph = {
 				'nodes': [

@@ -4,10 +4,18 @@ svg.dv-plot {
 	font: 10px sans-serif;
 	padding: 8px;
 
+	&.hide-d-error {
+		.d-error { display: none; }
+	}
+
 	.axis path, .axis line {
 	  fill: none;
 	  stroke: #000;
 	  shape-rendering: crispEdges;
+	}
+
+	.x-label {
+		color: #999;
 	}
 
 	.tick text {

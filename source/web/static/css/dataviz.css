@@ -2,11 +2,17 @@ svg.dv-plot {
   font: 10px sans-serif;
   padding: 8px;
 }
+svg.dv-plot.hide-d-error .d-error {
+  display: none;
+}
 svg.dv-plot .axis path,
 svg.dv-plot .axis line {
   fill: none;
   stroke: black;
   shape-rendering: crispEdges;
+}
+svg.dv-plot .x-label {
+  color: #999999;
 }
 svg.dv-plot .tick text {
   fill: black;

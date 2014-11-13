@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/config", "core/registry", "core/base/components", "core/ui"],
+	["core/config", "core/registry", "core/base/components", "core/ui" , "vas-basic/data/trainhisto"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports vas-basic/components/running_screen
 	 */
-	function(config,R,C,UI) {
+	function(config,R,C,UI, TrainHisto) {
 
 		/**
 		 * @class
