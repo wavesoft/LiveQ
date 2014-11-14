@@ -642,10 +642,10 @@ h1 + p.subtitle {
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+  -webkit-transition: top 0.5s;
+  -moz-transition: top 0.5s;
+  -o-transition: top 0.5s;
+  transition: top 0.5s;
   -webkit-box-shadow: 1px 1px 7px black;
   -moz-box-shadow: 1px 1px 7px black;
   -o-box-shadow: 1px 1px 7px black;
@@ -670,7 +670,7 @@ h1 + p.subtitle {
   color: white;
 }
 .growl.success {
-  border-color: #27ae60;
-  background-color: #2ecc71;
+  border-color: #16a085;
+  background-color: #16a085;
   color: white;
 }

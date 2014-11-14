@@ -1237,12 +1237,22 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * Growl a message.
 		 * @param {string} message - The message to growl
 		 */
-		UI.growl = function( message, callback, growlClass ) {
+		UI.growl = function( message, v_callback, v_timeout, v_growlClass ) {
 
-			// Check for missing callback
-			if (typeof(callback) == "string") {
-				growlClass = callback;
-				callback = null;
+			// Dynamic parameter population
+			var callback = null,
+				timeout = 0,
+				growlClass = "",
+				args = [v_callback, v_timeout, v_growlClass];
+
+			for (var i=0; i<args.length; i++) {
+				if (typeof(args[i]) == "number") {
+					timeout = args[i];
+				} else if (typeof(args[i]) == "string") {
+					growlClass = args[i];
+				} else if (typeof(args[i]) == "function") {
+					callback = args[i];
+				}
 			}
 
 			// Realign growl stack
@@ -1259,12 +1269,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			// Create a growl
 			var growl = $('<div class="growl '+ growlClass +'">' + message + '</div>').appendTo($("body"));
 
-			// Register disposal
-			growl.click(function() {
 
-				// Fire callback
-				if (callback) callback();
-
+			// Dispose growl
+			var _disposeGrowl = function() {
 				// Dismiss the given growl item
 				for (var i=0; i<UI.growlStack.length; i++) {
 					if (UI.growlStack[i].is(growl)) {
@@ -1272,15 +1279,28 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 						break;
 					}
 				}
-
 				// Fade out
 				growl.fadeOut(function() {
 					growl.remove();
 				});
-
 				// Realign
-				_reaignGrowlStack();
+				_reaignGrowlStack();				
+			}
+
+			// Register disposal
+			growl.click(function() {
+				// Fire callback
+				if (callback) callback();
+				// Dispose
+				_disposeGrowl();
 			});
+
+			// Fire timeout
+			if (timeout) {
+				setTimeout(function() {
+					_disposeGrowl();
+				}, timeout);
+			}
 
 			// Put it on stack
 			UI.growlStack.push(growl);
