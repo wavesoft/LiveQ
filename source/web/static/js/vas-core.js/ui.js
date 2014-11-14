@@ -1241,7 +1241,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			// Check for missing callback
 			if (typeof(callback) == "string") {
-				growlStack = callback;
+				growlClass = callback;
 				callback = null;
 			}
 
@@ -1252,7 +1252,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 					UI.growlStack[i].css({
 						'top': top
 					});
-					top += 80;
+					top += 86;
 				}
 			};
 

@@ -41,6 +41,14 @@ define(
 		};
 
 		/**
+		 * Log error
+		 */
+		VAS.logError = function( message, critical ) {
+			console.error(message);
+			UI.growl(message, "alert");
+		}
+
+		/**
 		 * Initialize VAS to the given DOM element
 		 */
 		VAS.initialize = function( readyCallback ) {
@@ -61,7 +69,7 @@ define(
 			// Prepare progress screen
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
 			if (!scrProgress) {
-				console.error("Core: Unable to initialize progress screen!");
+				VAS.logError("Core: Unable to initialize progress screen!");
 				return;
 			}
 
@@ -256,8 +264,8 @@ define(
 			var prog_login = progressAggregator.begin(1),
 				init_login = function(cb) {
 					var scrLogin = UI.initAndPlaceScreen("screen.login");
-					if (!scrLogin) {
-						console.error("Core: Unable to initialize login screen!");
+					if (!scrLogin) {						
+						VAS.logError("Core: Unable to initialize login screen!");
 						return;
 					}
 
@@ -296,7 +304,7 @@ define(
 				init_results = function(cb) {
 					var scrResults = VAS.scrResults = UI.initAndPlaceScreen("screen.results");
 					if (!scrResults) {
-						console.error("Core: Unable to initialize results screen!");
+						VAS.logError("Core: Unable to initialize results screen!");
 						return;
 					}
 
@@ -314,7 +322,7 @@ define(
 				init_home = function(cb) {
 					var scrHome = VAS.scrHome = UI.initAndPlaceScreen("screen.home");
 					if (!scrHome) {
-						console.error("Core: Unable to initialize home screen!");
+						VAS.logError("Core: Unable to initialize home screen!");
 						return;
 					}
 
@@ -338,7 +346,7 @@ define(
 				init_cinematic = function(cb) {
 					var scrCinematic = VAS.scrCinematic = UI.initAndPlaceScreen("screen.cinematic");
 					if (!scrCinematic) {
-						console.error("Core: Unable to initialize cinematic screen!");
+						VAS.logError("Core: Unable to initialize cinematic screen!");
 						return;
 					}
 
@@ -352,7 +360,7 @@ define(
 				init_run = function(cb) {
 					var scrRunning = VAS.scrRunning = UI.initAndPlaceScreen("screen.running");
 					if (!scrRunning) {
-						console.error("Core: Unable to initialize run screen!");
+						VAS.logError("Core: Unable to initialize run screen!");
 						return;
 					}
 
@@ -382,7 +390,7 @@ define(
 					// Create explain screen
 					var scrExplain = VAS.scrExplain = UI.initAndPlaceScreen("screen.explain", Components.ExplainScreen);
 					if (!scrExplain) {
-						console.error("Core: Unable to initialize explaination screen!");
+						VAS.logError("Core: Unable to initialize explaination screen!");
 						return;
 					}
 
@@ -413,7 +421,7 @@ define(
 					// Create tuning screen
 					var scrTuning = VAS.scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.TuningScreen);
 					if (!scrTuning) {
-						console.error("Core: Unable to initialize explaination screen!");
+						VAS.logError("Core: Unable to initialize explaination screen!");
 						return;
 					}
 
