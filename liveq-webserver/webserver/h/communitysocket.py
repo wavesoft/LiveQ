@@ -23,6 +23,7 @@ import uuid
 import logging
 import base64
 
+from lievq.models import User
 from webserver.config import Config
 import tornado.websocket
 
@@ -60,6 +61,9 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         Community socket open
         """
 
+        # Get user ID
+        self.user = User.get(name="icharala")
+
         # Reset local variables
         self.chatroom = None
 
@@ -93,9 +97,71 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
 
     ####################################################################################
     # --------------------------------------------------------------------------------
+    #                                 CHATROOM CALLBACKS
+    # --------------------------------------------------------------------------------
+    ####################################################################################
+
+    def onChatroomEnter(self, data):
+        """
+        User joined the chartroom
+        """
+
+        # Validate data
+        if not 'user' in data:
+            return
+
+        # Send notification for user joining the chatroom
+        self.sendAction("chatroom.join", { "user": data['user'] })
+
+    def onChatroomLeave(self, data):
+        """
+        User left the chartroom
+        """
+
+        # Validate data
+        if not 'user' in data:
+            return
+
+        # Send notification for user joining the chatroom
+        self.sendAction("chatroom.leave", { "user": data['user'] })
+
+    def onChatroomChat(self, data):
+        """
+        User said something on the chatroom
+        """
+
+        # Validate data
+        if not 'user' in data:
+            return
+
+        # Send notification for user joining the chatroom
+        self.sendAction("chatroom.chat", { "user": data['user'], "message": data['message'] })
+
+    ####################################################################################
+    # --------------------------------------------------------------------------------
     #                                 HELPER FUNCTIONS
     # --------------------------------------------------------------------------------
     ####################################################################################
+
+    def joinChatroom(self, name):
+        """
+        Join a particular chatroom
+        """
+
+        # Close previous chatroom
+        if self.chatroom != None:
+            self.chatroom.close()
+
+        # Join chatroom
+        self.chatroom = Config.IBUS.openChannel("chatroom.%s" % name)
+
+        # Bind events
+        self.chatroom.on('chatroom.enter', self.onChatroomEnter)
+        self.chatroom.on('chatroom.leave', self.onChatroomLeave)
+        self.chatroom.on('chatroom.chat', self.onChatroomChat)
+
+        # Get people in this room
+        roomUsers = Config.STORE.smembers("chatroom.presence.%s" % self.user)
 
     def sendError(self, error):
         """

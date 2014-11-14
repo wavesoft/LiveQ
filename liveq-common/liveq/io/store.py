@@ -36,3 +36,15 @@ class Store:
 		"""
 		raise NotImplementedError("The Store class did not implement the set() function")
 
+	def append(self, key, value):
+		"""
+		Append value to a list under the key
+		"""
+		raise NotImplementedError("The Store class did not implement the append() function")
+
+	def remove(self, key, value):
+		"""
+		Remove value from a list under the key
+		"""
+		raise NotImplementedError("The Store class did not implement the remove() function")
+
