@@ -81,13 +81,23 @@ class Bus(EventDispatcher):
 
 	"""
 
+	#: Open the channel using channels defautls
+	OPEN_DEFAULT = 0
+
+	#: Bind on the channel, waiting for incoming messages
+	#: (if not specified, it just sends)
+	OPEN_BIND = 1
+
+	#: Publish data to all targets
+	OPEN_BROADCAST = 2
+
 	def __init__(self):
 		"""
 		Initialize event dispatcher
 		"""
 		EventDispatcher.__init__(self)
 
-	def openChannel(self, name):
+	def openChannel(self, name, flags=0):
 		"""
 		Open a named channel on the bus.
 		This function should return a BusChannel instance

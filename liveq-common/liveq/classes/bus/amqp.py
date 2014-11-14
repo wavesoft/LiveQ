@@ -26,15 +26,23 @@ could in principle be supported.
 
 All the channels opened with this mechanism follow the same principle:
 
-- There is one exchange for the entire LiveQ framework called 'liveq'
-- The 'liveq' exchange is of type 'direct', meaning that receivers are picked in
+- There is an exchange prefix for the LiveQ framework called 'liveq.*'
+- The 'liveq.direct' exchange is of type 'direct', meaning that receivers are picked in
   round-robin manner.
+- The 'liveq.fanout' exchange is of type 'fanout', maning that it broadcasts the message
+  to all receivers.
 
-When a channel opens:
+When a channel opens in serving mode:
 - It will post messages with :routing_key equal to the queue name 
 - It will create an anonymous queue where responses can be posted
 
+When a channel opens in broadcast mode:
+- It will bind an anonymous queue on the 'liveq.direct' exchange with :routing_key
+  equal to the name of the channel
+
 """
+
+import pdb
 
 import Queue
 import pika
@@ -49,6 +57,11 @@ import uuid
 from liveq.events import GlobalEvents
 from liveq.io.bus import BusChannelException, NoBusChannelException, BusChannel, Bus
 from liveq.config.classes import BusConfigClass
+
+SYNC_TIMEOUT = 0.01
+
+from pika.adapters.select_connection import SelectPoller
+SelectPoller.TIMEOUT = SYNC_TIMEOUT
 
 class Config(BusConfigClass):
 	"""
@@ -76,7 +89,6 @@ class Config(BusConfigClass):
 
 		# Exchange name to use for this bus
 		self.EXCHANGE_NAME = "liveq"
-		self.EXCHANGE_TYPE = "direct"
 
 		# Serializer to use
 		self.SERIALIZER = "json"
@@ -98,14 +110,14 @@ class AMQPBusChannel(BusChannel):
 	* <message>	: When a message arrives from the bus. Each message has the name specified while sending it.
 	"""
 
-	def __init__(self, name, bus, serve=False):
+	def __init__(self, name, bus, consumer=False, exchange_type="direct"):
 		"""
 		Initialize event dispatcher
 		"""
 
 		# Setup parent
 		BusChannel.__init__(self, name)
-		self.consumer = serve
+		self.consumer = consumer
 		self.bus = bus
 
 		# Empty containers
@@ -114,6 +126,7 @@ class AMQPBusChannel(BusChannel):
 		self.primary_consumer_tag = None
 		self.reply_consumer_tag = None
 		self.reply_queue = None
+		self.main_queue = None
 		self.wait_queue = {}
 		self.closing = False
 
@@ -129,8 +142,8 @@ class AMQPBusChannel(BusChannel):
 		# Configuration
 		self.routing_key = ""
 		self.EXCHANGE = {
-			'name' 			: bus.config.EXCHANGE_NAME,
-			'type' 		 	: bus.config.EXCHANGE_TYPE,
+			'name' 			: "%s.%s" % (bus.config.EXCHANGE_NAME, exchange_type),
+			'type' 		 	: exchange_type,
 			'auto_delete'	: False,
 			'durable' 		: True
 		}
@@ -237,13 +250,18 @@ class AMQPBusChannel(BusChannel):
 		"""
 		self.logger.info("Exchange (%s, type=%s) declared" % (self.EXCHANGE['name'], self.EXCHANGE['type']))
 
+		# On fanout, create an anonymous queue
+		queue = self.QUEUE['name']
+		if self.EXCHANGE['type'] == "fanout":
+			queue = ""
+
 		# Declare main queue
 		# (Even if we are consumers we need this in order
 		#  to have the queue ready before binding)
 		self.bus.declare_queue(
  				channel=self.channel,
 			   callback=self._queue_primary_declared,
-				  queue=self.QUEUE['name'],
+				  queue=queue,
 			auto_delete=self.QUEUE['auto_delete'],
 				durable=self.QUEUE['durable'],
 			  arguments={
@@ -256,11 +274,12 @@ class AMQPBusChannel(BusChannel):
 		Callback when the main queue was declared
 		"""
 		self.logger.info("Primary queue (%s) declared" % queue)
+		self.main_queue = queue
 
 		# Bind exchange messages targeting this queue on the queue
 		self.channel.queue_bind(
 				callback=self._queue_primary_bound,
-				   queue=self.QUEUE['name'],
+				   queue=self.main_queue,
 				exchange=self.EXCHANGE['name'],
 			 routing_key=self.QUEUE['name']
 			)
@@ -269,7 +288,7 @@ class AMQPBusChannel(BusChannel):
 		"""
 		Callback when the primary queue is bound to the exchange
 		"""
-		self.logger.info("Primary queue (%s) bound to exchange (%s)" % (self.QUEUE['name'], self.EXCHANGE['name']))
+		self.logger.info("Primary queue (%s) bound to exchange (%s)" % (self.main_queue, self.EXCHANGE['name']))
 
 		# Declare an anonymous reply queue
 		self.bus.declare_queue(
@@ -302,9 +321,10 @@ class AMQPBusChannel(BusChannel):
 		# If we are consumers, place a consumer callback on the queue callback
 		if self.consumer:
 			# Establish a basic consumer
+			self.logger.info("Starting consumer on primary queue (%s)" % self.main_queue)
 			self.primary_consumer_tag = self.channel.basic_consume(
 					consumer_callback=self._on_message,
-					            queue=self.QUEUE['name'],
+					            queue=self.main_queue,
 				)
 
 		# Queues are initialized
@@ -319,7 +339,7 @@ class AMQPBusChannel(BusChannel):
 		self.channel_ready = True
 
 		# Drain any pending egress messages & start flush pool
-		self._scheduled_flush()
+		self.bus.connection.add_timeout(SYNC_TIMEOUT, self._scheduled_flush)
 
 	def _on_message(self, channel, method, properties, body):
 		"""
@@ -362,7 +382,7 @@ class AMQPBusChannel(BusChannel):
 		"""		
 		reply_uuid = properties.correlation_id
 		self.logger.info("Reply arrived (uuid=%s) (%r)" % (reply_uuid, body))
-	
+
 		# Check if we have somebody in the wait queue under this correlation ID
 		if reply_uuid in self.wait_queue:
 
@@ -412,7 +432,7 @@ class AMQPBusChannel(BusChannel):
 
 		"""
 
-		# Setu parameters
+		# Setup parameters
 		correlation_id = None
 		reply_to = None
 		exchange = ""
@@ -466,21 +486,22 @@ class AMQPBusChannel(BusChannel):
 
 	def _scheduled_flush(self):
 		"""
-		Flush and schedule next flush
+		Flush and schedule next flush (should always be executed
+		in the main AMQPBus thread)
 		"""
 
 		# Flush egress queue
 		self._flush_egress()
 
-		# If queue is empty and we requested close, close it now
+		# If a close is pending, do it now
 		if self.closing:
-			self.bus.connection.add_timeout(0.01, self._close)
-			# Prohibit re-scheduling
+			# Run _close from the main thread
+			self.bus.connection.add_timeout(SYNC_TIMEOUT, self._close)
 			return
 
 		# Only if we have a valid channel, fire next ioloop tick
 		if self.channel and self.channel.is_open and self.bus.connection:
-			self.bus.connection.add_timeout(0.01, self._scheduled_flush)
+			self.bus.connection.add_timeout(SYNC_TIMEOUT, self._scheduled_flush)
 
 	def _close(self):
 		"""
@@ -603,12 +624,9 @@ class AMQPBusChannel(BusChannel):
 		"""
 		self.logger.info("Will close channel")
 
-		# We are closing
+		# Mark as closing (will be closed by _scheduled_flush)
 		self.closing = True
 
-		# If we have egress pending, don't close
-		if self.egress.empty() and not self.processing_flag:
-			self.bus.connection.add_timeout(0.01, self._close)
 
 class AMQPBus(Bus, threading.Thread):
 	"""
@@ -702,7 +720,6 @@ class AMQPBus(Bus, threading.Thread):
 			self.logger.info("Connection interrupted (%s) %s. Reopening in 5 seconds" % (reply_code, reply_text))
 			self.connection.add_timeout(5, self.reconnect)
 
-
 	def serve_channel(self, busChannel):
 		"""
 		[AMQP] Try to serve a AMQP channel to the given bus channel
@@ -712,7 +729,9 @@ class AMQPBus(Bus, threading.Thread):
 		if (self.connection != None) and (self.connection.is_open):
 			self.logger.info("Openning channel...")
 			# Asynchronously open a channel for the given bus channel
-			self.connection.channel(on_open_callback=busChannel._channelOpen)
+			def asyncOpen():
+				self.connection.channel(on_open_callback=busChannel._channelOpen)
+			self.connection.add_timeout(SYNC_TIMEOUT, asyncOpen)
 		else:
 			self.logger.warn("Connection is not open in order to open channel. Will do when connected")
 
@@ -795,13 +814,21 @@ class AMQPBus(Bus, threading.Thread):
 		simmilar requests from cache
 		"""
 
+		self.logger.info("-- declaring queue %s --" % queue)
+		gotResponse = False
+
 		# Check if this entry is cached
 		if queue and queue in self.cacheFlags['queue']:
 			callback(self.cacheFlags['queue'][queue])
 			return
 
+		#timeoutHandle = self.connection.add_timeout(0.5, pdb.set_trace)
+
 		# Helper callback
 		def queue_callback(method_frame):
+			self.logger.info("-- queue %s declared --" % queue)
+			#self.connection.remove_timeout(timeoutHandle)
+
 			# Get declared queue name
 			queue_ref = method_frame.method.queue
 			# Store on cache if not anonymous
@@ -824,7 +851,7 @@ class AMQPBus(Bus, threading.Thread):
 	# Bus Interface
 	#####################################
 
-	def openChannel(self, name, serve=None):
+	def openChannel(self, name, flags=Bus.OPEN_DEFAULT, serve=None):
 		"""
 		Open a named channel on the bus.
 		This function should return a BusChannel instance
@@ -834,15 +861,22 @@ class AMQPBus(Bus, threading.Thread):
 		if name in self.channels:
 			return self.channels[name]
 
-		# Check if we are serving this channel
+		# Setup flags
 		is_consumer = False
+		exchange_type = "direct"
+		if (flags & Bus.OPEN_BIND) != 0:
+			is_consumer = True
+		if (flags & Bus.OPEN_BROADCAST) != 0:
+			exchange_type = "fanout"
+
+		# Backwards compatibility
 		if serve != None:
-			is_consumer = serve
-		else:
-			is_consumer = (name in self.config.SERVE_QUEUES)
+			if serve:
+				flags |= Bus.OPEN_BIND
+				is_consumer = True
 
 		# Create a bus channel instance
-		channel = AMQPBusChannel(name, self, is_consumer)
+		channel = AMQPBusChannel(name, self, is_consumer, exchange_type)
 		self.channels[name] = channel
 
 		# Start main thread if it's not already started
