@@ -246,6 +246,13 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		UI.firstTimeAidsShown = {};
 
 		/**
+		 * Stack of growl elements in the screen
+		 * 
+		 * @type {Array}
+		 */
+		UI.growlStack = [];
+
+		/**
 		 * Screen transitions
 		 *
 		 */
@@ -1225,6 +1232,64 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			return eNext;
 
 		}
+
+		/**
+		 * Growl a message.
+		 * @param {string} message - The message to growl
+		 */
+		UI.growl = function( message, callback, growlClass ) {
+
+			// Check for missing callback
+			if (typeof(callback) == "string") {
+				growlStack = callback;
+				callback = null;
+			}
+
+			// Realign growl stack
+			var _reaignGrowlStack = function() {
+				var top = 10;
+				for (var i=0; i<UI.growlStack.length; i++) {
+					UI.growlStack[i].css({
+						'top': top
+					});
+					top += 80;
+				}
+			};
+
+			// Create a growl
+			var growl = $('<div class="growl '+ growlClass +'">' + message + '</div>').appendTo($("body"));
+
+			// Register disposal
+			growl.click(function() {
+
+				// Fire callback
+				if (callback) callback();
+
+				// Dismiss the given growl item
+				for (var i=0; i<UI.growlStack.length; i++) {
+					if (UI.growlStack[i].is(growl)) {
+						UI.growlStack.splice(i,1);
+						break;
+					}
+				}
+
+				// Fade out
+				growl.fadeOut(function() {
+					growl.remove();
+				});
+
+				// Realign
+				_reaignGrowlStack();
+			});
+
+			// Put it on stack
+			UI.growlStack.push(growl);
+
+			// Realign
+			_reaignGrowlStack();
+
+		}
+
 
 		// Return UI
 		return UI;

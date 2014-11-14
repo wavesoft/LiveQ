@@ -640,3 +640,37 @@ h1 + p.subtitle {
 	border: solid 5px #FF6600;
 	background-image: url(@image-warning);
 }
+
+// ===============================
+//  Growl widgets
+// ===============================
+
+.growl {
+	.border-radius(10px);
+	.transition( all 0.5s );
+	.box-shadow( 1px 1px 7px #000 );
+
+	position: absolute;
+	border: solid 2px;
+	z-index: 10000;
+	right: 10px;
+
+	width: 200px;
+	height: 48px;
+	padding: 10px;
+	margin: 5px;
+	font-size: 14px;
+	cursor: pointer;
+
+	// Styling
+	border-color: #999;
+	background-color: #eee;
+	color: #333;
+
+	&.alert {
+		border-color: #993300;
+		background-color: #FFCCCC;
+		color: #CC3300;
+	}
+
+}

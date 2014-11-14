@@ -55,7 +55,7 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         """
         return True
 
-    def open(self, labid):
+    def open(self):
         """
         Community socket open
         """
