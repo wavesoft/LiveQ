@@ -1336,9 +1336,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   line-height: 48px;
   text-decoration: none;
   font-size: 24px;
-  opacity: 0.25;
+  opacity: 0.1;
 }
 .screen.cinematic a.video-skip:hover {
   background-color: rgba(0, 0, 0, 0.7);
-  opacity: 1;
+  opacity: 0.8;
 }
