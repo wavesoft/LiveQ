@@ -770,7 +770,7 @@ define(
 					cb();
 				},
 				function(message) {
-					alert('Could not connect to LiveQ! '+message);
+					UI.growl('LiveQ Error! '+message, "alert");
 				}
 			);
 

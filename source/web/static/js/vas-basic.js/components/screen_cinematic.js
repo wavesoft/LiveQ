@@ -27,6 +27,7 @@ define(
 
 			// Prepare the container for the video
 			this.videoContainer = $('<div class="video-container" id="cinematic-video-host"></div>').appendTo(this.hostDOM);
+			this.videoBlocker = $('<div class="video-blocker"></div>').appendTo(this.hostDOM);
 			this.skipVideo = $('<a href="javascript:;" class="video-skip">Skip</a>').appendTo(this.hostDOM);
 
 			// Set a null completed callback

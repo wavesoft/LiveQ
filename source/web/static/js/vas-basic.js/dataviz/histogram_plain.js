@@ -35,6 +35,12 @@ define(
 				'bulletSize' : 2
 			}
 
+
+			// Reset properties
+			this.datasets = [];
+			this.plotHeight = this.height;
+			this.plotWidth = this.width;
+
 			// Prepare histogram SVG host
 			this.svg = d3.select( this.hostDOM[0] )
 						.append("svg")
@@ -43,9 +49,6 @@ define(
 						.attr("transform", "translate("+this.margin.left+","+this.margin.top+")");
 			this.svgLegend = this.svgPlot.append("g")
 						.attr("class", "legend");
-
-			// Reset datasets
-			this.datasets = [];
 
 			// Define scales to default values
 			this.x = d3.scale.linear()
@@ -86,14 +89,12 @@ define(
 				.text("From:")
 				.attr("class", "x-label")
 				.attr("text-anchor", "end")
-				.attr("x", this.margin.left - 4)
-				.attr("y", this.plotHeight + 12 + this.margin.top);
+				.attr("x", this.margin.left - 4);
 
 			this.xLabelMax = this.svg.append("text")
 				.text("To:")
 				.attr("text-anchor", "end")
-				.attr("x", this.margin.left - 4)
-				.attr("y", this.plotHeight + 24 + this.margin.top);
+				.attr("x", this.margin.left - 4);
 
 
 		};

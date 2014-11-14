@@ -76,7 +76,7 @@ define(
 			// Prepare progress aggregator
 			var progressAggregator = new ProgressAggregator();
 			progressAggregator.on('progress', function(progress, message){ scrProgress.onProgress(progress, message); });
-			progressAggregator.on('error', function(message){ scrProgress.onProgressError(message); });
+			progressAggregator.on('error', function(message){ scrProgress.onProgressError(message); VAS.logError(message); });
 			progressAggregator.on('completed', function(){
 				scrProgress.onProgressCompleted(); 
 				if (readyCallback) readyCallback();
@@ -253,6 +253,7 @@ define(
 					});
 					Community.on('error', function(message) {
 						// Community socket error
+						VAS.logError(message, "error");
 						prog_community.fail("Could not initialize community!" + message);
 					});
 
@@ -276,7 +277,7 @@ define(
 							'password' : password
 						}, function(status, errorMsg) {
 							if (!status) {
-								alert("Could not log-in! "+errorMsg)
+								UI.growl("Could not log-in! "+errorMsg, "alert")
 							} else {
 								VAS.displayHome();
 							}
@@ -288,7 +289,7 @@ define(
 							'password' : password
 						}, function(status, errorMsg) {
 							if (!status) {
-								alert("Could not register the user! "+errorMsg)
+								UI.growl("Could not register the user! "+errorMsg, "alert")
 							} else {
 								VAS.displayHome();
 							}
@@ -447,7 +448,7 @@ define(
 								VAS.referenceHistograms = histograms;
 							},
 							function(error) {
-								alert("Could not request interpolation! "+error);
+								UI.growl("Could not request interpolation! "+error, "alert", 5000);
 							}
 						);
 
@@ -467,7 +468,6 @@ define(
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;
-						console.log("---",i);
 
 						// If we run out of chain, run callback
 						if (i >= chainRun.length) {
@@ -598,8 +598,8 @@ define(
 					VAS.scrHome.onStateChanged( 'simulating', false );
 
 					// "Aborted" is not an error ;)
-					if (errorMsg == "Aborted") return;
-					alert("Simulation Error: "+errorMsg);
+					if (errorMsg.trim().toLowerCase() == "aborted") return;
+					UI.growl("Simulation Error: "+errorMsg, "alert");
 
 					// Go to the home screen					
 					VAS.displayHome();
