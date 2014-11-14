@@ -219,6 +219,28 @@ define(["core/config", "core/base/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
+		 * Initializes a new TutorialScreen Component.
+		 *
+		 * This component is used for displaying screens used solely for tutorial or informative purposes.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var TutorialScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		TutorialScreen.prototype = Object.create( Component.prototype );
+
+		////////////////////////////////////////////////////////////
+		/**
 		 * Initializes a new RunningScreen Component.
 		 *
 		 * This component is displayed when the user submits his/her tune and the machinery
@@ -780,6 +802,7 @@ define(["core/config", "core/base/component" ],
 			'ProgressScreen'	: ProgressScreen,
 			'ResultsScreen'		: ResultsScreen,
 			'CinematicScreen'	: CinematicScreen,
+			'TutorialScreen'	: TutorialScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,
