@@ -15,6 +15,13 @@ define({
 	},
 
 	/**
+	 * Community
+	 */
+	'community' : {
+		'socket_url'	: 'wss://test4theory.cern.ch/vas/communitysocket'
+	},
+
+	/**
 	 * CouchDB Database Configuration
 	 */
 	'db': {

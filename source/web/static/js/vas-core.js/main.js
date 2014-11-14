@@ -4,9 +4,9 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/base/components", "core/util/progress_aggregator", "liveq/core", "liveq/Calculate" ], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/community", "core/base/components", "core/util/progress_aggregator", "liveq/core", "liveq/Calculate" ], 
 
-	function($, config, R, UI, DB, User, Components, ProgressAggregator, LiveQCore, LiveQCalc) {
+	function($, config, R, UI, DB, User, Community, Components, ProgressAggregator, LiveQCore, LiveQCalc) {
 		var VAS = { };
 
 		/**
@@ -234,6 +234,25 @@ define(
 
 				};
 
+			var prog_community = progressAggregator.begin(1),
+				init_community = function(cb) {
+
+					// Register community handlers
+					Community.on('ready', function() {
+						// Community socket ready
+						prog_community.ok("Community initialized");
+						cb();
+					});
+					Community.on('error', function(message) {
+						// Community socket error
+						prog_community.fail("Could not initialize community!" + message);
+					});
+
+					// Connect to community socket
+					Community.connect( config.community.socket_url );
+
+				};
+
 			var prog_login = progressAggregator.begin(1),
 				init_login = function(cb) {
 					var scrLogin = UI.initAndPlaceScreen("screen.login");
@@ -436,7 +455,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_community, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;

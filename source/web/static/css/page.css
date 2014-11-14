@@ -16,8 +16,9 @@ body {
 body {
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 12px;
-  background-image: url(../img/white_abstract.jpg);
+  background-image: url(../img/back/intro.jpg);
   background-size: cover;
+  background-position: top center;
   background-repeat: no-repeat;
 }
 h1 + p.subtitle {
