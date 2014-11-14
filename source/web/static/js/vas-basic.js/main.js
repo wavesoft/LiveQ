@@ -9,6 +9,7 @@ define([
 	'vas-basic/components/screen_progress',
 	'vas-basic/components/screen_login',
 	'vas-basic/components/screen_results',
+	'vas-basic/components/screen_cinematic',
 
 	// Other components
 	'vas-basic/components/nav_mini',

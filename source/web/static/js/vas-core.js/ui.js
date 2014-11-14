@@ -948,7 +948,6 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 		}
 
-
 		/**
 		 * Show an agent and start the specified tutorial sequence.
 		 *

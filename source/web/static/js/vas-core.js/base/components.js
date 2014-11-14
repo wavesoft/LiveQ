@@ -459,6 +459,58 @@ define(["core/config", "core/base/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
+		 * Initializes a new Cinematic Screen
+		 *
+		 * This component is used when a full-screen cinematic should be displayed.
+		 *
+		 * @class
+		 * @classdesc Abstract class for defining cinematic cutoffs.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var CinematicScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		/**
+		 * This function is fired before the onShow and should prepare the cinematic screen for the
+		 * multimedia to be presented.
+		 *
+		 * @abstract
+		 * @example <caption>Example of using a CinematicScreen</caption>
+		 * cinematicScreenComponentInstance.onCinematicDefined({
+		 *    'mp4': 'path/to/video.mp4'
+		 *    'ogg': 'path/to/video.ogg'
+		 *    'webm': 'path/to/video.webm'
+		 *    'jpg': 'path/to/poster.jpg'
+		 * });
+		 * @param {object} config - The cinematic video configuration to load
+		 * @param {function} cb_ready - The callback to fire when the cinematic is ready
+		 */
+		CinematicScreen.prototype.onCinematicDefined = function( config, cb_ready ) {
+			if (cb_ready) cb_ready();
+
+		}
+
+		/**
+		 * This function defines a single (overridable) callback function to be fired
+		 * when the cinematic is completed.
+		 *
+		 * @param {object} config - The cinematic video configuration to load
+		 * @param {function} cb_ready - The callback to fire when the cinematic is ready
+		 */
+		CinematicScreen.prototype.onCallbackDefined = function( cb_ready ) {
+		}
+
+		// Subclass from Component
+		CinematicScreen.prototype = Object.create( Component.prototype );
+
+		////////////////////////////////////////////////////////////
+		/**
 		 * Initializes a new Book Screen.
 		 *
 		 * This component is used when the user has completed the simulation.
@@ -711,6 +763,12 @@ define(["core/config", "core/base/component" ],
 		 * @event module:core/base/components~LoginScreen#login		
 		 */
 
+		/**
+		 * This event should be fired by the CinematicScreen when the video is completed.
+		 *
+		 * @event module:core/base/components~CinematicScreen#completed		
+		 */
+
 		////////////////////////////////////////////////////////////
 
 		// Expose components
@@ -721,6 +779,7 @@ define(["core/config", "core/base/component" ],
 			'HomeScreen'		: HomeScreen,
 			'ProgressScreen'	: ProgressScreen,
 			'ResultsScreen'		: ResultsScreen,
+			'CinematicScreen'	: CinematicScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,

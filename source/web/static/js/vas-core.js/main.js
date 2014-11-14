@@ -48,6 +48,8 @@ define(
 			// Absolutely minimum UI initializations
 			UI.initialize();
 
+			window.vas = this;
+
 			// Prepare properties
 			VAS.alertUnload = false;
 			VAS.referenceHistograms = null;
@@ -313,6 +315,20 @@ define(
 					cb();
 				};
 
+			var prog_cinematic = progressAggregator.begin(1),
+				init_cinematic = function(cb) {
+					var scrCinematic = VAS.scrCinematic = UI.initAndPlaceScreen("screen.cinematic");
+					if (!scrCinematic) {
+						console.error("Core: Unable to initialize cinematic screen!");
+						return;
+					}
+
+					// Complete login
+					prog_cinematic.ok("Cinematic screen ready");
+					cb();
+				};				
+
+
 			var prog_run = progressAggregator.begin(1),
 				init_run = function(cb) {
 					var scrRunning = VAS.scrRunning = UI.initAndPlaceScreen("screen.running");
@@ -420,7 +436,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_home, init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;
@@ -450,6 +466,22 @@ define(
 
 			}, 500)
 
+
+		}
+
+		/**
+		 * Display the cinematic screen
+		 */
+		VAS.displayCinematic = function( video, callback ) {
+
+			// Initialize cinematic screen
+			VAS.scrCinematic.onCallbackDefined(callback);
+			VAS.scrCinematic.onCinematicDefined(video, (function() {
+
+				// Show cinematic screen
+				UI.selectScreen("screen.cinematic");
+
+			}).bind(this));
 
 		}
 

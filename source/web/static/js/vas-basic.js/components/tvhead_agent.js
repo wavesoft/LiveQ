@@ -23,17 +23,17 @@ define(
 
 			return {
 				start: function(event, track) {
-					var videoHost = options.videoHost;
+					var pluginHost = options.pluginHost;
 
 					// Fire onEnter if defined
 					if (options['onEnter'] !== undefined)
 						options['onEnter']();
 
 					// Tell video host to aligh with the visual aid
-					videoHost.realign( options.focus );
+					pluginHost.realign( options.focus );
 
 					// Check if we have duration
-					videoHost.trigger('focusVisualAid',
+					pluginHost.trigger('focusVisualAid',
 							options.focus,
 							options['end'] - options['start'],
 							options['addClass'] || "",
@@ -42,13 +42,13 @@ define(
 
 				},
 				end: function(event, track) {
-					var videoHost = options.videoHost;
+					var pluginHost = options.pluginHost;
 
 					// Check if we have duration
-					videoHost.trigger('blurVisualAid');
+					pluginHost.trigger('blurVisualAid');
 
 					// Tell video host to realign without aids
-					videoHost.realign( false );
+					pluginHost.realign( false );
 
 					// Fire onExit
 					if (options['onExit'] !== undefined)
@@ -246,7 +246,7 @@ define(
 						'start': entry.at,
 						'end': frameEnd,
 						'focus': entry.focus,
-						'videoHost': this,
+						'pluginHost': this,
 
 						// Optional
 						'title': entry['title'],
