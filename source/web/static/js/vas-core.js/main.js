@@ -322,6 +322,31 @@ define(
 					cb();
 				};
 
+			var prog_tutorials = progressAggregator.begin(1),
+				init_tutorials = function(cb) {
+
+					// Tutorial screens
+					var tutScreens = [
+						'screen.tutorial.stats'
+					];
+
+					// Iterate over tutorial screens
+					for (var i=0; i<tutScreens.length; i++) {
+
+						// Init and place tutorial screen
+						var scrTutorial = UI.initAndPlaceScreen(tutScreens[i]);
+						if (!scrTutorial) {						
+							UI.logError("Core: Unable to initialize tutorial screen '"+tutScreens[i]+"'!");
+							return;
+						}
+
+					}
+
+					// Tutorial screens are ready
+					prog_tutorials.ok("Tutorial screens ready");
+					cb();
+				};
+
 			var prog_results = progressAggregator.begin(1),
 				init_results = function(cb) {
 					var scrResults = VAS.scrResults = UI.initAndPlaceScreen("screen.results");
@@ -485,7 +510,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_api, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_api, init_home, init_cinematic, init_tutorials, init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;

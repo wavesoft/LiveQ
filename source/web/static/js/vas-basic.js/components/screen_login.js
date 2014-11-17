@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/config", "core/registry", "core/base/components", "core/ui" , "vas-basic/data/trainhisto"],
+	["core/config", "core/registry", "core/base/components", "core/ui" ],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports vas-basic/components/running_screen
 	 */
-	function(config,R,C,UI, TrainHisto) {
+	function(config,R,C,UI) {
 
 		/**
 		 * @class
@@ -98,58 +98,14 @@ define(
 				this.trigger("register", fName.val(), fPassword.val() );
 			}).bind(this));
 
-
-
-			// Create dummy histogram for testing
-			var h = $('<div style="width: 800px; height: 400px; position: absolute; left: 100px; top: 100px;"></div>').appendTo(this.foregroundDOM),
-				hc = R.instanceComponent("dataviz.histogram_plain", h);
-
-			var th = new TrainHisto({
-				bins: 20,
-				samples: 10000
-			});
-
-			var visible = true;
-			h.click(function() {
-				visible = !visible;
-				hc.showErrorBars(visible);
-			});
-
-			hc.onMetaUpdate({
-				'bins': th.bins(),
-				'domain': [0,1],
-				'sets': [
-					{
-						'name': 'Reference',
-						'color': '#fbb03b',
-						'valueBar': true,
-						'valueColor': '#993300'
-					},
-					{
-						'name': 'Simulation',
-						'color': '#662d91',
-						'opacity': 0.5,
-						'valueBar': true,
-						'valueColor': '#000000',
-						'valueDash' : '2, 2'
-					}
-				]
-			});
-
-			hc.onUpdate([
-					th.gen(),
-					th.gen()
-				]);
-
-			var i=0.001;
-			setInterval(function() {
-				hc.onUpdate([
-						th.gen(1, 1),
-						th.gen(1-Math.pow(1-i,4) , 0.65)
-					]);
-
-				i = Math.min(1.0, i+Math.random() * 0.001);
-			}, 100);
+			// Prepare test button to test the new features
+			var btnRegister = $('<input type="button" value="Test" />');
+			loginBtnHost.append(btnRegister);
+			btnRegister.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				UI.selectScreen("screen.tutorial.stats");
+			}).bind(this));
 
 		}
 		LoginScreen.prototype = Object.create( C.LoginScreen.prototype );
