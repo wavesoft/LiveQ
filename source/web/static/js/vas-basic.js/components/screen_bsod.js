@@ -22,8 +22,9 @@ define(
 			hostDOM.addClass("bsod");
 
 			// Create image and text placeholders
-			this.eText = $('<div class="text"></div>');
-			this.eIcon = $('<div class="image"></div>');
+			this.eContent = $('<div class="content"></div>').appendTo(hostDOM);
+			this.eText = $('<div class="text"></div>').appendTo(this.eContent);
+			this.eIcon = $('<div class="image"></div>').appendTo(this.eContent);
 
 		}
 		BSODScreen.prototype = Object.create( C.BSODScreen.prototype );
@@ -39,6 +40,7 @@ define(
 				this.eIcon.css("background-image", "");
 				this.eIcon.append($(icon));
 			}
+			this.eText.html("<p>" + text + '</p>\n<p>This is a critical error and you cannot continue. Please try to <a href="javascript:location.reload()">refresh the page</a> and try later.</p>');
 		}
 
 		// Register login screen

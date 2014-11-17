@@ -34,8 +34,13 @@ define(
 
 			}).bind(this));
 
+			// Start fade out
+			this.hostDOM.hide();
+			this.visible = false;
+
 		}
 		NavMini.prototype = Object.create( C.Nav.prototype );
+
 
 		/**
 		 * Hide mini-nav when we are on home
@@ -43,8 +48,10 @@ define(
 		NavMini.prototype.onPageWillChange = function(from, to) {
 			if ((to == "screen.tuning") || (to == "screen.running") || (to == "screen.explain")) {
 				this.hostDOM.fadeIn();
+				this.visible = true;
 			} else {
 				this.hostDOM.fadeOut();
+				this.visible = false;
 			}
 		}
 

@@ -45,14 +45,17 @@ define(
 		 */
 		UI.logError = function( message, critical ) {
 
-			// Growl the error
-			console.error(message);
-			UI.growl(message, "alert");
-
-			// Display BSOD if critical
 			if (critical) {
+				console.error(message);
+
+				// Display BSOD if critical
 				var bsod = UI.selectScreen("screen.bsod");
-				bsod.onBSODDefined(message, '<span class="glyphicon glyphicon-off"></span>');
+				if (bsod) bsod.onBSODDefined(message, '<span class="glyphicon glyphicon-off"></span>');
+			} else {
+				console.warn(message);
+
+				// Otherwise display a growl
+				UI.growl(message, "alert");
 			}
 
 		}
@@ -75,10 +78,15 @@ define(
 			VAS.runningTask = "";
 			VAS.runningTopic = "";
 
-			// Prepare progress screen
+			// Prepare core screens
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
 			if (!scrProgress) {
 				UI.logError("Core: Unable to initialize progress screen!");
+				return;
+			}
+			var scrBSOD = UI.initAndPlaceScreen("screen.bsod", Components.BSODScreen);
+			if (!scrBSOD) {
+				UI.logError("Core: Unable to initialize BSOD screen!");
 				return;
 			}
 
@@ -262,7 +270,7 @@ define(
 					});
 					APISocket.on('error', function(message) {
 						// API socket error
-						UI.logError(message, "error");
+						UI.logError(message, true);
 						prog_api.fail("Could not initialize core I/O socket!" + message, true);
 					});
 

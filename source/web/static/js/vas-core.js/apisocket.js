@@ -4,14 +4,14 @@ define(["core/util/event_base", "core/config"],
 	function( EventBase, Config ) {
 
 		/**
-		 * The community class provides all the required functionality to interact in real time
-		 * with other community members.
+		 * The APISocket class provides all the required functionality to interact in real time
+		 * with other APISocket members.
 		 *
 		 * @class
-		 * @classdesc The Community class
+		 * @classdesc The APISocket class
 		 * @see {@link module:core/util/event_base~EventBase|EventBase} (Parent class)
 		 */
-		var Community = function( hostDOM ) {
+		var APISocket = function( hostDOM ) {
 
 			// Initialize superclass
 			EventBase.call(this);
@@ -25,21 +25,21 @@ define(["core/util/event_base", "core/config"],
 		}
 
 		// Subclass from EventBase
-		Community.prototype = Object.create( EventBase.prototype );
+		APISocket.prototype = Object.create( EventBase.prototype );
 
 		/**
 		 * Start the socket keepalive poller
 		 */
-		Community.prototype.__keepalivePoller = function() {
+		APISocket.prototype.__keepalivePoller = function() {
 			if (this.connected) {
 				this.send("io.keepalive");
 			}
 		}
 
 		/**
-		 * Connect to the community server
+		 * Connect to the APISocket server
 		 */
-		Community.prototype.connect = function(url) {
+		APISocket.prototype.connect = function(url) {
 			try {
 
 				// Create new websocket instance
@@ -71,7 +71,7 @@ define(["core/util/event_base", "core/config"],
 				// If for any reason the socket is closed, retry connection
 				//
 				this.socket.onclose = (function() {
-					this.trigger('error', 'Disconnected from the community socket!');
+					this.trigger('error', 'Disconnected from the APISocket socket!');
 					this.connected = false;
 				}).bind(this);
 
@@ -79,13 +79,13 @@ define(["core/util/event_base", "core/config"],
 				// Handle socket errors
 				//
 				this.socket.onerror = (function(ws, error) {
-					this.trigger('error', 'Error while trying to connect to the community socket!');
+					this.trigger('error', 'Error while trying to connect to the API socket!');
 					this.connected = false;
 				}).bind(this);
 
 			}
 			catch (e) {
-				this.trigger('error', 'Could not connect to the community socket! ' + String(e));
+				this.trigger('error', 'Could not connect to the API socket! ' + String(e));
 				this.connected = false;
 			}
 		}
@@ -93,7 +93,7 @@ define(["core/util/event_base", "core/config"],
 		/**
 		 * Send an action frame
 		 */
-		Community.prototype.send = function( action, parameters ) {
+		APISocket.prototype.send = function( action, parameters ) {
 
 			// Prepare data to send
 			var param = parameters || { };
@@ -107,17 +107,17 @@ define(["core/util/event_base", "core/config"],
 		}
 
 		/**
-		 * Handle an action frame that arrives from the community channel
+		 * Handle an action frame that arrives from the APISocket channel
 		 */
-		Community.prototype.handleActionFrame = function( action, parameters ) {
+		APISocket.prototype.handleActionFrame = function( action, parameters ) {
 
 		}
 
 		/**
-		 * Return a community singleton
+		 * Return a APISocket singleton
 		 */
-		var community = new Community();
-		return community;
+		var APISocket = new APISocket();
+		return APISocket;
 
 	}
 	
