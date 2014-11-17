@@ -51,6 +51,10 @@ define(
 				// Display BSOD if critical
 				var bsod = UI.selectScreen("screen.bsod");
 				if (bsod) bsod.onBSODDefined(message, '<span class="glyphicon glyphicon-off"></span>');
+
+				// Enter UI Lockdown
+				UI.lockdown = true;
+
 			} else {
 				console.warn(message);
 

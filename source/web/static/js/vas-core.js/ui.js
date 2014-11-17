@@ -253,6 +253,15 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		UI.growlStack = [];
 
 		/**
+		 * UI Lockdown flag
+		 *
+		 * When this is set to true, no interface operations are allowed
+		 *
+		 * @type {Boolean}
+		 */
+		UI.lockdown = false;
+
+		/**
 		 * Screen transitions
 		 *
 		 */
@@ -480,6 +489,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 */
 		UI.showOverlay = function(name, transition, cb_ready) {
 
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
+
 			// Check for missing arguments
 			if (typeof(transition) == 'function') {
 				cb_ready = transition; transition = null;
@@ -663,6 +676,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				visualAid = R.getVisualAidMeta(aid_id),
 				userAids = User.getFirstTimeDetails();
 
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
+
 			// Skip missing visual aid definitions
 			if (!visualAid) return;
 			if (!userAids[aid_id]) return;
@@ -773,6 +790,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 *
 		 */
 		UI.showPopup = function(name, x, y, body, config) {
+
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
 
 			// If x was a Dom element, update x/y accordingly
 			if ((x instanceof $) || (x instanceof Element)) {
@@ -990,6 +1011,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 */
 		UI.showTutorial = function( sequence, cb_completed ) {
 
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
+
 			// Asynchronouos callback to start the sequence
 			var __startTutorial = function() {
 
@@ -1125,6 +1150,10 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 *
 		 */
 		UI.selectScreen = function(name, transition, cb_ready) {
+
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
 
 			// Check for wrong values
 			if (UI.activeScreen == name)
