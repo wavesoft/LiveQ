@@ -238,6 +238,72 @@ define(["core/config", "core/base/component" ],
 
 		// Subclass from Component
 		TutorialScreen.prototype = Object.create( Component.prototype );
+		
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new BSODScreen Component.
+		 *
+		 * This component is used as a placeholder to be shown when a critical error
+		 * has occured.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var BSODScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		BSODScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Define the blue screen of death message.
+		 *
+		 * @abstract
+		 * @param {string} text - The text of the BSOD scren.
+		 * @param {string} icon - The icon to show.
+		 */
+		BSODScreen.prototype.onBSODDefined = function(text, icon) {
+		};
+		
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new In-Place IDE Component.
+		 *
+		 * This component is used for editing user interface components in-place.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var IPIDEScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		IPIDEScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Define the code to be shown on the IPIDE screen
+		 *
+		 * @abstract
+		 * @param {string} title - The title of the IPIDE content.
+		 * @param {string} code - The code to display.
+		 */
+		IPIDEScreen.prototype.onCodeLoaded = function(title, code) {
+
+		};
 
 		////////////////////////////////////////////////////////////
 		/**
@@ -803,6 +869,8 @@ define(["core/config", "core/base/component" ],
 			'ResultsScreen'		: ResultsScreen,
 			'CinematicScreen'	: CinematicScreen,
 			'TutorialScreen'	: TutorialScreen,
+			'BSODScreen'		: BSODScreen,
+			'IPIDEScreen'		: IPIDEScreen,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,

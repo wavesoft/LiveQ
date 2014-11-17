@@ -14,6 +14,11 @@ define(["core/config", "core/db"],
 		var User = { };
 
 		/**
+		 * Enable/disable editing of the interface
+		 */
+		User.enableIPIDE = false;
+
+		/**
 		 * Login and initialize user record
 		 *
 		 * @param {Object} params - A dictionary that contains the 'username' and 'password' fields.

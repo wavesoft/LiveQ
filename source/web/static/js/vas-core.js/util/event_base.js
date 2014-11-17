@@ -53,6 +53,11 @@ define(
 		EventBase.prototype.off = function(name, handler) {
 			if (this.__eventCallbacks[name] == undefined)
 				return;
+			// If handler is missing, remove all handlers
+			if (handler == undefined) {
+				delete this.__eventCallbacks[name];
+				return;
+			}
 			// Remove event callback
 			var i = this.__eventCallbacks[name].indexOf(handler);
 			this.__eventCallbacks[name].splice(i,1);

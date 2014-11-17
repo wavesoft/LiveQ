@@ -1,5 +1,5 @@
 
-define(["core/util/event_base", "core/config"], 
+define(["core/util/event_base", "core/config", "core/user"], 
 
 	/**
 	 * This module provides the base component class which is used for derriving all of the
@@ -24,6 +24,19 @@ define(["core/util/event_base", "core/config"],
 
 			// Keep reference of the host DOM element
 			this.hostDOM = hostDOM;
+
+			// Put the edit button
+			this.editBtn = $('<a href="#" class="btn-edit-component"><span class="glyphicon glyphicon-edit"></span></a>')
+				.appendTo(hostDOM)
+				.click((function(e) {
+					e.stopPropagation();
+					e.preventDefault();
+
+					var name = this.__registryID;
+					require(["core/developer"], function(Developer) {
+						Developer.editComponent(name);
+					});
+				}).bind(this))
 
 			// Prepare properties
 			this.width = 0;

@@ -127,6 +127,7 @@ define(["core/config", "core/base/component"],
 
 			// Store component and it's weight
 			component.__weight = w;
+			component.prototype.__registryID = name;
 			registry.components[name] = component;
 			
 		}

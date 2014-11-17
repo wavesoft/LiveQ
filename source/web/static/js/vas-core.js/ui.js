@@ -274,6 +274,17 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		};
 
 		/**
+		 * Overridable function
+		 */
+		UI.logError = function(text, critical) {
+			if (critical) {
+				console.error("Critical Error: ",text);
+			} else {
+				console.warn("Critical Error: ",text);
+			}
+		}
+
+		/**
 		 * Initialize & Register the specified screen by it's name
 		 */
 		UI.initAndPlaceScreen = function(name, validateSubclass) {
@@ -463,6 +474,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * Slide an overlay module as screen.
 		 *
 		 * @param {string} name - The name of the module to focus.
+		 * @param {array} transition - The transition definition (defaults to UI.Transitions.ZOOM_IN)
 		 * @param {function} cb_ready - The callback to fire when the screen has changed
 		 *
 		 */

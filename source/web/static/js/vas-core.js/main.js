@@ -4,9 +4,9 @@
  */
 define(
 
-	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/community", "core/base/components", "core/util/progress_aggregator", "liveq/core", "liveq/Calculate" ], 
+	["jquery", "core/config",  "core/registry", "core/ui", "core/db", "core/user", "core/apisocket", "core/base/components", "core/util/progress_aggregator", "liveq/core", "liveq/Calculate" ], 
 
-	function($, config, R, UI, DB, User, Community, Components, ProgressAggregator, LiveQCore, LiveQCalc) {
+	function($, config, R, UI, DB, User, APISocket, Components, ProgressAggregator, LiveQCore, LiveQCalc) {
 		var VAS = { };
 
 		/**
@@ -41,11 +41,20 @@ define(
 		};
 
 		/**
-		 * Log error
+		 * Override error logging from UI
 		 */
-		VAS.logError = function( message, critical ) {
+		UI.logError = function( message, critical ) {
+
+			// Growl the error
 			console.error(message);
 			UI.growl(message, "alert");
+
+			// Display BSOD if critical
+			if (critical) {
+				var bsod = UI.selectScreen("screen.bsod");
+				bsod.onBSODDefined(message, '<span class="glyphicon glyphicon-off"></span>');
+			}
+
 		}
 
 		/**
@@ -69,14 +78,14 @@ define(
 			// Prepare progress screen
 			var scrProgress = UI.initAndPlaceScreen("screen.progress", Components.ProgressScreen);
 			if (!scrProgress) {
-				VAS.logError("Core: Unable to initialize progress screen!");
+				UI.logError("Core: Unable to initialize progress screen!");
 				return;
 			}
 
 			// Prepare progress aggregator
 			var progressAggregator = new ProgressAggregator();
 			progressAggregator.on('progress', function(progress, message){ scrProgress.onProgress(progress, message); });
-			progressAggregator.on('error', function(message){ scrProgress.onProgressError(message); VAS.logError(message); });
+			progressAggregator.on('error', function(message){ scrProgress.onProgressError(message); UI.logError(message); });
 			progressAggregator.on('completed', function(){
 				scrProgress.onProgressCompleted(); 
 				if (readyCallback) readyCallback();
@@ -242,23 +251,23 @@ define(
 
 				};
 
-			var prog_community = progressAggregator.begin(1),
-				init_community = function(cb) {
+			var prog_api = progressAggregator.begin(1),
+				init_api = function(cb) {
 
-					// Register community handlers
-					Community.on('ready', function() {
-						// Community socket ready
-						prog_community.ok("Community initialized");
+					// Register core handlers
+					APISocket.on('ready', function() {
+						// API socket ready
+						prog_api.ok("Core I/O socket initialized");
 						cb();
 					});
-					Community.on('error', function(message) {
-						// Community socket error
-						VAS.logError(message, "error");
-						prog_community.fail("Could not initialize community!" + message);
+					APISocket.on('error', function(message) {
+						// API socket error
+						UI.logError(message, "error");
+						prog_api.fail("Could not initialize core I/O socket!" + message, true);
 					});
 
-					// Connect to community socket
-					Community.connect( config.community.socket_url );
+					// Connect to core socket
+					APISocket.connect( config.core.socket_url );
 
 				};
 
@@ -266,7 +275,7 @@ define(
 				init_login = function(cb) {
 					var scrLogin = UI.initAndPlaceScreen("screen.login");
 					if (!scrLogin) {						
-						VAS.logError("Core: Unable to initialize login screen!");
+						UI.logError("Core: Unable to initialize login screen!");
 						return;
 					}
 
@@ -305,7 +314,7 @@ define(
 				init_results = function(cb) {
 					var scrResults = VAS.scrResults = UI.initAndPlaceScreen("screen.results");
 					if (!scrResults) {
-						VAS.logError("Core: Unable to initialize results screen!");
+						UI.logError("Core: Unable to initialize results screen!");
 						return;
 					}
 
@@ -323,7 +332,7 @@ define(
 				init_home = function(cb) {
 					var scrHome = VAS.scrHome = UI.initAndPlaceScreen("screen.home");
 					if (!scrHome) {
-						VAS.logError("Core: Unable to initialize home screen!");
+						UI.logError("Core: Unable to initialize home screen!");
 						return;
 					}
 
@@ -347,7 +356,7 @@ define(
 				init_cinematic = function(cb) {
 					var scrCinematic = VAS.scrCinematic = UI.initAndPlaceScreen("screen.cinematic");
 					if (!scrCinematic) {
-						VAS.logError("Core: Unable to initialize cinematic screen!");
+						UI.logError("Core: Unable to initialize cinematic screen!");
 						return;
 					}
 
@@ -361,7 +370,7 @@ define(
 				init_run = function(cb) {
 					var scrRunning = VAS.scrRunning = UI.initAndPlaceScreen("screen.running");
 					if (!scrRunning) {
-						VAS.logError("Core: Unable to initialize run screen!");
+						UI.logError("Core: Unable to initialize run screen!");
 						return;
 					}
 
@@ -391,7 +400,7 @@ define(
 					// Create explain screen
 					var scrExplain = VAS.scrExplain = UI.initAndPlaceScreen("screen.explain", Components.ExplainScreen);
 					if (!scrExplain) {
-						VAS.logError("Core: Unable to initialize explaination screen!");
+						UI.logError("Core: Unable to initialize explaination screen!");
 						return;
 					}
 
@@ -422,7 +431,7 @@ define(
 					// Create tuning screen
 					var scrTuning = VAS.scrTuning = UI.initAndPlaceScreen("screen.tuning", Components.TuningScreen);
 					if (!scrTuning) {
-						VAS.logError("Core: Unable to initialize explaination screen!");
+						UI.logError("Core: Unable to initialize explaination screen!");
 						return;
 					}
 
@@ -464,7 +473,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_community, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_api, init_home, init_cinematic, init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;

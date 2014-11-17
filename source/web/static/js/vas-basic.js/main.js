@@ -10,6 +10,8 @@ define([
 	'vas-basic/components/screen_login',
 	'vas-basic/components/screen_results',
 	'vas-basic/components/screen_cinematic',
+	'vas-basic/components/screen_bsod',
+	'vas-basic/components/screen_ipide',
 
 	// Other components
 	'vas-basic/components/nav_mini',

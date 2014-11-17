@@ -23,13 +23,13 @@ import uuid
 import logging
 import base64
 
-from lievq.models import User
+from liveq.models import User
 from webserver.config import Config
 import tornado.websocket
 
-class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
+class APISocketHandler(tornado.websocket.WebSocketHandler):
     """
-    Community I/O Socket handler
+    API I/O Socket handler
     """
 
     def __init__(self, application, request, **kwargs):
@@ -40,9 +40,10 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
 
         # Initialize
         self.chatroom = None
+        self.user = None
 
         # Open logger
-        self.logger = logging.getLogger("CommunitySocket")
+        self.logger = logging.getLogger("APISocket")
 
     ####################################################################################
     # --------------------------------------------------------------------------------
@@ -62,7 +63,7 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         """
 
         # Get user ID
-        self.user = User.get(name="icharala")
+        self.logger.info("Socket open")
 
         # Reset local variables
         self.chatroom = None
@@ -71,6 +72,8 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         """
         Community Socket closed
         """
+
+        self.leaveChatroom()
         self.logger.info("Socket closed")
 
     def on_message(self, message):
@@ -86,6 +89,13 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         if not 'action' in parsed:
             return self.sendError("Missing 'action' parameter from request")
         action = parsed['action']
+
+        # If the action is not 'login' and we don't have a user, 
+        # conider this invalid
+        if not self.user:
+            if action != "user.login":
+                self.sendError("The user was not logged in!")
+                return
 
         # Check for parameters
         param = { }
@@ -122,6 +132,10 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         if not 'user' in data:
             return
 
+        # Remove user from chatroom
+        key = "chatroom.%s" % self.chatroom.name
+        Config.STORE.sadd(key, data['user'])
+
         # Send notification for user joining the chatroom
         self.sendAction("chatroom.leave", { "user": data['user'] })
 
@@ -143,25 +157,45 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
     # --------------------------------------------------------------------------------
     ####################################################################################
 
-    def joinChatroom(self, name):
+    def leaveChatroom(self):
+        """
+        Leave previous chatroom
+        """
+
+        # Leave previous chatroom
+        if self.chatroom != None:
+            # Leave channel
+            self.chatroom.send('chatroom.leave', {'user':self.user.username})
+            # Close channel
+            self.chatroom.close()
+            # Reset variable
+            self.chatroom = None
+
+    def selectChatroom(self, name):
         """
         Join a particular chatroom
         """
 
-        # Close previous chatroom
-        if self.chatroom != None:
-            self.chatroom.close()
+        # Leave previous chatroom
+        self.leaveChatroom()
 
         # Join chatroom
         self.chatroom = Config.IBUS.openChannel("chatroom.%s" % name)
+
+        # Add user in chatroom
+        key = "chatroom.%s" % self.chatroom.username
+        Config.STORE.sadd(key, data['user'])
+
+        # Get users in the channel
+        roomUsers = list(key, Config.STORE.smembers())
 
         # Bind events
         self.chatroom.on('chatroom.enter', self.onChatroomEnter)
         self.chatroom.on('chatroom.leave', self.onChatroomLeave)
         self.chatroom.on('chatroom.chat', self.onChatroomChat)
 
-        # Get people in this room
-        roomUsers = Config.STORE.smembers("chatroom.presence.%s" % self.user)
+        # Send presence
+        self.sendAction("chatroom.presence", { 'users': roomUsers })
 
     def sendError(self, error):
         """
@@ -194,6 +228,23 @@ class CommunitySocketHandler(tornado.websocket.WebSocketHandler):
         """
         Handle the specified incoming action from the javascript interface
         """
-        
+
+        self.logger.info("Got action '%s' from user '%s'" % (action, str(self.user)))
+
+        # Handle login
+        if action == "user.login":
+            self.user = User.get(User.username == param['user'])
+
+        # Select the chatroom to join
+        elif action == "chatroom.select":
+
+            # Join the specified chatroom
+            self.selectChatroom( param['chatroom'] )
+
+        elif action == "chatroom.chat":
+            # Send message to active chatroom
+            if self.chatroom != None:
+                self.chatroom.send("chatroom.chat", { 'user': self.user.username })
+
         # Not implemented
         return self.sendError("Interface not implemented")

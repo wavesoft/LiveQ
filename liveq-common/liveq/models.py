@@ -44,8 +44,8 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunables, Observables, TunableToObservable ]:
+	for table in [ User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
+					Tutorials, Tunables, Observables, TunableToObservable, TeamNotebook ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -59,10 +59,24 @@ class User(BaseModel):
 	The user registry
 	"""
 
-	#: The name of the user
-	username = CharField()
-	#: Binding index to external entry
-	bindid = CharField(index=True, unique=True)
+	#: The log-in username of the user
+	username = CharField(max_length=128)
+	#: The e-mail of the user
+	email = CharField(max_length=128)
+
+	#: The first name of the user
+	name = CharField(max_length=128)
+	#: The last name of the user
+	surname = CharField(max_length=128)
+
+	#: The team avatar
+	avatar = CharField(max_length=128)
+
+	def __str__(self):
+		"""
+		Stringify result
+		"""
+		return username
 
 
 class AgentGroup(BaseModel):
@@ -72,6 +86,54 @@ class AgentGroup(BaseModel):
 
 	#: Add an additional UUID lookup index
 	uuid = CharField(max_length=128, index=True, unique=True)
+
+class Team(BaseModel):
+	"""
+	The team registry
+	"""
+
+	#: The team uuid
+	uuid = CharField(max_length=128, index=True, unique=True)
+	#: The team name
+	name = CharField(max_length=128)
+	#: The team avatar
+	avatar = CharField(max_length=128)
+
+	#: The related agent group
+	agentGroup = ForeignKeyField(AgentGroup)
+
+class TeamMembers(BaseModel):
+	"""
+	User - Team correlations
+	"""
+
+	#: The related user
+	user = ForeignKeyField(User)
+	#: The related team
+	team = ForeignKeyField(Team)
+	#: The user role
+	status = CharField(max_length=6, default="user")
+
+
+class Jobs(BaseModel):
+	"""
+	Jobs
+	"""
+
+	#: When the job was submitted
+	timestamp = IntegerField(default=0)
+	#: The tunable configuration
+	tunables = TextField(default="")
+	#: The job status
+	status = CharField(max_length=4)
+
+class TeamNotebook(BaseModel):
+	"""
+	The shared notebook along teammates
+	"""
+
+	#: The team owning the book
+	team = ForeignKeyField(Team)
 
 class Agent(BaseModel):
 	"""
@@ -101,6 +163,9 @@ class Agent(BaseModel):
 	group = ForeignKeyField(AgentGroup, related_name='groups')
 	#: The job currently running on the agent
 	activeJob = CharField(default="")
+
+	#: The owner of this agent
+	owner = ForeignKeyField(User)
 
 class AgentJobs(BaseModel):
 	"""
