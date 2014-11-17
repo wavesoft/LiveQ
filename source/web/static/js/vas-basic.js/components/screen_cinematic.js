@@ -40,6 +40,7 @@ define(
 				e.preventDefault();
 
 				this.trigger('completed');
+				this.trigger('sequence.next', 'completed'); // [SEQUENCING]
 				if (this.completedCallback)
 					this.completedCallback();
 			}).bind(this));
@@ -73,10 +74,19 @@ define(
 			this.popcorn = Popcorn( videoWrapper );
 			this.popcorn.on('ended', (function() {
 				this.trigger('completed');
+				this.trigger('sequence.next', 'completed'); // [SEQUENCING]
 				if (this.completedCallback)
 					this.completedCallback();
 			}).bind(this));
 
+		}
+
+		/**
+		 * [SEQUENCING] Support sequencing
+		 */
+		CinematicScreen.prototype.onSequenceConfig = function(config, callback) {
+			// Forward to onCinematicDefined
+			this.onCinematicDefined( config['video'], callback );
 		}
 
 		/**

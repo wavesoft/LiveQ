@@ -22,15 +22,19 @@ define(
 		/**
 		 * Helper class for managing multiple histograms
 		 */
-		var HistogramsGroup = function( hostDOM, eventsLabel, progressBar, progressValue ) {
+		var HistogramsGroup = function( hostDOM, eventsLabel, progressBar, progressLabel, chi2Label ) {
 			this.hostDOM = hostDOM;
 			this.eventsLabel = eventsLabel;
 			this.progressBar = progressBar;
-			this.progressValue = progressValue;
+			this.progressLabel = progressLabel;
+			this.chi2Label = chi2Label;
 
 			// Create dummy histogram for testing
 			var h = this.domHisto = $('<div style="width: 100%; height: 100%;"></div>').appendTo(hostDOM);
 			var hc = this.hc = R.instanceComponent("dataviz.histogram_plain", h);
+
+			// Callback to be fired when we reached 100%
+			this.onMaxedOut = function() { };
 
 			// Reroll
 			this.reroll();
@@ -87,13 +91,17 @@ define(
 			this.progressBar.css({
 				'width': percent + '%'
 			});
-			this.progressValue.html("Machine Load: <strong>" + Math.round(percent).toFixed(0) + "%</strong>");
+			this.progressLabel.html("Machine Load: <strong>" + Math.round(percent).toFixed(0) + "%</strong>");
 
 			// Update histogram
 			this.hc.onUpdate([
 					this.th.gen(1, 1),
 					this.th.gen(easedValue , 0.65)
 				]);
+
+			// Update chi-squared fit
+			this.chi2 = this.th.chi2(easedValue, 0.65, 1.0);
+			this.chi2Label.text( this.chi2.toFixed(2) );
 
 		}
 
@@ -104,7 +112,8 @@ define(
 			// Setup a new train histogram
 			var th = this.th = new TrainHisto({
 				bins: 20,
-				samples: 10000
+				samples:  10000,
+				fuzziness:1000
 			});
 
 			// Update histogram metadata
@@ -142,10 +151,24 @@ define(
 		 */
 		HistogramsGroup.prototype.start = function() {
 			var i=0.001;
+			
+			// Reset properties
+			this.chi2 = 1000;
+
 			if (this.timer) clearInterval(this.timer);
 			this.timer = setInterval((function() {
 
+				// Update progression
 				this.setProgression(i);
+
+				// Check for completion
+				if (i >= 0.9999) {
+					i = 0;
+					if (this.onMaxedOut) this.onMaxedOut();
+					this.stop();
+				}
+
+				// Update step
 				i = Math.min(1.0, i+Math.random() * 0.001);
 
 			}).bind(this), 100);
@@ -157,6 +180,13 @@ define(
 		HistogramsGroup.prototype.stop = function() {
 			if (this.timer) clearInterval(this.timer);
 			this.timer = 0;
+		}
+
+		/**
+		 * Check if values are accepted
+		 */
+		HistogramsGroup.prototype.isAccepted = function() {
+
 		}
 
 		/**
@@ -200,25 +230,42 @@ define(
 				}
 			}).bind(this));
 
+			// Prepare chi-squared group
+			this.gChi2 = $('<div class="group"></div>').appendTo(this.panelControls).hide();
+			this.chi2Label = $('<strong></strong>');
+			($('<p>&chi;<sup>2</sup> test score = </p>').appendTo(this.gChi2)).append(this.chi2Label)
+
 			this.eToggleChi2 = $('<a class="btn-toggle" href="#">&chi;<sup>2</sup> test score</a>').appendTo(this.gControls);
 			this.eToggleChi2.click((function() {
 				if (this.eToggleChi2.hasClass("active")) {
 					this.eToggleChi2.removeClass("active");
+					this.gChi2.hide();
 				} else {
 					this.eToggleChi2.addClass("active");
+					this.gChi2.show();
 				}
 			}).bind(this));
+
+			// Prepare the simulation class
+			this.histograms = new HistogramsGroup(this.panelHistogram, this.eEventRate, this.eProgressBarBar, this.eProgressBarValue, this.chi2Label);
+			this.onMaxedOut = (function(){ 
+				this.trigger('sequence.next', 'timeout');
+			}).bind(this);
 
 			// Prepare Accept results group
 			this.gControls = $('<div class="group group-bottom"></div>').appendTo(this.panelControls);
 			this.eAcceptBtn = $('<a class="btn-accept" href="#">Accept this values</a>').appendTo(this.gControls);
 			this.eAcceptBtn.click((function() {
-
+				if (this.histograms.chi2 < 1) {
+					this.trigger('sequence.next', 'perfect');
+				} else if (this.histograms.chi2 < 2) {
+					this.trigger('sequence.next', 'good');
+				} else {
+					this.trigger('sequence.next', 'bad');
+				}
 			}).bind(this));
 
-			this.histograms = new HistogramsGroup(this.panelHistogram, this.eEventRate, this.eProgressBarBar, this.eProgressBarValue);
-
-			// Vibration UI
+			// Vibration timer
 			this.vibrationTimer = setInterval(this.__vibrator.bind(this), 50);
 
 		}

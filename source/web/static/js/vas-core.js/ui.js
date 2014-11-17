@@ -1276,7 +1276,11 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 		/**
 		 * Growl a message.
+		 *
 		 * @param {string} message - The message to growl
+		 * @param {function} v_callback - The callback function to fire when the user clicks on the bubble.
+		 * @param {int} v_timeout - The timeout (in milliseconds) before it disappears
+		 * @param {string} v_growlClass - The class to append on the growl bubble
 		 */
 		UI.growl = function( message, v_callback, v_timeout, v_growlClass ) {
 
@@ -1348,6 +1352,89 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			// Realign
 			_reaignGrowlStack();
+
+		}
+
+		/**
+		 * Display a configurable sequence of screens
+		 *
+		 * Each screen should trigger the event 'sequence' when it's completed,
+		 * passing an argument that can be translated by this function into a usable
+		 * result.
+		 *
+		 * @param {array} sequences - The configuration of the sequences
+		 * @param {function} callback - The callback function to be fired when the sequence is completed
+		 */
+		UI.displaySequence = function( sequences, callback ) {
+
+			// Config contains the following sequence information:
+			// [
+			//   {
+			//      'screen': 'screen_name',
+			//      'config': { },
+			//      'next' : { // Routing information when we receive the 'sequence' event
+			//         'key': <index>, // Go to the given sequence
+			//              : 0        // Exit sequence
+			//      }
+			// ]
+
+			// Prepare variables
+			var seq_index = 0;
+
+			// Process the next sequencing task
+			var handeSequence = function() {
+				// Pick transition
+				var sequence = sequences[seq_index],
+					transition = sequence['transition'] || UI.Transitions.ZOOM_IN;
+
+				// First, show the interface
+				var scr = UI.screens[sequence['screen']];
+
+				// Delay-called after (possible) configuration
+				var sequenceContinueFn = function() {
+
+					// After we are configured, select screen
+					UI.selectScreen(sequence['screen'], transition, function() {
+
+						// The interface is visible, wait for events
+						scr.off('sequence.next');
+						scr.on('sequence.next', function(key) {
+
+							// Lookup status on the sequence table
+							var routing_table = sequence['next'] || {};
+							if ((routing_table[key] == undefined) || (routing_table[key] < 0)) {
+								// We are completed
+								if (callback) callback();
+							} else {
+								// Apply routing
+								var index = routing_table[key];
+
+								// Check validity of next index
+								if ((index >= 0) && (index < sequences.length)) {
+									seq_index = index;
+									handeSequence();
+								} else {
+									// Otherwise trigger error
+									UI.logError("Invalid index specified on screen sequence!");
+								}
+							}
+
+						});
+
+					});
+
+				};
+
+				// Check if have to apply configuration on the screne
+				if ((sequence['config'] != undefined) && (scr.onSequenceConfig !== undefined))
+					scr.onSequenceConfig( sequence['config'], sequenceContinueFn );
+				else
+					sequenceContinueFn();
+
+			};
+
+			// Start with the first sequence
+			handeSequence();
 
 		}
 

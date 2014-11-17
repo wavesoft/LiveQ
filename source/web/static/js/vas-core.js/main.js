@@ -340,6 +340,17 @@ define(
 							return;
 						}
 
+						// Check tutorial feedback
+						scrTutorial.on('submit', function(value) {
+							if (value >= 0.5) {
+								VAS.displayHome();
+							} else {
+								VAS.displayCinematic( function() {
+									VAS.displayTuro
+								});
+							}
+						});
+
 					}
 
 					// Tutorial screens are ready
