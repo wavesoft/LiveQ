@@ -1,0 +1,216 @@
+
+///////////////////////////////////////////////
+// Reusable components
+///////////////////////////////////////////////
+
+// Machine overlays
+// ---------------------
+.r-machine-overlay {
+
+	width: 1092px;
+	height: 258px;
+	.transform( translate(-546px,-129px) );
+
+	> div {
+		.transform(translate(-21px,-21px));
+		.border-radius(42px);
+		.transition(~"border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s");
+		width: 42px;
+		height: 42px;
+
+		position: absolute;
+		display: block;
+		cursor: pointer;
+
+		border-style: solid;
+		border-width: 0;
+		background-color: #e74c3c;
+		border-color: #e74c3c;
+
+		background-image: url(../img/iconsets.png);
+		background-repeat: no-repeat;
+		background-position-y: 0;
+
+		&:hover {
+			.transform(translate(-27px,-27px));
+			border-width: 6px;
+			background-color: #FFF;
+			background-position-y: -42px;
+		}
+
+		&.locked {
+			.transform(translate(-21px,-21px));
+			border-width: 0;
+			background-position-x: -336px;
+			background-color: #bdc3c7;
+			border-color: #bdc3c7;
+			&:hover {
+				background-color: #FFF;
+			}
+		}
+	}
+
+	.c-beam {
+		left: 86px;
+		top: 101px;
+		background-position-x: -42px;
+	}
+
+	.c-issr {
+		left: 219px;
+		top: 101px;
+		background-position-x: -126px;
+	}
+
+	.c-hard {
+		left: 298px;
+		top: 141px;
+		background-position-x: -168px;
+	}
+
+	.c-remnant {
+		left: 395px;
+		top: 12px;
+		background-position-x: -84px;
+	}
+
+	.c-fssr {
+		left: 457px;
+		top: 106px;
+		background-position-x: -126px;
+	}
+
+	.c-hadr {
+		left: 724px;
+		top: 97px;
+		background-position-x: -210px;
+	}
+
+	.c-decay {
+		left: 1013px;
+		top: 97px;
+		background-position-x: -252px;
+	}
+
+}
+
+// Machine layout
+// ----------------
+.r-machine {
+
+	width: 1092px;
+	height: 258px;
+	.transform( translate(-546px,-129px) );
+
+	&.active {
+		> div {
+			background-image: url(../img/machine-active.png);
+		}
+	}
+
+	> div {
+		background-image: url(../img/machine.png)	;
+		background-repeat: no-repeat;
+		display: block;
+		overflow: hidden;
+		position: absolute;
+
+		&:hover {
+			background-image: url(../img/machine-active.png);
+		}
+
+		&.m-beam {
+			width: 200px;
+			height: 200px;
+			background-position: 0px 0px;
+			left: 0px;
+			top: 0px;
+		}
+		&.u-pdf {
+			width: 200px;
+			height: 100px;
+			background-position: 0px -200px;
+			left: 0px;
+			top: 50px;
+
+			&.alt-0 {
+			}
+			&.alt-1 {
+				background-position: 0px -300px;
+			}
+		}
+		&.u-hard {
+			width: 128px;
+			height: 35px;
+			background-position: -200px -250px;
+			left: 236px;
+			top: 83px;
+
+			&.alt-0 {
+			}
+			&.alt-1 {
+				background-position: -200px -285px;
+			}
+			&.alt-1 {
+				background-position: -200px -320px;
+			}
+		}
+		&.m-issr {
+			width: 120px;
+			height: 150px;
+			background-position: -200px 0px;
+			left: 159px;
+			top: 25px;
+		}
+		&.m-hard {
+			width: 171px;
+			height: 250px;
+			background-position: -330px -250px;
+			left: 228px;
+			top: 26px;
+		}
+		&.m-fssr {
+			width: 195px;
+			height: 100px;
+			background-position: -696px -251px;
+			left: 359px;
+			top: 51px;
+		}
+		&.m-remn-up {
+			width: 350px;
+			height: 120px;
+			background-position: -330px 0px;
+			left: 219px;
+			top: -28px;
+		}
+		&.m-remn-down {
+			width: 350px;
+			height: 120px;
+			background-position: -330px -120px;
+			left: 220px;
+			top: 110px;
+		}
+		&.m-remn-join {
+			width: 125px;
+			height: 100px;
+			background-position: -200px -150px;
+			left: 514px;
+			top: 50px;
+		}
+		&.m-hadr {
+			width: 349px;
+			height: 250px;
+			background-position: -680px 0px;
+			left: 598px;
+			top: -25px;
+		}
+		&.m-decay {
+			width: 194px;
+			height: 101px;
+			background-position: -501px -251px;
+			left: 906px;
+			top: 50px;
+		}
+	}
+
+}

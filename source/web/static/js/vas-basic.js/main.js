@@ -3,7 +3,7 @@ define([
 	
 	// Screens
 	'vas-basic/components/screen_explain',
-	'vas-basic/components/screen_home',
+	'vas-basic/components/screen_home2',
 	'vas-basic/components/screen_running',
 	'vas-basic/components/screen_tuning',
 	'vas-basic/components/screen_progress',
