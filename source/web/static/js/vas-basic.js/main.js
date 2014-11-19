@@ -5,7 +5,7 @@ define([
 	'vas-basic/components/screen_explain',
 	'vas-basic/components/screen_home2',
 	'vas-basic/components/screen_running',
-	'vas-basic/components/screen_tuning',
+	'vas-basic/components/screen_tuning2',
 	'vas-basic/components/screen_progress',
 	'vas-basic/components/screen_login',
 	'vas-basic/components/screen_results',
@@ -27,6 +27,7 @@ define([
 	'vas-basic/components/backdrop_progress',
 	'vas-basic/components/backdrop_login',
 	'vas-basic/components/backdrop_results',
+	'vas-basic/components/backdrop_machine',
 
 	// Tuning-related
 	"vas-basic/components/tuning/tunable", 

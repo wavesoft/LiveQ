@@ -10,6 +10,7 @@
 	width: 1092px;
 	height: 258px;
 	.transform( translate(-546px,-129px) );
+	.pointer-events(none);
 
 	> div {
 		.transform(translate(-21px,-21px));
@@ -53,42 +54,49 @@
 	.c-beam {
 		left: 140px;
 		top: 150px;
+		.pointer-events(auto);
 		background-position-x: -42px;
 	}
 
 	.c-issr {
 		left: 219px;
 		top: 101px;
+		.pointer-events(auto);
 		background-position-x: -126px;
 	}
 
 	.c-hard {
 		left: 298px;
 		top: 141px;
+		.pointer-events(auto);
 		background-position-x: -168px;
 	}
 
 	.c-remnant {
 		left: 395px;
 		top: 12px;
+		.pointer-events(auto);
 		background-position-x: -84px;
 	}
 
 	.c-fssr {
 		left: 457px;
 		top: 106px;
+		.pointer-events(auto);
 		background-position-x: -126px;
 	}
 
 	.c-hadr {
 		left: 724px;
 		top: 97px;
+		.pointer-events(auto);
 		background-position-x: -210px;
 	}
 
 	.c-decay {
 		left: 1013px;
 		top: 97px;
+		.pointer-events(auto);
 		background-position-x: -252px;
 	}
 
@@ -110,7 +118,11 @@
 
 	&.gray {
 		> div {
-			background-image: url(../img/machine/active.png);
+			background-image: url(../img/machine/gray.png);
+			&.focus {
+				background-image: url(../img/machine/default.png);
+				z-index: 1000;
+			}
 		}
 	}
 
@@ -123,9 +135,6 @@
 
 		&.focus {
 			background-image: url(../img/machine/active.png);
-		}
-		&.gray.focus {
-			background-image: url(../img/machine/default.png)	;
 		}
 
 		&.m-beam {

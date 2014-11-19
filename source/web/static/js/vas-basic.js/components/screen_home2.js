@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, UI, config, R,C) {
+	function($, d3, DB, UI, config, R,C) {
 
 		/**
 		 * @class
@@ -21,80 +21,30 @@ define(
 			// Prepare host
 			hostDOM.addClass("home");
 
-			// Handle mouse movement
-			this.mouseX = 0;
-			this.mouseY = 0;
-			hostDOM.mousemove((function(e) {
-				this.mouseX = e.clientX;
-				this.mouseY = e.clientY;
-				this.realignMachine();
-			}).bind(this));
-
-			// Create drag host
-			var dragHost = this.dragHost = $('<div class="fullscreen"></div>').appendTo(hostDOM);
-
-			// Prepare machine
-			var machine = this.machine = $('<div class="r-machine"></div>').appendTo(dragHost),
-				machineComponents = this.machineComponents = [
-					$('<div class="m-decay"></div>').appendTo(machine),
-					$('<div class="u-pdf"></div>').appendTo(machine),
-					$('<div class="m-beam"></div>').appendTo(machine),
-					$('<div class="m-issr"></div>').appendTo(machine),
-					$('<div class="u-hard"></div>').appendTo(machine),
-					$('<div class="m-hard"></div>').appendTo(machine),
-					$('<div class="m-fssr"></div>').appendTo(machine),
-					$('<div class="m-remn-join"></div>').appendTo(machine),
-					$('<div class="m-remn-down"></div>').appendTo(machine),
-					$('<div class="m-remn-up"></div>').appendTo(machine),
-					$('<div class="m-hadr"></div>').appendTo(machine),
-				];
-
-			// Prepare machine overlay
-			var overlay = $('<div class="r-machine-overlay"></div>').appendTo(dragHost),
-				overlayComponents = [
-					$('<div class="c-beam locked"></div>').appendTo(overlay),
-					$('<div class="c-issr"></div>').appendTo(overlay),
-					$('<div class="c-hard locked"></div>').appendTo(overlay),
-					$('<div class="c-remnant locked"></div>').appendTo(overlay),
-					$('<div class="c-fssr"></div>').appendTo(overlay),
-					$('<div class="c-hadr"></div>').appendTo(overlay),
-					$('<div class="c-decay"></div>').appendTo(overlay),
-				];
-
+			// Create a machine
+			var machineDOM = $('<div class="fullscreen"></div>').appendTo(hostDOM);
+			this.machine = R.instanceComponent("backdrop.machine", machineDOM);
+			this.forwardVisualEvents( this.machine, { 'left':0, 'top': 0, 'width': '100%', 'height': '100%' } );
+			
 			// Create a description vrame
-			var descFrame = this.descFrame = $('<div class="description-frame"></div>').appendTo(hostDOM),
-				descImage = this.descImage = $('<div class="image"></div>').appendTo(descFrame),
-				descContent = this.descContent = $('<div class="content"></div>').appendTo(descFrame);
+			var descFrame = this.descFrame = $('<div class="description-frame"></div>').appendTo(hostDOM);
+			this.descTitle = $('<h1>This is a header</h1>').appendTo(descFrame);
+			this.descBody = $('<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare eu ex consectetur feugiat. Pellentesque quis dolor sed lacus pellentesque euismod lacinia eget urna. Vestibulum ipsum lorem, posuere in dignissim ac, sollicitudin eu odio. Suspendisse ac porta turpis. Etiam nec consequat mauris, at placerat urna. Nam suscipit nisl eget nisi semper, quis aliquet sem interdum. Proin condimentum nunc vel imperdiet vehicula.</div>').appendTo(descFrame);
+
+			// Bind listeners
+			this.machine.on('hover', (function(id) {
+				var details = DB.cache['definitions']['machine-parts'][id];
+				if (details == undefined) {
+					this.descTitle.text("Quantum Machine");
+					this.descBody.html("Move your mouse over a component in order to see more details.");
+				} else {
+					this.descTitle.text(details['description']['title']);
+					this.descBody.html(details['description']['body']);
+				}
+			}).bind(this));
 
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
-
-		/**
-		 * Realign machine layout
-		 */
-		HomeScreen.prototype.realignMachine = function() {
-			var machineW = this.machine.width(),
-				machineH = this.machine.height();
-
-			// Realign based on cursor on smaller screens
-			if (machineW > this.width - 50) {
-				var delta = -(machineW - (this.width-50)),
-					mouseDelta = (this.mouseX - this.width/2) * delta / this.width;
-
-				this.dragHost.css({
-					'left': mouseDelta
-				});
-			}
-		}
-
-		/**
-		 * Handle resize events
-		 */
-		HomeScreen.prototype.onResize = function(width, height) {
-			this.width = width;
-			this.height = height;
-			this.realignMachine();
-		}
 
 
 		// Register home screen

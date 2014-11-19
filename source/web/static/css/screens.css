@@ -8,14 +8,14 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666;
+  border-top: solid 1px #666666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: #FFF;
+  color: white;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -31,12 +31,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333;
+  color: #333333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: #FFF;
+  color: white;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -93,7 +93,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -117,7 +117,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: #FFF;
+  color: white;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -141,7 +141,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -171,7 +171,7 @@
   border-radius: 20px;
   padding: 12px;
   margin: 12px;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0;
@@ -185,7 +185,7 @@
   top: 250px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: white;
   padding: 10px 10px 0;
 }
 .screen.explain .explain-window div.explain-popup div.btn-host {
@@ -230,7 +230,7 @@
   margin: 30px 0 0 30px;
 }
 .screen.explain .explain-window div.explain-screen.cs-blackboard {
-  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
+  background: black url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window.cs-green {
@@ -245,13 +245,13 @@
 }
 .screen.explain .explain-window.cs-green a.btn-level {
   background-color: #34495e;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window.cs-green a.btn-level.blur {
-  background-color: #7F8C8D;
+  background-color: #7f8c8d;
 }
 .screen.explain .explain-window.cs-green a.btn-level.active {
-  background-color: #E67E22;
+  background-color: #e67e22;
 }
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
@@ -264,6 +264,11 @@
   -moz-transform: translate(-546px, -129px);
   -o-transform: translate(-546px, -129px);
   transform: translate(-546px, -129px);
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
 }
 .r-machine-overlay > div {
   -webkit-transform: translate(-21px, -21px);
@@ -297,7 +302,7 @@
   -o-transform: translate(-27px, -27px);
   transform: translate(-27px, -27px);
   border-width: 6px;
-  background-color: #FFF;
+  background-color: white;
   background-position-y: -42px;
 }
 .r-machine-overlay > div.locked {
@@ -311,41 +316,76 @@
   border-color: #bdc3c7;
 }
 .r-machine-overlay > div.locked:hover {
-  background-color: #FFF;
+  background-color: white;
 }
 .r-machine-overlay .c-beam {
   left: 140px;
   top: 150px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -42px;
 }
 .r-machine-overlay .c-issr {
   left: 219px;
   top: 101px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -126px;
 }
 .r-machine-overlay .c-hard {
   left: 298px;
   top: 141px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -168px;
 }
 .r-machine-overlay .c-remnant {
   left: 395px;
   top: 12px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -84px;
 }
 .r-machine-overlay .c-fssr {
   left: 457px;
   top: 106px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -126px;
 }
 .r-machine-overlay .c-hadr {
   left: 724px;
   top: 97px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -210px;
 }
 .r-machine-overlay .c-decay {
   left: 1013px;
   top: 97px;
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   background-position-x: -252px;
 }
 .r-machine {
@@ -360,7 +400,11 @@
   background-image: url(../img/machine/active.png);
 }
 .r-machine.gray > div {
-  background-image: url(../img/machine/active.png);
+  background-image: url(../img/machine/gray.png);
+}
+.r-machine.gray > div.focus {
+  background-image: url(../img/machine/default.png);
+  z-index: 1000;
 }
 .r-machine > div {
   background-image: url(../img/machine/default.png);
@@ -371,9 +415,6 @@
 }
 .r-machine > div.focus {
   background-image: url(../img/machine/active.png);
-}
-.r-machine > div.gray.focus {
-  background-image: url(../img/machine/default.png);
 }
 .r-machine > div.m-beam {
   width: 200px;
@@ -465,36 +506,24 @@
 .screen.home .r-machine-overlay {
   position: absolute;
   left: 50%;
-  top: 230px;
+  top: 50%;
 }
 .screen.home .description-frame {
   position: absolute;
-  background-color: #fff;
+  background-color: white;
   left: 0;
   right: 0;
   bottom: 0;
-  top: 360px;
-  border-top: solid 2px #999;
+  height: 150px;
+  border-top: solid 1px #cccccc;
+  padding: 10px;
 }
-.screen.home .description-frame .image {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 250px;
-  background-color: #eee;
-  background-size: contain;
-  background-position: center center;
-  border-right: solid 1px #999;
+.screen.home .description-frame > h1 {
+  color: #c0392b;
+  font-size: 24px;
 }
-.screen.home .description-frame .content {
-  position: absolute;
-  left: 250px;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
+.screen.home .description-frame > div {
+  font-size: 14px;
 }
 .screen.login .host {
   width: 600px;
@@ -531,8 +560,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -584,6 +613,7 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   left: 50%;
   top: 40%;
@@ -601,12 +631,13 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999;
+  color: #999999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -622,8 +653,9 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
-  background-color: #eee;
+  background-color: #eeeeee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -634,468 +666,31 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #FF9900;
+  background-color: #ff9900;
   display: block;
   margin: 1px 0;
   height: 2px;
   width: 0;
 }
-.screen.tuning a {
-  text-decoration: none;
-}
-.screen.tuning .tuning-host {
+.screen.tuning2 .r-machine,
+.screen.tuning2 .r-machine-overlay {
   position: absolute;
+  left: 50%;
+  top: 50%;
 }
-.screen.tuning .tune-tl {
-  z-index: 200;
-  -webkit-pointer-events: none;
-  -khtml-pointer-events: none;
-  -moz-pointer-events: none;
-  -ms-pointer-events: none;
-  pointer-events: none;
-}
-.screen.tuning .tune-tl .btn-taglike {
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
-  -webkit-pointer-events: auto;
-  -khtml-pointer-events: auto;
-  -moz-pointer-events: auto;
-  -ms-pointer-events: auto;
-  pointer-events: auto;
-  -webkit-border-radius: 0px 0px 8px 8px;
-  -moz-border-radius: 0px 0px 8px 8px;
-  -o-border-radius: 0px 0px 8px 8px;
-  border-radius: 0px 0px 8px 8px;
-  cursor: pointer;
-  background-color: #16a085;
-  left: 0;
-  top: 145px;
-  position: absolute;
-  text-align: center;
-  color: #FFF;
-  width: 70px;
-  height: 45px;
-  padding-top: 5px;
-}
-.screen.tuning .tune-tl .btn-taglike:hover {
-  padding-top: 15px;
-}
-.screen.tuning .floater {
-  position: absolute;
-}
-.screen.tuning .floater.f-header {
-  left: 0;
-  top: 0;
-  width: 320px;
-  height: 75px;
-  border-bottom-right-radius: 75px;
-  background-color: #27ae60;
-}
-.screen.tuning .floater.f-header h1,
-.screen.tuning .floater.f-header p {
-  color: #FFF;
-  text-align: left;
-  margin: 2px 2px;
-}
-.screen.tuning .floater.f-header h1 {
-  width: 280px;
-  line-height: 32px;
-  left: 7px;
-  top: 7px;
-  font-size: 25px;
-}
-.screen.tuning .floater.f-header p {
-  width: 280px;
-  line-height: 18px;
-  left: 7px;
-  top: 35px;
-}
-.screen.tuning .sidebar {
-  background-color: #ecf0f1;
-  position: absolute;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-.screen.tuning .sidebar h1 {
-  margin: 8px 0 10px;
-  padding: 5px;
-  border-left: solid 4px #16a085;
-  color: #16a085;
-  font-size: 20px;
-}
-.screen.tuning .sidebar h1 span.help {
-  -webkit-border-radius: 18px;
-  -moz-border-radius: 18px;
-  -o-border-radius: 18px;
-  border-radius: 18px;
-  cursor: pointer;
-  display: block;
-  float: right;
-  width: 18px;
-  height: 18px;
-  margin: 4px;
-  font-size: 16px;
-  color: #CCC;
-  border: solid 1px #CCC;
-  text-align: center;
-  line-height: 17px;
-}
-.screen.tuning .sidebar h1 span.help:hover {
-  color: #333;
-  border: solid 1px #333;
-}
-.screen.tuning .sidebar .sidebar-buttons {
-  height: 45px;
-  background-color: #1ABC9C;
-}
-.screen.tuning .sidebar .sidebar-buttons .btn-tutorial {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 45px;
-  cursor: pointer;
-  color: #fff;
-  text-align: center;
-}
-.screen.tuning .sidebar .sidebar-buttons .btn-save {
-  position: relative;
-  width: 37px;
-  height: 45px;
-  background-color: #16a085;
-  border-left: solid 1px #1ABC9C;
-  float: right;
-  color: #fff;
-  cursor: pointer;
-}
-.screen.tuning .sidebar .sidebar-buttons .btn-save .led {
-  position: absolute;
-  left: 3.5px;
-  top: 6px;
-  width: 30px;
-  height: 6px;
-  background-color: #1ABC9C;
-}
-.screen.tuning .sidebar .sidebar-buttons .btn-save .text {
-  position: absolute;
-  left: 7px;
-  top: 15px;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  background: url(../img/uicons-24.png) no-repeat -312px 0px;
-}
-.screen.tuning .sidebar .sidebar-buttons .btn-save.active .led {
-  background-color: #F1C40F;
-}
-.screen.tuning .tunable {
-  -webkit-transition: background-color 0.25s;
-  -moz-transition: background-color 0.25s;
-  -o-transition: background-color 0.25s;
-  transition: background-color 0.25s;
-  background-color: rgba(255, 255, 255, 0);
-  display: block;
-  position: relative;
-  height: 52px;
-  width: 100%;
-}
-.screen.tuning .tunable div.title {
-  cursor: help;
-  display: block;
-  position: absolute;
-  left: 0px;
-  width: 45px;
-  top: 0;
-  height: 30px;
-  line-height: 30px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: #7f8c8d;
-}
-.screen.tuning .tunable div.slider {
-  display: block;
-  position: absolute;
-  left: 45px;
-  right: 0;
-  height: 30px;
-}
-.screen.tuning .tunable div.slider div.draghost {
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  -o-border-radius: 4px;
-  border-radius: 4px;
-  overflow: hidden;
-  display: block;
-  position: absolute;
-  top: 2px;
-  left: 0;
-  right: 0;
-  height: 30px;
-  background-color: #cccccc;
-}
-.screen.tuning .tunable div.slider div.draghost div.dragdealer {
-  position: absolute;
-  display: block;
-  left: 20px;
-  right: 20px;
-  height: 25px;
-}
-.screen.tuning .tunable div.slider div.draghost div.dragdealer div.handle {
-  display: block;
-  position: absolute;
-  background-color: #c0392b;
-  color: #ffffff;
-  width: 40px;
-  line-height: 25px;
-  height: 25px;
-  text-align: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-.screen.tuning .tunable div.slider div.draghost div.arrow {
-  position: absolute;
-  display: block;
-  bottom: 0;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 5px solid #c0392b;
-}
-.screen.tuning .tunable div.slider div.draghost a {
-  display: block;
-  position: absolute;
-  width: 20px;
-  height: 30px;
-  line-height: 30px;
-  background-color: #16a085;
-  color: #ffffff;
-  text-align: center;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.screen.tuning .tunable div.slider div.draghost a.minus {
-  left: 0;
-}
-.screen.tuning .tunable div.slider div.draghost a.plus {
-  right: 0;
-}
-.screen.tuning .tunable div.markers {
-  -webkit-transition: opacity 0.25s;
-  -moz-transition: opacity 0.25s;
-  -o-transition: opacity 0.25s;
-  transition: opacity 0.25s;
-  opacity: 0.1;
-  position: absolute;
-  left: 65px;
-  right: 20px;
-  height: 16px;
-  bottom: 2px;
-}
-.screen.tuning .tunable div.markers div.marker {
-  position: absolute;
-  height: 16px;
-  width: 10px;
-  cursor: pointer;
-}
-.screen.tuning .tunable div.markers div.marker div.arrow {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 5px solid;
-}
-.screen.tuning .tunable div.markers div.marker div.label {
-  position: absolute;
-  left: 0;
-  width: 10px;
-  top: 5px;
-  font-size: 9px;
-  text-align: center;
-}
-.screen.tuning .tunable:hover {
-  background-color: rgba(255, 255, 255, 0.5);
-}
-.screen.tuning .tunable:hover div.markers {
-  opacity: 1;
-}
-.screen.tuning .details-view {
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
-  z-index: 100;
-  background-color: #FFF;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 0;
-}
-.screen.tuning .details-view.expanded {
-  height: 200px;
-}
-.screen.tuning .details-view div.scroller {
-  border-top: solid 4px #16a085;
-  background-color: #4d4d4d;
-  width: 100%;
-  height: 200px;
-  overflow-x: scroll;
-  overflow-y: hidden;
-}
-.screen.tuning .details-view div.scroller div.histogram {
-  display: inline-block;
-  height: 180px;
-  width: 290px;
-  padding: 0;
-  margin: 0 2px;
-  background-color: #333;
-}
-.screen.tuning .details-view div.btn-taglike {
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
-  -webkit-pointer-events: auto;
-  -khtml-pointer-events: auto;
-  -moz-pointer-events: auto;
-  -ms-pointer-events: auto;
-  pointer-events: auto;
-  -webkit-border-radius: 8px 8px 0px 0px;
-  -moz-border-radius: 8px 8px 0px 0px;
-  -o-border-radius: 8px 8px 0px 0px;
-  border-radius: 8px 8px 0px 0px;
-  cursor: pointer;
-  background-color: #16a085;
-  left: 0;
-  top: -50px;
-  position: absolute;
-  text-align: center;
-  color: #FFF;
-  width: 70px;
-  height: 45px;
-  padding-top: 5px;
-}
-.screen.tuning .details-view div.btn-taglike:hover {
-  top: -60px;
-  padding-bottom: 10px;
-}
-.screen.tuning .progress-widget {
-  -webkit-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  transition: all 0.4s;
-  -webkit-border-radius: 160px;
-  -moz-border-radius: 160px;
-  -o-border-radius: 160px;
-  border-radius: 160px;
-  position: absolute;
-  display: block;
-  width: 156px;
-  height: 156px;
-  background-color: #FFF;
-  border: solid 2px #34495e;
-}
-.screen.tuning .progress-widget div.message {
-  color: #c0392b;
-  font-size: 12px;
-  font-style: italic;
-  text-align: center;
-  position: absolute;
-  width: 70px;
-  left: 40px;
-  top: 50px;
-}
-.screen.tuning .progress-widget div.knob {
-  position: absolute;
-  left: 4px;
-  top: 4px;
-}
-.screen.tuning .progress-widget div.knob input {
-  display: none;
-}
-.screen.tuning .progress-widget a.button {
-  -webkit-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  transition: all 0.4s;
-  position: absolute;
-  display: block;
-  line-height: 50px;
-  overflow: hidden;
-  background: url(../img/btn-striped.png) no-repeat center center;
-  color: #2c3e50;
-  width: 108px;
+.screen.tuning2 .control-board > div {
+  margin: 0 auto;
   height: 50px;
-  text-align: center;
-  font-size: 17px;
-  left: 24px;
-  top: 123px;
-  cursor: pointer;
-}
-.screen.tuning .progress-widget div.c-marker {
-  position: absolute;
-  border: dashed 1px #999;
-}
-.screen.tuning .progress-widget div.c-marker div.label {
-  padding-top: 5px;
-  position: absolute;
-  font-size: 12px;
-  color: #999;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  bottom: -16px;
-}
-body.layout-compact .screen.tuning .sidebar.sb0 {
-  display: block;
   width: 200px;
-  left: 0;
-  top: 75px;
-  bottom: 0;
-}
-body.layout-compact .screen.tuning .sidebar.sb0 .btn-tutorial {
-  width: 49px;
-}
-body.layout-compact .screen.tuning .sidebar.sb1 {
-  display: none;
-}
-body.layout-wide .screen.tuning .sidebar.sb0 {
-  display: block;
-  width: 240px;
-  top: 75px;
-  bottom: 0;
-  left: 0;
-}
-body.layout-wide .screen.tuning .sidebar.sb0 .btn-tutorial {
-  width: 88px;
-}
-body.layout-wide .screen.tuning .sidebar.sb1 {
-  display: block;
-  width: 240px;
-  top: 0px;
-  bottom: 0;
-  right: 0;
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999;
+  color: #999999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -1119,7 +714,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -1174,23 +769,24 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95A5A6;
+  border: solid 2px #95a5a6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
+
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -1210,7 +806,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: #FFFFFF;
+  color: white;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -1218,9 +814,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
+  position: absolute;
   left: 0;
   top: 0;
-  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1298,7 +894,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
   text-align: center;
   display: block;
   position: absolute;
@@ -1307,7 +903,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   bottom: 0;
   height: 48px;
   font-size: 14px;
-  color: #fff;
+  color: white;
   line-height: 48px;
   text-decoration: none;
   font-size: 24px;
@@ -1319,7 +915,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.bsod {
   background-color: rgba(0, 0, 0, 0.7);
-  color: #fff;
+  color: white;
 }
 .screen.bsod .content {
   position: absolute;
@@ -1353,25 +949,25 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100%;
   font-size: 14px;
   text-align: center;
-  color: #fff;
+  color: white;
 }
 .screen.bsod .content .text a {
-  color: #33CCFF;
+  color: #33ccff;
   text-decoration: none;
 }
 .screen.bsod .content .text a:hover {
-  color: #fff;
+  color: white;
 }
 .screen.ipide {
-  background-color: #fff;
+  background-color: white;
   position: relative;
 }
 .screen.ipide .header,
 .screen.ipide .footer {
   position: absolute;
-  background-color: #999;
+  background-color: #999999;
   height: 32px;
-  color: #fff;
+  color: white;
   font-size: 16px;
   padding: 4px;
 }
@@ -1392,18 +988,18 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   float: right;
   width: 100px;
   height: 32px;
-  color: #333;
+  color: #333333;
   border: none;
   text-decoration: none;
-  background-color: #AAA;
+  background-color: #aaaaaa;
   text-align: center;
   margin-top: 4px;
   margin-left: 1px;
   padding: 5px 0 0;
 }
 .screen.ipide .footer .btn-footer:hover {
-  background-color: #fff;
-  color: #000;
+  background-color: white;
+  color: black;
 }
 .screen.ipide .code {
   position: absolute;
@@ -1449,7 +1045,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-border-radius: 5px;
   border-radius: 5px;
   border: solid 1px #c0392b;
-  background: #ffffff;
+  background: white;
   height: 30px;
   margin: 6px;
 }
@@ -1498,7 +1094,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   font-weight: bold;
   margin-left: 14px;
   text-align: center;
-  color: #FFF;
+  color: white;
 }
 .screen.tutorial-stats .vibrator-host .panel-event-rate .label {
   position: absolute;
@@ -1508,7 +1104,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   top: 0;
   bottom: 0;
   padding-top: 10px;
-  color: #ddd;
+  color: #dddddd;
   font-size: 12px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram {
@@ -1517,7 +1113,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   right: 430px;
   bottom: 50px;
   border-right: solid 1px #333333;
-  background-color: #fff;
+  background-color: white;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend {
   left: 10px;
@@ -1527,14 +1123,14 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   border-top: solid 1px #333333;
   padding: 5px;
   font-style: italic;
-  color: #333;
+  color: #333333;
   font-size: 14px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend span.box {
   display: inline-block;
   width: 50px;
   height: 20px;
-  border: solid 1px #666;
+  border: solid 1px #666666;
   vertical-align: middle;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls {
@@ -1549,7 +1145,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #EEE;
+  background-color: #eeeeee;
   margin: 5px;
   padding: 5px;
 }
@@ -1575,8 +1171,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   text-align: right;
   font-size: 16px;
   text-decoration: none;
-  color: #333;
-  border: solid 2px #CCC;
+  color: #333333;
+  border: solid 2px #cccccc;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle:after {
   -webkit-border-radius: 16px;
@@ -1593,8 +1189,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active {
-  background-color: #ccc;
-  color: #000;
+  background-color: #cccccc;
+  color: black;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active:after {
   background-color: #2ecc71;
@@ -1619,15 +1215,15 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   color: #003300;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept:hover {
-  color: #fff;
+  color: white;
   background-color: #2ecc71;
 }
 .screen.courseroom .monitor {
   background: no-repeat center center url(../img/blackboard.jpg);
   background-size: cover;
   position: absolute;
-  border: solid 8px #DDD;
-  background-color: #FFF;
+  border: solid 8px #dddddd;
+  background-color: white;
 }
 .screen.courseroom .chat-chairs > div {
   height: 72px;
@@ -1669,8 +1265,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   right: 0;
   bottom: 0;
   height: 60px;
-  border-top: solid 1px #999;
-  background-color: #fff;
+  border-top: solid 1px #999999;
+  background-color: white;
 }
 .screen.courseroom .chat-box > div.chat-input {
   position: absolute;
@@ -1694,10 +1290,10 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100px;
   top: 2px;
   bottom: 2px;
-  background-color: #3399CC;
+  background-color: #3399cc;
   font-size: 18px;
   border: none;
-  color: #fff;
+  color: white;
 }
 .screen.courseroom .chat_bubble {
   -webkit-border-radius: 5px;
@@ -1705,8 +1301,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-border-radius: 5px;
   border-radius: 5px;
   position: absolute;
-  background: #FFFFCC;
-  border: 1px solid #999;
+  background: #ffffcc;
+  border: 1px solid #999999;
   max-width: 200px;
   padding: 5px;
 }
@@ -1723,13 +1319,13 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.courseroom .chat_bubble:after {
   border-color: rgba(255, 255, 204, 0);
-  border-top-color: #FFFFCC;
+  border-top-color: #ffffcc;
   border-width: 10px;
   margin-left: -10px;
 }
 .screen.courseroom .chat_bubble:before {
   border-color: rgba(153, 153, 153, 0);
-  border-top-color: #999;
+  border-top-color: #999999;
   border-width: 11px;
   margin-left: -11px;
 }
@@ -1757,7 +1353,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 .screen.overlay-book > div .book-body .tab {
   font-size: 14px;
   padding: 10px;
-  color: #fff;
+  color: white;
 }
 .screen.overlay-book > div .book-body .tab.tab-error {
   padding: 34px 0 0 160px;
@@ -1778,7 +1374,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   line-height: 40px;
   padding: 0 10px;
   font-size: 16px;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.overlay-book > div .book-tabs a.cs-blue {

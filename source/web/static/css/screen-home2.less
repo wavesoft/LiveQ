@@ -11,30 +11,23 @@
 	.r-machine, .r-machine-overlay {
 		position: absolute;
 		left: 50%;
-		top: 230px;
+		top: 50%;
 	}
 
 	.description-frame {
 		position: absolute;
 		background-color: #fff;
 		left: 0; right: 0;
-		bottom: 0; top: 360px;
-		border-top: solid 2px #999;
+		bottom: 0; height: 150px;
+		border-top: solid 1px #ccc;
+		padding: 10px;
 
-		.image {
-			position: absolute;
-			left: 0; top: 0; bottom: 0; width: 250px;
-			background-color: #eee;
-			background-size: contain;
-			background-position: center center;
-			border-right: solid 1px #999;
+		> h1 {
+			color: #c0392b;
+			font-size: 24px;
 		}
-
-		.content {
-			position: absolute;
-			left: 250px; right: 0; top: 0; bottom: 0;
-			overflow-x: hidden;
-			overflow-y: auto;
+		> div {
+			font-size: 14px;
 		}
 	}
 
