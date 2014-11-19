@@ -51,8 +51,8 @@
 	}
 
 	.c-beam {
-		left: 86px;
-		top: 101px;
+		left: 140px;
+		top: 150px;
 		background-position-x: -42px;
 	}
 
@@ -104,19 +104,28 @@
 
 	&.active {
 		> div {
-			background-image: url(../img/machine-active.png);
+			background-image: url(../img/machine/active.png);
+		}
+	}
+
+	&.gray {
+		> div {
+			background-image: url(../img/machine/active.png);
 		}
 	}
 
 	> div {
-		background-image: url(../img/machine.png)	;
+		background-image: url(../img/machine/default.png)	;
 		background-repeat: no-repeat;
 		display: block;
 		overflow: hidden;
 		position: absolute;
 
-		&:hover {
-			background-image: url(../img/machine-active.png);
+		&.focus {
+			background-image: url(../img/machine/active.png);
+		}
+		&.gray.focus {
+			background-image: url(../img/machine/default.png)	;
 		}
 
 		&.m-beam {

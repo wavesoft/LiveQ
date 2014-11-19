@@ -8,14 +8,14 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666666;
+  border-top: solid 1px #666;
 }
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: white;
+  color: #FFF;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -31,12 +31,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333333;
+  color: #333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: white;
+  color: #FFF;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -93,7 +93,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -117,7 +117,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: white;
+  color: #FFF;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -141,7 +141,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -171,7 +171,7 @@
   border-radius: 20px;
   padding: 12px;
   margin: 12px;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0;
@@ -185,7 +185,7 @@
   top: 250px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: white;
+  color: #fff;
   padding: 10px 10px 0;
 }
 .screen.explain .explain-window div.explain-popup div.btn-host {
@@ -230,7 +230,7 @@
   margin: 30px 0 0 30px;
 }
 .screen.explain .explain-window div.explain-screen.cs-blackboard {
-  background: black url(../img/blackboard.jpg) no-repeat center center;
+  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window.cs-green {
@@ -245,23 +245,256 @@
 }
 .screen.explain .explain-window.cs-green a.btn-level {
   background-color: #34495e;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-window.cs-green a.btn-level.blur {
-  background-color: #7f8c8d;
+  background-color: #7F8C8D;
 }
 .screen.explain .explain-window.cs-green a.btn-level.active {
-  background-color: #e67e22;
+  background-color: #E67E22;
 }
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
   background-color: #3498db;
 }
+.r-machine-overlay {
+  width: 1092px;
+  height: 258px;
+  -webkit-transform: translate(-546px, -129px);
+  -moz-transform: translate(-546px, -129px);
+  -o-transform: translate(-546px, -129px);
+  transform: translate(-546px, -129px);
+}
+.r-machine-overlay > div {
+  -webkit-transform: translate(-21px, -21px);
+  -moz-transform: translate(-21px, -21px);
+  -o-transform: translate(-21px, -21px);
+  transform: translate(-21px, -21px);
+  -webkit-border-radius: 42px;
+  -moz-border-radius: 42px;
+  -o-border-radius: 42px;
+  border-radius: 42px;
+  -webkit-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
+  -moz-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
+  -o-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
+  transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
+  width: 42px;
+  height: 42px;
+  position: absolute;
+  display: block;
+  cursor: pointer;
+  border-style: solid;
+  border-width: 0;
+  background-color: #e74c3c;
+  border-color: #e74c3c;
+  background-image: url(../img/iconsets.png);
+  background-repeat: no-repeat;
+  background-position-y: 0;
+}
+.r-machine-overlay > div:hover {
+  -webkit-transform: translate(-27px, -27px);
+  -moz-transform: translate(-27px, -27px);
+  -o-transform: translate(-27px, -27px);
+  transform: translate(-27px, -27px);
+  border-width: 6px;
+  background-color: #FFF;
+  background-position-y: -42px;
+}
+.r-machine-overlay > div.locked {
+  -webkit-transform: translate(-21px, -21px);
+  -moz-transform: translate(-21px, -21px);
+  -o-transform: translate(-21px, -21px);
+  transform: translate(-21px, -21px);
+  border-width: 0;
+  background-position-x: -336px;
+  background-color: #bdc3c7;
+  border-color: #bdc3c7;
+}
+.r-machine-overlay > div.locked:hover {
+  background-color: #FFF;
+}
+.r-machine-overlay .c-beam {
+  left: 140px;
+  top: 150px;
+  background-position-x: -42px;
+}
+.r-machine-overlay .c-issr {
+  left: 219px;
+  top: 101px;
+  background-position-x: -126px;
+}
+.r-machine-overlay .c-hard {
+  left: 298px;
+  top: 141px;
+  background-position-x: -168px;
+}
+.r-machine-overlay .c-remnant {
+  left: 395px;
+  top: 12px;
+  background-position-x: -84px;
+}
+.r-machine-overlay .c-fssr {
+  left: 457px;
+  top: 106px;
+  background-position-x: -126px;
+}
+.r-machine-overlay .c-hadr {
+  left: 724px;
+  top: 97px;
+  background-position-x: -210px;
+}
+.r-machine-overlay .c-decay {
+  left: 1013px;
+  top: 97px;
+  background-position-x: -252px;
+}
+.r-machine {
+  width: 1092px;
+  height: 258px;
+  -webkit-transform: translate(-546px, -129px);
+  -moz-transform: translate(-546px, -129px);
+  -o-transform: translate(-546px, -129px);
+  transform: translate(-546px, -129px);
+}
+.r-machine.active > div {
+  background-image: url(../img/machine/active.png);
+}
+.r-machine.gray > div {
+  background-image: url(../img/machine/active.png);
+}
+.r-machine > div {
+  background-image: url(../img/machine/default.png);
+  background-repeat: no-repeat;
+  display: block;
+  overflow: hidden;
+  position: absolute;
+}
+.r-machine > div.focus {
+  background-image: url(../img/machine/active.png);
+}
+.r-machine > div.gray.focus {
+  background-image: url(../img/machine/default.png);
+}
+.r-machine > div.m-beam {
+  width: 200px;
+  height: 200px;
+  background-position: 0px 0px;
+  left: 0px;
+  top: 0px;
+}
+.r-machine > div.u-pdf {
+  width: 200px;
+  height: 100px;
+  background-position: 0px -200px;
+  left: 0px;
+  top: 50px;
+}
+.r-machine > div.u-pdf.alt-1 {
+  background-position: 0px -300px;
+}
+.r-machine > div.u-hard {
+  width: 128px;
+  height: 35px;
+  background-position: -200px -250px;
+  left: 236px;
+  top: 83px;
+}
+.r-machine > div.u-hard.alt-1 {
+  background-position: -200px -285px;
+}
+.r-machine > div.u-hard.alt-1 {
+  background-position: -200px -320px;
+}
+.r-machine > div.m-issr {
+  width: 120px;
+  height: 150px;
+  background-position: -200px 0px;
+  left: 159px;
+  top: 25px;
+}
+.r-machine > div.m-hard {
+  width: 171px;
+  height: 250px;
+  background-position: -330px -250px;
+  left: 228px;
+  top: 26px;
+}
+.r-machine > div.m-fssr {
+  width: 195px;
+  height: 100px;
+  background-position: -696px -251px;
+  left: 359px;
+  top: 51px;
+}
+.r-machine > div.m-remn-up {
+  width: 350px;
+  height: 120px;
+  background-position: -330px 0px;
+  left: 219px;
+  top: -28px;
+}
+.r-machine > div.m-remn-down {
+  width: 350px;
+  height: 120px;
+  background-position: -330px -120px;
+  left: 220px;
+  top: 110px;
+}
+.r-machine > div.m-remn-join {
+  width: 125px;
+  height: 100px;
+  background-position: -200px -150px;
+  left: 514px;
+  top: 50px;
+}
+.r-machine > div.m-hadr {
+  width: 349px;
+  height: 250px;
+  background-position: -680px 0px;
+  left: 598px;
+  top: -25px;
+}
+.r-machine > div.m-decay {
+  width: 194px;
+  height: 101px;
+  background-position: -501px -251px;
+  left: 906px;
+  top: 50px;
+}
 .screen.home .r-machine,
 .screen.home .r-machine-overlay {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 230px;
+}
+.screen.home .description-frame {
+  position: absolute;
+  background-color: #fff;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 360px;
+  border-top: solid 2px #999;
+}
+.screen.home .description-frame .image {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
+  background-color: #eee;
+  background-size: contain;
+  background-position: center center;
+  border-right: solid 1px #999;
+}
+.screen.home .description-frame .content {
+  position: absolute;
+  left: 250px;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .screen.login .host {
   width: 600px;
@@ -298,8 +531,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #cccccc;
-  border-bottom: solid 1px #cccccc;
+  border-top: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -351,7 +584,6 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   left: 50%;
   top: 40%;
@@ -369,13 +601,12 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999999;
+  color: #999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -391,9 +622,8 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
-  background-color: #eeeeee;
+  background-color: #eee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -404,7 +634,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #ff9900;
+  background-color: #FF9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -444,7 +674,7 @@
   top: 145px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -465,7 +695,7 @@
 }
 .screen.tuning .floater.f-header h1,
 .screen.tuning .floater.f-header p {
-  color: white;
+  color: #FFF;
   text-align: left;
   margin: 2px 2px;
 }
@@ -508,18 +738,18 @@
   height: 18px;
   margin: 4px;
   font-size: 16px;
-  color: #cccccc;
-  border: solid 1px #cccccc;
+  color: #CCC;
+  border: solid 1px #CCC;
   text-align: center;
   line-height: 17px;
 }
 .screen.tuning .sidebar h1 span.help:hover {
-  color: #333333;
-  border: solid 1px #333333;
+  color: #333;
+  border: solid 1px #333;
 }
 .screen.tuning .sidebar .sidebar-buttons {
   height: 45px;
-  background-color: #1abc9c;
+  background-color: #1ABC9C;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-tutorial {
   position: absolute;
@@ -527,7 +757,7 @@
   top: 0;
   height: 45px;
   cursor: pointer;
-  color: white;
+  color: #fff;
   text-align: center;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save {
@@ -535,9 +765,9 @@
   width: 37px;
   height: 45px;
   background-color: #16a085;
-  border-left: solid 1px #1abc9c;
+  border-left: solid 1px #1ABC9C;
   float: right;
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save .led {
@@ -546,7 +776,7 @@
   top: 6px;
   width: 30px;
   height: 6px;
-  background-color: #1abc9c;
+  background-color: #1ABC9C;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save .text {
   position: absolute;
@@ -561,7 +791,7 @@
   background: url(../img/uicons-24.png) no-repeat -312px 0px;
 }
 .screen.tuning .sidebar .sidebar-buttons .btn-save.active .led {
-  background-color: #f1c40f;
+  background-color: #F1C40F;
 }
 .screen.tuning .tunable {
   -webkit-transition: background-color 0.25s;
@@ -620,7 +850,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: white;
+  color: #ffffff;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -645,7 +875,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: white;
+  color: #ffffff;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -706,7 +936,7 @@
   -o-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 100;
-  background-color: white;
+  background-color: #FFF;
   position: absolute;
   bottom: 0;
   left: 0;
@@ -730,7 +960,7 @@
   width: 290px;
   padding: 0;
   margin: 0 2px;
-  background-color: #333333;
+  background-color: #333;
 }
 .screen.tuning .details-view div.btn-taglike {
   -webkit-transition: all 0.5s;
@@ -752,7 +982,7 @@
   top: -50px;
   position: absolute;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -774,7 +1004,7 @@
   display: block;
   width: 156px;
   height: 156px;
-  background-color: white;
+  background-color: #FFF;
   border: solid 2px #34495e;
 }
 .screen.tuning .progress-widget div.message {
@@ -816,13 +1046,13 @@
 }
 .screen.tuning .progress-widget div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.tuning .progress-widget div.c-marker div.label {
   padding-top: 5px;
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -860,12 +1090,12 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -889,7 +1119,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -944,24 +1174,23 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95a5a6;
+  border: solid 2px #95A5A6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -981,7 +1210,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
   width: 108px;
   height: 52px;
-  color: white;
+  color: #FFFFFF;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -989,9 +1218,9 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
-  position: absolute;
   left: 0;
   top: 0;
+  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1069,7 +1298,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
   text-align: center;
   display: block;
   position: absolute;
@@ -1078,7 +1307,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   bottom: 0;
   height: 48px;
   font-size: 14px;
-  color: white;
+  color: #fff;
   line-height: 48px;
   text-decoration: none;
   font-size: 24px;
@@ -1090,7 +1319,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 }
 .screen.bsod {
   background-color: rgba(0, 0, 0, 0.7);
-  color: white;
+  color: #fff;
 }
 .screen.bsod .content {
   position: absolute;
@@ -1124,25 +1353,25 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   width: 100%;
   font-size: 14px;
   text-align: center;
-  color: white;
+  color: #fff;
 }
 .screen.bsod .content .text a {
-  color: #33ccff;
+  color: #33CCFF;
   text-decoration: none;
 }
 .screen.bsod .content .text a:hover {
-  color: white;
+  color: #fff;
 }
 .screen.ipide {
-  background-color: white;
+  background-color: #fff;
   position: relative;
 }
 .screen.ipide .header,
 .screen.ipide .footer {
   position: absolute;
-  background-color: #999999;
+  background-color: #999;
   height: 32px;
-  color: white;
+  color: #fff;
   font-size: 16px;
   padding: 4px;
 }
@@ -1163,18 +1392,18 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   float: right;
   width: 100px;
   height: 32px;
-  color: #333333;
+  color: #333;
   border: none;
   text-decoration: none;
-  background-color: #aaaaaa;
+  background-color: #AAA;
   text-align: center;
   margin-top: 4px;
   margin-left: 1px;
   padding: 5px 0 0;
 }
 .screen.ipide .footer .btn-footer:hover {
-  background-color: white;
-  color: black;
+  background-color: #fff;
+  color: #000;
 }
 .screen.ipide .code {
   position: absolute;
@@ -1220,7 +1449,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -o-border-radius: 5px;
   border-radius: 5px;
   border: solid 1px #c0392b;
-  background: white;
+  background: #ffffff;
   height: 30px;
   margin: 6px;
 }
@@ -1269,7 +1498,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   font-weight: bold;
   margin-left: 14px;
   text-align: center;
-  color: white;
+  color: #FFF;
 }
 .screen.tutorial-stats .vibrator-host .panel-event-rate .label {
   position: absolute;
@@ -1279,7 +1508,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   top: 0;
   bottom: 0;
   padding-top: 10px;
-  color: #dddddd;
+  color: #ddd;
   font-size: 12px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram {
@@ -1288,7 +1517,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   right: 430px;
   bottom: 50px;
   border-right: solid 1px #333333;
-  background-color: white;
+  background-color: #fff;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend {
   left: 10px;
@@ -1298,14 +1527,14 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   border-top: solid 1px #333333;
   padding: 5px;
   font-style: italic;
-  color: #333333;
+  color: #333;
   font-size: 14px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend span.box {
   display: inline-block;
   width: 50px;
   height: 20px;
-  border: solid 1px #666666;
+  border: solid 1px #666;
   vertical-align: middle;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls {
@@ -1320,7 +1549,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #eeeeee;
+  background-color: #EEE;
   margin: 5px;
   padding: 5px;
 }
@@ -1346,8 +1575,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   text-align: right;
   font-size: 16px;
   text-decoration: none;
-  color: #333333;
-  border: solid 2px #cccccc;
+  color: #333;
+  border: solid 2px #CCC;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle:after {
   -webkit-border-radius: 16px;
@@ -1364,8 +1593,8 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   position: absolute;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active {
-  background-color: #cccccc;
-  color: black;
+  background-color: #ccc;
+  color: #000;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active:after {
   background-color: #2ecc71;
@@ -1390,8 +1619,119 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   color: #003300;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept:hover {
-  color: white;
+  color: #fff;
   background-color: #2ecc71;
+}
+.screen.courseroom .monitor {
+  background: no-repeat center center url(../img/blackboard.jpg);
+  background-size: cover;
+  position: absolute;
+  border: solid 8px #DDD;
+  background-color: #FFF;
+}
+.screen.courseroom .chat-chairs > div {
+  height: 72px;
+  position: absolute;
+}
+.screen.courseroom .chat-chairs > div.chat-row {
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  background-image: url(../img/chairs-row.png);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+.screen.courseroom .chat-chairs > div.chat-user > div {
+  position: absolute;
+  width: 68px;
+  height: 72px;
+  background-image: url(../img/chairs-users.png);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+.screen.courseroom .chat-chairs > div.chat-user > div.col-blue {
+  background-position: 0px 0px;
+}
+.screen.courseroom .chat-chairs > div.chat-user > div.col-green {
+  background-position: -68px 0px;
+}
+.screen.courseroom .chat-chairs > div.chat-user > div.col-yellow {
+  background-position: -136px 0px;
+}
+.screen.courseroom .chat-chairs > div.chat-user > div.col-red {
+  background-position: -204px 0px;
+}
+.screen.courseroom .chat-box {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60px;
+  border-top: solid 1px #999;
+  background-color: #fff;
+}
+.screen.courseroom .chat-box > div.chat-input {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  right: 110px;
+  bottom: 10px;
+}
+.screen.courseroom .chat-box > div.chat-input input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  font-size: 18px;
+}
+.screen.courseroom .chat-box > button {
+  position: absolute;
+  right: 2px;
+  width: 100px;
+  top: 2px;
+  bottom: 2px;
+  background-color: #3399CC;
+  font-size: 18px;
+  border: none;
+  color: #fff;
+}
+.screen.courseroom .chat_bubble {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  position: absolute;
+  background: #FFFFCC;
+  border: 1px solid #999;
+  max-width: 200px;
+  padding: 5px;
+}
+.screen.courseroom .chat_bubble:after,
+.screen.courseroom .chat_bubble:before {
+  top: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.screen.courseroom .chat_bubble:after {
+  border-color: rgba(255, 255, 204, 0);
+  border-top-color: #FFFFCC;
+  border-width: 10px;
+  margin-left: -10px;
+}
+.screen.courseroom .chat_bubble:before {
+  border-color: rgba(153, 153, 153, 0);
+  border-top-color: #999;
+  border-width: 11px;
+  margin-left: -11px;
 }
 .screen.overlay-book {
   overflow: hidden;
@@ -1417,7 +1757,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
 .screen.overlay-book > div .book-body .tab {
   font-size: 14px;
   padding: 10px;
-  color: white;
+  color: #fff;
 }
 .screen.overlay-book > div .book-body .tab.tab-error {
   padding: 34px 0 0 160px;
@@ -1438,7 +1778,7 @@ body.layout-wide .screen.tuning .sidebar.sb1 {
   line-height: 40px;
   padding: 0 10px;
   font-size: 16px;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.overlay-book > div .book-tabs a.cs-blue {

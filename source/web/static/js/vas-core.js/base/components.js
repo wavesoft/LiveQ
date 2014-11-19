@@ -238,6 +238,28 @@ define(["core/config", "core/base/component" ],
 
 		// Subclass from Component
 		TutorialScreen.prototype = Object.create( Component.prototype );
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new CourseroomScene Component.
+		 *
+		 * This component is used for displaying a courseroom introduction to a subject.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var CourseroomScene = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		CourseroomScene.prototype = Object.create( Component.prototype );
 		
 		////////////////////////////////////////////////////////////
 		/**
@@ -871,6 +893,7 @@ define(["core/config", "core/base/component" ],
 			'TutorialScreen'	: TutorialScreen,
 			'BSODScreen'		: BSODScreen,
 			'IPIDEScreen'		: IPIDEScreen,
+			'CourseroomScene'	: CourseroomScene,
 			'Nav'				: Nav,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,

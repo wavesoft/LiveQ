@@ -61,6 +61,11 @@ define(
 					$('<div class="c-decay"></div>').appendTo(overlay),
 				];
 
+			// Create a description vrame
+			var descFrame = this.descFrame = $('<div class="description-frame"></div>').appendTo(hostDOM),
+				descImage = this.descImage = $('<div class="image"></div>').appendTo(descFrame),
+				descContent = this.descContent = $('<div class="content"></div>').appendTo(descFrame);
+
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
 

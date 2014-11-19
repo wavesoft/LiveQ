@@ -16,7 +16,8 @@ define(["core/config", "core/db"],
 		/**
 		 * Enable/disable editing of the interface
 		 */
-		User.enableIPIDE = false;
+		User.enableIPIDE = true;
+		$("body").addClass("enable-ipide")
 
 		/**
 		 * Login and initialize user record

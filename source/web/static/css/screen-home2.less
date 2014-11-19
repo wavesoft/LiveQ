@@ -1,4 +1,7 @@
 
+// Import machine definition
+@import "reusable-machine.less";
+
 ///////////////////////////////////////////////
 // Home Screen
 ///////////////////////////////////////////////
@@ -6,11 +9,33 @@
 .screen.home {
 
 	.r-machine, .r-machine-overlay {
-
 		position: absolute;
 		left: 50%;
-		top: 50%;
+		top: 230px;
+	}
 
+	.description-frame {
+		position: absolute;
+		background-color: #fff;
+		left: 0; right: 0;
+		bottom: 0; top: 360px;
+		border-top: solid 2px #999;
+
+		.image {
+			position: absolute;
+			left: 0; top: 0; bottom: 0; width: 250px;
+			background-color: #eee;
+			background-size: contain;
+			background-position: center center;
+			border-right: solid 1px #999;
+		}
+
+		.content {
+			position: absolute;
+			left: 250px; right: 0; top: 0; bottom: 0;
+			overflow-x: hidden;
+			overflow-y: auto;
+		}
 	}
 
 }

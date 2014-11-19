@@ -413,6 +413,18 @@ define(
 					cb();
 				};				
 
+			var prog_courseroom = progressAggregator.begin(1),
+				init_courseroom = function(cb) {
+					var scrCourseroom = VAS.scrCourseroom = UI.initAndPlaceScreen("screen.courseroom");
+					if (!scrCourseroom) {
+						UI.logError("Core: Unable to initialize courseroom screen!");
+						return;
+					}
+
+					// Complete login
+					prog_courseroom.ok("Courseroom screen ready");
+					cb();
+				};				
 
 			var prog_run = progressAggregator.begin(1),
 				init_run = function(cb) {
@@ -521,7 +533,8 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_api, init_home, init_cinematic, init_tutorials, init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_api, init_home, init_cinematic, init_courseroom, init_tutorials, 
+						init_login, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;

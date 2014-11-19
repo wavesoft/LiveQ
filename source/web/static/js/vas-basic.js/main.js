@@ -13,6 +13,7 @@ define([
 	'vas-basic/components/screen_bsod',
 	'vas-basic/components/screen_ipide',
 	'vas-basic/components/screen_tutorial_stats',
+	'vas-basic/components/screen_courseroom',
 
 	// Other components
 	'vas-basic/components/nav_mini',
