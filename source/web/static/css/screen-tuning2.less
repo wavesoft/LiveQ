@@ -17,12 +17,57 @@
 			height: 50px;
 			width: 200px;
 
-
 		}
 	}
 
-	.control-popup {
+	.parameter-group {
+		.border-radius(42px);
+		.transform(translate(-24px, -24px));
+		width: 42px;
+		height: 42px;
+		opacity: 1;
+		background-color: #999;
+		overflow: hidden;
+		padding: 10px 5px;
+		position: absolute;
+		opacity: 0;
+
+		&.animating {
+			.transition(all 0.5s);
+		}
+	
+		&.expanded {
+			.transform(translate(-205px, -150px));
+			.border-radius(10px);
+			width: 410px;
+			height: 300px;
+			opacity: 1;
+		}
+
+		> div {
+			width: 400px;
+			height: 280px;
+			overflow-y: auto;
+
+			> div {
+				float: left;
+				width: 45%;
+			}
+		}
 
 	}
 
+	.popover {
+		.border-radius(10px);
+		background-color: #DDD;
+		border: solid 1px #CCC;
+		width: 400px;
+		height: 400px;
+	}
+
+
+}
+
+.overlay-window .tuning-panel {
+	background-color: #fff;	
 }

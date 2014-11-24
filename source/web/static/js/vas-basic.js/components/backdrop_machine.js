@@ -21,9 +21,11 @@ define(
 			// Handle mouse movement
 			this.mouseX = 0;
 			this.mouseY = 0;
+			this.locked = false;
 			hostDOM.mousemove((function(e) {
 				this.mouseX = e.clientX;
 				this.mouseY = e.clientY;
+				if (this.locked) return;
 				this.realignMachine();
 			}).bind(this));
 
@@ -50,7 +52,7 @@ define(
 			var overlay = $('<div class="r-machine-overlay"></div>').appendTo(dragHost);
 			this.overlayComponents = [
 					$('<div class="c-beam locked"></div>').appendTo(overlay),
-					$('<div class="c-issr locked></div>').appendTo(overlay),
+					$('<div class="c-issr locked"></div>').appendTo(overlay),
 					$('<div class="c-hard locked"></div>').appendTo(overlay),
 					$('<div class="c-remnant locked"></div>').appendTo(overlay),
 					$('<div class="c-fssr locked"></div>').appendTo(overlay),
@@ -67,7 +69,11 @@ define(
 
 				this.overlayComponents[i].mouseover((function(index) {
 					return function() {
-						this.trigger("hover", aliases[index]);
+						var pos = this.overlayComponents[index].position(),
+							ppos = overlay.position();
+						pos.left += ppos.left+ 24; 
+						pos.top += ppos.top + 24;
+						this.trigger("hover", aliases[index], pos);
 
 						// Grey everything and focus the particular
 						this.machine.removeClass("active");
@@ -85,7 +91,11 @@ define(
 
 				this.overlayComponents[i].mouseout((function(index) {
 					return function() {
-						this.trigger("mouseout");
+						var pos = this.overlayComponents[index].position(),
+							ppos = overlay.position();
+						pos.left += ppos.left+ 24; 
+						pos.top += ppos.top + 24;
+						this.trigger("mouseout", pos);
 
 						// Reset gray focus
 						this.machine.removeClass("active");
@@ -99,7 +109,11 @@ define(
 
 				this.overlayComponents[i].click((function(index) {
 					return function() {
-						this.trigger("click", aliases[index]);
+						var pos = this.overlayComponents[index].position(),
+							ppos = overlay.position();
+						pos.left += ppos.left+ 24; 
+						pos.top += ppos.top + 24;
+						this.trigger("click", aliases[index], pos);
 					}
 				})(i).bind(this));
 

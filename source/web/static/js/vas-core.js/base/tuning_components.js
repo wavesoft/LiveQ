@@ -60,6 +60,29 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		// Subclass from DataWidget
 		ObservableWidget.prototype = Object.create( DataWidget.prototype );
 
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new Tuning Panel component.
+		 *
+		 * This component is used to display a group of relevant tuning parameters
+		 *
+		 * @class
+		 * @classdesc Base class for providing a tunable visualization.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/data_widget~DataWidget|DataWidget} (Parent class)
+		 *
+		 */
+		var TuningPanel = function( hostDOM ) {
+
+			// Initialize base class
+			DataWidget.call(this, hostDOM);
+
+		}
+
+		// Subclass from DataWidget
+		TuningPanel.prototype = Object.create( DataWidget.prototype );
+
 		////////////////////////////////////////////////////////////
 		//             Event definitions for JSDoc                //
 		////////////////////////////////////////////////////////////
@@ -119,6 +142,7 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		// Expose tuning components
 		var tuningComponents = {
 			'TunableWidget'		: TunableWidget,
+			'TuningPanel'		: TuningPanel,
 			'ObservableWidget'	: ObservableWidget,
 		};
 

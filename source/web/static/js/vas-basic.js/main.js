@@ -31,6 +31,7 @@ define([
 
 	// Tuning-related
 	"vas-basic/components/tuning/tunable", 
+	"vas-basic/components/tuning/tuning_panel",
 	"vas-basic/components/tuning/observable",
 	"vas-basic/components/tuning/status-tune",
 	"vas-basic/components/tuning/status-observe",
