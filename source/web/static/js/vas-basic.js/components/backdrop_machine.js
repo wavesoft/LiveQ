@@ -147,8 +147,6 @@ define(
 			var machineW = this.machine.width(),
 				machineH = this.machine.height();
 
-			console.log(this.width, this.height, machineW, machineH);
-
 			// Realign based on cursor on smaller screens
 			if (machineW > this.width - 50) {
 				var delta = -(machineW - (this.width-50)),

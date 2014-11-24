@@ -1,7 +1,7 @@
 
-define(["core/util/event_base", "core/config"], 
+define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chatroom" ], 
 
-	function( EventBase, Config ) {
+	function( EventBase, SHA1, Config, UI, APIChatroom ) {
 
 		/**
 		 * The APISocket class provides all the required functionality to interact in real time
@@ -18,23 +18,13 @@ define(["core/util/event_base", "core/config"],
 
 			// Initialize properties
 			this.connected = false;
-
-			// Start keepalive timer
-			setInterval(this.__keepalivePoller.bind(this), 10000);
+			this.chatroom = null;
+			this.loginCallback = null;
 
 		}
 
 		// Subclass from EventBase
 		APISocket.prototype = Object.create( EventBase.prototype );
-
-		/**
-		 * Start the socket keepalive poller
-		 */
-		APISocket.prototype.__keepalivePoller = function() {
-			if (this.connected) {
-				this.send("io.keepalive");
-			}
-		}
 
 		/**
 		 * Connect to the APISocket server
@@ -111,6 +101,56 @@ define(["core/util/event_base", "core/config"],
 		 */
 		APISocket.prototype.handleActionFrame = function( action, parameters ) {
 
+			// Handle chatroom events
+			if ((action.substr(0,9) == "chatroom.") && this.chatroom) {
+				this.chatroom.handleAction(action, parameters);
+			}
+
+			// Handle login events
+			else if (action == "user.login.success") {
+				this.loginCallback(parameters);
+			}
+
+			// Handle errors
+			else if (action == "error") {
+				UI.logError(parameters['message']);
+			}
+
+		}
+
+		///////////////////////////////////////////////////////////////
+		//                    PUBLIC API INTERFACE                   //
+		///////////////////////////////////////////////////////////////
+
+		/**
+		 * Join the given chatroom
+		 */
+		APISocket.prototype.openChatroom = function( chatroom ) {
+
+			// Abort any previous chatroom instance
+			if (this.chatroom)
+				this.chatroom.close();
+
+			// Return new chatroom API interface
+			return this.chatroom = new APIChatroom(this, chatroom);
+
+		}
+
+		/**
+		 * Try to log user-in
+		 */
+		APISocket.prototype.login = function( user, password, callback ) {
+
+			// Try to log user in
+			this.send('user.login', {
+				'user': user,
+				'password': password
+			});
+
+			// Register the callback to fire on 'user.login.callback'
+			this.loginCallback = function(parameters) {
+				callback(parameters['user_profile']);
+			};
 		}
 
 		/**

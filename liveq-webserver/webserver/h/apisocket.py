@@ -18,14 +18,25 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import datetime
+import time
 import struct
 import uuid
 import logging
 import base64
 
+from webserver.h.api.chat import ChatInterface
+
 from liveq.models import User
 from webserver.config import Config
+from tornado.ioloop import IOLoop
 import tornado.websocket
+
+#: Ping interval (ms)
+PING_INTERVAL = datetime.timedelta(0,2)
+
+#: Ping timeout (ms)
+PING_TIMEOUT = datetime.timedelta(0,1)
 
 class APISocketHandler(tornado.websocket.WebSocketHandler):
     """
@@ -39,8 +50,16 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
         tornado.websocket.WebSocketHandler.__init__(self, application, request, **kwargs)
 
         # Initialize
-        self.chatroom = None
+        self.remote_ip = ""
         self.user = None
+        self.connected = False
+        self.pingTimeout = None
+        self.pingTimer = None
+
+        # Multiple API interfaces
+        self.interfaces = [
+            ChatInterface(self)
+        ]
 
         # Open logger
         self.logger = logging.getLogger("APISocket")
@@ -63,18 +82,52 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
         """
 
         # Get user ID
-        self.logger.info("Socket open")
+        self.remote_ip = self.request.remote_ip
+        self.logger.info("[%s] Socket open", self.remote_ip)
 
-        # Reset local variables
-        self.chatroom = None
+        # We are connected
+        self.connected = True
+
+        # Start ping timer
+        self.pingTimer = IOLoop.instance().add_timeout(PING_INTERVAL, self.scheduledPing)
+
+        # Open interfaces
+        for i in self.interfaces:
+            i.open()
+
+    def on_pong(self, msg):
+        """
+        Got a ping reply
+        """
+
+        # Validate pong message
+        if msg != "io.keepalive":
+            self.logger.warn("[%s] Got invalid PONG reply!", self.remote_ip)
+            return
+
+        # Remove the timeout timer
+        if self.pingTimeout:
+            IOLoop.instance().remove_timeout(self.pingTimeout)
+
+        # Schedule next ping
+        self.pingTimer = IOLoop.instance().add_timeout(PING_INTERVAL, self.scheduledPing)        
 
     def on_close(self):
         """
         Community Socket closed
         """
 
-        self.leaveChatroom()
-        self.logger.info("Socket closed")
+        # Remove the scheduledPing timer
+        if self.pingTimer:
+            IOLoop.instance().remove_timeout(self.pingTimer)
+
+        # Close interfaces
+        for i in self.interfaces:
+            i.close()
+
+        # We are no longer connected
+        self.connected = False
+        self.logger.info("[%s] Socket closed", self.remote_ip)
 
     def on_message(self, message):
         """
@@ -107,95 +160,37 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
     ####################################################################################
     # --------------------------------------------------------------------------------
-    #                                 CHATROOM CALLBACKS
-    # --------------------------------------------------------------------------------
-    ####################################################################################
-
-    def onChatroomEnter(self, data):
-        """
-        User joined the chartroom
-        """
-
-        # Validate data
-        if not 'user' in data:
-            return
-
-        # Send notification for user joining the chatroom
-        self.sendAction("chatroom.join", { "user": data['user'] })
-
-    def onChatroomLeave(self, data):
-        """
-        User left the chartroom
-        """
-
-        # Validate data
-        if not 'user' in data:
-            return
-
-        # Remove user from chatroom
-        key = "chatroom.%s" % self.chatroom.name
-        Config.STORE.sadd(key, data['user'])
-
-        # Send notification for user joining the chatroom
-        self.sendAction("chatroom.leave", { "user": data['user'] })
-
-    def onChatroomChat(self, data):
-        """
-        User said something on the chatroom
-        """
-
-        # Validate data
-        if not 'user' in data:
-            return
-
-        # Send notification for user joining the chatroom
-        self.sendAction("chatroom.chat", { "user": data['user'], "message": data['message'] })
-
-    ####################################################################################
-    # --------------------------------------------------------------------------------
     #                                 HELPER FUNCTIONS
     # --------------------------------------------------------------------------------
     ####################################################################################
 
-    def leaveChatroom(self):
+    def scheduledPing(self):
         """
-        Leave previous chatroom
-        """
-
-        # Leave previous chatroom
-        if self.chatroom != None:
-            # Leave channel
-            self.chatroom.send('chatroom.leave', {'user':self.user.username})
-            # Close channel
-            self.chatroom.close()
-            # Reset variable
-            self.chatroom = None
-
-    def selectChatroom(self, name):
-        """
-        Join a particular chatroom
+        Send a ping and schedule a timeout
         """
 
-        # Leave previous chatroom
-        self.leaveChatroom()
+        # If we are not connected, exit
+        if not self.connected:
+            return
 
-        # Join chatroom
-        self.chatroom = Config.IBUS.openChannel("chatroom.%s" % name)
+        # Send a ping request
+        self.ping("io.keepalive")
 
-        # Add user in chatroom
-        key = "chatroom.%s" % self.chatroom.username
-        Config.STORE.sadd(key, data['user'])
+        # Schedule a timeout timer
+        self.pingTimeout = IOLoop.instance().add_timeout(PING_TIMEOUT, self.pingTimeoutCallback)
+        self.pingTimer = None
 
-        # Get users in the channel
-        roomUsers = list(key, Config.STORE.smembers())
 
-        # Bind events
-        self.chatroom.on('chatroom.enter', self.onChatroomEnter)
-        self.chatroom.on('chatroom.leave', self.onChatroomLeave)
-        self.chatroom.on('chatroom.chat', self.onChatroomChat)
+    def pingTimeoutCallback(self):
+        """
+        The socket timed out
+        """
 
-        # Send presence
-        self.sendAction("chatroom.presence", { 'users': roomUsers })
+        # Timeout while waiting for pong
+        self.logger.warn("[%s] Socket connection timeout", self.remote_ip)
+
+        # Close
+        self.close()
 
     def sendError(self, error):
         """
@@ -211,12 +206,14 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
             })
 
         # And log the error
-        self.logger.warn(error)
+        self.logger.warn("[%s] %s" % (self.remote_ip, error))
 
     def sendAction(self, action, param={}):
         """
         Send a named action, with an optional data dictionary
         """
+
+        self.logger.info("Sending %s (%r)" % (action, param))
 
         # Send text frame to websocket
         self.write_message({
@@ -233,18 +230,39 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
         # Handle login
         if action == "user.login":
-            self.user = User.get(User.username == param['user'])
 
-        # Select the chatroom to join
-        elif action == "chatroom.select":
+            # Fetch user entry
+            try:
+                user = User.get(User.username == param['user'])
+            except User.DoesNotExist:
+                self.sendError("User does not exist!");
+                return
 
-            # Join the specified chatroom
-            self.selectChatroom( param['chatroom'] )
+            # Validate user password
+            if user.password != param['password']:
+                self.sendError("User password does not match!");
+                return
 
-        elif action == "chatroom.chat":
-            # Send message to active chatroom
-            if self.chatroom != None:
-                self.chatroom.send("chatroom.chat", { 'user': self.user.username })
+            # Success
+            self.user = user
+            self.sendAction('user.login.success', { })
 
-        # Not implemented
-        return self.sendError("Interface not implemented")
+            # Let all interface know that we are ready
+            for i in self.interfaces:
+                i.ready()
+
+        else:
+
+            # Forward to API interfaces
+            handled = False
+            for i in self.interfaces:
+                # Check if this action can be handled by this action domain
+                if action[0:len(i.domain)+1] == "%s." % i.domain:
+                    # Handle action
+                    i.handleAction(action[len(i.domain)+1:], param)
+                    handled = True
+                    break
+
+            # Not implemented
+            if not handled:
+                return self.sendError("Action '%s' is not implemented" % action)

@@ -63,6 +63,8 @@ class User(BaseModel):
 	username = CharField(max_length=128)
 	#: The e-mail of the user
 	email = CharField(max_length=128)
+	#: The password
+	password = CharField(max_length=128)
 
 	#: The first name of the user
 	name = CharField(max_length=128)
@@ -76,7 +78,7 @@ class User(BaseModel):
 		"""
 		Stringify result
 		"""
-		return username
+		return self.username
 
 
 class AgentGroup(BaseModel):

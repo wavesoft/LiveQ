@@ -1,9 +1,9 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["core/config", "core/db"], 
+define(["core/config", "core/db", "core/apisocket"], 
 
-	function(Config, DB) {
+	function(Config, DB, APISocket) {
 
 		/**
 		 * Database interface
