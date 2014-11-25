@@ -42,6 +42,9 @@ define(
 					this.descBody.html(details['description']['body']);
 				}
 			}).bind(this));
+			this.machine.on('click', (function(id) {
+				this.trigger('changeScreen', 'screen.tuning');
+			}).bind(this));
 
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );

@@ -74,6 +74,9 @@ class User(BaseModel):
 	#: The team avatar
 	avatar = CharField(max_length=128)
 
+	#: Variable parameters
+	variables = TextField(default="{}")
+
 	def __str__(self):
 		"""
 		Stringify result

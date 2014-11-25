@@ -18,6 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import json
 import datetime
 import time
 import struct
@@ -235,21 +236,39 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
             try:
                 user = User.get(User.username == param['user'])
             except User.DoesNotExist:
-                self.sendError("User does not exist!");
+                self.sendAction('user.login.failure', {
+                        'message': "User does not exist"
+                    })
                 return
 
             # Validate user password
             if user.password != param['password']:
-                self.sendError("User password does not match!");
+                self.sendAction('user.login.failure', {
+                        'message': "Password mismatch"
+                    })
                 return
 
             # Success
             self.user = user
-            self.sendAction('user.login.success', { })
+            self.sendAction('user.login.success', {
+                    'profile': {
+                        'username': user.username,
+                        'name': user.name,
+                        'surname': user.surname,
+                        'avatar': user.avatar,
+                        'vars': json.loads(user.variables)
+                    }
+                })
 
             # Let all interface know that we are ready
             for i in self.interfaces:
                 i.ready()
+
+        # Handle variable update
+        elif action == "user.variables":
+
+            # Update variable
+            self.user.variables = json.dumps(param['vars'])
 
         else:
 

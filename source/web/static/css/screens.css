@@ -447,17 +447,17 @@
   width: 42px;
   height: 42px;
   opacity: 1;
-  background-color: #999;
+  background-color: #DDD;
   overflow: hidden;
   padding: 10px 5px;
   position: absolute;
-  opacity: 0;
+  opacity: 0.8;
 }
 .screen.tuning2 .parameter-group.animating {
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
 }
 .screen.tuning2 .parameter-group.expanded {
   -webkit-transform: translate(-205px, -150px);
@@ -472,24 +472,33 @@
   height: 300px;
   opacity: 1;
 }
-.screen.tuning2 .parameter-group > div {
-  width: 400px;
-  height: 280px;
-  overflow-y: auto;
+.screen.tuning2 .tuning-panel {
+  border: solid 1px #DDD;
 }
-.screen.tuning2 .parameter-group > div > div {
+.screen.tuning2 .tuning-panel .header {
+  background-color: #EEE;
+  color: #099;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 32px;
+  font-size: 18px;
+  padding: 4px 10px;
+}
+.screen.tuning2 .tuning-panel .tunables {
+  background-color: #fff;
+  overflow-y: auto;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 33px;
+  bottom: 0;
+  padding: 4px;
+}
+.screen.tuning2 .tuning-panel .tunables > div {
   float: left;
   width: 45%;
-}
-.screen.tuning2 .popover {
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
-  background-color: #DDD;
-  border: solid 1px #CCC;
-  width: 400px;
-  height: 400px;
 }
 .overlay-window .tuning-panel {
   background-color: #fff;
@@ -1287,10 +1296,10 @@
   -moz-border-radius: 42px;
   -o-border-radius: 42px;
   border-radius: 42px;
-  -webkit-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
-  -moz-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
-  -o-transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
-  transition: border-width 0.2s, background-color 0.2s, transform 0.2s, -webkit-transform 0.2s, -moz-transform 0.2s, -o-transform 0.2s, -ms-transform 0.2s;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
   width: 42px;
   height: 42px;
   position: absolute;

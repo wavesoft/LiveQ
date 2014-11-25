@@ -1,5 +1,5 @@
 
-define(["core/util/event_base", "core/config", "core/user"], 
+define(["core/util/event_base", "core/config"], 
 
 	/**
 	 * This module provides the base component class which is used for derriving all of the

@@ -11,13 +11,18 @@ define(["core/config", "core/db", "core/apisocket"],
 		 * @class
 		 * @exports core/user
 		 */
-		var User = { };
+		var User = {
+			// Static profile variables
+			'profile' 	: { },
+			// Dynamic variables
+			'vars' 		: { }
+		};
 
 		/**
 		 * Enable/disable editing of the interface
 		 */
-		User.enableIPIDE = true;
-		$("body").addClass("enable-ipide")
+		//User.enableIPIDE = true;
+		//$("body").addClass("enable-ipide")
 
 		/**
 		 * Login and initialize user record
@@ -28,15 +33,17 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.login = function(params, callback) {
 
 			// Try to log-in the user
-			DB.authenticateUser(params['username'], params['password'], (function(status, errorMsg) {
+			APISocket.login(params['username'], params['password'], (function(profile, errorMsg) {
 				
 				// If something went wrong, fire error callback
-				if (!status) {
+				if (!profile) {
 					if (callback) callback(false, errorMsg);
 					return;
 				}
 
 				// Otherwise process uer record
+				this.profile = profile;
+				this.vars = profile['vars'];
 				this.initialize();
 
 				// Fire callback
@@ -81,17 +88,27 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.initialize = function() {
 
 			// Create enabled_topics if missing
-			if (!DB.userRecord['data']['enabled_topics'])
-				DB.userRecord['data']['enabled_topics'] = {};
+			if (!this.vars['enabled_topics'])
+				this.vars['enabled_topics'] = {};
 
 			// Create per-task user details
-			if (!DB.userRecord['data']['task_details'])
-				DB.userRecord['data']['task_details'] = {};
+			if (!this.vars['task_details'])
+				this.vars['task_details'] = {};
 
 			// Create first-time pop-up status
-			if (!DB.userRecord['data']['first_time'])
-				DB.userRecord['data']['first_time'] = {};
+			if (!this.vars['first_time'])
+				this.vars['first_time'] = {};
 
+		}
+
+		/**
+		 * Commit user variables to the database
+		 */
+		User.commitUserRecord = function() {
+			// Commit user variables
+			APISocket.send( "user.variables", {
+				'vars': this.vars
+			});
 		}
 
 		/**
@@ -99,14 +116,14 @@ define(["core/config", "core/db", "core/apisocket"],
 		 */
 		User.getTaskDetails = function( task_id ) {
 			var db_task = DB.cache['tasks'][task_id],
-				u_task  = DB.userRecord['data']['task_details'][task_id];
+				u_task  = this.vars['task_details'][task_id];
 
 			// Check if the entire record is missing
 			if (!db_task) return null;
 
 			// Populate additional fields
 			if (!u_task) {
-				DB.userRecord['data']['task_details'][task_id] = u_task = {
+				this.vars['task_details'][task_id] = u_task = {
 					'enabled': false,
 					'seen_intro': false,
 					'save': [null,null,null,null]
@@ -155,10 +172,10 @@ define(["core/config", "core/db", "core/apisocket"],
 				node_id = {};
 
 			// Traverse nodes
-			var traverse_node = function(node, parent) {
+			var traverse_node = (function(node, parent) {
 
 				// Skip invisible nodes
-				if ((parent != null) && !DB.userRecord['data']['enabled_topics'][node['_id']])
+				if ((parent != null) && !this.vars['enabled_topics'][node['_id']])
 					return;
 
 				// Store to nodes & it's lookup
@@ -177,7 +194,7 @@ define(["core/config", "core/db", "core/apisocket"],
 					traverse_node( node.children[i], node );
 				}
 
-			}
+			}).bind(this);
 
 			// Start node traversal
 			traverse_node( DB.cache['topic_root'], null );
@@ -199,11 +216,11 @@ define(["core/config", "core/db", "core/apisocket"],
 			var topic = DB.cache['topic_index'][topic_id];
 			for (var i=0; i<topic.children.length; i++) {
 				// Grant access to the given topic
-				DB.userRecord['data']['enabled_topics'][topic.children[i]['_id']] = 1;
+				this.vars['enabled_topics'][topic.children[i]['_id']] = 1;
 			}
 
 			// Commit changes
-			DB.commitUserRecord();
+			this.commitUserRecord();
 
 		}
 
@@ -213,13 +230,13 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.getTaskSaveSlots = function(task) {
 
 			// Make sure data exist
-			if (!DB.userRecord['data']['task_details'][task_id])
-				DB.userRecord['data']['task_details'][task_id] = {};
-			if (!DB.userRecord['data']['task_details'][task_id]['save'])
-				DB.userRecord['data']['task_details'][task_id]['save'] = [null,null,null,null];
+			if (!this.vars['task_details'][task_id])
+				this.vars['task_details'][task_id] = {};
+			if (!this.vars['task_details'][task_id]['save'])
+				this.vars['task_details'][task_id]['save'] = [null,null,null,null];
 
 			// Return save slot info
-			return DB.userRecord['data']['task_details'][task_id]['save'];
+			return this.vars['task_details'][task_id]['save'];
 
 		}
 
@@ -229,20 +246,20 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.setTaskSaveSlot = function(task_id, slot, data) {
 			
 			// Make sure data exist
-			if (!DB.userRecord['data']['task_details'][task_id])
-				DB.userRecord['data']['task_details'][task_id] = {};
-			if (!DB.userRecord['data']['task_details'][task_id]['save'])
-				DB.userRecord['data']['task_details'][task_id]['save'] = [null,null,null,null];
+			if (!this.vars['task_details'][task_id])
+				this.vars['task_details'][task_id] = {};
+			if (!this.vars['task_details'][task_id]['save'])
+				this.vars['task_details'][task_id]['save'] = [null,null,null,null];
 
 			// Wrap slot index
 			if (slot<0) slot=0;
 			if (slot>3) slot=3;
 
 			// Update slot data
-			DB.userRecord['data']['task_details'][task_id]['save'][slot] = data;
+			this.vars['task_details'][task_id]['save'][slot] = data;
 
 			// Commit changes
-			DB.commitUserRecord();
+			this.commitUserRecord();
 
 		}
 
@@ -252,16 +269,16 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.setTaskAnimationAsSeen = function(task_id) {
 
 			// Make sure data exist
-			if (!DB.userRecord['data']['task_details'][task_id])
-				DB.userRecord['data']['task_details'][task_id] = {};
-			if (!DB.userRecord['data']['task_details'][task_id]['save'])
-				DB.userRecord['data']['task_details'][task_id]['save'] = [null,null,null,null];
+			if (!this.vars['task_details'][task_id])
+				this.vars['task_details'][task_id] = {};
+			if (!this.vars['task_details'][task_id]['save'])
+				this.vars['task_details'][task_id]['save'] = [null,null,null,null];
 
 			// Grant access to the given task
-			DB.userRecord['data']['task_details'][task_id]['seen_intro'] = 1;
+			this.vars['task_details'][task_id]['seen_intro'] = 1;
 
 			// Commit changes
-			DB.commitUserRecord();
+			this.commitUserRecord();
 
 		}
 
@@ -271,16 +288,16 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.enableTask = function(task_id) {
 
 			// Make sure data exist
-			if (!DB.userRecord['data']['task_details'][task_id])
-				DB.userRecord['data']['task_details'][task_id] = {};
-			if (!DB.userRecord['data']['task_details'][task_id]['save'])
-				DB.userRecord['data']['task_details'][task_id]['save'] = [null,null,null,null];
+			if (!this.vars['task_details'][task_id])
+				this.vars['task_details'][task_id] = {};
+			if (!this.vars['task_details'][task_id]['save'])
+				this.vars['task_details'][task_id]['save'] = [null,null,null,null];
 
 			// Grant access to the given task
-			DB.userRecord['data']['task_details'][task_id]['enabled'] = 1;
+			this.vars['task_details'][task_id]['enabled'] = 1;
 
 			// Commit changes
-			DB.commitUserRecord();
+			this.commitUserRecord();
 
 		}
 
@@ -322,7 +339,7 @@ define(["core/config", "core/db", "core/apisocket"],
 
 			// Check which tasks are handled by the user
 			for (var i=0; i<topic.tasks.length; i++) {
-				var task = DB.userRecord['data']['task_details'][topic.tasks[i]];
+				var task = this.vars['task_details'][topic.tasks[i]];
 				// Found at least one not completed
 				if (!task || !task.enabled)
 					return false;
@@ -344,10 +361,10 @@ define(["core/config", "core/db", "core/apisocket"],
 				var ft = DB.cache['first_time'][k];
 
 				// Check if this first-time is shown
-				if (!DB.userRecord['data']['first_time'][k]) {
+				if (!this.vars['first_time'][k]) {
 					ft.shown = false;
 				} else {
-					ft.shown = DB.userRecord['data']['first_time'][k];
+					ft.shown = this.vars['first_time'][k];
 				}
 
 				// Store details
@@ -363,10 +380,10 @@ define(["core/config", "core/db", "core/apisocket"],
 		User.markFirstTimeAsSeen = function(aid_id) {
 
 			// Update first_time aid status
-			DB.userRecord['data']['first_time'][aid_id] = 1;
+			this.vars['first_time'][aid_id] = 1;
 
 			// Commit changes
-			DB.commitUserRecord();
+			this.commitUserRecord();
 
 		}
 

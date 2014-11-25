@@ -108,7 +108,14 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 
 			// Handle login events
 			else if (action == "user.login.success") {
-				this.loginCallback(parameters);
+				if (this.loginCallback)
+					this.loginCallback(true, parameters);
+			}
+
+			// Handle login events
+			else if (action == "user.login.failure") {
+				if (this.loginCallback) 
+					this.loginCallback(false, parameters);
 			}
 
 			// Handle errors
@@ -148,9 +155,16 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 			});
 
 			// Register the callback to fire on 'user.login.callback'
-			this.loginCallback = function(parameters) {
-				callback(parameters['user_profile']);
-			};
+			if (callback) {
+				this.loginCallback = function(success, parameters) {
+					if (success) {
+						callback(parameters['profile']);
+					} else {
+						callback(null, parameters['message']);
+					}
+				};
+			}
+			
 		}
 
 		/**

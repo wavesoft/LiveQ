@@ -83,6 +83,12 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		// Subclass from DataWidget
 		TuningPanel.prototype = Object.create( DataWidget.prototype );
 
+		/**
+		 * Define tunables panel
+		 */
+		TuningPanel.prototype.onTuningPanelDefined = function(title, tunables) {
+		}
+
 		////////////////////////////////////////////////////////////
 		//             Event definitions for JSDoc                //
 		////////////////////////////////////////////////////////////

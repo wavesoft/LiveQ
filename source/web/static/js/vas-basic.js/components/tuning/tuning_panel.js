@@ -17,7 +17,8 @@ define(
 
 			// Prepare DOM
 			hostDOM.addClass("tuning-panel");
-			this.tunableHost = $('<div class="tunable-host"></div>').appendTo(hostDOM);
+			this.headerElm = $('<div class="header">Test</div>').appendTo(hostDOM);
+			this.tunablesElm = $('<div class="tunables"></div>').appendTo(hostDOM);
 
 		};
 
@@ -32,7 +33,7 @@ define(
 		 * Register a new tunable widget
 		 */
 		DefaultTuningPanel.prototype.defineAndRegister = function(metadata) {
-			var container = $('<div class="tunable"></div>').appendTo(this.tunableHost),
+			var container = $('<div class="tunable"></div>').appendTo(this.tunablesElm),
 				com = R.instanceComponent("widget.tunable.tuning", container);
 			if (!com) return;
 
@@ -53,20 +54,10 @@ define(
 		////////////////////////////////////////////////////////////
 
 		/**
-		 * This event is fired when the view is scrolled/resized and it
-		 * specifies the height coordinates of the bottom side of the screen.
+		 * This event is fired when the tunables of this panel should be defined
 		 */
-		DefaultTuningPanel.prototype.onResize = function(width, height) {
-			this.width = width;
-			this.height = height;
-		}
-
-		/**
-		 * HAndle the onWillShow event
-		 */
-		DefaultTuningPanel.prototype.onWillShow = function(ready) {
-
-			this.tunableHost.empty();
+		DefaultTuningPanel.prototype.onTuningPanelDefined = function(title, tunables) {
+			this.tunablesElm.empty();
 			for (var i=0; i<10; i++) {
 				this.defineAndRegister({
 			          _id: 'num-'+i, // The tunable id (ex. TimeShower:alphaSvalue)
@@ -87,16 +78,17 @@ define(
 			         }
 				});
 			}
-
-			ready();
 		}
 
 		/**
-		 * HAndle the onShow event
+		 * This event is fired when the view is scrolled/resized and it
+		 * specifies the height coordinates of the bottom side of the screen.
 		 */
-		DefaultTuningPanel.prototype.onShown = function() {
-
+		DefaultTuningPanel.prototype.onResize = function(width, height) {
+			this.width = width;
+			this.height = height;
 		}
+
 
 		// Store tuning widget component on registry
 		R.registerComponent( 'widget.tunable.tuningpanel', DefaultTuningPanel, 1 );

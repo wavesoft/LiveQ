@@ -26,14 +26,14 @@
 		width: 42px;
 		height: 42px;
 		opacity: 1;
-		background-color: #999;
+		background-color: #DDD;
 		overflow: hidden;
 		padding: 10px 5px;
 		position: absolute;
-		opacity: 0;
+		opacity: 0.8;
 
 		&.animating {
-			.transition(all 0.5s);
+			.transition(all 0.2s);
 		}
 	
 		&.expanded {
@@ -44,27 +44,34 @@
 			opacity: 1;
 		}
 
-		> div {
-			width: 400px;
-			height: 280px;
+	}
+
+	.tuning-panel {
+		border: solid 1px #DDD;
+
+		.header {
+			background-color: #EEE;
+			color: #099;
+			position: absolute;
+			left: 0; right: 0;
+			top: 0; height: 32px;
+			font-size: 18px;
+			padding: 4px 10px;
+		}
+		.tunables {
+			background-color: #fff;
 			overflow-y: auto;
+			position: absolute;
+			left: 0; right: 0;
+			top: 33px; bottom: 0;
+			padding: 4px;
 
 			> div {
 				float: left;
 				width: 45%;
 			}
 		}
-
 	}
-
-	.popover {
-		.border-radius(10px);
-		background-color: #DDD;
-		border: solid 1px #CCC;
-		width: 400px;
-		height: 400px;
-	}
-
 
 }
 
