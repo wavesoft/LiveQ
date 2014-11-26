@@ -126,6 +126,11 @@ define(
 		 * Topic tree is defined
 		 */
 		MachineBackdrop.prototype.onTopicTreeUpdated = function(tree) {
+			
+			// Check focusing mode to use
+			this.focusMode = 0;
+
+			// Build tree
 			for (var k in tree) {
 				var i = this.aliases.indexOf(k);
 				if (i < 0) continue;

@@ -8,14 +8,81 @@
 	.r-machine, .r-machine-overlay {
 		position: absolute;
 		left: 50%;
-		top: 50%;
+		top: 40%;
+	}
+
+	.btn-help {
+		position: absolute;
+		height: 62px;
+		width: 62px;
+		left: 5px;
+		bottom: 5px;
+	}
+
+	.description-frame {
+		.transition(bottom 0.2s);
+		position: absolute;
+		background-color: #fff;
+		left: 0; right: 0;
+		bottom: -230px; height: 210px;
+		border-top: solid 1px #ccc;
+		padding: 10px;
+
+		> h1 {
+			color: #16a085;
+			font-size: 24px;
+		}
+		> div {
+			font-size: 14px;
+		}
+		&.visible {
+			bottom: 0;
+		}
+
+		.btn-course {
+			position: absolute;
+			height: 62px;
+			width: 62px;
+			left: 72px;
+			bottom: 5px;
+		}
+
 	}
 
 	.control-board {
+		.pointer-events(none);
+		position: absolute;
+		bottom: -1px; left: 0; right: 0;
+
 		> div {
+			.pointer-events(auto);
 			margin: 0 auto;
-			height: 50px;
-			width: 200px;
+			height: 62px;
+			padding: 5px;
+			width: 394px;
+			border: solid 1px #CCC;
+			background-color: white;
+			border-radius: 5px 5px 0 0;
+
+			> button, div {
+				float: left;
+				margin-left: 2px;
+				margin-right: 2px;
+			}
+
+			> button {
+				height: 62px;
+				width: 62px;
+			}
+			> div.panel-shaded {
+				color: #333;
+				float: left;
+				width: 190px;
+				height: 59px;
+				line-height: 62px;
+				font-size: 23px;
+			}
+
 		}
 	}
 
@@ -44,6 +111,7 @@
 
 	.tuning-panel {
 		border: solid 1px #DDD;
+		line-height: 28px;
 
 		.header {
 			background-color: #EEE;

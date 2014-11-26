@@ -21,6 +21,10 @@ define(
 			// Prepare host
 			hostDOM.addClass("tuning2");
 
+			// ---------------------------------
+			// Create machine backdrop
+			// ---------------------------------
+
 			// Create a machine
 			this.machineDOM = $('<div class="fullscreen fx-animated"></div>').appendTo(hostDOM);
 			this.machine = R.instanceComponent("backdrop.machine", this.machineDOM);
@@ -35,10 +39,51 @@ define(
 				this.showPopover(pos);
 			}).bind(this));
 
+			// ---------------------------------
+			// Create help message panel
+			// ---------------------------------
+
 			// Create a description vrame
+			var descFrame = this.descFrame = $('<div class="description-frame"></div>').appendTo(hostDOM);
+			this.descTitle = $('<h1>This is a header</h1>').appendTo(descFrame);
+			this.descBody = $('<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare eu ex consectetur feugiat. Pellentesque quis dolor sed lacus pellentesque euismod lacinia eget urna. Vestibulum ipsum lorem, posuere in dignissim ac, sollicitudin eu odio. Suspendisse ac porta turpis. Etiam nec consequat mauris, at placerat urna. Nam suscipit nisl eget nisi semper, quis aliquet sem interdum. Proin condimentum nunc vel imperdiet vehicula.</div>').appendTo(descFrame);
+
+			// Bind listeners
+			this.machine.on('hover', (function(id) {
+				var details = DB.cache['definitions']['machine-parts'][id];
+				if (details == undefined) {
+					this.descTitle.text("Quantum Machine");
+					this.descBody.html("Move your mouse over a component in order to see more details.");
+				} else {
+					this.descTitle.text(details['description']['title']);
+					this.descBody.html(details['description']['body']);
+				}
+			}).bind(this));
+
+			// Create course button
+			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
+
+			// ---------------------------------
+			// Create a control board
+			// ---------------------------------
+
 			var boardHost = $('<div class="control-board"></div>').appendTo(hostDOM),
 				descBoard = $('<div></div>').appendTo(boardHost);
 
+			$('<button class="btn-shaded btn-with-icon btn-red"><span class="glyphicon glyphicon-unchecked"></span><br />Estimate</button>').appendTo(descBoard);
+			$('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Submit</button>').appendTo(descBoard);
+			$('<div class="panel-shaded">Good Fit</div>').appendTo(descBoard);
+			$('<button class="btn-shaded btn-with-icon btn-darkblue"><span class="glyphicon glyphicon-dashboard"></span><br />View</button>').appendTo(descBoard);
+
+			// Create help button
+			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
+			this.btnHelp.click((function() {
+				this.descFrame.toggleClass("visible");
+			}).bind(this));
+
+			// ---------------------------------
+			// Create tuning panel
+			// ---------------------------------
 
 			// Prepare tuning panel DOM
 			this.tuningMask = $('<div class="fullscreen mask"></div>').hide().appendTo(hostDOM);

@@ -95,6 +95,101 @@ h1 + p.subtitle {
 }
 
 // ===============================
+// Shaded buttons
+// ===============================
+
+.panel-shaded {
+	border-radius: 4px;
+	outline: none;
+	border-style: solid;
+	border-width: 2px 1px 1px;
+	text-align: center;
+	font-family: "Lucida Console", Monaco, monospace;
+	background-color: #EEE;
+	border-color: #BBB;
+}
+
+.btn-shaded {
+	.border-radius(4px);
+	outline: none;
+	color: #fff;
+	cursor: pointer;
+	border-style: none none solid none;
+	border-width: 5px;
+
+	&.btn-with-icon {
+		font-size: 12px;
+
+		.glyphicon {
+			opacity: 0.9;
+			font-size: 20px;
+			margin-bottom: 8px;		
+		}
+	}
+
+	&.disabled {
+		.pointer-events(none);
+		cursor: not-allowed;
+		background-color: #ccc !important;
+		border-color: #aaa !important;
+		color: #666 !important;
+		background-image: none !important;
+	}
+
+	&.btn-striped {
+		background-image: url(../img/btn-striped-rect.png);
+		background-repeat: no-repeat;
+		background-position: center top;
+	}
+
+	&.btn-red {
+		background-color: #e74c3c;
+		border-color: #c0392b;
+	}
+	&.btn-teal {
+		background-color: #1abc9c;
+		border-color: #16a085;
+	}
+	&.btn-green {
+		background-color: #2ecc71;
+		border-color: #27ae60;
+	}
+	&.btn-blue {
+		background-color: #3498db;
+		border-color: #2980b9;
+		color: #036;
+	}
+	&.btn-orange {
+		background-color: #e67e22;
+		border-color: #d35400;
+		color: #930;
+	}
+	&.btn-yellow {
+		background-color: #f1c40f;
+		border-color: #f39c12;
+		color: #630;
+	}
+	&.btn-darkblue {
+		background-color: #34495e;
+		border-color: #2c3e50;
+	}
+	&.btn-purple {
+		background-color: #9b59b6;
+		border-color: #8e44ad;
+	}
+	&.btn-grey {
+		background-color: #ecf0f1;
+		border-color: #bdc3c7;
+	}
+
+}
+
+.btn-shaded:active {
+	margin-top: 2px;
+	border-width: 2px;
+}
+
+// ===============================
 // Round buttons
 // ===============================
 

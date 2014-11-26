@@ -431,12 +431,88 @@
 .screen.tuning2 .r-machine-overlay {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 40%;
+}
+.screen.tuning2 .btn-help {
+  position: absolute;
+  height: 62px;
+  width: 62px;
+  left: 5px;
+  bottom: 5px;
+}
+.screen.tuning2 .description-frame {
+  -webkit-transition: bottom 0.2s;
+  -moz-transition: bottom 0.2s;
+  -o-transition: bottom 0.2s;
+  transition: bottom 0.2s;
+  position: absolute;
+  background-color: white;
+  left: 0;
+  right: 0;
+  bottom: -230px;
+  height: 210px;
+  border-top: solid 1px #cccccc;
+  padding: 10px;
+}
+.screen.tuning2 .description-frame > h1 {
+  color: #16a085;
+  font-size: 24px;
+}
+.screen.tuning2 .description-frame > div {
+  font-size: 14px;
+}
+.screen.tuning2 .description-frame.visible {
+  bottom: 0;
+}
+.screen.tuning2 .description-frame .btn-course {
+  position: absolute;
+  height: 62px;
+  width: 62px;
+  left: 72px;
+  bottom: 5px;
+}
+.screen.tuning2 .control-board {
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
 }
 .screen.tuning2 .control-board > div {
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   margin: 0 auto;
-  height: 50px;
-  width: 200px;
+  height: 62px;
+  padding: 5px;
+  width: 394px;
+  border: solid 1px #cccccc;
+  background-color: white;
+  border-radius: 5px 5px 0 0;
+}
+.screen.tuning2 .control-board > div > button,
+.screen.tuning2 .control-board > div div {
+  float: left;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.screen.tuning2 .control-board > div > button {
+  height: 62px;
+  width: 62px;
+}
+.screen.tuning2 .control-board > div > div.panel-shaded {
+  color: #333333;
+  float: left;
+  width: 190px;
+  height: 59px;
+  line-height: 62px;
+  font-size: 23px;
 }
 .screen.tuning2 .parameter-group {
   -webkit-border-radius: 10px;
@@ -470,6 +546,7 @@
 }
 .screen.tuning2 .tuning-panel {
   border: solid 1px #dddddd;
+  line-height: 28px;
 }
 .screen.tuning2 .tuning-panel .header {
   background-color: #eeeeee;
