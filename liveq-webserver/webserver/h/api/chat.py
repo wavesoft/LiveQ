@@ -60,6 +60,11 @@ class ChatInterface(APIInterface):
 			# Join the specified chatroom
 			self.selectChatroom( param['chatroom'] )
 
+		# Exit current chatroom
+		if action == "leave":
+			# Leave chatroom
+			self.leaveChatroom()
+
 		elif action == "chat":
 			# Send message to active chatroom
 			if self.chatroom != None:
@@ -87,14 +92,10 @@ class ChatInterface(APIInterface):
 		"""
 		User left the chartroom
 		"""
-
+		
 		# Validate data
 		if not 'user' in data:
 			return
-
-		# Remove user from chatroom
-		key = "chat.%s" % self.chatroom.name
-		Config.STORE.sadd(key, data['user'])
 
 		# Send notification for user joining the chatroom
 		self.sendAction("leave", { "user": data['user'] })
@@ -124,8 +125,19 @@ class ChatInterface(APIInterface):
 
 		# Leave previous chatroom
 		if self.chatroom != None:
+
+			# Remove me from chatroom
+			key = "chat.%s" % self.chatroom.name
+			Config.STORE.srem(key, self.user.username)
+
 			# Leave channel
-			self.chatroom.send('chatroom.leave', {'user':self.user.username})
+			self.chatroom.send('chat.leave', {'user':self.user.username})
+
+			# Unbind functions
+			self.chatroom.off('chat.enter', self.onChatroomEnter)
+			self.chatroom.off('chat.leave', self.onChatroomLeave)
+			self.chatroom.off('chat.chat', self.onChatroomChat)
+
 			# Close channel
 			self.chatroom.close()
 			# Reset variable
@@ -156,4 +168,4 @@ class ChatInterface(APIInterface):
 
 		# Send presence
 		self.sendAction("presence", { 'users': roomUsers })
-
+		self.chatroom.send('chat.enter', {'user':self.user.username})

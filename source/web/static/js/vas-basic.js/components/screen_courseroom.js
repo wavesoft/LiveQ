@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
 
 	/**
 	 * Basic version of the courseroom screen
 	 *
 	 * @exports basic/components/screem_courseroom
 	 */
-	function($, UI, config, R,C) {
+	function($, UI, config, R,C, API) {
 
 		/**
 		 * @class
@@ -30,6 +30,13 @@ define(
 			var chatHost =  $('<div class="chat-input"></div>').appendTo(this.eChatBox);
 			this.eInput =   $('<input placeholder="Share your thoughts..." />').appendTo(chatHost);
 			this.eSend =    $('<button>Send</button>').appendTo(this.eChatBox);
+
+			// Setup events
+			this.eSend.click((function(e) {
+				var txt = this.eInput.val();
+				this.eInput.val("");
+				this.chat.send(txt);
+			}).bind(this));
 
 			// Populate chairs
 			this.eChairRows = [];
@@ -171,6 +178,34 @@ define(
 				'width': w,
 				'height': h
 			});
+
+		}
+
+		/**
+		 * 
+		 */
+		CourseroomScene.prototype.onCourseDefined = function(course_id) {
+
+			// Open course & bind events
+			var course = this.course = API.openCourse(course_id);
+			course.on('info', (function(details) { 
+
+			}).bind(this));
+			course.on('sync', (function(details) { 
+
+			}).bind(this));
+
+			// Open chatroom & bind events
+			var chat = this.chat = API.openChatroom("course-"+course_id);
+			chat.on('join', (function(details) { 
+
+			}).bind(this));
+			chat.on('leave', (function(details) { 
+
+			}).bind(this));
+			chat.on('chat', (function(details) { 
+
+			}).bind(this));
 
 		}
 

@@ -121,6 +121,7 @@ class AMQPBusChannel(BusChannel):
 		self.bus = bus
 
 		# Empty containers
+		self.instances = 1
 		self.channel = None
 		self.channel_ready = False
 		self.primary_consumer_tag = None
@@ -624,6 +625,11 @@ class AMQPBusChannel(BusChannel):
 		"""
 		self.logger.debug("Will close channel")
 
+		# Decrement instances
+		self.instances -= 1
+		if self.instances > 0:
+			return
+
 		# Mark as closing (will be closed by _scheduled_flush)
 		self.closing = True
 
@@ -859,6 +865,9 @@ class AMQPBus(Bus, threading.Thread):
 
 		# Reuse channel
 		if name in self.channels:
+			# Increment instances
+			self.channels[name].instances += 1
+			# Return instance
 			return self.channels[name]
 
 		# Setup flags

@@ -43,7 +43,8 @@ define(
 				}
 			}).bind(this));
 			this.machine.on('click', (function(id) {
-				this.trigger('changeScreen', 'screen.tuning');
+				this.trigger('changeScreen', 'screen.courseroom');
+				UI.screens['screen.courseroom'].onCourseDefined("test");
 			}).bind(this));
 
 		}

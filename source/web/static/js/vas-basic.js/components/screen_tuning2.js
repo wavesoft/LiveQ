@@ -62,6 +62,9 @@ define(
 
 			// Create course button
 			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
+			this.btnCourse.click((function(e) {
+				UI.selectScreen("screen.courseroom");
+			}).bind(this));
 
 			// ---------------------------------
 			// Create a control board

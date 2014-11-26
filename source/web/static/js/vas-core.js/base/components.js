@@ -261,6 +261,15 @@ define(["core/config", "core/base/component" ],
 		// Subclass from Component
 		CourseroomScene.prototype = Object.create( Component.prototype );
 		
+		/**
+		 * A course is defined
+		 *
+		 * @abstract
+		 * @param {string} course - The course ID for the user to attend.
+		 */
+		CourseroomScene.prototype.onCourseDefined = function( course ) {
+		};
+
 		////////////////////////////////////////////////////////////
 		/**
 		 * Initializes a new BSODScreen Component.

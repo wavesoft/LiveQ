@@ -1,7 +1,7 @@
 
-define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chatroom" ], 
+define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chatroom", "core/api/course"  ], 
 
-	function( EventBase, SHA1, Config, UI, APIChatroom ) {
+	function( EventBase, SHA1, Config, UI, APIChatroom, APICourseroom ) {
 
 		/**
 		 * The APISocket class provides all the required functionality to interact in real time
@@ -18,8 +18,11 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 
 			// Initialize properties
 			this.connected = false;
-			this.chatroom = null;
 			this.loginCallback = null;
+
+			// Dynamic API
+			this.chatroom = null;
+			this.course = null;
 
 		}
 
@@ -140,6 +143,20 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 
 			// Return new chatroom API interface
 			return this.chatroom = new APIChatroom(this, chatroom);
+
+		}
+
+		/**
+		 * Join the given course
+		 */
+		APISocket.prototype.openCourse = function( course ) {
+
+			// Abort any previous course instance
+			if (this.course)
+				this.course.close();
+
+			// Return new course API interface
+			return this.course = new APICourseroom(this, course);
 
 		}
 

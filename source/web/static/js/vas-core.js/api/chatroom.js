@@ -33,7 +33,7 @@ define(["core/util/event_base", "core/config"],
 			if (!this.active) return;
 			console.log("Chat action:",action,data);
 			if (action == "chatroom.join") {
-				this.trigger('enter', data);
+				this.trigger('join', data);
 			} else if (action == "chatroom.leave") {
 				this.trigger('leave', data);
 			} else if (action == "chatroom.chat") {
