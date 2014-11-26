@@ -22,8 +22,8 @@ define(
 			hostDOM.addClass("tuning2");
 
 			// Create a machine
-			var machineDOM = $('<div class="fullscreen"></div>').appendTo(hostDOM);
-			this.machine = R.instanceComponent("backdrop.machine", machineDOM);
+			this.machineDOM = $('<div class="fullscreen fx-animated"></div>').appendTo(hostDOM);
+			this.machine = R.instanceComponent("backdrop.machine", this.machineDOM);
 			this.forwardVisualEvents( this.machine, { 'left':0, 'top': 0, 'width': '100%', 'height': '100%' } );
 			
 			// Setup machine
@@ -45,7 +45,6 @@ define(
 			this.tunableGroup = $('<div class="parameter-group"></div>').appendTo(this.tuningMask);
 			this.tuningMask.click((function() {
 				this.hidePopover((function() {
-					this.tuningMask.hide();
 				}).bind(this));
 			}).bind(this));
 
@@ -70,49 +69,76 @@ define(
 		 * Hide pop-up
 		 */
 		TuningScreen.prototype.hidePopover = function(callback) {
-			this.tunableGroup.removeClass("expanded");
-			setTimeout(callback, 200);
+
+			// Remove back-blur fx on the machine DOM
+			this.machineDOM.removeClass("fx-backblur");
+
+			// Hide element
+			this.tunableGroup.addClass("hidden");
+			this.tunableGroup.css(this.popoverPos).css({
+				'transform': '',
+				'oTransform': '',
+				'msTransform': '',
+				'webkitTransform': '',
+				'mozTransform': '',
+			})
+
+			// Cleanup upon animation completion
+			setTimeout((function() {
+				this.tunableGroup.removeClass("animating");
+				this.tuningMask.hide();
+				if (callback) callback();
+			}).bind(this), 200);
 		}
+
 
 		/** 
 		 * Show popover over the given coordinates
 		 */
 		TuningScreen.prototype.showPopover = function( pos ) {
 
-			this.tuningPanel.onTuningPanelDefined();
-			this.tuningPanel.onWillShow((function() {
+			// Define tuning panel
+			var elm = [];
+			for (var i=0; i<Math.round(Math.random()*50); i++) {
+				elm.push(1);
+			}
+			this.tuningPanel.onTuningPanelDefined("Test Panel", elm);
 
-				// Calculate centered coordinates
-				var sz_w = 410, sz_h = 300,
-					x = pos.left, y = pos.top;
+			// Add back-blur fx on the machine DOM
+			this.machineDOM.addClass("fx-backblur");
 
-				// Wrap inside screen coordinates
-				if (x - sz_w/2 < 0) x = sz_w/2;
-				if (y - sz_h/2 < 0) y = sz_h/2;
-				if (x + sz_w/2 > this.width) x = this.width - sz_w/2;
-				if (y + sz_h/2 > this.height) y = this.height - sz_h/2;
+			// Calculate centered coordinates
+			var sz_w = this.tuningPanel.width, 
+				sz_h = this.tuningPanel.height,
+				x = pos.left, y = pos.top;
 
-				// Change position
-				this.tuningMask.show();
-				this.tunableGroup.removeClass("animating");
-				this.tunableGroup.css({
-					'left': pos.left, 'top': pos.top
-				});
+			// Wrap inside screen coordinates
+			if (x - sz_w/2 < 0) x = sz_w/2;
+			if (y - sz_h/2 < 0) y = sz_h/2;
+			if (x + sz_w/2 > this.width) x = this.width - sz_w/2;
+			if (y + sz_h/2 > this.height) y = this.height - sz_h/2;
 
-				// Show
-				setTimeout((function() {
-					this.tunableGroup.addClass("expanded animating");
+			// Apply position
+			this.tunableGroup.css(this.popoverPos = pos);
+
+			// Prepare show sequence
+			this.tuningMask.show();
+			this.tunableGroup.addClass("animating");
+			setTimeout((function() {
+				this.tuningPanel.onResize(sz_w, sz_h);
+				this.tuningPanel.onWillShow((function() {
+					// Make element animated
+					this.tunableGroup.removeClass("hidden");
+					// Add css
 					this.tunableGroup.css({
-						'left': x, 'top': y
-					});
+						'left': x,
+						'top': y
+					});				
+					// Shown
+					this.tuningPanel.onShown();
+				}).bind(this));
 
-					setTimeout((function() {
-						this.tuningPanel.onResize(sz_w, sz_h);
-						this.tuningPanel.onShown();
-					}).bind(this), 250);
-				}).bind(this), 10);
-
-			}).bind(this));
+			}).bind(this), 10);
 
 		}
 

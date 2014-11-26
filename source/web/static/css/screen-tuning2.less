@@ -16,32 +16,28 @@
 			margin: 0 auto;
 			height: 50px;
 			width: 200px;
-
 		}
 	}
 
 	.parameter-group {
-		.border-radius(42px);
-		.transform(translate(-24px, -24px));
-		width: 42px;
-		height: 42px;
+		.border-radius(10px);
 		opacity: 1;
 		background-color: #DDD;
 		overflow: hidden;
 		padding: 10px 5px;
 		position: absolute;
-		opacity: 0.8;
+		opacity: 1;
 
 		&.animating {
 			.transition(all 0.2s);
 		}
 	
-		&.expanded {
-			.transform(translate(-205px, -150px));
-			.border-radius(10px);
-			width: 410px;
-			height: 300px;
-			opacity: 1;
+		&.hidden {
+			.transform(translate(-24px, -24px));
+			.border-radius(42px);
+			width: 42px !important;
+			height: 42px !important;
+			opacity: 0.8;
 		}
 
 	}
@@ -62,14 +58,14 @@
 			background-color: #fff;
 			overflow-y: auto;
 			position: absolute;
-			left: 0; right: 0;
-			top: 33px; bottom: 0;
+			left: 0; top: 33px;
 			padding: 4px;
 
-			> div {
+			&.col-2 > div {
 				float: left;
 				width: 45%;
 			}
+
 		}
 	}
 
