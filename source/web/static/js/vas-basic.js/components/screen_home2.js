@@ -43,8 +43,8 @@ define(
 				}
 			}).bind(this));
 			this.machine.on('click', (function(id) {
+				UI.screens['screen.courseroom'].onCourseDefined("level-1-1");
 				this.trigger('changeScreen', 'screen.courseroom');
-				UI.screens['screen.courseroom'].onCourseDefined("test");
 			}).bind(this));
 
 		}

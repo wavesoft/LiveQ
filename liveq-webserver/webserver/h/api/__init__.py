@@ -26,6 +26,7 @@ class APIInterface:
 		"""
 		self.socket = socket
 		self.domain = domain
+		self.isOpen = True
 
 	######################################
 	#           INGRESS EVENTS           #
@@ -62,6 +63,7 @@ class APIInterface:
 	def requireParameters(self, parameters):
 		"""
 		"""
+		pass
 
 	######################################
 	#          EGRESS COMMANDS           #
@@ -72,6 +74,10 @@ class APIInterface:
 		Send action, automatically prefixing it with the appropriate
 		API domain suffix.
 		"""
+		# If we are not open, ignore it
+		if not self.isOpen:
+			return
+
 		# Send action
 		self.socket.sendAction("%s.%s" % (self.domain, action), param)
 
@@ -80,5 +86,9 @@ class APIInterface:
 		Send action, automatically prefixing it with the appropriate
 		API domain suffix.
 		"""
+		# If we are not open, ignore it
+		if not self.isOpen:
+			return
+
 		# Send error
 		self.socket.sendError("[%s] %s" % (self.domain, message))

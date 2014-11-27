@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
+	["jquery", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
 
 	/**
 	 * Basic version of the courseroom screen
 	 *
 	 * @exports basic/components/screem_courseroom
 	 */
-	function($, UI, config, R,C, API) {
+	function($, DB, UI, config, R,C, API) {
 
 		/**
 		 * @class
@@ -21,8 +21,30 @@ define(
 			// Prepare host
 			hostDOM.addClass("courseroom");
 
-			// Prepare amphitheater
+			// Reset properties
+			this.course_id = "";
+			this.userMap = {};
+
+			// ---------------------------------
+			// Create screen
+			// ---------------------------------
+
+			// Create presentation monitor
 			this.eMonitor = $('<div class="monitor"></div>').appendTo(hostDOM);
+
+			// Create countdown clock
+			this.eCountdown = $('<div class="countdown"></div>').appendTo(this.eMonitor);
+			this.eCountTitle = $('<h5>Course starts in</h5>').appendTo(this.eCountdown);
+			this.eCountTimer = $('<p>00:00</p>').appendTo(this.eCountdown);
+
+			// Create video player
+			this.createExplainScreen();
+
+			// ---------------------------------
+			// Create amphitheater
+			// ---------------------------------
+
+			// Prepare amphitheater
 			this.eChairs =  $('<div class="chat-chairs"></div>').appendTo(hostDOM);
 			this.eChatBox = $('<div class="chat-box"></div>').appendTo(hostDOM);
 
@@ -36,6 +58,13 @@ define(
 				var txt = this.eInput.val();
 				this.eInput.val("");
 				this.chat.send(txt);
+			}).bind(this));
+			this.eInput.keypress((function(e) {
+				if (e.keyCode == 13) {
+					e.preventDefault();
+					e.stopPropagation();
+					this.eSend.click();
+				}
 			}).bind(this));
 
 			// Populate chairs
@@ -53,6 +82,75 @@ define(
 
 		}
 		CourseroomScene.prototype = Object.create( C.CourseroomScene.prototype );
+
+		/**
+		 * Initialize procedural presentation video
+		 */
+		CourseroomScene.prototype.createExplainScreen = function() {
+
+			var com = R.instanceComponent("explain.blackboard", this.eMonitor);
+
+			if (!com) {
+				console.warn("CourseroomScene: Unable to ininitalize explain blackboard!");
+				explainBlackboard.remove();
+				return;
+			} else {
+
+				// Initialize component
+				this.explainComponent = com;
+
+				// Adopt & Forward events
+				this.forwardVisualEvents( com );
+				this.adoptEvents( com );
+
+				// Handle events
+				com.on('animationCompleted', (function() {
+					alert('Presentation completed!');
+				}).bind(this));
+
+			}
+
+		}
+
+		////////////////////////////////////////////////////////////////////
+		// Helper functions
+		////////////////////////////////////////////////////////////////////
+
+
+		/**
+		 * Load explain scene
+		 */
+		CourseroomScene.prototype.loadAnimation = function(id, cb) {
+
+			// Load animations for the explain scene
+			var db = DB.openDatabase("animations");
+			db.get(id, (function(doc, err) {
+				if (!doc) {
+					// TODO: Show error
+				} else {
+					this.explainComponent.onAnimationUpdated( doc, cb );
+					this.explainComponent.onAnimationStop();
+				}
+			}).bind(this));
+			
+		}
+
+		/**
+		 * Start screen animation
+		 */
+		CourseroomScene.prototype.playAnimation = function() {
+			// Start animation
+			this.explainComponent.onAnimationStart();
+			// Hide all first-time aids previously shown
+			UI.hideAllfirstTimeAids();
+		}
+
+		/**
+		 * Stop screen animation
+		 */
+		CourseroomScene.prototype.stopAnimation = function() {
+			this.explainComponent.onAnimationStop();
+		}
 
 		/**
 		 * Realign rows
@@ -152,8 +250,93 @@ define(
 			chatElm.fadeOut(function() {
 				chatElm.dispose();
 			})
-			},1000);
+			}, 5000);
 		}
+
+		/**
+		 * Enable and allocate a new slot for the given user
+		 */
+		CourseroomScene.prototype.getUserAvatar = function(user) {
+			
+			// Check if a slot is already cached
+			if (this.userMap[user] != undefined) 
+				return this.userSlots[this.userMap[user]];
+
+			// Pick a free slot
+			var i = Math.floor( this.userSlots.length * Math.random() );
+			for (var j=0; j<this.userSlots.length; j++) {
+				if (!this.userSlots[i].is(":visible")) {
+					this.userMap[user] = i;
+					this.userSlots[i].fadeIn();
+					return this.userSlots[i];
+				} else {
+					if (++i >= this.userSlots.length) i=0;
+				}
+			}
+
+			// We ran out of space for avatars... sorry :(
+			return null;
+
+		}
+
+		/**
+		 * Release and free the user
+		 */
+		CourseroomScene.prototype.freeUserAvatar = function(user) {
+			// Check if a slot is already cached
+			if (this.userMap[user] != undefined) {
+				this.userSlots[this.userMap[user]].fadeOut();
+				delete this.userMap[user];
+			}
+		}
+
+		/**
+		 * Set timer value using seconds given
+		 */
+		CourseroomScene.prototype.setTimer = function(seconds) {
+			var	min = String(Math.floor(seconds / 60)),
+				sec = String(Math.round(seconds % 60));
+
+			// Prepend zeroes
+			if (min.length == 1) min = "0"+min;
+			if (sec.length == 1) sec = "0"+sec;
+
+			// Update counter
+			this.eCountTimer.text(min+":"+sec);
+
+		}
+
+		/**
+		 * Start course timer
+		 */
+		CourseroomScene.prototype.startCourseTimer = function(seconds) {
+
+			// Set initial value
+			var timeLeft = seconds;
+			this.setTimer(seconds);
+
+			// Start incrementing
+			this.courseTimer = setInterval((function() {
+				timeLeft -= 1;
+				this.setTimer(timeLeft);
+				if (timeLeft == 0) {
+					this.stopCourseTimer();
+				}
+			}).bind(this), 1000);
+		}
+
+		/**
+		 * Stop course timer
+		 */
+		CourseroomScene.prototype.stopCourseTimer = function(seconds) {
+			// Stop the interval
+			clearInterval(this.courseTimer);
+		}
+
+		////////////////////////////////////////////////////////////////////
+		// Event handlers
+		////////////////////////////////////////////////////////////////////
+
 
 		/**
 		 * Resize courseroom
@@ -179,31 +362,80 @@ define(
 				'height': h
 			});
 
+			// Resize monitor component
+			if (this.explainComponent) {
+				this.explainComponent.onResize(w,h);
+			}
+
 		}
 
 		/**
-		 * 
+		 * Define course
 		 */
 		CourseroomScene.prototype.onCourseDefined = function(course_id) {
 
-			// Open course & bind events
-			var course = this.course = API.openCourse(course_id);
-			course.on('info', (function(details) { 
+			// Store course ID
+			// (Will be initialized onWillShow)
+			this.course_id = course_id;
 
-			}).bind(this));
-			course.on('sync', (function(details) { 
+		}
 
-			}).bind(this));
+		/**
+		 * Initialize scene before showing
+		 */
+		CourseroomScene.prototype.onWillShow = function(cb) {
 
-			// Open chatroom & bind events
-			var chat = this.chat = API.openChatroom("course-"+course_id);
-			chat.on('join', (function(details) { 
+			// Reset interface
+			this.userMap = {};
+			for (var i=0; i<this.userSlots.length; i++) {
+				this.userSlots[i].hide();
+			}
 
-			}).bind(this));
-			chat.on('leave', (function(details) { 
+			// Load animation
+			this.loadAnimation(this.course_id, (function() {
 
-			}).bind(this));
-			chat.on('chat', (function(details) { 
+				// Stop animation
+				this.stopAnimation();
+				// And be forceful
+				setTimeout((function() {
+					this.stopAnimation();
+				}).bind(this), 500);
+
+				// If we are sure the animation is stopped, launch course config
+				setTimeout((function() {
+
+					// Open course & bind events
+					var course = this.course = API.openCourse(this.course_id);
+					course.on('info', (function(data) { 
+						// Fetch course information
+						this.startCourseTimer(data['time']);
+					}).bind(this));
+					course.on('sync', (function(data) { 
+						// Start course
+						this.eCountdown.fadeOut();
+						this.playAnimation();
+					}).bind(this));
+
+					// Open chatroom & bind events
+					var chat = this.chat = API.openChatroom("course-"+this.course_id);
+					chat.on('join', (function(data) {
+						// Allocate new avatar on join
+						this.getUserAvatar(data['user']);
+					}).bind(this));
+					chat.on('leave', (function(data) {
+						// Release avatar on exit
+						this.freeUserAvatar(data['user']);
+					}).bind(this));
+					chat.on('chat', (function(data) {
+						// Show speech bubble on chat
+						var user = this.getUserAvatar(data['user']);
+						if (user) this.showBubble(user, data['user'], data['message']);
+					}).bind(this));
+
+					// Fire callback
+					cb();
+
+				}).bind(this));
 
 			}).bind(this));
 

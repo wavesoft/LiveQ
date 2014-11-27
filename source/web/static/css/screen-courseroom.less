@@ -7,11 +7,46 @@
 	
 	// The monitor where the video is projected
 	.monitor {
+		position: relative;
 		background: no-repeat center center url(../img/blackboard.jpg);
 		background-size: cover;
 		position: absolute;
 		border: solid 8px #DDD;
 		background-color: #FFF;
+
+		// Countdown counter wihtin the monitor screen
+		.countdown {
+			.border-radius(10px);
+			position: absolute;
+			width: 200px;
+			height: 60px;
+			left: 50%;
+			top: 50%;
+			transform: translate(-100px, -30px);
+			text-align: center;
+			background-color: rgba(0, 0, 0, 0.8);
+			color: #fff;
+
+			h5 {
+				margin: 5px 0;
+				font-size:14px;
+				color: #999;
+			}
+			p {
+				margin: 0;
+				font-size: 25px;
+				font-weight: bold;
+			}
+			div.wait {
+
+			}
+
+		}
+
+		canvas {
+			.transform-origin(0% 0%);
+		}
+
 	}
 
 	// The chairs 

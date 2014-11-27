@@ -62,7 +62,7 @@ class CourseInterface(APIInterface):
 		if action == "enter":
 
 			# Schedule a course in 5 minutes
-			delta = self.scheduleSync(5)
+			delta = self.scheduleSync(2)
 
 			# Return course information
 			self.sendAction("info", {
@@ -79,7 +79,7 @@ class CourseInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
-	def onCoursePing():
+	def onCoursePing(self):
 		"""
 		Send courseroom sync
 		"""
@@ -109,7 +109,7 @@ class CourseInterface(APIInterface):
 			IOLoop.instance().remove_timeout(self.syncTimer)
 
 		# Schedule a sync
-		self.syncTimer = IOLoop.instance().add_timeout(datetime.timedelta(0,freq_sec), self.onCoursePing)
+		self.syncTimer = IOLoop.instance().add_timeout(datetime.timedelta(0,delta), self.onCoursePing)
 
 		# Return the time delta until the next course slot
 		return delta

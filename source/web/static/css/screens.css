@@ -1110,11 +1110,43 @@
   background-color: #2ecc71;
 }
 .screen.courseroom .monitor {
+  position: relative;
   background: no-repeat center center url(../img/blackboard.jpg);
   background-size: cover;
   position: absolute;
   border: solid 8px #dddddd;
   background-color: white;
+}
+.screen.courseroom .monitor .countdown {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  position: absolute;
+  width: 200px;
+  height: 60px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-100px, -30px);
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+}
+.screen.courseroom .monitor .countdown h5 {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #999999;
+}
+.screen.courseroom .monitor .countdown p {
+  margin: 0;
+  font-size: 25px;
+  font-weight: bold;
+}
+.screen.courseroom .monitor canvas {
+  -webkit-transform-origin: 0% 0%;
+  -moz-transform-origin: 0% 0%;
+  -o-transform-origin: 0% 0%;
+  transform-origin: 0% 0%;
 }
 .screen.courseroom .chat-chairs > div {
   height: 72px;

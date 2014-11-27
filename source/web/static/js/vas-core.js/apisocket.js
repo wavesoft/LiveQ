@@ -109,6 +109,11 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 				this.chatroom.handleAction(action, parameters);
 			}
 
+			// Handle course events
+			else if ((action.substr(0,7) == "course.") && this.course) {
+				this.course.handleAction(action, parameters);
+			}
+
 			// Handle login events
 			else if (action == "user.login.success") {
 				if (this.loginCallback)

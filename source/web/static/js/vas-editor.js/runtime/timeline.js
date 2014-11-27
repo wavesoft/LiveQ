@@ -15,7 +15,8 @@ define(
 			this.audioElement = null;
 			this.audioTween = null;
 			this.gotoAndStop(0);
-			window.t = this;
+			this.isPaused = false;
+			window.tl = this;
 		};
 
 		// Subclass from createjs.Timeline because we are using most of it's
@@ -28,6 +29,7 @@ define(
 		Timeline.prototype.gotoAndPlay = function( pos ) {
 			var gotoAndPlayFn = (function() {
 				createjs.Timeline.prototype.gotoAndPlay.call( this, pos );
+				this.isPaused = false;
 				if (!this.audioElement) return;
 
 				// Seek and play audio
@@ -51,6 +53,7 @@ define(
 		Timeline.prototype.gotoAndStop = function( pos ) {
 			var gotoAndStopFn = (function() {
 				createjs.Timeline.prototype.gotoAndStop.call( this, pos );
+				this.isPaused = true;
 				if (!this.audioElement) return;
 
 				// Seek & Stop audio
@@ -68,10 +71,24 @@ define(
 		}
 
 		/**
+		 * Overload tick in order to provide pause ability
+		 */
+		Timeline.prototype.tick = function( delta ) {
+
+			// Don't forward ticks if paused
+			if (this.isPaused) return;
+
+			// Stopy timeline one way or another
+			createjs.Timeline.prototype.tick.call( this, delta );
+
+		}
+
+		/**
 		 * Overload setPaused in order to pause/resume the audio element too
 		 */
 		Timeline.prototype.setPaused = function( paused ) {
 			createjs.Timeline.prototype.setPaused.call( this, paused );
+			this.isPaused = paused;
 			if (!this.audioElement) return;
 
 			// Pause/resume audio

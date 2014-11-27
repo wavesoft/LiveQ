@@ -5,12 +5,14 @@
 
 .screen.tuning2 {
 
+	// Machine backdrop
 	.r-machine, .r-machine-overlay {
 		position: absolute;
 		left: 50%;
 		top: 40%;
 	}
 
+	// Corner help button
 	.btn-help {
 		position: absolute;
 		height: 62px;
@@ -19,6 +21,7 @@
 		bottom: 5px;
 	}
 
+	// Bottom description frame
 	.description-frame {
 		.transition(bottom 0.2s);
 		position: absolute;
@@ -27,7 +30,6 @@
 		bottom: -230px; height: 210px;
 		border-top: solid 1px #ccc;
 		padding: 10px;
-
 		> h1 {
 			color: #16a085;
 			font-size: 24px;
@@ -35,10 +37,13 @@
 		> div {
 			font-size: 14px;
 		}
+
+		// For sliding the help panel up
 		&.visible {
 			bottom: 0;
 		}
 
+		// For the join course button inside the frame
 		.btn-course {
 			position: absolute;
 			height: 62px;
@@ -49,11 +54,11 @@
 
 	}
 
+	// Centered control board
 	.control-board {
 		.pointer-events(none);
 		position: absolute;
 		bottom: -1px; left: 0; right: 0;
-
 		> div {
 			.pointer-events(auto);
 			margin: 0 auto;
@@ -64,16 +69,18 @@
 			background-color: white;
 			border-radius: 5px 5px 0 0;
 
+			// Control buttons
 			> button, div {
 				float: left;
 				margin-left: 2px;
 				margin-right: 2px;
 			}
-
 			> button {
 				height: 62px;
 				width: 62px;
 			}
+
+			// Results panel
 			> div.panel-shaded {
 				color: #333;
 				float: left;
@@ -86,6 +93,7 @@
 		}
 	}
 
+	// The animated pop-up frame where tunables can be changed
 	.parameter-group {
 		.border-radius(10px);
 		opacity: 1;
@@ -109,6 +117,7 @@
 
 	}
 
+	// The tuning panel inside the parameter group
 	.tuning-panel {
 		border: solid 1px #DDD;
 		line-height: 28px;

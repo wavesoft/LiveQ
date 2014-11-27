@@ -126,6 +126,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 		# Close interfaces
 		for i in self.interfaces:
+			i.isOpen = False
 			i.close()
 
 		# We are no longer connected
