@@ -333,7 +333,7 @@
   position: absolute;
   width: 38%;
   right: 5px;
-  top: 72px;
+  top: 90px;
   bottom: 72px;
   padding: 0 2px;
 }
@@ -359,6 +359,16 @@
 }
 .screen.home .p-go-machine {
   right: 27.5%;
+}
+.screen.home .legend {
+  position: absolute;
+  color: #16a085;
+  width: 38%;
+  right: 5px;
+  top: 69px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: bold;
 }
 .screen.login .host {
   width: 600px;
@@ -1367,11 +1377,6 @@
   margin-left: 2px;
   margin-right: 2px;
 }
-.screen.team div.table-list tbody tr,
-.screen.team div.table-list tbody td {
-  height: 38px;
-  line-height: 38px;
-}
 .screen.team.team-people div.table-list {
   right: 15px;
 }
@@ -1454,7 +1459,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  color: #3498db;
+  background-color: #3498db;
 }
 .screen.team.team-messages div.controls .control-panel,
 .screen.team.team-notebook div.controls .control-panel,

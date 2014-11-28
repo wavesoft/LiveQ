@@ -765,11 +765,7 @@ div.table-list table tr th {
   display: block;
   height: 25px;
   line-height: 25px;
-  padding: 0 2px;
   text-align: left;
-}
-div.table-list table tr:after {
-  clear: after;
 }
 div.table-list table tbody tr {
   cursor: pointer;
@@ -834,7 +830,7 @@ div.table-list.table-scroll table tbody {
   overflow-x: none;
 }
 div.table-list.table-sm table tr {
-  height: 18px;
+  height: 20px;
 }
 div.table-list.table-sm table tr td,
 div.table-list.table-sm table tr th {
@@ -842,18 +838,18 @@ div.table-list.table-sm table tr th {
   line-height: 18px;
 }
 div.table-list.table-sm table tbody {
-  top: 18px;
+  top: 20px;
 }
 div.table-list.table-lg table tr {
-  height: 34px;
+  height: 36px;
 }
 div.table-list.table-lg table tr td,
 div.table-list.table-lg table tr th {
   height: 34px;
-  line-height: 32px;
+  line-height: 34px;
 }
 div.table-list.table-lg table tbody {
-  top: 34px;
+  top: 36px;
 }
 div.table-list.table-center table tr td,
 div.table-list.table-center table tr th {
@@ -946,6 +942,7 @@ div.table-list.table-center table tr th {
 .btn-shaded.btn-grey {
   background-color: #ecf0f1;
   border-color: #bdc3c7;
+  color: #333333;
 }
 .btn-shaded:active {
   margin-top: 2px !important;

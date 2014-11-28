@@ -27,7 +27,7 @@ define(
 			// Team list
 			this.eListHost = $('<div class="table-list table-scroll table-lg"></div>').appendTo(hostDOM);
 			this.eListTable = $('<table></table>').appendTo(this.eListHost);
-			this.eListHeader = $('<thead><tr><th class="col-9">Notes</th><th class="col-3">Options</th></tr></thead>').appendTo(this.eListTable);
+			this.eListHeader = $('<thead><tr><th class="col-8">Notes</th><th class="col-4">Options</th></tr></thead>').appendTo(this.eListTable);
 			this.eListBody = $('<tbody></tbody>').appendTo(this.eListTable);
 
 			for (var i=0; i<10; i++) {
@@ -43,7 +43,6 @@ define(
 			this.btnMachines = $('<button class="p-machines btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Machines</button>').appendTo(hostDOM);
 			this.btnNotebook = $('<button class="p-notebook disabled btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-edit"></span><br />Notebook</button>').appendTo(hostDOM);
 			this.btnMessages = $('<button class="p-messages btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-comment"></span><br />Messages</button>').appendTo(hostDOM);
-			this.btnInvite = $('<button class="p-edge btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-plus"></span><br />Invite</button>').appendTo(hostDOM);
 			this.btnUsers.click((function() {
 				this.trigger("changeScreen", "screen.team.people", UI.Transitions.MOVE_LEFT);
 			}).bind(this))
@@ -53,7 +52,10 @@ define(
 			this.btnMessages.click((function() {
 				this.trigger("changeScreen", "screen.team.messages", UI.Transitions.MOVE_LEFT);
 			}).bind(this))
-			this.btnInvite.click((function() {
+
+			// Create new window
+			this.btnCreate = $('<button class="p-edge btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-plus"></span><br />Create</button>').appendTo(hostDOM);
+			this.btnCreate.click((function() {
 				this.trigger("invite");
 			}).bind(this))
 
@@ -65,8 +67,8 @@ define(
 		 */
 		TeamScreen.prototype.addMachine = function(person) {
 			var row = $('<tr></tr>'),
-				c1 = $('<td class="col-9"><span class="glyphicon glyphicon-edit"></span> ' + person['name'] + '</td>').appendTo(row),
-				c2 = $('<td class="col-3 text-right"></td>').appendTo(row),
+				c1 = $('<td class="col-8"><span class="glyphicon glyphicon-edit"></span> ' + person['name'] + '</td>').appendTo(row),
+				c2 = $('<td class="col-4 text-right"></td>').appendTo(row),
 				b1 = $('<button class="btn-shaded btn-darkblue"><span class="glyphicon glyphicon-edit"></span> Edit</button>').appendTo(c2);
 
 			// Select on click

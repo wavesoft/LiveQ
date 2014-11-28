@@ -82,6 +82,9 @@ define(
 			this.eListHeader = $('<thead><tr><th class="col-6">Alias</th><th class="col-3">Score</th><th class="col-3">Actions</th></tr></thead>').appendTo(this.eListTable);
 			this.eListBody = $('<tbody></tbody>').appendTo(this.eListTable);
 
+			// Job legend
+			$('<div class="legend">Past, current and scheduled attemts</div>').appendTo(hostDOM);
+
 			// Submit
 			this.btnSubmit = $('<button class="p-submit btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-send"></span><br />Submit selected results</button>').appendTo(hostDOM);
 
@@ -111,7 +114,7 @@ define(
 				c1 = $('<td class="col-6"><span class="glyphicon glyphicon-edit"></span> ' + job['name'] + '</td>').appendTo(row),
 				c2 = $('<td class="col-3">' + job['score'] + '</td>').appendTo(row),
 				c3 = $('<td class="col-3 text-right"></td>').appendTo(row),
-				b1 = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-trash"></span> Abort</button>').appendTo(c3);
+				b1 = $('<button class="btn-shaded btn-yellow"><span class="glyphicon glyphicon-trash"></span> Abort</button>').appendTo(c3);
 
 			// Select on click
 			row.click((function() {

@@ -27,7 +27,7 @@ define(
 			// Team list
 			this.eListHost = $('<div class="table-list table-scroll table-lg"></div>').appendTo(hostDOM);
 			this.eListTable = $('<table></table>').appendTo(this.eListHost);
-			this.eListHeader = $('<thead><tr><th class="col-9">Name</th><th class="col-3">Options</th></tr></thead>').appendTo(this.eListTable);
+			this.eListHeader = $('<thead><tr><th class="col-8">Name</th><th class="col-4">Options</th></tr></thead>').appendTo(this.eListTable);
 			this.eListBody = $('<tbody></tbody>').appendTo(this.eListTable);
 
 			for (var i=0; i<10; i++) {
@@ -43,7 +43,6 @@ define(
 			this.btnMachines = $('<button class="p-machines btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Machines</button>').appendTo(hostDOM);
 			this.btnNotebook = $('<button class="p-notebook btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-edit"></span><br />Notebook</button>').appendTo(hostDOM);
 			this.btnMessages = $('<button class="p-messages disabled btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-comment"></span><br />Messages</button>').appendTo(hostDOM);
-			this.btnInvite = $('<button class="p-edge btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-plus"></span><br />Invite</button>').appendTo(hostDOM);
 			this.btnUsers.click((function() {
 				this.trigger("changeScreen", "screen.team.people", UI.Transitions.MOVE_LEFT);
 			}).bind(this))
@@ -53,8 +52,10 @@ define(
 			this.btnNotebook.click((function() {
 				this.trigger("changeScreen", "screen.team.notebook", UI.Transitions.MOVE_RIGHT);
 			}).bind(this))
-			this.btnInvite.click((function() {
-				this.trigger("invite");
+
+			// Compose new mail
+			this.btnCompose = $('<button class="p-edge btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-plus"></span><br />Compose</button>').appendTo(hostDOM);
+			this.btnCompose.click((function() {
 			}).bind(this))
 
 			// Prepare machine panel
@@ -68,8 +69,8 @@ define(
 		 */
 		TeamScreen.prototype.addMessage = function(person) {
 			var row = $('<tr></tr>'),
-				c1 = $('<td class="col-9"><span class="glyphicon glyphicon-comment"></span> ' + person['name'] + '</td>').appendTo(row),
-				c2 = $('<td class="col-3 text-right"></td>').appendTo(row),
+				c1 = $('<td class="col-8"><span class="glyphicon glyphicon-comment"></span> ' + person['name'] + '</td>').appendTo(row),
+				c2 = $('<td class="col-4 text-right"></td>').appendTo(row),
 				b1 = $('<button class="btn-shaded btn-darkblue"><span class="glyphicon glyphicon-arrow-left"></span> Reply</button>').appendTo(c2),
 				b2 = $('<button class="btn-shaded btn-red"><span class="glyphicon glyphicon-trash"></span></button>').appendTo(c2);
 

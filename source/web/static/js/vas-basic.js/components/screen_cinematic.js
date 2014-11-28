@@ -21,6 +21,7 @@ define(
 
 			// Prepare the video element for the cinematic screen
 			this.videoElm = null;
+			this.videoURL = "";
 
 			// Mark host screen for cinematic
 			this.hostDOM.addClass("cinematic");
@@ -63,21 +64,9 @@ define(
 			// Dispose previous video
 			this.videoContainer.empty();
 
-			// Create a popcorn video wrapper
-			var videoWrapper = Popcorn.HTMLYouTubeVideoElement( "#cinematic-video-host" );
-			videoWrapper.src = video;
-			videoWrapper.addEventListener('loadeddata', function() {
-				cb_ready();
-			});
-
-			// Create a popcorn instance
-			this.popcorn = Popcorn( videoWrapper );
-			this.popcorn.on('ended', (function() {
-				this.trigger('completed');
-				this.trigger('sequence.next', 'completed'); // [SEQUENCING]
-				if (this.completedCallback)
-					this.completedCallback();
-			}).bind(this));
+			// Prepare for the next video
+			this.videoURL = video;
+			cb_ready();
 
 		}
 
@@ -101,9 +90,31 @@ define(
 		 * Start video when to be shown
 		 */
 		CinematicScreen.prototype.onWillShow = function(cb) {
-			if (this.popcorn) this.popcorn.play();
-			cb();
+
+			// Create a popcorn video wrapper
+			var videoWrapper = Popcorn.HTMLYouTubeVideoElement( "#cinematic-video-host" );
+			videoWrapper.src = this.videoURL;
+			videoWrapper.addEventListener('loadeddata', function() {
+				cb();
+			});
+
+			// Create a popcorn instance
+			this.popcorn = Popcorn( videoWrapper );
+			this.popcorn.on('ended', (function() {
+				this.trigger('completed');
+				this.trigger('sequence.next', 'completed'); // [SEQUENCING]
+				if (this.completedCallback)
+					this.completedCallback();
+			}).bind(this));
 		}
+
+
+		/**
+		 * Start video when shown
+		 */
+		CinematicScreen.prototype.onShown = function() {
+			if (this.popcorn) this.popcorn.play();
+		}		
 
 		/**
 		 * Start video when to be hidden
