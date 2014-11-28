@@ -657,8 +657,9 @@ h1 + p.subtitle {
   font-style: italic;
   color: #999999;
 }
-.text-center {
-  text-align: center;
+h1 span.highlight {
+  color: #c0392b;
+  font-weight: bold;
 }
 .fullscreen {
   position: absolute;
@@ -697,6 +698,21 @@ h1 + p.subtitle {
   display: block;
   content: " ";
 }
+.text-right {
+  text-align: right !important;
+}
+.text-left {
+  text-align: left !important;
+}
+.text-center {
+  text-align: center !important;
+}
+.pull-right {
+  float: right !important;
+}
+.pull-left {
+  float: left !important;
+}
 .fx-animated {
   -webkit-transition: 0.2s;
   -moz-transition: 0.2s;
@@ -709,6 +725,139 @@ h1 + p.subtitle {
   -o-transform: scale(0.8);
   transform: scale(0.8);
   opacity: 0.2;
+}
+div.table-list {
+  background: rgba(255, 255, 255, 0.3);
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
+}
+div.table-list table {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 100%;
+}
+div.table-list table thead {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  border-bottom: solid 1px #cccccc;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+div.table-list table tbody {
+  display: block;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  top: 28px;
+}
+div.table-list table tr {
+  display: block;
+  height: 25px;
+}
+div.table-list table tr td,
+div.table-list table tr th {
+  float: left;
+  display: block;
+  height: 25px;
+  line-height: 25px;
+  padding: 0 2px;
+  text-align: left;
+}
+div.table-list table tr:after {
+  clear: after;
+}
+div.table-list table tbody tr {
+  cursor: pointer;
+}
+div.table-list table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+div.table-list table tbody tr:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+div.table-list table tbody tr:nth-child(odd):hover {
+  background-color: rgba(255, 255, 255, 0.6);
+}
+div.table-list table tbody tr.selected {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+}
+div.table-list table tbody tr.selected:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+div.table-list table .col-1 {
+  width: 8%;
+}
+div.table-list table .col-2 {
+  width: 16%;
+}
+div.table-list table .col-3 {
+  width: 24%;
+}
+div.table-list table .col-4 {
+  width: 32%;
+}
+div.table-list table .col-5 {
+  width: 40%;
+}
+div.table-list table .col-6 {
+  width: 48%;
+}
+div.table-list table .col-7 {
+  width: 56%;
+}
+div.table-list table .col-8 {
+  width: 64%;
+}
+div.table-list table .col-9 {
+  width: 72%;
+}
+div.table-list table .col-10 {
+  width: 80%;
+}
+div.table-list table .col-11 {
+  width: 88%;
+}
+div.table-list table .col-12 {
+  width: 100%;
+}
+div.table-list.table-scroll table thead tr {
+  margin-right: 18px;
+}
+div.table-list.table-scroll table tbody {
+  overflow-y: scroll;
+  overflow-x: none;
+}
+div.table-list.table-sm table tr {
+  height: 18px;
+}
+div.table-list.table-sm table tr td,
+div.table-list.table-sm table tr th {
+  height: 18px;
+  line-height: 18px;
+}
+div.table-list.table-sm table tbody {
+  top: 18px;
+}
+div.table-list.table-lg table tr {
+  height: 34px;
+}
+div.table-list.table-lg table tr td,
+div.table-list.table-lg table tr th {
+  height: 34px;
+  line-height: 32px;
+}
+div.table-list.table-lg table tbody {
+  top: 34px;
+}
+div.table-list.table-center table tr td,
+div.table-list.table-center table tr th {
+  text-align: center;
 }
 .panel-shaded {
   border-radius: 4px;
@@ -725,11 +874,14 @@ h1 + p.subtitle {
   -moz-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
+  position: relative;
   outline: none;
   color: white;
   cursor: pointer;
   border-style: none none solid none;
   border-width: 5px;
+  text-align: center;
+  padding: 5px;
 }
 .btn-shaded.btn-with-icon {
   font-size: 12px;
@@ -796,7 +948,7 @@ h1 + p.subtitle {
   border-color: #bdc3c7;
 }
 .btn-shaded:active {
-  margin-top: 2px;
+  margin-top: 2px !important;
   border-width: 2px;
 }
 .btn-round {
@@ -1385,11 +1537,33 @@ body.enable-ipide .btn-edit-component {
   height: 80%;
 }
 #game-frame .nav-mini {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  -webkit-border-radius: 10px 0 0 10px;
+  -moz-border-radius: 10px 0 0 10px;
+  -o-border-radius: 10px 0 0 10px;
+  border-radius: 10px 0 0 10px;
+  background-color: white;
+  overflow: hidden;
   position: absolute;
   display: block;
   z-index: 100;
+  right: 0;
+  top: 5px;
+  padding: 5px;
+  height: 40px;
+  width: 40px;
+}
+#game-frame .nav-mini button {
+  position: absolute;
   right: 5px;
-  bottom: 5px;
+  font-size: 14px;
+  padding: 8px;
+}
+#game-frame .nav-mini:hover {
+  width: 200px;
 }
 .screen.error-screen {
   min-height: 48px;

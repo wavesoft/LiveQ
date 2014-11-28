@@ -21,6 +21,9 @@ define(
 			// Prepare host
 			hostDOM.addClass("tuning2");
 
+			// Team header
+			$('<h1><span class="highlight">Tuning</span> The Quantum Machine</h1><div class="subtitle">Fiddle with the quantum machine and find the best values</div>').appendTo(hostDOM);
+
 			// ---------------------------------
 			// Create machine backdrop
 			// ---------------------------------
@@ -63,7 +66,7 @@ define(
 			// Create course button
 			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
 			this.btnCourse.click((function(e) {
-				UI.selectScreen("screen.courseroom");
+				this.trigger("course", "level-1-1");
 			}).bind(this));
 
 			// ---------------------------------

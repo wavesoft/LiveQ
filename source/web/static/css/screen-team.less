@@ -1,0 +1,142 @@
+
+///////////////////////////////////////////////
+// Team screen
+///////////////////////////////////////////////
+
+.screen.team {
+
+	// Various buttons in the page
+	.p-users, .p-machines, .p-notebook, .p-messages, .p-edge {
+		position: absolute;
+		bottom: 5px;
+		height: 62px;
+		width: 62px;
+	}
+	.p-users {
+		left: 15px;
+	}
+	.p-machines {
+		left: 82px;
+	}
+	.p-messages {
+		left: 148px;
+	}
+	.p-notebook {
+		left: 215px;
+	}
+	.p-edge {
+		right: 15px;
+	}
+
+	// Main table
+	div.table-list {
+		position: absolute;
+		left: 15px; top: 64px; bottom: 75px;
+
+		button {
+			margin-left: 2px;
+			margin-right: 2px;
+		}
+
+		tbody {
+			tr, td {
+				height: 38px;
+				line-height: 38px;
+			}
+		}
+	}
+
+	// Table dimentions
+	&.team-people {
+		div.table-list {
+			right: 15px;			
+		}
+	}
+
+	&.team-messages, &.team-notebook, &.team-machines {
+
+		div.table-list {
+			right: 50%;
+		}
+
+		div.controls {
+			position: absolute;
+			top: 64px; bottom: 75px;
+			left: 50%; right: 5px;
+			padding-left: 5px;
+
+			h4 {
+
+			}
+
+			// Status panels
+			.status-panel {
+				.border-radius(10px);
+				position: relative;
+				padding: 5px;
+				background: #fff;
+				border: solid 1px #DDD;
+
+				&.p-status {
+					height: 84px;
+
+					.icon {
+						left: 10px;
+						top: 10px;
+						bottom: 20px;
+						width: 62px;
+						position: absolute;
+						font-size: 42px;
+						text-align: center;
+						color: #999;
+						padding-top: 5px;
+					}
+					.title {
+						position: absolute;
+						left: 80px;
+						top: 10px;
+						right: 10px;
+						font-size: 20px;
+					}
+					.label {
+						position: absolute;
+						left: 80px;
+						top: 34px;
+						right: 10px;
+					}
+					.progress {
+						position: absolute;
+						left: 10px; right: 10px;
+						bottom: 10px;
+						height: 8px;
+						background-color: #DDD;
+
+						.bar {
+							position: absolute;
+							left: 0; top:0; bottom: 0;
+							color: #3498db;
+						}
+					}
+
+				}
+
+			}
+
+			// Control panel
+			.control-panel {
+				height: 72px;
+				padding-top: 10px;
+
+				button.btn-shaded {
+					float: left;
+					height: 62px;
+					width: 62px;
+					margin-right: 4px;
+				}
+			}
+
+		}
+
+	}
+
+}

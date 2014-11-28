@@ -11,6 +11,7 @@ define(
 		var Globe3D = function(hostDOM) {
 			Component.call(this, hostDOM);
 
+			this.paused = false;
 			this.animating = true;
 			this.half = {x:0, y:0};
 			window.d = this;
@@ -165,7 +166,8 @@ define(
 		 */
 		Globe3D.prototype.render = function() {
 
-			this.globeHost.rotateY(0.01);
+			if (!this.paused)
+				this.globeHost.rotateY(0.01);
 
 			this.renderer.render( 
 				this.scene, 
@@ -173,6 +175,14 @@ define(
 			);
 
 		};
+
+		/**
+		 * This function is called to control the animation
+		 */
+		Globe3D.prototype.setPaused = function( paused ) {
+			this.paused = paused;
+		}
+
 
 		/**
 		 * Reisze canvas & engine dimentions to fit host

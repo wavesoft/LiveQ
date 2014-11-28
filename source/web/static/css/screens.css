@@ -10,6 +10,17 @@
   height: 1;
   border-top: solid 1px #666666;
 }
+.screen h1 {
+  margin: 15px 15px 0;
+  color: #2c3e50;
+}
+.screen h1 span.highlight {
+  color: #16a085;
+}
+.screen h1 + div.subtitle {
+  color: #999999;
+  margin: 0 15px;
+}
 .screen .observable {
   -webkit-transition: all 0.4s;
   -moz-transition: all 0.4s;
@@ -20,14 +31,14 @@
   text-align: center;
   cursor: pointer;
   z-index: 100;
-  width: 45px;
-  height: 45px;
-  line-height: 45px;
-  font-size: 22.5px;
-  -webkit-border-radius: 45px;
-  -moz-border-radius: 45px;
-  -o-border-radius: 45px;
-  border-radius: 45px;
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  font-size: 17.5px;
+  -webkit-border-radius: 35px;
+  -moz-border-radius: 35px;
+  -o-border-radius: 35px;
+  border-radius: 35px;
   border: solid 2px;
 }
 .screen .observable.grey {
@@ -257,28 +268,97 @@
   border-color: #2980b9;
   background-color: #3498db;
 }
-.screen.home .r-machine,
-.screen.home .r-machine-overlay {
+.screen.home .side-screen {
+  left: 0;
+  top: 0;
+  bottom: 0;
   position: absolute;
-  left: 50%;
-  top: 50%;
+  width: 60%;
 }
-.screen.home .description-frame {
+.screen.home .side-screen .observable-short {
   position: absolute;
-  background-color: white;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 150px;
-  border-top: solid 1px #cccccc;
-  padding: 10px;
+  top: 40px;
+  bottom: 40px;
 }
-.screen.home .description-frame > h1 {
-  color: #c0392b;
-  font-size: 24px;
+.screen.home .side-screen .bg-slice {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.25);
 }
-.screen.home .description-frame > div {
-  font-size: 14px;
+.screen.home .side-screen .bg-globe {
+  position: absolute;
+  background-color: rgba(20, 20, 20, 0.1);
+}
+.screen.home .side-screen div.status-label .panel-label {
+  color: #333333;
+}
+.screen.home .side-screen div.status-label .panel-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+.screen.home .side-screen .p-machines,
+.screen.home .side-screen .p-events,
+.screen.home .side-screen .p-progress {
+  position: absolute;
+  width: 30%;
+}
+.screen.home .side-screen .p-machines {
+  left: 5px;
+  top: 5px;
+}
+.screen.home .side-screen .p-progress {
+  right: 30px;
+  top: 5px;
+}
+.screen.home .side-screen .p-events {
+  left: 30%;
+  top: 5px;
+}
+.screen.home .side-screen .p-abort {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  height: 62px;
+  width: 62px;
+}
+.screen.home .side-screen .p-view {
+  position: absolute;
+  bottom: 5px;
+  left: 70px;
+  height: 62px;
+  width: 62px;
+}
+.screen.home div.table-list {
+  position: absolute;
+  width: 38%;
+  right: 5px;
+  top: 72px;
+  bottom: 72px;
+  padding: 0 2px;
+}
+.screen.home .p-submit {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  height: 62px;
+  width: 39%;
+}
+.screen.home .p-go-course,
+.screen.home .p-go-cafe,
+.screen.home .p-go-machine {
+  position: absolute;
+  top: 5px;
+  width: 13%;
+}
+.screen.home .p-go-course {
+  right: 14%;
+}
+.screen.home .p-go-cafe {
+  right: 5px;
+}
+.screen.home .p-go-machine {
+  right: 27.5%;
 }
 .screen.login .host {
   width: 600px;
@@ -1252,6 +1332,144 @@
   border-width: 11px;
   margin-left: -11px;
 }
+.screen.team .p-users,
+.screen.team .p-machines,
+.screen.team .p-notebook,
+.screen.team .p-messages,
+.screen.team .p-edge {
+  position: absolute;
+  bottom: 5px;
+  height: 62px;
+  width: 62px;
+}
+.screen.team .p-users {
+  left: 15px;
+}
+.screen.team .p-machines {
+  left: 82px;
+}
+.screen.team .p-messages {
+  left: 148px;
+}
+.screen.team .p-notebook {
+  left: 215px;
+}
+.screen.team .p-edge {
+  right: 15px;
+}
+.screen.team div.table-list {
+  position: absolute;
+  left: 15px;
+  top: 64px;
+  bottom: 75px;
+}
+.screen.team div.table-list button {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+.screen.team div.table-list tbody tr,
+.screen.team div.table-list tbody td {
+  height: 38px;
+  line-height: 38px;
+}
+.screen.team.team-people div.table-list {
+  right: 15px;
+}
+.screen.team.team-messages div.table-list,
+.screen.team.team-notebook div.table-list,
+.screen.team.team-machines div.table-list {
+  right: 50%;
+}
+.screen.team.team-messages div.controls,
+.screen.team.team-notebook div.controls,
+.screen.team.team-machines div.controls {
+  position: absolute;
+  top: 64px;
+  bottom: 75px;
+  left: 50%;
+  right: 5px;
+  padding-left: 5px;
+}
+.screen.team.team-messages div.controls .status-panel,
+.screen.team.team-notebook div.controls .status-panel,
+.screen.team.team-machines div.controls .status-panel {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  position: relative;
+  padding: 5px;
+  background: white;
+  border: solid 1px #dddddd;
+}
+.screen.team.team-messages div.controls .status-panel.p-status,
+.screen.team.team-notebook div.controls .status-panel.p-status,
+.screen.team.team-machines div.controls .status-panel.p-status {
+  height: 84px;
+}
+.screen.team.team-messages div.controls .status-panel.p-status .icon,
+.screen.team.team-notebook div.controls .status-panel.p-status .icon,
+.screen.team.team-machines div.controls .status-panel.p-status .icon {
+  left: 10px;
+  top: 10px;
+  bottom: 20px;
+  width: 62px;
+  position: absolute;
+  font-size: 42px;
+  text-align: center;
+  color: #999999;
+  padding-top: 5px;
+}
+.screen.team.team-messages div.controls .status-panel.p-status .title,
+.screen.team.team-notebook div.controls .status-panel.p-status .title,
+.screen.team.team-machines div.controls .status-panel.p-status .title {
+  position: absolute;
+  left: 80px;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+}
+.screen.team.team-messages div.controls .status-panel.p-status .label,
+.screen.team.team-notebook div.controls .status-panel.p-status .label,
+.screen.team.team-machines div.controls .status-panel.p-status .label {
+  position: absolute;
+  left: 80px;
+  top: 34px;
+  right: 10px;
+}
+.screen.team.team-messages div.controls .status-panel.p-status .progress,
+.screen.team.team-notebook div.controls .status-panel.p-status .progress,
+.screen.team.team-machines div.controls .status-panel.p-status .progress {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  height: 8px;
+  background-color: #dddddd;
+}
+.screen.team.team-messages div.controls .status-panel.p-status .progress .bar,
+.screen.team.team-notebook div.controls .status-panel.p-status .progress .bar,
+.screen.team.team-machines div.controls .status-panel.p-status .progress .bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  color: #3498db;
+}
+.screen.team.team-messages div.controls .control-panel,
+.screen.team.team-notebook div.controls .control-panel,
+.screen.team.team-machines div.controls .control-panel {
+  height: 72px;
+  padding-top: 10px;
+}
+.screen.team.team-messages div.controls .control-panel button.btn-shaded,
+.screen.team.team-notebook div.controls .control-panel button.btn-shaded,
+.screen.team.team-machines div.controls .control-panel button.btn-shaded {
+  float: left;
+  height: 62px;
+  width: 62px;
+  margin-right: 4px;
+}
 .screen.overlay-book {
   overflow: hidden;
 }
@@ -1759,4 +1977,13 @@
 }
 .tunable:hover div.markers {
   opacity: 1;
+}
+.observable-short .globe {
+  position: absolute;
+  display: block;
+  width: 160px;
+  height: 160px;
+  z-index: 70;
+  background: white;
+  border: solid 2px #dddddd;
 }

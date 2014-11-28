@@ -1,9 +1,9 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["core/config", "core/db", "core/apisocket"], 
+define(["core/config", "core/db", "core/apisocket", "core/global"], 
 
-	function(Config, DB, APISocket) {
+	function(Config, DB, APISocket, Global) {
 
 		/**
 		 * Database interface
@@ -45,6 +45,9 @@ define(["core/config", "core/db", "core/apisocket"],
 				this.profile = profile;
 				this.vars = profile['vars'];
 				this.initialize();
+
+				// Let global listeners that the user is logged in
+				Global.events.trigger("login", profile);
 
 				// Fire callback
 				if (callback) callback(true);

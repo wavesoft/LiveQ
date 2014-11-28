@@ -64,7 +64,7 @@ define(
 		 */
 		DefaultObservableWidget.prototype.onMetaUpdate = function(meta) {
 			this.meta = meta;
-			this.element.text(meta['info']['short']);
+			this.element.html(meta['info']['short']);
 		}
 
 		/**

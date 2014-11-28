@@ -39,8 +39,11 @@ h1 + p.subtitle {
 	color: #999;
 }
 
-.text-center {
-	text-align: center;
+h1 {
+	span.highlight {
+		color: #c0392b;
+		font-weight: bold;
+	}
 }
 
 .fullscreen {
@@ -82,6 +85,27 @@ h1 + p.subtitle {
 }
 
 // ===============================
+// General text flags
+// ===============================
+
+.text-right {
+	text-align: right !important;
+}
+.text-left {
+	text-align: left !important;
+}
+.text-center {
+	text-align: center !important;
+}
+
+.pull-right {
+	float: right !important;
+}
+.pull-left {
+	float: left !important;
+}
+
+// ===============================
 // General purpose visual fx
 // ===============================
 
@@ -92,6 +116,151 @@ h1 + p.subtitle {
 .fx-backblur {
 	.transform( scale(0.8) );
 	opacity: 0.2;
+}
+
+// ===============================
+// Styled list
+// ===============================
+
+// Custom table with bordered container
+div.table-list {
+	background: rgba(255, 255, 255, 0.3);
+	border-top: solid 1px #cccccc;
+	border-bottom: solid 1px #cccccc;	
+
+	// Table subcontainer
+	table {
+		position: absolute;
+		left: 0; width: 100%;
+		top: 0; height: 100%;
+
+		thead {
+			display: block;
+			position: absolute;
+			left: 0; right: 0; top: 0;
+
+			border-bottom: solid 1px #CCC;
+			background-color: rgba(255,255,255,0.5);
+		}
+
+		tbody {
+			display: block;
+			position: absolute;
+			left: 0; width: 100%;
+			bottom: 0;
+			top: 28px;
+		}
+
+		tr {
+			display: block;
+			height: 25px;
+
+			td, th {
+				float: left;
+				display: block;
+				height: 25px;
+				line-height: 25px;
+				padding: 0 2px;
+				text-align: left;
+			}
+			&:after {
+				clear: after;
+			}
+		}
+
+		tbody {
+			tr {
+				cursor: pointer;
+				&:hover {
+					background-color: rgba(255,255,255,0.4);
+				}
+				&:nth-child(odd) {
+					background-color: rgba(255,255,255,0.2);
+					&:hover {
+						background-color: rgba(255,255,255,0.6);
+					}
+				}
+				&.selected {
+					background-color: rgba(0, 0, 0, 0.6);
+					color: #fff;
+					&:hover {
+						background-color: rgba(0, 0, 0, 0.6);
+					}
+				}
+			}
+		}
+
+		// Column dimentions
+		.col-1   { width: 8.0% }
+		.col-2   { width: 16.0% }
+		.col-3   { width: 24.0% }
+		.col-4   { width: 32.0% }
+		.col-5   { width: 40.0% }
+		.col-6   { width: 48.0% }
+		.col-7   { width: 56.0% }
+		.col-8   { width: 64.0% }
+		.col-9   { width: 72.0% }
+		.col-10  { width: 80.0% }
+		.col-11  { width: 88.0% }
+		.col-12  { width: 100% }
+
+	}
+
+	// Scroll additions
+	&.table-scroll {
+		table {
+			thead {
+				tr {
+					margin-right: 18px;
+				}
+			}
+			tbody {
+				overflow-y: scroll;
+				overflow-x: none;
+			}
+		}
+	}
+
+	// Large line heights
+	&.table-sm {
+		table {
+			tr {
+				height: 18px;
+				td, th {
+					height: 18px;
+					line-height: 18px;
+				}
+			}
+			tbody {
+				top: 18px; 
+			}
+		}
+	}
+	&.table-lg {
+		table {
+			tr {
+				height: 34px;
+				td, th {
+					height: 34px;
+					line-height: 32px;
+				}
+			}
+			tbody {
+				top: 34px; 
+			}
+		}
+	}
+	&.table-center {
+		table {
+			tr {
+				td, th {
+					text-align: center;
+				}
+			}
+		}
+
+	}
+
 }
 
 // ===============================
@@ -111,11 +280,14 @@ h1 + p.subtitle {
 
 .btn-shaded {
 	.border-radius(4px);
+	position: relative;
 	outline: none;
 	color: #fff;
 	cursor: pointer;
 	border-style: none none solid none;
 	border-width: 5px;
+	text-align: center;
+	padding: 5px;
 
 	&.btn-with-icon {
 		font-size: 12px;
@@ -185,7 +357,7 @@ h1 + p.subtitle {
 }
 
 .btn-shaded:active {
-	margin-top: 2px;
+	margin-top: 2px !important;
 	border-width: 2px;
 }
 
@@ -761,11 +933,28 @@ body.enable-ipide {
 
 
 	.nav-mini {
+		.transition(all 0.2s);
+		.border-radius(10px 0 0 10px);
+		background-color: #fff;
+		overflow: hidden;
 		position: absolute;
 		display: block;
 		z-index: 100;
-		right: 5px;
-		bottom: 5px;
+		right: 0; top: 5px;
+		padding: 5px;
+		height: 40px;
+		width: 40px;
+
+		button {
+			position: absolute;
+			right: 5px;
+			font-size: 14px;
+			padding: 8px;			
+		}
+
+		&:hover {
+			width: 200px;
+		}
 	}
 
 }

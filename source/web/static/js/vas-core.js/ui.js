@@ -268,18 +268,42 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		UI.Transitions = {
 			ZOOM_IN  		: [ 'pt-page-scaleDown', 	'pt-page-scaleUpDown pt-page-delay300' ],
 			ZOOM_OUT 		: [ 'pt-page-scaleDownUp', 'pt-page-scaleUp pt-page-delay300' ],
+			
 			DIFF_RIGHT 		: [ 'pt-page-moveToLeftEasing pt-page-ontop', 'pt-page-moveFromRight' ],
 			DIFF_LEFT 		: [ 'pt-page-moveToRightEasing pt-page-ontop', 'pt-page-moveFromLeft' ],
 			DIFF_BOTTOM		: [ 'pt-page-moveToTopEasing pt-page-ontop', 'pt-page-moveFromBottom' ],
 			DIFF_TOP		: [ 'pt-page-moveToBottomEasing pt-page-ontop', 'pt-page-moveFromTop' ],
+			
 			FLIP_RIGHT		: [ 'pt-page-flipOutRight', 'pt-page-flipInLeft pt-page-delay500' ],
 			FLIP_LEFT		: [ 'pt-page-flipOutLeft', 'pt-page-flipInRight pt-page-delay500' ],
 			FLIP_TOP		: [ 'pt-page-flipOutTop', 'pt-page-flipInBottom pt-page-delay500' ],
 			FLIP_BOTTOM		: [ 'pt-page-flipOutBottom', 'pt-page-flipInTop pt-page-delay500' ],
+
 			PULL_RIGHT		: [ 'pt-page-rotatePushLeft', 'pt-page-rotatePullRight pt-page-delay180' ],
 			PULL_LEFT		: [ 'pt-page-rotatePushRight', 'pt-page-rotatePullLeft pt-page-delay180' ],
 			PULL_BOTTOM		: [ 'pt-page-rotatePushTop', 'pt-page-rotatePullBottom pt-page-delay180' ],
 			PULL_TOP		: [ 'pt-page-rotatePushBottom', 'pt-page-rotatePullTop pt-page-delay180' ],
+
+			FADE_LEFT		: [ 'pt-page-fade', 'pt-page-moveFromRight pt-page-ontop' ],
+			FADE_RIGHT		: [ 'pt-page-fade', 'pt-page-moveFromLeft pt-page-ontop' ],
+			FADE_BOTTOM		: [ 'pt-page-fade', 'pt-page-moveFromBottom pt-page-ontop' ],
+			FADE_TOP		: [ 'pt-page-fade', 'pt-page-moveFromTop pt-page-ontop' ],
+
+			MOVE_LEFT		: [ 'pt-page-moveToRight', 'pt-page-moveFromLeft' ],
+			MOVE_RIGHT		: [ 'pt-page-moveToLeft', 'pt-page-moveFromRight' ],
+			MOVE_BOTTOM		: [ 'pt-page-moveToTop', 'pt-page-moveFromBottom' ],
+			MOVE_TOP		: [ 'pt-page-moveToBottom', 'pt-page-moveFromTop' ],
+
+			SCALEDOWN_LEFT	: [ 'pt-page-scaleDown', 'pt-page-moveFromRight pt-page-ontop' ],
+			SCALEDOWN_RIGHT	: [ 'pt-page-scaleDown', 'pt-page-moveFromLeft pt-page-ontop' ],
+			SCALEDOWN_BOTTOM: [ 'pt-page-scaleDown', 'pt-page-moveFromBottom pt-page-ontop' ],
+			SCALEDOWN_TOP	: [ 'pt-page-scaleDown', 'pt-page-moveFromTop pt-page-ontop' ],
+
+			SCALEUP_LEFT	: [ 'pt-page-moveToLeft pt-page-ontop', 'pt-page-scaleUp' ],
+			SCALEUP_RIGHT	: [ 'pt-page-moveToRight pt-page-ontop', 'pt-page-scaleUp' ],
+			SCALEUP_BOTTOM 	: [ 'pt-page-moveToTop pt-page-ontop', 'pt-page-scaleUp' ],
+			SCALEUP_TOP		: [ 'pt-page-moveToBottom pt-page-ontop', 'pt-page-scaleUp' ],
+
 		};
 
 		/**

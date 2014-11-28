@@ -5,27 +5,104 @@
 
 .screen.home {
 
-	.r-machine, .r-machine-overlay {
+	// Side screen
+	.side-screen {
+		left: 0; top: 0; bottom: 0;
 		position: absolute;
-		left: 50%;
-		top: 50%;
+		width: 60%;
+
+		// The short version of the observable monitor
+		.observable-short {
+			position: absolute;
+			left: 0; right: 0;
+			top: 40px; bottom: 40px;
+		}
+
+		// The background trim circle
+		.bg-slice {
+			position: absolute;
+			background-color: rgba(255, 255, 255, 0.25);
+		}
+		.bg-globe {
+			position: absolute;
+			background-color: rgba(20,20,20,0.1);
+		}
+
+		// The shaded input panels around
+		div.status-label {
+			.panel-label {
+				color: #333;
+			}
+			.panel-value {
+				font-size: 20px;
+				font-weight: bold;
+			}
+		}
+
+		// Positioned elements
+		.p-machines, .p-events, .p-progress {
+			position: absolute;
+			width: 30%;
+		}
+		.p-machines {
+			left: 5px; top: 5px;
+		}
+		.p-progress {
+			right: 30px; top: 5px;
+		}
+		.p-events {
+			left: 30%; top: 5px;
+		}
+
+		.p-abort {
+			position: absolute;
+			bottom: 5px;
+			left: 5px;
+			height: 62px;
+			width: 62px;
+		}
+		.p-view {
+			position: absolute;
+			bottom: 5px;
+			left: 70px;
+			height: 62px;
+			width: 62px;
+		}
+
 	}
 
-	.description-frame {
+	// List of jobs
+	div.table-list {
 		position: absolute;
-		background-color: #fff;
-		left: 0; right: 0;
-		bottom: 0; height: 150px;
-		border-top: solid 1px #ccc;
-		padding: 10px;
+		width: 38%;
+		right: 5px;
+		top: 72px;
+		bottom: 72px;
+		padding: 0 2px;
+	}
 
-		> h1 {
-			color: #c0392b;
-			font-size: 24px;
-		}
-		> div {
-			font-size: 14px;
-		}
+	// Submit channel
+	.p-submit {
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		height: 62px;
+		width: 39%;
+	}
+
+	.p-go-course, .p-go-cafe, .p-go-machine {
+		position: absolute;
+		top: 5px;
+		width: 13%;
+	}
+	.p-go-course {
+		right: 14%;
+	}
+	.p-go-cafe {
+		right: 5px;
+	}
+	.p-go-machine {
+		right: 27.5%;
 	}
 
 }

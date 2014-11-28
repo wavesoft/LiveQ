@@ -219,6 +219,46 @@ define(["core/config", "core/base/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
+		 * Initializes a new ObservableScreen Component.
+		 *
+		 * This component is used for showing status of observables.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var ObservableScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		ObservableScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Define the observable configuration.
+		 *
+		 * @abstract
+		 * @param {array} observables - A list of Observable classes, one for each observable.
+		 */
+		ObservableScreen.prototype.onObservablesDefined = function(observables) {
+		};
+
+		/**
+		 * Update the observable values
+		 *
+		 * @abstract
+		 * @param {array} observables - A list of Observable classes, one for each observable.
+		 */
+		ObservableScreen.prototype.onObservablesUpdated = function(observables) {
+		};
+
+		////////////////////////////////////////////////////////////
+		/**
 		 * Initializes a new TutorialScreen Component.
 		 *
 		 * This component is used for displaying screens used solely for tutorial or informative purposes.
@@ -238,6 +278,38 @@ define(["core/config", "core/base/component" ],
 
 		// Subclass from Component
 		TutorialScreen.prototype = Object.create( Component.prototype );
+
+		////////////////////////////////////////////////////////////
+		/**
+		 * Initializes a new TeamScreen Component.
+		 *
+		 * This component is used for displaying team status
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var TeamScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		TeamScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * Define team information
+		 *
+		 * @abstract
+		 * @param {array} team - The team configuration
+		 */
+		TeamScreen.prototype.onTeamUpdate = function( team ) {
+
+		};
 
 		////////////////////////////////////////////////////////////
 		/**
@@ -903,7 +975,9 @@ define(["core/config", "core/base/component" ],
 			'BSODScreen'		: BSODScreen,
 			'IPIDEScreen'		: IPIDEScreen,
 			'CourseroomScene'	: CourseroomScene,
+			'ObservableScreen'	: ObservableScreen,
 			'Nav'				: Nav,
+			'TeamScreen'		: TeamScreen,
 			'Backdrop'			: Backdrop,
 			'LoginScreen'		: LoginScreen,
 			'Popup'				: Popup

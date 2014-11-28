@@ -13,7 +13,7 @@
 @tuning-scr-c-bad		: #e74c3c;
 @tuning-scr-sz-bad		: 54px;
 
-@tuning-scr-sz-generic	: 45px;
+@tuning-scr-sz-generic	: 35px;
 @tuning-scr-c-grey		: #CCC;
 
 @tuning-scr-drag-h	    : 30px;
@@ -31,13 +31,27 @@
 
 .screen {
 
-
 	.line {
 		width: 100px;
 		height: 1;
 		border-top: solid 1px #666;
 	}
 
+	// Header
+	h1 {
+		margin: 15px 15px 0;
+		color: #2c3e50;
+
+		span.highlight {
+			color: #16a085;
+		}
+	}
+
+	h1 + div.subtitle {
+		color: #999;
+		margin: 0 15px;
+	}
+	
 	// ===========================
 	//  Observable bubble element
 	// ===========================
@@ -192,6 +206,7 @@
 @import "screen-ipide.less";
 @import "screen-tutorial-stats.less";
 @import "screen-courseroom.less";
+@import "screen-team.less";
 
 // Overlays
 @import "overlay-book.less";
@@ -199,3 +214,4 @@
 // Reusable components
 @import "component-machine.less";
 @import "component-tunable.less";
+@import "component-observable-short.less";

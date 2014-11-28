@@ -3,7 +3,7 @@ define([
 	
 	// Screens
 	'vas-basic/components/screen_explain',
-	'vas-basic/components/screen_home2',
+	'vas-basic/components/screen_home',
 	'vas-basic/components/screen_running',
 	'vas-basic/components/screen_tuning2',
 	'vas-basic/components/screen_progress',
@@ -14,6 +14,14 @@ define([
 	'vas-basic/components/screen_ipide',
 	'vas-basic/components/screen_tutorial_stats',
 	'vas-basic/components/screen_courseroom',
+	'vas-basic/components/screen_courses',
+	'vas-basic/components/screen_team_people',
+	'vas-basic/components/screen_team_notebook',
+	'vas-basic/components/screen_team_machines',
+	'vas-basic/components/screen_team_messages',
+
+	// Subscreens
+	'vas-basic/components/screen_observable_short',
 
 	// Other components
 	'vas-basic/components/nav_mini',

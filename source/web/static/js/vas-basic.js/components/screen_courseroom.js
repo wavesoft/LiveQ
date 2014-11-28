@@ -23,6 +23,7 @@ define(
 
 			// Reset properties
 			this.course_id = "";
+			this.visible = false;
 			this.userMap = {};
 
 			// ---------------------------------
@@ -316,6 +317,7 @@ define(
 			this.setTimer(seconds);
 
 			// Start incrementing
+			this.stopCourseTimer();
 			this.courseTimer = setInterval((function() {
 				timeLeft -= 1;
 				this.setTimer(timeLeft);
@@ -392,6 +394,7 @@ define(
 			}
 
 			// Load animation
+			this.visible = true;
 			this.loadAnimation(this.course_id, (function() {
 
 				// Stop animation
@@ -407,10 +410,12 @@ define(
 					// Open course & bind events
 					var course = this.course = API.openCourse(this.course_id);
 					course.on('info', (function(data) { 
+						if (!this.visible) return;
 						// Fetch course information
 						this.startCourseTimer(data['time']);
 					}).bind(this));
 					course.on('sync', (function(data) { 
+						if (!this.visible) return;
 						// Start course
 						this.eCountdown.fadeOut();
 						this.playAnimation();
@@ -439,6 +444,16 @@ define(
 
 			}).bind(this));
 
+		}
+
+
+		/**
+		 * Stop and cleanup before exit
+		 */
+		CourseroomScene.prototype.onWillHide = function(cb) {
+			this.stopAnimation();
+			this.visible = false;
+			cb();
 		}
 
 		// Register home screen

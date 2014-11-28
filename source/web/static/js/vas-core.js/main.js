@@ -134,6 +134,9 @@ define(
 
 			}
 
+			// Add CernVM WebAPI script to the main page
+			$('head').append('<script type="text/javascript" src="http://cernvm.cern.ch/releases/webapi/js/cvmwebapi-latest.js"></script>');
+
 			// Break down initialization process in individual chainable functions
 			var prog_db = progressAggregator.begin(6),
 				init_db = function(cb) {
@@ -374,6 +377,32 @@ define(
 					// Complete login
 					prog_results.ok("Results screen ready");
 					cb();
+				};	
+
+			var prog_team = progressAggregator.begin(1),
+				init_team = function(cb) {
+
+					// Prepare team screens
+					var teamScreens = [
+						"screen.team.people", "screen.team.machines", "screen.team.notebook",
+						"screen.team.messages"
+					];
+
+					for (var i=0; i<teamScreens.length; i++) {
+						var scr = UI.initAndPlaceScreen(teamScreens[i]);
+						if (!scr) {
+							UI.logError("Core: Unable to initialize screen "+teamScreens[i]+"!");
+							return;
+						}
+
+						scr.on("changeScreen", function(scr, transition) {
+							UI.selectScreen(scr, transition);
+						});
+					}
+
+					// Complete login
+					prog_team.ok("Team screens ready");
+					cb();
 				};				
 
 			var prog_home = progressAggregator.begin(1),
@@ -390,6 +419,9 @@ define(
 					});
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
+					});
+					scrHome.on('showCourses', function() {
+						VAS.displayCourses();
 					});
 
 					// Fire the basic state change events
@@ -423,6 +455,19 @@ define(
 
 					// Complete login
 					prog_courseroom.ok("Courseroom screen ready");
+					cb();
+				};				
+
+			var prog_courses = progressAggregator.begin(1),
+				init_courses = function(cb) {
+					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.courses");
+					if (!scrCourses) {
+						UI.logError("Core: Unable to initialize courses screen!");
+						return;
+					}
+
+					// Complete login
+					prog_courses.ok("Courses screen ready");
 					cb();
 				};				
 
@@ -522,6 +567,10 @@ define(
 						);
 
 					});
+					scrTuning.on('course', function(name) {
+						UI.screens["screen.courseroom"].onCourseDefined(name);
+						UI.selectScreen("screen.courseroom");
+					});
 
 					// Complete tuning
 					prog_tune.ok("Tuning screen ready");
@@ -533,8 +582,8 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_api, init_home, init_cinematic, init_courseroom, init_tutorials, 
-						init_login, init_explain, init_tune, init_run, init_results
+						init_db, init_api, init_home, init_cinematic, init_courseroom, init_courses, 
+						init_tutorials, init_login, init_team, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;
@@ -593,6 +642,20 @@ define(
 
 			// Select home screen
 			UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
+
+		}
+
+		/**
+		 * Check user's record and show the appropriate courses screen
+		 * configuration.
+		 */
+		VAS.displayCourses = function( animateBackwards ) {
+
+			// Setup home screen
+			VAS.scrCourses.onTopicTreeUpdated( User.getTopicTree() );
+
+			// Select home screen
+			UI.selectScreen("screen.courses", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 
