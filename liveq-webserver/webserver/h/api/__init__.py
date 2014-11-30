@@ -20,12 +20,13 @@
 
 class APIInterface:
 
-	def __init__(self, socket, domain):
+	def __init__(self, socket, domain, binaryDomain=0x00):
 		"""
 		Initialize the API Base class
 		"""
 		self.socket = socket
 		self.domain = domain
+		self.binaryDomain = binaryDomain << 16
 		self.isOpen = True
 
 	######################################
@@ -80,6 +81,17 @@ class APIInterface:
 
 		# Send action
 		self.socket.sendAction("%s.%s" % (self.domain, action), param)
+
+	def sendBuffer(self, frameID, data):
+		"""
+		Send a binary buffer
+		"""
+		# If we are not open, ignore it
+		if not self.isOpen:
+			return
+
+		# Send buffer, prefixing the binary domain
+		self.socket.sendBuffer( (frameID & 0xffff) | this.binaryDomain , data)
 
 	def sendError(self, message ):
 		"""

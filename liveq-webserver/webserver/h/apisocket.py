@@ -28,6 +28,8 @@ import base64
 
 from webserver.h.api.chat import ChatInterface
 from webserver.h.api.course import CourseInterface
+from webserver.h.api.account import AccountInterface
+from webserver.h.api.labsocket import LabSocketInterface
 
 from liveq.models import User
 from webserver.config import Config
@@ -61,7 +63,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Multiple API interfaces
 		self.interfaces = [
 			ChatInterface(self),
-			CourseInterface(self)
+			CourseInterface(self),
+			AccountInterface(self),
+			LabSocketInterface(self),
 		]
 
 		# Open logger
@@ -150,7 +154,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# If the action is not 'login' and we don't have a user, 
 		# conider this invalid
 		if not self.user:
-			if action != "user.login":
+			if action != "account.login":
 				self.sendError("The user was not logged in!")
 				return
 
@@ -225,6 +229,17 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				"param": param
 			})
 
+	def sendBuffer(self, frameID, data):
+		"""
+		Send a binary payload to the socket
+		"""
+		# Send a binary frame to WebSocket
+		self.write_message( 
+			# Header MUST be 64-bit aligned
+			struct.pack("<II", frameID, 0)+data, 
+			binary=True
+		)		
+
 	def handleAction(self, action, param):
 		"""
 		Handle the specified incoming action from the javascript interface
@@ -233,45 +248,42 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.logger.info("Got action '%s' from user '%s'" % (action, str(self.user)))
 
 		# Handle login
-		if action == "user.login":
+		if action == "account.login":
 
 			# Fetch user entry
 			try:
 				user = User.get(User.username == param['user'])
 			except User.DoesNotExist:
-				self.sendAction('user.login.failure', {
+				self.sendAction('account.login.response', {
+						'status' : 'error',
 						'message': "User does not exist"
 					})
 				return
 
 			# Validate user password
 			if user.password != param['password']:
-				self.sendAction('user.login.failure', {
+				self.sendAction('account.login.response', {
+						'status' : 'error',
 						'message': "Password mismatch"
 					})
 				return
 
 			# Success
 			self.user = user
-			self.sendAction('user.login.success', {
-					'profile': {
-						'username': user.username,
-						'name': user.name,
-						'surname': user.surname,
-						'avatar': user.avatar,
-						'vars': json.loads(user.variables)
-					}
+			self.sendAction('account.login.response', {
+					'status' : 'ok'
+				})
+			self.sendAction('account.profile', {
+					'username': user.username,
+					'name': user.name,
+					'surname': user.surname,
+					'avatar': user.avatar,
+					'vars': json.loads(user.variables)
 				})
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:
 				i.ready()
-
-		# Handle variable update
-		elif action == "user.variables":
-
-			# Update variable
-			self.user.variables = json.dumps(param['vars'])
 
 		else:
 

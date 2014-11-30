@@ -76,7 +76,7 @@ define(
 
 			// Update local machine status when user is logged in
 			this.setMachineStatus(-2);
-			Global.events.on('login', (function(profile) {
+			Global.events.on('login', (function() {
 				this.updateLocalMachineStatus();
 			}).bind(this));
 

@@ -276,6 +276,12 @@ define(
 						cb();
 					});
 					APISocket.on('error', function(message) {
+						// Generic error message from the socket
+						UI.logError('I/O Error: '+message);
+					});
+
+					// Critical socket error
+					APISocket.on('critical', function(message) {
 						// API socket error
 						UI.logError(message, true);
 						prog_api.fail("Could not initialize core I/O socket!" + message, true);

@@ -11,12 +11,25 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		 * @class
 		 * @exports core/user
 		 */
-		var User = {
-			// Static profile variables
-			'profile' 	: { },
-			// Dynamic variables
-			'vars' 		: { }
-		};
+		var User = { };
+
+		/**
+		 * The user profile variables
+		 * @type {object}
+		 */
+		User.profile = { };
+
+		/**
+		 * The dynamic user variables
+		 * @type {object}
+		 */
+		User.vars = { };
+
+		/**
+		 * The socket used for account I/O
+		 * @type {object}
+		 */
+		User.accountIO = null;
 
 		/**
 		 * Enable/disable editing of the interface
@@ -25,34 +38,58 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		//$("body").addClass("enable-ipide")
 
 		/**
+		 * Interface to get a signleton to the accountIO class
+		 */
+		User.getAccountIO = function() {
+			if (!User.accountIO)
+				User.accountIO = APISocket.openAccount();
+			return User.accountIO;
+		}
+
+		/**
 		 * Login and initialize user record
 		 *
 		 * @param {Object} params - A dictionary that contains the 'username' and 'password' fields.
 		 * @param {function(status)} callback - A callback function to fire when the login-process has completed
 		 */
 		User.login = function(params, callback) {
+			var accountIO = this.getAccountIO();
 
 			// Try to log-in the user
-			APISocket.login(params['username'], params['password'], (function(profile, errorMsg) {
+			accountIO.login(params['username'], params['password'], (function(response) {
 				
 				// If something went wrong, fire error callback
-				if (!profile) {
-					if (callback) callback(false, errorMsg);
+				if (response['status'] != 'ok') {
+					if (callback) callback(false, response['message']);
 					return;
 				}
 
-				// Otherwise process uer record
-				this.profile = profile;
-				this.vars = profile['vars'];
-				this.initialize();
+				// Wait until the user profile arrives
+				accountIO.callbackOnAction("profile", (function(profile) {
 
-				// Let global listeners that the user is logged in
-				Global.events.trigger("login", profile);
+					// Let global listeners that the user is logged in
+					Global.events.trigger("login", profile);
 
-				// Fire callback
-				if (callback) callback(true);
+					// Handle profile
+					this.profile = profile;
+					this.vars = profile['vars'];
+					this.initialize();					
+
+					// Fire callback
+					if (callback) callback(true);
+
+				}).bind(this));
 
 			}).bind(this));
+
+		}
+
+		/**
+		 * Callback when user's dynamic variables are updated
+		 *
+		 * @param {Object} profile - The new profile dictionary
+		 */
+		User.onProfileUpdated = function(profile) {
 
 		}
 

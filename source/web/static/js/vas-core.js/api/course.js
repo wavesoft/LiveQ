@@ -32,7 +32,6 @@ define(["core/api/interface", "core/config"],
 		 * Handle course event
 		 */
 		APICourseroom.prototype.handleAction = function(action, data) {
-			if (!this.active) return;
 			console.log("Course action:",action,data);
 			if (action == "info") {
 				this.trigger('info', data);
@@ -47,15 +46,8 @@ define(["core/api/interface", "core/config"],
 		 * Close and lock class
 		 */
 		APICourseroom.prototype.handleClose = function() {
-			// Prohibit any furher usage
-			if (!this.active) return;
-			this.active = false;
-
 			// Leave course
-			this.apiSocket.send('course.leave');
-
-			// Fire close event
-			this.trigger('close');
+			this.sendAction('leave');
 		}
 
 		// Return the Chatroom class

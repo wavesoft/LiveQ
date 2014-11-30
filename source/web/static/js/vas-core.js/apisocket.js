@@ -1,7 +1,7 @@
 
-define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chatroom", "core/api/course"  ], 
+define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "core/api/course"  ], 
 
-	function( EventBase, SHA1, Config, UI, APIChatroom, APICourseroom ) {
+	function( EventBase, SHA1, Config, APIChatroom, APICourseroom ) {
 
 		/**
 		 * Bitmask filter
@@ -32,8 +32,10 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 			this.apiInstances = [];
 
 			// Register interfaces
+			this.registerInterface( "account" 	, 0x00, "core/api/account" );
 			this.registerInterface( "chatroom"	, 0x00, "core/api/chatroom" );
 			this.registerInterface( "course" 	, 0x00, "core/api/course" );
+			this.registerInterface( "labsocket" , 0x01, "core/api/labsocket" );
 
 		}
 
@@ -57,10 +59,10 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 					// Close and cleanup previous instance
 					if (this.apiInstances[domain] !== undefined ) {
 						try {
-							this.apiInstances[domain].handleClose();
-							this.apiInstances[domain].offAll();
-							this.apiInstances[domain].trigger("close");
-						} catch(e) {};
+							this.apiInstances[domain].__handleClose();
+						} catch(e) {
+							console.error("Error closing interface '",domain,"':",e);
+						};
 						delete this.apiInstances[domain];
 					}
 
@@ -156,16 +158,16 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 				// If for any reason the socket is closed, retry connection
 				//
 				this.socket.onclose = (function() {
-					this.trigger('error', 'Disconnected from the APISocket socket!');
+					this.trigger('critical', 'Disconnected from the APISocket socket!');
 					this.connected = false;
 
 					// Cleanup dynamic API instances
 					for (k in this.apiInstances) {
 						try {
-							this.apiInstances[k].handleClose();
-							this.apiInstances[k].offAll();
-							this.apiInstances[k].trigger("close");
-						} catch(e) { };
+							this.apiInstances[k].__handleClose();
+						} catch(e) {
+							console.error("Error closing interface '",k,"':",e);
+						};
 						this.apiInstances.splice(0);
 					}
 
@@ -175,13 +177,13 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 				// Handle socket errors
 				//
 				this.socket.onerror = (function(ws, error) {
-					this.trigger('error', 'Error while trying to connect to the API socket!');
+					this.trigger('critical', 'Error while trying to connect to the API socket!');
 					this.connected = false;
 				}).bind(this);
 
 			}
 			catch (e) {
-				this.trigger('error', 'Could not connect to the API socket! ' + String(e));
+				this.trigger('critical', 'Could not connect to the API socket! ' + String(e));
 				this.connected = false;
 			}
 		}
@@ -232,7 +234,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 
 				// Check if bitmask matches
 				if (frameID & API_BINFRAME_MASK == mask) {
-					this.apiInstances[domain].handleData( action, reader );
+					this.apiInstances[domain].__handleData( action, reader );
 				}
 
 			}
@@ -252,7 +254,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 			// Check if we have a domain handler
 			if (this.apiInstances[domain]) {
 				// Handle action on the given API instance
-				this.apiInstances[domain].handleAction( domainAction, parameters );
+				this.apiInstances[domain].__handleAction( domainAction, parameters );
 			}
 
 			// Handle login events
@@ -269,7 +271,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 
 			// Handle errors
 			else if (action == "error") {
-				UI.logError(parameters['message']);
+				this.trigger('error', parameters['message']);
 			}
 
 		}

@@ -1,9 +1,9 @@
 /**
  * [core/api/labsocket] - LabSocket API
  */
-define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/config"], 
+define(["core/api/interface", "liveq/LiveQ", "liveq/LabProtocol", "liveq/BufferReader", "core/config"], 
 
-	function(APIInterface, LabProtocol, BufferReader, Config) {
+	function(APIInterface, LiveQ, LabProtocol, BufferReader, Config) {
 
 		/**
 		 * APISocket LabSocket
@@ -11,7 +11,7 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 		 * @see {@link module:core/api/interface~APIInterface|APIInterface} (Parent class)
 		 * @exports core/api/labsocket
 		 */
-		var APILabSocket = function(apiSocket, labID) {
+		var APILabSocket = function(apiSocket, labID, config) {
 
 			// Initialize superclass
 			APIInterface.call(this, apiSocket);
@@ -26,6 +26,26 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 			// Keep the LabID
 			this.labID = labID;
 
+			// Prepare handshake frame
+			var handshakeFrame = {
+				"version": LiveQ.version,
+				"labid": labID,
+			};
+
+			// Append tunables/observables if specified
+			var cfg = config || {};
+			if (cfg.tunables) handshakeFrame['tunables'] = cfg.tunables;
+			if (cfg.observables) handshakeFrame['observables'] = cfg.observables;
+
+			// Do handshake
+			this.sendAction("open", handshakeFrame);
+
+			// We are connected
+			this.connected = true;
+
+			// Fire callbacks
+			this.trigger('connected', this);
+
 		}
 
 		// Subclass from APIInterface
@@ -33,9 +53,11 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 
 		/**
 		 * Handle labSocket event
+		 *
+		 * @param {string} action - The action name
+		 * @param {object} data - The action parameters
 		 */
 		APILabSocket.prototype.handleAction = function(action, data) {
-			if (!this.active) return;
 
 			if (action == "status") {  /* Status message */
 				console.log(data['message']);
@@ -68,11 +90,13 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 				this.running = false;
 
 			}
-
 		}
 
 		/**
-		 * Handle labSocket event
+		 * Handle labSocket binary frame
+		 *
+		 * @param {int} action - The action frame ID (16-bit integer)
+		 * @param {ArrayBuffer} data - The action payload as a javascript ArrayBuffer
 		 */
 		APILabSocket.prototype.handleDataFrame = function(action, data) {
 
@@ -133,13 +157,13 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 		/**
 		 * This event is fired when the socket is connected.
 		 *
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#connected		
+		 * @event module:core/api/labsocket~APILabSocket#connected		
 		 */
 
 		/**
 		 * This event is fired when the socket is disconnected.
 		 *
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#disconnected		
+		 * @event module:core/api/labsocket~APILabSocket#disconnected		
 		 */
 
 		/**
@@ -147,27 +171,27 @@ define(["core/api/interface", "liveq/LabProtocol", "liveq/BufferReader", "core/c
 		 *
 		 * @param {string} errorMessage - The error message
 		 * @param {boolean} recoverable - If true the error is recoverable
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#error		
+		 * @event module:core/api/labsocket~APILabSocket#error		
 		 */
 
 		/**
 		 * This event is fired when there was a simulation error.
 		 *
 		 * @param {string} errorMessage - The error message
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#runError		
+		 * @event module:core/api/labsocket~APILabSocket#runError		
 		 */
 
 		/**
 		 * This event is fired when the simulation is completed.
 		 *
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#runCompleted		
+		 * @event module:core/api/labsocket~APILabSocket#runCompleted		
 		 */
 
 		/**
 		 * A log message arrived from the server.
 		 *
 		 * @param {string} logMessage - The message to log
-		 * @event module:core/api/labsocket/LabSocket~LabSocket#log		
+		 * @event module:core/api/labsocket~APILabSocket#log		
 		 */
 
 		// Return the APILabSocket class
