@@ -85,7 +85,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 	def open(self):
 		"""
-		Community socket open
+		Real-Time API socket open
 		"""
 
 		# Get user ID
@@ -121,7 +121,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 	def on_close(self):
 		"""
-		Community Socket closed
+		Real-Time API Socket closed
 		"""
 
 		# Remove the scheduledPing timer
@@ -182,11 +182,15 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			return
 
 		# Send a ping request
-		self.ping("io.keepalive")
+		try:
+			self.ping("io.keepalive")
 
-		# Schedule a timeout timer
-		self.pingTimeout = IOLoop.instance().add_timeout(PING_TIMEOUT, self.pingTimeoutCallback)
-		self.pingTimer = None
+			# Schedule a timeout timer
+			self.pingTimeout = IOLoop.instance().add_timeout(PING_TIMEOUT, self.pingTimeoutCallback)
+			self.pingTimer = None
+
+		except:
+			pass
 
 
 	def pingTimeoutCallback(self):
