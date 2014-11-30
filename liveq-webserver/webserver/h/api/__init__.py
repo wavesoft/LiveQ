@@ -50,7 +50,7 @@ class APIInterface:
 		"""
 		pass
 
-	def action(self, action, param):
+	def handleAction(self, action, param):
 		"""
 		Handle incoming action (without domain suffix)
 		"""

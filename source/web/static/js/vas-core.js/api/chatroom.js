@@ -1,30 +1,32 @@
 /**
  * [core/api/chatroom] - Chatroom API
  */
-define(["core/util/event_base", "core/config"], 
+define(["core/api/interface", "core/config"], 
 
-	function(EventBase, Config) {
+	function(APIInterface, Config) {
 
 		/**
 		 * APISocket Chatroom
+		 *
+		 * @see {@link module:core/api/interface~APIInterface|APIInterface} (Parent class)
+		 * @exports core/api/chatroom
 		 */
 		var APIChatroom = function(apiSocket, chatroom) {
 
 			// Initialize superclass
-			EventBase.call(this);
+			APIInterface.call(this, apiSocket);
 
 			// Setup properties
-			this.apiSocket = apiSocket;
 			this.chatroom = chatroom;
 			this.active = true;
 
 			// Join chatroom
-			this.apiSocket.send('chatroom.select', { 'chatroom': chatroom } );
+			this.sendAction('select', { 'chatroom': chatroom } );
 
 		}
 
-		// Subclass from EventBase
-		APIChatroom.prototype = Object.create( EventBase.prototype );
+		// Subclass from APIInterface
+		APIChatroom.prototype = Object.create( APIInterface.prototype );
 
 		/**
 		 * Handle chatroom event
@@ -32,17 +34,21 @@ define(["core/util/event_base", "core/config"],
 		APIChatroom.prototype.handleAction = function(action, data) {
 			if (!this.active) return;
 			console.log("Chat action:",action,data);
-			if (action == "chatroom.join") {
+			if (action == "join") {
 				this.trigger('join', data);
-			} else if (action == "chatroom.leave") {
+
+			} else if (action == "leave") {
 				this.trigger('leave', data);
-			} else if (action == "chatroom.chat") {
+
+			} else if (action == "chat") {
 				this.trigger('chat', data);
-			} else if (action == "chatroom.presence") {
+
+			} else if (action == "presence") {
 				this.trigger('presence', data);
 				for (var i=0; i<data['users'].length; i++) {
 					this.trigger('join', { 'user': data['users'][i] });
 				}
+				
 			}
 		}
 
@@ -51,13 +57,13 @@ define(["core/util/event_base", "core/config"],
 		 */
 		APIChatroom.prototype.send = function(chat) {
 			if (!this.active) return;
-			this.apiSocket.send('chatroom.chat', { 'message': chat });
+			this.sendAction('chat', { 'message': chat });
 		}
 
 		/**
 		 * Close and lock channel
 		 */
-		APIChatroom.prototype.close = function() {
+		APIChatroom.prototype.handleClose = function() {
 			// Prohibit any furher usage
 			if (!this.active) return;
 			this.active = false;

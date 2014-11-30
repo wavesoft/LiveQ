@@ -1,30 +1,32 @@
 /**
  * [core/api/chatroom] - Chatroom API
  */
-define(["core/util/event_base", "core/config"], 
+define(["core/api/interface", "core/config"], 
 
-	function(EventBase, Config) {
+	function(APIInterface, Config) {
 
 		/**
 		 * APISocket Chatroom
+		 *
+		 * @see {@link module:core/api/interface~APIInterface|APIInterface} (Parent class)
+		 * @exports core/api/course
 		 */
 		var APICourseroom = function(apiSocket, course) {
 
 			// Initialize superclass
-			EventBase.call(this);
+			APIInterface.call(this, apiSocket);
 
 			// Setup properties
-			this.apiSocket = apiSocket;
 			this.course = course;
 			this.active = true;
 
 			// Join course
-			this.apiSocket.send('course.enter', { 'course': course } );
+			this.sendAction('enter', { 'course': course } );
 
 		}
 
-		// Subclass from EventBase
-		APICourseroom.prototype = Object.create( EventBase.prototype );
+		// Subclass from APIInterface
+		APICourseroom.prototype = Object.create( APIInterface.prototype );
 
 		/**
 		 * Handle course event
@@ -32,17 +34,19 @@ define(["core/util/event_base", "core/config"],
 		APICourseroom.prototype.handleAction = function(action, data) {
 			if (!this.active) return;
 			console.log("Course action:",action,data);
-			if (action == "course.info") {
+			if (action == "info") {
 				this.trigger('info', data);
-			} else if (action == "course.sync") {
+
+			} else if (action == "sync") {
 				this.trigger('sync', data);
+				
 			}
 		}
 
 		/**
 		 * Close and lock class
 		 */
-		APICourseroom.prototype.close = function() {
+		APICourseroom.prototype.handleClose = function() {
 			// Prohibit any furher usage
 			if (!this.active) return;
 			this.active = false;

@@ -67,6 +67,15 @@ define(
 		}
 
 		/**
+		 * Unregister all event listeners
+		 */
+		EventBase.prototype.offAll = function() {
+			// Reset all
+			this.__eventCallbacks = {};
+			this.__eventForwarders = [];
+		}
+
+		/**
 		 * Fire an event
 		 *
 		 * @param {String} name - The name of the event

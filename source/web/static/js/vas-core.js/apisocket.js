@@ -4,12 +4,19 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 	function( EventBase, SHA1, Config, UI, APIChatroom, APICourseroom ) {
 
 		/**
+		 * Bitmask filter
+		 */
+		var API_MASK_DOMAIN = 0xffff0000,
+			API_MASK_ID     = 0x0000ffff;
+
+		/**
 		 * The APISocket class provides all the required functionality to interact in real time
 		 * with other APISocket members.
 		 *
 		 * @class
 		 * @classdesc The APISocket class
 		 * @see {@link module:core/util/event_base~EventBase|EventBase} (Parent class)
+		 * @exports core/apisocket
 		 */
 		var APISocket = function( hostDOM ) {
 
@@ -20,14 +27,71 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 			this.connected = false;
 			this.loginCallback = null;
 
-			// Dynamic API
-			this.chatroom = null;
-			this.course = null;
+			// Dynamic API interfaces
+			this.apiInterfaces = {};
+			this.apiInstances = [];
+
+			// Register interfaces
+			this.registerInterface( "chatroom"	, 0x00, "core/api/chatroom" );
+			this.registerInterface( "course" 	, 0x00, "core/api/course" );
 
 		}
 
 		// Subclass from EventBase
 		APISocket.prototype = Object.create( EventBase.prototype );
+
+		/**
+		 * Register a dynamic API interface
+		 */
+		APISocket.prototype.registerInterface = function( domain, bitDomain, classPath ) {
+
+			// Request an interface through require.js
+			require([classPath], (function(Interface) {
+
+				// Store instance under the specified domain
+				this.apiInterfaces[domain] = Interface;
+
+				// Register open function
+				this['open' + domain[0].toUpperCase() + domain.substr(1) ] = (function() {
+
+					// Close and cleanup previous instance
+					if (this.apiInstances[domain] !== undefined ) {
+						try {
+							this.apiInstances[domain].handleClose();
+							this.apiInstances[domain].offAll();
+							this.apiInstances[domain].trigger("close");
+						} catch(e) {};
+						delete this.apiInstances[domain];
+					}
+
+					// Prepare arguments by the ones given to openXXXX function
+					var args = [this];
+					for (i = 0; i < arguments.length; i++) {
+						args.push( arguments[i] );
+					}
+
+					// Prepare instance proxy
+					function I() {
+						Interface.apply(this, args);
+					}
+					I.prototype = Interface.prototype;
+
+					// Update domain and bitmask
+					I.prototype.domain = domain;
+					I.prototype.bitmask = bitDomain << 16;
+
+					// Create instance
+					var inst = new I();
+					this.apiInstances[domain] = inst;
+
+					// Return instance
+					return inst;
+
+				}).bind(this);
+
+			}).bind(this));
+
+		}
 
 		/**
 		 * Connect to the APISocket server
@@ -43,12 +107,40 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 				// This listener supports both binary and text data receiving
 				// 
 				this.socket.onmessage = (function(event) {
-					// Convert data to JSON
-					var data = JSON.parse(event.data);
-					// Extract parameters
-					var param = data['param'] || { };
-					// Handle action
-					this.handleActionFrame( data['action'], param );
+
+					// Check if the incoming data is a binary frame
+					if (event.data instanceof Blob) {
+						// If we have a binary response, read input
+
+						// Prepare FileReader to read Blob into a ArrayBuffer
+						var blobReader = new FileReader();
+						blobReader.onload = (function() {
+
+							// Cast result to UInt32 array in order to extract
+							// the frame ID
+							var buf = new Uint32Array( this.result, 0, 1 ),
+								frameID = buf[0];
+
+							// Handle data frame
+							this.handleDataFrame( frameID, this.result );
+
+						}).bind(this);
+
+						// Send Blob to the FileReader
+						blobReader.readAsArrayBuffer(event.data);
+
+					} else {
+
+						// Parse JSON frame
+						var data = JSON.parse(event.data);
+						// Extract parameters
+						var param = data['param'] || { };
+
+						// Handle action
+						this.handleActionFrame( data['action'], param );
+
+					}
+
 				}).bind(this);
 
 				// -----------------------------------------------------------
@@ -66,6 +158,17 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 				this.socket.onclose = (function() {
 					this.trigger('error', 'Disconnected from the APISocket socket!');
 					this.connected = false;
+
+					// Cleanup dynamic API instances
+					for (k in this.apiInstances) {
+						try {
+							this.apiInstances[k].handleClose();
+							this.apiInstances[k].offAll();
+							this.apiInstances[k].trigger("close");
+						} catch(e) { };
+						this.apiInstances.splice(0);
+					}
+
 				}).bind(this);
 
 				// -----------------------------------------------------------
@@ -86,7 +189,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 		/**
 		 * Send an action frame
 		 */
-		APISocket.prototype.send = function( action, parameters ) {
+		APISocket.prototype.sendAction = function( action, parameters ) {
 
 			// Prepare data to send
 			var param = parameters || { };
@@ -100,18 +203,56 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 		}
 
 		/**
+		 * Send blob
+		 */
+		APISocket.prototype.sendBlob = function( frameID, payload ) {
+
+			// Prepare data to send
+			var param = parameters || { };
+
+			// Send command
+			this.socket.send(JSON.stringify({
+				"action": action,
+				"param": param
+			}));
+
+		}
+
+		/**
+		 * Handle data frame
+		 */
+		APISocket.prototype.handleDataFrame = function( frameID, reader ) {
+
+			// Check which bitmask fits the arrived frame ID
+			for (k in this.apiInstances) {
+
+				// Get bitmask
+				var mask = this.apiInstances[k].bitmask;
+				if (!mask) continue;
+
+				// Check if bitmask matches
+				if (frameID & API_BINFRAME_MASK == mask) {
+					this.apiInstances[domain].handleData( action, reader );
+				}
+
+			}
+
+		}
+
+		/**
 		 * Handle an action frame that arrives from the APISocket channel
 		 */
 		APISocket.prototype.handleActionFrame = function( action, parameters ) {
 
-			// Handle chatroom events
-			if ((action.substr(0,9) == "chatroom.") && this.chatroom) {
-				this.chatroom.handleAction(action, parameters);
-			}
+			// Lookup the domain on the domain
+			var parts = action.split(".", 2),
+				domain = parts[0],
+				domainAction = action.substr(domain.length+1);
 
-			// Handle course events
-			else if ((action.substr(0,7) == "course.") && this.course) {
-				this.course.handleAction(action, parameters);
+			// Check if we have a domain handler
+			if (this.apiInstances[domain]) {
+				// Handle action on the given API instance
+				this.apiInstances[domain].handleAction( domainAction, parameters );
 			}
 
 			// Handle login events
@@ -138,40 +279,12 @@ define(["core/util/event_base", "sha1", "core/config", "core/ui", "core/api/chat
 		///////////////////////////////////////////////////////////////
 
 		/**
-		 * Join the given chatroom
-		 */
-		APISocket.prototype.openChatroom = function( chatroom ) {
-
-			// Abort any previous chatroom instance
-			if (this.chatroom)
-				this.chatroom.close();
-
-			// Return new chatroom API interface
-			return this.chatroom = new APIChatroom(this, chatroom);
-
-		}
-
-		/**
-		 * Join the given course
-		 */
-		APISocket.prototype.openCourse = function( course ) {
-
-			// Abort any previous course instance
-			if (this.course)
-				this.course.close();
-
-			// Return new course API interface
-			return this.course = new APICourseroom(this, course);
-
-		}
-
-		/**
 		 * Try to log user-in
 		 */
 		APISocket.prototype.login = function( user, password, callback ) {
 
 			// Try to log user in
-			this.send('user.login', {
+			this.sendAction('user.login', {
 				'user': user,
 				'password': password
 			});
