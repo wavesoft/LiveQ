@@ -115,8 +115,8 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 						// If we have a binary response, read input
 
 						// Prepare FileReader to read Blob into a ArrayBuffer
-						var blobReader = new FileReader();
-						blobReader.onload = (function() {
+						var blobReader = new FileReader(), self = this;
+						blobReader.onload = function() {
 
 							// Cast result to UInt32 array in order to extract
 							// the frame ID
@@ -124,9 +124,9 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 								frameID = buf[0];
 
 							// Handle data frame
-							this.handleDataFrame( frameID, this.result );
+							self.handleDataFrame( frameID, this.result );
 
-						}).bind(this);
+						};
 
 						// Send Blob to the FileReader
 						blobReader.readAsArrayBuffer(event.data);
@@ -223,7 +223,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 		/**
 		 * Handle data frame
 		 */
-		APISocket.prototype.handleDataFrame = function( frameID, reader ) {
+		APISocket.prototype.handleDataFrame = function( frameID, byteArray ) {
 
 			// Check which bitmask fits the arrived frame ID
 			for (k in this.apiInstances) {
@@ -233,8 +233,8 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				if (!mask) continue;
 
 				// Check if bitmask matches
-				if (frameID & API_MASK_DOMAIN == mask) {
-					this.apiInstances[domain].__handleData( action & API_MASK_ID, reader );
+				if ((frameID & API_MASK_DOMAIN) == mask) {
+					this.apiInstances[k].__handleData( frameID & API_MASK_ID, byteArray );
 				}
 
 			}

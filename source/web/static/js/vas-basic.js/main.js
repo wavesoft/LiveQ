@@ -68,6 +68,7 @@ define([
 	'vas-basic/dataviz/histogram',
 	'vas-basic/dataviz/histogram_plain',
 	'vas-basic/dataviz/histogram_ratio',
+	'vas-basic/dataviz/histogram_full',
 
 	// Data
 	'vas-basic/data/trainhisto',

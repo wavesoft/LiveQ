@@ -919,6 +919,12 @@ class AMQPBus(Bus, threading.Thread):
 				flags |= Bus.OPEN_BIND
 				is_consumer = True
 
+		# Default fallback to configuration
+		if flags == Bus.OPEN_DEFAULT and serve == None:
+			if name in self.config.SERVE_QUEUES:
+				flags |= Bus.OPEN_BIND
+				is_consumer = True
+
 		# Create a bus channel instance
 		channel = AMQPBusChannel(name, self, is_consumer, exchange_type)
 		self.channels[name] = channel

@@ -68,7 +68,7 @@ define(["core/util/event_base"],
 		 * @param {int} frameID - The action frame ID (16-bit integer)
 		 * @param {ArrayBuffer} payload - The action payload as a javascript ArrayBuffer
 		 */
-		APIInterface.prototype.handleBinary = function( frameID, payload ) {
+		APIInterface.prototype.handleData = function( frameID, payload ) {
 		}
 
 		/////////////////////////////////////////////////////////
@@ -123,11 +123,11 @@ define(["core/util/event_base"],
 		/**
 		 * Handle incoming binary message
 		 */
-		APIInterface.prototype.__handleBinary = function(action, payload) {
+		APIInterface.prototype.__handleData = function(action, payload) {
 			if (!this.active) return;
 
 			// Handle action by the implementation
-			this.handleBinary(action, payload);
+			this.handleData(action, payload);
 		}
 
 		/////////////////////////////////////////////////////////

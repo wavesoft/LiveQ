@@ -54,9 +54,6 @@ class LabSocketInterface(APIInterface):
 		self.trimObs = []
 		self.trimTun = []
 
-		# Open logger
-		self.logger = logging.getLogger("LabSocket")
-
 	####################################################################################
 	# --------------------------------------------------------------------------------
 	#                             API INTERFACE IMPLEMENTATION
@@ -122,7 +119,7 @@ class LabSocketInterface(APIInterface):
 
 			# We have a handshake with the agent.
 			# Fetch configuration and send configuration frame
-			self.logger.info("Handshake with client API v%s" % self.cversion)
+			self.logger.info("Opening lab %s with client v%s" % (labID, self.cversion))
 
 			# Check if we have trim parameters
 			if 'tunables' in param:

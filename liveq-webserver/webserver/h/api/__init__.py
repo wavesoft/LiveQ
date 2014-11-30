@@ -18,6 +18,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
+
 class APIInterface:
 
 	def __init__(self, socket, domain, binaryDomain=0x00):
@@ -28,6 +30,9 @@ class APIInterface:
 		self.domain = domain
 		self.binaryDomain = binaryDomain << 16
 		self.isOpen = True
+
+		# Open logger
+		self.logger = logging.getLogger("api.%s" % domain)
 
 	######################################
 	#           INGRESS EVENTS           #

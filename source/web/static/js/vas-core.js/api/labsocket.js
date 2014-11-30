@@ -98,7 +98,7 @@ define(["core/api/interface", "liveq/LiveQ", "liveq/LabProtocol", "liveq/BufferR
 		 * @param {int} action - The action frame ID (16-bit integer)
 		 * @param {ArrayBuffer} data - The action payload as a javascript ArrayBuffer
 		 */
-		APILabSocket.prototype.handleDataFrame = function(action, data) {
+		APILabSocket.prototype.handleData = function(action, data) {
 
 			// Encapsuate ArrayBuffer in a BufferReader class
 			var reader = new BufferReader(data);

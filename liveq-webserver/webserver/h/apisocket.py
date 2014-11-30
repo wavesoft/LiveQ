@@ -69,7 +69,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		]
 
 		# Open logger
-		self.logger = logging.getLogger("APISocket")
+		self.logger = logging.getLogger("api.socket")
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -233,6 +233,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		"""
 		Send a binary payload to the socket
 		"""
+
+		self.logger.info("Sending binary frame  #%s (%s bytes)" % (frameID, len(data)))
+
 		# Send a binary frame to WebSocket
 		self.write_message( 
 			# Header MUST be 64-bit aligned
