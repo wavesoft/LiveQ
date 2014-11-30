@@ -131,6 +131,11 @@ class AMQPBusChannel(BusChannel):
 		self.wait_queue = {}
 		self.closing = False
 
+		# Fail counter
+		self.failure = False
+		self.failCount = 0
+		self.firstFailTime = 0
+
 		self.last_reply_queue = None
 		self.last_reply_uuid = None
 
@@ -210,6 +215,30 @@ class AMQPBusChannel(BusChannel):
 		# Handle cases where this was not caused by the channel
 		if (channel != None) and not self.closing:
 			self.logger.warning("Channel closed unexpectidly (%s) %s" % (reply_code, reply_text))
+
+			# Check for failures
+			if self.failCount == 0:
+				self.firstFailTime = time.time()
+
+			# Increment fail counter
+			self.failCount += 1
+			if self.failCount > 4:
+				# More than 4 failures within 10 seconds
+				if time.time() - self.firstFailTime < 10:
+					self.logger.error("Too many failures, will not re-open channel!")
+
+					# Close channel
+					self._close()
+					
+					# Interrupt any blocking wait operation
+					for k,v in self.wait_queue.iteritems():
+						v['data'] = None
+						v['event'].set()
+					self.wait_queue = {}
+
+					# Mark channel as failed
+					self.failure = True
+					return
 
 			# Try to serve a new channel to ourselves
 			self.bus.serve_channel( self )	
@@ -529,6 +558,9 @@ class AMQPBusChannel(BusChannel):
 		"""
 		Sends a message to the bus
 		"""
+		# If channel is in failure mode, accept no requests
+		if self.failure:
+			return None
 
 		# Format message object according to specs
 		frame_body = {
@@ -590,6 +622,9 @@ class AMQPBusChannel(BusChannel):
 		"""
 		Reply to the last message received
 		"""
+		# If channel is in failure mode, accept no requests
+		if self.failure:
+			return None
 
 		# Check if we actually have a reply data
 		if not self.last_reply_uuid or not self.last_reply_queue:

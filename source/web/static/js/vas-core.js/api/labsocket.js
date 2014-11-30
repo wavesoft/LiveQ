@@ -131,9 +131,9 @@ define(["core/api/interface", "liveq/LiveQ", "liveq/LabProtocol", "liveq/BufferR
 
 			// Begin simulation with the given parameters
 			if (onlyInterpolate) {
-				this.send("sim_estimate", parameters);
+				this.sendAction("sim_estimate", parameters);
 			} else {
-				this.send("sim_start", parameters);
+				this.sendAction("sim_start", parameters);
 			}
 
 			// Mark simulation as active
@@ -147,7 +147,7 @@ define(["core/api/interface", "liveq/LiveQ", "liveq/LabProtocol", "liveq/BufferR
 		APILabSocket.prototype.abortSimulation = function(action) {
 
 			// Begin simulation with the given parameters
-			this.send("sim_abort");
+			this.sendAction("sim_abort");
 
 			// Mark simulation as inactive
 			this.running = false;

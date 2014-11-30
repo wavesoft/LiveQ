@@ -233,8 +233,8 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				if (!mask) continue;
 
 				// Check if bitmask matches
-				if (frameID & API_BINFRAME_MASK == mask) {
-					this.apiInstances[domain].__handleData( action, reader );
+				if (frameID & API_MASK_DOMAIN == mask) {
+					this.apiInstances[domain].__handleData( action & API_MASK_ID, reader );
 				}
 
 			}

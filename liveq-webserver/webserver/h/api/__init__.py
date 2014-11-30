@@ -91,7 +91,7 @@ class APIInterface:
 			return
 
 		# Send buffer, prefixing the binary domain
-		self.socket.sendBuffer( (frameID & 0xffff) | this.binaryDomain , data)
+		self.socket.sendBuffer( (frameID & 0xffff) | self.binaryDomain , data)
 
 	def sendError(self, message ):
 		"""
