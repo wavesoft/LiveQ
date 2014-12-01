@@ -22,6 +22,7 @@ import json
 
 from peewee import *
 from liveq.config.database import DatabaseConfig
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
 
 # -----------------------------------------------------
 #  Base class for the models
@@ -127,10 +128,93 @@ class Jobs(BaseModel):
 
 	#: When the job was submitted
 	timestamp = IntegerField(default=0)
-	#: The tunable configuration
+
+	#: The channel name where real-time I/O is performed
+	channel = CharField(max_length=128)
+
+	#: The tunable in this configuration
 	tunables = TextField(default="")
+	#: The observables in this configuration
+	observables = TextField(default="")
+
+	#: The tunable values of this configuration
+	tunableValues = TextField(default="")
+	#: The observable results of this configuration
+	observableValues = TextField(default="")
+
+	#: The team that owns this job
+	team = ForeignKeyField(Team)
+
 	#: The job status
-	status = CharField(max_length=4)
+	status = CharField(max_length=4, default="PEND")
+
+	#: Job status can be one of the following:
+	STATUS_ENUM = (
+		# Job not yet started
+		'PEND',
+		# Job currently running
+		'RUN',
+		# Job completed
+		'DONE',
+		# Job failed
+		'FAIL'
+	)
+
+	def getTunableValues(self):
+		"""
+		Return the tunable configuration
+		"""		
+		return json.loads(self.tunableValues)
+
+	def setTunableValues(self, data):
+		"""
+		Return the tunable configuration
+		"""
+		self.tunableValues = json.dumps(data)
+
+	def getObservableValues(self):
+		"""
+		Return the observable histograms data
+		"""
+		# Return blank if no histograms included
+		if not self.observableValues:
+			return IntermediateHistogramCollection()
+		else:
+			return IntermediateHistogramCollection.fromPack(self.observableValues)
+
+	def setObservableValues(self, intermediateHistogramCollection):
+		"""
+		Set the observable histogram data
+		"""
+		# Get a subset of the observables that we are monitoring
+		sset = intermediateHistogramCollection.subset(this.getObservableNames())
+		# Pack and store
+		self.observableValues = sset.pack()
+
+
+	def getTunableNames(self):
+		"""
+		Return the names of the tunables
+		"""
+		return str(self.tunables).split(",")
+
+	def setTunableNames(self, data):
+		"""
+		Update the names of the tunables
+		"""
+		self.tunables = ",".join(data)
+
+	def getObservableNames(self):
+		"""
+		Return the names of the Observables
+		"""
+		return str(self.observables).split(",")
+
+	def setObservableNames(self, data):
+		"""
+		Update the names of the Observables
+		"""
+		self.observables = ",".join(data)
 
 class TeamNotebook(BaseModel):
 	"""

@@ -20,7 +20,10 @@ define(
 
 			// Initial metrics
 			this.diameter = 250;
+			this.radMin = 0;
+			this.radMax = 0;
 			this.observables = [];
+			this.observableMap = {};
 
 			// --------------------------------
 			// Prepare the 3D globe widget
@@ -42,15 +45,12 @@ define(
 			}
 			this.globe.setPaused(true);
 
-			// ------------------------------------
-			// Prepare the target zone
-			// ------------------------------------
+			// --------------------------------
+			// Prepare for observables
+			// --------------------------------
 
-			var n = 10, s = 2*Math.PI/n, a = 0;
-			for (var i=0; i<n; i++) {
-				this.observables.push( this.createObservable(a, DB.cache['observables'][i]) );
-				a += s;
-			}
+			// Prepare the DOM to host the observables
+			this.obsDOM = $('<div class="fullscreen"></div>').appendTo(hostDOM);
 
 
 		}
@@ -59,10 +59,10 @@ define(
 		/**
 		 * Create an observable widget
 		 */
-		ObservableScreen.prototype.createObservable = function( angle, metadata ) {
+		ObservableScreen.prototype.createObservable = function( metadata, histo, histoRef ) {
 
 			// Try to instantiate the observable component
-			var e = R.instanceComponent("widget.observable.tuning", this.hostDOM );
+			var e = R.instanceComponent("widget.observable.tuning", this.obsDOM );
 			if (!e) {
 				console.warn("Unable to instantiate an observable widget!");
 				return undefined;
@@ -70,10 +70,6 @@ define(
 
 			// Forward visual events
 			this.forwardVisualEvents( e );
-
-			// Set pivot configuration for doing this nice
-			// circular distribution
-			e.setRadialConfig( undefined, undefined, angle );
 
 			// Event: Request for explanation
 			e.on('explain', (function(book) {
@@ -90,7 +86,7 @@ define(
 
 			// Set metadata and value
 			e.onMetaUpdate( metadata );
-			e.onUpdate( undefined );
+			e.onUpdate({ 'data': histo, 'ref': histoRef });
 
 			return e;
 		}
@@ -122,13 +118,13 @@ define(
 			});
 
 			// Calculate radial distances
-			var tunableRadius = 24,
-				radMin = this.diameter/2 + tunableRadius,
-				radMax = rectSize/2 - tunableRadius;
+			var tunableRadius = 24;
+			this.radMin = this.diameter/2 + tunableRadius,
+			this.radMax = rectSize/2 - tunableRadius;
 
 			// Update radial config
 			for (var i=0; i<this.observables.length; i++) {
-				this.observables[i].setRadialConfig( radMin, radMax );
+				this.observables[i].setRadialConfig( this.radMin, this.radMax );
 			}
 
 
@@ -181,6 +177,59 @@ define(
 
 
 		}
+
+		/**
+		 * Register an observable on the interface.
+		 *
+		 * @param {liveq/HistogramData~HistogramData} data - The histogram data.
+		 * @param {liveq/ReferenceData~ReferenceData} data - The histogram reference data.
+		 */
+		ObservableScreen.prototype.onObservableAdded = function( data, ref ) {
+			var id = data.id,  // Histogram data ID
+				meta = null;
+
+			// Lookup the observable metadata from the database
+			for (var i=0; i<DB.cache['observables'].length; i++) {
+				if (DB.cache['observables'][i]['_id'] == id) {
+					meta = DB.cache['observables'][i];
+					break;
+				}
+			}
+
+			// If we don't have metadata, exit
+			if (!meta) return;
+
+			// Create observable
+			var o = this.createObservable(meta, data, ref);
+			this.observables.push(o);
+			this.observableMap[id] = o;
+
+			// Realign observables
+			var r = 0, rs = Math.PI*2/this.observables.length;
+			for (var i=0; i<this.observables.length; i++) {
+
+				// Set pivot configuration for doing this nice
+				// circular distribution
+				this.observables[i].setRadialConfig( this.radMin, this.radMax, r );
+
+				// Radial step
+				r += rs;
+
+			}
+
+		};
+
+		/**
+		 * Reset the observables
+		 */
+		ObservableScreen.prototype.onObservablesReset = function() {
+
+			// Reset
+			this.obsDOM.empty();
+			this.observables = [];
+			this.observableMap = {};			
+
+		};
 
 		// Register home screen
 		R.registerComponent( "screen.observable.short", ObservableScreen, 1 );

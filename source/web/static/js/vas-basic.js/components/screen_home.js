@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/db", "core/ui", "core/apisocket", "core/config", "core/registry", "core/base/components"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, DB, UI, config, R,C) {
+	function($, d3, DB, UI, APISocket, config, R,C) {
 
 		/**
 		 * @class
@@ -28,11 +28,12 @@ define(
 			this.bgSlice = $('<div class="bg-slice"></div>').appendTo(this.sideScreenDOM);
 
 			// ---------------------------------
-			// Create the globe backdrop
+			// Create the observable screen
 			// ---------------------------------
 			this.statusScreenDOM = $('<div class="observable-short"></div>').appendTo(this.sideScreenDOM);
 			this.statusScreen = R.instanceComponent("screen.observable.short", this.statusScreenDOM);
 			this.forwardVisualEvents(this.statusScreen);
+
 
 			// ---------------------------------
 			// Prepare status fields and buttons
@@ -102,6 +103,7 @@ define(
 			// List
 			this.listJobs = $('<div class="list-jobs"></div>').appendTo(this.hostDOM);
 
+
 		}
 		HomeScreen.prototype = Object.create( C.HomeScreen.prototype );
 
@@ -156,6 +158,23 @@ define(
 				'mzBorderRadius': sz
 			});
 
+
+		}
+
+		HomeScreen.prototype.onWillShow = function(cb) {
+
+			// Reset observables
+			this.statusScreen.onObservablesReset();
+
+			// Open labsocket for testing
+			this.lab = APISocket.openLabsocket("3e63661c13854de7a9bdeed71be16bb9");
+			this.lab.on('histogramAdded', (function(data, ref) {
+				this.statusScreen.onObservableAdded(data, ref);
+			}).bind(this));
+
+			this.lab.beginSimulation({}, true);
+
+			cb();
 
 		}
 

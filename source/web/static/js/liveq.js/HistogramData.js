@@ -6,7 +6,7 @@ define(
 	/**
 	 * This class contains the utility class to manage reference histogram data
 	 *
- 	 * @exports liveq/LabSocket
+ 	 * @exports liveq/HistogramData
 	 */
 	function() {
 

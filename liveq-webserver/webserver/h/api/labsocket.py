@@ -119,7 +119,7 @@ class LabSocketInterface(APIInterface):
 
 			# We have a handshake with the agent.
 			# Fetch configuration and send configuration frame
-			self.logger.info("Opening lab %s with client v%s" % (labID, self.cversion))
+			self.logger.info("Opening lab %s with client v%s" % (param['labid'], self.cversion))
 
 			# Check if we have trim parameters
 			if 'tunables' in param:

@@ -121,7 +121,7 @@ define(
 		DataVizHistogram.prototype.regen = function() {
 
 			// If we have no data, plot no data points
-			if (this.data != null) {
+			if ((this.data != null) && !this.data.empty) {
 
 				// ------------------------------------------
 				//  Data Definition

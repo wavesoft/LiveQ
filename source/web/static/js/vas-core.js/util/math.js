@@ -31,6 +31,7 @@ define(["core/config"],
 				bMax = config['chi2-bounds']['max'];
 			if (chiSq < bMin) return min;
 			if (chiSq > bMax) return max;
+			if ((chiSq == null) || (chiSq == undefined) || isNaN(chiSq)) return max;
 
 			// Map values using the map function provided
 			var lgMin = mapFn(bMin), lgMax = mapFn(bMax),

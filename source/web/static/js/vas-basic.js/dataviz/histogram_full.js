@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "d3", "core/registry","core/base/data_widget" ], 
+	["jquery", "d3", "core/registry","core/base/data_widget", "liveq/Calculate" ], 
 
 	/**
 	 * This is the default data widget for visualizing a historgram
 	 *
  	 * @exports vas-basic/dataviz/histogram
 	 */
-	function(config, d3, R, DataWidget) {
+	function(config, d3, R, DataWidget, Calculate) {
 
 		/**
 		 * A histogram object that can be placed 
@@ -72,10 +72,13 @@ define(
 			// Initialize widget
 			DataWidget.call(this, hostDOM);
 
+			// Initialize properties
+			this.metadata = {};
+
 			// Create SVG instance and specify dimentions
 			this.svg = d3.select(this.hostDOM.get(0))
-				.attr("class", "plot-window")
 				.append("svg:svg")
+					.attr("class", "dv-plot-full")
 					.attr("width", this.width || 1)
 					.attr("height", this.height || 1);
 
@@ -149,9 +152,9 @@ define(
 				self = this;
 
 			// Remove previous instances
-			self.imgXLabel.remove();
-			self.imgYLabel.remove();
-			self.imgTitle.remove();
+			if (self.imgXLabel) self.imgXLabel.remove();
+			if (self.imgYLabel) self.imgYLabel.remove();
+			if (self.imgTitle) self.imgTitle.remove();
 
 			// Check for title
 			if (iX) {
@@ -470,7 +473,7 @@ define(
 				.clamp(true);
 
 			// Compare bins of those histograms
-			var yErrors = LiveQ.Calculate.chi2Bins( this.plots[1].histo, this.plots[0].histo );
+			var yErrors = Calculate.chi2Bins( this.plots[1].histo, this.plots[0].histo );
 			if (!yErrors)
 				return;
 
@@ -765,21 +768,25 @@ define(
 			    .attr("transform", "translate(0,"+height+")");
 
 			// Update image positions
-			imW = parseInt(this.imgXLabel.attr("width"));
-			imH = parseInt(this.imgXLabel.attr("height"));
-			this.imgXLabel
-				.attr("x", width-imW )
-				.attr("y", height-imH-this.style.titlePad );
-
-			imW = parseInt(this.imgYLabel.attr("width"));
-			self.imgYLabel
-				.attr("transform", "rotate(270) translate("+(-imW)+","+self.style.titlePad+")");
-
-			imW = parseInt(this.imgTitle.attr("width"));
-			imH = parseInt(this.imgTitle.attr("height"));
-			self.imgTitle
-				.attr("x", self.style.plotMargin.left+(width-imW)/2 )
-				.attr("y", self.style.titlePad );
+			if (this.imgXLabel) {
+				imW = parseInt(this.imgXLabel.attr("width"));
+				imH = parseInt(this.imgXLabel.attr("height"));
+				this.imgXLabel
+					.attr("x", width-imW )
+					.attr("y", height-imH-this.style.titlePad );
+			}
+			if (this.imgYLabel) {
+				imW = parseInt(this.imgYLabel.attr("width"));
+				this.imgYLabel
+					.attr("transform", "rotate(270) translate("+(-imW)+","+this.style.titlePad+")");
+			}
+			if (this.imgTitle) {
+				imW = parseInt(this.imgTitle.attr("width"));
+				imH = parseInt(this.imgTitle.attr("height"));
+				this.imgTitle
+					.attr("x", this.style.plotMargin.left+(width-imW)/2 )
+					.attr("y", this.style.titlePad );
+			}
 
 			// Update everything else
 			this.rescaleAxes();
@@ -814,7 +821,6 @@ define(
 					data['ref'].imgXLabel,
 					data['ref'].imgYLabel
 					);
-
 			}
 
 			// Update
@@ -827,7 +833,7 @@ define(
 		 * Update widget metadata
 		 */
 		DataVizFullHistogram.prototype.onMetaUpdate = function( config ) {
-
+			this.metadata = config;
 		}
 
 		// Store histogram data visualization on registry

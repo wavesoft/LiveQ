@@ -43,6 +43,7 @@ define(
 			// Prepare plot component on body
 			this.registerTab("dataviz.histogram", "uicon-plot-sideside");
 			this.registerTab("dataviz.histogram_ratio", "uicon-plot-ratio");
+			this.registerTab("dataviz.histogram_full", "uicon-plot-ratio");
 
 			// Select the last active tab
 			this.selectTab(lastActiveTab);
