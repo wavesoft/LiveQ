@@ -13,26 +13,31 @@
 		position: absolute;
 		text-align: center;
 		left: 5px; top: 5px; bottom: 5px;
-		width: 50%;
+		width: 30%;
 	}
 
 	.side-right {
 		position: absolute;
 		text-align: left;
 		right: 5px; top: 5px; bottom: 5px;
-		width: 50%;
+		width: 70%;
+		overflow-y: auto;
+	}
+
+	.side-full {
+		position: absolute;
+		left: 10px; right: 10px; top: 10px; bottom: 10px;
 		overflow-y: auto;
 	}
 
 	.panel {
-		padding: 10px;
 
 		> h1 {
 			margin: 15px 0;
 			color: #009999;
 		}
 		> p {
-			color: #999;
+			color: #666;
 		}
 
 
@@ -46,7 +51,7 @@
 				padding: 6px;
 				float: left;
 			}
-			input {
+			input[type=text], input[type=password] {
 				width: 250px;
 				padding: 4px;
 			}
@@ -58,6 +63,7 @@
 			div.details {
 				font-size: 12px;
 				margin: 5px 0 10px 160px;
+				color: #999;
 			}
 
 			&:after {
@@ -88,6 +94,19 @@
 				background-color: #BDDAFF;
 			}
 		}
+	}
+
+	.alert {
+		.border-radius(10px);
+		background-color: #E74C3C;
+		border: solid 1px #C0392B;
+		padding: 10px;
+		color: #fff;
+		margin-bottom: 10px;
+	}
+
+	input.invalid {
+		border: solid 1px #E74C3C;
 	}
 
 }

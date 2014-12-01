@@ -451,7 +451,7 @@
   left: 5px;
   top: 5px;
   bottom: 5px;
-  width: 50%;
+  width: 30%;
 }
 .screen.register .side-right {
   position: absolute;
@@ -459,18 +459,23 @@
   right: 5px;
   top: 5px;
   bottom: 5px;
-  width: 50%;
+  width: 70%;
   overflow-y: auto;
 }
-.screen.register .panel {
-  padding: 10px;
+.screen.register .side-full {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  overflow-y: auto;
 }
 .screen.register .panel > h1 {
   margin: 15px 0;
   color: #009999;
 }
 .screen.register .panel > p {
-  color: #999;
+  color: #666;
 }
 .screen.register .panel .row {
   padding: 2px;
@@ -482,7 +487,8 @@
   padding: 6px;
   float: left;
 }
-.screen.register .panel .row input {
+.screen.register .panel .row input[type=text],
+.screen.register .panel .row input[type=password] {
   width: 250px;
   padding: 4px;
 }
@@ -492,6 +498,7 @@
 .screen.register .panel .row div.details {
   font-size: 12px;
   margin: 5px 0 10px 160px;
+  color: #999;
 }
 .screen.register .panel .row:after {
   content: " ";
@@ -516,6 +523,20 @@
 }
 .screen.register .avatar-list .item.selected {
   background-color: #BDDAFF;
+}
+.screen.register .alert {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  background-color: #E74C3C;
+  border: solid 1px #C0392B;
+  padding: 10px;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.screen.register input.invalid {
+  border: solid 1px #E74C3C;
 }
 .screen.progress {
   background-color: rgba(0, 0, 0, 0.6);

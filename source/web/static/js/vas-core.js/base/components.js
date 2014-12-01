@@ -344,6 +344,37 @@ define(["core/config", "core/base/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
+		 * Initializes a new RegisterScreen Component.
+		 *
+		 * This component is used for displaying the registration screen.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var RegisterScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		RegisterScreen.prototype = Object.create( Component.prototype );
+		
+		/**
+		 * A registration error occured
+		 *
+		 * @abstract
+		 * @param {string} message - The message of the error.
+		 */
+		RegisterScreen.prototype.onRegistrationError = function( message ) {
+		};
+
+		////////////////////////////////////////////////////////////
+		/**
 		 * Initializes a new BSODScreen Component.
 		 *
 		 * This component is used as a placeholder to be shown when a critical error
@@ -968,6 +999,7 @@ define(["core/config", "core/base/component" ],
 			'RunningScreen'		: RunningScreen,
 			'ExplainScreen' 	: ExplainScreen,
 			'HomeScreen'		: HomeScreen,
+			'RegisterScreen'	: RegisterScreen,
 			'ProgressScreen'	: ProgressScreen,
 			'ResultsScreen'		: ResultsScreen,
 			'CinematicScreen'	: CinematicScreen,

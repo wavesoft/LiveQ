@@ -295,12 +295,6 @@ define(
 			var prog_login = progressAggregator.begin(1),
 				init_login = function(cb) {
 
-					var scrRegister = UI.initAndPlaceScreen("screen.register");
-					if (!scrRegister) {						
-						UI.logError("Core: Unable to initialize register screen!");
-						return;
-					}
-
 					var scrLogin = UI.initAndPlaceScreen("screen.login");
 					if (!scrLogin) {						
 						UI.logError("Core: Unable to initialize login screen!");
@@ -336,7 +330,14 @@ define(
 					});
 					scrLogin.on('register', function(user, password) {
 
-						UI.showOverlay("screen.register");
+						UI.showOverlay("screen.register", function(scrRegister) {
+							scrRegister.on('register', function(profile) {
+								UI.hideOverlay();
+							});
+							scrRegister.on('cancel', function() {
+								UI.hideOverlay();
+							});
+						});
 
 						/*
 						User.register({
@@ -352,10 +353,6 @@ define(
 						*/
 
 					});
-					scrRegister.on('register', function(profile) {
-						UI.hideOverlay();
-					});
-
 					// Complete login
 					prog_login.ok("Home screen ready");
 					cb();

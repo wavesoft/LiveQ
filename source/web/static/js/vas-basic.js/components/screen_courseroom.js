@@ -33,13 +33,13 @@ define(
 			// Create presentation monitor
 			this.eMonitor = $('<div class="monitor"></div>').appendTo(hostDOM);
 
+			// Create video player
+			this.createExplainScreen();
+
 			// Create countdown clock
 			this.eCountdown = $('<div class="countdown"></div>').appendTo(this.eMonitor);
 			this.eCountTitle = $('<h5>Course starts in</h5>').appendTo(this.eCountdown);
 			this.eCountTimer = $('<p>00:00</p>').appendTo(this.eCountdown);
-
-			// Create video player
-			this.createExplainScreen();
 
 			// ---------------------------------
 			// Create amphitheater

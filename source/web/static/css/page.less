@@ -25,6 +25,10 @@ body {
 
 }
 
+input, textarea, keygen, select, button {
+	margin: 2px;
+}
+
 .pointer {
 	position: absolute;
 	width: 10px;
@@ -295,6 +299,10 @@ div.table-list {
 		}
 	}
 
+	&.btn-lg {
+		padding: 20px;
+	}
+
 	&.disabled {
 		.pointer-events(none);
 		cursor: not-allowed;
@@ -325,7 +333,6 @@ div.table-list {
 	&.btn-blue {
 		background-color: #3498db;
 		border-color: #2980b9;
-		color: #036;
 	}
 	&.btn-orange {
 		background-color: #e67e22;

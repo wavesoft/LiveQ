@@ -81,7 +81,7 @@ define(
 			this.elmRightBody.append( loginBtnHost );
 
 			// Prepare log-in button
-			var btnLogin = $('<input type="button" value="Login" />');
+			var btnLogin = $('<button class="btn-shaded btn-blue">Login</button>');
 			loginBtnHost.append(btnLogin);
 			btnLogin.click((function(e) {
 				e.preventDefault();
@@ -90,7 +90,7 @@ define(
 			}).bind(this));
 
 			// Prepare register button
-			var btnRegister = $('<input type="button" value="Register" />');
+			var btnRegister = $('<button class="btn-shaded btn-teal">Register</button>');
 			loginBtnHost.append(btnRegister);
 			btnRegister.click((function(e) {
 				e.preventDefault();
