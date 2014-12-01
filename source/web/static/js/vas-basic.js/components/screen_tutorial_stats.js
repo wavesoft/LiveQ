@@ -268,6 +268,11 @@ define(
 			// Vibration timer
 			this.vibrationTimer = setInterval(this.__vibrator.bind(this), 50);
 
+			// Register visual events
+			R.registerVisualAid("tunetutorial.controls", this.eToggleErrors, { "screen": "screen.tutorial.stats" });
+			R.registerVisualAid("tunetutorial.machine", this.panelEvents, { "screen": "screen.tutorial.stats" });
+			R.registerVisualAid("tunetutorial.submit", this.eAcceptBtn, { "screen": "screen.tutorial.stats" });
+
 		}
 		StatsTutorial.prototype = Object.create( C.TutorialScreen.prototype );
 
@@ -309,6 +314,11 @@ define(
 		 */
 		StatsTutorial.prototype.onShown = function() {
 			this.histograms.resize( this.panelHistogram.width(), this.panelHistogram.height() );
+
+			// Show visual aid
+			UI.showFirstTimeAid("tunetutorial.controls");
+			UI.showFirstTimeAid("tunetutorial.machine");
+			UI.showFirstTimeAid("tunetutorial.submit");
 		}
 
 		/**

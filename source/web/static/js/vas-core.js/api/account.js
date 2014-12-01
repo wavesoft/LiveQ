@@ -38,6 +38,18 @@ define(["core/api/interface", "core/config"],
 		}
 
 		/**
+		 * Send user variables 
+		 */
+		APIAccount.prototype.sendVariables = function(vars) {
+
+			// Log-in user and fire callback when logged in
+			this.sendAction("variables", {
+				'vars': vars
+			});
+			
+		}
+
+		/**
 		 * Handle chatroom event
 		 */
 		APIAccount.prototype.handleAction = function(action, data) {

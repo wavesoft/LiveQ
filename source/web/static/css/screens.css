@@ -8,7 +8,7 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666666;
+  border-top: solid 1px #666;
 }
 .screen h1 {
   margin: 15px 15px 0;
@@ -18,7 +18,7 @@
   color: #16a085;
 }
 .screen h1 + div.subtitle {
-  color: #999999;
+  color: #999;
   margin: 0 15px;
 }
 .screen .observable {
@@ -26,7 +26,7 @@
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: white;
+  color: #FFF;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -42,12 +42,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333333;
+  color: #333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: white;
+  color: #FFF;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -104,7 +104,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -128,7 +128,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: white;
+  color: #FFF;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -152,7 +152,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: white;
+  color: #FFF;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -182,7 +182,7 @@
   border-radius: 20px;
   padding: 12px;
   margin: 12px;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0;
@@ -196,7 +196,7 @@
   top: 250px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: white;
+  color: #fff;
   padding: 10px 10px 0;
 }
 .screen.explain .explain-window div.explain-popup div.btn-host {
@@ -241,7 +241,7 @@
   margin: 30px 0 0 30px;
 }
 .screen.explain .explain-window div.explain-screen.cs-blackboard {
-  background: black url(../img/blackboard.jpg) no-repeat center center;
+  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window.cs-green {
@@ -256,13 +256,13 @@
 }
 .screen.explain .explain-window.cs-green a.btn-level {
   background-color: #34495e;
-  color: white;
+  color: #fff;
 }
 .screen.explain .explain-window.cs-green a.btn-level.blur {
-  background-color: #7f8c8d;
+  background-color: #7F8C8D;
 }
 .screen.explain .explain-window.cs-green a.btn-level.active {
-  background-color: #e67e22;
+  background-color: #E67E22;
 }
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
@@ -291,7 +291,7 @@
   background-color: rgba(20, 20, 20, 0.1);
 }
 .screen.home .side-screen div.status-label .panel-label {
-  color: #333333;
+  color: #333;
 }
 .screen.home .side-screen div.status-label .panel-value {
   font-size: 20px;
@@ -405,8 +405,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #cccccc;
-  border-bottom: solid 1px #cccccc;
+  border-top: solid 1px #ccc;
+  border-bottom: solid 1px #ccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -439,6 +439,84 @@
   padding: 8px;
   cursor: pointer;
 }
+.screen.register {
+  background-color: #fff;
+  padding: 10px;
+  font-size: 14px;
+  overflow-y: auto;
+}
+.screen.register .side-left {
+  position: absolute;
+  text-align: center;
+  left: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: 50%;
+}
+.screen.register .side-right {
+  position: absolute;
+  text-align: left;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: 50%;
+  overflow-y: auto;
+}
+.screen.register .panel {
+  padding: 10px;
+}
+.screen.register .panel > h1 {
+  margin: 15px 0;
+  color: #009999;
+}
+.screen.register .panel > p {
+  color: #999;
+}
+.screen.register .panel .row {
+  padding: 2px;
+}
+.screen.register .panel .row label {
+  width: 150px;
+  text-align: right;
+  font-weight: bold;
+  padding: 6px;
+  float: left;
+}
+.screen.register .panel .row input {
+  width: 250px;
+  padding: 4px;
+}
+.screen.register .panel .row div.input {
+  margin-left: 160px;
+}
+.screen.register .panel .row div.details {
+  font-size: 12px;
+  margin: 5px 0 10px 160px;
+}
+.screen.register .panel .row:after {
+  content: " ";
+  clear: both;
+}
+.screen.register .avatar-list {
+  height: 126px;
+  border: solid 1px #DDD;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.screen.register .avatar-list .item {
+  float: left;
+  display: block;
+  width: 60px;
+  height: 60px;
+  margin: 2px;
+  cursor: pointer;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.screen.register .avatar-list .item.selected {
+  background-color: #BDDAFF;
+}
 .screen.progress {
   background-color: rgba(0, 0, 0, 0.6);
 }
@@ -458,7 +536,6 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   left: 50%;
   top: 40%;
@@ -476,13 +553,12 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999999;
+  color: #999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -498,9 +574,8 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
-
   position: absolute;
-  background-color: #eeeeee;
+  background-color: #eee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -511,7 +586,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #ff9900;
+  background-color: #FF9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -536,12 +611,12 @@
   -o-transition: bottom 0.2s;
   transition: bottom 0.2s;
   position: absolute;
-  background-color: white;
+  background-color: #fff;
   left: 0;
   right: 0;
   bottom: -230px;
   height: 210px;
-  border-top: solid 1px #cccccc;
+  border-top: solid 1px #ccc;
   padding: 10px;
 }
 .screen.tuning2 .description-frame > h1 {
@@ -582,7 +657,7 @@
   height: 62px;
   padding: 5px;
   width: 394px;
-  border: solid 1px #cccccc;
+  border: solid 1px #CCC;
   background-color: white;
   border-radius: 5px 5px 0 0;
 }
@@ -597,7 +672,7 @@
   width: 62px;
 }
 .screen.tuning2 .control-board > div > div.panel-shaded {
-  color: #333333;
+  color: #333;
   float: left;
   width: 190px;
   height: 59px;
@@ -609,11 +684,11 @@
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  opacity: 1;
-  background-color: #dddddd;
+  background-color: #DDD;
   overflow: hidden;
   padding: 10px 5px;
   position: absolute;
+  opacity: 1;
 }
 .screen.tuning2 .parameter-group.animating {
   -webkit-transition: all 0.2s;
@@ -635,12 +710,12 @@
   opacity: 0.8;
 }
 .screen.tuning2 .tuning-panel {
-  border: solid 1px #dddddd;
+  border: solid 1px #DDD;
   line-height: 28px;
 }
 .screen.tuning2 .tuning-panel .header {
-  background-color: #eeeeee;
-  color: #009999;
+  background-color: #EEE;
+  color: #099;
   position: absolute;
   left: 0;
   right: 0;
@@ -650,7 +725,7 @@
   padding: 4px 10px;
 }
 .screen.tuning2 .tuning-panel .tunables {
-  background-color: white;
+  background-color: #fff;
   overflow-y: auto;
   position: absolute;
   left: 0;
@@ -662,16 +737,16 @@
   width: 45%;
 }
 .overlay-window .tuning-panel {
-  background-color: white;
+  background-color: #fff;
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999999;
+  border: dashed 1px #999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999999;
+  color: #999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -695,7 +770,7 @@
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: white;
+  color: #FFF;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -750,24 +825,23 @@
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95a5a6;
+  border: solid 2px #95A5A6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
-
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -787,7 +861,7 @@
   position: absolute;
   width: 108px;
   height: 52px;
-  color: white;
+  color: #FFFFFF;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -795,9 +869,9 @@
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
-  position: absolute;
   left: 0;
   top: 0;
+  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -875,7 +949,7 @@
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0);
   text-align: center;
   display: block;
   position: absolute;
@@ -884,7 +958,7 @@
   bottom: 0;
   height: 48px;
   font-size: 14px;
-  color: white;
+  color: #fff;
   line-height: 48px;
   text-decoration: none;
   font-size: 24px;
@@ -896,7 +970,7 @@
 }
 .screen.bsod {
   background-color: rgba(0, 0, 0, 0.7);
-  color: white;
+  color: #fff;
 }
 .screen.bsod .content {
   position: absolute;
@@ -930,25 +1004,25 @@
   width: 100%;
   font-size: 14px;
   text-align: center;
-  color: white;
+  color: #fff;
 }
 .screen.bsod .content .text a {
-  color: #33ccff;
+  color: #33CCFF;
   text-decoration: none;
 }
 .screen.bsod .content .text a:hover {
-  color: white;
+  color: #fff;
 }
 .screen.ipide {
-  background-color: white;
+  background-color: #fff;
   position: relative;
 }
 .screen.ipide .header,
 .screen.ipide .footer {
   position: absolute;
-  background-color: #999999;
+  background-color: #999;
   height: 32px;
-  color: white;
+  color: #fff;
   font-size: 16px;
   padding: 4px;
 }
@@ -969,18 +1043,18 @@
   float: right;
   width: 100px;
   height: 32px;
-  color: #333333;
+  color: #333;
   border: none;
   text-decoration: none;
-  background-color: #aaaaaa;
+  background-color: #AAA;
   text-align: center;
   margin-top: 4px;
   margin-left: 1px;
   padding: 5px 0 0;
 }
 .screen.ipide .footer .btn-footer:hover {
-  background-color: white;
-  color: black;
+  background-color: #fff;
+  color: #000;
 }
 .screen.ipide .code {
   position: absolute;
@@ -1026,7 +1100,7 @@
   -o-border-radius: 5px;
   border-radius: 5px;
   border: solid 1px #c0392b;
-  background: white;
+  background: #ffffff;
   height: 30px;
   margin: 6px;
 }
@@ -1075,7 +1149,7 @@
   font-weight: bold;
   margin-left: 14px;
   text-align: center;
-  color: white;
+  color: #FFF;
 }
 .screen.tutorial-stats .vibrator-host .panel-event-rate .label {
   position: absolute;
@@ -1085,7 +1159,7 @@
   top: 0;
   bottom: 0;
   padding-top: 10px;
-  color: #dddddd;
+  color: #ddd;
   font-size: 12px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram {
@@ -1094,7 +1168,7 @@
   right: 430px;
   bottom: 50px;
   border-right: solid 1px #333333;
-  background-color: white;
+  background-color: #fff;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend {
   left: 10px;
@@ -1104,14 +1178,14 @@
   border-top: solid 1px #333333;
   padding: 5px;
   font-style: italic;
-  color: #333333;
+  color: #333;
   font-size: 14px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend span.box {
   display: inline-block;
   width: 50px;
   height: 20px;
-  border: solid 1px #666666;
+  border: solid 1px #666;
   vertical-align: middle;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls {
@@ -1126,7 +1200,7 @@
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #eeeeee;
+  background-color: #EEE;
   margin: 5px;
   padding: 5px;
 }
@@ -1152,8 +1226,8 @@
   text-align: right;
   font-size: 16px;
   text-decoration: none;
-  color: #333333;
-  border: solid 2px #cccccc;
+  color: #333;
+  border: solid 2px #CCC;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle:after {
   -webkit-border-radius: 16px;
@@ -1170,8 +1244,8 @@
   position: absolute;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active {
-  background-color: #cccccc;
-  color: black;
+  background-color: #ccc;
+  color: #000;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active:after {
   background-color: #2ecc71;
@@ -1196,7 +1270,7 @@
   color: #003300;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept:hover {
-  color: white;
+  color: #fff;
   background-color: #2ecc71;
 }
 .screen.courseroom .monitor {
@@ -1204,8 +1278,8 @@
   background: no-repeat center center url(../img/blackboard.jpg);
   background-size: cover;
   position: absolute;
-  border: solid 8px #dddddd;
-  background-color: white;
+  border: solid 8px #DDD;
+  background-color: #FFF;
 }
 .screen.courseroom .monitor .countdown {
   -webkit-border-radius: 10px;
@@ -1220,12 +1294,12 @@
   transform: translate(-100px, -30px);
   text-align: center;
   background-color: rgba(0, 0, 0, 0.8);
-  color: white;
+  color: #fff;
 }
 .screen.courseroom .monitor .countdown h5 {
   margin: 5px 0;
   font-size: 14px;
-  color: #999999;
+  color: #999;
 }
 .screen.courseroom .monitor .countdown p {
   margin: 0;
@@ -1278,8 +1352,8 @@
   right: 0;
   bottom: 0;
   height: 60px;
-  border-top: solid 1px #999999;
-  background-color: white;
+  border-top: solid 1px #999;
+  background-color: #fff;
 }
 .screen.courseroom .chat-box > div.chat-input {
   position: absolute;
@@ -1303,10 +1377,10 @@
   width: 100px;
   top: 2px;
   bottom: 2px;
-  background-color: #3399cc;
+  background-color: #3399CC;
   font-size: 18px;
   border: none;
-  color: white;
+  color: #fff;
 }
 .screen.courseroom .chat_bubble {
   -webkit-border-radius: 5px;
@@ -1314,8 +1388,8 @@
   -o-border-radius: 5px;
   border-radius: 5px;
   position: absolute;
-  background: #ffffcc;
-  border: 1px solid #999999;
+  background: #FFFFCC;
+  border: 1px solid #999;
   max-width: 200px;
   padding: 5px;
 }
@@ -1332,13 +1406,13 @@
 }
 .screen.courseroom .chat_bubble:after {
   border-color: rgba(255, 255, 204, 0);
-  border-top-color: #ffffcc;
+  border-top-color: #FFFFCC;
   border-width: 10px;
   margin-left: -10px;
 }
 .screen.courseroom .chat_bubble:before {
   border-color: rgba(153, 153, 153, 0);
-  border-top-color: #999999;
+  border-top-color: #999;
   border-width: 11px;
   margin-left: -11px;
 }
@@ -1404,8 +1478,8 @@
   border-radius: 10px;
   position: relative;
   padding: 5px;
-  background: white;
-  border: solid 1px #dddddd;
+  background: #fff;
+  border: solid 1px #DDD;
 }
 .screen.team.team-messages div.controls .status-panel.p-status,
 .screen.team.team-notebook div.controls .status-panel.p-status,
@@ -1422,7 +1496,7 @@
   position: absolute;
   font-size: 42px;
   text-align: center;
-  color: #999999;
+  color: #999;
   padding-top: 5px;
 }
 .screen.team.team-messages div.controls .status-panel.p-status .title,
@@ -1450,7 +1524,7 @@
   right: 10px;
   bottom: 10px;
   height: 8px;
-  background-color: #dddddd;
+  background-color: #DDD;
 }
 .screen.team.team-messages div.controls .status-panel.p-status .progress .bar,
 .screen.team.team-notebook div.controls .status-panel.p-status .progress .bar,
@@ -1499,7 +1573,7 @@
 .screen.overlay-book > div .book-body .tab {
   font-size: 14px;
   padding: 10px;
-  color: white;
+  color: #fff;
 }
 .screen.overlay-book > div .book-body .tab.tab-error {
   padding: 34px 0 0 160px;
@@ -1520,7 +1594,7 @@
   line-height: 40px;
   padding: 0 10px;
   font-size: 16px;
-  color: white;
+  color: #fff;
   text-decoration: none;
 }
 .screen.overlay-book > div .book-tabs a.cs-blue {
@@ -1646,7 +1720,7 @@
   -o-transform: translate(-27px, -27px);
   transform: translate(-27px, -27px);
   border-width: 6px;
-  background-color: white;
+  background-color: #FFF;
   background-position-y: -42px;
 }
 .r-machine-overlay > div.locked {
@@ -1660,7 +1734,7 @@
   border-color: #bdc3c7;
 }
 .r-machine-overlay > div.locked:hover {
-  background-color: white;
+  background-color: #FFF;
 }
 .r-machine-overlay .c-beam {
   left: 140px;
@@ -1903,7 +1977,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: white;
+  color: #ffffff;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -1928,7 +2002,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: white;
+  color: #ffffff;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -1989,6 +2063,6 @@
   width: 160px;
   height: 160px;
   z-index: 70;
-  background: white;
-  border: solid 2px #dddddd;
+  background: #fff;
+  border: solid 2px #DDD;
 }

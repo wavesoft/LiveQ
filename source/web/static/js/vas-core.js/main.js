@@ -294,6 +294,13 @@ define(
 
 			var prog_login = progressAggregator.begin(1),
 				init_login = function(cb) {
+
+					var scrRegister = UI.initAndPlaceScreen("screen.register");
+					if (!scrRegister) {						
+						UI.logError("Core: Unable to initialize register screen!");
+						return;
+					}
+
 					var scrLogin = UI.initAndPlaceScreen("screen.login");
 					if (!scrLogin) {						
 						UI.logError("Core: Unable to initialize login screen!");
@@ -309,11 +316,29 @@ define(
 							if (!status) {
 								UI.growl("Could not log-in! "+errorMsg, "alert")
 							} else {
-								VAS.displayHome();
+
+								// User is logged-in, check if he has sheen the introduction
+								// sequence
+								if (!User.isFirstTimeSeen("intro")) {
+										// Display the intro sequence
+										UI.displaySequence( DB.cache['definitions']['intro-sequence']['sequence'] , function() {
+											// Mark introduction sequence as shown
+											User.markFirstTimeAsSeen("intro");
+											// Display home page
+											VAS.displayHome();
+										});
+								} else {
+									VAS.displayHome();
+								}
+
 							}
 						});
 					});
 					scrLogin.on('register', function(user, password) {
+
+						UI.showOverlay("screen.register");
+
+						/*
 						User.register({
 							'username' : user,
 							'password' : password
@@ -324,6 +349,11 @@ define(
 								VAS.displayHome();
 							}
 						});
+						*/
+
+					});
+					scrRegister.on('register', function(profile) {
+						UI.hideOverlay();
 					});
 
 					// Complete login

@@ -98,56 +98,6 @@ define(
 				this.trigger("register", fName.val(), fPassword.val() );
 			}).bind(this));
 
-			// Prepare test button to test the new features
-			var btnRegister = $('<input type="button" value="Test" />');
-			loginBtnHost.append(btnRegister);
-			btnRegister.click((function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				UI.displaySequence([
-					{
-						'screen': 'screen.cinematic',
-						'config': {
-							'video': 'http://www.youtube.com/watch?v=y2Ky3Wo37AY'
-						},
-						'next': {
-							'completed': 1
-						}
-					},
-					{
-						'screen': 'screen.tutorial.stats',
-						'next': {
-							'perfect': -1,
-							'good': 1,
-							'bad': 2,
-							'timeout': 2
-						}
-					},
-					{
-						'screen': 'screen.cinematic',
-						'config': {
-							'video': 'http://www.youtube.com/watch?v=1_CIx0PxaB8'
-						},
-						'next': {
-							'completed': 1
-						}
-					},
-					{
-						'screen': 'screen.cinematic',
-						'config': {
-							'video': 'http://www.youtube.com/watch?v=ZAB0He7qqqE'
-						},
-						'next': {
-							'completed': 1
-						}
-					},
-				], function() {
-					UI.selectScreen("screen.login");
-				});
-
-			}).bind(this));
-
 		}
 		LoginScreen.prototype = Object.create( C.LoginScreen.prototype );
 

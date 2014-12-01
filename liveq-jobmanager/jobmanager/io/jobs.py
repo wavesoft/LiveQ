@@ -30,8 +30,6 @@ from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
 from liveq.reporting.lars import LARS
 
-JOB_CHANNELS = { }
-
 class Job:
 	"""
 	Store interface with the job management
@@ -97,12 +95,8 @@ class Job:
 			dataChannel = self.store_meta['dataChannel']
 		if dataChannel:
 
-			# Open IBUS channel and keep it on JOB_CHANNELS
-			if not dataChannel in JOB_CHANNELS:
-				JOB_CHANNELS[dataChannel] = Config.IBUS.openChannel(dataChannel)
-
 			# Fetch job channel
-			self.channel = JOB_CHANNELS[dataChannel]
+			self.channel = Config.IBUS.openChannel(dataChannel)
 			self.dataChannel = dataChannel
 
 		else:
@@ -217,7 +211,6 @@ class Job:
 
 		# Close channel
 		self.channel.close()
-		del JOB_CHANNELS[self.dataChannel]
 
 	def addAgentInfo(self, agent):
 		"""

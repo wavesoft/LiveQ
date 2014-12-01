@@ -20,6 +20,7 @@
 
 import time
 import datetime
+import json
 
 from liveq.io.bus import Bus
 
@@ -52,6 +53,7 @@ class AccountInterface(APIInterface):
 		if action == "variables":
 			# Update variable
 			self.user.variables = json.dumps(param['vars'])
+			self.user.save()
 
 		elif action == "profile":
 			# Send user profile event

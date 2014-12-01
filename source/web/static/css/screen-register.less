@@ -1,0 +1,93 @@
+
+///////////////////////////////////////////////
+// Register Screen
+///////////////////////////////////////////////
+
+.screen.register {
+	background-color: #fff;
+	padding: 10px;
+	font-size: 14px;
+	overflow-y: auto;
+	
+	.side-left {
+		position: absolute;
+		text-align: center;
+		left: 5px; top: 5px; bottom: 5px;
+		width: 50%;
+	}
+
+	.side-right {
+		position: absolute;
+		text-align: left;
+		right: 5px; top: 5px; bottom: 5px;
+		width: 50%;
+		overflow-y: auto;
+	}
+
+	.panel {
+		padding: 10px;
+
+		> h1 {
+			margin: 15px 0;
+			color: #009999;
+		}
+		> p {
+			color: #999;
+		}
+
+
+		.row {
+			padding: 2px;
+
+			label {
+				width: 150px;
+				text-align: right;
+				font-weight: bold;
+				padding: 6px;
+				float: left;
+			}
+			input {
+				width: 250px;
+				padding: 4px;
+			}
+
+			div.input {
+				margin-left: 160px;
+			}
+
+			div.details {
+				font-size: 12px;
+				margin: 5px 0 10px 160px;
+			}
+
+			&:after {
+				content: " ";
+				clear: both;
+			}
+		}
+	}
+
+	.avatar-list {
+		height: 126px;
+		border: solid 1px #DDD;
+		overflow-y: auto;
+		overflow-x: hidden;
+
+		.item {
+			float: left;
+			display: block;
+			width: 60px;
+			height: 60px;
+			margin: 2px;
+			cursor: pointer;
+			background-size: contain;
+			background-repeat: no-repeat;
+			background-position: center center;
+
+			&.selected {
+				background-color: #BDDAFF;
+			}
+		}
+	}
+
+}

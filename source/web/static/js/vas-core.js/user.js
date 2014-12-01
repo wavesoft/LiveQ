@@ -146,9 +146,8 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		 */
 		User.commitUserRecord = function() {
 			// Commit user variables
-			APISocket.send( "user.variables", {
-				'vars': this.vars
-			});
+			var accountIO = this.getAccountIO();
+			accountIO.sendVariables(this.vars);
 		}
 
 		/**
@@ -412,6 +411,13 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 			}
 
 			return details;
+		}
+
+		/**
+		 * Check if first-time is seen
+		 */
+		User.isFirstTimeSeen = function(aid_id) {
+			return !!this.vars['first_time'][aid_id];
 		}
 
 		/**
