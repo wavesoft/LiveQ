@@ -18,7 +18,7 @@ define({
 	 * Community
 	 */
 	'core' : {
-		'socket_url'	: 'wss://test4theory.cern.ch/vas/communitysocket'
+		'socket_url'	: 'wss://test4theory.cern.ch/vas/apisocket'
 	},
 
 	/**
