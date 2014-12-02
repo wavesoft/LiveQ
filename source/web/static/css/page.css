@@ -1266,6 +1266,9 @@ body.enable-ipide .btn-edit-component {
 .uicon.uicon-course {
   background-position: -432px 0px;
 }
+.uicon.uicon-money {
+  background-position: -456px 0px;
+}
 .onscreen {
   position: absolute;
   background: rgba(64, 64, 64, 0.9);
@@ -1593,7 +1596,7 @@ body.enable-ipide .btn-edit-component {
   background: url(../img/icons/credits.png) no-repeat left center;
   text-indent: 40px;
   opacity: 0;
-  font-size: 20px;
+  font-size: 14px;
 }
 #game-frame .nav-mini:hover {
   width: 200px;

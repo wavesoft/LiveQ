@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/ui", "core/config", "core/registry", "core/base/components", "core/user" ],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, UI, config, R,C) {
+	function($, d3, UI, config, R,C, User) {
 
 		/**
 		 * Blank image payload
@@ -70,6 +70,7 @@ define(
 				.attr("r", function(d) { return d.radius; })
 				.style("fill", function(d) { return d.color; })
 				.style("stroke", function(d) { return darkenColor(d.color); })
+				.style("opacity", function(d) { return d.opacity; })
 
 			// Update/Create image
 			var image = sel.select("image");
@@ -94,22 +95,22 @@ define(
 						(function(hostDOM) {
 
 							// Prepare the body
-							var comBody = R.instanceComponent("infoblock.knowlege", hostDOM);
+							var comBody = R.instanceComponent("infoblock.knowledge", hostDOM);
 							if (comBody) {
 								// Update infoblock 
 								comBody.onMetaUpdate( d );
 								// Adopt events from infoblock as ours
 								d.eventDelegate.adoptEvents( comBody );
 							} else {
-								console.warn("Could not instantiate knowlege infoblock!");
+								console.warn("Could not instantiate knowledge infoblock!");
 							}
 
 						}).bind(this),
 						{
 							'offset-x' : 2*d.radius + 20,
 							'offset-y' : d.radius,
-							'color'    : '#2ECC71',
-							'title'    : d.info.title
+							'color'    : d.color,
+							'title'    : (d.enabled ? "" : '<span class="glyphicon glyphicon-lock"></span> ' ) + d.info.title
 						});
 				}).bind(this), 250);
 
@@ -137,25 +138,37 @@ define(
 
 		/**
 		 * @class
-		 * @classdesc The basic home screen
+		 * @classdesc The basic tuning screen
 		 */
-		var KnowlegeScreen = function( hostDOM ) {
+		var KnowledgeScreen = function( hostDOM ) {
 			C.HomeScreen.call(this, hostDOM);
 
 			// Prepare host
-			hostDOM.addClass("home");
+			hostDOM.addClass("knowledge");
 
 			// Team header
-			$('<h1><span class="highlight">Knowlege</span> Tree</h1><div class="subtitle">Expand your scientific knowlege from the science grid.</div>').appendTo(hostDOM);
+			$('<h1><span class="highlight">Knowledge</span> Tree</h1><div class="subtitle">Expand your scientific knowledge from the science grid.</div>').appendTo(hostDOM);
+
+			// ---------------------------------
+			// Create splash backdrop
+			// ---------------------------------
 
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
 			hostDOM.append(this.backdropDOM);
 			this.backdrop = R.instanceComponent("backdrop.explain", this.backdropDOM);
 
+			// ---------------------------------
+			// Create foreground DOM
+			// ---------------------------------
+
 			// Create foreground
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append(this.foregroundDOM);
+
+			// ---------------------------------
+			// Create the SVG graph
+			// ---------------------------------
 
 			// Create SVG host
 			this.svg = d3.select(this.foregroundDOM[0])
@@ -172,9 +185,16 @@ define(
 			}).bind(this));
 			this.btnActiveRunBtn.hide();
 
+			// ---------------------------------
+			// Register visual aids
+			// ---------------------------------
+
 			// Register visual aids
 			R.registerVisualAid( "home.run", this.btnActiveRunBtn, { "screen": "screen.home" });
 
+			// ---------------------------------
+			// Initialize scene
+			// ---------------------------------
 
 			// Create a directed graph
 			this.graph = {
@@ -189,12 +209,12 @@ define(
 			this.updateScene();
 
 		}
-		KnowlegeScreen.prototype = Object.create( C.HomeScreen.prototype );
+		KnowledgeScreen.prototype = Object.create( C.HomeScreen.prototype );
 
 		/**
 		 * Regenerate the level graph
 		 */
-		KnowlegeScreen.prototype.setupScene = function() {
+		KnowledgeScreen.prototype.setupScene = function() {
 			var color = d3.scale.category20();
 
 			// Initialize force
@@ -216,7 +236,8 @@ define(
 				// Enter
 				this.links.enter().append("line")
 					.attr("class", "link")
-					.style("stroke", function(d) { darkenColor(d.source.color); })
+					.style("opacity", function(d) { return darkenColor(d.source.opacity); })
+					.style("stroke", function(d) { return darkenColor(d.source.color); })
 
 			// Setup nodes
 			this.nodes = this.svg.selectAll(".node")
@@ -256,7 +277,7 @@ define(
 		/**
 		 * Regenerate the level graph
 		 */
-		KnowlegeScreen.prototype.updateScene = function() {
+		KnowledgeScreen.prototype.updateScene = function() {
 
 			// Update force
 			this.force
@@ -274,6 +295,7 @@ define(
 				// Enter
 				this.links.enter().append("line")
 					.attr("class", "link")
+					.style("opacity", function(d) { return darkenColor(d.source.opacity); })
 					.style("stroke", function(d) { return darkenColor(d.source.color); })
 
 			this.nodes = this.svg.selectAll(".node")
@@ -284,13 +306,12 @@ define(
 					.call(homeNode)
 					.call(this.force.drag);
 
-
 		}
 
 		/**
-		 * Forward KnowlegeScreen events to our child components
+		 * Forward KnowledgeScreen events to our child components
 		 */
-		KnowlegeScreen.prototype.onResize = function(w,h) {
+		KnowledgeScreen.prototype.onResize = function(w,h) {
 			this.width = w;
 			this.height = h;
 
@@ -307,14 +328,14 @@ define(
 		/**
 		 * Pause fore before exiting
 		 */
-		KnowlegeScreen.prototype.onHidden = function() {
+		KnowledgeScreen.prototype.onHidden = function() {
 			this.force.stop();
 		}
 
 		/**
 		 * Update level status 
 		 */
-		KnowlegeScreen.prototype.onWillShow = function(cb) {
+		KnowledgeScreen.prototype.onWillShow = function(cb) {
 			this.updateScene();
 			cb();
 		}
@@ -322,7 +343,7 @@ define(
 		/**
 		 * When shown, show first-time aids
 		 */
-		KnowlegeScreen.prototype.onShown = function() {
+		KnowledgeScreen.prototype.onShown = function() {
 			UI.showFirstTimeAid( "home.begin" );
 			UI.showFirstTimeAid( "home.firstbranch" );
 
@@ -334,7 +355,7 @@ define(
 		/**
 		 * Topic information has updated 
 		 */
-		KnowlegeScreen.prototype.onTopicTreeUpdated = function(tree) {
+		KnowledgeScreen.prototype.onTopicTreeUpdated = function(tree) {
 
 			// Deset graph and import links
 			this.graph.nodes = [];
@@ -342,19 +363,25 @@ define(
 
 			// Color schemes to hex colors
 			var color_sceme = {
-				'green': '#2ECC71'
+				'green': '#2ECC71',
+				'gray' : '#999',
 			};
 
 			// Update graph with additional details required
 			// by the d3 library to work
 			for (var i=0; i<tree.nodes.length; i++) {
 				var n = tree.nodes[i],
-					d3_node = {
-						'info'	: n.info || {},
-						'icon'	: n.info.icon || 'static/img/level-icons/hard.png',
-						'color' : color_sceme[n.info.color || 'green'],
-						'radius': 20,
-						'click' : (function(record) {
+					n_enabled = !!n.enabled;
+				if (n.parent == null) n_enabled = true;
+				var d3_node = {
+						'id'		: n._id || "",
+						'info'		: n.info || {},
+						'enabled'	: n_enabled,
+						'icon'		: config['images_url'] + "/" + (n.info.icon || 'level-icons/hard.png'),
+						'color' 	: n.enabled ? color_sceme[n.info.color || 'green'] : color_sceme['gray'],
+						'radius' 	: 20,
+						'opacity' 	: (n.enabled ? 1.0 : 0.5),
+						'click'  	: (function(record) {
 							return function(e) {
 								this.trigger("expandTopic", n['_id']);
 							};
@@ -382,7 +409,7 @@ define(
 		/**
 		 * Update running screen status
 		 */
-		KnowlegeScreen.prototype.onStateChanged = function( stateID, stateValue ) {
+		KnowledgeScreen.prototype.onStateChanged = function( stateID, stateValue ) {
 			if (stateID == "simulating") {
 
 				// Show/hide the simulating button
@@ -395,7 +422,7 @@ define(
 		}
 
 		// Register home screen
-		R.registerComponent( "screen.knowlege", KnowlegeScreen, 1 );
+		R.registerComponent( "screen.knowledge", KnowledgeScreen, 1 );
 
 	}
 

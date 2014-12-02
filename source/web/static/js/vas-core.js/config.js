@@ -8,6 +8,11 @@ define({
 	'dom-host' 			: '#game-frame',
 
 	/**
+	 * Base URL for images
+	 */
+	'images_url'		: 'static/img',
+
+	/**
 	 * LiveQ-Specific configuration
 	 */
 	'liveq' : {

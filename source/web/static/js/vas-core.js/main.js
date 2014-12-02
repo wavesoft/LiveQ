@@ -209,7 +209,7 @@ define(
 							function(cb) {
 
 								DB.getAll("knowlege_grid", "tree", function(grid) {
-									prog_db.ok("Fetched knowlege grid");
+									prog_db.ok("Fetched knowledge grid");
 									cb();
 								});
 
@@ -481,8 +481,8 @@ define(
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
 					});
-					scrHome.on('showKnowlege', function() {
-						VAS.displayKnowlege();
+					scrHome.on('showKnowledge', function() {
+						VAS.displayKnowledge();
 					});
 					scrHome.on('showMachine', function(name) {
 						VAS.displayTuningScreen();
@@ -524,14 +524,14 @@ define(
 
 			var prog_courses = progressAggregator.begin(1),
 				init_courses = function(cb) {
-					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.knowlege");
+					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.knowledge");
 					if (!scrCourses) {
-						UI.logError("Core: Unable to initialize knowlege screen!");
+						UI.logError("Core: Unable to initialize knowledge screen!");
 						return;
 					}
 
 					// Complete login
-					prog_courses.ok("Knowlege screen ready");
+					prog_courses.ok("knowledge screen ready");
 					cb();
 				};				
 
@@ -710,13 +710,13 @@ define(
 		 * Check user's record and show the appropriate courses screen
 		 * configuration.
 		 */
-		VAS.displayKnowlege = function( animateBackwards ) {
+		VAS.displayKnowledge = function( animateBackwards ) {
 
 			// Setup home screen
-			VAS.scrCourses.onTopicTreeUpdated( User.getKnowlegeTree(true) );
+			VAS.scrCourses.onTopicTreeUpdated( User.getKnowledgeTree(true) );
 
 			// Select home screen
-			UI.selectScreen("screen.knowlege", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
+			UI.selectScreen("screen.knowledge", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 

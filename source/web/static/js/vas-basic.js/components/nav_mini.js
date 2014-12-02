@@ -38,7 +38,7 @@ define(
 			// Register on profile updates
 			User.on('profile', (function(profile) {
 				// Update credits
-				this.elmCredit.text( profile['credits'] );
+				this.elmCredit.html( "Credits: <strong>" + profile['credits'].toString() + "</strong>" );
 			}).bind(this));
 
 			// Start fade out
@@ -57,7 +57,7 @@ define(
 				"screen.explain", "screen.courseroom",
 				"screen.team.people", "screen.team.machines", 
 				"screen.team.notebook", "screen.team.messages",
-				"screen.knowlege"
+				"screen.knowledge"
 			];
 
 			// This works on valid screen

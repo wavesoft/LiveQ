@@ -153,9 +153,9 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 			if (!this.vars['enabled_topics'])
 				this.vars['enabled_topics'] = {};
 
-			// Create the explored_knowlege grid
-			if (!this.vars['explored_knowlege'])
-				this.vars['explored_knowlege'] = {};
+			// Create the explored_knowledge grid
+			if (!this.vars['explored_knowledge'])
+				this.vars['explored_knowledge'] = {};
 
 			// Create per-task user details
 			if (!this.vars['task_details'])
@@ -168,17 +168,18 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 		}
 
 		/**
-		 * Build and return a flat version of the knowlege tree.
+		 * Build and return a flat version of the knowledge tree.
 		 */
-		User.prototype.getKnowlegeList = function() {
+		User.prototype.getKnowledgeList = function() {
 			// Prepare answer array
 			var ans = [];
 
-			// Iterate over the knowlege grid
+			// Iterate over the knowledge grid
 			for (var i=0; i<DB.cache['knowlege_grid_list'].length; i++) {
 				var item = DB.cache['knowlege_grid_list'][i];
 				// Check it item is explored
-				item['enabled'] = !!(this.vars['explored_knowlege'][item['_id']]);
+				item['enabled'] = !!(this.vars['explored_knowledge'][item['_id']]);
+				if (item['parent'] == null) item['enabled']=true;
 				ans.push(item);
 			}
 			return ans;
@@ -186,7 +187,7 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 
 		/**
 		 * Build and return the enabled tunables and enabled observables
-		 * by traversing the knowlege grid and the relevant databases.
+		 * by traversing the knowledge grid and the relevant databases.
 		 */
 		User.prototype.getTuningConfiguration = function() {
 			var config = {
@@ -217,18 +218,18 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 				}
 			}
 
-			// Get the knowlege list
-			var knowlege = this.getKnowlegeList();
-			for (var i=0; i<knowlege.length; i++) {
-				if (knowlege[i].enabled || (knowlege[i].parent == null)) {
-					// This knowlege topic is enabled (or the root one)!
+			// Get the knowledge list
+			var knowledge = this.getKnowledgeList();
+			for (var i=0; i<knowledge.length; i++) {
+				if (knowledge[i].enabled || (knowledge[i].parent == null)) {
+					// This knowledge topic is enabled (or the root one)!
 
 					// Store observable names
-					for (var j=0; j<knowlege[i].observables.length; j++) {
-						var obsName = knowlege[i].observables[j],
+					for (var j=0; j<knowledge[i].observables.length; j++) {
+						var obsName = knowledge[i].observables[j],
 							obs = dbObservables[obsName];
 						if (!obs) {
-							console.warn("Could not find observable '",obsName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							console.warn("Could not find observable '",obsName,"' provided by knowledge node '", knowledge[i]['_id'],"'");
 							continue;
 						}
 						config.observables.push(obsName);
@@ -238,11 +239,11 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 					// Look for enabled tunables and place them on the 
 					// appropriate machine part that they relate to.
 					//
-					for (var j=0; j<knowlege[i].tunables.length; j++) {
-						var tunName = knowlege[i].tunables[j],
+					for (var j=0; j<knowledge[i].tunables.length; j++) {
+						var tunName = knowledge[i].tunables[j],
 							tun = dbTunables[tunName];
 						if (!tun) {
-							console.warn("Could not find tunable '",tunName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							console.warn("Could not find tunable '",tunName,"' provided by knowledge node '", knowledge[i]['_id'],"'");
 							continue;
 						}
 
@@ -252,7 +253,7 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 
 						// Check if we have a machine part with this prefix
 						if (machinePart == undefined) {
-							console.warn("Could not find machine part for tunable '",tunName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							console.warn("Could not find machine part for tunable '",tunName,"' provided by knowledge node '", knowledge[i]['_id'],"'");
 							continue;
 						}
 
@@ -276,9 +277,9 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 		}
 
 		/**
-		 * Build and return the user's knowlege information tree
+		 * Build and return the user's knowledge information tree
 		 */
-		User.prototype.getKnowlegeTree = function( showEdgeNode ) {
+		User.prototype.getKnowledgeTree = function( showEdgeNode ) {
 
 			// Prepare nodes and links
 			var nodes = [],

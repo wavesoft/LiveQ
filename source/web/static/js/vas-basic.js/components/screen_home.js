@@ -61,13 +61,13 @@ define(
 
 			// Main buttons
 			this.btnMachine = $('<button class="p-go-machine btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Machine</button>').appendTo(hostDOM);
-			this.btnCourse = $('<button class="p-go-course btn-shaded btn-darkblue btn-with-icon"><span></span><br />Knowlege Tree</button>').appendTo(hostDOM);
+			this.btnCourse = $('<button class="p-go-course btn-shaded btn-darkblue btn-with-icon"><span></span><br />Knowledge Tree</button>').appendTo(hostDOM);
 			this.btnCafe = $('<button class="p-go-cafe btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-user"></span><br />Team</button>').appendTo(hostDOM);
 			this.btnMachine.click((function() {
 				this.trigger("showMachine");
 			}).bind(this))
 			this.btnCourse.click((function() {
-				this.trigger("showKnowlege");
+				this.trigger("showKnowledge");
 			}).bind(this))
 			this.btnCafe.click((function() {
 				this.trigger("changeScreen", "screen.team.people");

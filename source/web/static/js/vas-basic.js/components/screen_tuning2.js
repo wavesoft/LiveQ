@@ -43,7 +43,7 @@ define(
 			this.machine.onMachinePartsEnabled({});
 
 			this.machine.on('click', (function(eid, pos) {
-				this.showPopover(pos, eid);
+				this.showPopover(pos, efid);
 			}).bind(this));
 
 			// ---------------------------------
@@ -64,7 +64,7 @@ define(
 				} else {
 					if (!this.machinePartsEnabled[id]) {
 						this.descTitle.html('<span class="glyphicon glyphicon-lock"></span> Part Locked');
-						this.descBody.html("You don't have the experience required to unlock this machine part.");
+						this.descBody.html("You don't have enough experience in order to tune this component. Go back to the <em>Knowlege Tree</em> and unlock new topics.");
 					} else {
 						this.descTitle.text(details['description']['title']);
 						this.descBody.html(details['description']['body']);
