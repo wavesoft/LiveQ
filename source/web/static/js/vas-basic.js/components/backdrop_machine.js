@@ -18,6 +18,9 @@ define(
 		var MachineBackdrop = function( hostDOM ) {
 			C.Backdrop.call(this, hostDOM);
  
+			// The enabled machine parts
+			this.enabledMachineParts = {};
+
 			// Handle mouse movement
 			this.mouseX = 0;
 			this.mouseY = 0;
@@ -123,20 +126,23 @@ define(
 		MachineBackdrop.prototype = Object.create( C.Backdrop.prototype );
 
 		/**
-		 * Topic tree is defined
+		 * Machine parts are enabled
 		 */
-		MachineBackdrop.prototype.onTopicTreeUpdated = function(tree) {
+		MachineBackdrop.prototype.onMachinePartsEnabled = function(parts) {
 			
 			// Check focusing mode to use
 			this.focusMode = 0;
 
-			// Build tree
-			for (var k in tree) {
+			// Keep a reference of the enabled machine parts
+			this.enabledMachineParts = parts;
+
+			// Build parts
+			for (var k in parts) {
 				var i = this.aliases.indexOf(k);
 				if (i < 0) continue;
 
 				// Mark particular component locked/unlocked
-				if (tree[k]) {
+				if (parts[k]) {
 					this.overlayComponents[i].removeClass('locked');
 				} else {
 					this.overlayComponents[i].addClass('locked');

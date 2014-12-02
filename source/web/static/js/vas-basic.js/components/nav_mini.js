@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["core/registry", "core/base/components", "core/ui"],
+	["core/registry", "core/base/components", "core/ui", "core/user"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/nav_mini
 	 */
-	function(R,C,UI) {
+	function(R,C,UI,User) {
 
 		/**
 		 * @class
@@ -32,13 +32,21 @@ define(
 
 			}).bind(this));
 
+			// Prepare credit menu
+			this.elmCredit = $('<div class="credits"></div>').appendTo(hostDOM);
+
+			// Register on profile updates
+			User.on('profile', (function(profile) {
+				// Update credits
+				this.elmCredit.text( profile['credits'] );
+			}).bind(this));
+
 			// Start fade out
 			this.hostDOM.hide();
 			this.visible = false;
 
 		}
 		NavMini.prototype = Object.create( C.Nav.prototype );
-
 
 		/**
 		 * Hide mini-nav when we are on home
@@ -49,7 +57,7 @@ define(
 				"screen.explain", "screen.courseroom",
 				"screen.team.people", "screen.team.machines", 
 				"screen.team.notebook", "screen.team.messages",
-				"screen.courses"
+				"screen.knowlege"
 			];
 
 			// This works on valid screen

@@ -90,16 +90,27 @@ define(
 
 				clearTimeout(moTimer);
 				moTimer = setTimeout((function() {
-					UI.showPopup('widget.onscreen', this, function(hostDOM) {
+					UI.showPopup('widget.onscreen', this,
+						(function(hostDOM) {
 
-						hostDOM.append($('<p>'+d.desc+'</p>'))
+							// Prepare the body
+							var comBody = R.instanceComponent("infoblock.knowlege", hostDOM);
+							if (comBody) {
+								// Update infoblock 
+								comBody.onMetaUpdate( d );
+								// Adopt events from infoblock as ours
+								d.eventDelegate.adoptEvents( comBody );
+							} else {
+								console.warn("Could not instantiate knowlege infoblock!");
+							}
 
-					}, {
-						'offset-x' : 2*d.radius + 20,
-						'offset-y' : d.radius,
-						'color'    : '#2ECC71',
-						'title'    : d.name
-					});
+						}).bind(this),
+						{
+							'offset-x' : 2*d.radius + 20,
+							'offset-y' : d.radius,
+							'color'    : '#2ECC71',
+							'title'    : d.info.title
+						});
 				}).bind(this), 250);
 
 			});
@@ -128,14 +139,14 @@ define(
 		 * @class
 		 * @classdesc The basic home screen
 		 */
-		var CoursesScreen = function( hostDOM ) {
+		var KnowlegeScreen = function( hostDOM ) {
 			C.HomeScreen.call(this, hostDOM);
 
 			// Prepare host
 			hostDOM.addClass("home");
 
 			// Team header
-			$('<h1><span class="highlight">Courses</span> Science Grid</h1><div class="subtitle">Expand your scientific knowlege from the science grid.</div>').appendTo(hostDOM);
+			$('<h1><span class="highlight">Knowlege</span> Tree</h1><div class="subtitle">Expand your scientific knowlege from the science grid.</div>').appendTo(hostDOM);
 
 			// Create a slpash backdrop
 			this.backdropDOM = $('<div class="'+config.css['backdrop']+'"></div>');
@@ -178,12 +189,12 @@ define(
 			this.updateScene();
 
 		}
-		CoursesScreen.prototype = Object.create( C.HomeScreen.prototype );
+		KnowlegeScreen.prototype = Object.create( C.HomeScreen.prototype );
 
 		/**
 		 * Regenerate the level graph
 		 */
-		CoursesScreen.prototype.setupScene = function() {
+		KnowlegeScreen.prototype.setupScene = function() {
 			var color = d3.scale.category20();
 
 			// Initialize force
@@ -245,7 +256,7 @@ define(
 		/**
 		 * Regenerate the level graph
 		 */
-		CoursesScreen.prototype.updateScene = function() {
+		KnowlegeScreen.prototype.updateScene = function() {
 
 			// Update force
 			this.force
@@ -277,9 +288,9 @@ define(
 		}
 
 		/**
-		 * Forward CoursesScreen events to our child components
+		 * Forward KnowlegeScreen events to our child components
 		 */
-		CoursesScreen.prototype.onResize = function(w,h) {
+		KnowlegeScreen.prototype.onResize = function(w,h) {
 			this.width = w;
 			this.height = h;
 
@@ -296,14 +307,14 @@ define(
 		/**
 		 * Pause fore before exiting
 		 */
-		CoursesScreen.prototype.onHidden = function() {
+		KnowlegeScreen.prototype.onHidden = function() {
 			this.force.stop();
 		}
 
 		/**
 		 * Update level status 
 		 */
-		CoursesScreen.prototype.onWillShow = function(cb) {
+		KnowlegeScreen.prototype.onWillShow = function(cb) {
 			this.updateScene();
 			cb();
 		}
@@ -311,7 +322,7 @@ define(
 		/**
 		 * When shown, show first-time aids
 		 */
-		CoursesScreen.prototype.onShown = function() {
+		KnowlegeScreen.prototype.onShown = function() {
 			UI.showFirstTimeAid( "home.begin" );
 			UI.showFirstTimeAid( "home.firstbranch" );
 
@@ -323,7 +334,7 @@ define(
 		/**
 		 * Topic information has updated 
 		 */
-		CoursesScreen.prototype.onTopicTreeUpdated = function(tree) {
+		KnowlegeScreen.prototype.onTopicTreeUpdated = function(tree) {
 
 			// Deset graph and import links
 			this.graph.nodes = [];
@@ -339,16 +350,16 @@ define(
 			for (var i=0; i<tree.nodes.length; i++) {
 				var n = tree.nodes[i],
 					d3_node = {
-						'name'	: n.info.name || "",
-						'desc'  : n.info.desc || "",
+						'info'	: n.info || {},
 						'icon'	: n.info.icon || 'static/img/level-icons/hard.png',
 						'color' : color_sceme[n.info.color || 'green'],
 						'radius': 20,
 						'click' : (function(record) {
 							return function(e) {
-								this.trigger("explainTopic", n['_id']);
+								this.trigger("expandTopic", n['_id']);
 							};
-						})(n).bind(this)
+						})(n).bind(this),
+						'eventDelegate' : this
 					};
 				this.graph.nodes.push(d3_node);
 			}
@@ -371,7 +382,7 @@ define(
 		/**
 		 * Update running screen status
 		 */
-		CoursesScreen.prototype.onStateChanged = function( stateID, stateValue ) {
+		KnowlegeScreen.prototype.onStateChanged = function( stateID, stateValue ) {
 			if (stateID == "simulating") {
 
 				// Show/hide the simulating button
@@ -384,7 +395,7 @@ define(
 		}
 
 		// Register home screen
-		R.registerComponent( "screen.courses", CoursesScreen, 1 );
+		R.registerComponent( "screen.knowlege", KnowlegeScreen, 1 );
 
 	}
 

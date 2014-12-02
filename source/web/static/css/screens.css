@@ -10,14 +10,14 @@
   height: 1;
   border-top: solid 1px #666666;
 }
-.screen h1 {
+.screen > h1 {
   margin: 15px 15px 0;
   color: #2c3e50;
 }
-.screen h1 span.highlight {
+.screen > h1 span.highlight {
   color: #16a085;
 }
-.screen h1 + div.subtitle {
+.screen > h1 + div.subtitle {
   color: #999999;
   margin: 0 15px;
 }
@@ -334,15 +334,21 @@
   width: 38%;
   right: 5px;
   top: 240px;
-  bottom: 72px;
+  bottom: 90px;
   padding: 0 2px;
 }
 .screen.home .p-submit {
   position: absolute;
   bottom: 5px;
   right: 5px;
-  height: 62px;
+  height: 72px;
   width: 39%;
+}
+.screen.home .p-submit span {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: no-repeat center center url(../img/icons/prof.png);
 }
 .screen.home .p-go-course,
 .screen.home .p-go-cafe,
@@ -351,14 +357,22 @@
   top: 5px;
   width: 13%;
   height: 200px;
+  font-size: 14px;
 }
 .screen.home .p-go-course span,
 .screen.home .p-go-cafe span,
 .screen.home .p-go-machine span {
-  font-size: 40px;
+  font-size: 42px;
+  margin-bottom: 14px;
 }
 .screen.home .p-go-course {
   right: 14%;
+}
+.screen.home .p-go-course span {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  background: no-repeat center center url(../img/icons/brain.png);
 }
 .screen.home .p-go-cafe {
   right: 5px;
@@ -768,6 +782,13 @@
 .screen.tuning2 .tuning-panel .tunables.col-2 > div {
   float: left;
   width: 45%;
+}
+.screen.tuning2 .tuning-panel .tunables .empty-placeholder {
+  width: 200px;
+  height: 100px;
+  text-align: center;
+  font-size: 16px;
+  color: #999999;
 }
 .overlay-window .tuning-panel {
   background-color: white;

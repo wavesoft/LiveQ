@@ -1,0 +1,41 @@
+{
+   "_id": "ea662db6a205b19ae791d95da002e12d",
+   "_rev": "3-f5736efb529106fb5b0529ded6ef7a7e",
+   "parent": null,
+   "info": {
+       "title": "Quantum Simulation Machine",
+       "shortdesc": "This is an introduction tutorial that explains what really happens behind the scenes. What is a simulation, and what are you doing from this interface.",
+       "descurl": "desc/quantum.html",
+       "icon": "icons/topic-atom.png",
+       "book": "",
+       "course": "quantum-machine",
+       "tutorial": "",
+       "cost": 0
+   },
+   "configurations": [
+   ],
+   "tunables": [
+   ],
+   "observables": [
+   ]
+}
+        "parent": "ea662db6a205b19ae791d95da002e12d",
+        "info": {
+            "title": "Final State Shower",
+            "shortdesc": "The final state shower is a component of the quantum simulation machine. In this topic you are going to explore it and start playing with your first parameter!",
+            "descurl": "desc/fss-intro.html",
+            "icon": "level-icons/showers.png",
+            "book": "",
+            "course": "fss-intro",
+            "tutorial": "",
+            "cost": 8
+        },
+        "configurations": [
+            "ee"
+        ],
+        "tunables": [
+            "TimeShower:alphaSvalue"
+        ],
+        "observables": [
+            "/ALEPH_2004_S5765862/d54-x01-y01"
+        ],

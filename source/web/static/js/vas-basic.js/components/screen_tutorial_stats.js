@@ -320,9 +320,9 @@ define(
 				if (status.hasBlank) // Blank data is an error right-away
 					return "err-blank";
 				if (status.trusted) {
-					if (stats.chi2 > 2) { // Chi 0-2 = accepted
+					if (status.chi2 > 2) { // Chi 0-2 = accepted
 						allFit = false;
-					} else if (stats.chi2 > 1) { // Chi 0-1 = best
+					} else if (status.chi2 > 1) { // Chi 0-1 = best
 						bestFit = false;
 					}
 				} else {
@@ -339,7 +339,7 @@ define(
 						return "err-looksgood";
 					}
 				} else {
-					if (userIsTrusting) {
+					if (!userIsTrusting) {
 						return "good";
 					} else {
 						return "err-looksbad";

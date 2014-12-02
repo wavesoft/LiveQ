@@ -386,6 +386,85 @@ define(["jquery", "sha1", "core/config"],
 			return new Database(name);
 		}
 
+		/**
+		 * Get all records of the given database and cache them
+		 *
+		 * @param {string} name - The database records to fetch
+		 * @param {string} format - The result format: "list", "object", "tree"
+		 * @param {function} callback - The callback to fire when the record is ready
+		 */
+		DB.getAll = function(name, format, callback) {
+
+			// Handle missing parameters
+			if (format == undefined) {
+				format = "object";
+			}
+			if (typeof(format) == "function") {
+				callback = format;
+				format = "object";
+			}
+
+			// Check cache first
+			if (DB.cache[name] !== undefined) {
+				if (callback) callback(DB.cache[name]);
+				return DB.cache[name];
+			} else {
+
+				// Call database after
+				var db = DB.openDatabase(name);
+				db.all(function(records) {
+
+					// Process records
+					if (format == "object") {
+
+						// Covert record to object ('_id' is the key)
+						DB.cache[name] = {};
+						for (var i=0; i<records.length; i++) {
+							DB.cache[name][records[i]['_id']] = records[i];
+						}
+
+					} else if (format == "tree") {
+
+						// Convert record to tree
+						// ('parent' points to a parent entry, 'child' will contain the child nodes, returns root)
+						DB.cache[name+'_list'] = records;
+						DB.cache[name+'_index'] = {};
+						DB.cache[name] = null;
+
+						// First pass: build index & initialize children array
+						for (var i=0; i<records.length; i++) {
+							records[i].children = [];
+							DB.cache[name+'_index'][records[i]['_id']] = records[i];
+							if (!records[i]['parent']) DB.cache[name] = DB.cache[name+'_index'][records[i]['_id']];
+						}
+
+						// Second pass: build tree
+						for (var i=0; i<records.length; i++) {
+							var parent = DB.cache[name+'_index'][records[i]['parent']];
+							// Check if that's a root item
+							if (!parent) continue;
+							// Update children and parent with references
+							parent.children.push( records[i] );
+							records[i]['parent'] = parent;
+						}
+
+					} else {
+
+						// Use raw format
+						DB.cache[name] = records;
+					}
+
+					// Fire callback
+					if (callback) callback(DB.cache[name]);
+
+				});
+				
+				// Return empty record here
+				return null;
+			}
+		}
+
+
 		// Return the global scope
 		return DB;
 	}

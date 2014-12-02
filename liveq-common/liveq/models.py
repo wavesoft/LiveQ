@@ -75,6 +75,9 @@ class User(BaseModel):
 	#: Birthdate (timestamp)
 	birthdate = IntegerField()
 
+	#: User credits
+	credits = IntegerField(default=8)
+
 	#: Check if the user aggrees to participate to the
 	#: stats collection
 	collectStats = BooleanField(default=True)

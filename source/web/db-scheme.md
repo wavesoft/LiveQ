@@ -180,3 +180,36 @@ This database contains the list of tasks the user can run. They are refered from
             "..", ...
         ],
     }
+
+# Knowlege Grid
+
+Database name `knowlege_grid`
+
+This database contains the linked-list information for building the knowlege the user is going to discover:
+
+    {
+        "_id": "..",            // A unique ID for this topic
+        "parent": "..",         // The parent topic ID or null for the root topic
+        "info": {
+            // Interface details
+            "title": "...",     // The topic title
+            "shortdesc": "..",  // A short text for the topic, listed below the header
+            "desc": "..",       // A long HTML description
+            "icon": "...",      // The icon to place on the topic tile
+            "color": "..",      // The color scheme to use for this topic tile
+            // Educational details
+            "book": "..",       // The book ID
+            "course": "..",     // Related course for this topic
+            "tutorial": "..",   // A UI tutorial that will be visualized here
+            "cost": ".."        // The cost in units to unlock this
+        },
+        "configurations": [     // The list of enabled machine configurations
+            "ee", ...
+        ]
+        "tunables": [           // The list of tunable IDs to display to the user
+            "..", ...
+        ],
+        "observables": [        // The list of observble IDs to display to the user
+            "..", ...
+        ],
+    }

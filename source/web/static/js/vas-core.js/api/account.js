@@ -62,11 +62,24 @@ define(["core/api/interface", "core/config"],
 		}
 
 		/**
+		 * Set a fuse that can only be set once 
+		 */
+		APIAccount.prototype.setFuse = function(name) {
+
+			// Send the setFuse Action
+			this.sendAction("setFuse", {
+				'name': name
+			});
+
+			// This usually triggers a profile update
+			
+		}
+
+		/**
 		 * Handle chatroom event
 		 */
 		APIAccount.prototype.handleAction = function(action, data) {
 			if (!this.active) return;
-			console.log("Profile action:",action,data);
 
 			if (action == "profile") { /* Profile information arrived */
 				this.trigger('profile', data);

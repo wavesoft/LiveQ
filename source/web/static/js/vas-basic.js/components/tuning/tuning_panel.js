@@ -64,6 +64,23 @@ define(
 		 */
 		DefaultTuningPanel.prototype.onTuningPanelDefined = function(title, tunables) {
 
+			// First, reset the panel
+			this.tunablesElm.empty();
+
+			// If we don't have tunables, display an error page
+			if (!tunables) {
+				this.headerElm.text("Locked");
+				this.tunablesElm.addClass("empty");
+				$('<div class="empty-placeholder">No tunable parameters in this machine part</div>').appendTo(this.tunablesElm);
+				this.width = 200;
+				this.height = 100;
+				return;
+			} else {
+				this.tunablesElm.removeClass("empty");
+				this.headerElm.text(title);
+			}
+
+
 			// Prepare panel dimentions according to the number of tunables
 			var row_height = 52, row_width = 187,
 				grid_w = 0, grid_h = 0;
@@ -89,7 +106,6 @@ define(
 			this.height = 21 + grid_h;
 
 			// Regenerate tunables
-			this.tunablesElm.empty();
 			for (var i=0; i<tunables.length; i++) {
 				var t = tunables[i];
 				this.defineAndRegister({

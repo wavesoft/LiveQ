@@ -273,6 +273,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				'collectStats'	: user.collectStats,
 				'displayName' 	: user.displayName,
 				'avatar' 		: user.avatar,
+				'credits'		: user.credits,
 				'vars' 			: json.loads(user.variables)
 			})
 

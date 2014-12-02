@@ -14,7 +14,7 @@ define([
 	'vas-basic/components/screen_ipide',
 	'vas-basic/components/screen_tutorial_stats',
 	'vas-basic/components/screen_courseroom',
-	'vas-basic/components/screen_courses',
+	'vas-basic/components/screen_knowlege',
 	'vas-basic/components/screen_register',
 	'vas-basic/components/screen_team_people',
 	'vas-basic/components/screen_team_notebook',
@@ -64,6 +64,7 @@ define([
 	'vas-basic/infoblock/tunable',
 	'vas-basic/infoblock/observable',
 	'vas-basic/infoblock/book',
+	'vas-basic/infoblock/knowlege',
 
 	// Data vizualization
 	'vas-basic/dataviz/histogram',

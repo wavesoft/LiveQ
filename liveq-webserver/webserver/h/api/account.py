@@ -57,10 +57,5 @@ class AccountInterface(APIInterface):
 
 		elif action == "profile":
 			# Send user profile event
-			self.sendAction('profile', {
-					'username': self.user.username,
-					'name': self.user.name,
-					'surname': self.user.surname,
-					'avatar': self.user.avatar,
-					'vars': json.loads(self.user.variables)
-				})
+			self.socket.sendUserProfile()
+

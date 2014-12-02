@@ -60,14 +60,14 @@ define(
 			// ---------------------------------
 
 			// Main buttons
-			this.btnMachine = $('<button class="p-go-machine btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Machine</button>').appendTo(hostDOM);
-			this.btnCourse = $('<button class="p-go-course btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(hostDOM);
-			this.btnCafe = $('<button class="p-go-cafe btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-user"></span><br />Team</button>').appendTo(hostDOM);
+			this.btnMachine = $('<button class="p-go-machine btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Machine</button>').appendTo(hostDOM);
+			this.btnCourse = $('<button class="p-go-course btn-shaded btn-darkblue btn-with-icon"><span></span><br />Knowlege Tree</button>').appendTo(hostDOM);
+			this.btnCafe = $('<button class="p-go-cafe btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-user"></span><br />Team</button>').appendTo(hostDOM);
 			this.btnMachine.click((function() {
-				this.trigger("changeScreen", "screen.tuning");
+				this.trigger("showMachine");
 			}).bind(this))
 			this.btnCourse.click((function() {
-				this.trigger("showCourses");
+				this.trigger("showKnowlege");
 			}).bind(this))
 			this.btnCafe.click((function() {
 				this.trigger("changeScreen", "screen.team.people");
@@ -87,7 +87,7 @@ define(
 			$('<div class="legend">Past, current and scheduled attemts</div>').appendTo(hostDOM);
 
 			// Submit
-			this.btnSubmit = $('<button class="p-submit btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-send"></span><br />Submit selected results</button>').appendTo(hostDOM);
+			this.btnSubmit = $('<button class="p-submit btn-shaded btn-red btn-with-icon"><span class="glyphicon glyphicon-send"></span><br />Submit selected results</button>').appendTo(hostDOM);
 
 			for (var i=0; i<10; i++) {
 				this.addJob({

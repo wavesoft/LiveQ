@@ -1,9 +1,9 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["core/config", "core/db", "core/apisocket", "core/global"], 
+define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "core/global"], 
 
-	function(Config, DB, APISocket, Global) {
+	function(Config, EventBase, DB, APISocket, Global) {
 
 		/**
 		 * Database interface
@@ -11,25 +11,56 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		 * @class
 		 * @exports core/user
 		 */
-		var User = { };
+		var User = function() {
+			window.user = this;
 
-		/**
-		 * The user profile variables
-		 * @type {object}
-		 */
-		User.profile = { };
+			// Subclass from EventBase
+			EventBase.call(this);
 
-		/**
-		 * The dynamic user variables
-		 * @type {object}
-		 */
-		User.vars = { };
+			/**
+			 * The user profile variables
+			 * @type {object}
+			 */
+			this.profile = { };
 
-		/**
-		 * The socket used for account I/O
-		 * @type {object}
-		 */
-		User.accountIO = null;
+			/**
+			 * The dynamic user variables
+			 * @type {object}
+			 */
+			this.vars = { };
+
+			/**
+			 * The socket used for account I/O
+			 * @type {object}
+			 */
+			this.accountIO = null;
+
+
+			// On user log-in update credits
+			APISocket.on('ready', (function() {
+
+				// Open Account socket when API socket is ready
+				this.accountIO = APISocket.openAccount();
+
+				// Bind events
+				this.accountIO.on('profile', (function(profile) {
+
+					// Update profile and variables
+					this.profile = profile;
+					this.vars = profile['vars'];
+					this.initVars();
+
+					// Fire the profile event
+					this.trigger('profile', profile);
+
+				}).bind(this));
+
+			}).bind(this));
+
+		}
+
+		// Subclass from EventBase
+		User.prototype = Object.create( EventBase.prototype );
 
 		/**
 		 * Enable/disable editing of the interface
@@ -38,25 +69,15 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		//$("body").addClass("enable-ipide")
 
 		/**
-		 * Interface to get a signleton to the accountIO class
-		 */
-		User.getAccountIO = function() {
-			if (!User.accountIO)
-				User.accountIO = APISocket.openAccount();
-			return User.accountIO;
-		}
-
-		/**
 		 * Login and initialize user record
 		 *
 		 * @param {Object} params - A dictionary that contains the 'username' and 'password' fields.
 		 * @param {function(status)} callback - A callback function to fire when the login-process has completed
 		 */
-		User.login = function(params, callback) {
-			var accountIO = this.getAccountIO();
+		User.prototype.login = function(params, callback) {
 
 			// Try to log-in the user
-			accountIO.login(params['username'], params['password'], (function(response) {
+			this.accountIO.login(params['username'], params['password'], (function(response) {
 				
 				// If something went wrong, fire error callback
 				if (response['status'] != 'ok') {
@@ -65,7 +86,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 				}
 
 				// Wait until the user profile arrives
-				accountIO.callbackOnAction("profile", (function(profile) {
+				this.accountIO.callbackOnAction("profile", (function(profile) {
 
 					// Let global listeners that the user is logged in
 					Global.events.trigger("login", profile);
@@ -73,7 +94,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 					// Handle profile
 					this.profile = profile;
 					this.vars = profile['vars'];
-					this.initialize();					
+					this.initVars();					
 
 					// Fire callback
 					if (callback) callback(true);
@@ -90,11 +111,10 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		 * @param {Object} params - A dictionary that contains the 'username', 'password', 'email' and 'name' fields.
 		 * @param {function(status)} callback - A callback function to fire when the register-process has completed
 		 */
-		User.register = function(params, callback) {
-			var accountIO = this.getAccountIO();
+		User.prototype.register = function(params, callback) {
 
 			// Try to register-in the user
-			accountIO.register(params, (function(response) {
+			this.accountIO.register(params, (function(response) {
 				
 				// If something went wrong, fire error callback
 				if (response['status'] != 'ok') {
@@ -103,7 +123,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 				}
 
 				// Wait until the user profile arrives
-				accountIO.callbackOnAction("profile", (function(profile) {
+				this.accountIO.callbackOnAction("profile", (function(profile) {
 
 					// Let global listeners that the user is logged in
 					Global.events.trigger("login", profile);
@@ -111,7 +131,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 					// Handle profile
 					this.profile = profile;
 					this.vars = profile['vars'];
-					this.initialize();					
+					this.initVars();					
 
 					// Fire callback
 					if (callback) callback(true);
@@ -127,11 +147,15 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		 *
 		 * This function fetches the database user record and prepares the local fields.
 		 */
-		User.initialize = function() {
+		User.prototype.initVars = function() {
 
 			// Create enabled_topics if missing
 			if (!this.vars['enabled_topics'])
 				this.vars['enabled_topics'] = {};
+
+			// Create the explored_knowlege grid
+			if (!this.vars['explored_knowlege'])
+				this.vars['explored_knowlege'] = {};
 
 			// Create per-task user details
 			if (!this.vars['task_details'])
@@ -144,18 +168,195 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		}
 
 		/**
+		 * Build and return a flat version of the knowlege tree.
+		 */
+		User.prototype.getKnowlegeList = function() {
+			// Prepare answer array
+			var ans = [];
+
+			// Iterate over the knowlege grid
+			for (var i=0; i<DB.cache['knowlege_grid_list'].length; i++) {
+				var item = DB.cache['knowlege_grid_list'][i];
+				// Check it item is explored
+				item['enabled'] = !!(this.vars['explored_knowlege'][item['_id']]);
+				ans.push(item);
+			}
+			return ans;
+		}
+
+		/**
+		 * Build and return the enabled tunables and enabled observables
+		 * by traversing the knowlege grid and the relevant databases.
+		 */
+		User.prototype.getTuningConfiguration = function() {
+			var config = {
+				// The enabled machine configurations (ex. ee, ppbar)
+				'configurations': [],
+				// The machine groups and their tunables
+				'machineParts': [],
+				// The list of observables under consideration
+				'observables': []
+			};
+
+			// Get some useful databases
+			var dbMachineParts = DB.cache['definitions']['machine-parts'],
+				dbTunables = DB.getAll("tunables"),
+				dbObservables = DB.getAll("observables");
+
+			// Tunable group index and prefix-to-machine parts lookup table
+			var tunableGroupIndex = {},
+				prefixToMachinePart = {};
+
+			// Populate prefix-to-machine part index
+			for (k in dbMachineParts) {
+				if (k[0] == "_") continue;
+				if (!dbMachineParts[k]['prefixes']) continue;
+				for (var i=0; i<dbMachineParts[k]['prefixes'].length; i++) {
+					// Map this prefix to machine part ID
+					prefixToMachinePart[dbMachineParts[k]['prefixes'][j]] = k;
+				}
+			}
+
+			// Get the knowlege list
+			var knowlege = this.getKnowlegeList();
+			for (var i=0; i<knowlege.length; i++) {
+				if (knowlege[i].enabled || (knowlege[i].parent == null)) {
+					// This knowlege topic is enabled (or the root one)!
+
+					// Store observable names
+					for (var j=0; j<knowlege[i].observables.length; j++) {
+						var obsName = knowlege[i].observables[j],
+							obs = dbObservables[obsName];
+						if (!obs) {
+							console.warn("Could not find observable '",obsName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							continue;
+						}
+						config.observables.push(obsName);
+					}
+
+					//
+					// Look for enabled tunables and place them on the 
+					// appropriate machine part that they relate to.
+					//
+					for (var j=0; j<knowlege[i].tunables.length; j++) {
+						var tunName = knowlege[i].tunables[j],
+							tun = dbTunables[tunName];
+						if (!tun) {
+							console.warn("Could not find tunable '",tunName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							continue;
+						}
+
+						// Find tunable prefix
+						var tunPrefix = tunName.split(":")[0],
+							machinePart = prefixToMachinePart[tunPrefix];
+
+						// Check if we have a machine part with this prefix
+						if (machinePart == undefined) {
+							console.warn("Could not find machine part for tunable '",tunName,"' provided by knowlege node '", knowlege[i]['_id'],"'");
+							continue;
+						}
+
+						// Get/Place group
+						var machineGroup = tunableGroupIndex[machinePart];
+						if (!machineGroup) {
+							machineGroup = { "part": machinePart, "tunables": [] };
+							tunableGroupIndex[machinePart] = machineGroup;
+							config.machineParts.push(machineGroup);
+						}
+
+						// Append tunable on the machine tunables
+						machineGroup.tunables.push( tun );
+
+					}
+
+				}
+			}
+
+			return config;
+		}
+
+		/**
+		 * Build and return the user's knowlege information tree
+		 */
+		User.prototype.getKnowlegeTree = function( showEdgeNode ) {
+
+			// Prepare nodes and links
+			var nodes = [],
+				links = [],
+				node_id = {},
+				showEdge = (showEdgeNode == undefined) ? false : showEdgeNode;
+
+			// Traverse nodes
+			var traverse_node = (function(node, parent, show_edge) {
+
+				// Skip invisible nodes
+				if ((parent != null) && !this.vars['enabled_topics'][node['_id']]) {
+					if (show_edge) {
+						show_edge = false;
+					} else {
+						return;
+					}
+				}
+
+				// Store to nodes & it's lookup
+				var curr_node_id = nodes.length;
+				node_id[node['_id']] = curr_node_id;
+				node_id[node['_id']].edge = !show_edge;
+				nodes.push( node );
+
+				// Check if we should make a link
+				if (parent != null) {
+					var parent_id = node_id[parent['_id']];
+					links.push({ 'source': curr_node_id, 'target': parent_id });
+				}
+
+				// Traverse child nodes
+				for (var i=0; i<node.children.length; i++) {
+					traverse_node( node.children[i], node, show_edge );
+				}
+
+			}).bind(this);
+
+			// Start node traversal
+			traverse_node( DB.cache['knowlege_grid'], null, showEdge );
+
+			// Return the tree data
+			return {
+				'nodes': nodes,
+				'links': links
+			};
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		/**
 		 * Commit user variables to the database
 		 */
-		User.commitUserRecord = function() {
+		User.prototype.commitUserRecord = function() {
 			// Commit user variables
-			var accountIO = this.getAccountIO();
-			accountIO.sendVariables(this.vars);
+			this.accountIO.sendVariables(this.vars);
 		}
 
 		/**
 		 * Build and return the user's task information tree
 		 */
-		User.getTaskDetails = function( task_id ) {
+		User.prototype.getTaskDetails = function( task_id ) {
 			var db_task = DB.cache['tasks'][task_id],
 				u_task  = this.vars['task_details'][task_id];
 
@@ -184,7 +385,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Build and return the user's topic information
 		 */
-		User.getTopicDetails = function( topic_id ) {
+		User.prototype.getTopicDetails = function( topic_id ) {
 			var topic = DB.cache['topic_index'][topic_id];
 			if (!topic) return;
 
@@ -192,7 +393,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 			var taskDetails = [];
 			for (var i=0; i<topic.tasks.length; i++) {
 				// Collect task details
-				taskDetails.push( User.getTaskDetails(topic.tasks[i]) );
+				taskDetails.push( this.getTaskDetails(topic.tasks[i]) );
 				// The first one is always enabled
 				if (i==0) taskDetails[0].enabled = true;
 			}
@@ -205,7 +406,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Build and return the user's topic information tree
 		 */
-		User.getTopicTree = function() {
+		User.prototype.getTopicTree = function() {
 
 			// Prepare nodes and links
 			var nodes = [],
@@ -251,7 +452,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Grant user access to the specified topic
 		 */
-		User.enableChildTopics = function(topic_id) {
+		User.prototype.enableChildTopics = function(topic_id) {
 
 			// Lookup children
 			var topic = DB.cache['topic_index'][topic_id];
@@ -268,7 +469,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Get the save slots for the tasks
 		 */
-		User.getTaskSaveSlots = function(task) {
+		User.prototype.getTaskSaveSlots = function(task) {
 
 			// Make sure data exist
 			if (!this.vars['task_details'][task_id])
@@ -284,7 +485,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Update the save slot of a particular task
 		 */
-		User.setTaskSaveSlot = function(task_id, slot, data) {
+		User.prototype.setTaskSaveSlot = function(task_id, slot, data) {
 			
 			// Make sure data exist
 			if (!this.vars['task_details'][task_id])
@@ -307,7 +508,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Enable a task
 		 */
-		User.setTaskAnimationAsSeen = function(task_id) {
+		User.prototype.setTaskAnimationAsSeen = function(task_id) {
 
 			// Make sure data exist
 			if (!this.vars['task_details'][task_id])
@@ -326,7 +527,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Enable a task
 		 */
-		User.enableTask = function(task_id) {
+		User.prototype.enableTask = function(task_id) {
 
 			// Make sure data exist
 			if (!this.vars['task_details'][task_id])
@@ -345,10 +546,10 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Mark a task as completed, by selecting the next one
 		 */
-		User.markTaskCompleted = function(task_id, topic_id) {
+		User.prototype.markTaskCompleted = function(task_id, topic_id) {
 
 			// Fetch topic information
-			var topic = User.getTopicDetails(topic_id);
+			var topic = this.getTopicDetails(topic_id);
 
 			// Check which tasks are handled by the user
 			for (var i=0; i<topic.taskDetails.length; i++) {
@@ -373,7 +574,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Check if a topic is complete
 		 */
-		User.hasCompletedTopic = function(topic_id) {
+		User.prototype.hasCompletedTopic = function(topic_id) {
 
 			// Fetch topic information
 			var topic = DB.cache['topic_index'][topic_id];
@@ -394,7 +595,7 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Get first-time aids detail
 		 */
-		User.getFirstTimeDetails = function() {
+		User.prototype.getFirstTimeDetails = function() {
 			if (!DB.cache['first_time']) return [];
 
 			var details = {};
@@ -418,14 +619,14 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		/**
 		 * Check if first-time is seen
 		 */
-		User.isFirstTimeSeen = function(aid_id) {
+		User.prototype.isFirstTimeSeen = function(aid_id) {
 			return !!this.vars['first_time'][aid_id];
 		}
 
 		/**
 		 * Mark a first-time aid as seen
 		 */
-		User.markFirstTimeAsSeen = function(aid_id) {
+		User.prototype.markFirstTimeAsSeen = function(aid_id) {
 
 			// Update first_time aid status
 			this.vars['first_time'][aid_id] = 1;
@@ -435,8 +636,14 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 
 		}
 
+
+
+
+
+
 		// Return the user scope
-		return User;
+		var user = new User();
+		return user;
 	}
 
 );

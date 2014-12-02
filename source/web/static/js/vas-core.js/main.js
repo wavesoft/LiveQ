@@ -144,7 +144,7 @@ define(
 			$('head').append('<script type="text/javascript" src="http://cernvm.cern.ch/releases/webapi/js/cvmwebapi-latest.js"></script>');
 
 			// Break down initialization process in individual chainable functions
-			var prog_db = progressAggregator.begin(6),
+			var prog_db = progressAggregator.begin(7),
 				init_db = function(cb) {
 					var sequence = [
 
@@ -153,20 +153,18 @@ define(
 
 							function(cb) {
 
-								// Fetch tunables
-								var dTunables = DB.openDatabase("tunables").all(function(tunables) {
+								// Fetch & cache tunables
+								DB.getAll("tunables", "object", function(tunables) {
 									prog_db.ok("Fetched tunable configuration");
-									DB.cache['tunables'] = tunables;
 									cb();
 								});
 
 							},
 							function(cb) {
 
-								// Fetch observables
-								var dObservables = DB.openDatabase("observables").all(function(observables) {
+								// Fetch & cache observables
+								DB.getAll("observables", "object", function(tunables) {
 									prog_db.ok("Fetched observable configuration");
-									DB.cache['observables'] = observables;
 									cb();
 								});
 
@@ -206,6 +204,14 @@ define(
 									cb();
 								});
 
+
+							},
+							function(cb) {
+
+								DB.getAll("knowlege_grid", "tree", function(grid) {
+									prog_db.ok("Fetched knowlege grid");
+									cb();
+								});
 
 							},
 							function(cb) {
@@ -475,8 +481,11 @@ define(
 					scrHome.on('explainTopic', function(topic_id) {
 						VAS.displayExplainTopic(topic_id);
 					});
-					scrHome.on('showCourses', function() {
-						VAS.displayCourses();
+					scrHome.on('showKnowlege', function() {
+						VAS.displayKnowlege();
+					});
+					scrHome.on('showMachine', function(name) {
+						VAS.displayTuningScreen();
 					});
 
 					// Fire the basic state change events
@@ -515,14 +524,14 @@ define(
 
 			var prog_courses = progressAggregator.begin(1),
 				init_courses = function(cb) {
-					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.courses");
+					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.knowlege");
 					if (!scrCourses) {
-						UI.logError("Core: Unable to initialize courses screen!");
+						UI.logError("Core: Unable to initialize knowlege screen!");
 						return;
 					}
 
 					// Complete login
-					prog_courses.ok("Courses screen ready");
+					prog_courses.ok("Knowlege screen ready");
 					cb();
 				};				
 
@@ -692,9 +701,6 @@ define(
 		 */
 		VAS.displayHome = function( animateBackwards ) {
 
-			// Setup home screen
-			VAS.scrHome.onTopicTreeUpdated( User.getTopicTree() );
-
 			// Select home screen
 			UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
@@ -704,13 +710,13 @@ define(
 		 * Check user's record and show the appropriate courses screen
 		 * configuration.
 		 */
-		VAS.displayCourses = function( animateBackwards ) {
+		VAS.displayKnowlege = function( animateBackwards ) {
 
 			// Setup home screen
-			VAS.scrCourses.onTopicTreeUpdated( User.getTopicTree() );
+			VAS.scrCourses.onTopicTreeUpdated( User.getKnowlegeTree(true) );
 
 			// Select home screen
-			UI.selectScreen("screen.courses", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
+			UI.selectScreen("screen.knowlege", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 
@@ -732,11 +738,10 @@ define(
 		/**
 		 * Check user's configuration and display the appropriate tuning screen
 		 */
-		VAS.displayTuningScreen = function( task_id ) {
+		VAS.displayTuningScreen = function() {
 
 			// Start task
-			VAS.scrTuning.onStartTask( User.getTaskDetails( task_id ) );
-			VAS.activeTask = task_id;
+			VAS.scrTuning.onTuningConfigUpdated( User.getTuningConfiguration() );
 
 			// Display tuning screen
 			UI.selectScreen("screen.tuning")
