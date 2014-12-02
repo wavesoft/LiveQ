@@ -75,7 +75,7 @@ class APIInterface:
 	#          EGRESS COMMANDS           #
 	######################################
 
-	def sendAction(self, action, param):
+	def sendAction(self, action, param={}):
 		"""
 		Send action, automatically prefixing it with the appropriate
 		API domain suffix.

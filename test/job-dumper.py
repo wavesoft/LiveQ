@@ -142,7 +142,8 @@ class JobDumperComponent(Component):
 
         # Open lab
         try:
-            self.lab = Lab.get(Lab.uuid == "3eb1263a77f35ba11d334cc8e29fc0c3")
+            #self.lab = Lab.get(Lab.uuid == "3eb1263a77f35ba11d334cc8e29fc0c3")
+            self.lab = Lab.get(Lab.uuid == "3e63661c13854de7a9bdeed71be16bb9")
         except Lab.DoesNotExist:
             self.logger.error("Unable to locate lab with id '%s'" % labid)
             return
@@ -169,11 +170,14 @@ class JobDumperComponent(Component):
                 "StringZ:aLund": 0.8,
                 "StringZ:bLund": 0.3
             })
-        """
         self.startJob("good", {
                 "TimeShower:alphaSvalue": 0.1383,
                 "StringZ:aLund": 0.3,
                 "StringZ:bLund": 0.8
+            })
+        """
+        self.startJob("partial", {
+                "TimeShower:alphaSvalue": 0.12
             })
 
         # Run component

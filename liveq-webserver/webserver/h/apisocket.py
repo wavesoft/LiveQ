@@ -30,6 +30,7 @@ from webserver.h.api.chat import ChatInterface
 from webserver.h.api.course import CourseInterface
 from webserver.h.api.account import AccountInterface
 from webserver.h.api.labsocket import LabSocketInterface
+from webserver.h.api.labtrain import LabTrainInterface
 
 from liveq.models import User
 from webserver.config import Config
@@ -66,6 +67,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			CourseInterface(self),
 			AccountInterface(self),
 			LabSocketInterface(self),
+			LabTrainInterface(self),
 		]
 
 		# Open logger

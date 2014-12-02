@@ -3,14 +3,14 @@
 define(
 
 	// Requirements
-	["jquery", "core/registry", "core/base/components", "core/db", "core/ui", "core/user", "vas-basic/data/trainhisto" ],
+	["jquery", "core/registry", "core/base/components", "core/db", "core/ui", "liveq/Calculate", "core/apisocket" ],
 
 	/**
 	 * Basic version of the introduction to tutorial screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, R, C, DB, UI, User, TrainHisto) {
+	function($, R, C, DB, UI, Calculate, APISocket) {
 		
 		/**
 		 * Helper function to format thousands
@@ -29,29 +29,82 @@ define(
 			this.progressLabel = progressLabel;
 			this.chi2Label = chi2Label;
 
-			// Create dummy histogram for testing
-			var h = this.domHisto = $('<div style="width: 100%; height: 100%;"></div>').appendTo(hostDOM);
-			var hc = this.hc = R.instanceComponent("dataviz.histogram_plain", h);
+			this.width = 0;
+			this.height = 0;
+			this.rows = 0;
+			this.cols = 0;
+			this.maxEvents = 800000;
+
+			// Flags
+			this.flagErrorBars = false;
+			this.flagErrorColors = false;
+
+			// Histogram resizing information
+			this.histograms = [];
 
 			// Callback to be fired when we reached 100%
 			this.onMaxedOut = function() { };
 
-			// Reroll
-			this.reroll();
-
 			// Hide error bars
 			this.showErrorBars(false);
-			this.timer = 0;
+			this.showErrorColors(false);
 			this.vibrationWidth = 0;
 
-			// Histogram resizing information
-			
 		}
+
+		/**
+		 * Resize histograms
+		 */
+		HistogramsGroup.prototype.resizeHistograms = function() {
+			var pad = 20, x=0, y=0,
+				elmW = (this.width - 2 * this.cols * pad) / this.cols,
+				elmH = (this.height - 2 * this.rows * pad) / this.rows;
+
+			for (var i=0; i<this.histograms.length; i++) {
+				var h = this.histograms[i],
+					pX = pad * (x+1) + elmW * x,
+					pY = pad * (y+1) + elmH * y;
+
+				// Reposition element
+				h.dom.css({
+					'left': pX,
+					'top': pY,
+					'width': elmW,
+					'height': elmH
+				});
+
+				// Resize object
+				h.inst.onResize( elmW, elmH );
+
+				// Forward
+				if (++x >= this.cols) {
+					x=0; y++;
+				}
+			}
+		}
+
 
 		/**
 		 * Show/hide error bars
 		 */
-		HistogramsGroup.prototype.addHistogram = function( histo ) {
+		HistogramsGroup.prototype.addHistogram = function( histoData, histoRef ) {
+
+			// Store histogram
+			var domHisto = $('<div></div>').appendTo(this.hostDOM),
+				hist = R.instanceComponent("dataviz.histogram_full", domHisto);
+
+			// Store on histograms
+			hist.onUpdate({ 'data': histoData, 'ref': histoRef })
+			this.histograms.push({ 'inst': hist, 'dom': domHisto, 'data': histoData, 'ref': histoRef });
+
+			// Realign histograms
+			var len = this.histograms.length;
+			this.cols = parseInt(Math.ceil(Math.sqrt(len))),
+			this.rows = parseInt(Math.ceil(len / this.cols));
+
+			// Resize histograms
+			this.resizeHistograms();
+			this.applyFlags();
 
 		}
 
@@ -59,36 +112,60 @@ define(
 		 * Show/hide error bars
 		 */
 		HistogramsGroup.prototype.clearHistograms = function() {
-			
+			this.hostDOM.empty();
+			this.histograms = [];
+		}
+
+		/**
+		 * Apply flags to the histograms
+		 */
+		HistogramsGroup.prototype.applyFlags = function() {
+			for (var i=0; i<this.histograms.length; i++) {
+				var h = this.histograms[i];
+				h.inst.onMetaUpdate({
+					'errorBars': this.flagErrorBars,
+					'errorColors': this.flagErrorColors
+				});
+			}			
 		}
 
 		/**
 		 * Show/hide error bars
 		 */
 		HistogramsGroup.prototype.showErrorBars = function( visible ) {
-			this.hc.showErrorBars(visible);
+			this.flagErrorBars = visible;
+			this.applyFlags();
 		}
 
 		/**
-		 * Resize histograms on demand
+		 * Show/hide error bars
 		 */
-		HistogramsGroup.prototype.resize = function(w,h) {
-			var padding = 20;
-
-			this.domHisto.css({
-				'width': w - padding*2,
-				'height': h - padding*2
-			})
-			this.hc.onResize(w-padding*2,h-padding*2);
+		HistogramsGroup.prototype.showErrorColors = function( visible ) {
+			this.flagErrorColors = visible;
+			this.applyFlags();
 		}
 
 		/**
-		 * Resize histograms on demand
+		 * Update all histograms
 		 */
-		HistogramsGroup.prototype.setProgression = function(v) {
-			var easedValue = 1-Math.pow(1-v,4),
-				totalEvents = Math.round(v * 100000000),
-				load = (easedValue/2 + 0.5);
+		HistogramsGroup.prototype.updateHistograms = function( allHistograms ) {
+			for (var i=0; i<allHistograms.length; i++) {
+				var h = this.histograms[i];
+				h.inst.onMetaUpdate(allHistograms[i]);
+				h.data = allHistograms[i].data;
+				h.ref = allHistograms[i].ref;
+			}
+		}
+
+		/**
+		 * Handle metadata update
+		 */
+		HistogramsGroup.prototype.handleMedatada = function( metadata ) {
+			var progress = metadata['nevts'] / this.maxEvents;
+			this.eventsLabel.text(numberWithCommas( metadata['nevts'] ));
+
+			// Calculate machine load by the progress
+			var load = progress / 2 + 0.5;
 
 			// Update vibration width
 			if (load > 0.8) {
@@ -96,9 +173,6 @@ define(
 			} else {
 				this.vibrationWidth = 0;
 			}
-
-			// Update events rate
-			this.eventsLabel.text( numberWithCommas(totalEvents) );
 
 			// Update progress
 			load += 0.005 - Math.random() * 0.01;
@@ -108,56 +182,45 @@ define(
 			});
 			this.progressLabel.html("Machine Load: <strong>" + Math.round(percent).toFixed(0) + "%</strong>");
 
-			// Update histogram
-			this.hc.onUpdate([
-					this.th.gen(1, 1),
-					this.th.gen(easedValue , 0.65)
-				]);
+		}
 
-			// Update chi-squared fit
-			this.chi2 = this.th.chi2(easedValue, 0.65, 1.0);
-			this.chi2Label.text( this.chi2.toFixed(2) );
+		/**
+		 * Handle metadata update
+		 */
+		HistogramsGroup.prototype.handleCompleted = function() {
+			// We have maxed out!
+			if (this.onMaxedOut) this.onMaxedOut();
+		}
 
+		/**
+		 * Resize histograms on demand
+		 */
+		HistogramsGroup.prototype.resize = function(w,h) {
+			this.width = w;
+			this.height = h;
+			this.resizeHistograms();
 		}
 
 		/**
 		 * Re-roll, by creating a new sample set
 		 */
-		HistogramsGroup.prototype.reroll = function() {
-			// Setup a new train histogram
-			var th = this.th = new TrainHisto({
-				bins: 20,
-				samples:  10000,
-				fuzziness:1000
-			});
+		HistogramsGroup.prototype.initialize = function(config) {
 
-			// Update histogram metadata
-			this.hc.onMetaUpdate({
-				'bins': th.bins(),
-				'domain': [0,1],
-				'sets': [
-					{
-						'name': 'Reference',
-						'color': '#fbb03b',
-						'valueBar': true,
-						'valueColor': '#993300'
-					},
-					{
-						'name': 'Simulation',
-						'color': '#2ecc71',
-						'opacity': 0.5,
-						'valueBar': true,
-						'valueColor': '#000000',
-						'valueDash' : '2, 2'
-					}
-				]
-			});
+			// Reset previous
+			this.clearHistograms();
 
-			// Update original values
-			this.hc.onUpdate([
-					th.gen(),
-					th.gen()
+			// Open new training socket
+			this.api = APISocket.openLabtrain(
+				config.sequence || "good", 
+				config.observables || [ 
+					"/ALEPH_2004_S5765862/d54-x01-y01"
 				]);
+
+			// Handle API actions
+			this.api.on('histogramAdded', this.addHistogram.bind(this));
+			this.api.on('histogramsUpdated', this.updateHistograms.bind(this));
+			this.api.on('metadataUpdated', this.handleMedatada.bind(this));
+			this.api.on('completed', this.handleCompleted.bind(this));
 
 		}
 
@@ -165,44 +228,136 @@ define(
 		 * Reset & start simulation
 		 */
 		HistogramsGroup.prototype.start = function() {
-			var i=0.001;
-			
-			// Reset properties
-			this.chi2 = 1000;
-
-			if (this.timer) clearInterval(this.timer);
-			this.timer = setInterval((function() {
-
-				// Update progression
-				this.setProgression(i);
-
-				// Check for completion
-				if (i >= 0.9999) {
-					i = 0;
-					if (this.onMaxedOut) this.onMaxedOut();
-					this.stop();
-				}
-
-				// Update step
-				i = Math.min(1.0, i+Math.random() * 0.001);
-
-			}).bind(this), 100);
+			// Start 
+			if (this.api) this.api.beginTrain();
 		}
 
 		/**
 		 * Stop running simulation
 		 */
 		HistogramsGroup.prototype.stop = function() {
-			if (this.timer) clearInterval(this.timer);
-			this.timer = 0;
+			// Stop train sequence
+			if (this.api) this.api.stopTrain();
 		}
 
 		/**
-		 * Check if values are accepted
+		 * Compare histograms and return an object with metrics and falgs
 		 */
-		HistogramsGroup.prototype.isAccepted = function() {
+		HistogramsGroup.prototype.checkHistograms = function(histo, ref) {
+			var res = {};
+
+			// Perform chi-square per bins
+			var chi2_err = Calculate.chi2WithError(histo, ref.data),
+				chi2_bins = Calculate.chi2Bins(histo, ref.data);
+
+			// Check some obvious cases
+			res.trusted = false;
+			if (chi2_err[1] < chi2_err[0]) { // Error smaller than data
+				res.trusted = true;
+			} else {
+				if (chi2_err[0] < 2) {
+					res.trusted = true;
+				}
+			}
+
+			res.chi2 = chi2_err[0];
+			res.chi2err = chi2_err[1];
+
+			// Helper to check if error bars are within eachother
+			// (values: [y, y+, y-, x, x+, x-])
+			var errbar_inside = function(a,b) { // a inside b
+					var ayTop = a[0]+a[1], ayBottom = a[0]-a[2],
+						byTop = b[0]+b[1], byBottom = b[0]-b[2];
+					return (ayTop <= byTop) && (ayBottom >= byBottom);
+				},
+				errbar_touch = function(a,b) {
+					var ayTop = a[0]+a[1], ayBottom = a[0]-a[2],
+						byTop = b[0]+b[1], byBottom = b[0]-b[2];
+					return ((ayTop >= byBottom) && (ayTop <= byTop)) ||
+						   ((ayBottom >= byBottom) && (ayBottom <= byTop));
+				}
+
+			// Reset flags
+			res.hasBlank = false;
+
+			// Reset metrics
+			var errsInside = 0,
+				errsTouch = 0;
+
+			// Start counting
+			for (var i=0; i<histo.values.length; i++) {
+				if (chi2_bins[i] == 0) { // Missing bin? That's a major fault
+					res.hasBlank = true;
+					res.trusted = false;
+				} else {
+					// Check if error bars are wintin eachother
+					if (errbar_inside(histo.values[i], ref.data.values[i]))
+						errsInside++;
+					if (errbar_touch(histo.values[i], ref.data.values[i]))
+						errsTouch++;
+				}
+			}
+
+			// Update flags based on metrics
+			res.insideRatio = errsInside / histo.bins;
+			res.touchRatio = errsTouch / histo.bins;
+
+			return res;
+		}
+
+		/**
+		 * Check current errors in the histograms
+		 */
+		HistogramsGroup.prototype.getResult = function( userIsTrusting ) {
+			var allTrusted = true,
+				allFit = true,
+				bestFit = true,
+				lastError = "";
+
+			// Get metrics of all histograms
+			for (var i=0; i<this.histograms.length; i++) {
+				var status = this.checkHistograms( this.histograms[i].data, this.histograms[i].ref );
+				if (status.hasBlank) // Blank data is an error right-away
+					return "err-blank";
+				if (status.trusted) {
+					if (stats.chi2 > 2) { // Chi 0-2 = accepted
+						allFit = false;
+					} else if (stats.chi2 > 1) { // Chi 0-1 = best
+						bestFit = false;
+					}
+				} else {
+					allTrusted = false;
+				}
+			}
+
+			// Pick a choice of words
+			if (allTrusted) {
+				if (allFit) {
+					if (userIsTrusting) {
+						return bestFit ? "perfect" : "good";
+					} else {
+						return "err-looksgood";
+					}
+				} else {
+					if (userIsTrusting) {
+						return "good";
+					} else {
+						return "err-looksbad";
+					}
+				}
+			} else {
+				return "err-nostats";
+			}
 
 		}
+
+		///////////////////////////////////////////////////////////////////////////////////
+		// -------------------------------------------------------------------------------
+		//                            TUTORIAL SCREEN IMPLEMENTATION
+		// -------------------------------------------------------------------------------
+		///////////////////////////////////////////////////////////////////////////////////
+
+
 
 		/**
 		 * @class
@@ -220,7 +375,7 @@ define(
 			this.panelEvents = $('<div class="panel-event-rate"></div>').appendTo(this.vibratingDOM);
 			this.panelHistogram = $('<div class="panel-histogram"></div>').appendTo(this.vibratingDOM);
 			this.panelControls = $('<div class="panel-controls"></div>').appendTo(this.vibratingDOM);
-			this.panelLegends = $('<div class="panel-histogram-legend"><span class="box" style="background-color: #fbb03b"></span> Measurements by the accelerators &nbsp; &nbsp; <span class="box" style="background-color: #2ecc71"></span> Current measurements from the Quantum Simulation</div>').appendTo(this.vibratingDOM);
+			this.panelLegends = $('<div class="panel-histogram-legend"><span class="box" style="background-color: #000"></span> Measurements by the accelerators &nbsp; &nbsp; <span class="box" style="background-color: rgb(0, 102, 255);"></span> Current measurements from the Quantum Simulation</div>').appendTo(this.vibratingDOM);
 
 			// Prepare progress bar
 			this.eProgressBar = $('<div class="progressbar"></div>').appendTo(this.panelMachine);
@@ -234,6 +389,7 @@ define(
 			// Prepare histogram features control group
 			this.gControls = $('<div class="group"></div>').appendTo(this.panelControls);
 			$('<span>Enable/Disable assistant features:</span>').appendTo(this.gControls);
+
 			this.eToggleErrors = $('<a class="btn-toggle" href="#">Histogram error bars</a>').appendTo(this.gControls);
 			this.eToggleErrors.click((function() {
 				if (this.eToggleErrors.hasClass("active")) {
@@ -242,6 +398,17 @@ define(
 				} else {
 					this.eToggleErrors.addClass("active");
 					this.histograms.showErrorBars(true);
+				}
+			}).bind(this));
+
+			this.eToggleErrorColors = $('<a class="btn-toggle" href="#">Per-bin comparison colors</a>').appendTo(this.gControls);
+			this.eToggleErrorColors.click((function() {
+				if (this.eToggleErrorColors.hasClass("active")) {
+					this.eToggleErrorColors.removeClass("active");
+					this.histograms.showErrorColors(false);
+				} else {
+					this.eToggleErrorColors.addClass("active");
+					this.histograms.showErrorColors(true);
 				}
 			}).bind(this));
 
@@ -263,22 +430,38 @@ define(
 
 			// Prepare the simulation class
 			this.histograms = new HistogramsGroup(this.panelHistogram, this.eEventRate, this.eProgressBarBar, this.eProgressBarValue, this.chi2Label);
-			this.onMaxedOut = (function(){ 
+			this.histograms.onMaxedOut = (function(){ 
 				this.trigger('sequence.next', 'timeout');
 			}).bind(this);
 
 			// Prepare Accept results group
 			this.gControls = $('<div class="group group-bottom"></div>').appendTo(this.panelControls);
-			this.eAcceptBtn = $('<a class="btn-accept" href="#">Accept this values</a>').appendTo(this.gControls);
+			this.eAcceptBtn = $('<a class="btn-accept" href="#">This is a match</a>').appendTo(this.gControls);
 			this.eAcceptBtn.click((function() {
-				if (this.histograms.chi2 < 1) {
-					this.trigger('sequence.next', 'perfect');
-				} else if (this.histograms.chi2 < 2) {
-					this.trigger('sequence.next', 'good');
-				} else {
-					this.trigger('sequence.next', 'bad');
-				}
+
+				// Stop sequencer
+				this.histograms.stop();
+
+				// User is trusting.. check
+				var status = this.histograms.getResult(true);
+				console.log("Status: ",status);
+				this.trigger('sequence.next', status);
+
 			}).bind(this));
+
+			this.eDiscardBtn = $('<a class="btn-discard" href="#">This is not a match</a>').appendTo(this.gControls);
+			this.eDiscardBtn.click((function() {
+
+				// Stop sequencer
+				this.histograms.stop();
+
+				// User is not trusting.. check
+				var status = this.histograms.getResult(false);
+				console.log("Status: ",status);
+				this.trigger('sequence.next', status);
+
+			}).bind(this));
+
 
 			// Vibration timer
 			this.vibrationTimer = setInterval(this.__vibrator.bind(this), 50);
@@ -305,6 +488,20 @@ define(
 			});
 		}
 
+		///////////////////////////////////////////////////////////////////////////////////
+		// -------------------------------------------------------------------------------
+		//                            INTERFACE IMPLEMENTATION
+		// -------------------------------------------------------------------------------
+		///////////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Handle sequence configuration
+		 */
+		StatsTutorial.prototype.onSequenceConfig = function( config, cbReady ) {
+			this.trainConfig = config;
+			cbReady();
+		}
+
 		/**
 		 * Handle resize vents
 		 */
@@ -319,7 +516,7 @@ define(
 		 * Initialize before show
 		 */
 		StatsTutorial.prototype.onWillShow = function(cb) {
-			this.histograms.reroll();
+			this.histograms.initialize( this.trainConfig );
 			this.histograms.start();
 			cb();
 		}

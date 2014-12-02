@@ -333,7 +333,7 @@
   position: absolute;
   width: 38%;
   right: 5px;
-  top: 90px;
+  top: 240px;
   bottom: 72px;
   padding: 0 2px;
 }
@@ -350,6 +350,12 @@
   position: absolute;
   top: 5px;
   width: 13%;
+  height: 200px;
+}
+.screen.home .p-go-course span,
+.screen.home .p-go-cafe span,
+.screen.home .p-go-machine span {
+  font-size: 40px;
 }
 .screen.home .p-go-course {
   right: 14%;
@@ -365,7 +371,7 @@
   color: #16a085;
   width: 38%;
   right: 5px;
-  top: 69px;
+  top: 215px;
   text-align: right;
   font-size: 14px;
   font-weight: bold;
@@ -1198,6 +1204,9 @@
   border-right: solid 1px #333333;
   background-color: white;
 }
+.screen.tutorial-stats .vibrator-host .panel-histogram > div {
+  position: absolute;
+}
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend {
   left: 10px;
   bottom: 10px;
@@ -1278,7 +1287,8 @@
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active:after {
   background-color: #2ecc71;
 }
-.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept {
+.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept,
+.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-discard {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   -o-border-radius: 5px;
@@ -1294,12 +1304,22 @@
   text-align: center;
   font-size: 24px;
   text-decoration: none;
+}
+.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept {
   background-color: #27ae60;
   color: #003300;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept:hover {
   color: white;
   background-color: #2ecc71;
+}
+.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-discard {
+  background-color: #c0392b;
+  color: #330000;
+}
+.screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-discard:hover {
+  color: white;
+  background-color: #e74c3c;
 }
 .screen.courseroom .monitor {
   position: relative;

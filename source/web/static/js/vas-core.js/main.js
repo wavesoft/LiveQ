@@ -58,6 +58,9 @@ define(
 				// Enter UI Lockdown
 				UI.lockdown = true;
 
+				// Don't alert on unload
+				VAS.alertUnload = false;
+
 			} else {
 				console.warn(message);
 

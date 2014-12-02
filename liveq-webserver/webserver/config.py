@@ -36,6 +36,7 @@ class WebserverConfig:
 	SERVER_PORT = 8080
 	BASE_URL = "/vas"
 	HISTODESC_PATH = ""
+	TRAINSEQ_PATH = ""
 	HISTODESC = None
 	SSL = False
 	SSL_PORT = 8043
@@ -47,6 +48,7 @@ class WebserverConfig:
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
+		WebserverConfig.TRAINSEQ_PATH = config.get("webserver", "trainseq_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
 		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
 		WebserverConfig.SSL_PORT = config.get("webserver", "ssl_port")

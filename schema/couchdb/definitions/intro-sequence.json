@@ -1,0 +1,258 @@
+{
+   "_id": "intro-sequence",
+   "sequence": [
+
+
+       {
+          "_comment": "[0] CINEMATIC: Introduction",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=y2Ky3Wo37AY"
+           },
+           "next": {
+               "completed": 1
+           }
+       },
+
+
+       {
+          "_comment": "[1] TUTORIAL: Partial match",
+           "screen": "screen.tutorial.stats",
+           "config": {
+               "sequence": "partial",
+               "observables": [
+                   "/ALEPH_2004_S5765862/d54-x01-y01"
+               ]
+           },
+           "next": {
+               "perfect": 2,
+               "good": 3,
+               "err-blank": 4,
+               "err-nostats": 5,
+               "err-looksgood": 6,
+               "err-looksbad": 7
+           }
+       },
+
+
+       {
+          "_comment": "[2] CINEMATIC & NEXT: Perfect!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=1_CIx0PxaB8"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+       {
+          "_comment": "[3] CINEMATIC & NEXT: Good!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+       {
+          "_comment": "[4] CINEMATIC & NEXT: Has blanks!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 1
+           }
+       },
+       {
+          "_comment": "[5] CINEMATIC & NEXT: No stats!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 1
+           }
+       },
+       {
+          "_comment": "[6] CINEMATIC & NEXT: Looks good!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 1
+           }
+       },
+       {
+          "_comment": "[7] CINEMATIC & NEXT: Looks bad!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 1
+           }
+       },
+
+
+       {
+          "_comment": "[8] TUTORIAL: Bad match on two histograms",
+           "screen": "screen.tutorial.stats",
+           "config": {
+               "sequence": "bad",
+               "observables": [
+                   "/ALEPH_2004_S5765862/d54-x01-y01",
+                   "/ALEPH_2004_S5765862/d118-x01-y01"
+               ]
+           },
+           "next": {
+               "perfect": 9,
+               "good": 10,
+               "err-blank": 11,
+               "err-nostats": 12,
+               "err-looksgood": 13,
+               "err-looksbad": 14
+           }
+       },
+
+
+       {
+          "_comment": "[9] CINEMATIC & NEXT: Perfect!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=1_CIx0PxaB8"
+           },
+           "next": {
+               "completed": 15
+           }
+       },
+       {
+          "_comment": "[10] CINEMATIC & NEXT: Good!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 15
+           }
+       },
+       {
+          "_comment": "[11] CINEMATIC & NEXT: Has blanks!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+       {
+          "_comment": "[12] CINEMATIC & NEXT: No stats!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+       {
+          "_comment": "[13] CINEMATIC & NEXT: Looks good!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+       {
+          "_comment": "[14] CINEMATIC & NEXT: Looks bad!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 8
+           }
+       },
+
+       {
+          "_comment": "[15] TUTORIAL: Good match on four",
+           "screen": "screen.tutorial.stats",
+           "config": {
+               "sequence": "bad",
+               "observables": [
+                   "/ALEPH_2004_S5765862/d54-x01-y01",
+                   "/ALEPH_2004_S5765862/d78-x01-y01",
+                   "/OPAL_2004_S6132243/d13-x01-y01",
+                   "/ALEPH_2004_S5765862/d118-x01-y01"
+               ]
+           },
+           "next": {
+               "perfect": 16,
+               "good": 16,
+               "err-blank": 17,
+               "err-nostats": 18,
+               "err-looksgood": 19,
+               "err-looksbad": 20
+           }
+       },
+
+
+       {
+          "_comment": "[16] CINEMATIC & NEXT: Outro",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=1_CIx0PxaB8"
+           },
+           "next": {
+               "completed": -1
+           }
+       },
+       {
+          "_comment": "[17] CINEMATIC & NEXT: Has blanks!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 15
+           }
+       },
+       {
+          "_comment": "[18] CINEMATIC & NEXT: No stats!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 15
+           }
+       },
+       {
+          "_comment": "[19] CINEMATIC & NEXT: Looks good!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 15
+           }
+       },
+       {
+          "_comment": "[20] CINEMATIC & NEXT: Looks bad!",
+           "screen": "screen.cinematic",
+           "config": {
+               "video": "http://www.youtube.com/watch?v=ZAB0He7qqqE"
+           },
+           "next": {
+               "completed": 15
+           }
+       }
+
+
+   ]
+}

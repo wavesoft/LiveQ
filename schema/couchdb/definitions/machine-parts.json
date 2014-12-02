@@ -1,0 +1,45 @@
+{
+   "_id": "machine-parts",
+   "beam": {
+       "description": {
+           "title": "Beam and input configuration",
+           "body": "This is the very first component of the machine. From here you can define what kind of input beams you want to simulate. Specifically for protons, you can also configure the functions that describe the internal structure of it."
+       }
+   },
+   "issr": {
+       "description": {
+           "title": "Initial State Radiation (Spacelike Showers)",
+           "body": "Each particle that takes part in the collision process has an internal structure. When they are about to collide, only a particular substructure of the particla initiates the collision. The rest of it's structure remains intact and is processed at a later stage."
+       }
+   },
+   "remnant": {
+       "description": {
+           "title": "Beam Remnants",
+           "body": "Only a fraction of the incoming colliding partices are used. However by the laws of energy conservation, the entire ammount must be taken care in consideration. This component combines all these remnants so they can be used in the nest stage."
+       }
+   },
+   "hard": {
+       "description": {
+           "title": "Hard Process",
+           "body": "This component is the heart of the simulation. Particles reaching this component from the <em>initial state shower</em> are transformed into a different particles, according to the laws of <em>Quantum Mechanics</em> and energy and momentum conservation. There is a dozen of different processes that could happen in this stage. Each one produces a different pair of prticles. The term <em>hard</em> means that the particles have high energy."
+       }
+   },
+   "fssr": {
+       "description": {
+           "title": "Final State Radiation (Timelike Showers)",
+           "body": "After the hard process, the products of the hard process are analyzed even further. This means that the particles that come out of the hard process are actually composed of other, smaller ones. This component performs this conversion to the smallest possible fractions."
+       }
+   },
+   "hadr": {
+       "description": {
+           "title": "Hadronization (or Fragmentation)",
+           "body": "In this component, all the particle fractions are brought together. According to <em>Quantum Chromo-Dynamics</em>, each one of these fractions have a color. They will try to connect with eachother, trying to combine into a white color. However, they are still energetic, and the strings they form will be graduately expanded. At some point the string will <em>fragment</em> producing the final particles."
+       }
+   },
+   "decay": {
+       "description": {
+           "title": "Unstable Particle Decay",
+           "body": "Some of the particles produced in the hard process are very unstable and within a couple of femtoseconds they will decay into other particles. This component waits until all the decays are completed. The result is a collection of particles."
+       }
+   }
+}

@@ -26,7 +26,7 @@ class HistoDescriptionLab:
 	the defaults for identifying collisions on histogram names
 	"""
 
-	def __init__(self, description, lab):
+	def __init__(self, description, lab=None):
 		"""
 		Initialize a HistoDescriptionLab
 		"""
@@ -34,26 +34,31 @@ class HistoDescriptionLab:
 		# Keep reference
 		self.description = description
 
-		# Fetch parameters from the lab
-		processParameters = lab.getParameters()
-
-		# Extract parameter information used for resolving
-		# collisions in histogram names
+		# Default filters (none)
 		self.beam=""
-		if 'beam' in processParameters:
-			self.beam = processParameters['beam']
 		self.process=""
-		if 'process' in processParameters:
-			self.process = processParameters['process']
 		self.energy=""
-		if 'energy' in processParameters:
-			self.energy = processParameters['energy']
 		self.params="-"
-		if 'params' in processParameters:
-			self.params = processParameters['params']
 		self.specific = "-"
-		if 'specific' in processParameters:
-			self.specific = processParameters['specific']
+
+		# If we have a lab, update filters
+		if lab:
+
+			# Fetch parameters from the lab
+			processParameters = lab.getParameters()
+
+			# Extract parameter information used for resolving
+			# collisions in histogram names
+			if 'beam' in processParameters:
+				self.beam = processParameters['beam']
+			if 'process' in processParameters:
+				self.process = processParameters['process']
+			if 'energy' in processParameters:
+				self.energy = processParameters['energy']
+			if 'params' in processParameters:
+				self.params = processParameters['params']
+			if 'specific' in processParameters:
+				self.specific = processParameters['specific']
 
 	def describeHistogram(self, id):
 		"""
@@ -72,13 +77,13 @@ class HistoDescriptionLab:
 		for h in hdesc:
 
 			# Require match on the following fields:
-			if h[1] != self.beam:
+			if (self.beam != "") and (h[1] != self.beam):
 				continue
-			if h[2] != self.process:
+			if (self.process != "") and (h[2] != self.process):
 				continue
-			if str(h[3]) != str(self.energy):
+			if (self.energy != "") and (str(h[3]) != str(self.energy)):
 				continue
-			if h[4] != self.params:
+			if (self.params != "-") and (h[4] != self.params):
 				continue
 
 			# Found

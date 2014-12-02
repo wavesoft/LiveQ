@@ -129,10 +129,13 @@ define(
 		 * @private
 		 */
 		DataVizFullHistogram.prototype._yScale = function( v ) {
+			var width = this.width - this.style.plotMargin.right - this.style.plotMargin.left,
+				height = this.height - this.style.plotMargin.top - this.style.plotMargin.bottom;
+
 			if (v == 0) {
-				return this.height;
+				return height;
 			} else {
-				return this.yScale(v);
+				return Math.min(this.yScale(v), height);
 			}
 		}
 
@@ -242,10 +245,9 @@ define(
 				.attr("transform", "translate("+this.style.plotMargin.left+","+this.style.plotMargin.top+")");
 
 			// Create backdrop
-			if (this.style.features.colorError) {
-				this.svgBackdrop = this.svgPlot.append("g")
-					.attr("class", "backdrop");
-			}
+			this.svgBackdrop = this.svgPlot.append("g")
+				.attr("opacity", 0)
+				.attr("class", "backdrop");
 
 			// Create the X and Y axis
 			this.xAxisGraphic = this.svgPlot.append("g")
@@ -388,6 +390,7 @@ define(
 				ofsX = width;
 				ofsY = height - this.style.titlePad*2 - 20;
 			}
+			console.log("log:",placeAt,ofsX, ofsY, rightAlign, yDirection);
 
 			// Set legend alignment
 			this.svgLegend
@@ -444,6 +447,29 @@ define(
 					return color; 
 				});
 
+			// Update align
+			if (rightAlign) {
+				newGroups.selectAll("path")
+					.attr("d", "M"+(-lb)+","+(-lb/2)
+							  +"L0,"+(-lb/2)
+							  +"L0,"+(lb/2)
+							  +"L"+(-lb)+","+(lb/2)
+							  +"Z" );
+				record.selectAll("text")
+					.attr("transform", "translate("+(-lb-4)+",0)")
+					.style("text-anchor", "end" );
+			} else {
+				record.selectAll("text")
+					.attr("transform", "translate("+(lb+4)+",0)")
+					.style("text-anchor", "start" );
+				newGroups.selectAll("path")
+					.attr("d", "M"+lb+","+(-lb/2)
+							  +"L0,"+(-lb/2)
+							  +"L0,"+(lb/2)
+							  +"L"+lb+","+(lb/2)
+							  +"Z" );
+			}
+
 			// Delete
 			record.exit()
 				.remove();
@@ -490,6 +516,7 @@ define(
 
 			// Update backdrop
 			if (this.style.features.colorError) {
+				this.svgBackdrop.attr("opacity", "1");
 				var record = this.svgBackdrop.selectAll("rect").data(data);
 
 				// Enter
@@ -508,6 +535,8 @@ define(
 				// Delete
 				record.exit()
 					.remove();
+			} else {
+				this.svgBackdrop.attr("opacity", "0");
 			}
 
 		}
@@ -834,6 +863,17 @@ define(
 		 */
 		DataVizFullHistogram.prototype.onMetaUpdate = function( config ) {
 			this.metadata = config;
+
+			// Update styling
+			if (this.metadata['errorBars'] !== undefined) {
+				this.style.features.errorBand = this.metadata['errorBars'];
+				this.style.features.errorBarsY = this.metadata['errorBars'];
+			}
+			if (this.metadata['errorColors'] !== undefined) {
+				this.style.features.colorError = this.metadata['errorColors'];
+			}
+
+			this.update();
 		}
 
 		// Store histogram data visualization on registry
