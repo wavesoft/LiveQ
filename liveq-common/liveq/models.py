@@ -261,7 +261,7 @@ class Agent(BaseModel):
 	activeJob = CharField(default="")
 
 	#: The owner of this agent
-	owner = ForeignKeyField(User)
+	owner = ForeignKeyField(User, null=True, default=None)
 
 class AgentJobs(BaseModel):
 	"""

@@ -180,6 +180,14 @@ define(
 		RegisterScreen.prototype.markInvalid = function(field) {
 			field.addClass("invalid");
 			field.focus();
+
+			var f = function() {
+				if (field.val() != "") {
+					field.off('blur', f);
+					field.removeClass("invalid");
+				}
+			};
+			field.on('blur', f);
 		}
 
 		/**
@@ -194,10 +202,21 @@ define(
 
 			// Get obvious fields
 			profile.username = this.fUsername.val();
+			profile.displayName = this.fDisplayName.val();
 			profile.email = this.fEmail.val();
 			profile.gender = this.fGender.val();
+			profile.password = this.fPassword1.val();
 			profile.research = this.fResearch.is(":checked");
-			profile.displayName = this.fDisplayName.val();
+
+			// Validate blank fields
+			var noblank = [this.fUsername, this.fDisplayName, this.fEmail, this.fPassword1];
+			for (var i=0; i<noblank.length; i++) {
+				if (noblank[i].val() == "") {
+					this.markInvalid(noblank[i]);
+					this.onRegistrationError("This field cannot be blank!");
+					return null;
+				}
+			}
 
 			// Validate e-mail
 			var rx_mail = /^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$/;

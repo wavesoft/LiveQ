@@ -154,12 +154,13 @@ class Histogram:
 		if (tot >= (1.0-tollerance)) and (tot <= (1.0+tollerance)):
 			return ref
 
-		# Calculate scale (also equal to y-Values)
-		ref.y = ref.y / tot
+		if tot > 0:
+			# Calculate scale (also equal to y-Values)
+			ref.y = ref.y / tot
 
-		# Update errors
-		ref.yErrMinus /= tot
-		ref.yErrPlus /= tot
+			# Update errors
+			ref.yErrMinus /= tot
+			ref.yErrPlus /= tot
 
 		# Return histogram
 		return ref

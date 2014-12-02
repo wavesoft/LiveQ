@@ -151,6 +151,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			return self.sendError("Missing 'action' parameter from request")
 		action = parsed['action']
 
+		# Handle keepalive messages
+		if action == "io.keepalive":
+			self.sendAction("io.keepalive", {})
+			return
+
 		# If the action is not 'login' and we don't have a user, 
 		# conider this invalid
 		if not self.user:

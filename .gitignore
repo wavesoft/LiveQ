@@ -47,7 +47,7 @@ dump.rdb
 # Temporary files
 tools/temp*
 liveq-webserver/static/js/out*
-
 source/web/doc/jsdoc
 source/web/static/js/node_modules
 source/web/dat
+test/histo*

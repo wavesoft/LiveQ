@@ -52,6 +52,9 @@ define(
 				var bsod = UI.selectScreen("screen.bsod");
 				if (bsod) bsod.onBSODDefined(message, '<span class="glyphicon glyphicon-off"></span>');
 
+				// Hide overlay
+				UI.hideOverlay();
+
 				// Enter UI Lockdown
 				UI.lockdown = true;
 

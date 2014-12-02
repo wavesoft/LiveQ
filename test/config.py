@@ -21,11 +21,12 @@ import ConfigParser
 from liveq.config import configexceptions
 from liveq.config.core import CoreConfig
 from liveq.config.internalbus import InternalBusConfig
+from liveq.config.database import DatabaseConfig
 
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, InternalBusConfig):
+class Config(CoreConfig, InternalBusConfig, DatabaseConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -40,4 +41,5 @@ class Config(CoreConfig, InternalBusConfig):
 
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
+		DatabaseConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
