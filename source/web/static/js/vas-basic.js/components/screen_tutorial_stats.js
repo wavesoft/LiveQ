@@ -41,10 +41,25 @@ define(
 
 			// Hide error bars
 			this.showErrorBars(false);
-
 			this.timer = 0;
 			this.vibrationWidth = 0;
 
+			// Histogram resizing information
+			
+		}
+
+		/**
+		 * Show/hide error bars
+		 */
+		HistogramsGroup.prototype.addHistogram = function( histo ) {
+
+		}
+
+		/**
+		 * Show/hide error bars
+		 */
+		HistogramsGroup.prototype.clearHistograms = function() {
+			
 		}
 
 		/**

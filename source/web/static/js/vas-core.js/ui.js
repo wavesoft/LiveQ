@@ -407,7 +407,6 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			UI.hostOverlayWindow = $('<div class="pt-main pt-perspective"></div>').appendTo(UI.hostOverlay);
 			UI.hostOverlayWindow.addClass('overlay-window');
 			UI.hostOverlayWindow.click(function(e) {
-				e.preventDefault();
 				e.stopPropagation();
 			});
 
