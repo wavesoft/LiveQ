@@ -154,7 +154,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# If the action is not 'login' and we don't have a user, 
 		# conider this invalid
 		if not self.user:
-			if action != "account.login":
+			if (action != "account.login") and (action != "account.register"):
 				self.sendError("The user was not logged in!")
 				return
 
@@ -245,7 +245,29 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			# Header MUST be 64-bit aligned
 			struct.pack("<II", frameID, 0)+data, 
 			binary=True
-		)		
+		)
+
+	def sendUserProfile(self):
+		"""
+		Send user profile information
+		"""
+
+		# Shorthand to user
+		user = self.user
+		if not user:
+			return
+
+		# Send user profile
+		self.sendAction('account.profile', {
+				'username' 		: user.username,
+				'gender' 		: user.gender,
+				'birthdate'		: user.birthdate,
+				'email' 		: user.email,
+				'collectStats'	: user.collectStats,
+				'displayName' 	: user.displayName,
+				'avatar' 		: user.avatar,
+				'vars' 			: json.loads(user.variables)
+			})
 
 	def handleAction(self, action, param):
 		"""
@@ -259,7 +281,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 			# Fetch user entry
 			try:
-				user = User.get(User.username == param['user'])
+				userName = str(param['username']).lower()
+				user = User.get(User.username == userName)
 			except User.DoesNotExist:
 				self.sendAction('account.login.response', {
 						'status' : 'error',
@@ -280,13 +303,49 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			self.sendAction('account.login.response', {
 					'status' : 'ok'
 				})
-			self.sendAction('account.profile', {
-					'username': user.username,
-					'name': user.name,
-					'surname': user.surname,
-					'avatar': user.avatar,
-					'vars': json.loads(user.variables)
+			self.sendUserProfile()
+
+			# Let all interface know that we are ready
+			for i in self.interfaces:
+				i.ready()
+
+		elif action == "account.register":
+
+			# Fetch user profile
+			profile = param['profile']
+			userName = str(profile['username']).lower()
+
+			# Check if such user exist
+			try:
+				user = User.get(User.username == userName)
+				self.sendAction('account.register.response', {
+						'status' : 'error',
+						'message': "A user with this name already exists!"
+					})
+				return
+			except User.DoesNotExist:
+				pass
+
+			# Create new user
+			user = User.create(
+				username=userName,
+				password=profile['password'],
+				gender=profile['gender'],
+				email=profile['email'],
+				birthdate=profile['birthdate'],
+				avatar=profile['avatar'],
+				collectStats=profile['research'],
+				displayName=profile['displayName'],
+				variables="{}"
+				)
+			user.save()
+
+			# Success
+			self.user = user
+			self.sendAction('account.register.response', {
+					'status' : 'ok'
 				})
+			self.sendUserProfile()
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:

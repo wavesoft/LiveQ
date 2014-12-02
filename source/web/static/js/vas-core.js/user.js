@@ -85,36 +85,38 @@ define(["core/config", "core/db", "core/apisocket", "core/global"],
 		}
 
 		/**
-		 * Callback when user's dynamic variables are updated
-		 *
-		 * @param {Object} profile - The new profile dictionary
-		 */
-		User.onProfileUpdated = function(profile) {
-
-		}
-
-		/**
 		 * Login and initialize user record
 		 *
 		 * @param {Object} params - A dictionary that contains the 'username', 'password', 'email' and 'name' fields.
 		 * @param {function(status)} callback - A callback function to fire when the register-process has completed
 		 */
 		User.register = function(params, callback) {
+			var accountIO = this.getAccountIO();
 
 			// Try to register-in the user
-			DB.createUser(params, (function(status, errorMsg) {
+			accountIO.register(params, (function(response) {
 				
 				// If something went wrong, fire error callback
-				if (!status) {
-					if (callback) callback(false, errorMsg);
+				if (response['status'] != 'ok') {
+					if (callback) callback(false, response['message']);
 					return;
 				}
 
-				// Otherwise process uer record
-				this.initialize();
+				// Wait until the user profile arrives
+				accountIO.callbackOnAction("profile", (function(profile) {
 
-				// Fire callback
-				if (callback) callback(true);
+					// Let global listeners that the user is logged in
+					Global.events.trigger("login", profile);
+
+					// Handle profile
+					this.profile = profile;
+					this.vars = profile['vars'];
+					this.initialize();					
+
+					// Fire callback
+					if (callback) callback(true);
+
+				}).bind(this));
 
 			}).bind(this));
 

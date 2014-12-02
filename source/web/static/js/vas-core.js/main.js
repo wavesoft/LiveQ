@@ -311,6 +311,9 @@ define(
 								UI.growl("Could not log-in! "+errorMsg, "alert")
 							} else {
 
+								// Alert on unload
+								VAS.alertUnload = true;
+
 								// User is logged-in, check if he has sheen the introduction
 								// sequence
 								if (!User.isFirstTimeSeen("intro")) {
@@ -329,29 +332,42 @@ define(
 						});
 					});
 					scrLogin.on('register', function(user, password) {
-
 						UI.showOverlay("screen.register", function(scrRegister) {
-							scrRegister.on('register', function(profile) {
-								UI.hideOverlay();
-							});
+
+							// On cancel just hide
 							scrRegister.on('cancel', function() {
 								UI.hideOverlay();
 							});
-						});
 
-						/*
-						User.register({
-							'username' : user,
-							'password' : password
-						}, function(status, errorMsg) {
-							if (!status) {
-								UI.growl("Could not register the user! "+errorMsg, "alert")
-							} else {
-								VAS.displayHome();
-							}
-						});
-						*/
+							// Handle register event
+							scrRegister.on('register', function(profile) {
 
+								// Try registering the user
+								User.register(profile, function(status, errorMsg) {
+									if (!status) {
+										scrRegister.onRegistrationError(errorMsg);
+									} else {
+
+										/////////////
+										// The user is registered and logged in
+										/////////////
+
+										// Hide overlay
+										UI.hideOverlay();
+
+										// Display the intro sequence
+										UI.displaySequence( DB.cache['definitions']['intro-sequence']['sequence'] , function() {
+											// Mark introduction sequence as shown
+											User.markFirstTimeAsSeen("intro");
+											// Display home page
+											VAS.displayHome();
+										});
+									}
+								});
+
+							});
+
+						});
 					});
 					// Complete login
 					prog_login.ok("Home screen ready");

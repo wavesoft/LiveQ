@@ -27,12 +27,24 @@ define(["core/api/interface", "core/config"],
 		/**
 		 * Perform login 
 		 */
-		APIAccount.prototype.login = function(user, password, callback) {
+		APIAccount.prototype.login = function(username, password, callback) {
 
 			// Log-in user and fire callback when logged in
 			this.sendAction("login", {
-				'user': user,
+				'username': username,
 				'password': password
+			}, callback);
+			
+		}
+
+		/**
+		 * Perform login 
+		 */
+		APIAccount.prototype.register = function(profile, callback) {
+
+			// Log-in user and fire callback when logged in
+			this.sendAction("register", {
+				'profile': profile
 			}, callback);
 			
 		}

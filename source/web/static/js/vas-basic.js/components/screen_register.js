@@ -35,32 +35,39 @@ define(
 			this.eAlert = $('<div class="alert"></div>').appendTo(panel).hide();
 
 			// FIELD: Username
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-username">User name:</label>'))
 				.append(this.fUsername = $('<input type="text" id="f-username" />'))
+				.append($('<div class="details">The username to use for logging into the game.</div>'))
+				.appendTo(panel);
+
+			// FIELD: Display name
+			$('<div class="row"></div>')
+				.append($('<label for="f-displayname">Display name:</label>'))
+				.append(this.fDisplayName = $('<input type="text" id="f-displayname" />'))
 				.append($('<div class="details">How everone will see you.</div>'))
 				.appendTo(panel);
 
 			// FIELD: E-Mail address
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-email">E-Mail:</label>'))
 				.append(this.fEmail = $('<input type="text" id="f-email" />'))
 				.append($('<div class="details">We will use this e-mail address to send you notifications regarding in-game events.</div>'))
 				.appendTo(panel);
 
 			// FIELD: Password
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-password1">Password:</label>'))
 				.append(this.fPassword1 = $('<input type="password" id="f-password1" />'))
 				.appendTo(panel);
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-password2">Password (Repeat):</label>'))
 				.append(this.fPassword2 = $('<input type="password" id="f-password2" />'))
 				.append($('<div class="details">This is your account password. Be careful not to forget it!</div>'))
 				.appendTo(panel);
 
 			// FIELD: Birth date
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-birth-month">Birth Date:</label>'))
 				.append(this.fBirthDay = $('<select id="f-birth-month" />'))
 				.append(this.fBirthMonth = $('<select id="f-birth-month" />'))
@@ -94,7 +101,7 @@ define(
 
 			// FIELD: Gender
 
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-gender">I am a:</label>'))
 				.append(this.fGender = $('<select id="f-gender" />'))
 				.append($('<div class="details">In order to customize the messages for you.</div>'))
@@ -108,7 +115,7 @@ define(
 
 			// FIELD: Avatar
 
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-avatar">Avatar:</label>'))
 				.append(this.fAvatarList = $('<div class="input avatar-list"></div>'))
 				.append($('<div class="details">Pick your favourite avatar.</div>'))
@@ -116,8 +123,8 @@ define(
 
 			// Populate the avatars table
 			var self = this,
-				avatars = ['model-1.png', 'model-2.png', 'model-3.png', 'model-4.png', 'model-5.png',
-						   'model-6.png', 'model-7.png'];
+				avatars = ['model-1.png', 'model-2.png', 'model-3.png', 'model-4.png', 
+				           'model-5.png', 'model-6.png', 'model-7.png'];
 			for (var i=0; i<avatars.length; i++) {
 				var item = $('<div class="item" style="background-image: url(static/img/avatars/'+avatars[i]+')"></div>')
 								.data("avatar", avatars[i])
@@ -131,13 +138,13 @@ define(
 
 			// FIELD: Accept to be a research patrtner
 
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append($('<label for="f-research">Count me in:</label>'))
 				.append(this.fResearch = $('<input id="f-research" type="checkbox" checked="checked" value="1" />'))
 				.append($('<div class="details">Check the box above if you allow CERN and it\'s partners to collect anonymous information regarding your game experience in order to improve future versions of Virtual Atom Smasher.</div>'))
 				.appendTo(panel);
 
-			$('<div class="row">')
+			$('<div class="row"></div>')
 				.append(
 					$('<div class="input"></div>')
 					.append(this.btnRegister = $('<button class="btn-shaded btn-blue btn-lg">Register</button>'))
@@ -161,7 +168,7 @@ define(
 		/**
 		 * Collect all the fields into a profile object
 		 */
-		RegisterScreen.prototype.showAlert = function(text) {
+		RegisterScreen.prototype.onRegistrationError = function(text) {
 			this.ePanel.scrollTop(0);
 			this.eAlert.html(text);
 			this.eAlert.fadeIn();
@@ -190,12 +197,13 @@ define(
 			profile.email = this.fEmail.val();
 			profile.gender = this.fGender.val();
 			profile.research = this.fResearch.is(":checked");
+			profile.displayName = this.fDisplayName.val();
 
 			// Validate e-mail
 			var rx_mail = /^\w[-._\w]*\w@\w[-._\w]*\w\.\w{2,3}$/;
 			if (!profile.email.match(rx_mail)) {
 				this.markInvalid(this.fEmail);
-				this.showAlert("The e-mail address is not valid!");
+				this.onRegistrationError("The e-mail address is not valid!");
 				return null;
 			}
 
@@ -203,7 +211,7 @@ define(
 			profile.password = this.fPassword1.val();
 			if (this.fPassword2.val() != profile.password) {
 				this.markInvalid(this.fPassword2);
-				this.showAlert("The passwords do not match!");
+				this.onRegistrationError("The passwords do not match!");
 				return null;
 			}
 

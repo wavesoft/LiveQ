@@ -67,10 +67,17 @@ class User(BaseModel):
 	#: The password
 	password = CharField(max_length=128)
 
-	#: The first name of the user
-	name = CharField(max_length=128)
-	#: The last name of the user
-	surname = CharField(max_length=128)
+	#: The display name
+	displayName = CharField(max_length=128)
+
+	#: Gender
+	gender = CharField(max_length=10)
+	#: Birthdate (timestamp)
+	birthdate = IntegerField()
+
+	#: Check if the user aggrees to participate to the
+	#: stats collection
+	collectStats = BooleanField(default=True)
 
 	#: The team avatar
 	avatar = CharField(max_length=128)

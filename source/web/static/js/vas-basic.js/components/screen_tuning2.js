@@ -70,24 +70,6 @@ define(
 			}).bind(this));
 
 			// ---------------------------------
-			// Create a control board
-			// ---------------------------------
-
-			var boardHost = $('<div class="control-board"></div>').appendTo(hostDOM),
-				descBoard = $('<div></div>').appendTo(boardHost);
-
-			$('<button class="btn-shaded btn-with-icon btn-red"><span class="glyphicon glyphicon-unchecked"></span><br />Estimate</button>').appendTo(descBoard);
-			$('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Submit</button>').appendTo(descBoard);
-			$('<div class="panel-shaded">Good Fit</div>').appendTo(descBoard);
-			$('<button class="btn-shaded btn-with-icon btn-darkblue"><span class="glyphicon glyphicon-dashboard"></span><br />View</button>').appendTo(descBoard);
-
-			// Create help button
-			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
-			this.btnHelp.click((function() {
-				this.descFrame.toggleClass("visible");
-			}).bind(this));
-
-			// ---------------------------------
 			// Create tuning panel
 			// ---------------------------------
 
@@ -105,6 +87,25 @@ define(
 				e.stopPropagation();
 				e.preventDefault();
 			});
+			
+			// ---------------------------------
+			// Create a control board
+			// ---------------------------------
+
+			var boardHost = $('<div class="control-board"></div>').appendTo(hostDOM),
+				descBoard = $('<div></div>').appendTo(boardHost);
+
+			$('<button class="btn-shaded btn-with-icon btn-red"><span class="glyphicon glyphicon-unchecked"></span><br />Estimate</button>').appendTo(descBoard);
+			$('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Submit</button>').appendTo(descBoard);
+			$('<div class="panel-shaded">Good Fit</div>').appendTo(descBoard);
+			$('<button class="btn-shaded btn-with-icon btn-darkblue"><span class="glyphicon glyphicon-dashboard"></span><br />View</button>').appendTo(descBoard);
+
+			// Create help button
+			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
+			this.btnHelp.click((function() {
+				this.descFrame.toggleClass("visible");
+			}).bind(this));
+
 
 		}
 		TuningScreen.prototype = Object.create( C.TuningScreen.prototype );
