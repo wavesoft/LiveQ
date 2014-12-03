@@ -159,18 +159,18 @@ class AccountInterface(APIInterface):
 		elif action == "credits.claim":
 
 			# Check for missing parameters
-			if not 'name' in param:
-				self.sendError("Missing 'name' parameter")
-				return
 			if not 'claim' in param:
 				self.sendError("Missing 'claim' parameter")
 				return
+			if not 'category' in param:
+				self.sendError("Missing 'category' parameter")
+				return
 
 			# Get credits group
-			claims = self.getVariable("credit_claims", param['claim'])
+			claims = self.getVariable("credit_claims", param['category'], {})
 
 			# Check if claim is placed
-			if param['name'] in claims:
+			if param['claim'] in claims:
 				# Send response
 				self.sendResponse({
 							"status": "error",
@@ -179,25 +179,26 @@ class AccountInterface(APIInterface):
 				return
 
 			# Accept this claim
-			self.setVariable("credit_claims", param['claim'], 1)
+			claims[param['claim']] = 1
+			self.setVariable("credit_claims", param['category'], claims)
 
 			# Find how much credits it's worth
 			credits = 0
-			if param['claim'] == "estimate":
-				if param['name'] == "perfect":
+			if param['category'] == "estimate":
+				if param['claim'] == "perfect":
 					credits = 8
-				elif param['name'] == "good":
+				elif param['claim'] == "good":
 					credits = 4
-				elif param['name'] == "fair":
+				elif param['claim'] == "fair":
 					credits = 2
 				else:
 					credits = 1
-			elif param['claim'] == "run":
-				if param['name'] == "perfect":
+			elif param['category'] == "run":
+				if param['claim'] == "perfect":
 					credits = 16
-				elif param['name'] == "good":
+				elif param['claim'] == "good":
 					credits = 8
-				elif param['name'] == "fair":
+				elif param['claim'] == "fair":
 					credits = 4
 				else:
 					credits = 2
@@ -216,7 +217,10 @@ class AccountInterface(APIInterface):
 
 			# Reply with status and the new user profile
 			self.socket.sendUserProfile()
-			self.sendResponse({ "status": "ok" })
+			self.sendResponse({
+				"status": "ok",
+				"credits": credits
+				})
 
 
 		##################################################
@@ -225,12 +229,12 @@ class AccountInterface(APIInterface):
 		elif action == "credits.reset":
 
 			# Check for missing parameters
-			if not 'claim' in param:
-				self.sendError("Missing 'claim' parameter")
+			if not 'category' in param:
+				self.sendError("Missing 'category' parameter")
 				return
 
 			# Get credits group
-			self.delVariable("credit_claims", param['claim'])
+			self.delVariable("credit_claims", param['category'])
 			self.user.save()
 
 

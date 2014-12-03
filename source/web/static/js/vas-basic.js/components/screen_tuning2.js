@@ -274,18 +274,30 @@ define(
 				chi2 /= histos.length;
 
 				// Classify and display
-				var msg = "Bad";
+				var msg = "Bad",
+					claim = "bad",
+					claim_reason = "for a reasonable try";
+
 				if (chi2 < 1) {
 					msg = "Perfect";
+					claim = "perfect";
+					claim_reason = "for your excellet guess";
 				} else if (chi2 < 2) {
 					msg = "Good";
+					claim = "good";
+					claim_reason = "for your good estimate";
 				} else if (chi2 < 4) {
 					msg = "Fair";
+					claim = "fair";
+					claim_reason = "your fair attempt";
 				}
 				msg += "(" + chi2.toFixed(2) + ")";
 
 				// Print result
 				this.panelStatus.text(msg);
+
+				// Place credits claim request
+				User.claimCredits("estimate", claim, claim_reason);
 
 			}).bind(this));
 
@@ -384,9 +396,6 @@ define(
 			// Then update interface
 			this.machine.onMachinePartsEnabled( this.machinePartsEnabled );
 
-			// Reset btnView, because we don't have any data yet
-			this.btnView.addClass("disabled");
-
 			// ============================
 			// Initialize values
 			// ============================
@@ -411,6 +420,9 @@ define(
 
 			}).bind(this));
 
+			// Reset UI
+			this.btnView.addClass("disabled");
+			this.panelStatus.text("---");
 
 		}
 

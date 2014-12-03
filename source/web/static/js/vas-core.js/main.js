@@ -143,6 +143,12 @@ define(
 			// Add CernVM WebAPI script to the main page
 			$('head').append('<script type="text/javascript" src="http://cernvm.cern.ch/releases/webapi/js/cvmwebapi-latest.js"></script>');
 
+			// Listen to global user events
+			User.on('notification', function(message, type) {
+				UI.growl(message, type || "success")
+			});
+
+
 			// Break down initialization process in individual chainable functions
 			var prog_db = progressAggregator.begin(7),
 				init_db = function(cb) {

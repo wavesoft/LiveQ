@@ -216,6 +216,51 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 		}
 
 		/**
+		 * Claim credits
+		 */
+		User.prototype.claimCredits = function( category, claim, reason ) {
+
+			// Try to register-in the user
+			this.accountIO.sendAction("credits.claim", 
+				{
+					'category': category,
+					'claim': claim
+				}, 
+				(function(response) {
+
+					// Fire callback
+					if (response['status'] == 'ok') {
+						this.trigger("notification", "You got <strong>"+response['credits']+'</strong> credit '+reason);
+					}
+
+				}).bind(this)
+			);
+
+		}
+
+		/**
+		 * Reset credit claim category
+		 */
+		User.prototype.resetClaimCategory = function( category ) {
+
+			// Try to register-in the user
+			this.accountIO.sendAction("credits.reset", 
+				{
+					'category': category
+				}, 
+				(function(response) {
+
+					// Fire callback
+					if (response['status'] == 'ok') {
+
+					}
+
+				}).bind(this)
+			);
+
+		}
+
+		/**
 		 * Initialize the user record 
 		 *
 		 * This function fetches the database user record and prepares the local fields.
