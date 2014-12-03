@@ -74,7 +74,19 @@ define(
 			];
 
 			// Show/hide appropriate screens
-			if (to == "screen.")
+			if (to == "screen.tuning") {
+				this.btnTuning.hide();
+				this.btnHome.show();
+				this.btnKnowlege.show();
+			} else if (to == "screen.home") {
+				this.btnHome.hide();
+				this.btnTuning.show();
+				this.btnKnowlege.show();
+			} else if (to == "screen.knowledge") {
+				this.btnKnowlege.hide();
+				this.btnTuning.show();
+				this.btnHome.show();
+			}
 
 			// This works on valid screen
 			if (valid_screens.indexOf(to) >= 0) {
