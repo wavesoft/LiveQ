@@ -30,6 +30,7 @@ class APIInterface:
 		self.domain = domain
 		self.binaryDomain = binaryDomain << 16
 		self.isOpen = True
+		self.currentAction = ""
 
 		# Open logger
 		self.logger = logging.getLogger("api.%s" % domain)
@@ -74,6 +75,17 @@ class APIInterface:
 	######################################
 	#          EGRESS COMMANDS           #
 	######################################
+
+	def sendResponse(self, param={}):
+		"""
+		Reply to the last received action
+		"""
+		# If we are not open, ignore it
+		if not self.isOpen:
+			return
+
+		# Send action
+		self.socket.sendAction("%s.%s.response" % (self.domain, self.currentAction), param)
 
 	def sendAction(self, action, param={}):
 		"""

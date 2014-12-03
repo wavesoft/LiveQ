@@ -277,6 +277,17 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				'vars' 			: json.loads(user.variables)
 			})
 
+	def sendNotification(self, message, msgType="info"):
+		"""
+		Push a notification to the user
+		"""
+
+		# Send notification action
+		self.sendAction("ui.notification", {
+				"type": msgType,
+				"message": message
+			})
+
 	def handleAction(self, action, param):
 		"""
 		Handle the specified incoming action from the javascript interface
@@ -367,7 +378,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				# Check if this action can be handled by this action domain
 				if action[0:len(i.domain)+1] == "%s." % i.domain:
 					# Handle action
-					i.handleAction(action[len(i.domain)+1:], param)
+					i.currentAction = action[len(i.domain)+1:]
+					i.handleAction(i.currentAction, param)
 					handled = True
 					break
 

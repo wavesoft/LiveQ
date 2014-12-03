@@ -64,6 +64,9 @@ define(
 			// Update component value
 			com.onUpdate( this.valuesMap[metadata['_id']] );
 
+			// Resize to update DOM information
+			com.onResize( com.width, com.height );
+
 			// Store component tunables map
 			this.tunablesMap[metadata['_id']] = com;
 
@@ -95,7 +98,7 @@ define(
 		/**
 		 * This event is fired when the saved slot values are updated
 		 */
-		DefaultTuningPanel.prototype.onMarkersDefined = function( markersMap ) {
+		DefaultTuningPanel.prototype.onTuningMarkersDefined = function( markersMap ) {
 			// Update all markers
 			for (k in markersMap) {
 				if (this.tunablesMap[k]) {
@@ -125,9 +128,8 @@ define(
 				this.headerElm.text(title);
 			}
 
-
 			// Prepare panel dimentions according to the number of tunables
-			var row_height = 52, row_width = 187,
+			var row_height = 58, row_width = 250,
 				grid_w = 0, grid_h = 0;
 			if (tunables.length <= 5) {
 				grid_h = row_height * tunables.length + 8;

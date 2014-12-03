@@ -169,6 +169,53 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 		}
 
 		/**
+		 * Get the values of a given save slot
+		 */
+		User.prototype.getSlotValues = function( index, callback ) {
+
+			// Try to register-in the user
+			this.accountIO.sendAction("save.get", 
+				{
+					'id': index
+				}, 
+				(function(response) {
+
+					// Fire callback
+					if (response['status'] == 'ok') {
+						if (callback) callback(response['values']);
+					}
+
+				}).bind(this)
+			);
+
+		}
+
+		/**
+		 * Set the value to a save slot
+		 */
+		User.prototype.saveSlotValues = function( index, values, callback ) {
+
+			// Try to register-in the user
+			this.accountIO.sendAction("save.set", 
+				{
+					'id': index,
+					'values': values
+				}, 
+				(function(response) {
+
+					// Fire callback
+					if (response['status'] == 'ok') {
+						if (callback) callback(true);
+					} else {
+						if (callback) callback(false);
+					}
+
+				}).bind(this)
+			);
+
+		}
+
+		/**
 		 * Initialize the user record 
 		 *
 		 * This function fetches the database user record and prepares the local fields.
@@ -362,8 +409,6 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 			};
 
 		}
-
-
 
 
 

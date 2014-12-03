@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
+	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/user", "core/apisocket", "liveq/Calculate"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, DB, UI, config, R,C, APISocket) {
+	function($, d3, DB, UI, config, R,C, User, APISocket, Calculate ) {
 
 		/**
 		 * @class
@@ -27,6 +27,7 @@ define(
 			this.machinePartTunables = {};
 			this.observables = [];
 			this.values = {};
+			this.markers = {};
 
 			// Team header
 			$('<h1><span class="highlight">Tuning</span> The Quantum Machine</h1><div class="subtitle">Fiddle with the quantum machine and find the best values</div>').appendTo(hostDOM);
@@ -101,6 +102,7 @@ define(
 			// Bind events
 			this.tuningPanel.on('change', (function(e) {
 
+
 			}).bind(this));
 
 			// ---------------------------------
@@ -132,8 +134,18 @@ define(
 
 			this.btnEstimate = $('<button class="btn-shaded btn-with-icon btn-red"><span class="glyphicon glyphicon-unchecked"></span><br />Estimate</button>').appendTo(descBoard);
 			this.btnSubmit = $('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Submit</button>').appendTo(descBoard);
-			this.panelStatus = $('<div class="panel-shaded">Good Fit</div>').appendTo(descBoard);
+			this.panelStatus = $('<div class="panel-shaded">---</div>').appendTo(descBoard);
 			this.btnView = $('<button class="btn-shaded btn-with-icon btn-darkblue"><span class="glyphicon glyphicon-dashboard"></span><br />View</button>').appendTo(descBoard);
+
+			// Bind events
+			this.btnEstimate.click((function() {
+				this.estimateResults();
+			}).bind(this));
+
+			// View histograms
+			this.btnView.click((function() {
+
+			}).bind(this));
 
 			// Create help button
 			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
@@ -188,6 +200,7 @@ define(
 			var details = DB.cache['definitions']['machine-parts'][machinePartID];
 			this.tuningPanel.onTuningPanelDefined( details.description.title, this.machinePartTunables[machinePartID] );
 			this.tuningPanel.onTuningValuesDefined( this.values );
+			this.tuningPanel.onTuningMarkersDefined( this.markers );
 
 			// Add back-blur fx on the machine DOM
 			this.machineDOM.addClass("fx-backblur");
@@ -245,14 +258,67 @@ define(
 				'beam': configMode
 			});
 
+			// Pick the appropriate labSocket
+			this.lab = APISocket.openLabsocket("3e63661c13854de7a9bdeed71be16bb9");
+			this.lab.on('histogramAdded', (function(data, ref) {
+
+			}).bind(this));
+			this.lab.on('histogramsUpdated', (function(histos) {
+
+				// Calculate the Chi2 over all histograms
+				var chi2 = 0;
+				for (var i=0; i<histos.length; i++) {
+					var v = Calculate.chi2(histos[i].data, histos[i].ref.data);
+					chi2 += v;
+				}
+				chi2 /= histos.length;
+
+				// Classify and display
+				var msg = "Bad";
+				if (chi2 < 1) {
+					msg = "Perfect";
+				} else if (chi2 < 2) {
+					msg = "Good";
+				} else if (chi2 < 4) {
+					msg = "Fair";
+				}
+				msg += "(" + chi2.toFixed(2) + ")";
+
+				// Print result
+				this.panelStatus.text(msg);
+
+			}).bind(this));
+
 		}
 
+		/** 
+		 * Submit results for estimation
+		 */
+		TuningScreen.prototype.estimateResults = function() {
+
+			// Submit for interpolation
+			this.lab.beginSimulation( this.values, true );
+
+			// Enable view option
+			this.btnView.removeClass("disabled");
+
+			// Save user values
+			User.saveSlotValues("L", this.values);
+
+			// Update 'L' markers
+			for (k in this.values) {
+				if (typeof(this.values[k]) != 'number') continue;
+				this.markers[k]['L'] = this.values[k];
+			}
+
+		}
 
 		/** 
 		 * Define the parameters of the machine
 		 */
 		TuningScreen.prototype.onTuningConfigUpdated = function( tuningConfig ) {
 
+			// ============================
 			// Machine configurations
 			// ============================
 
@@ -293,11 +359,13 @@ define(
 			}
 			this.setMachineConfiguration(lastMode.substr(5));
 
+			// ============================
 			// Machine parts & Tunables
 			// ============================
 
 			// Reset tunable values
 			this.values = {};
+			this.markers = {};
 
 			// First update enabled machine parts
 			this.machinePartsEnabled = {};
@@ -318,6 +386,31 @@ define(
 
 			// Reset btnView, because we don't have any data yet
 			this.btnView.addClass("disabled");
+
+			// ============================
+			// Initialize values
+			// ============================
+
+			// Get save slot values
+			User.getSlotValues("L", (function(values) {
+				
+				// Prepare markers
+				var markers = {};
+
+				// Update local values
+				for (k in values) {
+					this.values[k] = values[k];
+					markers[k] = {
+						'L': values[k]
+					};
+				}
+
+				// Update markers
+				this.markers = markers;
+
+
+			}).bind(this));
+
 
 		}
 

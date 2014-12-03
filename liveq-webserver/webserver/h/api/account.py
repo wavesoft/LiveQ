@@ -59,24 +59,187 @@ class AccountInterface(APIInterface):
 		# Put back
 		self.user.variables = json.dumps(varDump)
 
+	def getVariable(self, group, key, defValue=None):
+		"""
+		Set a user variable in the dynamic variables
+		"""
+		# Load variable dump
+		varDump = json.loads(self.user.variables)
+
+		# Update variable
+		if not group in varDump:
+			return defValue
+		if not key in varDump[group]:
+			return defValue
+
+		# Return
+		return varDump[group][key]
+
+	def delVariable(self, group, key):
+		"""
+		Set a user variable in the dynamic variables
+		"""
+		# Load variable dump
+		varDump = json.loads(self.user.variables)
+
+		# Update variable
+		if not group in varDump:
+			return
+		if not key in varDump[group]:
+			return
+
+		# Delete key
+		del varDump[group][key]
+
+		# Put back
+		self.user.variables = json.dumps(varDump)
+
 	def handleAction(self, action, param):
 		"""
 		Handle chat actions
 		"""
 		
+		##################################################
 		# Update user's dynamic variables
+		# ------------------------------------------------
 		if action == "variables":
 			# Update variable
 			self.user.variables = json.dumps(param['vars'])
 			self.user.save()
 
+		##################################################
+		# Request profile
+		# ------------------------------------------------
 		elif action == "profile":
 			# Send user profile event
 			self.socket.sendUserProfile()
 
+		##################################################
+		# Get a value from a save slot
+		# ------------------------------------------------
+		elif action == "save.get":
+
+			# Check for missing parameters
+			if not 'id' in param:
+				self.sendError("Missing 'id' parameter")
+				return
+
+			# Return save slot values or blank array if missing
+			self.sendResponse({ 
+					"status": "ok",
+					"values": self.getVariable("save_slots", param['id'], {})
+				})
+
+
+		##################################################
+		# Set a value to a save slot
+		# ------------------------------------------------
+		elif action == "save.set":
+
+			# Check for missing parameters
+			if not 'id' in param:
+				self.sendError("Missing 'id' parameter")
+				return
+			if not 'values' in param:
+				self.sendError("Missing 'values' parameter")
+				return
+
+			# Set variable
+			self.setVariable( "save_slots", param['id'], param['values'] )
+			self.user.save()
+
+			# Send response
+			self.sendResponse({ 
+					"status": "ok"
+					})
+
+		##################################################
+		# Claim credits for a particular achievement
+		# ------------------------------------------------
+		elif action == "credits.claim":
+
+			# Check for missing parameters
+			if not 'name' in param:
+				self.sendError("Missing 'name' parameter")
+				return
+			if not 'claim' in param:
+				self.sendError("Missing 'claim' parameter")
+				return
+
+			# Get credits group
+			claims = self.getVariable("credit_claims", param['claim'])
+
+			# Check if claim is placed
+			if param['name'] in claims:
+				# Send response
+				self.sendResponse({
+							"status": "error",
+							"message": "Credits already claimed"
+						})
+				return
+
+			# Accept this claim
+			self.setVariable("credit_claims", param['claim'], 1)
+
+			# Find how much credits it's worth
+			credits = 0
+			if param['claim'] == "estimate":
+				if param['name'] == "perfect":
+					credits = 8
+				elif param['name'] == "good":
+					credits = 4
+				elif param['name'] == "fair":
+					credits = 2
+				else:
+					credits = 1
+			elif param['claim'] == "run":
+				if param['name'] == "perfect":
+					credits = 16
+				elif param['name'] == "good":
+					credits = 8
+				elif param['name'] == "fair":
+					credits = 4
+				else:
+					credits = 2
+
+			# Check if this action gives no credit
+			if credits == 0:
+				self.sendResponse({
+							"status": "error",
+							"message": "No credits awarded"
+						})
+				return
+
+			# Place credits in user's profile
+			self.user.credits += credits
+			self.user.save()
+
+			# Reply with status and the new user profile
+			self.socket.sendUserProfile()
+			self.sendResponse({ "status": "ok" })
+
+
+		##################################################
+		# Reset the claims of a particular achievement
+		# ------------------------------------------------
+		elif action == "credits.reset":
+
+			# Check for missing parameters
+			if not 'claim' in param:
+				self.sendError("Missing 'claim' parameter")
+				return
+
+			# Get credits group
+			self.delVariable("credit_claims", param['claim'])
+			self.user.save()
+
+
+		##################################################
+		# Unlock a particular knowlege with credits
+		# ------------------------------------------------
 		elif action == "knowledge.unlock":
 
-			# Get knowledge id
+			# Check for missing parameters
 			if not 'id' in param:
 				self.sendError("Missing 'id' parameter")
 				return
@@ -100,7 +263,7 @@ class AccountInterface(APIInterface):
 
 				# Reply with status and the new user profile
 				self.socket.sendUserProfile()
-				self.sendAction("knowledge.unlock.response", { "status": "ok" })
+				self.sendResponse({ "status": "ok" })
 
 			# Missing credits?
 			else:				

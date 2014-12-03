@@ -252,8 +252,13 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				domain = parts[0],
 				domainAction = action.substr(domain.length+1);
 
+			// Handle some priority messages
+			if (action == "ui.notification") {
+				this.trigger('notification', parameters['message'], parameters['type']);
+			}
+
 			// Check if we have a domain handler
-			if (this.apiInstances[domain]) {
+			else if (this.apiInstances[domain]) {
 				// Handle action on the given API instance
 				this.apiInstances[domain].__handleAction( domainAction, parameters );
 			}

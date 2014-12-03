@@ -299,6 +299,11 @@ define(
 						prog_api.fail("Could not initialize core I/O socket!" + message, true);
 					});
 
+					// Growl notificataions
+					APISocket.on('notification', function(message, type) {
+						UI.growl(message, type)
+					});
+
 					// Connect to core socket
 					APISocket.connect( config.core.socket_url );
 

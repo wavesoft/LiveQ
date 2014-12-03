@@ -207,10 +207,11 @@ define(
 			this.elmMarkers.empty();
 			this.markers = [ ];
 			for (i in markers) {
-				if (typeof(markers[i] != 'number')) continue;
+				if (typeof(markers[i]) != 'number') continue;
 
 				// Get marker info
 				var v = markers[i];
+				if (v != null) v = this.unmapValue(v);
 
 				// Prepare DOM Elements
 				var eMarker = $('<div class="marker"></div>'),
