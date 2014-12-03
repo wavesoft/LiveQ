@@ -2331,3 +2331,57 @@
   background: white;
   border: solid 2px #dddddd;
 }
+#game-frame .nav-mini {
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  -webkit-border-radius: 10px 0 0 10px;
+  -moz-border-radius: 10px 0 0 10px;
+  -o-border-radius: 10px 0 0 10px;
+  border-radius: 10px 0 0 10px;
+  background-color: white;
+  overflow: hidden;
+  padding: 5px;
+  height: 39px;
+  width: 40px;
+}
+#game-frame .nav-mini button {
+  float: right;
+  right: 5px;
+  font-size: 14px;
+  padding: 8px;
+}
+#game-frame .nav-mini .credits {
+  height: 40px;
+  line-height: 40px;
+  color: #999999;
+  background: url(../img/icons/credits.png) no-repeat left center;
+  text-indent: 40px;
+  opacity: 0;
+  font-size: 14px;
+}
+#game-frame .nav-mini:hover,
+#game-frame .nav-mini.expand-notepad {
+  width: 300px;
+}
+#game-frame .nav-mini:hover .credits,
+#game-frame .nav-mini.expand-notepad .credits {
+  opacity: 1;
+}
+#game-frame .nav-mini.expand-notepad {
+  height: 400px;
+}
+#game-frame .nav-mini textarea.notepad {
+  position: absolute;
+  left: 5px;
+  width: 290px;
+  top: 54px;
+  height: 340px;
+  background-color: #ffff99;
+  border-left: none;
+  border-top: none;
+  border-bottom: solid 2px #ffcc00;
+  border-right: solid 2px #ffcc00;
+  font-family: 'Crafty Girls', cursive;
+}

@@ -137,6 +137,13 @@ define(
 						UI.selectScreen(to, UI.Transitions.ZOOM_OUT);
 					}
 				});
+				// Bind events
+				UI.mininav.on("displayKnowledge", function(to) {
+					VAS.displayKnowledge();
+				});
+				UI.mininav.on("displayTuningScreen", function(to) {
+					VAS.displayTuningScreen();
+				});
 
 			}
 

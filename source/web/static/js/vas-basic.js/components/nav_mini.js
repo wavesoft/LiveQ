@@ -19,18 +19,31 @@ define(
 			C.Nav.call(this, hostDOM);
 
 			// Put the home icon
-			var btnHome = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-home"></span></button>')
-			hostDOM.append(btnHome);
+			this.btnKnowlege = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-book"></span></button>').appendTo(this.hostDOM);
+			this.btnTuning = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-dashboard"></span></button>').appendTo(this.hostDOM);
+			this.btnHome = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-home"></span></button>').appendTo(this.hostDOM);
+			this.btnNotes = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-pencil"></span></button>').appendTo(this.hostDOM);
+			this.elmNotebook = $('<textarea class="notepad"></textarea>').appendTo(this.hostDOM);
 
-			// When clicked, goto home
-			hostDOM.click((function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-
-				// Fire the changeScreen event
+			// Setup navigation buttons
+			this.btnHome.click((function(e) {
 				this.trigger("changeScreen", "screen.home");
-
 			}).bind(this));
+			this.btnKnowlege.click((function(e) {
+				this.trigger("displayKnowledge");
+			}).bind(this));
+			this.btnTuning.click((function(e) {
+				this.trigger("displayTuningScreen");
+			}).bind(this));
+			this.btnNotes.click((function(e) {
+				this.hostDOM.toggleClass("expand-notepad");
+				if (this.hostDOM.hasClass("expand-notepad")) {
+					this.btnNotes.attr("class", "btn-shaded btn-yellow");
+				} else {
+					this.btnNotes.attr("class", "btn-shaded btn-orange");
+				}
+			}).bind(this));
+
 
 			// Prepare credit menu
 			this.elmCredit = $('<div class="credits"></div>').appendTo(hostDOM);
@@ -59,6 +72,9 @@ define(
 				"screen.team.notebook", "screen.team.messages",
 				"screen.knowledge"
 			];
+
+			// Show/hide appropriate screens
+			if (to == "screen.")
 
 			// This works on valid screen
 			if (valid_screens.indexOf(to) >= 0) {

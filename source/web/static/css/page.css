@@ -629,7 +629,8 @@
 .glyphicon-tree-deciduous:before {
   content: "\e200";
 }
-@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700);
+@import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700);
+@import url(//fonts.googleapis.com/css?family=Crafty+Girls);
 html,
 body {
   overflow: hidden;
@@ -1564,45 +1565,11 @@ body.enable-ipide .btn-edit-component {
   height: 80%;
 }
 #game-frame .nav-mini {
-  -webkit-transition: all 0.2s;
-  -moz-transition: all 0.2s;
-  -o-transition: all 0.2s;
-  transition: all 0.2s;
-  -webkit-border-radius: 10px 0 0 10px;
-  -moz-border-radius: 10px 0 0 10px;
-  -o-border-radius: 10px 0 0 10px;
-  border-radius: 10px 0 0 10px;
-  background-color: white;
-  overflow: hidden;
   position: absolute;
   display: block;
   z-index: 100;
   right: 0;
   top: 5px;
-  padding: 5px;
-  height: 40px;
-  width: 40px;
-}
-#game-frame .nav-mini button {
-  position: absolute;
-  right: 5px;
-  font-size: 14px;
-  padding: 8px;
-}
-#game-frame .nav-mini .credits {
-  height: 40px;
-  line-height: 40px;
-  color: #999999;
-  background: url(../img/icons/credits.png) no-repeat left center;
-  text-indent: 40px;
-  opacity: 0;
-  font-size: 14px;
-}
-#game-frame .nav-mini:hover {
-  width: 200px;
-}
-#game-frame .nav-mini:hover .credits {
-  opacity: 1;
 }
 .screen.error-screen {
   min-height: 48px;
@@ -1647,5 +1614,10 @@ body.enable-ipide .btn-edit-component {
 .growl.success {
   border-color: #16a085;
   background-color: #16a085;
+  color: white;
+}
+.growl.info {
+  border-color: #2980b9;
+  background-color: #3498db;
   color: white;
 }
