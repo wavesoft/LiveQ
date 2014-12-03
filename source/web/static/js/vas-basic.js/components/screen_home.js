@@ -87,7 +87,7 @@ define(
 			$('<div class="legend">Past, current and scheduled attemts</div>').appendTo(hostDOM);
 
 			// Submit
-			this.btnSubmit = $('<button class="p-submit btn-shaded btn-red btn-with-icon"><span class="glyphicon glyphicon-send"></span><br />Submit selected results</button>').appendTo(hostDOM);
+			this.btnSubmit = $('<button class="p-submit btn-shaded btn-red btn-with-icon"><span></span><br />Submit selected results</button>').appendTo(hostDOM);
 
 			for (var i=0; i<10; i++) {
 				this.addJob({

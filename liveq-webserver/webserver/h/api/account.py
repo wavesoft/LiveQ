@@ -262,12 +262,16 @@ class AccountInterface(APIInterface):
 				# Mark this knowledge as explored
 				self.setVariable("explored_knowledge", param['id'], 1)
 
+				# Delete the credits claim regarding estimations
+				self.delVariable("credit_claims", "estimate")
+
 				# Save user record
 				self.user.save()
 
 				# Reply with status and the new user profile
 				self.socket.sendUserProfile()
 				self.sendResponse({ "status": "ok" })
+
 
 			# Missing credits?
 			else:				

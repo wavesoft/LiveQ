@@ -145,7 +145,7 @@ define(
 
 			// Listen to global user events
 			User.on('notification', function(message, type) {
-				UI.growl(message, type || "success")
+				UI.growl(message, 5000, type || "success")
 			});
 
 
