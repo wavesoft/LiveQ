@@ -20,6 +20,10 @@ define(
 			this.headerElm = $('<div class="header">Test</div>').appendTo(hostDOM);
 			this.tunablesElm = $('<div class="tunables"></div>').appendTo(hostDOM);
 
+			// Map of tunables
+			this.tunablesMap = {};
+			this.valuesMap = {};
+
 			// Dimentions of the panel
 			this.panelSize = {
 				'width': 0,
@@ -50,14 +54,55 @@ define(
 			this.forwardVisualEvents(com);
 
 			// Bind events
-			com.on('change', (function() {
-
+			com.on('valueChanged', (function(newValue) {
+				// Update value on valuesMap
+				this.valuesMap[metadata['_id']] = newValue;
+				// Trigger change
+				this.trigger('change', this.valuesMap);
 			}).bind(this));
+
+			// Update component value
+			com.onUpdate( this.valuesMap[metadata['_id']] );
+
+			// Store component tunables map
+			this.tunablesMap[metadata['_id']] = com;
+
+			// Return component
+			return com;
 		}
 
 		////////////////////////////////////////////////////////////
 		//           Implementation of the TuningWidget           //
 		////////////////////////////////////////////////////////////
+
+		/**
+		 * This event is fired when the tunables of this panel should be defined
+		 */
+		DefaultTuningPanel.prototype.onTuningValuesDefined = function( currentValues ) {
+
+			// Keep a reference of the values map
+			this.valuesMap = currentValues;
+
+			// Update all markers
+			for (k in currentValues) {
+				if (this.tunablesMap[k]) {
+					this.tunablesMap[k].onUpdate( this.valuesMap[k] );
+				}
+			}
+
+		}
+
+		/**
+		 * This event is fired when the saved slot values are updated
+		 */
+		DefaultTuningPanel.prototype.onMarkersDefined = function( markersMap ) {
+			// Update all markers
+			for (k in markersMap) {
+				if (this.tunablesMap[k]) {
+					this.tunablesMap[k].onMarkersDefined( markersMap[k] );
+				}
+			}
+		}
 
 		/**
 		 * This event is fired when the tunables of this panel should be defined
@@ -108,24 +153,7 @@ define(
 			// Regenerate tunables
 			for (var i=0; i<tunables.length; i++) {
 				var t = tunables[i];
-				this.defineAndRegister({
-			          _id: 'num-'+i, // The tunable id (ex. TimeShower:alphaSvalue)
-			         type: 'num',    // One of: num,str,list,bool
-			          def: 0,        // The default value for this element
-			         value: {        // Value metadata, for 'num' type:
-			            min: 0,      //   The minimum value
-			            max: 10,     //   The maximum value
-			            dec: 2       //   The decimals on the number
-			         },
-			         info: {         // Information for the user:
-			           name: 'Parm'+i,  //   The visible name for this parameter
-			          short: 'P'+i,  //   A short (iconic) name for this parameter
-			           book: 'r-'+i, //   Reference ID for providing more explaination 
-			          group: 'first'   //   The group name where this parameter belongs
-			         },
-			         corr: {         // Correlation information
-			         }
-				});
+				this.defineAndRegister(t);
 			}
 		}
 

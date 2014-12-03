@@ -559,6 +559,13 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 					});
 				},100);
 
+				// Listen for close events of this component
+				var close_handler = function() {
+					s.off('close', close_handler);
+					UI.hideOverlay();
+				};
+				s.on('close', close_handler);
+
 			}
 
 			// If we have a previous overlay screen, hide it

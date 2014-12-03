@@ -206,8 +206,8 @@ define(
 		DefaultTunableWidget.prototype.updateMarkers = function(markers) {
 			this.elmMarkers.empty();
 			this.markers = [ ];
-
-			for (var i=0; i<markers.length; i++) {
+			for (i in markers) {
+				if (typeof(markers[i] != 'number')) continue;
 
 				// Get marker info
 				var v = markers[i];
@@ -221,7 +221,7 @@ define(
 				this.elmMarkers.append(eMarker);
 
 				// Populate
-				eLabel.text(i+1);
+				eLabel.text(i);
 				eMarker.click( (function(index){
 					return function(e) {
 						e.preventDefault();
@@ -257,10 +257,9 @@ define(
 		/**
 		 * Update saved slot value
 		 */
-		DefaultTunableWidget.prototype.onSaveSlotUpdate = function(slot, value) {
+		DefaultTunableWidget.prototype.onMarkersDefined = function( markers ) {
 			// Update markers 
-			this.markers[slot].v = this.unmapValue( value );
-			this.update();
+			this.updateMarkers(markers);
 		}
 
 		/**
@@ -352,7 +351,7 @@ define(
 				vertical   : false,
 				slide      : false,
 				requestAnimationFrame : true,
-				value : this.value,
+				x 		   : this.value,
 
 				// Handle value change
 				animationCallback: (function(x,y) {

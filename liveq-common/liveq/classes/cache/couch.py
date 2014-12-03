@@ -20,7 +20,7 @@
 """
 CouchDB Cache Class
 
-This class provides a OuchDB interface for cached data.
+This class provides a CouchDB interface for read-only, cached data.
 """
 
 import couchdb
@@ -34,14 +34,12 @@ class CouchDBCache:
 		"""
 		self.couch = couchdb.Server(url)
 
-	def getAll(self, name):
+	def get(self, database, key):
 		"""
-		Return all entries under the given cache key
-		In couchDB terms, that's
+		Open couchdb database
 		"""
-
-	def get(self, name):
-		pass
+		db = self.couch[database]
+		return db.get(key)
 
 class Config(CacheConfigClass):
 	"""

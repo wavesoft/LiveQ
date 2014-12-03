@@ -25,6 +25,7 @@ from liveq.config.core import CoreConfig, StaticConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
+from liveq.config.cache import CacheConfig
 from liveq.data.histo.description import HistoDescription
 from liveq.models import createBaseTables
 
@@ -62,7 +63,7 @@ class WebserverConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig):
+class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -77,6 +78,7 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, WebserverConfig, Databa
 
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
+		CacheConfig.fromConfig( config, runtimeConfig )
 		StoreConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		DatabaseConfig.fromConfig( config, runtimeConfig )

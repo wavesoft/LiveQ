@@ -38,11 +38,6 @@ from webserver.h.api import APIInterface
 from tornado.ioloop import IOLoop
 from webserver.common.training import OfflineSequence
 
-#### DEBUG
-import couchdb
-couch_server = couchdb.Server("http://test4theory.cern.ch/vas/db")
-couch_observables = couch_server['observables']
-
 class LabTrainInterface(APIInterface):
 
 	def __init__(self, socket):
@@ -162,7 +157,7 @@ class LabTrainInterface(APIInterface):
 				return
 
 			# Fetch additional information from database
-			record = couch_observables.get(hid)
+			record = Config.CACHE.get("observables", hid)
 
 			# Update append information
 			for k,v in record['info'].iteritems():

@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components"],
+	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, DB, UI, config, R,C) {
+	function($, d3, DB, UI, config, R,C, APISocket) {
 
 		/**
 		 * @class
@@ -26,6 +26,7 @@ define(
 			this.machinePartsEnabled = {};
 			this.machinePartTunables = {};
 			this.observables = [];
+			this.values = {};
 
 			// Team header
 			$('<h1><span class="highlight">Tuning</span> The Quantum Machine</h1><div class="subtitle">Fiddle with the quantum machine and find the best values</div>').appendTo(hostDOM);
@@ -43,7 +44,7 @@ define(
 			this.machine.onMachinePartsEnabled({});
 
 			this.machine.on('click', (function(eid, pos) {
-				this.showPopover(pos, efid);
+				this.showPopover(pos, eid);
 			}).bind(this));
 
 			// ---------------------------------
@@ -96,6 +97,31 @@ define(
 				e.stopPropagation();
 				e.preventDefault();
 			});
+
+			// Bind events
+			this.tuningPanel.on('change', (function(e) {
+
+			}).bind(this));
+
+			// ---------------------------------
+			// Create machine types
+			// ---------------------------------
+
+			// Machine modes
+			this.machineConfigModes = [
+				"ee", "ppbar"
+			];
+			this.machineConfigBtns = [
+				$('<button class="btn-config-1 btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Electrons</button>').appendTo(hostDOM),
+				$('<button class="btn-config-2 btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Protons</button>').appendTo(hostDOM)
+			];
+			for (var i=0; i<this.machineConfigBtns.length; i++) {
+				this.machineConfigBtns[i].click( (function(configMode) {
+					return function() {
+						this.setMachineConfiguration(configMode);
+					}
+				})(this.machineConfigModes[i]).bind(this));
+			}
 			
 			// ---------------------------------
 			// Create a control board
@@ -160,7 +186,8 @@ define(
 
 			// Find out what tunables are in this machine part
 			var details = DB.cache['definitions']['machine-parts'][machinePartID];
-			this.tuningPanel.onTuningPanelDefined(details.description.title, this.machinePartTunables[machinePartID]);
+			this.tuningPanel.onTuningPanelDefined( details.description.title, this.machinePartTunables[machinePartID] );
+			this.tuningPanel.onTuningValuesDefined( this.values );
 
 			// Add back-blur fx on the machine DOM
 			this.machineDOM.addClass("fx-backblur");
@@ -201,6 +228,27 @@ define(
 		}
 
 		/** 
+		 * Configure machine for either ee or ppbar
+		 */
+		TuningScreen.prototype.setMachineConfiguration = function( configMode ) {
+			var index = this.machineConfigModes.indexOf( configMode );
+			if (index < 0) return;
+
+			// Reset all buttons
+			for (var i=0; i<this.machineConfigBtns.length; i++) {
+				this.machineConfigBtns[i].removeClass("btn-striped");
+			}
+			this.machineConfigBtns[index].addClass("btn-striped");
+
+			// Update backdrop machine configuration
+			this.machine.onMachineConfigChanged({
+				'beam': configMode
+			});
+
+		}
+
+
+		/** 
 		 * Define the parameters of the machine
 		 */
 		TuningScreen.prototype.onTuningConfigUpdated = function( tuningConfig ) {
@@ -216,26 +264,53 @@ define(
 			}
 
 			// Then update UI to reflect the configurations
-			if (!this.machineConfigurationsEnabled['simulate']) {
+			if (!this.machineConfigurationsEnabled['sim-interpolate']) {
 				this.btnEstimate.addClass("disabled");
 			} else {
 				this.btnEstimate.removeClass("disabled");
 			}
-			if (!this.machineConfigurationsEnabled['run']) {
+			if (!this.machineConfigurationsEnabled['sim-run']) {
 				this.btnSubmit.addClass("disabled");
 			} else {
 				this.btnSubmit.removeClass("disabled");
 			}
 
-			// Machine parts
+			// Update machine modes
+			for (var i=0; i<this.machineConfigBtns.length; i++) {
+				this.machineConfigBtns[i].addClass("disabled");
+				this.machineConfigBtns[i].removeClass("btn-striped");
+			}
+
+			// Enable mode buttons
+			var lastMode = "";
+			if (this.machineConfigurationsEnabled['beam-ee']) {
+				this.machineConfigBtns[0].removeClass("disabled");
+				lastMode = "beam-ee";
+			}
+			if (this.machineConfigurationsEnabled['beam-ppbar']) {
+				this.machineConfigBtns[1].removeClass("disabled");
+				lastMode = "beam-ppbar";
+			}
+			this.setMachineConfiguration(lastMode.substr(5));
+
+			// Machine parts & Tunables
 			// ============================
+
+			// Reset tunable values
+			this.values = {};
 
 			// First update enabled machine parts
 			this.machinePartsEnabled = {};
-			for (var i=0; i<tuningConfig.configurations.length; i++) {
-				var partName = tuningConfig.configurations[i].part;
+			for (var i=0; i<tuningConfig.machineParts.length; i++) {
+				var partName = tuningConfig.machineParts[i].part,
+					tunables = tuningConfig.machineParts[i].tunables;
 				this.machinePartsEnabled[partName] = true;
-				this.machinePartTunables[partName] = tuningConfig.configurations[i].tunables;
+				this.machinePartTunables[partName] = tunables;
+
+				// Place tunable values on map
+				for (var i=0; i<tunables.length; i++) {
+					this.values[tunables[i]['_id']] = tunables[i]['def'] || tunables[i]['value']['min'] || 0.0;
+				}
 			}
 
 			// Then update interface

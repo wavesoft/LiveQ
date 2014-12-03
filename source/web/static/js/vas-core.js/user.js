@@ -143,6 +143,32 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 		}
 
 		/**
+		 * Unlock the given knowledge refered by it's ID.
+		 * The server is going to perform the transaction and fire the callback when ready.
+		 *
+		 * @param {string} id - The knowledge ID
+		 * @param {function(status)} callback - A callback function to fire when the knowledge is unlocked
+		 */
+		User.prototype.unlockKnowledge = function(id, callback) {
+
+			// Try to register-in the user
+			this.accountIO.sendAction("knowledge.unlock", 
+				{
+					'id': id
+				}, 
+				(function(response) {
+
+					// Fire callback
+					if (response['status'] == 'ok') {
+						if (callback) callback();
+					}
+
+				}).bind(this)
+			);
+
+		}
+
+		/**
 		 * Initialize the user record 
 		 *
 		 * This function fetches the database user record and prepares the local fields.
@@ -214,7 +240,7 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 				if (!dbMachineParts[k]['prefixes']) continue;
 				for (var i=0; i<dbMachineParts[k]['prefixes'].length; i++) {
 					// Map this prefix to machine part ID
-					prefixToMachinePart[dbMachineParts[k]['prefixes'][j]] = k;
+					prefixToMachinePart[dbMachineParts[k]['prefixes'][i]] = k;
 				}
 			}
 
@@ -223,6 +249,13 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 			for (var i=0; i<knowledge.length; i++) {
 				if (knowledge[i].enabled || (knowledge[i].parent == null)) {
 					// This knowledge topic is enabled (or the root one)!
+
+					// Collect configurations
+					for (var j=0; j<knowledge[i].configurations.length; j++) {
+						var cfgName = knowledge[i].configurations[j];
+						if (config.configurations.indexOf(cfgName) == -1)
+							config.configurations.push(cfgName);
+					}
 
 					// Store observable names
 					for (var j=0; j<knowledge[i].observables.length; j++) {
@@ -291,7 +324,7 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 			var traverse_node = (function(node, parent, show_edge) {
 
 				// Skip invisible nodes
-				if ((parent != null) && !this.vars['enabled_topics'][node['_id']]) {
+				if ((parent != null) && !this.vars['explored_knowledge'][node['_id']]) {
 					if (show_edge) {
 						show_edge = false;
 					} else {
@@ -302,7 +335,8 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 				// Store to nodes & it's lookup
 				var curr_node_id = nodes.length;
 				node_id[node['_id']] = curr_node_id;
-				node_id[node['_id']].edge = !show_edge;
+				node.edge = !show_edge;
+				node.enabled = !!this.vars['explored_knowledge'][node['_id']];
 				nodes.push( node );
 
 				// Check if we should make a link

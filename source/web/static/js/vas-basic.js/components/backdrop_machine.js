@@ -128,6 +128,20 @@ define(
 		/**
 		 * Machine parts are enabled
 		 */
+		MachineBackdrop.prototype.onMachineConfigChanged = function(config) {
+
+			// Change beam mode
+			if (config['beam'] !== undefined) {
+				var alt = 0;
+				if (config['beam'] != "ee") alt=1;
+				this.machineComponents[1].attr("class", "u-pdf alt-"+alt);
+			}
+
+		}
+
+		/**
+		 * Machine parts are enabled
+		 */
 		MachineBackdrop.prototype.onMachinePartsEnabled = function(parts) {
 			
 			// Check focusing mode to use

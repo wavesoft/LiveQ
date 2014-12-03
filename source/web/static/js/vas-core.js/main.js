@@ -530,6 +530,13 @@ define(
 						return;
 					}
 
+					// Handle buy action
+					scrCourses.on('unlock', function(knowledge_id) {
+						User.unlockKnowledge(knowledge_id, function() {
+							VAS.displayKnowledge();
+						});
+					});
+
 					// Complete login
 					prog_courses.ok("knowledge screen ready");
 					cb();

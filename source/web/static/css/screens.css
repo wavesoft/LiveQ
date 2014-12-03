@@ -652,6 +652,28 @@
   left: 5px;
   bottom: 5px;
 }
+.screen.tuning2 .btn-config-1,
+.screen.tuning2 .btn-config-2,
+.screen.tuning2 .btn-config-3 {
+  position: absolute;
+  height: 62px;
+  width: 62px;
+  bottom: 5px;
+}
+.screen.tuning2 .btn-config-1 span.big,
+.screen.tuning2 .btn-config-2 span.big,
+.screen.tuning2 .btn-config-3 span.big {
+  font-size: 18px;
+}
+.screen.tuning2 .btn-config-1 {
+  right: 5px;
+}
+.screen.tuning2 .btn-config-2 {
+  right: 72px;
+}
+.screen.tuning2 .btn-config-3 {
+  right: 139px;
+}
 .screen.tuning2 .description-frame {
   -webkit-transition: bottom 0.2s;
   -moz-transition: bottom 0.2s;
