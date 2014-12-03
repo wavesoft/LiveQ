@@ -141,7 +141,7 @@ define(
 				inH = this.height - inPad*2;
 
 			// Resize status screen
-			this.statusScreen.onMove( 0, inPad );
+			this.statusScreen.onMove( 0, inPad + 40 );
 			this.statusScreen.onResize( inW, inH );
 
 			// Resize background graphics

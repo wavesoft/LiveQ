@@ -26,6 +26,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 			// Initialize properties
 			this.connected = false;
 			this.loginCallback = null;
+			this.keepaliveTimer = 0;
 
 			// Dynamic API interfaces
 			this.apiInterfaces = {};
@@ -151,8 +152,11 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				// the initial configuration for the histograms.
 				// 
 				this.socket.onopen = (function() {
+
 					this.trigger('ready');
 					this.connected = true;
+					this.keepaliveTimer = setInterval(this.sendKeepalive.bind(this), 10000);
+
 				}).bind(this);
 
 				// -----------------------------------------------------------
@@ -161,6 +165,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				this.socket.onclose = (function() {
 					this.trigger('critical', 'Disconnected from the APISocket socket!');
 					this.connected = false;
+					clearInterval(this.keepaliveTimer);
 
 					// Cleanup dynamic API instances
 					for (k in this.apiInstances) {
@@ -180,6 +185,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				this.socket.onerror = (function(ws, error) {
 					this.trigger('critical', 'Error while trying to connect to the API socket!');
 					this.connected = false;
+					clearInterval(this.keepaliveTimer);
 				}).bind(this);
 
 			}
@@ -187,6 +193,13 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 				this.trigger('critical', 'Could not connect to the API socket! ' + String(e));
 				this.connected = false;
 			}
+		}
+
+		/**
+		 * Send an I/O ping frame
+		 */
+		APISocket.prototype.sendKeepalive = function() {
+			this.sendAction("io.keepalive");
 		}
 
 		/**
@@ -198,6 +211,7 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 			var param = parameters || { };
 
 			// Send command
+			if (!this.connected) return;
 			this.socket.send(JSON.stringify({
 				"action": action,
 				"param": param
@@ -209,16 +223,10 @@ define(["core/util/event_base", "sha1", "core/config", "core/api/chatroom", "cor
 		 * Send blob
 		 */
 		APISocket.prototype.sendBlob = function( frameID, payload ) {
-
 			// Prepare data to send
 			var param = parameters || { };
-
 			// Send command
-			this.socket.send(JSON.stringify({
-				"action": action,
-				"param": param
-			}));
-
+			if (!this.connected) return;
 		}
 
 		/**
