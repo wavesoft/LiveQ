@@ -125,13 +125,18 @@ define(["core/api/interface", "liveq/LiveQ", "liveq/LabProtocol", "liveq/BufferR
 		 * Send a tune and begin simulation
 		 *
 		 * @param {object} parameters - An object with the tunable parameter names and their values
+		 * @param {boolean} onlyInterpolate - Request only interpolation, do not run simulation
+		 * @param {array} histograms - A list of histogram names that you want to observe
 		 *
 		 */
-		APILabSocket.prototype.beginSimulation = function(parameters, onlyInterpolate) {
+		APILabSocket.prototype.beginSimulation = function(parameters, onlyInterpolate, histograms) {
 
 			// Begin simulation with the given parameters
 			if (onlyInterpolate) {
-				this.sendAction("sim_estimate", parameters);
+				this.sendAction("sim_estimate", {
+					'parameters': parameters,
+					'observables': histograms || []
+				});
 			} else {
 				this.sendAction("sim_start", parameters);
 			}

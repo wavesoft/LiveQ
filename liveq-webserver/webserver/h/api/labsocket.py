@@ -172,8 +172,14 @@ class LabSocketInterface(APIInterface):
 			# We requested just an estimate.
 			# No need to have full job management
 
+			# Fetch parameters
+			tunables = param['parameters']
+			trimObs = param['observables']
+			if trimObs and len(trimObs) > 0:
+				self.trimObs = trimObs
+
 			# Format user tunables
-			tunables = self.lab.formatTunables( param )
+			tunables = self.lab.formatTunables( tunables )
 
 			# Send interpolation
 			if not self.sendInterpolation(tunables):

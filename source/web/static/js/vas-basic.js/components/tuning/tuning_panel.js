@@ -53,6 +53,9 @@ define(
 			// Forward visual events to the component
 			this.forwardVisualEvents(com);
 
+			// Adopt all events from the tunables
+			this.adoptEvents( com );
+
 			// Bind events
 			com.on('valueChanged', (function(newValue) {
 				// Update value on valuesMap

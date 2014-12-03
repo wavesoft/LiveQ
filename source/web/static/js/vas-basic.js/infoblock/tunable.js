@@ -48,7 +48,7 @@ define(
 			l.click((function(e) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.trigger('explain', meta['info']['book'] );
+				this.trigger('showBook', meta['info']['book'] );
 			}).bind(this));
 			this.moreLinks.append( l );
 			
