@@ -508,20 +508,30 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * @param {string} name - The name of the module to focus.
 		 * @param {array} transition - The transition definition (defaults to UI.Transitions.ZOOM_IN)
 		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 * @param {boolean} blur_back - Blur background
 		 *
 		 */
-		UI.showOverlay = function(name, transition, cb_ready) {
+		UI.showOverlay = function(name, v_transition, v_cb_ready, v_blur_back) {
 
 			// Skip on lockdown
 			if (UI.lockdown)
 				return;
 
 			// Check for missing arguments
-			if (typeof(transition) == 'function') {
-				cb_ready = transition; transition = null;
-			}
-			if (!transition) {
-				transition = UI.Transitions.ZOOM_IN;
+			var args = [v_transition, v_cb_ready, v_blur_back],
+				transition = UI.Transitions.ZOOM_IN,
+				cb_ready = null,
+				blur_back = true;
+
+			// Auto-arrange arguments
+			for (var i=0; i<args.length; i++) {
+				if (typeof(args[i]) == 'function') {
+					cb_ready = args[i];
+				} else if (typeof(args[i]) == 'object') {
+					transition = args[i];
+				} else if (typeof(args[i]) == 'boolean') {
+					blur_back = args[i];
+				}
 			}
 
 			// Create host DOM for the component
@@ -546,7 +556,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				UI.activeOverlayComponent = s;
 
 				// Blur background & show overlay
-				UI.host.addClass("fx-blur");
+				if (blur_back) UI.host.addClass("fx-blur");
 				UI.hostOverlay.show();
 
 				// Transition between blank screen and current
@@ -573,6 +583,43 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 
 			// Return component instance
 			return s;
+
+		}
+
+		/**
+		 * Show a flash message
+		 *
+		 * @param {string} title - The name of the module to focus.
+		 * @param {string} text - The text in the window.
+		 * @param {string} icon - The icon message
+		 * @param {array} transition - The transition definition (defaults to UI.Transitions.ZOOM_IN)
+		 * @param {function} cb_ready - The callback to fire when the screen has changed
+		 *
+		 */
+		UI.showFlash = function(title, text, icon, transition, cb_ready) {
+
+			// Skip on lockdown
+			if (UI.lockdown)
+				return;
+
+			// Check for missing arguments
+			if (typeof(transition) == 'function') {
+				cb_ready = transition; transition = null;
+			}
+			if (!transition) {
+				transition = UI.Transitions.ZOOM_IN;
+			}
+
+			// Return component instance
+			return UI.showOverlay("overlay.flash", transition, function(com) {
+
+				// Define message
+				com.onMessageDefined( icon, title, text );
+
+				// Fire callback if we have it
+				if (cb_ready) cb_ready(com);
+
+			});
 
 		}
 

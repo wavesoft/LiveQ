@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "core/registry", "core/base/components"],
+	["jquery", "core/registry", "core/base/components", "core/ui"],
 
 	/**
 	 * Basic version of the machine backdrop
 	 *
 	 * @exports basic/components/backdrop_machine
 	 */
-	function($, R,C) {
+	function($, R,C,UI) {
 
 		/**
 		 * @class
@@ -151,6 +151,7 @@ define(
 			this.enabledMachineParts = parts;
 
 			// Build parts
+			var first = true;
 			for (var k in parts) {
 				var i = this.aliases.indexOf(k);
 				if (i < 0) continue;
@@ -158,6 +159,14 @@ define(
 				// Mark particular component locked/unlocked
 				if (parts[k]) {
 					this.overlayComponents[i].removeClass('locked');
+
+					// Check for first time
+					if (first) {
+						// Register visual aids
+						R.registerVisualAid("machine.first-topic", this.overlayComponents[i]);
+						first = false;
+					}
+
 				} else {
 					this.overlayComponents[i].addClass('locked');
 				}
@@ -201,6 +210,13 @@ define(
 		MachineBackdrop.prototype.onWillShow = function(cb) {
 			this.realignMachine();
 			cb();
+		}
+
+		/**
+		 * DIsplay first-time aids when shown
+		 */
+		MachineBackdrop.prototype.onShown = function() {
+			UI.showFirstTimeAid("machine.first-topic");
 		}
 
 

@@ -77,5 +77,7 @@ define([
 
 	// Overlays
 	'vas-basic/overlays/book',
+	'vas-basic/overlays/flash',
+	'vas-basic/overlays/histograms',
 
 ]);

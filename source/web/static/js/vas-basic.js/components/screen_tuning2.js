@@ -27,6 +27,7 @@ define(
 			this.machinePartTunables = {};
 			this.observables = [];
 			this.values = {};
+			this.lastHistograms = [];
 			this.markers = {};
 
 			// Team header
@@ -53,7 +54,7 @@ define(
 			// ---------------------------------
 
 			// Create a description vrame
-			var descFrame = this.descFrame = $('<div class="description-frame"></div>').appendTo(hostDOM);
+			var descFrame = this.descFrame = $('<div class="description-frame visible"></div>').appendTo(hostDOM);
 			this.descTitle = $('<h1>This is a header</h1>').appendTo(descFrame);
 			this.descBody = $('<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ornare eu ex consectetur feugiat. Pellentesque quis dolor sed lacus pellentesque euismod lacinia eget urna. Vestibulum ipsum lorem, posuere in dignissim ac, sollicitudin eu odio. Suspendisse ac porta turpis. Etiam nec consequat mauris, at placerat urna. Nam suscipit nisl eget nisi semper, quis aliquet sem interdum. Proin condimentum nunc vel imperdiet vehicula.</div>').appendTo(descFrame);
 
@@ -101,21 +102,25 @@ define(
 
 			// Bind events
 			this.tuningPanel.on('change', (function(e) {
-
-
+			}).bind(this));
+			this.tuningPanel.on('showBook', (function(book) { // Incoming events 
+				this.trigger('showBook', book);
 			}).bind(this));
 
 			// ---------------------------------
 			// Create machine types
 			// ---------------------------------
 
+			// Get machine components
+			var machineOverlay = this.machineDOM.find(".r-machine-overlay");
+
 			// Machine modes
 			this.machineConfigModes = [
 				"ee", "ppbar"
 			];
 			this.machineConfigBtns = [
-				$('<button class="btn-config-1 btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Electrons</button>').appendTo(hostDOM),
-				$('<button class="btn-config-2 btn-shaded btn-darkblue btn-with-icon"><span class="glyphicon glyphicon-cog"></span><br />Protons</button>').appendTo(hostDOM)
+				$('<button class="btn-machine-beam beam-1 btn-shaded btn-green">Electrons</button>').appendTo(machineOverlay),
+				$('<button class="btn-machine-beam beam-2 btn-shaded btn-green">Protons</button>').appendTo(machineOverlay)
 			];
 			for (var i=0; i<this.machineConfigBtns.length; i++) {
 				this.machineConfigBtns[i].click( (function(configMode) {
@@ -133,7 +138,7 @@ define(
 				descBoard = $('<div></div>').appendTo(boardHost);
 
 			this.btnEstimate = $('<button class="btn-shaded btn-with-icon btn-red"><span class="glyphicon glyphicon-unchecked"></span><br />Estimate</button>').appendTo(descBoard);
-			this.btnSubmit = $('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Submit</button>').appendTo(descBoard);
+			this.btnValidate = $('<button class="btn-shaded btn-with-icon btn-red btn-striped "><span class="glyphicon glyphicon-expand"></span><br />Validate</button>').appendTo(descBoard);
 			this.panelStatus = $('<div class="panel-shaded">---</div>').appendTo(descBoard);
 			this.btnView = $('<button class="btn-shaded btn-with-icon btn-darkblue"><span class="glyphicon glyphicon-dashboard"></span><br />View</button>').appendTo(descBoard);
 
@@ -145,6 +150,11 @@ define(
 			// View histograms
 			this.btnView.click((function() {
 
+				// Show histograms overlay
+				UI.showOverlay("overlay.histograms", (function(com) {
+
+				}).bind(this)).onHistogramsDefined( this.lastHistograms );
+
 			}).bind(this));
 
 			// Create help button
@@ -152,6 +162,16 @@ define(
 			this.btnHelp.click((function() {
 				this.descFrame.toggleClass("visible");
 			}).bind(this));
+
+			// ---------------------------------
+			// Register first-time & visual aids
+			// ---------------------------------
+
+			R.registerVisualAid("tuning.control.estimate", this.btnEstimate, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.control.validate", this.btnValidate, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.control.status", this.panelStatus, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.control.view", this.btnView, { "screen": "screen.tuning" });
+			R.registerVisualAid("tuning.machine.beam", this.machineConfigBtns[1], { "screen": "screen.tuning" });
 
 
 		}
@@ -260,10 +280,10 @@ define(
 
 			// Pick the appropriate labSocket
 			this.lab = APISocket.openLabsocket("3e63661c13854de7a9bdeed71be16bb9");
-			this.lab.on('histogramAdded', (function(data, ref) {
-
-			}).bind(this));
 			this.lab.on('histogramsUpdated', (function(histos) {
+
+				// Save last histograms
+				this.lastHistograms = histos;
 
 				// Calculate the Chi2 over all histograms
 				var chi2 = 0;
@@ -275,8 +295,8 @@ define(
 
 				// Classify and display
 				var msg = "Bad",
-					claim = "bad",
-					claim_reason = "for a reasonable try";
+					claim = "",
+					claim_reason = "";
 
 				if (chi2 < 1) {
 					msg = "Perfect";
@@ -297,7 +317,8 @@ define(
 				this.panelStatus.text(msg);
 
 				// Place credits claim request
-				User.claimCredits("estimate", claim, claim_reason);
+				if (claim != "")
+					User.claimCredits("estimate", claim, claim_reason);
 
 			}).bind(this));
 
@@ -309,10 +330,11 @@ define(
 		TuningScreen.prototype.estimateResults = function() {
 
 			// Submit for interpolation
-			this.lab.beginSimulation( this.values, true );
+			this.lab.beginSimulation( this.values, true, this.observables );
 
 			// Enable view option
 			this.btnView.removeClass("disabled");
+			UI.showFirstTimeAid("tuning.control.view");
 
 			// Save user values
 			User.saveSlotValues("L", this.values);
@@ -326,9 +348,29 @@ define(
 		}
 
 		/** 
+		 * Display visual aids when shown
+		 */
+		TuningScreen.prototype.onShown = function() {
+
+			// Fire first-time interface components
+			if (!this.btnEstimate.hasClass("disabled"))
+				UI.showFirstTimeAid("tuning.control.estimate");
+			if (!this.btnValidate.hasClass("disabled"))
+				UI.showFirstTimeAid("tuning.control.validate");
+
+		}
+
+		/** 
 		 * Define the parameters of the machine
 		 */
 		TuningScreen.prototype.onTuningConfigUpdated = function( tuningConfig ) {
+
+			// ============================
+			// Update observables
+			// ============================
+
+			// Set the observables trim
+			this.observables = tuningConfig.observables;
 
 			// ============================
 			// Machine configurations
@@ -348,9 +390,9 @@ define(
 				this.btnEstimate.removeClass("disabled");
 			}
 			if (!this.machineConfigurationsEnabled['sim-run']) {
-				this.btnSubmit.addClass("disabled");
+				this.btnValidate.addClass("disabled");
 			} else {
-				this.btnSubmit.removeClass("disabled");
+				this.btnValidate.removeClass("disabled");
 			}
 
 			// Update machine modes
@@ -388,8 +430,8 @@ define(
 				this.machinePartTunables[partName] = tunables;
 
 				// Place tunable values on map
-				for (var i=0; i<tunables.length; i++) {
-					this.values[tunables[i]['_id']] = tunables[i]['def'] || tunables[i]['value']['min'] || 0.0;
+				for (var j=0; j<tunables.length; j++) {
+					this.values[tunables[j]['_id']] = tunables[j]['def'] || tunables[j]['value']['min'] || 0.0;
 				}
 			}
 

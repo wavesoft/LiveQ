@@ -230,7 +230,11 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 
 					// Fire callback
 					if (response['status'] == 'ok') {
-						this.trigger("notification", "You got <strong>"+response['credits']+'</strong> credit '+reason);
+						this.trigger("flash", 
+							"You got <strong>"+response['credits']+'</strong> credits', 
+							reason,
+							Config.images_url + '/flash-icons/coins.png'
+							);
 					}
 
 				}).bind(this)

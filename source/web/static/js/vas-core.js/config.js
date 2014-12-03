@@ -45,6 +45,7 @@ define({
 		'nav-mini'		: 'nav-mini',
 		'screen'		: 'screen',
 		'overlay'		: 'overlay',
+		'overlay-flash'	: 'overlay-flash',
 		'backdrop'		: 'backdrop',
 		'foreground'	: 'foreground',
 		'error-screen' 	: 'error-screen',

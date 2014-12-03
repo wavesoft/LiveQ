@@ -1,0 +1,149 @@
+///////////////////////////////////////////////
+// The view histograms overlay
+///////////////////////////////////////////////
+
+@observ-c-desc:		#333333;
+@observ-c-perfect:	#66CC00;
+@observ-c-good:		#669933;
+@observ-c-average:	#FF9900;
+@observ-c-bad:		#990000;
+@observ-c-nofit:	#CCCCCC;
+@observ-c-back:		#FFFFFF;
+
+.histograms-overlay {
+	.border-radius(20px);
+	background: #fff;
+	border: solid 5px #DDD;
+
+	div.group {
+		padding: 20px;
+		clear: both;
+
+		h1 {
+
+		}
+
+		div.histograms {
+			padding: 5px;
+
+			div.histogram {
+				.border-radius( 10px 0 0 10px );
+				position: relative;
+				display: block;
+				float: left;
+				width: 280px;
+				height: 250px;
+				cursor: pointer;
+				border: 1px #ddd;
+				border-style: none;
+				margin: 1px 0 1px 1px;
+
+				div.details {
+					.border-radius( 0 10px 10px 0 );
+					.pointer-events( none );
+					background-color: #ddd;
+					position: absolute;
+					height: 250px;
+					left: 280px; top: -1px;
+					border: 1px #ddd;
+					border-style: none;
+					z-index: 1000;
+
+					.transition( all 0.2s );
+					width: 0;
+					opacity: 0;
+				}
+
+				&:hover {
+					border-style: solid none solid solid;
+					margin: 0;
+
+					div.details {
+						border-style: solid solid solid none;
+						width: 200px;
+						opacity: 1;
+
+
+						div.description {
+							padding: 8px;
+
+							h2 {
+								margin: 5px 0;
+							}
+						}
+
+						div.fit-score {
+							position: absolute;
+							bottom: 0; left: 0; right: 0;
+							color: darken(@observ-c-nofit, 20%);
+
+							div.status {
+								text-align: center;
+								font-size: 1.5em;
+								font-weight: bold;
+								text-align: center;
+								padding: 4px;
+								background-color: @observ-c-nofit;
+							}
+							div.detail {
+								text-align: center;
+								font-size: 0.8em;
+								font-weight: bold;
+								text-align: center;
+								padding: 4px;
+								background-color: @observ-c-nofit;
+							}
+
+							&.perfect {
+								color: darken(@observ-c-perfect, 10%);
+								div.status {
+									background: screen(@observ-c-nofit, @observ-c-perfect);
+								}
+								div.detail {
+									background: darken(screen(@observ-c-nofit, @observ-c-perfect), 20%);
+								}
+							}
+
+							&.good {
+								color: darken(@observ-c-good, 10%);
+								div.status {
+									background: screen(@observ-c-nofit, @observ-c-good);
+								}
+								div.detail {
+									background: darken(screen(@observ-c-nofit, @observ-c-good), 20%);
+								}
+							}
+
+							&.average {
+								color: darken(@observ-c-average, 10%);
+								div.status {
+									background: screen(@observ-c-nofit, @observ-c-average);
+								}
+								div.detail {
+									background: darken(screen(@observ-c-nofit, @observ-c-average), 20%);
+								}
+
+							}
+
+							&.bad {
+								color: darken(@observ-c-bad, 10%);
+								div.status {
+									background: screen(@observ-c-nofit, @observ-c-bad);
+								}
+								div.detail {
+									background: darken(screen(@observ-c-nofit, @observ-c-bad), 20%);
+								}
+
+							}
+
+						}
+
+					}
+				}
+			}
+
+		}
+		
+	}
+
+}

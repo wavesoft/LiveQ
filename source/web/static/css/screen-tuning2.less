@@ -22,23 +22,24 @@
 	}
 
 	// Corned machine configuraiton buttons
-	.btn-config-1, .btn-config-2, .btn-config-3 {
+	.btn-machine-beam {
+		.pointer-events(auto);
 		position: absolute;
 		height: 62px;
 		width: 62px;
 		bottom: 5px;
-		span.big {
-			font-size: 18px;
+		left: -60px;
+
+		&.disabled {
+			.pointer-events(none);
 		}
-	}
-	.btn-config-1 {
-		right: 5px;
-	}
-	.btn-config-2 {
-		right: 72px;
-	}
-	.btn-config-3 {
-		right: 139px;
+
+		&.beam-1 {
+			top: 30px;	
+		}
+		&.beam-2 {
+			top: 100px;	
+		}
 	}
 
 	// Bottom description frame

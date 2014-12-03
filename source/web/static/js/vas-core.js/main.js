@@ -147,6 +147,9 @@ define(
 			User.on('notification', function(message, type) {
 				UI.growl(message, 5000, type || "success")
 			});
+			User.on('flash', function(title,body,icon) {
+				UI.showFlash(title, body, icon);
+			});
 
 
 			// Break down initialization process in individual chainable functions
@@ -345,10 +348,10 @@ define(
 											// Mark introduction sequence as shown
 											User.markFirstTimeAsSeen("intro");
 											// Display home page
-											VAS.displayHome();
+											VAS.displayTuningScreen();
 										});
 								} else {
-									VAS.displayHome();
+									VAS.displayTuningScreen();
 								}
 
 							}
@@ -383,7 +386,7 @@ define(
 											// Mark introduction sequence as shown
 											User.markFirstTimeAsSeen("intro");
 											// Display home page
-											VAS.displayHome();
+											VAS.displayTuningScreen();
 										});
 									}
 								});
@@ -421,7 +424,7 @@ define(
 								VAS.displayHome();
 							} else {
 								VAS.displayCinematic( function() {
-									VAS.displayTuro
+									
 								});
 							}
 						});
@@ -498,6 +501,9 @@ define(
 					scrHome.on('showMachine', function(name) {
 						VAS.displayTuningScreen();
 					});
+					scrHome.on('flash', function(title,body,icon) {
+						UI.showFlash(title, body, icon);
+					});
 
 					// Fire the basic state change events
 					scrHome.onStateChanged( 'simulating', false );
@@ -546,6 +552,9 @@ define(
 						User.unlockKnowledge(knowledge_id, function() {
 							VAS.displayKnowledge();
 						});
+					});
+					scrCourses.on('flash', function(title,body,icon) {
+						UI.showFlash(title, body, icon);
 					});
 
 					// Complete login
@@ -652,6 +661,9 @@ define(
 					scrTuning.on('course', function(name) {
 						UI.screens["screen.courseroom"].onCourseDefined(name);
 						UI.selectScreen("screen.courseroom");
+					});
+					scrTuning.on('flash', function(title,body,icon) {
+						UI.showFlash(title, body, icon);
 					});
 
 					// Complete tuning

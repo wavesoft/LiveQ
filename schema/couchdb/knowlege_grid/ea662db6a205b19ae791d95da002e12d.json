@@ -19,23 +19,3 @@
    "observables": [
    ]
 }
-        "parent": "ea662db6a205b19ae791d95da002e12d",
-        "info": {
-            "title": "Final State Shower",
-            "shortdesc": "The final state shower is a component of the quantum simulation machine. In this topic you are going to explore it and start playing with your first parameter!",
-            "descurl": "desc/fss-intro.html",
-            "icon": "level-icons/showers.png",
-            "book": "",
-            "course": "fss-intro",
-            "tutorial": "",
-            "cost": 8
-        },
-        "configurations": [
-            "ee"
-        ],
-        "tunables": [
-            "TimeShower:alphaSvalue"
-        ],
-        "observables": [
-            "/ALEPH_2004_S5765862/d54-x01-y01"
-        ],

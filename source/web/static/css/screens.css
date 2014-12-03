@@ -652,27 +652,30 @@
   left: 5px;
   bottom: 5px;
 }
-.screen.tuning2 .btn-config-1,
-.screen.tuning2 .btn-config-2,
-.screen.tuning2 .btn-config-3 {
+.screen.tuning2 .btn-machine-beam {
+  -webkit-pointer-events: auto;
+  -khtml-pointer-events: auto;
+  -moz-pointer-events: auto;
+  -ms-pointer-events: auto;
+  pointer-events: auto;
   position: absolute;
   height: 62px;
   width: 62px;
   bottom: 5px;
+  left: -60px;
 }
-.screen.tuning2 .btn-config-1 span.big,
-.screen.tuning2 .btn-config-2 span.big,
-.screen.tuning2 .btn-config-3 span.big {
-  font-size: 18px;
+.screen.tuning2 .btn-machine-beam.disabled {
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
 }
-.screen.tuning2 .btn-config-1 {
-  right: 5px;
+.screen.tuning2 .btn-machine-beam.beam-1 {
+  top: 30px;
 }
-.screen.tuning2 .btn-config-2 {
-  right: 72px;
-}
-.screen.tuning2 .btn-config-3 {
-  right: 139px;
+.screen.tuning2 .btn-machine-beam.beam-2 {
+  top: 100px;
 }
 .screen.tuning2 .description-frame {
   -webkit-transition: bottom 0.2s;
@@ -1766,6 +1769,177 @@
 .screen.overlay-book > div.cs-yellow .book-tabs {
   background-color: #f39c12;
 }
+.flash-overlay {
+  -webkit-border-radius: 150px;
+  -moz-border-radius: 150px;
+  -o-border-radius: 150px;
+  border-radius: 150px;
+  -webkit-transform: translate(-150px, -150px);
+  -moz-transform: translate(-150px, -150px);
+  -o-transform: translate(-150px, -150px);
+  transform: translate(-150px, -150px);
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: white;
+  left: 50%;
+  top: 50%;
+  font-size: 14px;
+  text-align: center;
+}
+.flash-overlay div.image {
+  position: absolute;
+  left: 86px;
+  top: 24px;
+  width: 128px;
+  height: 128px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+}
+.flash-overlay div.title {
+  position: absolute;
+  font-weight: bold;
+  font-size: 20px;
+  left: 10px;
+  top: 163px;
+  width: 280px;
+  height: 25px;
+}
+.flash-overlay div.body {
+  position: absolute;
+  left: 48px;
+  top: 188px;
+  width: 200px;
+  height: 90px;
+}
+.histograms-overlay {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  background: white;
+  border: solid 5px #dddddd;
+}
+.histograms-overlay div.group {
+  padding: 20px;
+  clear: both;
+}
+.histograms-overlay div.group div.histograms {
+  padding: 5px;
+}
+.histograms-overlay div.group div.histograms div.histogram {
+  -webkit-border-radius: 10px 0 0 10px;
+  -moz-border-radius: 10px 0 0 10px;
+  -o-border-radius: 10px 0 0 10px;
+  border-radius: 10px 0 0 10px;
+  position: relative;
+  display: block;
+  float: left;
+  width: 280px;
+  height: 250px;
+  cursor: pointer;
+  border: 1px #dddddd;
+  border-style: none;
+  margin: 1px 0 1px 1px;
+}
+.histograms-overlay div.group div.histograms div.histogram div.details {
+  -webkit-border-radius: 0 10px 10px 0;
+  -moz-border-radius: 0 10px 10px 0;
+  -o-border-radius: 0 10px 10px 0;
+  border-radius: 0 10px 10px 0;
+  -webkit-pointer-events: none;
+  -khtml-pointer-events: none;
+  -moz-pointer-events: none;
+  -ms-pointer-events: none;
+  pointer-events: none;
+  background-color: #dddddd;
+  position: absolute;
+  height: 250px;
+  left: 280px;
+  top: -1px;
+  border: 1px #dddddd;
+  border-style: none;
+  z-index: 1000;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  transition: all 0.2s;
+  width: 0;
+  opacity: 0;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover {
+  border-style: solid none solid solid;
+  margin: 0;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details {
+  border-style: solid solid solid none;
+  width: 200px;
+  opacity: 1;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.description {
+  padding: 8px;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.description h2 {
+  margin: 5px 0;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  color: #999999;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score div.status {
+  text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 4px;
+  background-color: #cccccc;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score div.detail {
+  text-align: center;
+  font-size: 0.8em;
+  font-weight: bold;
+  padding: 4px;
+  background-color: #cccccc;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.perfect {
+  color: #4d9900;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.perfect div.status {
+  background: #e0f5cc;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.perfect div.detail {
+  background: #ade477;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.good {
+  color: #4d7326;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.good div.status {
+  background: #e0ebd6;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.good div.detail {
+  background: #adc992;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.average {
+  color: #cc7a00;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.average div.status {
+  background: #ffebcc;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.average div.detail {
+  background: #ffc266;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.bad {
+  color: #660000;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.bad div.status {
+  background: #ebcccc;
+}
+.histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score.bad div.detail {
+  background: #cd8383;
+}
 .r-machine-overlay {
   width: 1092px;
   height: 258px;
@@ -2027,7 +2201,7 @@
   display: block;
   position: absolute;
   left: 0px;
-  width: 45px;
+  width: 60px;
   top: 0;
   height: 30px;
   line-height: 30px;
@@ -2039,7 +2213,7 @@
 .tunable div.slider {
   display: block;
   position: absolute;
-  left: 45px;
+  left: 60px;
   right: 0;
   height: 30px;
 }
@@ -2112,7 +2286,7 @@
   transition: opacity 0.25s;
   opacity: 0.1;
   position: absolute;
-  left: 65px;
+  left: 80px;
   right: 20px;
   height: 16px;
   bottom: 2px;

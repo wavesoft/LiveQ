@@ -1,0 +1,44 @@
+///////////////////////////////////////////////
+// The running globe component
+///////////////////////////////////////////////
+
+.flash-overlay {
+	.border-radius(150px);
+	.transform( translate(-150px, -150px) );
+	position: absolute;
+	width: 300px;
+	height: 300px;
+	background: #fff;
+	left: 50%;
+	top: 50%;
+	font-size: 14px;
+	text-align: center;
+
+	div.image {
+		position: absolute;
+		left: 86px; top: 24px;
+		width: 128px;
+		height: 128px;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: contain;
+	}
+
+	div.title {
+		position: absolute;
+		font-weight: bold;
+		font-size: 20px;
+		left: 10px; top: 163px;
+		width: 280px;
+		height: 25px;
+	}
+
+	div.body {
+		position: absolute;
+		left: 48px; top: 188px;
+		width: 200px;
+		height: 90px;
+	}
+
+}
+
