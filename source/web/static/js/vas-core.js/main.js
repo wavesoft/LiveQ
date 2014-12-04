@@ -548,19 +548,36 @@ define(
 
 			var prog_courses = progressAggregator.begin(1),
 				init_courses = function(cb) {
-					var scrCourses = VAS.scrCourses = UI.initAndPlaceScreen("screen.knowledge");
-					if (!scrCourses) {
+					var scrKnowledge = VAS.scrKnowledge = UI.initAndPlaceScreen("screen.knowledge");
+					if (!scrKnowledge) {
 						UI.logError("Core: Unable to initialize knowledge screen!");
 						return;
 					}
 
 					// Handle buy action
-					scrCourses.on('unlock', function(knowledge_id) {
+					scrKnowledge.on('unlock', function(knowledge_id) {
 						User.unlockKnowledge(knowledge_id, function() {
-							VAS.displayKnowledge();
+							// Unlock successful, display alert
+
+							// Get topic details
+							var knowlegeDetails = DB.cache['knowlege_grid_index'][knowledge_id];
+							if (knowlegeDetails) {
+
+								// Show flash banner
+								UI.showFlash(
+									'Knowledge expanded',
+									'You have just expanded your knowlege and unlocked the topic <em>'+knowlegeDetails['info']['title']+'</em>',
+									config['images_url']+'/flash-icons/books.png'
+								);
+
+							}
+
+							// Switch to tuning screen
+							VAS.displayTuningScreen();
+
 						});
 					});
-					scrCourses.on('flash', function(title,body,icon) {
+					scrKnowledge.on('flash', function(title,body,icon) {
 						UI.showFlash(title, body, icon);
 					});
 
@@ -750,7 +767,7 @@ define(
 		VAS.displayKnowledge = function( animateBackwards ) {
 
 			// Setup home screen
-			VAS.scrCourses.onTopicTreeUpdated( User.getKnowledgeTree(true) );
+			VAS.scrKnowledge.onTopicTreeUpdated( User.getKnowledgeTree(true) );
 
 			// Select home screen
 			UI.selectScreen("screen.knowledge", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);

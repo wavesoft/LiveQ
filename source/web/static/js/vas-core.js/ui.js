@@ -827,6 +827,25 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		}
 
 		/**
+		 * Fire this callback only once in the user session
+		 *
+		 * @param {string} once_id - The index to trigger only once.
+		 * @param {function} callback - The function to call
+		 *
+		 */
+		UI.showFirstTime = function(once_id, callback) {
+			// If first time aid was not seen, fire callback
+			if (!User.isFirstTimeSeen(once_id)) {
+				// Fire callback & Register a second depth
+				if (callback) callback(function() {
+					// Mark as seen
+					User.markFirstTimeAsSeen( once_id );
+				});
+			}
+		}
+
+
+		/**
 		 * Display a pop-up widget on the specified point on screen.
 		 * 
 		 * This function has a multi-call signature.
@@ -1496,6 +1515,12 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 								}
 							}
 
+						});
+
+						// Handle forceful sequence exit
+						scr.off('sequence.exit');
+						scr.on('sequence.exit', function(key) {
+							if (callback) callback();
 						});
 
 					});

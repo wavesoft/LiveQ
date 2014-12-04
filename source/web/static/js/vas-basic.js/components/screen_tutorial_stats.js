@@ -462,6 +462,15 @@ define(
 
 			}).bind(this));
 
+			this.eSkipTutorial = $('<a class="link-skip" href="do:skip">Skip introduction tutorial</a>').appendTo(this.gControls);
+			this.eSkipTutorial.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				// Trigger seqnece exit
+				this.trigger('sequence.exit');
+
+			}).bind(this));
 
 			// Vibration timer
 			this.vibrationTimer = setInterval(this.__vibrator.bind(this), 50);

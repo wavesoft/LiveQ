@@ -76,7 +76,7 @@ define(
 			}).bind(this));
 
 			// Create course button
-			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
+			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon disabled"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
 			this.btnCourse.click((function(e) {
 				this.trigger("course", "level-1-1");
 			}).bind(this));
@@ -285,6 +285,10 @@ define(
 				// Save last histograms
 				this.lastHistograms = histos;
 
+				// Enable view option
+				this.btnView.removeClass("disabled");
+				UI.showFirstTimeAid("tuning.control.view");
+
 				// Calculate the Chi2 over all histograms
 				var chi2 = 0;
 				for (var i=0; i<histos.length; i++) {
@@ -332,16 +336,13 @@ define(
 			// Submit for interpolation
 			this.lab.beginSimulation( this.values, true, this.observables );
 
-			// Enable view option
-			this.btnView.removeClass("disabled");
-			UI.showFirstTimeAid("tuning.control.view");
-
 			// Save user values
 			User.saveSlotValues("L", this.values);
 
 			// Update 'L' markers
 			for (k in this.values) {
 				if (typeof(this.values[k]) != 'number') continue;
+				if (!this.markers[k]) this.markers[k] = {};
 				this.markers[k]['L'] = this.values[k];
 			}
 

@@ -46,7 +46,7 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunables, Observables, TunableToObservable, TeamNotebook ]:
+					Tutorials, Tunables, Observables, TunableToObservable, TeamNotebook, QuestionaireResponses ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -93,6 +93,20 @@ class User(BaseModel):
 		Stringify result
 		"""
 		return self.username
+
+class QuestionaireResponses(BaseModel):
+	"""
+	Answers to questionaires
+	"""
+
+	#: The user who completed this questionaire
+	user = ForeignKeyField(User)
+
+	#: The questionaire name
+	questionaire = CharField(max_length=128)
+
+	#: User's responses
+	response = TextField(default="{}")
 
 
 class AgentGroup(BaseModel):

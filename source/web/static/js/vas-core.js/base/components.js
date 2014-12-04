@@ -281,6 +281,48 @@ define(["core/config", "core/base/component" ],
 
 		////////////////////////////////////////////////////////////
 		/**
+		 * Initializes a new QuestionaireScreen Component.
+		 *
+		 * This component is used for displaying questionaires to the user.
+		 *
+		 * @class
+		 * @classdesc Tutorial screen component.
+		 * @param {DOMElement} hostDOM - The DOM element where the component should be hosted in
+		 * @see {@link module:core/base/component~Component|Component} (Parent class)
+		 *
+		 */
+		var QuestionaireScreen = function( hostDOM ) {
+
+			// Initialize base class
+			Component.call(this, hostDOM);
+
+		}
+
+		// Subclass from Component
+		QuestionaireScreen.prototype = Object.create( Component.prototype );
+
+		/**
+		 * The questionaire questions are defined
+		 *
+		 * Each question object passed in this function has the folowing format:
+		 * @example <caption>Question Object Format</caption>
+		 * q.onQuestionsDefined([
+		 *		{
+		 *			"question": "..",					// Title of this question
+		 *			"type": "open,single,multiple",		// Type of the questionaire
+		 *			"options": [						// A list of closed-choice options
+		 *			],
+		 *			"answer": "<regex>"					// Regex to match the correct answer
+		 * 		}
+		 * ]);
+		 * @param {array} questions - An array with question objects
+		 */
+		QuestionaireScreen.prototype.onQuestionsDefined = function(questions) {
+
+		}
+
+		////////////////////////////////////////////////////////////
+		/**
 		 * Initializes a new TeamScreen Component.
 		 *
 		 * This component is used for displaying team status

@@ -22,7 +22,7 @@ define(
 			this.btnKnowlege = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-book"></span></button>').appendTo(this.hostDOM);
 			this.btnTuning = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-dashboard"></span></button>').appendTo(this.hostDOM);
 			this.btnHome = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-home"></span></button>').appendTo(this.hostDOM);
-			this.btnNotes = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-pencil"></span></button>').appendTo(this.hostDOM);
+			this.btnNotes = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-envelope"></span></button>').appendTo(this.hostDOM);
 			this.elmNotebook = $('<textarea class="notepad"></textarea>').appendTo(this.hostDOM);
 
 			// Setup navigation buttons
@@ -78,14 +78,14 @@ define(
 				this.btnTuning.hide();
 				this.btnHome.show();
 				this.btnKnowlege.show();
-			} else if (to == "screen.home") {
-				this.btnHome.hide();
-				this.btnTuning.show();
-				this.btnKnowlege.show();
 			} else if (to == "screen.knowledge") {
 				this.btnKnowlege.hide();
 				this.btnTuning.show();
 				this.btnHome.show();
+			} else {
+				this.btnHome.hide();
+				this.btnTuning.show();
+				this.btnKnowlege.show();
 			}
 
 			// This works on valid screen
