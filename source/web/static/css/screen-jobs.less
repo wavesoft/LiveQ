@@ -1,0 +1,169 @@
+
+///////////////////////////////////////////////
+// Jobs Screen
+///////////////////////////////////////////////
+
+.screen.jobs {
+
+	// Header
+	> h1 {
+		margin-left: 60%;
+		span.highlight {
+			color: #c0392b;
+		}
+	}
+	> p {
+		margin-left: 60%;
+	}
+
+	// Side screen
+	.side-screen {
+		left: 0; top: 0; bottom: 0;
+		position: absolute;
+		width: 60%;
+
+		// The short version of the observable monitor
+		.observable-short {
+			position: absolute;
+			left: 0; right: 0;
+			top: 80px;
+			bottom: 0;
+		}
+
+		// The background trim circle
+		.bg-slice {
+			position: absolute;
+			background-color: rgba(255, 255, 255, 0.25);
+		}
+		.bg-globe {
+			position: absolute;
+			background-color: rgba(20,20,20,0.1);
+		}
+
+		// The shaded input panels around
+		div.status-label {
+			.panel-label {
+				color: #666;
+				background: #CCC;
+				padding: 2px;
+				text-align: left;				
+			}
+			.panel-value {
+				font-size: 24px;
+				font-weight: bold;
+				margin: 6px;
+			}
+		}
+
+		// Positioned elements
+		.p-machines, .p-events, .p-progress {
+			position: absolute;
+			width: 30%;
+		}
+		.p-machines {
+			left: 5px; top: 5px;
+		}
+		.p-progress {
+			right: 30px; top: 5px;
+		}
+		.p-events {
+			left: 32.5%; top: 5px;
+		}
+
+		.p-abort {
+			position: absolute;
+			bottom: 5px;
+			left: 5px;
+			height: 62px;
+			width: 62px;
+		}
+		.p-view {
+			position: absolute;
+			bottom: 5px;
+			left: 70px;
+			height: 62px;
+			width: 62px;
+		}
+
+	}
+
+	// Legend
+	.legend {
+		position: absolute;
+		color: #c0392b;
+		width: 38%;
+		right: 5px;
+		top: 160px;
+		text-align: right;
+		font-size: 14px;
+		font-weight: bold;
+	}
+
+	// List of jobs
+	div.table-list {
+		position: absolute;
+		width: 38%;
+		right: 5px;
+		top: 150px;
+		bottom: 90px;
+		padding: 0 2px;
+	}
+
+	// Run status
+	.p-run-status {
+		position: absolute;
+		width: 38%;
+		height: 60px;
+		right: 7px;
+		top: 77px;
+		font-size: 30px;
+		line-height: 63px;
+	}
+
+	// Submit results
+	.p-submit {
+		font-size: 14px;
+		position: absolute;
+		bottom: 5px;
+		right: 5px;
+		height: 72px;
+		width: 39%;
+
+		span {
+			display: inline-block;
+			width: 32px;
+			height: 32px;
+			background: no-repeat center center url(../img/icons/prof.png);
+		}
+	}
+
+	.p-go-course, .p-go-cafe, .p-go-machine {
+		position: absolute;
+		top: 5px;
+		width: 13%;
+		height: 200px;
+
+		font-size: 14px;
+		span {
+			font-size: 42px;
+			margin-bottom: 14px;
+		}
+	}
+	.p-go-course {
+		right: 14%;
+
+		span {
+			display: inline-block;
+			width: 42px; height: 42px;
+			background: no-repeat center center url(../img/icons/brain.png);
+		}
+	}
+	.p-go-cafe {
+		right: 5px;
+	}
+	.p-go-machine {
+		right: 27.5%;
+	}
+
+
+}

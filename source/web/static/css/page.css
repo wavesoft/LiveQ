@@ -773,6 +773,7 @@ div.table-list table tr th {
   display: block;
   height: 25px;
   line-height: 25px;
+  text-indent: 5px;
   text-align: left;
 }
 div.table-list table tbody tr {
@@ -1569,7 +1570,7 @@ body.enable-ipide .btn-edit-component {
   display: block;
   z-index: 100;
   right: 0;
-  top: 5px;
+  top: 2px;
 }
 .screen.error-screen {
   min-height: 48px;

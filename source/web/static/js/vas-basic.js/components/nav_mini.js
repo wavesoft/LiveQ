@@ -22,12 +22,16 @@ define(
 			this.btnKnowlege = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-book"></span></button>').appendTo(this.hostDOM);
 			this.btnTuning = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-dashboard"></span></button>').appendTo(this.hostDOM);
 			this.btnHome = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-home"></span></button>').appendTo(this.hostDOM);
+			this.btnJobs = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-expand"></span></button>').appendTo(this.hostDOM);
 			this.btnNotes = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-envelope"></span></button>').appendTo(this.hostDOM);
 			this.elmNotebook = $('<textarea class="notepad"></textarea>').appendTo(this.hostDOM);
 
 			// Setup navigation buttons
 			this.btnHome.click((function(e) {
-				this.trigger("changeScreen", "screen.home");
+				this.trigger("displayHome");
+			}).bind(this));
+			this.btnJobs.click((function(e) {
+				this.trigger("displayJobs");
 			}).bind(this));
 			this.btnKnowlege.click((function(e) {
 				this.trigger("displayKnowledge");
@@ -70,22 +74,25 @@ define(
 				"screen.explain", "screen.courseroom",
 				"screen.team.people", "screen.team.machines", 
 				"screen.team.notebook", "screen.team.messages",
-				"screen.knowledge"
+				"screen.knowledge", "screen.jobs"
 			];
+
+			var buttons = [
+				this.btnHome, this.btnTuning, this.btnKnowlege, this.btnJobs
+			];
+
+			// Hide all buttons
+			for (var i=0; i<buttons.length; i++) buttons[i].hide();
 
 			// Show/hide appropriate screens
 			if (to == "screen.tuning") {
-				this.btnTuning.hide();
-				this.btnHome.show();
-				this.btnKnowlege.show();
+				buttons[3].show();
+				buttons[2].show();
 			} else if (to == "screen.knowledge") {
-				this.btnKnowlege.hide();
-				this.btnTuning.show();
-				this.btnHome.show();
+				buttons[3].show();
+				buttons[1].show();
 			} else {
-				this.btnHome.hide();
-				this.btnTuning.show();
-				this.btnKnowlege.show();
+				buttons[0].show();
 			}
 
 			// This works on valid screen

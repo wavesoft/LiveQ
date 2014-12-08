@@ -138,11 +138,14 @@ define(
 					}
 				});
 				// Bind events
-				UI.mininav.on("displayKnowledge", function(to) {
+				UI.mininav.on("displayKnowledge", function() {
 					VAS.displayKnowledge();
 				});
-				UI.mininav.on("displayTuningScreen", function(to) {
+				UI.mininav.on("displayTuningScreen", function() {
 					VAS.displayTuningScreen();
+				});
+				UI.mininav.on("displayJobs", function() {
+					VAS.displayJobs();
 				});
 
 			}
@@ -508,6 +511,9 @@ define(
 					scrHome.on('showMachine', function(name) {
 						VAS.displayTuningScreen();
 					});
+					scrHome.on('showJobs', function() {
+						VAS.displayJobs();
+					});
 					scrHome.on('flash', function(title,body,icon) {
 						UI.showFlash(title, body, icon);
 					});
@@ -530,6 +536,19 @@ define(
 
 					// Complete login
 					prog_cinematic.ok("Cinematic screen ready");
+					cb();
+				};				
+
+			var prog_jobs = progressAggregator.begin(1),
+				init_jobs = function(cb) {
+					var scrJobs = VAS.scrJobs = UI.initAndPlaceScreen("screen.jobs");
+					if (!scrJobs) {
+						UI.logError("Core: Unable to initialize jobs screen!");
+						return;
+					}
+
+					// Complete login
+					prog_jobs.ok("Jobs screen ready");
 					cb();
 				};				
 
@@ -700,7 +719,7 @@ define(
 			setTimeout(function() {
 
 				var chainRun = [
-						init_db, init_api, init_home, init_cinematic, init_courseroom, init_courses, 
+						init_db, init_api, init_home, init_jobs, init_cinematic, init_courseroom, init_courses, 
 						init_tutorials, init_login, init_team, init_explain, init_tune, init_run, init_results
 					],
 					runChain = function(cb, index) {
@@ -757,6 +776,16 @@ define(
 
 			// Select home screen
 			UI.selectScreen("screen.home", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
+
+		}
+
+		/**
+		 * Display the jobs screen
+		 */
+		VAS.displayJobs = function( animateBackwards ) {
+
+			// Select jobs screen
+			UI.selectScreen("screen.jobs", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 

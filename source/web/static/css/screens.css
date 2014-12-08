@@ -8,7 +8,7 @@
 .screen .line {
   width: 100px;
   height: 1;
-  border-top: solid 1px #666;
+  border-top: solid 1px #666666;
 }
 .screen > h1 {
   margin: 15px 15px 0;
@@ -18,7 +18,7 @@
   color: #16a085;
 }
 .screen > h1 + div.subtitle {
-  color: #999;
+  color: #999999;
   margin: 0 15px;
 }
 .screen .observable {
@@ -26,7 +26,7 @@
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  color: #FFF;
+  color: white;
   position: absolute;
   text-align: center;
   cursor: pointer;
@@ -42,12 +42,12 @@
   border: solid 2px;
 }
 .screen .observable.grey {
-  color: #333;
+  color: #333333;
   border-color: #b3b3b3;
   background-color: #cccccc;
 }
 .screen .observable.green {
-  color: #FFF;
+  color: white;
   border-color: #25a25a;
   background-color: #2ecc71;
 }
@@ -104,7 +104,7 @@
 }
 .screen .pagepart.run-tl h1,
 .screen .pagepart.run-tl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-tl h1 {
@@ -128,7 +128,7 @@
 }
 .screen .pagepart.run-tr h1,
 .screen .pagepart.run-tr p {
-  color: #FFF;
+  color: white;
   text-align: right;
 }
 .screen .pagepart.run-tr h1 {
@@ -152,7 +152,7 @@
 }
 .screen .pagepart.run-bl h1,
 .screen .pagepart.run-bl p {
-  color: #FFF;
+  color: white;
   text-align: left;
 }
 .screen .pagepart.run-bl h1 {
@@ -182,7 +182,7 @@
   border-radius: 20px;
   padding: 12px;
   margin: 12px;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window div.explain-header h1 {
   margin: 0;
@@ -196,7 +196,7 @@
   top: 250px;
   border-radius: 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: white;
   padding: 10px 10px 0;
 }
 .screen.explain .explain-window div.explain-popup div.btn-host {
@@ -241,7 +241,7 @@
   margin: 30px 0 0 30px;
 }
 .screen.explain .explain-window div.explain-screen.cs-blackboard {
-  background: #000000 url(../img/blackboard.jpg) no-repeat center center;
+  background: black url(../img/blackboard.jpg) no-repeat center center;
   background-size: cover;
 }
 .screen.explain .explain-window.cs-green {
@@ -256,139 +256,17 @@
 }
 .screen.explain .explain-window.cs-green a.btn-level {
   background-color: #34495e;
-  color: #fff;
+  color: white;
 }
 .screen.explain .explain-window.cs-green a.btn-level.blur {
-  background-color: #7F8C8D;
+  background-color: #7f8c8d;
 }
 .screen.explain .explain-window.cs-green a.btn-level.active {
-  background-color: #E67E22;
+  background-color: #e67e22;
 }
 .screen.explain .explain-window.cs-green a.btn-do {
   border-color: #2980b9;
   background-color: #3498db;
-}
-.screen.home .side-screen {
-  left: 0;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  width: 60%;
-}
-.screen.home .side-screen .observable-short {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 40px;
-  bottom: 40px;
-}
-.screen.home .side-screen .bg-slice {
-  position: absolute;
-  background-color: rgba(255, 255, 255, 0.25);
-}
-.screen.home .side-screen .bg-globe {
-  position: absolute;
-  background-color: rgba(20, 20, 20, 0.1);
-}
-.screen.home .side-screen div.status-label .panel-label {
-  color: #333;
-}
-.screen.home .side-screen div.status-label .panel-value {
-  font-size: 20px;
-  font-weight: bold;
-}
-.screen.home .side-screen .p-machines,
-.screen.home .side-screen .p-events,
-.screen.home .side-screen .p-progress {
-  position: absolute;
-  width: 30%;
-}
-.screen.home .side-screen .p-machines {
-  left: 5px;
-  top: 5px;
-}
-.screen.home .side-screen .p-progress {
-  right: 30px;
-  top: 5px;
-}
-.screen.home .side-screen .p-events {
-  left: 30%;
-  top: 5px;
-}
-.screen.home .side-screen .p-abort {
-  position: absolute;
-  bottom: 5px;
-  left: 5px;
-  height: 62px;
-  width: 62px;
-}
-.screen.home .side-screen .p-view {
-  position: absolute;
-  bottom: 5px;
-  left: 70px;
-  height: 62px;
-  width: 62px;
-}
-.screen.home div.table-list {
-  position: absolute;
-  width: 38%;
-  right: 5px;
-  top: 240px;
-  bottom: 90px;
-  padding: 0 2px;
-}
-.screen.home .p-submit {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  height: 72px;
-  width: 39%;
-}
-.screen.home .p-submit span {
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  background: no-repeat center center url(../img/icons/prof.png);
-}
-.screen.home .p-go-course,
-.screen.home .p-go-cafe,
-.screen.home .p-go-machine {
-  position: absolute;
-  top: 5px;
-  width: 13%;
-  height: 200px;
-  font-size: 14px;
-}
-.screen.home .p-go-course span,
-.screen.home .p-go-cafe span,
-.screen.home .p-go-machine span {
-  font-size: 42px;
-  margin-bottom: 14px;
-}
-.screen.home .p-go-course {
-  right: 14%;
-}
-.screen.home .p-go-course span {
-  display: inline-block;
-  width: 42px;
-  height: 42px;
-  background: no-repeat center center url(../img/icons/brain.png);
-}
-.screen.home .p-go-cafe {
-  right: 5px;
-}
-.screen.home .p-go-machine {
-  right: 27.5%;
-}
-.screen.home .legend {
-  position: absolute;
-  color: #16a085;
-  width: 38%;
-  right: 5px;
-  top: 215px;
-  text-align: right;
-  font-size: 14px;
-  font-weight: bold;
 }
 .screen.login .host {
   width: 600px;
@@ -425,8 +303,8 @@
 }
 .screen.login .body {
   background: rgba(255, 255, 255, 0.3);
-  border-top: solid 1px #ccc;
-  border-bottom: solid 1px #ccc;
+  border-top: solid 1px #cccccc;
+  border-bottom: solid 1px #cccccc;
 }
 .screen.login .body div.left {
   float: left;
@@ -460,7 +338,7 @@
   cursor: pointer;
 }
 .screen.register {
-  background-color: #fff;
+  background-color: white;
   padding: 10px;
   font-size: 14px;
   overflow-y: auto;
@@ -495,7 +373,7 @@
   color: #009999;
 }
 .screen.register .panel > p {
-  color: #666;
+  color: #666666;
 }
 .screen.register .panel .row {
   padding: 2px;
@@ -521,7 +399,7 @@
 .screen.register .panel .row div.details {
   font-size: 12px;
   margin: 5px 0 10px 160px;
-  color: #999;
+  color: #999999;
 }
 .screen.register .panel .row:after {
   content: " ";
@@ -529,7 +407,7 @@
 }
 .screen.register .avatar-list {
   height: 126px;
-  border: solid 1px #DDD;
+  border: solid 1px #dddddd;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -545,21 +423,21 @@
   background-position: center center;
 }
 .screen.register .avatar-list .item.selected {
-  background-color: #BDDAFF;
+  background-color: #bddaff;
 }
 .screen.register .alert {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #E74C3C;
-  border: solid 1px #C0392B;
+  background-color: #e74c3c;
+  border: solid 1px #c0392b;
   padding: 10px;
-  color: #fff;
+  color: white;
   margin-bottom: 10px;
 }
 .screen.register input.invalid {
-  border: solid 1px #E74C3C;
+  border: solid 1px #e74c3c;
 }
 .screen.progress {
   background-color: rgba(0, 0, 0, 0.6);
@@ -580,6 +458,7 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   left: 50%;
   top: 40%;
@@ -597,12 +476,13 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
   top: 80%;
   margin-top: -24px;
   font-family: Tahoma, Arial;
   font-size: 12px;
-  color: #999;
+  color: #999999;
 }
 .screen.progress div.bar-status {
   left: 10px;
@@ -618,8 +498,9 @@
   -o-transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   transition: all 500ms cubic-bezier(0.515, -0.155, 1, -0.34);
   /* custom */
+
   position: absolute;
-  background-color: #eee;
+  background-color: #eeeeee;
   left: 0;
   top: 80%;
   width: 100%;
@@ -630,7 +511,7 @@
   -moz-box-shadow: 0px 0px 10px 1px #ff9900;
   -o-box-shadow: 0px 0px 10px 1px #ff9900;
   box-shadow: 0px 0px 10px 1px #ff9900;
-  background-color: #FF9900;
+  background-color: #ff9900;
   display: block;
   margin: 1px 0;
   height: 2px;
@@ -680,12 +561,12 @@
   -o-transition: bottom 0.2s;
   transition: bottom 0.2s;
   position: absolute;
-  background-color: #fff;
+  background-color: white;
   left: 0;
   right: 0;
   bottom: -230px;
   height: 210px;
-  border-top: solid 1px #ccc;
+  border-top: solid 1px #cccccc;
   padding: 10px;
 }
 .screen.tuning2 .description-frame > h1 {
@@ -726,7 +607,7 @@
   height: 62px;
   padding: 5px;
   width: 394px;
-  border: solid 1px #CCC;
+  border: solid 1px #cccccc;
   background-color: white;
   border-radius: 5px 5px 0 0;
 }
@@ -741,7 +622,7 @@
   width: 62px;
 }
 .screen.tuning2 .control-board > div > div.panel-shaded {
-  color: #333;
+  color: #333333;
   float: left;
   width: 190px;
   height: 59px;
@@ -753,11 +634,11 @@
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #DDD;
+  opacity: 1;
+  background-color: #dddddd;
   overflow: hidden;
   padding: 10px 5px;
   position: absolute;
-  opacity: 1;
 }
 .screen.tuning2 .parameter-group.animating {
   -webkit-transition: all 0.2s;
@@ -779,12 +660,12 @@
   opacity: 0.8;
 }
 .screen.tuning2 .tuning-panel {
-  border: solid 1px #DDD;
+  border: solid 1px #dddddd;
   line-height: 28px;
 }
 .screen.tuning2 .tuning-panel .header {
-  background-color: #EEE;
-  color: #099;
+  background-color: #eeeeee;
+  color: #009999;
   position: absolute;
   left: 0;
   right: 0;
@@ -794,7 +675,7 @@
   padding: 4px 10px;
 }
 .screen.tuning2 .tuning-panel .tunables {
-  background-color: #fff;
+  background-color: white;
   overflow-y: auto;
   position: absolute;
   left: 0;
@@ -810,19 +691,19 @@
   height: 100px;
   text-align: center;
   font-size: 16px;
-  color: #999;
+  color: #999999;
 }
 .overlay-window .tuning-panel {
-  background-color: #fff;
+  background-color: white;
 }
 .screen.running div.c-marker {
   position: absolute;
-  border: dashed 1px #999;
+  border: dashed 1px #999999;
 }
 .screen.running div.c-marker .label {
   position: absolute;
   font-size: 12px;
-  color: #999;
+  color: #999999;
   left: 0;
   width: 100%;
   text-align: center;
@@ -846,7 +727,7 @@
   cursor: pointer;
   background-color: #d35400;
   text-align: center;
-  color: #FFF;
+  color: white;
   width: 70px;
   height: 45px;
   padding-top: 5px;
@@ -901,23 +782,24 @@
   display: block;
   width: 200px;
   height: 200px;
-  border: solid 2px #95A5A6;
+  border: solid 2px #95a5a6;
   background: #bfbfbf;
   /* Old browsers */
-  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -moz-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* FF3.6+ */
-  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, #ffffff));
+  background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, #bfbfbf), color-stop(100%, white));
   /* Chrome,Safari4+ */
-  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -webkit-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Chrome10+,Safari5.1+ */
-  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -o-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* Opera 12+ */
-  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, #ffffff 100%);
+  background: -ms-radial-gradient(center, ellipse cover, #bfbfbf 0%, white 100%);
   /* IE10+ */
-  background: radial-gradient(ellipse at center, #bfbfbf 0%, #ffffff 100%);
+  background: radial-gradient(ellipse at center, #bfbfbf 0%, white 100%);
   /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bfbfbf', endColorstr='#ffffff', GradientType=1);
   /* IE6-9 fallback on horizontal gradient */
+
 }
 .screen.running .progress-widget a.button {
   position: absolute;
@@ -937,7 +819,7 @@
   position: absolute;
   width: 108px;
   height: 52px;
-  color: #FFFFFF;
+  color: white;
   line-height: 52px;
   text-decoration: none;
   text-align: center;
@@ -945,9 +827,9 @@
   cursor: pointer;
 }
 .screen.running .progress-widget a.button:before {
+  position: absolute;
   left: 0;
   top: 0;
-  position: absolute;
   display: block;
   content: " ";
   background: #c0392b;
@@ -1025,7 +907,7 @@
   -moz-transition: all 0.4s;
   -o-transition: all 0.4s;
   transition: all 0.4s;
-  background-color: rgba(0, 0, 0, 0);
+  background-color: transparent;
   text-align: center;
   display: block;
   position: absolute;
@@ -1034,7 +916,7 @@
   bottom: 0;
   height: 48px;
   font-size: 14px;
-  color: #fff;
+  color: white;
   line-height: 48px;
   text-decoration: none;
   font-size: 24px;
@@ -1046,7 +928,7 @@
 }
 .screen.bsod {
   background-color: rgba(0, 0, 0, 0.7);
-  color: #fff;
+  color: white;
 }
 .screen.bsod .content {
   position: absolute;
@@ -1080,25 +962,25 @@
   width: 100%;
   font-size: 14px;
   text-align: center;
-  color: #fff;
+  color: white;
 }
 .screen.bsod .content .text a {
-  color: #33CCFF;
+  color: #33ccff;
   text-decoration: none;
 }
 .screen.bsod .content .text a:hover {
-  color: #fff;
+  color: white;
 }
 .screen.ipide {
-  background-color: #fff;
+  background-color: white;
   position: relative;
 }
 .screen.ipide .header,
 .screen.ipide .footer {
   position: absolute;
-  background-color: #999;
+  background-color: #999999;
   height: 32px;
-  color: #fff;
+  color: white;
   font-size: 16px;
   padding: 4px;
 }
@@ -1119,18 +1001,18 @@
   float: right;
   width: 100px;
   height: 32px;
-  color: #333;
+  color: #333333;
   border: none;
   text-decoration: none;
-  background-color: #AAA;
+  background-color: #aaaaaa;
   text-align: center;
   margin-top: 4px;
   margin-left: 1px;
   padding: 5px 0 0;
 }
 .screen.ipide .footer .btn-footer:hover {
-  background-color: #fff;
-  color: #000;
+  background-color: white;
+  color: black;
 }
 .screen.ipide .code {
   position: absolute;
@@ -1176,7 +1058,7 @@
   -o-border-radius: 5px;
   border-radius: 5px;
   border: solid 1px #c0392b;
-  background: #ffffff;
+  background: white;
   height: 30px;
   margin: 6px;
 }
@@ -1225,7 +1107,7 @@
   font-weight: bold;
   margin-left: 14px;
   text-align: center;
-  color: #FFF;
+  color: white;
 }
 .screen.tutorial-stats .vibrator-host .panel-event-rate .label {
   position: absolute;
@@ -1235,7 +1117,7 @@
   top: 0;
   bottom: 0;
   padding-top: 10px;
-  color: #ddd;
+  color: #dddddd;
   font-size: 12px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram {
@@ -1244,7 +1126,7 @@
   right: 430px;
   bottom: 50px;
   border-right: solid 1px #333333;
-  background-color: #fff;
+  background-color: white;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram > div {
   position: absolute;
@@ -1257,14 +1139,14 @@
   border-top: solid 1px #333333;
   padding: 5px;
   font-style: italic;
-  color: #333;
+  color: #333333;
   font-size: 14px;
 }
 .screen.tutorial-stats .vibrator-host .panel-histogram-legend span.box {
   display: inline-block;
   width: 50px;
   height: 20px;
-  border: solid 1px #666;
+  border: solid 1px #666666;
   vertical-align: middle;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls {
@@ -1279,7 +1161,7 @@
   -moz-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  background-color: #EEE;
+  background-color: #eeeeee;
   margin: 5px;
   padding: 5px;
 }
@@ -1305,8 +1187,8 @@
   text-align: right;
   font-size: 16px;
   text-decoration: none;
-  color: #333;
-  border: solid 2px #CCC;
+  color: #333333;
+  border: solid 2px #cccccc;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle:after {
   -webkit-border-radius: 16px;
@@ -1323,8 +1205,8 @@
   position: absolute;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active {
-  background-color: #ccc;
-  color: #000;
+  background-color: #cccccc;
+  color: black;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-toggle.active:after {
   background-color: #2ecc71;
@@ -1352,7 +1234,7 @@
   color: #003300;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-accept:hover {
-  color: #fff;
+  color: white;
   background-color: #2ecc71;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-discard {
@@ -1360,7 +1242,7 @@
   color: #330000;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.btn-discard:hover {
-  color: #fff;
+  color: white;
   background-color: #e74c3c;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.link-skip {
@@ -1368,10 +1250,10 @@
   text-align: right;
   text-decoration: none;
   margin: 2px;
-  color: #999;
+  color: #999999;
 }
 .screen.tutorial-stats .vibrator-host .panel-controls .group a.link-skip:hover {
-  color: #66CCFF;
+  color: #66ccff;
   text-decoration: underline;
 }
 .screen.courseroom .monitor {
@@ -1379,8 +1261,8 @@
   background: no-repeat center center url(../img/blackboard.jpg);
   background-size: cover;
   position: absolute;
-  border: solid 8px #DDD;
-  background-color: #FFF;
+  border: solid 8px #dddddd;
+  background-color: white;
 }
 .screen.courseroom .monitor .countdown {
   -webkit-border-radius: 10px;
@@ -1395,12 +1277,12 @@
   transform: translate(-100px, -30px);
   text-align: center;
   background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
+  color: white;
 }
 .screen.courseroom .monitor .countdown h5 {
   margin: 5px 0;
   font-size: 14px;
-  color: #999;
+  color: #999999;
 }
 .screen.courseroom .monitor .countdown p {
   margin: 0;
@@ -1453,8 +1335,8 @@
   right: 0;
   bottom: 0;
   height: 60px;
-  border-top: solid 1px #999;
-  background-color: #fff;
+  border-top: solid 1px #999999;
+  background-color: white;
 }
 .screen.courseroom .chat-box > div.chat-input {
   position: absolute;
@@ -1478,10 +1360,10 @@
   width: 100px;
   top: 2px;
   bottom: 2px;
-  background-color: #3399CC;
+  background-color: #3399cc;
   font-size: 18px;
   border: none;
-  color: #fff;
+  color: white;
 }
 .screen.courseroom .chat_bubble {
   -webkit-border-radius: 5px;
@@ -1489,8 +1371,8 @@
   -o-border-radius: 5px;
   border-radius: 5px;
   position: absolute;
-  background: #FFFFCC;
-  border: 1px solid #999;
+  background: #ffffcc;
+  border: 1px solid #999999;
   max-width: 200px;
   padding: 5px;
 }
@@ -1507,13 +1389,13 @@
 }
 .screen.courseroom .chat_bubble:after {
   border-color: rgba(255, 255, 204, 0);
-  border-top-color: #FFFFCC;
+  border-top-color: #ffffcc;
   border-width: 10px;
   margin-left: -10px;
 }
 .screen.courseroom .chat_bubble:before {
   border-color: rgba(153, 153, 153, 0);
-  border-top-color: #999;
+  border-top-color: #999999;
   border-width: 11px;
   margin-left: -11px;
 }
@@ -1579,8 +1461,8 @@
   border-radius: 10px;
   position: relative;
   padding: 5px;
-  background: #fff;
-  border: solid 1px #DDD;
+  background: white;
+  border: solid 1px #dddddd;
 }
 .screen.team.team-messages div.controls .status-panel.p-status,
 .screen.team.team-notebook div.controls .status-panel.p-status,
@@ -1597,7 +1479,7 @@
   position: absolute;
   font-size: 42px;
   text-align: center;
-  color: #999;
+  color: #999999;
   padding-top: 5px;
 }
 .screen.team.team-messages div.controls .status-panel.p-status .title,
@@ -1625,7 +1507,7 @@
   right: 10px;
   bottom: 10px;
   height: 8px;
-  background-color: #DDD;
+  background-color: #dddddd;
 }
 .screen.team.team-messages div.controls .status-panel.p-status .progress .bar,
 .screen.team.team-notebook div.controls .status-panel.p-status .progress .bar,
@@ -1649,6 +1531,151 @@
   height: 62px;
   width: 62px;
   margin-right: 4px;
+}
+.screen.jobs > h1 {
+  margin-left: 60%;
+}
+.screen.jobs > h1 span.highlight {
+  color: #c0392b;
+}
+.screen.jobs > p {
+  margin-left: 60%;
+}
+.screen.jobs .side-screen {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  width: 60%;
+}
+.screen.jobs .side-screen .observable-short {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 80px;
+  bottom: 0;
+}
+.screen.jobs .side-screen .bg-slice {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.25);
+}
+.screen.jobs .side-screen .bg-globe {
+  position: absolute;
+  background-color: rgba(20, 20, 20, 0.1);
+}
+.screen.jobs .side-screen div.status-label .panel-label {
+  color: #666666;
+  background: #cccccc;
+  padding: 2px;
+  text-align: left;
+}
+.screen.jobs .side-screen div.status-label .panel-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 6px;
+}
+.screen.jobs .side-screen .p-machines,
+.screen.jobs .side-screen .p-events,
+.screen.jobs .side-screen .p-progress {
+  position: absolute;
+  width: 30%;
+}
+.screen.jobs .side-screen .p-machines {
+  left: 5px;
+  top: 5px;
+}
+.screen.jobs .side-screen .p-progress {
+  right: 30px;
+  top: 5px;
+}
+.screen.jobs .side-screen .p-events {
+  left: 32.5%;
+  top: 5px;
+}
+.screen.jobs .side-screen .p-abort {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  height: 62px;
+  width: 62px;
+}
+.screen.jobs .side-screen .p-view {
+  position: absolute;
+  bottom: 5px;
+  left: 70px;
+  height: 62px;
+  width: 62px;
+}
+.screen.jobs .legend {
+  position: absolute;
+  color: #c0392b;
+  width: 38%;
+  right: 5px;
+  top: 160px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: bold;
+}
+.screen.jobs div.table-list {
+  position: absolute;
+  width: 38%;
+  right: 5px;
+  top: 150px;
+  bottom: 90px;
+  padding: 0 2px;
+}
+.screen.jobs .p-run-status {
+  position: absolute;
+  width: 38%;
+  height: 60px;
+  right: 7px;
+  top: 77px;
+  font-size: 30px;
+  line-height: 63px;
+}
+.screen.jobs .p-submit {
+  font-size: 14px;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  height: 72px;
+  width: 39%;
+}
+.screen.jobs .p-submit span {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background: no-repeat center center url(../img/icons/prof.png);
+}
+.screen.jobs .p-go-course,
+.screen.jobs .p-go-cafe,
+.screen.jobs .p-go-machine {
+  position: absolute;
+  top: 5px;
+  width: 13%;
+  height: 200px;
+  font-size: 14px;
+}
+.screen.jobs .p-go-course span,
+.screen.jobs .p-go-cafe span,
+.screen.jobs .p-go-machine span {
+  font-size: 42px;
+  margin-bottom: 14px;
+}
+.screen.jobs .p-go-course {
+  right: 14%;
+}
+.screen.jobs .p-go-course span {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  background: no-repeat center center url(../img/icons/brain.png);
+}
+.screen.jobs .p-go-cafe {
+  right: 5px;
+}
+.screen.jobs .p-go-machine {
+  right: 27.5%;
 }
 .screen.overlay-book {
   overflow: hidden;
@@ -1674,7 +1701,7 @@
 .screen.overlay-book > div .book-body .tab {
   font-size: 14px;
   padding: 10px;
-  color: #fff;
+  color: white;
 }
 .screen.overlay-book > div .book-body .tab.tab-error {
   padding: 34px 0 0 160px;
@@ -1695,7 +1722,7 @@
   line-height: 40px;
   padding: 0 10px;
   font-size: 16px;
-  color: #fff;
+  color: white;
   text-decoration: none;
 }
 .screen.overlay-book > div .book-tabs a.cs-blue {
@@ -1788,7 +1815,7 @@
   position: absolute;
   width: 300px;
   height: 300px;
-  background: #fff;
+  background: white;
   left: 50%;
   top: 50%;
   font-size: 14px;
@@ -1825,8 +1852,8 @@
   -moz-border-radius: 20px;
   -o-border-radius: 20px;
   border-radius: 20px;
-  background: #fff;
-  border: solid 5px #DDD;
+  background: white;
+  border: solid 5px #dddddd;
 }
 .histograms-overlay div.group {
   padding: 20px;
@@ -1846,7 +1873,7 @@
   width: 280px;
   height: 250px;
   cursor: pointer;
-  border: 1px #ddd;
+  border: 1px #dddddd;
   border-style: none;
   margin: 1px 0 1px 1px;
 }
@@ -1860,12 +1887,12 @@
   -moz-pointer-events: none;
   -ms-pointer-events: none;
   pointer-events: none;
-  background-color: #ddd;
+  background-color: #dddddd;
   position: absolute;
   height: 250px;
   left: 280px;
   top: -1px;
-  border: 1px #ddd;
+  border: 1px #dddddd;
   border-style: none;
   z-index: 1000;
   -webkit-transition: all 0.2s;
@@ -1898,16 +1925,16 @@
   color: #999999;
 }
 .histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score div.status {
+  text-align: center;
   font-size: 1.5em;
   font-weight: bold;
-  text-align: center;
   padding: 4px;
   background-color: #cccccc;
 }
 .histograms-overlay div.group div.histograms div.histogram:hover div.details div.fit-score div.detail {
+  text-align: center;
   font-size: 0.8em;
   font-weight: bold;
-  text-align: center;
   padding: 4px;
   background-color: #cccccc;
 }
@@ -1992,7 +2019,7 @@
   -o-transform: translate(-27px, -27px);
   transform: translate(-27px, -27px);
   border-width: 6px;
-  background-color: #FFF;
+  background-color: white;
   background-position-y: -42px;
 }
 .r-machine-overlay > div.locked {
@@ -2006,7 +2033,7 @@
   border-color: #bdc3c7;
 }
 .r-machine-overlay > div.locked:hover {
-  background-color: #FFF;
+  background-color: white;
 }
 .r-machine-overlay .c-beam {
   left: 140px;
@@ -2249,7 +2276,7 @@
   display: block;
   position: absolute;
   background-color: #c0392b;
-  color: #ffffff;
+  color: white;
   width: 40px;
   line-height: 25px;
   height: 25px;
@@ -2274,7 +2301,7 @@
   height: 30px;
   line-height: 30px;
   background-color: #16a085;
-  color: #ffffff;
+  color: white;
   text-align: center;
   font-size: 14px;
   font-weight: bold;
@@ -2335,8 +2362,8 @@
   width: 160px;
   height: 160px;
   z-index: 70;
-  background: #fff;
-  border: solid 2px #DDD;
+  background: white;
+  border: solid 2px #dddddd;
 }
 #game-frame .nav-mini {
   -webkit-transition: all 0.2s;
@@ -2347,7 +2374,7 @@
   -moz-border-radius: 10px 0 0 10px;
   -o-border-radius: 10px 0 0 10px;
   border-radius: 10px 0 0 10px;
-  background-color: #fff;
+  background-color: white;
   overflow: hidden;
   padding: 5px;
   height: 39px;
@@ -2362,7 +2389,7 @@
 #game-frame .nav-mini .credits {
   height: 40px;
   line-height: 40px;
-  color: #999;
+  color: #999999;
   background: url(../img/icons/credits.png) no-repeat left center;
   text-indent: 40px;
   opacity: 0;
@@ -2385,10 +2412,10 @@
   width: 290px;
   top: 54px;
   height: 340px;
-  background-color: #FFFF99;
+  background-color: #ffff99;
   border-left: none;
   border-top: none;
-  border-bottom: solid 2px #FFCC00;
-  border-right: solid 2px #FFCC00;
+  border-bottom: solid 2px #ffcc00;
+  border-right: solid 2px #ffcc00;
   font-family: 'Crafty Girls', cursive;
 }
