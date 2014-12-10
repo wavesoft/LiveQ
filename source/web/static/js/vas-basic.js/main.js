@@ -21,6 +21,7 @@ define([
 	'vas-basic/components/screen_team_machines',
 	'vas-basic/components/screen_team_messages',
 	'vas-basic/components/screen_jobs',
+	'vas-basic/components/screen_menu',
 
 	// Subscreens
 	'vas-basic/components/screen_observable_short',
