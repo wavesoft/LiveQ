@@ -553,6 +553,7 @@ define(
 				// Stop dragging
 				this.mouseDragMode = 0;
 				this.canvasHead.css('cursor', 'default');
+				this.lockUpdate = true;
 
 			}).bind(this));
 
@@ -847,9 +848,7 @@ define(
 			this.timeline.addEventListener('change', (function() {
 
 				// Ignore changes that we triggered
-				if (this.lockUpdate) {
-					this.lockUpdate = false;
-				} else {
+				if (!this.lockUpdate) {
 					// If timeline has gone out of view, wrap it
 					this.wrapView(0.5);
 				}
