@@ -178,7 +178,7 @@ define(
 		 * Realign machine layout
 		 */
 		MachineBackdrop.prototype.realignMachine = function() {
-			var machineW = this.machine.width(),
+			var machineW = this.machine.width() + 80,
 				machineH = this.machine.height();
 
 			// Realign based on cursor on smaller screens

@@ -21,14 +21,14 @@ define(
 			// Put the home icon
 			this.btnKnowlege = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-book"></span></button>').appendTo(this.hostDOM);
 			this.btnTuning = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-dashboard"></span></button>').appendTo(this.hostDOM);
-			this.btnHome = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-home"></span></button>').appendTo(this.hostDOM);
+			this.btnHome = $('<button class="btn-shaded btn-blue"><span class="glyphicon glyphicon-home"></span></button>').appendTo(this.hostDOM);
 			this.btnJobs = $('<button class="btn-shaded btn-teal"><span class="glyphicon glyphicon-expand"></span></button>').appendTo(this.hostDOM);
 			this.btnNotes = $('<button class="btn-shaded btn-orange"><span class="glyphicon glyphicon-envelope"></span></button>').appendTo(this.hostDOM);
 			this.elmNotebook = $('<textarea class="notepad"></textarea>').appendTo(this.hostDOM);
 
 			// Setup navigation buttons
 			this.btnHome.click((function(e) {
-				this.trigger("displayHome");
+				this.trigger("displayMenu");
 			}).bind(this));
 			this.btnJobs.click((function(e) {
 				this.trigger("displayJobs");
@@ -86,10 +86,10 @@ define(
 
 			// Show/hide appropriate screens
 			if (to == "screen.tuning") {
-				buttons[3].show();
+				buttons[0].show();
 				buttons[2].show();
 			} else if (to == "screen.knowledge") {
-				buttons[3].show();
+				buttons[0].show();
 				buttons[1].show();
 			} else {
 				buttons[0].show();

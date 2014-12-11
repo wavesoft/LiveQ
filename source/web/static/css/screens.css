@@ -1677,7 +1677,7 @@
 .screen.jobs .p-go-machine {
   right: 27.5%;
 }
-.screen.menu .dot {
+.screen.menu div.bubble {
   -webkit-border-radius: 25px;
   -moz-border-radius: 25px;
   -o-border-radius: 25px;
@@ -1688,6 +1688,193 @@
   transform: translate(-25px, -25px);
   width: 50px;
   height: 50px;
+  position: absolute;
+  background-color: black;
+}
+.screen.menu div.panel-top,
+.screen.menu div.panel-bottom {
+  -webkit-transition: all 1s;
+  -moz-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
+  background: rgba(255, 255, 255, 0.25);
+  display: block;
+  position: absolute;
+  height: 90%;
+  width: 90%;
+  left: 5%;
+}
+.screen.menu div.panel-top div.title,
+.screen.menu div.panel-bottom div.title {
+  font-size: 28px;
+  position: absolute;
+  height: 50px;
+  line-height: 50px;
+  color: #333333;
+  cursor: pointer;
+  left: 20px;
+  right: 20px;
+}
+.screen.menu div.panel-top .content,
+.screen.menu div.panel-bottom .content {
+  -webkit-transition: all 1s;
+  -moz-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+}
+.screen.menu div.panel-top.expanded,
+.screen.menu div.panel-bottom.expanded {
+  background: white;
+  opacity: 1;
+}
+.screen.menu div.panel-top.expanded .content,
+.screen.menu div.panel-bottom.expanded .content {
+  opacity: 1;
+}
+.screen.menu div.panel-top.hidden,
+.screen.menu div.panel-bottom.hidden {
+  opacity: 0;
+}
+.screen.menu div.panel-bottom {
+  top: 90%;
+}
+.screen.menu div.panel-bottom div.title {
+  top: 20px;
+}
+.screen.menu div.panel-bottom.expanded {
+  top: 5%;
+}
+.screen.menu div.panel-bottom.hidden {
+  top: 100%;
+}
+.screen.menu div.panel-bottom .content {
+  top: 70px;
+  bottom: 20px;
+}
+.screen.menu div.panel-top {
+  bottom: 90%;
+}
+.screen.menu div.panel-top div.title {
+  bottom: 20px;
+}
+.screen.menu div.panel-top.expanded {
+  bottom: 5%;
+}
+.screen.menu div.panel-top.hidden {
+  bottom: 100%;
+}
+.screen.menu div.panel-top .content {
+  bottom: 70px;
+  top: 20px;
+}
+.screen.menu div.achievements .content > div {
+  width: 80px;
+  height: 80px;
+  margin: 2px;
+  float: left;
+  background-repeat: no-repeat;
+  background-position: center center;
+  cursor: pointer;
+  border: solid 1px;
+  border-color: #dddddd;
+  background-image: url(../img/achievements/padlock.png);
+}
+.screen.menu div.achievements .content > div:hover {
+  border-color: #bdc3c7;
+}
+.screen.menu div.achievements .content > div.unlocked {
+  border-color: #27ae60;
+}
+.screen.menu div.achievements .content > div.unlocked:hover {
+  border-color: #2ecc71;
+}
+.screen.menu div.discussions iframe {
+  border: none;
+}
+.screen.menu div.menu-button {
+  -webkit-border-radius: 100px;
+  -moz-border-radius: 100px;
+  -o-border-radius: 100px;
+  border-radius: 100px;
+  -webkit-transform: translate(-100px, -100px);
+  -moz-transform: translate(-100px, -100px);
+  -o-transform: translate(-100px, -100px);
+  transform: translate(-100px, -100px);
+  -webkit-transition: all 0.25s;
+  -moz-transition: all 0.25s;
+  -o-transition: all 0.25s;
+  transition: all 0.25s;
+  width: 200px;
+  height: 200px;
+  color: white;
+  position: absolute;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.screen.menu div.menu-button .title {
+  -webkit-transition: all 0.25s;
+  -moz-transition: all 0.25s;
+  -o-transition: all 0.25s;
+  transition: all 0.25s;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 20px;
+  font-size: 20px;
+  text-align: center;
+  opacity: 0;
+}
+.screen.menu div.menu-button.b-team {
+  left: 50%;
+  top: 35%;
+  background-color: #34495e;
+  color: #34495e;
+  background-image: url(../img/icons/menu-team.png);
+}
+.screen.menu div.menu-button.b-team .title {
+  top: -30px;
+}
+.screen.menu div.menu-button.b-machine {
+  left: 30%;
+  top: 55%;
+  background-color: #2980b9;
+  color: #2980b9;
+  background-image: url(../img/icons/menu-machine.png);
+}
+.screen.menu div.menu-button.b-machine .title {
+  bottom: -30px;
+}
+.screen.menu div.menu-button.b-jobs {
+  left: 70%;
+  top: 55%;
+  background-color: #8e44ad;
+  color: #8e44ad;
+  background-image: url(../img/icons/menu-jobs.png);
+}
+.screen.menu div.menu-button.b-jobs .title {
+  bottom: -30px;
+}
+.screen.menu div.menu-button:hover {
+  -webkit-transform: translate(-100px, -100px) scale(1.2);
+  -moz-transform: translate(-100px, -100px) scale(1.2);
+  -o-transform: translate(-100px, -100px) scale(1.2);
+  transform: translate(-100px, -100px) scale(1.2);
+}
+.screen.menu div.menu-button:hover .title {
+  opacity: 1;
+}
+.screen.menu div.menu-button:active {
+  -webkit-transform: translate(-100px, -100px) scale(0.9);
+  -moz-transform: translate(-100px, -100px) scale(0.9);
+  -o-transform: translate(-100px, -100px) scale(0.9);
+  transform: translate(-100px, -100px) scale(0.9);
 }
 .screen.overlay-book {
   overflow: hidden;

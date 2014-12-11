@@ -147,6 +147,9 @@ define(
 				UI.mininav.on("displayJobs", function() {
 					VAS.displayJobs();
 				});
+				UI.mininav.on('displayMenu', function() {
+					VAS.displayMenu();
+				});
 
 			}
 
@@ -469,7 +472,7 @@ define(
 
 					// Prepare team screens
 					var teamScreens = [
-						"screen.team.people", "screen.team.machines", "screen.team.notebook",
+						"screen.team", "screen.team.people", "screen.team.machines", "screen.team.notebook",
 						"screen.team.messages"
 					];
 
@@ -562,6 +565,32 @@ define(
 
 					// Complete login
 					prog_courseroom.ok("Courseroom screen ready");
+					cb();
+				};				
+
+			var prog_menu = progressAggregator.begin(1),
+				init_menu = function(cb) {
+					var scrMenu = VAS.scrMenu = UI.initAndPlaceScreen("screen.menu");
+					if (!scrMenu) {
+						UI.logError("Core: Unable to initialize menu screen!");
+						return;
+					}
+
+					scrMenu.on('showMachine', function() {
+						VAS.displayTuningScreen();
+					});
+					scrMenu.on('showTeam', function() {
+						VAS.displayTeam();
+					});
+					scrMenu.on('showJobs', function() {
+						VAS.displayJobs();
+					});
+					scrMenu.on('showKnowledge', function() {
+						VAS.displayKnowledge();
+					});
+
+					// Complete login
+					prog_menu.ok("Menu screen ready");
 					cb();
 				};				
 
@@ -720,7 +749,8 @@ define(
 
 				var chainRun = [
 						init_db, init_api, init_home, init_jobs, init_cinematic, init_courseroom, init_courses, 
-						init_tutorials, init_login, init_team, init_explain, init_tune, init_run, init_results
+						init_tutorials, init_login, init_team, init_explain, init_tune, init_run, init_results,
+						init_menu
 					],
 					runChain = function(cb, index) {
 						var i = index || 0;
@@ -765,6 +795,24 @@ define(
 				UI.selectScreen("screen.cinematic");
 
 			}).bind(this));
+
+		}
+
+		/**
+		 * Display the team window
+		 */
+		VAS.displayTeam = function() {
+			// Show team screen
+			UI.selectScreen("screen.team");
+		}
+
+		/**
+		 * Display menu.
+		 */
+		VAS.displayMenu = function( animateBackwards ) {
+
+			// Select home screen
+			UI.selectScreen("screen.menu", animateBackwards ? UI.Transitions.ZOOM_OUT : UI.Transitions.ZOOM_IN);
 
 		}
 

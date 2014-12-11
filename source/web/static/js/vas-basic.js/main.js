@@ -16,6 +16,7 @@ define([
 	'vas-basic/components/screen_courseroom',
 	'vas-basic/components/screen_knowledge',
 	'vas-basic/components/screen_register',
+	'vas-basic/components/screen_team',
 	'vas-basic/components/screen_team_people',
 	'vas-basic/components/screen_team_notebook',
 	'vas-basic/components/screen_team_machines',

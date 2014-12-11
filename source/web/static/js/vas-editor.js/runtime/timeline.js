@@ -14,8 +14,10 @@ define(
 			this.canvas = canvas;
 			this.audioElement = null;
 			this.audioTween = null;
-			this.gotoAndStop(0);
 			this.isPaused = false;
+			this.gotoAndStopStack = [];
+			this.gotoAndStopStackActive = false;
+			this.gotoAndStop(0);
 			window.tl = this;
 		};
 
@@ -51,21 +53,48 @@ define(
 		 * Overload gotoAndStop in order to seek the audio element too
 		 */
 		Timeline.prototype.gotoAndStop = function( pos ) {
-			var gotoAndStopFn = (function() {
-				createjs.Timeline.prototype.gotoAndStop.call( this, pos );
-				this.isPaused = true;
-				if (!this.audioElement) return;
 
-				// Seek & Stop audio
-				if (!this.audioElement.paused) this.audioElement.pause();
-				this.audioElement.currentTime = pos/1000;
+			// Sequence asynchronous events
+			var process_stack = (function() {
+				if (this.gotoAndStopStack.length > 0) {
+					// Call function
+					var fn = this.gotoAndStopStack.shift();
+					fn();
+					// Stop stack
+					if (this.gotoAndStopStack.length == 0)
+						this.gotoAndStopStackActive = false;
+				}
+			}).bind(this);
+
+			// Goto and stop real function
+			var gotoAndStopFn = (function() {
+				// Do not exept
+				try {
+					createjs.Timeline.prototype.gotoAndStop.call( this, pos );
+					this.isPaused = true;
+					if (!this.audioElement) return;
+
+					// Seek & Stop audio
+					if (!this.audioElement.paused) this.audioElement.pause();
+					this.audioElement.currentTime = pos/1000;
+				} catch(e) {};
+				// Handle next stack event
+				process_stack();
 			}).bind(this);
 
 			// If position is 0, do audio rewind first
 			if (pos == 0) {
-				this.rewindAudio(gotoAndStopFn);
+				this.gotoAndStopStack.push((function() {
+					this.rewindAudio(gotoAndStopFn);
+				}).bind(this));
 			} else {
-				gotoAndStopFn();
+				this.gotoAndStopStack.push(gotoAndStopFn);
+			}
+
+			// If that's a new stack, process it now
+			if (!this.gotoAndStopStackActive) {
+				this.gotoAndStopStackActive = true;
+				process_stack();
 			}
 
 		}
