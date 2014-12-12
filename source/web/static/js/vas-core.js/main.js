@@ -611,14 +611,12 @@ define(
 							var knowlegeDetails = DB.cache['knowlege_grid_index'][knowledge_id];
 							if (knowlegeDetails) {
 
-								var showBanner = function() {
-									// Show flash banner
-									UI.showFlash(
-										'Knowledge expanded',
-										'You have just expanded your knowlege and unlocked the topic <em>'+knowlegeDetails['info']['title']+'</em>',
-										config['images_url']+'/flash-icons/books.png'
-									);
-								}
+								// Show flash banner
+								UI.showFlash(
+									'Knowledge expanded',
+									'You have just expanded your knowlege and unlocked the topic <em>'+knowlegeDetails['info']['title']+'</em>',
+									config['images_url']+'/flash-icons/books.png'
+								);
 
 								// Display course
 								if (knowlegeDetails['info']['course']) {
@@ -627,13 +625,15 @@ define(
 										setTimeout(showBanner, 500);
 									});
 								} else {
-									showBanner();
+									// Switch directly to tuning screen
+									VAS.displayTuningScreen();
 								}
 
+							} else {
+								// Switch directly to tuning screen
+								VAS.displayTuningScreen();
 							}
 
-							// Switch to tuning screen
-							VAS.displayTuningScreen();
 
 						});
 					});
