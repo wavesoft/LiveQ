@@ -22,17 +22,17 @@ define(
 			hostDOM.addClass("team team-compact");
 
 			// Team header
-			this.eHeader = $('<h1><span class="highlight">Team</span> Management</h1><div class="subtitle">Invite, check and communicate with your teammates.</div>').appendTo(hostDOM);
+			this.eHeader = $('<h1><span class="highlight">Team</span> Management</h1><div class="subtitle">From here you can see an overview of your team, and your computing resources.</div>').appendTo(hostDOM);
 
 			// ------------------------------
 			// Prepare Team list
 			// ------------------------------
 
 			// Team list
-			this.eListHost = $('<div class="table-list table-scroll table-lg"></div>').appendTo(hostDOM);
-			this.eListTable = $('<table></table>').appendTo(this.eListHost);
-			this.eListHeader = $('<thead><tr><th class="col-3">Name</th><th class="col-3">Status</th><th class="col-3">Contribution</th><th class="col-3">Options</th></tr></thead>').appendTo(this.eListTable);
-			this.eListBody = $('<tbody></tbody>').appendTo(this.eListTable);
+			this.eTeamListHost = $('<div class="table-users table-list table-scroll table-lg"></div>').appendTo(hostDOM);
+			this.eTeamListTable = $('<table></table>').appendTo(this.eTeamListHost);
+			this.eTeamListHeader = $('<thead><tr><th class="col-3">Name</th><th class="col-3">Status</th><th class="col-3">Contribution</th><th class="col-3">Options</th></tr></thead>').appendTo(this.eTeamListTable);
+			this.eTeamListBody = $('<tbody></tbody>').appendTo(this.eTeamListTable);
 
 			// Create some random users
 			for (var i=0; i<2; i++) {
@@ -44,11 +44,37 @@ define(
 			}
 
 			// ------------------------------
-			// Prepare Computing Element
+			// Prepare Team List
+			// ------------------------------
+
+
+
+			// ------------------------------
+			// Prepare Computing list
+			// ------------------------------
+
+			// Team list
+			this.eMachineListHost = $('<div class="table-machines table-list table-scroll table-lg"></div>').appendTo(hostDOM);
+			this.eMachineListTable = $('<table></table>').appendTo(this.eMachineListHost);
+			this.eMachineListHeader = $('<thead><tr><th class="col-4">ID</th><th class="col-4">Owner</th><th class="col-4">Status</th></tr></thead>').appendTo(this.eMachineListTable);
+			this.eMachineListBody = $('<tbody></tbody>').appendTo(this.eMachineListTable);
+
+			// Create some random users
+			for (var i=0; i<2; i++) {
+				this.addComputer({
+					'name'   : 'random-computer-'+i,
+					'status' : 'inactive',
+					'user'   : 'randomUser'
+				});
+			}
+
+
+			// ------------------------------
+			// Prepare Computing Panel
 			// ------------------------------
 
 			// Prepare machine panel
-			var controlHost = $('<div class="controls"></div>').appendTo(hostDOM);
+			var controlHost = $('<div class="panel-machines"></div>').appendTo(hostDOM);
 			this.statusPanel = $('<div class="status-panel p-status">').appendTo(controlHost);
 				this.statusIcon = $('<div class="icon"></div>').appendTo(this.statusPanel);
 				this.statusTitle = $('<div class="title">Machine disabled</div>').appendTo(this.statusPanel);
@@ -270,13 +296,43 @@ define(
 				c2 = $('<td class="col-3">' + person['status'] + '</td>').appendTo(row),
 				c3 = $('<td class="col-3">' + person['contrib'] + '</td>').appendTo(row),
 				c4 = $('<td class="col-3 text-right"></td>').appendTo(row),
-				b1 = $('<button class="btn-shaded btn-darkblue"><span class="glyphicon glyphicon-comment"></span> Message</button>').appendTo(c4),
-				b2 = $('<button class="btn-shaded btn-red"><span class="glyphicon glyphicon-trash"></span></button>').appendTo(c4);
+				b1 = $('<button class="btn-shaded btn-darkblue"><span class="glyphicon glyphicon-comment"></span> Message</button>').appendTo(c4);
+
+			// Select on click
+			row.click((function() {
+				this.eTeamListBody.children("tr").removeClass("selected");
+				row.addClass("selected");
+			}).bind(this));
+
+			// Put on table
+			this.eTeamListBody.append(row);
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// ------------------------------------------------------------------------------
+		//                               COMPUTING PANEL
+		// ------------------------------------------------------------------------------
+		/////////////////////////////////////////////////////////////////////////////////
+
+		/**
+		 * Add a computer in the team screen
+		 */
+		TeamScreen.prototype.addComputer = function(computer) {
+			var row = $('<tr></tr>'),
+				c1 = $('<td class="col-4"><span class="glyphicon glyphicon-cog"></span> ' + computer['name'] + '</td>').appendTo(row),
+				c2 = $('<td class="col-4">' + computer['user'] + '</td>').appendTo(row),
+				c3 = $('<td class="col-4">' + computer['status'] + '</td>').appendTo(row);
+
+			// Select on click
+			row.click((function() {
+				this.eMachineListBody.children("tr").removeClass("selected");
+				row.addClass("selected");
+			}).bind(this));
 
 			// Populate fields
-
-			this.eListBody.append(row);
+			this.eMachineListBody.append(row);
 		}
+
 
 		// Register home screen
 		R.registerComponent( "screen.team", TeamScreen, 1 );

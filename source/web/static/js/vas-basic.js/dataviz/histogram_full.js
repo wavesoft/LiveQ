@@ -528,6 +528,7 @@ define(
 
 				// Update
 				record
+					.attr("height", height)
 					.attr("x", function(d,i){ return self.xScale(d[0]); })
 					.attr("width", function(d,i){ return (self.xScale(d[1]) - self.xScale(d[0])); })
 					.attr("fill", function(d,i){ return (d[2]==0)?"#000000":colorScale(d[2]); });

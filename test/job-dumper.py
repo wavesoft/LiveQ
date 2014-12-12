@@ -175,9 +175,14 @@ class JobDumperComponent(Component):
                 "StringZ:aLund": 0.3,
                 "StringZ:bLund": 0.8
             })
-        """
         self.startJob("partial", {
                 "TimeShower:alphaSvalue": 0.12
+            })
+        """
+        self.startJob("good_long", {
+                "TimeShower:alphaSvalue": 0.1383,
+                "StringZ:aLund": 0.3,
+                "StringZ:bLund": 0.8
             })
 
         # Run component

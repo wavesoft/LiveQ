@@ -195,15 +195,27 @@
 
 		&.b-knowledge {
 			left: 50%;
-			top: 57%;
+			top: 73%;
 			width: 100px;
 			height: 100px;
-			background-color: #c0392b;
-			color: #c0392b;
-			background-image: url(../img/icons/menu-jobs.png);
+			background-color: #1abc9c;
+			color: #1abc9c;
+			background-image: url(../img/icons/menu-knowledge.png);
+			.transform(translate(-50px, -50px) scale(1));
 			.title {
 				bottom: -30px;
 			}
+
+			&:hover {
+				.transform(translate(-50px, -50px) scale(1.2));
+				.title {
+					opacity: 1;
+				}
+			}
+			&:active {
+				.transform(translate(-50px, -50px) scale(0.9));
+			}
+
 		}
 
 		&:hover {

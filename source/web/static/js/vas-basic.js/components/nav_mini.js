@@ -74,7 +74,7 @@ define(
 				"screen.explain", "screen.courseroom",
 				"screen.team.people", "screen.team.machines", 
 				"screen.team.notebook", "screen.team.messages",
-				"screen.knowledge", "screen.jobs"
+				"screen.knowledge", "screen.jobs", "screen.team"
 			];
 
 			var buttons = [

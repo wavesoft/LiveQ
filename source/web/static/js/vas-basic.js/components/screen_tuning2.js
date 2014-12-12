@@ -61,6 +61,7 @@ define(
 			// Bind listeners
 			this.machine.on('hover', (function(id) {
 				var details = DB.cache['definitions']['machine-parts'][id];
+				this.btnCourse.addClass("disabled").off('click');
 				if (details == undefined) {
 					this.descTitle.text("Quantum Machine");
 					this.descBody.html("Move your mouse over a component in order to see more details.");
@@ -71,15 +72,20 @@ define(
 					} else {
 						this.descTitle.text(details['description']['title']);
 						this.descBody.html(details['description']['body']);
+						if (details['description']['course']) {
+							this.btnCourse
+								.removeClass("disabled")
+								.off('click')
+								.on('click', (function(e) {
+									this.trigger("course", details['description']['course']);
+								}).bind(this));
+						}
 					}
 				}
 			}).bind(this));
 
 			// Create course button
 			this.btnCourse = $('<button class="btn-course btn-shaded btn-teal btn-with-icon disabled"><span class="glyphicon glyphicon-book"></span><br />Course</button>').appendTo(descFrame);
-			this.btnCourse.click((function(e) {
-				this.trigger("course", "level-1-1");
-			}).bind(this));
 
 			// ---------------------------------
 			// Create tuning panel

@@ -375,7 +375,7 @@ define(
 			this.panelEvents = $('<div class="panel-event-rate"></div>').appendTo(this.vibratingDOM);
 			this.panelHistogram = $('<div class="panel-histogram"></div>').appendTo(this.vibratingDOM);
 			this.panelControls = $('<div class="panel-controls"></div>').appendTo(this.vibratingDOM);
-			this.panelLegends = $('<div class="panel-histogram-legend"><span class="box" style="background-color: #000"></span> Measurements by the accelerators &nbsp; &nbsp; <span class="box" style="background-color: rgb(0, 102, 255);"></span> Current measurements from the Quantum Simulation</div>').appendTo(this.vibratingDOM);
+			this.panelLegends = $('<div class="panel-histogram-legend"><span class="box" style="background-color: #000"></span> Measurements by past experiments &nbsp; &nbsp; <span class="box" style="background-color: rgb(0, 102, 255);"></span> Current measurements from the Quantum Simulation</div>').appendTo(this.vibratingDOM);
 
 			// Prepare progress bar
 			this.eProgressBar = $('<div class="progressbar"></div>').appendTo(this.panelMachine);

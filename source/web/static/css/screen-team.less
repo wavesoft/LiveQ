@@ -31,7 +31,6 @@
 	// Main table
 	div.table-list {
 		position: absolute;
-		left: 15px; top: 64px; bottom: 75px;
 
 		button {
 			margin-left: 2px;
@@ -135,8 +134,99 @@
 
 	&.team-compact {
 
-		div.table-list {
-			right: 50%;
+
+		div.table-users {
+			position: absolute;
+			left: 15px; right: 40%;
+			top: 64px; bottom: 220px;
+		}
+
+		div.table-machines {
+			position: absolute;
+			left: 15px; right: 40%;
+			bottom: 15px; height: 180px;
+		}
+
+		div.panel-users {
+			position: absolute;
+			left: 60%; right: 15px;
+			top: 64px; bottom: 220px;
+			padding-left: 5px;
+		}
+
+		div.panel-machines {
+			position: absolute;
+			left: 60%; right: 15px;
+			bottom: 15px; height: 180px;
+			padding-left: 5px;
+
+			// Status panel
+			.status-panel {
+				.border-radius(10px);
+				position: relative;
+				padding: 5px;
+				background: #fff;
+				border: solid 1px #DDD;
+
+				&.p-status {
+					height: 84px;
+
+					.icon {
+						left: 10px;
+						top: 10px;
+						bottom: 20px;
+						width: 62px;
+						position: absolute;
+						font-size: 42px;
+						text-align: center;
+						color: #999;
+						padding-top: 5px;
+					}
+					.title {
+						position: absolute;
+						left: 80px;
+						top: 10px;
+						right: 10px;
+						font-size: 20px;
+					}
+					.label {
+						position: absolute;
+						left: 80px;
+						top: 34px;
+						right: 10px;
+					}
+					.progress {
+						position: absolute;
+						left: 10px; right: 10px;
+						bottom: 10px;
+						height: 8px;
+						background-color: #DDD;
+
+						.bar {
+							position: absolute;
+							left: 0; top:0; bottom: 0;
+							background-color: #3498db;
+						}
+					}
+
+				}
+
+			}
+
+			// Control panel
+			.control-panel {
+				height: 72px;
+				padding-top: 10px;
+
+				button.btn-shaded {
+					float: left;
+					height: 62px;
+					width: 62px;
+					margin-right: 4px;
+				}
+			}
+
+
 		}
 
 	}
