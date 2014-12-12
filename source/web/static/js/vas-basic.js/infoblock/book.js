@@ -116,7 +116,7 @@ define(
 				if (data != null) {
 
 					// Place description tab
-					var body = $('<div>'+data['info']['description']+'</div>');
+					var body = $('<div>'+data['info']['short']+'</div>');
 					this.createTab(body, '<span class="uicon uicon-explain"></span> Description');
 
 					// Place games tab

@@ -864,6 +864,26 @@ div.table-list.table-center table tr td,
 div.table-list.table-center table tr th {
   text-align: center;
 }
+.list {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.list > .list-item {
+  padding: 5px;
+  cursor: pointer;
+}
+.list > .list-item .title {
+  font-weight: bold;
+}
+.list > .list-item .subtitle {
+  font-size: 12px;
+}
+.list > .list-item.active {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+.list.list-invert > .list-item.active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
 .panel-shaded {
   border-radius: 4px;
   outline: none;

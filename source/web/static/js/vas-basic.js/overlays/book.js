@@ -2,14 +2,25 @@ define(
 
 	// Dependencies
 
-	["jquery", "core/registry","core/base/data_widget", "core/db" ], 
+	["jquery", "core/config", "core/registry","core/base/data_widget", "core/db" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a tunable
 	 *
  	 * @exports vas-basic/infoblock/tunable
 	 */
-	function(config, R, DataWidget, DB) {
+	function($, Config, R, DataWidget, DB) {
+
+		/**
+		 * Replace book macros (helpers for specifying images in the description)
+		 */
+		function replace_macros(body) {
+			var text = body;
+			// Replace macros
+			text = text.replace(/\${images}/gi, Config.images_url);
+			// Return text
+			return text;
+		}
 
 		/**
 		 * The default tunable body class
@@ -91,6 +102,8 @@ define(
 				'color': colorScheme
 			});
 
+			return tab;
+
 		}
 
 		/**
@@ -130,27 +143,69 @@ define(
 				if (data != null) {
 
 					// Place description tab
-					var body = $('<div>'+data['info']['description']+'</div>');
+					var body = $('<div class="content"><h1><span class="glyphicon glyphicon-book"></span> ' + data['info']['title'] + '</h1><div>'+replace_macros(data['info']['description'])+'</div></div>');
 					this.createTab(body, 'cs-blue', '<span class="uicon uicon-explain"></span> Description');
 
 					// Place games tab
 					if (data['games'] && (data['games'].length > 0)) {
-						var games_host = $('<div></div>');
+						var games_host = $('<div class="content"></div>'),
+							games_iframe = $('<iframe class="split-left" frameborder="0" border=0"></iframe>').appendTo(games_host),
+							games_list = $('<div class="split-right list"></div>').appendTo(games_host),
+							games_floater = $('<div class="fix-bottom-right"></div>').appendTo(games_host);
+
 						for (var i=0; i<data['games'].length; i++) {
-							var game = data['games'][i],
+							var game = data['games'][i];
+								// Create game label
+								game_label = $('<div class="list-item"><div class="title"><span class="uicon uicon-game"></span> '+game['title']+'</div><div class="subtitle">'+game['short']+'</div></div>').appendTo(games_list);
+								/*
 								color_css = (game['color'] ? '; background-color: '+game['color']+'' : ""),
 								a = $('<a target="_blank" class="tile-row" href="'+game['url']+'" title="'+game['title']+'">'+
 										'<div class="icon" style="background-image: url('+(game['icon'] || 'static/img/icon-game.png')+')'+color_css+'"></div>'+
 										'<div class="text">'+game['title']+'</div></a>'+
 									  '</a>');
-							games_host.append(a);
+								*/
+
+							// Activate on click
+							(function(game) {
+
+								// Check game type
+								var type='url', url = '';
+								if (game['type']) type = game['type'];
+								if (type == 'redwire') {
+									// The EMBED redwire IO parameter
+									url = 'http://redwire.io/#/game/'+game['redwireid']+'/embed?bg=#9b59b6';
+								} else {
+									// Otherwise, expect to find 'url' parameter
+									url = game['url'];
+								}
+
+								// Register label click
+								game_label.click(function() {
+									games_list.find(".list-item").removeClass("active");
+									$(this).addClass("active");
+									games_iframe.attr("src", url);
+
+									// Update floater
+									if (type == 'redwire') {
+										games_floater.html('<a href="http://redwire.io/#/game/'+game['redwireid']+'/edit" target="_blank"><img src="http://redwire.io/assets/images/ribbon.png" style="border:none; width: 100%"></a>');
+									} else {
+										games_floater.empty();
+									}
+
+								});
+							})(game);
+
 						}
-						this.createTab(games_host, 'cs-purple', '<span class="uicon uicon-game"></span> Understand');
+						this.createTab(games_host, 'cs-purple', '<span class="uicon uicon-game"></span> Understand')
+							.addClass("tab-noscroll").addClass("tab-fullheight");
+
+						// Click on the first item
+						games_list.find(".list-item:first-child").click();
 					}
 
 					// Place resources tab
 					if (data['material'] && (data['material'].length > 0)) {
-						var material_host = $('<div></div>');
+						var material_host = $('<div class="content"></div>');
 						for (var i=0; i<data['material'].length; i++) {
 							var mat = data['material'][i],
 								color_css = (mat['color'] ? '; background-color: '+mat['color']+'' : ""),

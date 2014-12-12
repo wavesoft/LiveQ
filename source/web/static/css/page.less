@@ -265,6 +265,34 @@ div.table-list {
 }
 
 // ===============================
+// General list usage
+// ===============================
+
+.list {
+	overflow-y: auto;
+	overflow-x: hidden;
+	> .list-item {
+		padding: 5px;
+		cursor: pointer;
+		.title {
+			font-weight: bold;
+		}
+		.subtitle {
+			font-size: 12px;
+		}
+		&.active {
+			background-color: rgba(0,0,0,0.3);
+		}
+	}
+
+	&.list-invert {
+		> .list-item.active {
+			background-color: rgba(255,255,255,0.3);
+		}
+	}
+}
+
+// ===============================
 // Shaded buttons
 // ===============================
 
