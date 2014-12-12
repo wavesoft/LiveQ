@@ -2019,11 +2019,12 @@
 }
 .screen.overlay-book > div .book-body .tab {
   font-size: 14px;
-  color: white;
 }
 .screen.overlay-book > div .book-body .tab div.content {
+  background-color: white;
   position: absolute;
-  padding: 15px;
+  margin: 15px;
+  padding: 10px;
   left: 0;
   right: 0;
   top: 0;
@@ -2042,9 +2043,10 @@
   float: right;
   height: 100%;
   width: 20%;
+  border-left: solid 1px #cccccc;
 }
 .screen.overlay-book > div .book-body .tab div.content .split-left {
-  width: 80%;
+  width: 79%;
   height: 100%;
   float: left;
 }

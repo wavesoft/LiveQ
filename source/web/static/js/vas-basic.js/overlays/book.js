@@ -151,7 +151,7 @@ define(
 						var games_host = $('<div class="content"></div>'),
 							games_iframe = $('<iframe class="split-left" frameborder="0" border=0"></iframe>').appendTo(games_host),
 							games_list = $('<div class="split-right list"></div>').appendTo(games_host),
-							games_floater = $('<div class="fix-bottom-right"></div>').appendTo(games_host);
+							games_floater = $('<div class="fix-bottom-left"></div>').appendTo(games_host);
 
 						for (var i=0; i<data['games'].length; i++) {
 							var game = data['games'][i];
@@ -205,17 +205,44 @@ define(
 
 					// Place resources tab
 					if (data['material'] && (data['material'].length > 0)) {
-						var material_host = $('<div class="content"></div>');
+						var material_host = $('<div class="content"></div>'),
+							material_iframe = $('<iframe class="split-left" frameborder="0" border=0"></iframe>').appendTo(material_host),
+							material_list = $('<div class="split-right list"></div>').appendTo(material_host),
+							material_floater = $('<div class="fix-bottom-left"></div>').appendTo(material_host);
+
 						for (var i=0; i<data['material'].length; i++) {
 							var mat = data['material'][i],
+								// Create material label
+								mat_label = $('<div class="list-item"><div class="title"><span class="uicon uicon-find"></span> '+mat['title']+'</div><div class="subtitle">'+mat['short']+'</div></div>').appendTo(material_list);
+
+							// Activate on click
+							(function(mat) {
+
+								// Register label click
+								mat_label.click(function() {
+									material_list.find(".list-item").removeClass("active");
+									$(this).addClass("active");
+									material_iframe.attr("src", mat['url']);
+								});
+							})(mat);
+
+							/*
 								color_css = (mat['color'] ? '; background-color: '+mat['color']+'' : ""),
 								a = $('<a target="_blank" class="tile-row" href="'+mat['url']+'" title="'+mat['title']+'">'+
 										'<div class="icon" style="background-image: url('+(mat['icon'] || 'static/img/icon-resource.png')+')'+color_css+'"></div>'+
 										'<div class="text">'+mat['title']+'</div></a>'+
 									  '</a>');
 							material_host.append(a);
+							*/
 						}
-						this.createTab(material_host, 'cs-green', '<span class="uicon uicon-find"></span> Research');
+
+						// Create tab
+						this.createTab(material_host, 'cs-green', '<span class="uicon uicon-find"></span> Research')
+							.addClass("tab-noscroll").addClass("tab-fullheight");
+							
+						// Click on the first item
+						material_list.find(".list-item:first-child").click();
+
 					}
 
 				} else {
