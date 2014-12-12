@@ -611,12 +611,24 @@ define(
 							var knowlegeDetails = DB.cache['knowlege_grid_index'][knowledge_id];
 							if (knowlegeDetails) {
 
-								// Show flash banner
-								UI.showFlash(
-									'Knowledge expanded',
-									'You have just expanded your knowlege and unlocked the topic <em>'+knowlegeDetails['info']['title']+'</em>',
-									config['images_url']+'/flash-icons/books.png'
-								);
+								var showBanner = function() {
+									// Show flash banner
+									UI.showFlash(
+										'Knowledge expanded',
+										'You have just expanded your knowlege and unlocked the topic <em>'+knowlegeDetails['info']['title']+'</em>',
+										config['images_url']+'/flash-icons/books.png'
+									);
+								}
+
+								// Display course
+								if (knowlegeDetails['info']['course']) {
+									VAS.displayCourse(knowlegeDetails['info']['course'], function() {
+										VAS.displayTuningScreen();
+										setTimeout(showBanner, 500);
+									});
+								} else {
+									showBanner();
+								}
 
 							}
 
@@ -627,6 +639,11 @@ define(
 					});
 					scrKnowledge.on('flash', function(title,body,icon) {
 						UI.showFlash(title, body, icon);
+					});
+					scrKnowledge.on('course', function(name) {
+						VAS.displayCourse(name, function() {
+							VAS.displayKnowledge();
+						});
 					});
 
 					// Complete login
@@ -795,6 +812,23 @@ define(
 				UI.selectScreen("screen.cinematic");
 
 			}).bind(this));
+
+		}
+
+		/**
+		 * Display the courseroom
+		 */
+		VAS.displayCourse = function( name, callback ) {
+
+			// Initialize courseroom
+			VAS.scrCourseroom.onCourseDefined(name);
+			UI.selectScreen("screen.courseroom");
+
+			// Rebind callback
+			VAS.scrCourseroom.off('completed');
+			if (callback) {
+				VAS.scrCourseroom.on('completed', callback);
+			}
 
 		}
 

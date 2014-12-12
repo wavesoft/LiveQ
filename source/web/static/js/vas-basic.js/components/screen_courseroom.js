@@ -24,6 +24,7 @@ define(
 			// Reset properties
 			this.course_id = "";
 			this.visible = false;
+			this.started = false;
 			this.userMap = {};
 
 			// ---------------------------------
@@ -106,7 +107,9 @@ define(
 
 				// Handle events
 				com.on('animationCompleted', (function() {
-					alert('Presentation completed!');
+					if (!this.started) return;
+					this.trigger('completed');
+					this.trigger('sequence.next', 'completed'); // [SEQUENCING]
 				}).bind(this));
 
 			}
@@ -144,12 +147,17 @@ define(
 			this.explainComponent.onAnimationStart();
 			// Hide all first-time aids previously shown
 			UI.hideAllfirstTimeAids();
+			// We are now started
+			this.started = true;
 		}
 
 		/**
 		 * Stop screen animation
 		 */
 		CourseroomScene.prototype.stopAnimation = function() {
+			// We are now stopped
+			this.started = false;
+			// Stop animation
 			this.explainComponent.onAnimationStop();
 		}
 
@@ -389,6 +397,7 @@ define(
 
 			// Reset interface
 			this.userMap = {};
+			this.started = false;
 			for (var i=0; i<this.userSlots.length; i++) {
 				this.userSlots[i].hide();
 			}
