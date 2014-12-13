@@ -417,7 +417,7 @@ define(
 			this.chi2Label = $('<strong></strong>');
 			($('<p>&chi;<sup>2</sup> test score = </p>').appendTo(this.gChi2)).append(this.chi2Label)
 
-			this.eToggleChi2 = $('<a class="btn-toggle" href="#">&chi;<sup>2</sup> test score</a>').appendTo(this.gControls);
+			this.eToggleChi2 = $('<a class="btn-toggle" href="#">&chi;<sup>2</sup> test score</a>')//.appendTo(this.gControls);
 			this.eToggleChi2.click((function() {
 				if (this.eToggleChi2.hasClass("active")) {
 					this.eToggleChi2.removeClass("active");

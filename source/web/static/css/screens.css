@@ -2033,6 +2033,13 @@
   -o-transform: translate(-100px, -100px) scale(0.9);
   transform: translate(-100px, -100px) scale(0.9);
 }
+.screen.knowledge .btn-help {
+  position: absolute;
+  height: 62px;
+  width: 62px;
+  left: 5px;
+  bottom: 5px;
+}
 .screen.overlay-book {
   overflow: hidden;
 }
@@ -2308,6 +2315,7 @@
   border: 1px #dddddd;
   border-style: none;
   z-index: 1000;
+  overflow: hidden;
   -webkit-transition: all 0.2s;
   -moz-transition: all 0.2s;
   -o-transition: all 0.2s;
@@ -2809,10 +2817,12 @@
   font-size: 14px;
 }
 #game-frame .nav-mini:hover,
+#game-frame .nav-mini.focus,
 #game-frame .nav-mini.expand-notepad {
   width: 300px;
 }
 #game-frame .nav-mini:hover .credits,
+#game-frame .nav-mini.focus .credits,
 #game-frame .nav-mini.expand-notepad .credits {
   opacity: 1;
 }

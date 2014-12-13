@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/data_widget" ], 
+	["jquery", "core/registry","core/base/data_widget", "core/user" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a knowledge topic
 	 *
  	 * @exports vas-basic/infoblock/knowledge
 	 */
-	function(config, R, DataWidget) {
+	function(config, R, DataWidget, User) {
 
 		/**
 		 * The default knowledge body class
@@ -36,15 +36,15 @@ define(
 		 */
 		KnowlegeBody.prototype.onMetaUpdate = function( meta ) {
 
-			// Prepare body DOM
-			this.bodyDOM.empty();
-			this.bodyDOM.append($('<div>'+meta['info']['shortdesc']+'</div>'));
-
 			// Prepare 'more' links
 			this.moreLinks.empty();
 
 			// If it's not enabled show how much credits it costs
 			if (!meta['enabled']) {
+
+				// Prepare body DOM
+				this.bodyDOM.empty();
+				this.bodyDOM.append($('<div>You need to unlock this topic first if you want to see more information!</div>'));
 
 				// Put credits button
 				var l = $('<a href="do:show-more"><span class="uicon uicon-money"></span> Unlock for <strong>' + meta['info']['cost'] + '</strong> credits</a>');
@@ -56,6 +56,21 @@ define(
 				this.moreLinks.append( l );
 
 			} else {
+
+				// Prepare body DOM
+				this.bodyDOM.empty();
+				this.bodyDOM.append($('<div>'+meta['info']['shortdesc']+'</div>'));
+
+				// Put an 'explain this' button which triggers the 'explain' event
+				if (meta['info']['book']) {
+					var l = $('<a href="do:show-more"><span class="uicon uicon-book"></span> Learn More</a>');
+					l.click((function(e) {
+						e.preventDefault();
+						e.stopPropagation();
+						this.trigger('explain', meta['info']['book'] );
+					}).bind(this));
+					this.moreLinks.append( l );
+				}
 
 				// Put a 'Course' button if we have a course
 				if (meta['info']['course']) {
@@ -75,17 +90,6 @@ define(
 						e.preventDefault();
 						e.stopPropagation();
 						this.trigger('tutorial', meta['info']['tutorial'] );
-					}).bind(this));
-					this.moreLinks.append( l );
-				}
-
-				// Put an 'explain this' button which triggers the 'explain' event
-				if (meta['info']['book']) {
-					var l = $('<a href="do:show-more"><span class="uicon uicon-book"></span> Learn More</a>');
-					l.click((function(e) {
-						e.preventDefault();
-						e.stopPropagation();
-						this.trigger('explain', meta['info']['book'] );
 					}).bind(this));
 					this.moreLinks.append( l );
 				}

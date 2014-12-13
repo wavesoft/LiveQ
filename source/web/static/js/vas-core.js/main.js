@@ -645,6 +645,9 @@ define(
 							VAS.displayKnowledge();
 						});
 					});
+					scrKnowledge.on('explain', function(bookID) {
+						VAS.displayBook(bookID);
+					});
 
 					// Complete login
 					prog_courses.ok("knowledge screen ready");

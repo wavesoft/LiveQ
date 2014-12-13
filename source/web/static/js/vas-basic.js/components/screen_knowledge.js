@@ -131,7 +131,7 @@ define(
 			// Tag visual aid if asked to do so
 			sel.each(function(d,i) {
 				if (d.tagAid)
-					R.registerVisualAid(d.tagAid, $(this).find("image"), { "screen": "screen.home" });
+					R.registerVisualAid(d.tagAid, $(this).find("image"));
 			})
 
 		}
@@ -142,6 +142,9 @@ define(
 		 */
 		var KnowledgeScreen = function( hostDOM ) {
 			C.HomeScreen.call(this, hostDOM);
+
+			// Prepare properties
+			this.visible = false;
 
 			// Prepare host
 			hostDOM.addClass("knowledge");
@@ -165,6 +168,12 @@ define(
 			// Create foreground
 			this.foregroundDOM = $('<div class="'+config.css['foreground']+'"></div>');
 			hostDOM.append(this.foregroundDOM);
+
+			// Create help button
+			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
+			this.btnHelp.click((function() {
+				UI.showTutorial("ui.knowledgegrid");
+			}).bind(this));
 
 			// ---------------------------------
 			// Create the SVG graph
@@ -271,6 +280,14 @@ define(
 
 			  }).bind(this));
 
+			// Show visual aids when stable
+			this.force.on("end", (function() {
+				if (!this.visible) return;
+				UI.showFirstTimeAid( "knowledgegrid.begin" );
+				UI.showFirstTimeAid( "knowledgegrid.firstbranch" );
+				UI.showFirstTimeAid( "knowledgegrid.undiscovered" );
+			}).bind(this));
+
 		}
 
 
@@ -329,6 +346,7 @@ define(
 		 * Pause fore before exiting
 		 */
 		KnowledgeScreen.prototype.onHidden = function() {
+			this.visible = false;
 			this.force.stop();
 		}
 
@@ -344,20 +362,20 @@ define(
 		 * When shown, show first-time aids
 		 */
 		KnowledgeScreen.prototype.onShown = function() {
-			UI.showFirstTimeAid( "knowledgegrid.begin" );
-			UI.showFirstTimeAid( "knowledgegrid.firstbranch" );
-			UI.showFirstTimeAid( "knowledgegrid.undiscovered" );
+
+			// We are now visible
+			this.visible = true;
 
 			// Button helpers
 			if (this.btnActiveRunBtn.is(":visible"))
 				UI.showFirstTimeAid( "home.run" );
 
 			// Check if user has not seen the intro tutorial
-			if (!User.isFirstTimeSeen("tuning.intro")) {
+			if (!User.isFirstTimeSeen("knowledegrid.intro")) {
 				// Display the intro sequence
-				UI.showTutorial("ui.tuning.new", function() {
+				UI.showTutorial("ui.knowledgegrid", function() {
 					// Mark introduction sequence as shown
-					User.markFirstTimeAsSeen("tuning.intro");
+					User.markFirstTimeAsSeen("knowledegrid.intro");
 				});
 			}
 
@@ -411,6 +429,11 @@ define(
 				if (d3_node.enabled && i>0 && !found_branch) {
 					d3_node.tagAid = "knowledgegrid.firstbranch";
 					found_branch = true;
+				}
+
+				// Check if the user can pay this item
+				if (User.profile['credits'] >= n.info.cost) {
+					d3_node.color = "#2ecc71";
 				}
 
 				this.graph.nodes.push(d3_node);

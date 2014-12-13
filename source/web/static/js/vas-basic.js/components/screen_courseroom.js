@@ -391,6 +391,15 @@ define(
 		}
 
 		/**
+		 * [SEQUENCING] Support sequencing
+		 */
+		CourseroomScene.prototype.onSequenceConfig = function(config, callback) {
+			// Update our course ID
+			this.course_id = config['course'];
+			callback();
+		}
+
+		/**
 		 * Initialize scene before showing
 		 */
 		CourseroomScene.prototype.onWillShow = function(cb) {
