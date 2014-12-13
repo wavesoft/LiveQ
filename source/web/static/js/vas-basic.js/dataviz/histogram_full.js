@@ -71,6 +71,7 @@ define(
 
 			// Initialize widget
 			DataWidget.call(this, hostDOM);
+			hostDOM.addClass("back-white");
 
 			// Initialize properties
 			this.metadata = {};

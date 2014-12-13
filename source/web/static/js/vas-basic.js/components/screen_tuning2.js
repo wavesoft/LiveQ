@@ -152,6 +152,9 @@ define(
 			this.btnEstimate.click((function() {
 				this.estimateResults();
 			}).bind(this));
+			this.btnValidate.click((function() {
+				this.validateResults();
+			}).bind(this));
 
 			// View histograms
 			this.btnView.click((function() {
@@ -336,12 +339,9 @@ define(
 		}
 
 		/** 
-		 * Submit results for estimation
+		 * Take a snapshot of the current values and save on markers
 		 */
-		TuningScreen.prototype.estimateResults = function() {
-
-			// Submit for interpolation
-			this.lab.beginSimulation( this.values, true, this.observables );
+		TuningScreen.prototype.snapshotMarkers = function() {
 
 			// Save user values
 			User.saveSlotValues("L", this.values);
@@ -352,6 +352,32 @@ define(
 				if (!this.markers[k]) this.markers[k] = {};
 				this.markers[k]['L'] = this.values[k];
 			}
+
+		}
+
+		/** 
+		 * Submit results for estimation
+		 */
+		TuningScreen.prototype.estimateResults = function() {
+
+			// Submit for interpolation
+			this.lab.beginSimulation( this.values, true, this.observables );
+
+			// Save user values
+			this.snapshotMarkers();
+
+		}
+
+		/** 
+		 * Submit results for validation
+		 */
+		TuningScreen.prototype.validateResults = function() {
+
+			// Submit for interpolation
+			this.trigger( 'submitParameters', this.values, this.observables );
+
+			// Save user values
+			this.snapshotMarkers();
 
 		}
 

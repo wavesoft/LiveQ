@@ -735,8 +735,12 @@ define(
 					scrTuning.on('showBook', function(bookID) {
 						VAS.displayBook(bookID);
 					});
-					scrTuning.on('submitParameters', function(values, taskData) {
-						VAS.displayRunningScreen( values, VAS.referenceHistograms, taskData );
+					scrTuning.on('submitParameters', function( values, observables ) {
+
+						// Set job detals and display jobs screen
+						VAS.scrJobs.__debug__setJobDetails( values, observables );
+						VAS.displayJobs();
+
 					});
 					scrTuning.on('interpolateParameters', function(values) {
 						LiveQCore.requestInterpolation( values, 

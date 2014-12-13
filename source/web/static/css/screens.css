@@ -2273,7 +2273,7 @@
   background: white;
   border: solid 5px #dddddd;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: auto !important;
 }
 .histograms-overlay div.group {
   padding: 20px;

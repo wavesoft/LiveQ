@@ -18,6 +18,15 @@ define(
 		var JobsScreen = function( hostDOM ) {
 			C.HomeScreen.call(this, hostDOM);
 
+			// Prepare propertis
+			this.__debug__jobTune = null;
+			this.histogramLookup = {};
+			this.lastHistograms = null;
+			this.numConnectedMachines = 0;
+			this.lastEvents = 0;
+			this.lastEventsTime = 0;
+			this.rateRing = [];
+
 			// Prepare host
 			hostDOM.addClass("jobs");
 
@@ -53,7 +62,7 @@ define(
 
 			this.statusProgress = $('<div class="panel-shaded status-label p-progress"></div>').appendTo(this.sideScreenDOM);
 			$('<div class="panel-label">Progress</div>').appendTo(this.statusProgress);
-			this.statusProgressValue = $('<div class="panel-value">0</div>').appendTo(this.statusProgress);
+			this.statusProgressValue = $('<div class="panel-value">0 %</div>').appendTo(this.statusProgress);
 
 			// Panel abort and view buttons
 			this.btnAbort = $('<button class="p-abort btn-shaded btn-red btn-striped btn-with-icon"><span class="glyphicon glyphicon-remove-circle"></span><br />Abort</button>').appendTo(this.sideScreenDOM);
@@ -63,6 +72,21 @@ define(
 			this.btnAbort.addClass("disabled");
 			this.btnView.addClass("disabled");
 
+			// Bind callbacks
+			this.btnAbort.click((function() {
+				if (this.lab) {
+					this.lab.abortSimulation();
+					this.interfaceUnbind();
+				}
+			}).bind(this));
+			this.btnView.click((function() {
+				if (this.lastHistograms) {
+					// Show histograms overlay
+					UI.showOverlay("overlay.histograms", (function(com) {
+					}).bind(this)).onHistogramsDefined( this.lastHistograms );
+				}
+			}).bind(this));
+
 			// ---------------------------------
 			// Prepare jobs list
 			// ---------------------------------
@@ -70,21 +94,14 @@ define(
 			// Prepare list
 			this.eListHost = $('<div class="table-list table-scroll table-lg"></div>').appendTo(hostDOM);
 			this.eListTable = $('<table></table>').appendTo(this.eListHost);
-			this.eListHeader = $('<thead><tr><th class="col-6">Alias</th><th class="col-3">Score</th><th class="col-3">Actions</th></tr></thead>').appendTo(this.eListTable);
+			this.eListHeader = $('<thead><tr><th class="col-6">Date</th><th class="col-3">Score</th><th class="col-3">Actions</th></tr></thead>').appendTo(this.eListTable);
 			this.eListBody = $('<tbody></tbody>').appendTo(this.eListTable);
 
 			// Prepare the progress status label
 			this.eStatusLabel = $('<div class="panel-shaded p-run-status">---</div>').appendTo(hostDOM);
 
 			// Submit
-			this.btnSubmit = $('<button class="p-submit btn-shaded btn-red btn-with-icon"><span></span><br />Submit for evaluation</button>').appendTo(hostDOM);
-
-			for (var i=0; i<10; i++) {
-				this.addJob({
-					'name'   : 'random-user-'+i,
-					'score'  : '4.3120'
-				});
-			}
+			this.btnSubmit = $('<button class="p-submit btn-shaded btn-red btn-with-icon disabled"><span></span><br />Submit for evaluation</button>').appendTo(hostDOM);
 
 			// ---------------------------------
 			// Jobs list
@@ -98,21 +115,14 @@ define(
 		JobsScreen.prototype = Object.create( C.HomeScreen.prototype );
 
 		/**
-		 * Set globe active or inactive
-		 */
-		JobsScreen.prototype.setActive = function( isActive ) {
-			
-		}
-
-		/**
 		 * Add a job in the status screen
 		 */
 		JobsScreen.prototype.addJob = function( job ) {
 			var row = $('<tr></tr>'),
 				c1 = $('<td class="col-6"><span class="glyphicon glyphicon-edit"></span> ' + job['name'] + '</td>').appendTo(row),
 				c2 = $('<td class="col-3">' + job['score'] + '</td>').appendTo(row),
-				c3 = $('<td class="col-3 text-right"></td>').appendTo(row),
-				b1 = $('<button class="btn-shaded btn-yellow"><span class="glyphicon glyphicon-eye-open"></span></button>').appendTo(c3);
+				c3 = $('<td class="col-3 text-right"></td>').appendTo(row)
+				b1 = $('<button class="btn-shaded btn-yellow disabled"><span class="glyphicon glyphicon-eye-open"></span></button>').appendTo(c3);
 
 			// Select on click
 			row.click((function() {
@@ -122,6 +132,39 @@ define(
 
 			// Populate fields
 			this.eListBody.append(row);
+		}
+
+		/**
+		 * Unbind interface from a job feedback
+		 */
+		JobsScreen.prototype.interfaceUnbind = function() {
+
+			// Disable buttons
+			this.btnView.addClass("disabled");
+			this.btnAbort.addClass("disabled");
+
+			// Reset status screen
+			this.statusScreen.onObservablesReset();
+
+			// Reset status messages
+			this.eStatusLabel.text("---");
+			this.statusMachinesValue.text("0");
+			this.statusEventsValue.text("0");
+			this.statusProgressValue.text("0 %");
+
+			// Reset properties
+			this.numConnectedMachines = 0;
+			this.lastEventsTime = 0;
+			this.lastEvents = 0;
+			this.rateRing = [];
+
+		}
+
+		/**
+		 * Add a job in the status screen
+		 */
+		JobsScreen.prototype.__debug__setJobDetails = function( details ) {
+			this.__debug__jobTune = details;
 		}
 
 		/**
@@ -157,6 +200,21 @@ define(
 
 		}
 
+		/**
+		 * Abort simulatio on unload
+		 */
+		JobsScreen.prototype.onWillHide = function(cb) {
+			if (this.lab) {
+				this.interfaceUnbind();
+				this.lab.abortSimulation();
+				this.__debug__jobTune = null;
+			}
+			cb();
+		}
+
+		/**
+		 * Initialize lab on load
+		 */
 		JobsScreen.prototype.onWillShow = function(cb) {
 
 			// Reset observables
@@ -164,11 +222,79 @@ define(
 
 			// Open labsocket for testing
 			this.lab = APISocket.openLabsocket("3e63661c13854de7a9bdeed71be16bb9");
+
+			// Register histograms
 			this.lab.on('histogramAdded', (function(data, ref) {
 				this.statusScreen.onObservableAdded(data, ref);
 			}).bind(this));
+			this.lab.on('histogramUpdated', (function(data, ref) {
+				this.statusScreen.onObservableUpdated(data, ref);
+			}).bind(this));
+			this.lab.on('histogramsUpdated', (function(histos) {
+				this.lastHistograms = histos;
+				this.btnView.removeClass("disabled");
+				this.eStatusLabel.text("RUNNING");
+			}).bind(this));
+			this.lab.on('metadataUpdated', (function(meta) {
+				var currNevts = parseInt(meta['nevts']),
+					progValue = currNevts / 40000;
+				this.statusProgressValue.text( Math.round(progValue) + " %" );
 
-			this.lab.beginSimulation({}, true);
+				// Calculate rate
+				var currTime = Date.now();
+				if (this.lastEventsTime) {
+					var deltaEvts = currNevts - this.lastEvents,
+						deltaTime = currTime - this.lastEventsTime,
+						rate = deltaEvts * 1000 / deltaTime,
+						avgRate = 0;
+
+					// Average with ring buffer
+					this.rateRing.push(rate);
+					if (this.rateRing.length > 10) this.rateRing.shift();
+					for (var i=0; i<this.rateRing.length; i++) 
+						avgRate += this.rateRing[i];
+					avgRate /= this.rateRing.length;
+
+					// Update average event rate
+					this.statusEventsValue.text( Math.round(avgRate) + " /s" );
+				}
+				this.lastEventsTime = currTime;
+				this.lastEvents = currNevts;
+
+			}).bind(this));
+
+			// Show/Hide workers
+			this.lab.on('log', (function(logLine, telemetryData) {
+				if (telemetryData['agent_added']) {
+					this.statusScreen.onWorkerAdded(telemetryData['agent_added'],
+					{
+						'lat' : Math.random() * 180 - 90,
+						'lng' : Math.random() * 180
+					});
+					this.numConnectedMachines++;
+					this.statusMachinesValue.text(this.numConnectedMachines);
+				} else if (telemetryData['agent_removed']) {
+					this.statusScreen.onWorkerRemoved(telemetryData['agent_removed']);
+					this.numConnectedMachines--;
+					this.statusMachinesValue.text(this.numConnectedMachines);
+				}
+				console.log(">>> ",logLine,telemetryData);
+			}).bind(this));
+
+			// Check if we should start a job
+			this.eListBody.empty();
+			if (this.__debug__jobTune) {
+				this.lab.beginSimulation( this.__debug__jobTune, false );
+				this.eStatusLabel.text("SUBMITTED");
+				this.statusScreen.globe.setPaused(false);
+				this.btnAbort.removeClass("disabled");
+
+				this.addJob({
+					'name'   : new Date().toLocaleString(),
+					'score'  : 'running'
+				});
+
+			}
 
 			cb();
 

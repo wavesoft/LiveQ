@@ -151,6 +151,7 @@ define(
 			// Prepare 'more' links
 			this.moreLinks.empty();
 
+			/*
 			// Put a 'pin this' button which triggers the 'pin' event
 			var l = $('<a href="do:pin-this"><span class="uicon uicon-pin"></span> Pin this ...</a>');
 			l.click((function(e) {
@@ -159,6 +160,7 @@ define(
 				this.trigger('pin');
 			}).bind(this));
 			this.moreLinks.append( l );
+			*/
 			
 			// Put an 'explain this' button which triggers the 'explain' event
 			if (meta['info']['book']) {

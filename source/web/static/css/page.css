@@ -1537,6 +1537,9 @@ body.enable-ipide .btn-edit-component {
 .tabs .tabs-body > .tab .tab-scrollable {
   overflow-y: auto;
 }
+.tabs .tabs-body > .tab.back-white {
+  background-color: rgba(255, 255, 255, 0.9);
+}
 .tabs .tabs-buttons > * {
   display: inline-block;
   margin: 0;

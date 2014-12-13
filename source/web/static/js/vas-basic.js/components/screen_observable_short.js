@@ -24,6 +24,7 @@ define(
 			this.radMax = 0;
 			this.observables = [];
 			this.observableMap = {};
+			this.pinIDs = {};
 
 			// --------------------------------
 			// Prepare the 3D globe widget
@@ -130,6 +131,30 @@ define(
 
 		}
 
+		//////////////////////////////////////////////////////////////
+		// ----------------------------------------------------------
+		//                        EVENT CALLBACKS
+		// ----------------------------------------------------------
+		//////////////////////////////////////////////////////////////
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		ObservableScreen.prototype.onWorkerRemoved = function( id ) {
+			this.globe.removePin( this.pinIDs[id] );
+			delete this.pinIDs[id];
+		}
+
+		/**
+		 * Fired when a worker node is added to the job
+		 */
+		ObservableScreen.prototype.onWorkerAdded = function( id, info ) {
+			var lat = info['lat'] || Math.random() * 180 - 90,
+				lng = info['lng'] || Math.random() * 180;
+			this.pinIDs[id] = this.globe.addPin( lat, lng );
+			this.globe.setPaused(false);
+		}
+
 		/**
 		 * Resize and re-center element
 		 */
@@ -186,15 +211,7 @@ define(
 		 */
 		ObservableScreen.prototype.onObservableAdded = function( data, ref ) {
 			var id = data.id,  // Histogram data ID
-				meta = null;
-
-			// Lookup the observable metadata from the database
-			for (var i=0; i<DB.cache['observables'].length; i++) {
-				if (DB.cache['observables'][i]['_id'] == id) {
-					meta = DB.cache['observables'][i];
-					break;
-				}
-			}
+				meta = DB.cache['observables'][id];
 
 			// If we don't have metadata, exit
 			if (!meta) return;
@@ -220,6 +237,23 @@ define(
 		};
 
 		/**
+		 * Update values of the given observable
+		 *
+		 * @param {liveq/HistogramData~HistogramData} data - The histogram data.
+		 * @param {liveq/ReferenceData~ReferenceData} data - The histogram reference data.
+		 */
+		ObservableScreen.prototype.onObservableUpdated = function( data, ref ) {
+
+			// Get observable or exit
+			var id = data.id;
+			if (!this.observableMap[id]) return;
+
+			// Update observable
+			this.observableMap[id].onUpdate({ 'data': data, 'ref': ref });
+
+		}
+
+		/**
 		 * Reset the observables
 		 */
 		ObservableScreen.prototype.onObservablesReset = function() {
@@ -228,6 +262,12 @@ define(
 			this.obsDOM.empty();
 			this.observables = [];
 			this.observableMap = {};			
+
+			// Remove all pins
+			this.globe.setPaused(true);
+			this.globe.removeAllPins();
+			this.pinIDs = {};
+
 
 		};
 
