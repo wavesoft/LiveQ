@@ -97,6 +97,12 @@ define(
 		}
 		JobsScreen.prototype = Object.create( C.HomeScreen.prototype );
 
+		/**
+		 * Set globe active or inactive
+		 */
+		JobsScreen.prototype.setActive = function( isActive ) {
+			
+		}
 
 		/**
 		 * Add a job in the status screen

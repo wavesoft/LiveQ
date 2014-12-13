@@ -61,6 +61,45 @@ class IntermediateHistogramCollection(dict):
 		self[ihisto.name] = ihisto
 
 	@staticmethod
+	def fromTarfile(tarObject, state=1):
+		"""
+		Create an IntermediateHistogramCollection from an MCPlots job tarfile.
+		The first paramter must be a reference to an already open tarfile object
+		"""
+
+		# Prepare collection
+		ans = IntermediateHistogramCollection()
+
+		# Read relevant entries
+		for fn in tarObject.getnames():
+
+			# Get only generator data objects (contain the name 'pythia' in path)
+			if (not 'pythia' in fn) or (not fn.endswith(".dat")):
+				continue
+
+			# Try to load histogram by the file object
+			fInst = tarObject.extractfile(fn)
+			try:
+				histo = IntermediateHistogram.fromFLAT( fInst )
+				fInst.close()
+			except Exception as e:
+				fInst.close()
+				logging.error("Exception while loading file %s" % ffile)
+				continue
+
+			# Report errors
+			if histo == None:
+				logging.error("Unable to load intermediate histogram from %s" % ffile)
+			else:
+				ans[histo.name] = histo
+
+		# Store state
+		ans.state = state
+
+		# Return collection
+		return ans
+
+	@staticmethod
 	def fromDirectory(baseDir, state=1, recursive=False):
 		"""
 		Create an IntermediateHistogramCollection from the contents of the specified directory.
@@ -446,8 +485,12 @@ class IntermediateHistogram:
 		Create an intermediate histogram by reading the specified FLAT file
 		"""
 
-		# Parse into structures
-		data = FLATParser.parse(filename)
+		# Parse into structures depending on if file is a string
+		# or a file object
+		if isinstance(filename, str) or isinstance(filename, unicode):
+			data = FLATParser.parse(filename)
+		else:
+			data = FLATParser.parseFileObject(filename)
 
 		# Ensure we got at least a HISTOSTATS
 		if not 'HISTOSTATS' in data:

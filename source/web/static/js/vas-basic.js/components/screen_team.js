@@ -35,18 +35,29 @@ define(
 			this.eTeamListBody = $('<tbody></tbody>').appendTo(this.eTeamListTable);
 
 			// Create some random users
-			for (var i=0; i<2; i++) {
-				this.addPerson({
-					'name'   : 'random-user-'+i,
-					'status' : 'inactive',
-					'contrib': 'Nada'
-				});
-			}
+			this.addPerson({
+				'name'   : 'Ioannis Charalampidis',
+				'status' : 'not connected',
+				'contrib': '<strong>1,412</strong> Runs, <strong>10</strong> Credits'
+			});
+			this.addPerson({
+				'name'   : 'Felps Nicolas',
+				'status' : 'not connected',
+				'contrib': '<strong>142</strong> Runs, <strong>8</strong> Credits'
+			});
 
 			// ------------------------------
-			// Prepare Team List
+			// Prepare Team Panel
 			// ------------------------------
 
+			this.eUsersPanel = $('<div class="panel-users"></div>').appendTo(hostDOM);
+			this.eUserDetails = $('<div class="user-profile"></div>').appendTo(this.eUsersPanel);
+			this.eUserPicture = $('<div class="user-image" style="background-image: url(static/img/avatars/model-1.png)"></div>').appendTo(this.eUserDetails);
+			this.eUserTitle = $('<div class="user-title">User Title</div>').appendTo(this.eUserDetails);
+			this.eUserCreditsHost = $('<div class="user-details"><span class="label">Credits: </span></div>').appendTo(this.eUserDetails);
+			this.eUserCredits = $('<span class="value">8</span>').appendTo(this.eUserCreditsHost);
+			this.eUserMachinesHost = $('<div class="user-details"><span class="label">Machines: </span></div>').appendTo(this.eUserDetails);
+			this.eUserMachines = $('<span class="value">8</span>').appendTo(this.eUserMachinesHost);
 
 
 			// ------------------------------
@@ -56,17 +67,25 @@ define(
 			// Team list
 			this.eMachineListHost = $('<div class="table-machines table-list table-scroll table-lg"></div>').appendTo(hostDOM);
 			this.eMachineListTable = $('<table></table>').appendTo(this.eMachineListHost);
-			this.eMachineListHeader = $('<thead><tr><th class="col-4">ID</th><th class="col-4">Owner</th><th class="col-4">Status</th></tr></thead>').appendTo(this.eMachineListTable);
+			this.eMachineListHeader = $('<thead><tr><th class="col-6">ID</th><th class="col-3">Owner</th><th class="col-3">Status</th></tr></thead>').appendTo(this.eMachineListTable);
 			this.eMachineListBody = $('<tbody></tbody>').appendTo(this.eMachineListTable);
 
 			// Create some random users
-			for (var i=0; i<2; i++) {
-				this.addComputer({
-					'name'   : 'random-computer-'+i,
-					'status' : 'inactive',
-					'user'   : 'randomUser'
-				});
-			}
+			this.addComputer({
+				'name'   : '11301e5a-6b05-49f2-9a30-a245a5cd713c',
+				'user'   : 'Ioannis Charalampidis',
+				'status' : 'Online (Free)'
+			});
+			this.addComputer({
+				'name'   : 'e70ef9fd-7d35-4197-b2d7-b03a98cd50a0',
+				'user'   : 'Ioannis Charalampidis',
+				'status' : 'Online (Free)'
+			});
+			this.addComputer({
+				'name'   : 'a491758f-a330-4b7f-9689-51865ad999fe',
+				'user'   : 'Ioannis Charalampidis',
+				'status' : 'Online (Free)'
+			});
 
 
 			// ------------------------------
@@ -291,7 +310,8 @@ define(
 		 * Add a person in the team screen
 		 */
 		TeamScreen.prototype.addPerson = function(person) {
-			var row = $('<tr></tr>'),
+			var focus = this.eTeamListBody.is(":empty"),
+				row = $('<tr></tr>'),
 				c1 = $('<td class="col-3"><span class="glyphicon glyphicon-user"></span> ' + person['name'] + '</td>').appendTo(row),
 				c2 = $('<td class="col-3">' + person['status'] + '</td>').appendTo(row),
 				c3 = $('<td class="col-3">' + person['contrib'] + '</td>').appendTo(row),
@@ -303,6 +323,10 @@ define(
 				this.eTeamListBody.children("tr").removeClass("selected");
 				row.addClass("selected");
 			}).bind(this));
+
+			// Focus if first
+			if (focus)
+				row.click();
 
 			// Put on table
 			this.eTeamListBody.append(row);
@@ -318,16 +342,21 @@ define(
 		 * Add a computer in the team screen
 		 */
 		TeamScreen.prototype.addComputer = function(computer) {
-			var row = $('<tr></tr>'),
+			var focus = this.eMachineListBody.is(":empty"),
+				row = $('<tr></tr>'),
 				c1 = $('<td class="col-4"><span class="glyphicon glyphicon-cog"></span> ' + computer['name'] + '</td>').appendTo(row),
 				c2 = $('<td class="col-4">' + computer['user'] + '</td>').appendTo(row),
-				c3 = $('<td class="col-4">' + computer['status'] + '</td>').appendTo(row);
+				c3 = $('<td class="col-4 f-green">' + computer['status'] + '</td>').appendTo(row);
 
 			// Select on click
 			row.click((function() {
 				this.eMachineListBody.children("tr").removeClass("selected");
 				row.addClass("selected");
 			}).bind(this));
+
+			// Focus if first
+			if (focus)
+				row.click();
 
 			// Populate fields
 			this.eMachineListBody.append(row);

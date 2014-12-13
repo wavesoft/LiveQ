@@ -29,18 +29,34 @@ class FLATParser:
 	WHITESPACE = re.compile("\s+")
 
 	@staticmethod
+	def parseFileObject(fileobject):
+		"""
+		Function to read a FLAT file (by the file object descriptor) into python structures
+		"""
+
+		# Read entire file and use parseBuffer
+		return FLATParser.parseBuffer(fileobject.read())
+
+
+	@staticmethod
 	def parse(filename):
 		"""
 		Function to read a FLAT file into python structures
 		"""
+
+		# Open file
+		with open(filename, 'r') as f:
+			# Use FileObject parser to read the file
+			return FLATParser.parseFileObject(f)
+
+	def parseBuffer(buf):
+		"""
+		Parse FLAT file from buffer
+		"""
+
 		sections = {}
 		section = None
 		activesection = None
-
-		# Dump the entire buffer in memory
-		buf = ""
-		with open(filename, 'r') as f:
-			buf = f.read()
 
 		# Start processing the buffer line-by-line
 		for line in buf.splitlines():

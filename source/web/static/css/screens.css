@@ -1551,6 +1551,42 @@
   bottom: 220px;
   padding-left: 5px;
 }
+.screen.team.team-compact div.panel-users .user-profile {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  position: relative;
+  padding: 5px 5px 5px 74px;
+  background: white;
+  border: solid 1px #dddddd;
+  height: 90px;
+}
+.screen.team.team-compact div.panel-users .user-profile div.user-image {
+  width: 60px;
+  height: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+.screen.team.team-compact div.panel-users .user-profile div.user-title {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 0 0 10px;
+}
+.screen.team.team-compact div.panel-users .user-profile div.user-details {
+  margin: 2px 0;
+}
+.screen.team.team-compact div.panel-users .user-profile div.user-details span.label {
+  font-weight: bold;
+  width: 70px;
+  display: inline-block;
+  text-align: right;
+  margin-right: 5px;
+}
 .screen.team.team-compact div.panel-machines {
   position: absolute;
   left: 60%;
@@ -1965,6 +2001,7 @@
 }
 .screen.menu div.menu-button.b-knowledge .title {
   bottom: -30px;
+  font-size: 15px;
 }
 .screen.menu div.menu-button.b-knowledge:hover {
   -webkit-transform: translate(-50px, -50px) scale(1.2);

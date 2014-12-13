@@ -771,6 +771,7 @@ div.table-list table tr td,
 div.table-list table tr th {
   float: left;
   display: block;
+  overflow: hidden;
   height: 25px;
   line-height: 25px;
   text-indent: 5px;
@@ -883,6 +884,48 @@ div.table-list.table-center table tr th {
 }
 .list.list-invert > .list-item.active {
   background-color: rgba(255, 255, 255, 0.3);
+}
+.f-green {
+  color: #27ae60;
+}
+.f-blue {
+  color: #2980b9;
+}
+.f-orange {
+  color: #d35400;
+}
+.f-yellow {
+  color: #f39c12;
+}
+.f-darkblue {
+  color: #2c3e50;
+}
+.f-purple {
+  color: #8e44ad;
+}
+.f-grey {
+  color: #bdc3c7;
+}
+.b-green {
+  background-color: #2ecc71;
+}
+.b-blue {
+  background-color: #3498db;
+}
+.b-orange {
+  background-color: #e67e22;
+}
+.b-yellow {
+  background-color: #f1c40f;
+}
+.b-darkblue {
+  background-color: #34495e;
+}
+.b-purple {
+  background-color: #9b59b6;
+}
+.b-grey {
+  background-color: #ecf0f1;
 }
 .panel-shaded {
   border-radius: 4px;
