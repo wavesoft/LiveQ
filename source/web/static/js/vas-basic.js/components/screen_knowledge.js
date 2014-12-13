@@ -150,7 +150,7 @@ define(
 			hostDOM.addClass("knowledge");
 
 			// Team header
-			$('<h1><span class="highlight">Knowledge</span> Tree</h1><div class="subtitle">Expand your scientific knowledge from the science grid.</div>').appendTo(hostDOM);
+			$('<h1><span class="highlight">Knowledge</span> Grid</h1><div class="subtitle">Expand your scientific knowledge from the science grid.</div>').appendTo(hostDOM);
 
 			// ---------------------------------
 			// Create splash backdrop

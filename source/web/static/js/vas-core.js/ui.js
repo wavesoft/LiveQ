@@ -144,8 +144,26 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			if (!e) {
 				overlaymasks_apply( false );
 			} else {
-				var offset = $(e).offset(),
-					w = $(e).outerWidth(), h = $(e).outerHeight();
+				var e = $(e),
+					offset = e.offset(),
+					w = e.outerWidth(),
+					h = e.outerHeight();
+
+				// Bugfix in corner cases
+				if (e.parents("svg").length > 0) {
+
+					// SVG:CIRCLE
+					if (e[0].tagName == "circle") {
+						w = h = parseInt(e.attr("r"))*2;
+					}
+					// SVG:IMAGE
+					else if (e[0].tagName == "image") {
+						w = parseInt(e.attr("width"));
+						h = parseInt(e.attr("height"));
+					}
+
+				}
+
 				overlaymasks_apply( offset.left, offset.top, w, h );
 			}
 		}
