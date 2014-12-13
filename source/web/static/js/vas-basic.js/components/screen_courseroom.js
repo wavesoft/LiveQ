@@ -202,7 +202,7 @@ define(
 					var ref = $('<div></div>')
 						.css({
 							'left': rowW*j,
-							'top': 0
+							'top': 1
 						}).hide()
 						.click((function() {
 							this.showBubble( this.userSlots[parseInt(this.userSlots.length*Math.random())], "Test", "This is some long, long text that could possibly span into multiple lines. Can this thing accommodate this?");

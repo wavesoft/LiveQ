@@ -20,6 +20,63 @@
 import numpy
 import re
 
+def parseFLATBuffer(buf):
+	"""
+	Parse FLAT buffer and return the structured data
+	"""
+	sections = {}
+	section = None
+	activesection = None
+
+	# Start processing the buffer line-by-line
+	for line in buf.splitlines():
+
+		# Process lines
+		if not line:
+			# Empty line
+			pass
+
+		elif line.startswith("# BEGIN "):
+
+			# Ignore labels found some times in AIDA files
+			dat = line.split(" ")
+			section = dat[2]
+			sectiontype = 0
+
+			# Allocate section record
+			activesection = { "d": { }, "v": [ ] }
+
+		elif line.startswith("# END ") and (section != None):
+			# Section end
+			sections[section] = activesection
+			section = None
+
+		elif line.startswith("#") or line.startswith(";"):
+			# Comment
+			pass
+
+		elif section:
+			# Data inside section
+
+			# Try to split
+			data = line.split("=",1)
+
+			# Could not split : They are histogram data
+			if len(data) == 1:
+
+				# Split data values
+				data = FLATParser.WHITESPACE.split(line)
+				activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
+
+			else:
+
+				# Store value
+				activesection['d'][data[0]] = data[1]
+
+	# Return sections
+	return sections
+
+
 class FLATParser:
 	"""
 	Simple function to parser histograms in FLAT format
@@ -35,7 +92,7 @@ class FLATParser:
 		"""
 
 		# Read entire file and use parseBuffer
-		return FLATParser.parseBuffer(fileobject.read())
+		return parseFLATBuffer(fileobject.read())
 
 
 	@staticmethod
@@ -47,62 +104,10 @@ class FLATParser:
 		# Open file
 		with open(filename, 'r') as f:
 			# Use FileObject parser to read the file
-			return FLATParser.parseFileObject(f)
+			return parseFLATBuffer(f.read())
 
 	def parseBuffer(buf):
 		"""
 		Parse FLAT file from buffer
 		"""
-
-		sections = {}
-		section = None
-		activesection = None
-
-		# Start processing the buffer line-by-line
-		for line in buf.splitlines():
-
-			# Process lines
-			if not line:
-				# Empty line
-				pass
-
-			elif line.startswith("# BEGIN "):
-
-				# Ignore labels found some times in AIDA files
-				dat = line.split(" ")
-				section = dat[2]
-				sectiontype = 0
-
-				# Allocate section record
-				activesection = { "d": { }, "v": [ ] }
-
-			elif line.startswith("# END ") and (section != None):
-				# Section end
-				sections[section] = activesection
-				section = None
-
-			elif line.startswith("#") or line.startswith(";"):
-				# Comment
-				pass
-
-			elif section:
-				# Data inside section
-
-				# Try to split
-				data = line.split("=",1)
-
-				# Could not split : They are histogram data
-				if len(data) == 1:
-
-					# Split data values
-					data = FLATParser.WHITESPACE.split(line)
-					activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
-
-				else:
-
-					# Store value
-					activesection['d'][data[0]] = data[1]
-
-		# Return sections
-		return sections
-
+		return parseFLATBuffer(buf)
