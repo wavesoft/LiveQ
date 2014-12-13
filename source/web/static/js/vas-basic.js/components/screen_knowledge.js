@@ -344,12 +344,23 @@ define(
 		 * When shown, show first-time aids
 		 */
 		KnowledgeScreen.prototype.onShown = function() {
-			UI.showFirstTimeAid( "home.begin" );
-			UI.showFirstTimeAid( "home.firstbranch" );
+			UI.showFirstTimeAid( "knowledgegrid.begin" );
+			UI.showFirstTimeAid( "knowledgegrid.firstbranch" );
+			UI.showFirstTimeAid( "knowledgegrid.undiscovered" );
 
 			// Button helpers
 			if (this.btnActiveRunBtn.is(":visible"))
 				UI.showFirstTimeAid( "home.run" );
+
+			// Check if user has not seen the intro tutorial
+			if (!User.isFirstTimeSeen("tuning.intro")) {
+				// Display the intro sequence
+				UI.showTutorial("ui.tuning.new", function() {
+					// Mark introduction sequence as shown
+					User.markFirstTimeAsSeen("tuning.intro");
+				});
+			}
+
 		}
 
 		/**
@@ -369,6 +380,7 @@ define(
 
 			// Update graph with additional details required
 			// by the d3 library to work
+			var found_gray = false, found_branch = false;
 			for (var i=0; i<tree.nodes.length; i++) {
 				var n = tree.nodes[i],
 					n_enabled = !!n.enabled;
@@ -388,6 +400,19 @@ define(
 						})(n).bind(this),
 						'eventDelegate' : this
 					};
+
+				// Tag the first gray node
+				if (!d3_node.enabled && i>0 && !found_gray) {
+					d3_node.tagAid = "knowledgegrid.undiscovered";
+					found_gray = true;
+				}
+
+				// Tag the first branch
+				if (d3_node.enabled && i>0 && !found_branch) {
+					d3_node.tagAid = "knowledgegrid.firstbranch";
+					found_branch = true;
+				}
+
 				this.graph.nodes.push(d3_node);
 			}
 
@@ -395,11 +420,7 @@ define(
 			this.graph.nodes[0].radius = 50;
 			this.graph.nodes[0].color = '#ECF0F1';
 			this.graph.nodes[0].icon = 'static/img/logo.png';
-			this.graph.nodes[0].tagAid = "home.begin";
-
-			// Tag first branch if we have it
-			if (this.graph.nodes.length > 1) 
-				this.graph.nodes[1].tagAid = "home.firstbranch";
+			this.graph.nodes[0].tagAid = "knowledgegrid.begin";
 
 			// Regen UI
 			this.updateScene();

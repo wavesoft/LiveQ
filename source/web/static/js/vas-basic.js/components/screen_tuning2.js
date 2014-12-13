@@ -166,7 +166,8 @@ define(
 			// Create help button
 			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
 			this.btnHelp.click((function() {
-				this.descFrame.toggleClass("visible");
+				//this.descFrame.toggleClass("visible");
+				UI.showTutorial("ui.tuning.new");
 			}).bind(this));
 
 			// ---------------------------------
@@ -359,11 +360,20 @@ define(
 		 */
 		TuningScreen.prototype.onShown = function() {
 
-			// Fire first-time interface components
+			// Fire first-time interface aids
 			if (!this.btnEstimate.hasClass("disabled"))
 				UI.showFirstTimeAid("tuning.control.estimate");
 			if (!this.btnValidate.hasClass("disabled"))
 				UI.showFirstTimeAid("tuning.control.validate");
+
+			// Check if user has not seen the intro tutorial
+			if (!User.isFirstTimeSeen("tuning.intro")) {
+				// Display the intro sequence
+				UI.showTutorial("ui.tuning.new", function() {
+					// Mark introduction sequence as shown
+					User.markFirstTimeAsSeen("tuning.intro");
+				});
+			}
 
 		}
 

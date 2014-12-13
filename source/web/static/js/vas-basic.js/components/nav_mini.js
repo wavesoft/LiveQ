@@ -48,6 +48,27 @@ define(
 				}
 			}).bind(this));
 
+			// Register visua aids
+			R.registerVisualAid("mininav.knowledge", this.btnKnowlege, {
+				onBeforeFocus: function() { hostDOM.addClass("focus"); },
+				onBlur: function() { hostDOM.removeClass("focus"); }
+			});
+			R.registerVisualAid("mininav.tuning", this.btnTuning, {
+				onBeforeFocus: function() { hostDOM.addClass("focus"); },
+				onBlur: function() { hostDOM.removeClass("focus"); }
+			});
+			R.registerVisualAid("mininav.home", this.btnHome, {
+				onBeforeFocus: function() { hostDOM.addClass("focus"); },
+				onBlur: function() { hostDOM.removeClass("focus"); }
+			});
+			R.registerVisualAid("mininav.jobs", this.btnJobs, {
+				onBeforeFocus: function() { hostDOM.addClass("focus"); },
+				onBlur: function() { hostDOM.removeClass("focus"); }
+			});
+			R.registerVisualAid("mininav.notes", this.btnNotes, {
+				onBeforeFocus: function() { hostDOM.addClass("focus"); },
+				onBlur: function() { hostDOM.removeClass("focus"); }
+			});
 
 			// Prepare credit menu
 			this.elmCredit = $('<div class="credits"></div>').appendTo(hostDOM);

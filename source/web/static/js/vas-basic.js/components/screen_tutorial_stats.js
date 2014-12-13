@@ -508,6 +508,8 @@ define(
 		 */
 		StatsTutorial.prototype.onSequenceConfig = function( config, cbReady ) {
 			this.trainConfig = config;
+			if (config['events'])
+				this.maxEvents = parseInt(config['events']);
 			cbReady();
 		}
 

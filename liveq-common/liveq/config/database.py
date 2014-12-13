@@ -20,7 +20,7 @@
 import ConfigParser
 import logging
 
-from playhouse.proxy import Proxy
+from peewee import Proxy
 from liveq.config import configexceptions
 from liveq.config.classes import DatabaseConfigClass
 

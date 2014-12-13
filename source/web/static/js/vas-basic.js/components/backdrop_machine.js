@@ -63,6 +63,15 @@ define(
 					$('<div class="c-decay locked"></div>').appendTo(overlay),
 				];
 
+			// Register visual aids
+			R.registerVisualAid("machine.expand.beam", this.overlayComponents[0]);
+			R.registerVisualAid("machine.expand.issr", this.overlayComponents[1]);
+			R.registerVisualAid("machine.expand.hard", this.overlayComponents[2]);
+			R.registerVisualAid("machine.expand.remnant", this.overlayComponents[3]);
+			R.registerVisualAid("machine.expand.fssr", this.overlayComponents[4]);
+			R.registerVisualAid("machine.expand.hadr", this.overlayComponents[5]);
+			R.registerVisualAid("machine.expand.decay", this.overlayComponents[6]);
+
 			// Aliases for each overlay component
 			var aliases = this.aliases = [ 'beam', 'issr', 'hard', 'remnant', 'fssr', 'hadr', 'decay' ];
 			var aliasComponent = this.aliasComponent = [ [1,2], [3], [4,5], [7,8,9], [6], [10], [0] ];

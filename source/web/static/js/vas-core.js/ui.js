@@ -145,7 +145,7 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 				overlaymasks_apply( false );
 			} else {
 				var offset = $(e).offset(),
-					w = $(e).width(), h = $(e).height();
+					w = $(e).outerWidth(), h = $(e).outerHeight();
 				overlaymasks_apply( offset.left, offset.top, w, h );
 			}
 		}
