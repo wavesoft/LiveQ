@@ -80,6 +80,15 @@ define(
 			var loginBtnHost = $('<div class="login"></div>');
 			this.elmRightBody.append( loginBtnHost );
 
+			// Prepare register button
+			var btnRegister = $('<button class="btn-shaded btn-teal">Create an account</button>');
+			loginBtnHost.append(btnRegister);
+			btnRegister.click((function(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.trigger("register", fName.val(), fPassword.val() );
+			}).bind(this));
+
 			// Prepare log-in button
 			var btnLogin = $('<button class="btn-shaded btn-blue">Login</button>');
 			loginBtnHost.append(btnLogin);
@@ -87,15 +96,6 @@ define(
 				e.preventDefault();
 				e.stopPropagation();
 				this.trigger("login", fName.val(), fPassword.val() );
-			}).bind(this));
-
-			// Prepare register button
-			var btnRegister = $('<button class="btn-shaded btn-teal">Register</button>');
-			loginBtnHost.append(btnRegister);
-			btnRegister.click((function(e) {
-				e.preventDefault();
-				e.stopPropagation();
-				this.trigger("register", fName.val(), fPassword.val() );
 			}).bind(this));
 
 		}

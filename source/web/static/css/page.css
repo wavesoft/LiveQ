@@ -1638,6 +1638,13 @@ body.enable-ipide .btn-edit-component {
   width: 80%;
   height: 80%;
 }
+#game-frame .host-overlay .overlay-window h1 .glyphicon,
+#game-frame .host-overlay .overlay-window h2 .glyphicon,
+#game-frame .host-overlay .overlay-window h3 .glyphicon,
+#game-frame .host-overlay .overlay-window h4 .glyphicon,
+#game-frame .host-overlay .overlay-window h5 .glyphicon {
+  opacity: 0.5;
+}
 #game-frame .nav-mini {
   position: absolute;
   display: block;
