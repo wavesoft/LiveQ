@@ -157,13 +157,6 @@ define(
 							var game = data['games'][i];
 								// Create game label
 								game_label = $('<div class="list-item"><div class="title"><span class="uicon uicon-game"></span> '+game['title']+'</div><div class="subtitle">'+game['short']+'</div></div>').appendTo(games_list);
-								/*
-								color_css = (game['color'] ? '; background-color: '+game['color']+'' : ""),
-								a = $('<a target="_blank" class="tile-row" href="'+game['url']+'" title="'+game['title']+'">'+
-										'<div class="icon" style="background-image: url('+(game['icon'] || 'static/img/icon-game.png')+')'+color_css+'"></div>'+
-										'<div class="text">'+game['title']+'</div></a>'+
-									  '</a>');
-								*/
 
 							// Activate on click
 							(function(game) {
@@ -173,7 +166,7 @@ define(
 								if (game['type']) type = game['type'];
 								if (type == 'redwire') {
 									// The EMBED redwire IO parameter
-									url = 'http://redwire.io/#/game/'+game['redwireid']+'/embed?bg=#9b59b6';
+									url = 'http://redwire.io/#/game/'+game['redwireid']+'/embed?backgroundColor=%23000000';
 								} else {
 									// Otherwise, expect to find 'url' parameter
 									url = game['url'];

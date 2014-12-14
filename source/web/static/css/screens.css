@@ -2076,13 +2076,6 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
-.screen.overlay-book > div .book-body .tab div.content h1 .glyphicon,
-.screen.overlay-book > div .book-body .tab div.content h2 .glyphicon,
-.screen.overlay-book > div .book-body .tab div.content h3 .glyphicon,
-.screen.overlay-book > div .book-body .tab div.content h4 .glyphicon,
-.screen.overlay-book > div .book-body .tab div.content h5 .glyphicon {
-  opacity: 0.5;
-}
 .screen.overlay-book > div .book-body .tab div.content .split-right {
   float: right;
   height: 100%;
@@ -2119,6 +2112,7 @@
   width: 20%;
 }
 .screen.overlay-book > div .book-body .tab.tab-error {
+  color: white;
   padding: 34px 0 0 160px;
   background: url(../img/exclamation.png) no-repeat 20px 20px;
 }
@@ -2841,4 +2835,34 @@
   border-bottom: solid 2px #ffcc00;
   border-right: solid 2px #ffcc00;
   font-family: 'Crafty Girls', cursive;
+}
+.questionaire-overlay {
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  -o-border-radius: 20px;
+  border-radius: 20px;
+  background: white;
+  border: solid 5px #dddddd;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  padding: 10px;
+}
+.questionaire-overlay .questions-host .question label {
+  display: block;
+  margin: 2px 2px 2px 15px;
+  cursor: pointer;
+}
+.questionaire-overlay .questions-host .question label input {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+.questionaire-overlay .questions-host .question label input:checked + span {
+  font-weight: bold;
+  color: #8e44ad;
+}
+.questionaire-overlay .questions-host .question label:hover {
+  background-color: #ccccff;
+}
+.questionaire-overlay .questions-footer {
+  margin-top: 20px;
 }

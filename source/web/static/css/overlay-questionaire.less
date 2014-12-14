@@ -1,0 +1,40 @@
+///////////////////////////////////////////////
+// The questionaire overlay component
+///////////////////////////////////////////////
+
+.questionaire-overlay {
+	.border-radius(20px);
+	background: #fff;
+	border: solid 5px #DDD;
+	overflow-x: hidden;
+	overflow-y: auto !important;
+	padding: 10px;
+
+	.questions-host{
+		.question {
+			label {
+				display: block;
+				margin: 2px 2px 2px 15px;
+				cursor: pointer;
+				input {
+					vertical-align: middle;
+					margin-right: 5px;
+				}
+
+				input:checked + span {
+					font-weight: bold;
+					color: #8e44ad;
+				}
+
+				&:hover {
+					background-color: #CCCCFF;
+				}
+			}
+		}
+	}
+
+	.questions-footer {
+		margin-top: 20px;
+	}
+
+}

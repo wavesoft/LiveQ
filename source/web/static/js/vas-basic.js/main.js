@@ -82,5 +82,6 @@ define([
 	'vas-basic/overlays/book',
 	'vas-basic/overlays/flash',
 	'vas-basic/overlays/histograms',
+	'vas-basic/overlays/questionaire',
 
 ]);

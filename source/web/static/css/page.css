@@ -706,6 +706,13 @@ h1 span.highlight {
   display: block;
   content: " ";
 }
+.overlay h1 .glyphicon,
+.overlay h2 .glyphicon,
+.overlay h3 .glyphicon,
+.overlay h4 .glyphicon,
+.overlay h5 .glyphicon {
+  opacity: 0.5;
+}
 .text-right {
   text-align: right !important;
 }
