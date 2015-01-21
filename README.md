@@ -5,7 +5,7 @@ LiveQ is a job distribution and monitoring framework with real-time feedback, co
 
 ## Architecture
 
-![LiveQ Architecture](/wavesoft/LiveQ/blob/master/doc/img/architecture.png?raw=true "LiveQ Architecture")
+![LiveQ Architecture](/doc/img/architecture.png?raw=true "LiveQ Architecture")
 
 # License
 
