@@ -26,6 +26,9 @@ define(["core/config", "core/analytics/transaction"],
 			// Timers
 			this.timers = { };
 
+			// Global properties
+			this.globals = { };
+
 			// Start probe timer
 			this.probeTimer = setInterval(this.probeListener.bind(this), 100);
 
@@ -74,6 +77,10 @@ define(["core/config", "core/analytics/transaction"],
 			// Check for listener
 			this.probeListener();
 
+			// Append globals
+			for (k in this.globals)
+				data[k] = this.globals[k];
+
 			// If we are expired, exit
 			if (this.expired) return;
 
@@ -118,6 +125,14 @@ define(["core/config", "core/analytics/transaction"],
 					}
 				} catch (e) { };
 			}
+		}
+
+		/**
+		 * Set a global property
+		 */
+		Analytics.prototype.setGlobal = function( name, value ) {
+			// Update global property
+			this.globals[name] = value;
 		}
 
 		/**

@@ -1,9 +1,9 @@
 /**
  * [core/main] - Core initialization module
  */
-define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "core/global"], 
+define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "core/global", "core/analytics/analytics"], 
 
-	function(Config, EventBase, DB, APISocket, Global) {
+	function(Config, EventBase, DB, APISocket, Global, Analytics) {
 
 		/**
 		 * Database interface
@@ -94,7 +94,10 @@ define(["core/config", "core/util/event_base", "core/db", "core/apisocket", "cor
 					// Handle profile
 					this.profile = profile;
 					this.vars = profile['vars'];
-					this.initVars();					
+					this.initVars();
+
+					// Update user ID on analytics
+					Analytics.setGlobal("userid", params['username']);
 
 					// Fire callback
 					if (callback) callback(true);

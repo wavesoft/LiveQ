@@ -38,6 +38,7 @@ define(
 
 			// Prepare tabs
 			this.tabs = [];
+			this.coverage = [];
 			this.currTab = 0;
 			this.createTab($('<p>This is a test</p>'), "cs-blue", '<span class="uicon uicon-info"></span> Explain' );
 			this.createTab($('<p>This is a another test</p>'), "cs-purple", '<span class="uicon uicon-game"></span> Understand' );
@@ -59,6 +60,7 @@ define(
 		 */
 		BookBody.prototype.clearTabs = function() {
 			this.tabs = [];
+			this.coverage = [];
 			this.currTab = 0;
 			this.bodyDOM.empty();
 			this.tabsDOM.empty();
@@ -106,6 +108,7 @@ define(
 				'tabBtn': tabBtn,
 				'color': colorScheme
 			});
+			this.coverage.push(0);
 
 			return tab;
 
@@ -133,10 +136,11 @@ define(
 			}
 
 			// Fire tab analytics
-			Analytics.fireEvent("book.tab_time", {
+			Analytics.fireEvent("book.tab_metrics", {
 				"id": this.meta['info']['book'],
 				"tab": this.currTab,
-				"time": Analytics.restartTimer("book-tab")
+				"time": Analytics.restartTimer("book-tab"),
+				"coverage": this.coverage[this.currTab]
 			});
 
 			// Update current tab
@@ -157,10 +161,11 @@ define(
 			if (!this.meta) return;
 
 			// Fire tab analytics
-			Analytics.fireEvent("book.tab_time", {
+			Analytics.fireEvent("book.tab_metrics", {
 				"id": this.meta['info']['book'],
 				"tab": this.currTab,
-				"time": Analytics.stopTimer("book-tab")
+				"time": Analytics.stopTimer("book-tab"),
+				"coverage": this.coverage[this.currTab]
 			});
 
 			// Fire book analytics
@@ -178,6 +183,7 @@ define(
 		 * Define the metadata to use for description
 		 */
 		BookBody.prototype.onMetaUpdate = function( meta ) {
+			var self = this;
 
 			// Remove previous tabs
 			this.clearTabs();
@@ -200,12 +206,26 @@ define(
 					var body = $('<div class="content"><h1><span class="glyphicon glyphicon-book"></span> ' + data['info']['title'] + '</h1><div>'+replace_macros(data['info']['description'])+'</div></div>');
 					this.createTab(body, 'cs-blue', '<span class="uicon uicon-explain"></span> Description');
 
+					// Handle body analytics
+					body.scroll((function(e) {
+
+						// Update page coverage
+						var currCoverage = e.currentTarget.scrollTop / (e.currentTarget.scrollHeight - $(e.currentTarget).height() );
+						if (currCoverage > this.coverage[0]) {
+							this.coverage[0] = currCoverage;
+						}
+
+					}).bind(this));
+
 					// Place games tab
 					if (data['games'] && (data['games'].length > 0)) {
 						var games_host = $('<div class="content"></div>'),
 							games_iframe = $('<iframe class="split-left" frameborder="0" border=0"></iframe>').appendTo(games_host),
 							games_list = $('<div class="split-right list"></div>').appendTo(games_host),
 							games_floater = $('<div class="fix-bottom-left"></div>').appendTo(games_host);
+
+						// Games coverage calculation
+						var gamesSeen = [];
 
 						for (var i=0; i<data['games'].length; i++) {
 							var game = data['games'][i];
@@ -224,7 +244,7 @@ define(
 								} else {
 									// Otherwise, expect to find 'url' parameter
 									url = game['url'];
-								}
+								}								
 
 								// Register label click
 								game_label.click(function() {
@@ -237,6 +257,12 @@ define(
 										games_floater.html('<a href="http://redwire.io/#/game/'+game['redwireid']+'/edit" target="_blank"><img src="http://redwire.io/assets/images/ribbon.png" style="border:none; width: 100%"></a>');
 									} else {
 										games_floater.empty();
+									}
+
+									// Update coverage
+									if (gamesSeen.indexOf(url) == -1) {
+										gamesSeen.push(url);
+										self.coverage[1] = gamesSeen.length / data['games'].length;
 									}
 
 								});
@@ -257,6 +283,9 @@ define(
 							material_list = $('<div class="split-right list"></div>').appendTo(material_host),
 							material_floater = $('<div class="fix-bottom-left"></div>').appendTo(material_host);
 
+						// material coverage calculation
+						var materialSeen = [];
+
 						for (var i=0; i<data['material'].length; i++) {
 							var mat = data['material'][i],
 								// Create material label
@@ -270,6 +299,13 @@ define(
 									material_list.find(".list-item").removeClass("active");
 									$(this).addClass("active");
 									material_iframe.attr("src", mat['url']);
+
+									// Update coverage
+									if (materialSeen.indexOf(url) == -1) {
+										materialSeen.push(url);
+										self.coverage[2] = materialSeen.length / data['material'].length;
+									}
+
 								});
 							})(mat);
 
