@@ -136,14 +136,6 @@ define(
 				this.headerElm.text(title);
 			}
 
-			var n_tunables = [];
-			for (var i=0; i<tunables.length; i++) {
-				for (var j=0; j<10; j++) {
-					n_tunables.push(tunables[i]);
-				}
-			}
-			tunables = n_tunables;
-
 			// Prepare panel dimentions according to the number of tunables
 			var row_height = 58, row_width = 250,
 				grid_w = 0, grid_h = 0;
