@@ -72,7 +72,6 @@ define(["core/config", "core/analytics/transaction"],
 		 * Trigger the analytics event
 		 */
 		Analytics.prototype.fireEvent = function( eventName, data, replace ) {
-			console.log("Analytics: ", eventName, data);
 
 			// Check for listener
 			this.probeListener();
@@ -80,6 +79,9 @@ define(["core/config", "core/analytics/transaction"],
 			// Append globals
 			for (k in this.globals)
 				data[k] = this.globals[k];
+
+			// Debug log
+			console.log("Analytics: ", eventName, data);
 
 			// If we are expired, exit
 			if (this.expired) return;

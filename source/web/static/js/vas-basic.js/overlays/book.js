@@ -169,12 +169,9 @@ define(
 			});
 
 			// Fire book analytics
-			Analytics.fireEvent("book.time", {
-				"id": this.meta['info']['book'],
-				"time": Analytics.stopTimer("book")
-			});
 			Analytics.fireEvent("book.hide", {
 				"id": this.meta['info']['book'],
+				"time": Analytics.stopTimer("book")
 			});
 
 		}
@@ -301,8 +298,8 @@ define(
 									material_iframe.attr("src", mat['url']);
 
 									// Update coverage
-									if (materialSeen.indexOf(url) == -1) {
-										materialSeen.push(url);
+									if (materialSeen.indexOf(mat['url']) == -1) {
+										materialSeen.push(mat['url']);
 										self.coverage[2] = materialSeen.length / data['material'].length;
 									}
 

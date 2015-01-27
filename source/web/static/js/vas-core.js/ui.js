@@ -1,6 +1,6 @@
 
-define(["jquery", "core/config", "core/registry", "core/db", "core/base/components", "core/user"], 
-	function($, config, R, DB, Components, User) {
+define(["jquery", "core/config", "core/registry", "core/db", "core/base/components", "core/user", "core/analytics/analytics"], 
+	function($, config, R, DB, Components, User, Analytics) {
 
 		///////////////////////////////////////////////////////////////
 		//                     HELPER FUNCTIONS                      //
@@ -1272,6 +1272,18 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 			// Check for wrong values
 			if (UI.activeScreen == name)
 				return;
+
+			// Fire analytics
+			var screenTime = Analytics.restartTimer("screen-time");
+			if (screenTime > 0) {
+				Analytics.fireEvent("ui.screen.time", {
+					"id": UI.activeScreen,
+					"time": screenTime
+				});
+			}
+			Analytics.fireEvent("ui.screen.change", {
+				"id": name
+			});
 
 			// Preserve previous screen ID
 			UI.previousScreen = UI.activeScreen;
