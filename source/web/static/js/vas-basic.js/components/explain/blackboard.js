@@ -33,6 +33,13 @@ define(
 		ExplainBlackboard.prototype = Object.create( C.ExplainScreen.prototype );
 
 		/**
+		 * Return the animation position normalized to 0.0-1.0
+		 */
+		ExplainBlackboard.prototype.getPosition = function() {
+			return this.canvas.getPosition(true);
+		}
+
+		/**
 		 * This event is fired when animation information has updated
 		 */
 		ExplainBlackboard.prototype.onAnimationUpdated = function( doc, cb ) {

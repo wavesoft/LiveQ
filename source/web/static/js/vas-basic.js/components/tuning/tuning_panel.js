@@ -64,6 +64,11 @@ define(
 				this.trigger('change', this.valuesMap);
 			}).bind(this));
 
+			// Listen for mouse events on the container
+			container.mouseenter((function() {
+				this.trigger('hover', metadata['_id']);
+			}).bind(this));
+
 			// Update component value
 			com.onUpdate( this.valuesMap[metadata['_id']] );
 
@@ -131,6 +136,14 @@ define(
 				this.headerElm.text(title);
 			}
 
+			var n_tunables = [];
+			for (var i=0; i<tunables.length; i++) {
+				for (var j=0; j<10; j++) {
+					n_tunables.push(tunables[i]);
+				}
+			}
+			tunables = n_tunables;
+
 			// Prepare panel dimentions according to the number of tunables
 			var row_height = 58, row_width = 250,
 				grid_w = 0, grid_h = 0;
@@ -139,7 +152,7 @@ define(
 				grid_w = row_width + 10;
 				this.tunablesElm.removeClass("col-2");
 			} else {
-				var max_rows = Math.ceil(tunables.length / 2);
+				var max_rows = Math.floor(tunables.length / 2);
 				grid_h = max_rows * row_height + 8;
 				grid_w = 2 * row_width + 10;
 				this.tunablesElm.addClass("col-2");

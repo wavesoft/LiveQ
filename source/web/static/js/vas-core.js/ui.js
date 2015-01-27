@@ -988,9 +988,9 @@ define(["jquery", "core/config", "core/registry", "core/db", "core/base/componen
 		 * Hide a pop-up previously shown with showPopup()
 		 *
 		 */
-		UI.hidePopup = function() {
+		UI.hidePopup = function(cb) {
 			if (popupWidget)
-				popupWidget.hide();
+				popupWidget.hide(cb);
 			popupWidget = false;
 		}
 

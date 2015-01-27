@@ -2,14 +2,14 @@ define(
 
 	// Dependencies
 
-	["jquery", "core/config", "core/registry","core/base/data_widget", "core/db" ], 
+	["jquery", "core/config", "core/registry","core/base/data_widget", "core/db", "core/analytics/analytics" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a tunable
 	 *
  	 * @exports vas-basic/infoblock/tunable
 	 */
-	function($, Config, R, DataWidget, DB) {
+	function($, Config, R, DataWidget, DB, Analytics) {
 
 		/**
 		 * Replace book macros (helpers for specifying images in the description)
@@ -38,12 +38,16 @@ define(
 
 			// Prepare tabs
 			this.tabs = [];
+			this.currTab = 0;
 			this.createTab($('<p>This is a test</p>'), "cs-blue", '<span class="uicon uicon-info"></span> Explain' );
 			this.createTab($('<p>This is a another test</p>'), "cs-purple", '<span class="uicon uicon-game"></span> Understand' );
 			this.createTab($('<p>This is a yet another test</p>'), "cs-green", '<span class="uicon uicon-find"></span> Research' );
 
 			// Prepare error tab
 			this.errorTab = $('<div class="tab tab-error"><h1>Error loading book</h1><p>It was not possible to find a book under the specified ID!</p></div>')
+
+			// Prpare properties
+			this.meta = null; 
 
 		};
 
@@ -55,6 +59,7 @@ define(
 		 */
 		BookBody.prototype.clearTabs = function() {
 			this.tabs = [];
+			this.currTab = 0;
 			this.bodyDOM.empty();
 			this.tabsDOM.empty();
 		}
@@ -110,6 +115,11 @@ define(
 		 * Select one of the specified tab
 		 */
 		BookBody.prototype.selectTab = function( index ) {
+
+			// Don't re-activate same tab
+			if (this.currTab == index) return;
+
+			// Select tab
 			for (var i=0; i<this.tabs.length; i++) {
 				if (i == index) {
 					this.tabs[i].tab.show();
@@ -121,6 +131,47 @@ define(
 					this.bookDOM.removeClass(this.tabs[i]['color']);
 				}
 			}
+
+			// Fire tab analytics
+			Analytics.fireEvent("book.tab_time", {
+				"id": this.meta['info']['book'],
+				"tab": this.currTab,
+				"time": Analytics.restartTimer("book-tab")
+			});
+
+			// Update current tab
+			this.currTab = index;
+
+			// Fire tab change analytic
+			Analytics.fireEvent("book.tab_change", {
+				"id": this.meta['info']['book'],
+				"tab": this.currTab
+			});
+
+		}
+
+		/**
+		 * Handle hidden event
+		 */
+		BookBody.prototype.onHidden = function() {
+			if (!this.meta) return;
+
+			// Fire tab analytics
+			Analytics.fireEvent("book.tab_time", {
+				"id": this.meta['info']['book'],
+				"tab": this.currTab,
+				"time": Analytics.stopTimer("book-tab")
+			});
+
+			// Fire book analytics
+			Analytics.fireEvent("book.time", {
+				"id": this.meta['info']['book'],
+				"time": Analytics.stopTimer("book")
+			});
+			Analytics.fireEvent("book.hide", {
+				"id": this.meta['info']['book'],
+			});
+
 		}
 
 		/**
@@ -137,6 +188,9 @@ define(
 				this.bodyDOM.append(this.errorTab);
 				return;
 			}
+
+			// Store meta
+			this.meta = meta;
 
 			// Load book
 			books.get(meta['info']['book'], (function(data, errorMsg) {
@@ -237,6 +291,13 @@ define(
 						material_list.find(".list-item:first-child").click();
 
 					}
+
+					// Initial analytics setup
+					Analytics.restartTimer("book");
+					Analytics.restartTimer("book-tab");
+					Analytics.fireEvent("book.show", {
+						"id": meta['info']['book']
+					});
 
 				} else {
 

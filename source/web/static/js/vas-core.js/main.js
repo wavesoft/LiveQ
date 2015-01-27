@@ -757,6 +757,9 @@ define(
 					scrTuning.on('course', function(name) {
 						UI.screens["screen.courseroom"].onCourseDefined(name);
 						UI.selectScreen("screen.courseroom");
+
+						
+
 					});
 					scrTuning.on('flash', function(title,body,icon) {
 						UI.showFlash(title, body, icon);

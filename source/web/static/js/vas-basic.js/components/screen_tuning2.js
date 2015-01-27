@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "d3", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/user", "core/apisocket", "liveq/Calculate"],
+	["jquery", "d3", "core/db", "core/ui", "sha1", "core/config", "core/registry", "core/base/components", "core/user", "core/apisocket", "liveq/Calculate", "core/analytics/analytics"],
 
 	/**
 	 * Basic version of the home screen
 	 *
 	 * @exports basic/components/explain_screen
 	 */
-	function($, d3, DB, UI, config, R,C, User, APISocket, Calculate ) {
+	function($, d3, DB, UI, SHA1, config, R,C, User, APISocket, Calculate, Analytics ) {
 
 		/**
 		 * @class
@@ -29,6 +29,7 @@ define(
 			this.values = {};
 			this.lastHistograms = [];
 			this.markers = {};
+			this.focusMachinePartID = null;
 
 			// Team header
 			$('<h1><span class="highlight">Tuning</span> The Quantum Machine</h1><div class="subtitle">Fiddle with the quantum machine and find the best values</div>').appendTo(hostDOM);
@@ -108,10 +109,36 @@ define(
 
 			// Bind events
 			this.tuningPanel.on('change', (function(e) {
+
+			}).bind(this));
+			this.tuningPanel.on('hover', (function(tunable) {
+				this.updateAssistance( tunable );
 			}).bind(this));
 			this.tuningPanel.on('showBook', (function(book) { // Incoming events 
 				this.trigger('showBook', book);
 			}).bind(this));
+			this.tuningPanel.on('valueChanged', (function(toValue, fromValue, meta) {
+
+				// A tuning value changed
+				Analytics.fireEvent("tuning.values.change", {
+					'id': meta['_id'],
+					'scale': Math.abs(fromValue - toValue) / (meta.value['max'] - meta.value['min'])
+				});
+
+			}).bind(this));
+
+			// ---------------------------------
+			// Create tuning assistance panel
+			// ---------------------------------
+
+			// Create a assistance frame
+			this.assistanceFrame = $('<div class="description-frame assistance-frame"></div>').appendTo(hostDOM);
+			this.assistanceTitle = $('<h1><span class="glyphicon glyphicon-user"></span> Collaboration Assistance</h1>').appendTo(this.assistanceFrame);
+			this.assistanceBody = $('<div>Move your mouse over a tunable parameter and you can see more information regarding other users in this panel.</div>').appendTo(this.assistanceFrame);
+
+			// Put additional assistance labels
+			var astLblTeam = $('<div class="ast-team-best"><span class="label">Team Best:</span> </div>').appendTo(this.assistanceFrame);
+			this.assistanceTeamBest = $('<span></span>').appendTo(astLblTeam);
 
 			// ---------------------------------
 			// Create machine types
@@ -167,7 +194,7 @@ define(
 			}).bind(this));
 
 			// Create help button
-			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(hostDOM);
+			this.btnHelp = $('<button class="btn-help btn-shaded btn-teal btn-with-icon"><span class="glyphicon glyphicon-bookmark"></span><br />Help</button>').appendTo(descFrame);
 			this.btnHelp.click((function() {
 				//this.descFrame.toggleClass("visible");
 				UI.showTutorial("ui.tuning.new");
@@ -202,6 +229,12 @@ define(
 			// Remove back-blur fx on the machine DOM
 			this.machineDOM.removeClass("fx-backblur");
 
+			// Hide assistance panels
+			this.assistanceFrame.removeClass("visible");
+			setTimeout((function() {
+				this.descFrame.addClass("visible");
+			}).bind(this), 100);
+
 			// Hide element
 			this.tunableGroup.addClass("hidden");
 			this.tunableGroup.css(this.popoverPos).css({
@@ -218,6 +251,13 @@ define(
 				this.tuningMask.hide();
 				if (callback) callback();
 			}).bind(this), 200);
+
+			// Fire analytics			
+			Analytics.fireEvent("tuning.machine.expand_time", {
+				"id": this.focusMachinePartID,
+				"time": Analytics.stopTimer("tuning-machine-part")
+			});
+
 		}
 
 
@@ -234,6 +274,15 @@ define(
 
 			// Add back-blur fx on the machine DOM
 			this.machineDOM.addClass("fx-backblur");
+
+			// Keep the focused machine part ID
+			this.focusMachinePartID = machinePartID;
+
+			// Fire analytics
+			Analytics.restartTimer("tuning-machine-part");
+			Analytics.fireEvent("tuning.machine.expand", {
+				"id": machinePartID
+			});
 
 			// Calculate centered coordinates
 			var sz_w = this.tuningPanel.width, 
@@ -253,6 +302,8 @@ define(
 			this.tuningMask.show();
 			this.tunableGroup.addClass("animating");
 			setTimeout((function() {
+
+				// Show tuning panel
 				this.tuningPanel.onResize(sz_w, sz_h);
 				this.tuningPanel.onWillShow((function() {
 					// Make element animated
@@ -264,6 +315,13 @@ define(
 					});				
 					// Shown
 					this.tuningPanel.onShown();
+
+					// Show the assistance panels
+					this.descFrame.removeClass("visible");
+					setTimeout((function() {
+						this.assistanceFrame.addClass("visible");
+					}).bind(this), 100);
+
 				}).bind(this));
 
 			}).bind(this), 10);
@@ -334,6 +392,12 @@ define(
 				if (claim != "")
 					User.claimCredits("estimate", claim, claim_reason);
 
+				// Fire analytics
+				Analytics.fireEvent("tuning.values.estimate", {
+					"id": this.getTuneID(),
+					"fit": chi2 
+				});
+
 			}).bind(this));
 
 		}
@@ -355,6 +419,24 @@ define(
 
 		}
 
+		/**
+		 * Calculate evaluation ID
+		 */
+		TuningScreen.prototype.getTuneID = function() {
+
+			// Create a string to hash
+			var str = "";
+
+			// Summarize
+			for (var k in this.values) {
+				str += k + "=" + this.values[k].toString() + ",";
+			}
+
+			// Checksum
+			return SHA1.hash(str);
+
+		}
+
 		/** 
 		 * Submit results for estimation
 		 */
@@ -365,6 +447,12 @@ define(
 
 			// Save user values
 			this.snapshotMarkers();
+
+			// Commit estimate transaction
+			Analytics.fireEvent("tuning.values.will_estimate", {
+				"id": this.getTuneID(),
+				"time": Analytics.restartTimer("tuning")
+			});
 
 		}
 
@@ -378,6 +466,19 @@ define(
 
 			// Save user values
 			this.snapshotMarkers();
+
+			// Commit estimate transaction
+			Analytics.fireEvent("tuning.values.will_estimate");
+
+		}
+
+		/** 
+		 * Update the assistance panel for the given tunable ID 
+		 */
+		TuningScreen.prototype.updateAssistance = function( tunableID ) {
+
+			// Change title
+			this.assistanceTitle.html( '<span class="glyphicon glyphicon-pencil"></span> ' + tunableID );
 
 		}
 
@@ -400,6 +501,9 @@ define(
 					User.markFirstTimeAsSeen("tuning.intro");
 				});
 			}
+
+			// Make sure we have a 'tuning' timer
+			Analytics.startTimer("tuning");
 
 		}
 

@@ -111,6 +111,17 @@ define(
 
 		}
 
+		/**
+		 * Get position
+		 */
+		Canvas.prototype.getPosition = function(normalized) {
+			if (normalized) {
+				return this.timeline.position / this.timeline.duration;
+			} else {
+				return this.timeline.position;
+			}
+		}
+
 		// Return hotspots overlay class
 		return Canvas;
 

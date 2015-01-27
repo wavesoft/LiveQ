@@ -2,14 +2,14 @@
 define(
 
 	// Requirements
-	["jquery", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket"],
+	["jquery", "core/db", "core/ui", "core/config", "core/registry", "core/base/components", "core/apisocket", "core/analytics/analytics"],
 
 	/**
 	 * Basic version of the courseroom screen
 	 *
 	 * @exports basic/components/screem_courseroom
 	 */
-	function($, DB, UI, config, R,C, API) {
+	function($, DB, UI, config, R,C, API, Analytics) {
 
 		/**
 		 * @class
@@ -110,6 +110,13 @@ define(
 					if (!this.started) return;
 					this.trigger('completed');
 					this.trigger('sequence.next', 'completed'); // [SEQUENCING]
+
+					// Fire analytics % of completion
+					Analytics.fireEvent("course.percent", {
+						'id': this.course_id,
+						'percent': 1.0
+					});
+
 				}).bind(this));
 
 			}
@@ -149,6 +156,10 @@ define(
 			UI.hideAllfirstTimeAids();
 			// We are now started
 			this.started = true;
+			// Fire analytics
+			Analytics.fireEvent("course.start", {
+				'id': this.course_id
+			});
 		}
 
 		/**
@@ -411,6 +422,11 @@ define(
 				this.userSlots[i].hide();
 			}
 
+			// Fire analytics
+			Analytics.fireEvent("course.show", {
+				'id': this.course_id
+			});
+
 			// Load animation
 			this.visible = true;
 			this.loadAnimation(this.course_id, (function() {
@@ -469,6 +485,15 @@ define(
 		 * Stop and cleanup before exit
 		 */
 		CourseroomScene.prototype.onWillHide = function(cb) {
+
+			// Fire analytics % of completion
+			if (this.started) {
+				Analytics.fireEvent("course.percent", {
+					'id': this.course_id,
+					'percent': this.explainComponent.getPosition()
+				});
+			}
+
 			this.stopAnimation();
 			this.visible = false;
 			cb();

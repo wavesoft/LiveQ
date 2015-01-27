@@ -118,6 +118,9 @@ define(["core/config", "core/base/data_widget", "core/base/component" ],
 		/**
 		 * This event is fired when the user has changed the value of the tunable.
 		 *
+		 * @param {number} value - The current value of the widget
+		 * @param {number} prevValue - The previous value of the widget
+		 * @param {object} meta - The metadata of the tunable widget
 		 * @event module:core/base/tuning_components~TunableWidget#valueChanged	
 		 */
 

@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "core/registry","core/base/data_widget" ], 
+	["jquery", "core/registry","core/base/data_widget", "core/analytics/analytics" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a tunable
 	 *
  	 * @exports vas-basic/infoblock/tunable
 	 */
-	function(config, R, DataWidget) {
+	function(config, R, DataWidget, Analytics) {
 
 		/**
 		 * The default tunable body class
@@ -49,6 +49,12 @@ define(
 				e.preventDefault();
 				e.stopPropagation();
 				this.trigger('showBook', meta['info']['book'] );
+
+				// Fire analytics event
+				Analytics.fireEvent("tuning.values.learn", {
+					'id': meta['_id']
+				});
+
 			}).bind(this));
 			this.moreLinks.append( l );
 			

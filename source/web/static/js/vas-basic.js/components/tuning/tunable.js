@@ -1,14 +1,14 @@
 define(
 
 	// Dependencies
-	["jquery", "dragdealer", "core/registry", "core/ui", "core/base/tuning_components", "core/util/spinner" ], 
+	["jquery", "dragdealer", "core/registry", "core/ui", "core/base/tuning_components", "core/util/spinner", "core/analytics/analytics" ], 
 
 	/**
 	 * This is the default tunable widget component for the base interface.
 	 *
  	 * @exports base/components/tuning/tunable
 	 */
-	function($, Dragdealer, R, UI, TC, Spinner) {
+	function($, Dragdealer, R, UI, TC, Spinner, Analytics) {
 
 		var DefaultTunableWidget = function(hostDOM) {
 
@@ -17,6 +17,7 @@ define(
 
 			// Prepare variables
 			this.value = 0;
+			this.prevValue = null;
 			this.meta = {};
 			this.markers = [];
 			this.lastMarkerInfo = {};
@@ -64,6 +65,14 @@ define(
 						this.hostDOM,
 						(function(hostDOM) {
 
+							// Fire analytics event
+							Analytics.fireEvent("tuning.values.explain", {
+								'id': this.meta['_id']
+							});
+
+							// Start analytics timer
+							Analytics.restartTimer("info-popup");
+
 							// Prepare the body
 							var comBody = R.instanceComponent("infoblock.tunable", hostDOM);
 							if (comBody) {
@@ -91,7 +100,15 @@ define(
 			this.hostDOM.mouseleave((function() {
 				clearTimeout(hoverTimer);
 				hoverTimer = setTimeout((function() {
-					UI.hidePopup();
+					UI.hidePopup((function() {
+
+						// Fire analytics event
+						Analytics.fireEvent("tuning.values.explain_time", {
+							'id': this.meta['_id'],
+							'time': Analytics.stopTimer("info-popup")
+						});
+
+					}).bind(this));					
 				}).bind(this), 100);
 			}).bind(this));
 
@@ -128,7 +145,10 @@ define(
 			// Use idle timer before forwarding value change event
 			clearTimeout(this.idleTimer);
 			this.idleTimer = setTimeout( (function() {
-				this.trigger('valueChanged', this.getValue());
+				if (this.prevValue != null) {
+					this.trigger('valueChanged', this.getValue(), this.mapValue(this.prevValue), this.meta);
+				}
+				this.prevValue = this.value;
 			}).bind(this), 250);
 
 		}
@@ -148,7 +168,14 @@ define(
 		 */
 		DefaultTunableWidget.prototype.getValue = function() {
 			if (!this.meta['value']) return this.value;
-			var vInt = this.meta['value']['min'] + (this.meta['value']['max'] - this.meta['value']['min']) * this.value;
+			return this.mapValue(this.value);
+		}
+
+		/**
+		 * Map value
+		 */
+		DefaultTunableWidget.prototype.mapValue = function(value) {
+			var vInt = this.meta['value']['min'] + (this.meta['value']['max'] - this.meta['value']['min']) * value;
 			return parseFloat( vInt.toFixed(this.meta['value']['dec'] || 2) )
 		}
 

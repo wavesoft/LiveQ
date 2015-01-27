@@ -54,6 +54,7 @@
 		> h1 {
 			color: #16a085;
 			font-size: 24px;
+			margin: 10px 0;
 		}
 		> div {
 			font-size: 14px;
@@ -71,6 +72,16 @@
 			width: 62px;
 			left: 72px;
 			bottom: 5px;
+		}
+
+		// Assistance frame
+		&.assistance-frame {
+			background-color: #333;
+			color: #fff;
+
+			> h1 {
+				color: #F1C40F;
+			}
 		}
 
 	}
@@ -173,6 +184,24 @@
 			}
 
 		}
+	}
+
+	// The tuning assisatnts
+	.assistance-frame {
+	
+		.ast-team-best {
+			position: absolute;
+			right: 10px;
+			bottom: 50px;
+			font-size: 22px;
+			width: 250px;
+
+			span.label {
+				font-weight: bold;
+			}
+
+		}
+
 	}
 
 }

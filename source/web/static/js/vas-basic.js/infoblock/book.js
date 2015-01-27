@@ -2,14 +2,14 @@ define(
 
 	// Dependencies
 
-	["jquery", "core/registry","core/base/data_widget", "core/db" ], 
+	["jquery", "core/registry","core/base/data_widget", "core/db", "core/analytics/analytics" ], 
 
 	/**
 	 * This is the default component for displaying information regarding a tunable
 	 *
  	 * @exports vas-basic/infoblock/tunable
 	 */
-	function(config, R, DataWidget, DB) {
+	function(config, R, DataWidget, DB, Analytics) {
 
 		/**
 		 * The default tunable body class
@@ -27,8 +27,12 @@ define(
 			this.element.append(this.bodyDOM);
 			this.element.append(this.moreLinks);
 
+			// Local properties
+			this.meta = {};
+
 			// Tab array
 			this.tabs = [];
+			this.currTab = 0;
 
 		};
 
@@ -91,6 +95,11 @@ define(
 		 * Select one of the specified tab
 		 */
 		BookBody.prototype.selectTab = function( index ) {
+
+			// Don't re-activate same tab
+			if (this.currTab == index) return;
+
+			// Select tab
 			for (var i=0; i<this.tabs.length; i++) {
 				if (i == index) {
 					this.tabs[i].tab.show();
@@ -100,6 +109,48 @@ define(
 					this.tabs[i].tabBtn.removeClass('active');
 				}
 			}
+
+
+			// Fire tab analytics
+			Analytics.fireEvent("book.tab_time", {
+				"id": meta['info']['book'],
+				"tab": this.currTab,
+				"time": Analytics.restartTimer("book-tab")
+			});
+
+			// Update current tab
+			this.currTab = index;
+
+			// Fire tab change analytic
+			Analytics.fireEvent("book.tab_change", {
+				"id": meta['info']['book'],
+				"tab": this.currTab
+			});
+
+		}
+
+		/**
+		 * Handle hidden event
+		 */
+		BookBody.prototype.onHidden = function() {
+			if (!this.meta) return;
+
+			// Fire tab analytics
+			Analytics.fireEvent("book.tab_time", {
+				"id": meta['info']['book'],
+				"tab": this.currTab,
+				"time": Analytics.stopTimer("book-tab")
+			});
+
+			// Fire book analytics
+			Analytics.fireEvent("book.time", {
+				"id": meta['info']['book'],
+				"time": Analytics.stopTimer("book")
+			});
+			Analytics.fireEvent("book.hide", {
+				"id": meta['info']['book'],
+			});
+
 		}
 
 		/**
@@ -109,6 +160,7 @@ define(
 
 			// Remove previous tabs
 			this.clearTabs();
+			this.meta = meta;
 
 			// Get the specified book from database
 			var books = DB.openDatabase("books");
@@ -157,7 +209,18 @@ define(
 
 				}
 
+				// Select first tab
+				this.selectTab(0);
+
+				// Initial analytics setup
+				Analytics.restartTimer("book");
+				Analytics.restartTimer("book-tab");
+				Analytics.fireEvent("book.show", {
+					"id": meta['info']['book']
+				});
+
 			}).bind(this));
+		
 			
 		}
 
