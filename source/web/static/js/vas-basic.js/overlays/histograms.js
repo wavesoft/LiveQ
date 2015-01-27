@@ -2,14 +2,14 @@ define(
 
 	// Dependencies
 
-	["jquery", "core/registry","core/base/component", "core/db", "liveq/Calculate" ], 
+	["jquery", "core/registry","core/base/component", "core/db", "liveq/Calculate", "core/analytics/analytics"], 
 
 	/**
 	 * This is the default component for displaying flash overlay messages
 	 *
  	 * @exports vas-basic/overlay/flash
 	 */
-	function(config, R, Component, DB, Calculate) {
+	function(config, R, Component, DB, Calculate, Analytics) {
 
 		/**
 		 * The default tunable body class
@@ -118,6 +118,11 @@ define(
 				}
 			}
 
+			// Fire analytics
+			Analytics.restartTimer("observables")
+			Analytics.fireEvent("observables.shown", {
+			});
+
 		}
 
 
@@ -140,6 +145,18 @@ define(
 
 			// Fire shown
 			cb();
+
+		}
+
+		/**
+		 * Histograms hidden
+		 */
+		OverlayHistograms.prototype.onHidden = function() {
+
+			// Fire analytics
+			Analytics.fireEvent("observables.hidden", {
+				"time": Analytics.stopTimer("observables")
+			});
 
 		}
 
