@@ -2,14 +2,14 @@ define(
 
 	// Dependencies
 
-	["jquery", "core/registry","core/base/component", "core/db", "liveq/Calculate", "core/analytics/analytics"], 
+	["jquery", "sha1", "core/registry","core/base/component", "core/db", "liveq/Calculate", "core/analytics/analytics"], 
 
 	/**
 	 * This is the default component for displaying flash overlay messages
 	 *
  	 * @exports vas-basic/overlay/flash
 	 */
-	function(config, R, Component, DB, Calculate, Analytics) {
+	function(config, SHA1, R, Component, DB, Calculate, Analytics) {
 
 		/**
 		 * The default tunable body class
@@ -36,6 +36,9 @@ define(
 			// Array of histogram objects
 			this.histograms = [];
 
+			// A unique checksum ID for the current set of histograms
+			this.checksumID = "";
+
 		};
 
 		// Subclass from ObservableWidget
@@ -46,6 +49,7 @@ define(
 		 */
 		OverlayHistograms.prototype.onHistogramsDefined = function( histograms ) {
 			var histoGroups = [[], [], []];
+			var hashData = "";
 
 			// Scan histograms and sort them into groups
 			for (var i=0; i<histograms.length; i++) {
@@ -57,6 +61,10 @@ define(
 				} else { // 3 sigma or more
 					histoGroups[0].push( histograms[i] );
 				}
+
+				// Collect ID for checksum calculation
+				hashData += histograms[i].id + ";";
+
 			}
 
 			// Create the visual components
@@ -64,6 +72,7 @@ define(
 			for (var i=0; i<histoGroups.length; i++) {
 				var histos = histoGroups[i],
 					targetDOM = this.elmCategoryHistograms[i].empty();
+
 
 				// Create, initialize and place on DOM
 				this.elmCategories[i].hide();
@@ -118,9 +127,13 @@ define(
 				}
 			}
 
+			// Store ID
+			this.checksumID = SHA1.hash( hashData );
+
 			// Fire analytics
 			Analytics.restartTimer("observables")
 			Analytics.fireEvent("observables.shown", {
+				'id': this.checksumID
 			});
 
 		}
@@ -155,6 +168,7 @@ define(
 
 			// Fire analytics
 			Analytics.fireEvent("observables.hidden", {
+				"id": this.checksumID,
 				"time": Analytics.stopTimer("observables")
 			});
 

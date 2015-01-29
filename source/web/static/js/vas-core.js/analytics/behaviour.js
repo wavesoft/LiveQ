@@ -5,14 +5,14 @@ define(["core/config"],
 
 	function(Config) {
 
-		var BehaviourCounter = function() {
+		var BehaviourIndicator = function() {
 			this.metrics = { };
 		}
 
 		/**
 		 * Sum the value
 		 */
-		BehaviourCounter.prototype.addSample = function( name, value, hint ) {
+		BehaviourIndicator.prototype.addSample = function( name, value, hint ) {
 			if (this.metrics[name] == undefined)
 				this.metrics[name] = [[], hint || 'sum'];
 			this.metrics[0].push(value);
@@ -21,15 +21,15 @@ define(["core/config"],
 		/**
 		 * Behaviour analyzer
 		 */
-		var BehaviourMatrix = function() {
+		var BehaviourTracker = function() {
 
-			// Analyzers bound
+			// Behaviour indicators
 			this.analyzers = [];
 
 		};
 
 		// Return behaviour analyzer class
-		return BehaviourMatrix;
+		return BehaviourTracker;
 
 	}
 

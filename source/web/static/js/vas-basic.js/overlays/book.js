@@ -207,7 +207,8 @@ define(
 					body.scroll((function(e) {
 
 						// Update page coverage
-						var currCoverage = e.currentTarget.scrollTop / (e.currentTarget.scrollHeight - $(e.currentTarget).height() );
+						var scrollHeight = e.currentTarget.scrollHeight - $(e.currentTarget).height() - parseFloat($(e).css("padding-top")) - parseFloat($(e).css("padding-bottom"));
+							currCoverage = e.currentTarget.scrollTop / scrollHeight;
 						if (currCoverage > this.coverage[0]) {
 							this.coverage[0] = currCoverage;
 						}
