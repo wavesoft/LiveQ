@@ -344,8 +344,12 @@ class Histogram:
 		Create a histogram by reading the specified FLAT file
 		"""
 
-		# Parse into structures
-		data = FLATParser.parse(filename)
+		# Parse into structures depending on if file is a string
+		# or a file object
+		if isinstance(filename, str) or isinstance(filename, unicode):
+			data = FLATParser.parse(filename)
+		else:
+			data = FLATParser.parseFileObject(filename)
 
 		# Ensure we got at least a HISTOGRAM
 		if not 'HISTOGRAM' in data:

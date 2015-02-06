@@ -20,7 +20,7 @@ from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 from liveq.component import Component
 
-from lvieq.data.histo import Histogram
+from liveq.data.histo import Histogram
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
@@ -162,7 +162,7 @@ class TarImport(Component):
 
 		# Select only the histograms used in this tune
 		hipol = self.lab.getHistograms()
-		for h in hipol:
+		for h in histos:
 			if (not h) or (not h.name in hipol):
 				continue
 			res.append(h)
