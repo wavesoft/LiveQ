@@ -118,6 +118,26 @@ class TarImport(Component):
 		# Return dictionary
 		return ans
 
+	def readConfig(self, fileObject):
+		"""
+		Read key/value configuration from fileObject
+		"""
+
+		# Read all lines
+		ans = {}
+		for l in fileObject.readlines():
+			# Trim newline
+			l = l[0:-1]
+			# Skip blank lines
+			if not l:
+				continue
+			# Split on '='
+			kv = l.split("=")
+			ans[kv[0]] = ans[kv[1]]
+
+		# Return 
+		return ans
+
 	def importFile(self, tarFile):
 		"""
 		Open tarfile
@@ -143,6 +163,22 @@ class TarImport(Component):
 			genFile.close()
 		except:
 			logging.error("Could not load tune %s" % tarFile)
+			return
+
+		# Load jobdata from tar archive
+		jobData = None
+		try:
+			# Open tune config
+			jobDataFile = f.extractfile("./jobdata")
+			jobData = self.readConfig(jobDataFile)
+			jobDataFile.close()
+		except:
+			logging.error("Could not load tune %s" % tarFile)
+			return
+
+		# Check for erroreus jobs
+		if int(jobData['exitcode']) != 0:
+			logging.error("Skipping due to exitcode=%s" % jobData['exitcode'])
 			return
 
 		# Load histograms from tarfile
