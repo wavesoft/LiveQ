@@ -168,11 +168,11 @@ class TarImport(Component):
 			res.append(h)
 			
 		# Generate fits for interpolation
-		ans.regenFits()
+		res.regenFits()
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
-				'data': hipol.pack()
+				'data': res.pack()
 			}, waitReply=True)
 
 	def run(self):
