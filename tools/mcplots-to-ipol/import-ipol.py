@@ -129,7 +129,7 @@ class TarImport(Component):
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
 				'data': ipolHistograms.pack()
-			})
+			}, waitReply=True)
 
 	def run(self):
 		"""
