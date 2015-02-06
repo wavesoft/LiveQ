@@ -42,19 +42,19 @@ class Histogram:
 		self.meta = meta
 
 		# Initialize bin values
-		if y == None:
+		if y is None:
 			y = numpy.zeros(bins)
-		if yErrPlus == None:
+		if yErrPlus is None:
 			yErrPlus = numpy.zeros(bins)
-		if yErrMinus == None:
+		if yErrMinus is None:
 			yErrMinus = numpy.zeros(bins)
 
 		# Initialize bins
-		if x == None:
+		if x is None:
 			x = numpy.zeros(bins)
-		if xErrPlus == None:
+		if xErrPlus is None:
 			xErrPlus = numpy.zeros(bins)
-		if xErrMinus == None:
+		if xErrMinus is None:
 			xErrMinus = numpy.zeros(bins)
 
 		# Store values
@@ -438,7 +438,7 @@ class Histogram:
 					sPath = sPath[:-1]
 
 				# Look for set name
-				if (setName == None) or (setName == sName):
+				if (setName is None) or (setName == sName):
 					print "Importing %s" % sName
 				
 					# Process data points
