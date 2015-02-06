@@ -131,6 +131,9 @@ class TarImport(Component):
 			# Skip blank lines
 			if not l:
 				continue
+			# Skip invalid lines
+			if not '=' in l:
+				continue
 			# Split on '='
 			kv = l.split("=")
 			ans[kv[0]] = ans[kv[1]]
@@ -150,8 +153,8 @@ class TarImport(Component):
 		try:
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
-		except:
-			logging.error("Could not open %s" % tarFile)
+		except Exception as e:
+			logging.error("Could not open archive (%s)" % str(e))
 			return
 
 		# Load tune from tar file
@@ -161,8 +164,8 @@ class TarImport(Component):
 			genFile = f.extractfile("./generator.tune")
 			tuneParam = self.readTune(genFile)
 			genFile.close()
-		except:
-			logging.error("Could not load tune %s" % tarFile)
+		except Exception as e:
+			logging.error("Could not load tune (%s)" % str(e))
 			return
 
 		# Load jobdata from tar archive
@@ -172,8 +175,8 @@ class TarImport(Component):
 			jobDataFile = f.extractfile("./jobdata")
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
-		except:
-			logging.error("Could not load tune %s" % tarFile)
+		except Exception as e:
+			logging.error("Could not load job data (%s)" % str(e))
 			return
 
 		# Check for erroreus jobs
