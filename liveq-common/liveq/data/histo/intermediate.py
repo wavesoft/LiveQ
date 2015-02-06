@@ -510,7 +510,7 @@ class IntermediateHistogram:
 		logY = False
 		if 'PLOT' in data:
 			if 'LogY' in data['PLOT']['d']:
-				logY = (int(data['PLOT']['d']) == 1)
+				logY = (int(data['PLOT']['d']['LogY']) == 1)
 		vMeta['logY'] = logY
 
 		# Get histogram name
