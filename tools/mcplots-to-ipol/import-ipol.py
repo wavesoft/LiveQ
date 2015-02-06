@@ -114,8 +114,8 @@ class TarImport(Component):
 		histos = None
 		try:
 			histos = IntermediateHistogramCollection.fromTarfile(f)
-		except:
-			logging.error("Could not load histograms from %s" % tarFile)
+		except Exception as ex:
+			logging.error("Could not load histograms from %s (%s)" % (tarFile, str(ex)))
 			return
 
 		# Close tarfile
