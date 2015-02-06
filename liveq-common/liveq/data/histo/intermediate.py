@@ -84,12 +84,12 @@ class IntermediateHistogramCollection(dict):
 				fInst.close()
 			except Exception as e:
 				fInst.close()
-				logging.error("Exception while loading file %s" % ffile)
+				logging.error("Exception while loading file %s (%s)" % (tarObject.name, str(e)))
 				continue
 
 			# Report errors
 			if histo == None:
-				logging.error("Unable to load intermediate histogram from %s" % ffile)
+				logging.error("Unable to load intermediate histogram from %s" % tarObject.name)
 			else:
 				ans[histo.name] = histo
 
