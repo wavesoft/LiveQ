@@ -257,7 +257,7 @@ class Histogram:
 		if self.bins == 1:
 
 			# Coefficients = values
-			combCoeff = numpy.concatenate( [self.y, self.yErrPlus, self.yErrMinus] )
+			combCoeff = numpy.concatenate( [self.y, self.yErrPlus, self.yErrMinus, [0]*deg*3] )
 
 		else:
 
