@@ -88,7 +88,7 @@ class TarImport(Component):
 		Open tarfile
 		"""
 
-		logging.info("Importing %s")
+		logging.info("Importing %s" % tarFile)
 
 		# Open tar file
 		f = None
@@ -124,7 +124,7 @@ class TarImport(Component):
 		# Create lower-quality (fitted) histograms, and send them
 		# to the interpolation database
 		tune = Tune( tuneParam, labid=self.lab.uuid )
-		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=self.lab.getHistograms())
+		ipolHistograms = histos.toInterpolatableCollection(tune, histograms=self.lab.getHistograms())
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
