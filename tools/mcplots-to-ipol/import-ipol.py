@@ -20,7 +20,9 @@ from liveq.events import GlobalEvents
 from liveq.exceptions import ConfigException
 from liveq.component import Component
 
+from lvieq.data.histo import Histogram
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
 
 from liveq.models import Agent, Lab
 from liveq.data.tune import Tune
@@ -61,6 +63,39 @@ class TarImport(Component):
 
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (Config.baseDir, suffix))
+
+	def readHistograms(self, tarObject):
+		"""
+		"""
+
+		# Prepare collection
+		ans = []
+
+		# Read relevant entries
+		for fn in tarObject.getnames():
+
+			# Get only generator data objects (contain the name 'pythia' in path)
+			if (not 'pythia' in fn) or (not fn.endswith(".dat")):
+				continue
+
+			# Try to load histogram by the file object
+			fInst = tarObject.extractfile(fn)
+			try:
+				histo = Histogram.fromFLAT( fInst )
+				fInst.close()
+			except Exception as e:
+				fInst.close()
+				logging.error("Exception while loading file %s (%s)" % (tarObject.name, str(e)))
+				continue
+
+			# Report errors
+			if histo == None:
+				logging.error("Unable to load intermediate histogram from %s:%s" % (tarObject.name, fn))
+			else:
+				ans.append(histo)
+
+		# Return collection
+		return ans
 
 	def readTune(self, fileObject):
 		"""
@@ -113,7 +148,7 @@ class TarImport(Component):
 		# Load histograms from tarfile
 		histos = None
 		try:
-			histos = IntermediateHistogramCollection.fromTarfile(f)
+			histos = self.readHistograms(f)
 		except Exception as ex:
 			logging.error("Could not load histograms from %s (%s)" % (tarFile, str(ex)))
 			return
@@ -121,14 +156,23 @@ class TarImport(Component):
 		# Close tarfile
 		f.close()
 
-		# Create lower-quality (fitted) histograms, and send them
-		# to the interpolation database
-		tune = Tune( tuneParam, labid=self.lab.uuid )
-		ipolHistograms = histos.toInterpolatableCollection(tune, histograms=self.lab.getHistograms())
+		# Prepare the interpolatable collection that will
+		# collect the data to send to the interpolator
+		res = InterpolatableCollection(tune=Tune( tuneParam, labid=self.lab.uuid ))
+
+		# Select only the histograms used in this tune
+		hipol = self.lab.getHistograms()
+		for h in hipol:
+			if (not h) or (not h.name in hipol):
+				continue
+			res.append(h)
+			
+		# Generate fits for interpolation
+		ans.regenFits()
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
-				'data': ipolHistograms.pack()
+				'data': hipol.pack()
 			}, waitReply=True)
 
 	def run(self):

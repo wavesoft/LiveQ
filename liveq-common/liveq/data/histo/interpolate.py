@@ -129,7 +129,7 @@ class InterpolatableCollection(dict):
 			coeff, meta = self[hname].polyFit()
 
 			# Skip buggy histograms
-			if coeff == None:
+			if coeff is None:
 				logging.warn("Could not calculate fits for histogram %s" % hname)
 				continue
 
