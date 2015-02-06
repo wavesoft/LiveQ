@@ -249,7 +249,7 @@ class Histogram:
 		# If we have a single bin, store the bin's value
 		# as coefficients
 		if self.bins == 1:
-			combCoeff = numpy.array([this.y, this.yErrPlus, this.yErrMinus])
+			combCoeff = numpy.array([self.y, self.yErrPlus, self.yErrMinus])
 
 		else:
 
