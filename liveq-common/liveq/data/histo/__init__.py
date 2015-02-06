@@ -259,12 +259,15 @@ class Histogram:
 			# Skip zero y-bins
 			if y != 0:
 				if logY:
-					vy.append(numpy.log(y)
+
+					vy.append(numpy.log(y))
+					
 					# Protect against zero values
 					if (y+self.yErrPlus[i]) == 0:
 						vyErrPlus.append(0)
 					else:
 						vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+
 					# Protect against zero values
 					if (y-self.yErrMinus[i]) == 0:
 						vyErrMinus.append(0)
