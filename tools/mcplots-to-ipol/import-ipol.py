@@ -202,8 +202,6 @@ class TarImport(Component):
 		# Select only the histograms used in this tune
 		hipol = self.lab.getHistograms()
 		for h in histos:
-			if (not h) or (not h.name in hipol):
-				continue
 			res.append(h)
 
 		# Generate fits for interpolation
