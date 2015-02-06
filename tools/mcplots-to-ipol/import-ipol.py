@@ -46,21 +46,21 @@ if sys.argv.length < 2:
 # Definition of the TarImport Component
 class TarImport(Component):
 
-	def __init__(self, lab_id, baseDir, suffix=".tgz"):
+	def __init__(self, baseDir, suffix=".tgz"):
 		"""
 		Initialize TarImport
 		"""
 		Component.__init__(self)
-		self.baseDir = baseDir
+		self.baseDir = Config.baseDir
 
 		# Open lab 
 		try:
-			self.lab = Lab.get( Lab.uuid == lab_id)
+			self.lab = Lab.get( Lab.uuid == Config.labID)
 		except Lab.DoesNotExist:
 			self.lab = None
 
 		# Prepare the list of histograms to process
-		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
+		self.histogramQueue = glob.glob("%s/*%s" % (Config.baseDir, suffix))
 
 	def readTune(self, fileObject):
 		"""
@@ -102,7 +102,10 @@ class TarImport(Component):
 		# Load tune from tar file
 		tuneParam = None
 		try:
-			tuneParam = self.readTune(f)
+			# Open tune config
+			genFile = f.extractfile("./generator.tune")
+			tuneParam = self.readTune(genFile)
+			genFile.close()
 		except:
 			logging.error("Could not load tune %s" % tarFile)
 			return
@@ -151,4 +154,4 @@ class TarImport(Component):
 		self.importFile( self.histogramQueue.pop() )
 
 # Run threaded
-ConsumerComponent.runThreaded()
+TarImport.runThreaded()

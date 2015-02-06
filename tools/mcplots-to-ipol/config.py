@@ -24,7 +24,7 @@ from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
 
 """
-Create a configuration for the JOB MANAGER based on the core config
+Create a configuration for the IMPORT IPOL based on the core config
 """
 class Config(CoreConfig, InternalBusConfig, DatabaseConfig):
 
@@ -43,3 +43,8 @@ class Config(CoreConfig, InternalBusConfig, DatabaseConfig):
 		CoreConfig.fromConfig( config, runtimeConfig )
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		InternalBusConfig.fromConfig( config, runtimeConfig )
+
+		# Extract ipol information
+		Config.labID = config.get("import-ipol", "lab")
+		Config.baseDir = config.get("import-ipol", "basedir")
+
