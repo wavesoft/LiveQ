@@ -261,12 +261,12 @@ class Histogram:
 				if logY:
 					vy.append(numpy.log(y)
 					# Protect against zero values
-					if y+self.yErrPlus[i] == 0:
+					if (y+self.yErrPlus[i]) == 0:
 						vyErrPlus.append(0)
 					else:
 						vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
 					# Protect against zero values
-					if y-self.yErrMinus[i] == 0:
+					if (y-self.yErrMinus[i]) == 0:
 						vyErrMinus.append(0)
 					else:
 						vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
