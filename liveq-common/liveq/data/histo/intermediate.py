@@ -89,7 +89,7 @@ class IntermediateHistogramCollection(dict):
 
 			# Report errors
 			if histo == None:
-				logging.error("Unable to load intermediate histogram from %s" % tarObject.name)
+				logging.error("Unable to load intermediate histogram from %s:%s" % (tarObject.name, fn))
 			else:
 				ans[histo.name] = histo
 
