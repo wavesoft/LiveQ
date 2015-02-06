@@ -246,54 +246,61 @@ class Histogram:
 	"""
 	def polyFit(self, deg=10, meta=True, logY=True):
 
-		# Keep only the y values that are non-zero
-		vy = [ ]
-		vyErrPlus = [ ]
-		vyErrMinus = [ ]
-		vx = [ ]
+		# If we have a single bin, store the bin's value
+		# as coefficients
+		if self.bins == 1:
+			combCoeff = numpy.array([this.y, this.yErrPlus, this.yErrMinus])
 
-		# Process bins
-		i=0
-		for y in self.y:
+		else:
 
-			# Skip zero y-bins
-			if y != 0:
-				if logY:
+			# Keep only the y values that are non-zero
+			vy = [ ]
+			vyErrPlus = [ ]
+			vyErrMinus = [ ]
+			vx = [ ]
 
-					vy.append(numpy.log(y))
-					
-					# Protect against zero values
-					if (y+self.yErrPlus[i]) == 0:
-						vyErrPlus.append(0)
+			# Process bins
+			i=0
+			for y in self.y:
+
+				# Skip zero y-bins
+				if y != 0:
+					if logY:
+
+						vy.append(numpy.log(y))
+
+						# Protect against zero values
+						if (y+self.yErrPlus[i]) == 0:
+							vyErrPlus.append(0)
+						else:
+							vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+
+						# Protect against zero values
+						if (y-self.yErrMinus[i]) == 0:
+							vyErrMinus.append(0)
+						else:
+							vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
 					else:
-						vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+						vy.append(y)
+					vx.append(self.x[i])
 
-					# Protect against zero values
-					if (y-self.yErrMinus[i]) == 0:
-						vyErrMinus.append(0)
-					else:
-						vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
+				# Increase index
+				i += 1
+
+			# If we have no y-bins with values, return null
+			if len(vy) == 0:
+				if meta:
+					return (None, None)
 				else:
-					vy.append(y)
-				vx.append(self.x[i])
+					return None
 
-			# Increase index
-			i += 1
+			# Coefficents for the plot
+			coeff = numpy.polyfit( vx, vy, deg )
+			coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
+			coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
 
-		# If we have no y-bins with values, return null
-		if len(vy) == 0:
-			if meta:
-				return (None, None)
-			else:
-				return None
-
-		# Coefficents for the plot
-		coeff = numpy.polyfit( vx, vy, deg )
-		coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
-		coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
-
-		# Calculate the combined coefficients
-		combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
+			# Calculate the combined coefficients
+			combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
 
 		# If we don't have metadata, return
 		if not meta:
@@ -322,18 +329,28 @@ class Histogram:
 		xErrMinus = meta['x'][1]
 		xErrPlus = meta['x'][2]
 
-		# Calculate the size of the coefficients array
-		cl = len(coeff) / 3
+		# If we have a single bin, that's a simple case
+		if meta['bins'] == 1:
 
-		# Re-create bin values from fitted data
-		if meta['logY']:
-			y = numpy.exp(numpy.polyval( coeff[0:cl], x ))
-			yErrMinus = numpy.exp(numpy.polyval( coeff[cl:cl*2], x ))
-			yErrPlus = numpy.exp(numpy.polyval( coeff[cl*2:cl*3], x ))
+			# Extract y,yErrMinus,yErrPlus from coefficients
+			y = numpy.array([coeff[0]])
+			yErrPlus = numpy.array([coeff[1]])
+			yErrMinus = numpy.array([coeff[2]])
+
 		else:
-			y = numpy.polyval( coeff[0:cl], x )
-			yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
-			yErrPlus = numpy.polyval( coeff[cl*2:cl*3], x )
+
+			# Calculate the size of the coefficients array
+			cl = len(coeff) / 3
+
+			# Re-create bin values from fitted data
+			if meta['logY']:
+				y = numpy.exp(numpy.polyval( coeff[0:cl], x ))
+				yErrMinus = numpy.exp(numpy.polyval( coeff[cl:cl*2], x ))
+				yErrPlus = numpy.exp(numpy.polyval( coeff[cl*2:cl*3], x ))
+			else:
+				y = numpy.polyval( coeff[0:cl], x )
+				yErrMinus = numpy.polyval( coeff[cl:cl*2], x )
+				yErrPlus = numpy.polyval( coeff[cl*2:cl*3], x )
 
 		# Return histogram instance
 		return Histogram(
