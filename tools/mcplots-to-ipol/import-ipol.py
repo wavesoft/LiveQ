@@ -46,7 +46,7 @@ if len(sys.argv) < 2:
 # Definition of the TarImport Component
 class TarImport(Component):
 
-	def __init__(self, baseDir, suffix=".tgz"):
+	def __init__(self, suffix=".tgz"):
 		"""
 		Initialize TarImport
 		"""
