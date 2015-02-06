@@ -110,6 +110,9 @@ class InterpolatorComponent(Component):
 		# Unpack intepolatable collection from data
 		histos = InterpolatableCollection.fromPack(data['data'])
 
+		# Regenerate histograms from interpolation data
+		histos.regenHistograms()
+
 		# Append data on the histogram store
 		HistogramStore.append( histos )
 
