@@ -39,7 +39,7 @@ except ConfigException as e:
 handleSIGINT()
 
 # Read parameters from command line
-if sys.argv.length < 2:
+if len(sys.argv) < 2:
 	print("ERROR   Please specify a directory!")
 	exit(1)
 
@@ -51,7 +51,7 @@ class TarImport(Component):
 		Initialize TarImport
 		"""
 		Component.__init__(self)
-		self.baseDir = Config.baseDir
+		self.baseDir = sys.argv[1]
 
 		# Open lab 
 		try:

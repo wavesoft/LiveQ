@@ -45,6 +45,6 @@ class Config(CoreConfig, InternalBusConfig, DatabaseConfig):
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 
 		# Extract ipol information
-		Config.labID = config.get("import-ipol", "lab")
-		Config.baseDir = config.get("import-ipol", "basedir")
+		Config.labID = config.get("import", "lab")
+		Config.baseDir = config.get("import", "basedir")
 
