@@ -166,7 +166,7 @@ class TarImport(Component):
 			if (not h) or (not h.name in hipol):
 				continue
 			res.append(h)
-			
+
 		# Generate fits for interpolation
 		res.regenFits()
 
@@ -184,6 +184,7 @@ class TarImport(Component):
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 
 		# Run component
+		time.sleep(1)
 		Component.run(self)
 
 	def step(self):
