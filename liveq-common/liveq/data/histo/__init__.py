@@ -255,7 +255,9 @@ class Histogram:
 		# If we have a single bin, store the bin's value
 		# as coefficients
 		if self.bins == 1:
-			combCoeff = numpy.array([self.y, self.yErrPlus, self.yErrMinus])
+
+			# Coefficients = values
+			combCoeff = numpy.array([self.y[0], self.yErrPlus[0], self.yErrMinus[0]])
 
 		else:
 
@@ -290,6 +292,10 @@ class Histogram:
 							vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
 					else:
 						vy.append(y)
+						vyErrPlus.append(y+self.yErrPlus[i])
+						vyErrMinus.append(y-self.yErrMinus[i])
+
+					# Collect sample
 					vx.append(self.x[i])
 
 				# Increase index
