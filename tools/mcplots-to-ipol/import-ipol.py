@@ -118,6 +118,9 @@ class TarImport(Component):
 			logging.error("Could not load histograms from %s" % tarFile)
 			return
 
+		# Close tarfile
+		f.close()
+
 		# Create lower-quality (fitted) histograms, and send them
 		# to the interpolation database
 		tune = Tune( tuneParam, labid=self.lab.uuid )
