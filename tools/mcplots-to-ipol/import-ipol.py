@@ -131,7 +131,6 @@ class TarImport(Component):
 				'data': ipolHistograms.pack()
 			})
 
-
 	def run(self):
 		"""
 		Bind setup

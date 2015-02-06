@@ -343,28 +343,28 @@ class IntermediateHistogram:
 
 		# Import values from the constructor or use defaults
 		self.xlow=xlow
-		if (xlow == None):
+		if (xlow is None):
 			self.xlow = numpy.zeros(self.bins)
 		self.xfocus=xfocus
-		if (xfocus == None):
+		if (xfocus is None):
 			self.xfocus = numpy.zeros(self.bins)
 		self.xhigh=xhigh
-		if (xhigh == None):
+		if (xhigh is None):
 			self.xhigh = numpy.zeros(self.bins)
 		self.Entries=Entries
-		if (Entries == None):
+		if (Entries is None):
 			self.Entries = numpy.zeros(self.bins)
 		self.SumW=SumW
-		if (SumW == None):
+		if (SumW is None):
 			self.SumW = numpy.zeros(self.bins)
 		self.SumW2=SumW2
-		if (SumW2 == None):
+		if (SumW2 is None):
 			self.SumW2 = numpy.zeros(self.bins)
 		self.SumXW=SumXW
-		if (SumXW == None):
+		if (SumXW is None):
 			self.SumXW = numpy.zeros(self.bins)
 		self.SumX2W=SumX2W
-		if (SumX2W == None):
+		if (SumX2W is None):
 			self.SumX2W = numpy.zeros(self.bins)
 
 	def clear(self):
