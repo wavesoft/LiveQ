@@ -244,7 +244,13 @@ class Histogram:
 	Optionally it returns the metadata required to re-construct the histogram using Histogram.fromFit()
 	function.
 	"""
-	def polyFit(self, deg=10, meta=True, logY=True):
+	def polyFit(self, deg=10, meta=True, logY=None):
+
+		# Check if we should use logY
+		if logY is None:
+			logY = True
+			if 'logY' in self.meta:
+				logY = self.meta['logY']
 
 		# If we have a single bin, store the bin's value
 		# as coefficients
@@ -266,17 +272,19 @@ class Histogram:
 				# Skip zero y-bins
 				if y != 0:
 					if logY:
-
-						vy.append(numpy.log(y))
+						if y < 0:
+							vy.append(y)
+						else:
+							vy.append(numpy.log(y))
 
 						# Protect against zero values
-						if (y+self.yErrPlus[i]) == 0:
+						if (y+self.yErrPlus[i]) <= 0:
 							vyErrPlus.append(0)
 						else:
 							vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
 
 						# Protect against zero values
-						if (y-self.yErrMinus[i]) == 0:
+						if (y-self.yErrMinus[i]) <= 0:
 							vyErrMinus.append(0)
 						else:
 							vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
@@ -395,6 +403,13 @@ class Histogram:
 		vMeta = { }
 		if 'METADATA' in data:
 			vMeta = data['METADATA']['d']
+
+		# Get LogY from PLOT
+		logY = False
+		if 'PLOT' in data:
+			if 'LogY' in data['PLOT']['d']:
+				logY = (int(data['PLOT']['d']) == 1)
+		vMeta['logY'] = logY
 
 		# Convert values into a flat 2D numpy array
 		values = numpy.array(vBins, dtype=numpy.float64).flatten()

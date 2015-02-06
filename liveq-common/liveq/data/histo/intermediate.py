@@ -506,6 +506,13 @@ class IntermediateHistogram:
 		if 'METADATA' in data:
 			vMeta = data['METADATA']['d']
 
+		# Get LogY from PLOT
+		logY = False
+		if 'PLOT' in data:
+			if 'LogY' in data['PLOT']['d']:
+				logY = (int(data['PLOT']['d']) == 1)
+		vMeta['logY'] = logY
+
 		# Get histogram name
 		name = data['HISTOSTATS']['d']['AidaPath']
 
