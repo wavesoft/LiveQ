@@ -136,7 +136,7 @@ class TarImport(Component):
 				continue
 			# Split on '='
 			kv = l.split("=")
-			ans[kv[0]] = ans[kv[1]]
+			ans[kv[0]] = kv[1]
 
 		# Return 
 		return ans
