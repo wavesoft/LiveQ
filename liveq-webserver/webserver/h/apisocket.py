@@ -31,6 +31,7 @@ from webserver.h.api.course import CourseInterface
 from webserver.h.api.account import AccountInterface
 from webserver.h.api.labsocket import LabSocketInterface
 from webserver.h.api.labtrain import LabTrainInterface
+from webserver.h.api.db import DatabaseInterface
 
 from liveq.models import User
 from webserver.config import Config
@@ -68,6 +69,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			AccountInterface(self),
 			LabSocketInterface(self),
 			LabTrainInterface(self),
+			DatabaseInterface(self)
 		]
 
 		# Open logger

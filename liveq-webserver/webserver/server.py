@@ -46,7 +46,6 @@ class MCPlotsServer(tornado.web.Application):
 			URLSpec(r"%s/help" % Config.BASE_URL, 			HelpHandler, 			name="help"),
 			URLSpec(r"%s/config" % Config.BASE_URL, 		ConfigHandler, 			name="config"),
 			URLSpec(r"%s/apisocket" % Config.BASE_URL,		APISocketHandler, 		name="api"),
-			URLSpec(r"%s/labsocket/(.*)" % Config.BASE_URL, LabSocketHandler,		name="ws"),
 		]
 
 		# Get root dir of files

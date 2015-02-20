@@ -46,7 +46,7 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunables, Observables, TunableToObservable, TeamNotebook, QuestionaireResponses ]:
+					Tutorials, Tunable, Observable, TunableToObservable, TeamNotebook, QuestionaireResponses ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -386,7 +386,7 @@ class Lab(BaseModel):
 		for name in names:
 
 			# Fetch the tunable record for every name
-			config.append( Tunables.get(name=name) )
+			config.append( Tunable.get(name=name) )
 
 		# Return tunable configuration
 		return config
@@ -435,7 +435,7 @@ class Tutorials(BaseModel):
 	url = CharField(max_length=128)
 
 
-class Tunables(BaseModel):
+class Tunable(BaseModel):
 	"""
 	Description for the tunables as an individual parameter
 	"""
@@ -444,27 +444,20 @@ class Tunables(BaseModel):
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
 	short = CharField(max_length=50)
-
-	#: Beam type where this tunable is valid
-	beam = CharField(max_length=12, default="ee")
-	#: Beam energy where this tunable is valid
-	energy = CharField(max_length=12, default="91.2")
-	#: Simulation process where this tunable is valid
-	process = CharField(max_length=12, default="zhad")
-
+	#: The group this tunable belongs in
+	group = CharField(max_length=128)
+	#: The book for more details regarding this tunable
+	book = CharField(max_length=128)
 	#: The human-readable name of the tunable
 	title = CharField(max_length=128)
+
 	#: A short description for this tunable
-	shortdesc = TextField(default="")
-	#: A long description for this tunable
-	longdesc = TextField(default="")
-	#: A URL for the long description
-	urldesc = CharField(max_length=128, default="")
-	#: The UUID of the tutorial
-	tutorial = CharField(max_length=64, default="")
+	desc = TextField(default="")
+	#: an image that accompanies the short description
+	descImage = CharField(max_length=128, default="")
 
 	#: The UI component to use for visualizing this variable
-	type = CharField(max_length=8, default="slider")
+	type = CharField(max_length=8, default="num")
 	#: The default value for the tunable
 	default = FloatField(default=0.0)
 	#: The minimum value for the tunable
@@ -474,7 +467,10 @@ class Tunables(BaseModel):
 	#: The number of decimals to show on the value
 	dec = IntegerField(default=4)
 
-class Observables(BaseModel):
+	#: A set of choices to pick from
+	choices = TextField(default="")
+
+class Observable(BaseModel):
 	"""
 	The description of the ovservables
 	"""

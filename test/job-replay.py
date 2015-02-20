@@ -35,7 +35,7 @@ from config import Config
 
 import liveq.data.histo.io as io
 
-from liveq.models import Lab, Observables, TunableToObservable
+from liveq.models import Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 

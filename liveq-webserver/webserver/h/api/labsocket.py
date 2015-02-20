@@ -28,7 +28,7 @@ import liveq.data.histo.io as io
 
 import tornado.escape
 
-from liveq.models import Lab, Observables, TunableToObservable
+from liveq.models import Lab, Observable, TunableToObservable
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
@@ -384,11 +384,11 @@ class LabSocketInterface(APIInterface):
 			try:
 
 				# Fetch the matching observable record
-				observableRecord = Observables.get(
-					(Observables.name==hid) &
-					(Observables.energy==descRecord['energy']) &
-					(Observables.beam==descRecord['beam']) &
-					(Observables.process==descRecord['process'])
+				observableRecord = Observable.get(
+					(Observable.name==hid) &
+					(Observable.energy==descRecord['energy']) &
+					(Observable.beam==descRecord['beam']) &
+					(Observable.process==descRecord['process'])
 					)
 
 				# Append extra fields
@@ -399,7 +399,7 @@ class LabSocketInterface(APIInterface):
 				descRecord['rightdesc'] = str(observableRecord.rightDesc)
 				descRecord['urldesc'] = str(observableRecord.urldesc)
 
-			except Observables.DoesNotExist:
+			except Observable.DoesNotExist:
 				self.sendError("Could not find assisting information for histogram %s (e=%s, b=%s, p=%s)" % (hid, descRecord['energy'], descRecord['beam'], descRecord['process']))
 				return
 

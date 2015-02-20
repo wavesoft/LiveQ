@@ -28,7 +28,6 @@ import liveq.data.js as js
 import liveq.data.histo.io as io
 import tornado.escape
 
-from liveq.models import Observables, TunableToObservable
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 

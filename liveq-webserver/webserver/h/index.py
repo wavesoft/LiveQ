@@ -23,7 +23,7 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from liveq.models import Lab, Observables, Tunables, Tutorials
+from liveq.models import Lab, Observable, Tunable, Tutorials
 from webserver.common.minimacros import convertMiniMacros
 
 """
@@ -67,7 +67,7 @@ class HelpHandler(tornado.web.RequestHandler):
 		if desc_type == "tunable":
 
 			# Get tunable
-			obj = Tunables.get( Tunables.name == desc_name )
+			obj = Tunable.get( Tunable.name == desc_name )
 
 			# Get tutorial
 			tut_url = ""
@@ -91,7 +91,7 @@ class HelpHandler(tornado.web.RequestHandler):
 		elif desc_type == "observable":
 
 			# Get observable
-			obj = Observables.get( Observables.name == desc_name )
+			obj = Observable.get( Observable.name == desc_name )
 
 			# Get tutorial
 			tut_url = ""

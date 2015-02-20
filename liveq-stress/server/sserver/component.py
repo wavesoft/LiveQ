@@ -26,7 +26,7 @@ from sserver.config import Config
 
 from liveq.component import Component
 from liveq.io.bus import BusChannelException
-from liveq.models import Tunables, Observables, Lab
+from liveq.models import Tunable, Observable, Lab
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
 
@@ -290,9 +290,9 @@ class StressServerComponent(Component):
 		tunables = []
 		for i in range(1, numParams+1):
 			try:
-				parm = Tunables.get(Tunables.name == "DummyParm:%i" % i)
-			except Tunables.DoesNotExist:
-				parm = Tunables.create(name="DummyParm:%i" % i, sort="[%i]" % i, title="Dummy Parameter #%i" % i)
+				parm = Tunable.get(Tunable.name == "DummyParm:%i" % i)
+			except Tunable.DoesNotExist:
+				parm = Tunable.create(name="DummyParm:%i" % i, sort="[%i]" % i, title="Dummy Parameter #%i" % i)
 				parm.save()
 			tunables.append("DummyParm:%i" % i)
 
@@ -300,9 +300,9 @@ class StressServerComponent(Component):
 		histos = []
 		for i in range(1, numHistograms+1):
 			try:
-				obs = Observables.get(Observables.name == "DummyHisto:%i" % i)
-			except Observables.DoesNotExist:
-				obs = Observables.create(name="DummyHisto:%i" % i, sort="[%i]" % i, title="Dummy Histogram #%i" % i)
+				obs = Observable.get(Observable.name == "DummyHisto:%i" % i)
+			except Observable.DoesNotExist:
+				obs = Observable.create(name="DummyHisto:%i" % i, sort="[%i]" % i, title="Dummy Histogram #%i" % i)
 				obs.save()
 			histos.append("DummyHisto:%i" % i)
 
