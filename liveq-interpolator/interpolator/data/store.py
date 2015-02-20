@@ -204,9 +204,10 @@ class HistogramStore:
 
 		# Debug
 		print "--[ Appending ]------------"
+		print "Size=%i" % len(collection)
 		print "Neighbors=%i" % len(neighbors)
 		if neighbors:
-			print "Histograms=%i" % len(neighbors[0])
+			print "Neighbor histograms=%i" % len(neighbors[0])
 		print "---------------------------"
 
 		# Replace identical indices
