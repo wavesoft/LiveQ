@@ -20,13 +20,20 @@
 import numpy
 import re
 
-def parseFLATBuffer(buf):
+def parseFLATBuffer(buf, index=True):
 	"""
 	Parse FLAT buffer and return the structured data
 	"""
-	sections = {}
+	sections_list = []
 	section = None
 	activesection = None
+
+	# Pick appropriate return format
+	sections = None
+	if index:
+		sections = {}
+	else:
+		sections = []
 
 	# Start processing the buffer line-by-line
 	for line in buf.splitlines():
@@ -43,12 +50,21 @@ def parseFLATBuffer(buf):
 			section = dat[2]
 			sectiontype = 0
 
+			# Get additional section title
+			title = ""
+			if len(dat) > 2:
+				title = " ".join(dat[2:])
+
 			# Allocate section record
-			activesection = { "d": { }, "v": [ ] }
+			activesection = { "d": { }, "v": [ ], "t": title }
 
 		elif line.startswith("# END ") and (section != None):
 			# Section end
-			sections[section] = activesection
+			if index:
+				sections[section] = activesection
+			else:
+				activesection['n'] = section
+				sections.append(activesection)
 			section = None
 
 		elif line.startswith("#") or line.startswith(";"):
