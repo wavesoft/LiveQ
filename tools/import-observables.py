@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# This script imports all tunables from a Pythia8 installation
+# This script imports all Observables from a Rivet source directory
 
 # ----------
 import sys
@@ -27,12 +27,12 @@ sys.path.append("../liveq-common")
 
 import json
 import os
-import util.pythiaTunables as Pythia
+import util.rivetHistos as Rivet
 from util.config import Config
 
 from liveq import handleSIGINT, exit
 from liveq.exceptions import ConfigException
-from liveq.models import Tunable
+from liveq.models import Observable
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -49,61 +49,39 @@ handleSIGINT()
 
 # Ensure we have at least one parameter
 if (len(sys.argv) < 2) or (not sys.argv[1]):
-	print "Tunables Import Script - Import tunable configuration from Pythia8"
+	print "Observables Import Script - Import histogram configuration from Rivet"
 	print "Usage:"
 	print ""
-	print " import-tunables.py <path to pythia source>"
+	print " import-observables.py <path to rivet source>"
 	print ""
 	sys.exit(1)
 
 # Check if we have xmldir
-if not os.path.isdir("%s/xmldoc" % sys.argv[1]):
-	print "ERROR: Could not find %s/xmldoc!" % sys.argv[1]
+if not os.path.isdir("%s/data/plotinfo" % sys.argv[1]):
+	print "ERROR: Could not find %s/data/plotinfo!" % sys.argv[1]
+	sys.exit(1)
+if not os.path.isdir("%s/data/refdata" % sys.argv[1]):
+	print "ERROR: Could not find %s/data/refdata!" % sys.argv[1]
 	sys.exit(1)
 
-# Load tunables
-tunables = Pythia.parseXMLDoc("%s/xmldoc" % sys.argv[1])
+# Load observables
+observables = Rivet.parsePlotData("%s/data/plotinfo" % sys.argv[1], "%s/data/refdata" % sys.argv[1])
 
 # Import them
-for k,v in tunables.iteritems():
+for k,v in observables.iteritems():
 	print "Importing %s..." % k,
 
 	# Check if it exists
-	if Tunable.select().where(Tunable.name == k).exists():
+	if Observable.select().where(Observable.name == k).exists():
 		print "exists"
 		continue
 
 	# Create new entry
-	t = Tunable(name=k)
+	t = Observable(name=k)
 
-	# Unless overriden title is the name
-	t.title = k
-
-	# Basic
-	t.type = v['type']
-	t.short = v['short']
-	t.group = v['group']
-	t.subgroup = v['subgroup']
-	t.desc = v['desc']
-
-	# Value information
-	if ('min' in v) and (v['min'] != None):
-		t.min = v['min']
-	if ('max' in v) and (v['max'] != None):
-		t.max = v['max']
-	if ('default' in v) and (v['default'] != None):
-		t.default = v['default']
-	if ('dec' in v) and (v['dec'] != None):
-		t.dec = v['dec']
-
-	# Serialize options
-	if 'options' in v:
-		t.options = json.dumps(v['options'])
-	else:
-		t.options = '[]'
 
 	# Save record
-	t.save()
+	#t.save()
 	print "ok"
 
 
