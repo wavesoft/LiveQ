@@ -446,10 +446,14 @@ class Tunable(BaseModel):
 	short = CharField(max_length=50)
 	#: The group this tunable belongs in
 	group = CharField(max_length=128)
+	#: The sub-group this tunable belongs in
+	subgroup = CharField(max_length=128)
 	#: The book for more details regarding this tunable
-	book = CharField(max_length=128)
+	book = CharField(max_length=128, default="")
 	#: The human-readable name of the tunable
-	title = CharField(max_length=128)
+	title = CharField(max_length=128, default="")
+	#: Units
+	units = CharField(max_length=64, default="")
 
 	#: A short description for this tunable
 	desc = TextField(default="")
@@ -467,8 +471,8 @@ class Tunable(BaseModel):
 	#: The number of decimals to show on the value
 	dec = IntegerField(default=4)
 
-	#: A set of choices to pick from
-	choices = TextField(default="")
+	#: A set of choices or additional options for the tunable
+	options = TextField(default="")
 
 class Observable(BaseModel):
 	"""
@@ -542,3 +546,22 @@ class PostMortems(BaseModel):
 	agent = ForeignKeyField(Agent)
 	#: The post-mortem payload
 	data = TextField(default="")
+
+class BookReference(BaseModel):
+	"""
+	Reference to scientific content for further reading 
+	"""
+
+	#: The name of the reference
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: The title of this publication
+	title = CharField(max_length=255, default="")
+	#: The author list
+	authors = CharField(max_length=255, default="")
+	#: An optional icon for the publication listing
+	icon = CharField(max_length=128, default="")
+
+	#: The URL to the publication
+	url = CharField(max_length=255, default="")
+

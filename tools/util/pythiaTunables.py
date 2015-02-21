@@ -1,4 +1,6 @@
+import sys
 import re
+import os
 from glob import glob
 
 RE_TAGOPEN = re.compile(r'<(\w+)([>/ ])')
@@ -6,6 +8,13 @@ RE_TAGNAME = re.compile(r'(\w+)[>/ ]')
 RE_CLOSETAG = re.compile(r'<(\w+)[^</>]*/>$')
 
 class IncompleteXMLParser:
+	"""
+	An in-house XML parser for the nonstandard and incomplete XML structure found
+	in the pythia documentation.
+
+	This is a low-level parser that assumes the bare minimum of the XML syntax and 
+	issues no warnings of any sort.
+	"""
 
 	def __init__(self, buf=""):
 		"""
@@ -132,7 +141,8 @@ class IncompleteXMLParser:
 
 	def closeTag(self, name=None):
 		"""
-		Forward index until the tag with the given name is closed
+		Forward index until the tag with the given name is closed and return
+		the length of the closing tag
 		"""
 
 		# Use lastTag if name is none
@@ -142,7 +152,7 @@ class IncompleteXMLParser:
 		# Check if the tag is literaly closed
 		if self.buffer[self.index] == ">":
 			self.index += 1
-			return
+			return 0
 
 		# Check if we are in the end of a tag
 		if self.buffer[self.index:self.index+2] == "/>":
@@ -150,6 +160,7 @@ class IncompleteXMLParser:
 			if m != None:
 				if m.gropu(1) == name:
 					self.index = m.end()
+					return m.end() - m.start()
 
 		# Look for the ending of the given tag
 		idx = self.buffer.find("</%s>" % name, self.index)
@@ -159,7 +170,8 @@ class IncompleteXMLParser:
 			return None
 
 		# Update index
-		self.index = idx
+		self.index = idx + len(name) + 3
+		return len(name)+3
 
 	def getTagBody(self, name=None):
 		"""
@@ -175,11 +187,27 @@ class IncompleteXMLParser:
 		str_start = self.index
 
 		# Close tag and get tag end
-		self.closeTag(name)
+		end_len = self.closeTag(name)
 		str_end = self.index
 
 		# Return body
-		return self.buffer[str_start:str_end]
+		return self.buffer[str_start:str_end-end_len].strip()
+
+def genShort(text):
+	capitals = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	sName = ""
+	parts = text.split(":")
+	for p in parts:
+		first = True
+		for c in p:
+			if first:
+				first = False
+				sName += c.upper()
+			else:
+				if c in capitals:
+					sName += c.lower()
+
+	return sName
 
 def parmDec(vdec, defDec=3):
 	"""
@@ -195,7 +223,74 @@ def parmDec(vdec, defDec=3):
 		else:
 			return ndec
 
-def parseParameters(filename):
+def ucfirst(string):
+	"""
+	Capitalize first letter
+	"""
+
+	# Strip and make sure it's not blank
+	string = string.strip()
+	if not string:
+		return ""
+
+	# Capitalize
+	return string[0].upper() + string[1:]
+
+def parmSplitOptions(payload, debug=False):
+	"""
+	Get all the <option> tags from the payload and return
+	a tuple like (leftover_payload, [options_array])
+	"""
+
+	# Initialize leftover buffer
+	options = []
+	lo_buf = ""
+	lo_idx = 0
+
+	# Create a parser
+	p = IncompleteXMLParser(payload)
+
+	if debug:
+		print "INIT: '%s' [%i:%i]" % (lo_buf, lo_idx, p.index)
+
+	# Scan all the <option> tags
+	while not p.completed:
+
+		# Process option tags
+		if p.getNextTag() == "option":
+			if debug:
+				print "O_IN: '%s' [%i:%i]" % (lo_buf, lo_idx, p.index)
+
+			# Keep leftover
+			lo_buf += payload[lo_idx:p.index-8]
+
+			# Get tag attributes
+			o_attr = p.getTagAttrib()
+			o_body = p.getTagBody()
+
+			# Store
+			o_attr['body'] = o_body
+			options.append(o_attr)
+
+			# Update lo_idx
+			lo_idx = p.index
+			if debug:
+				print "O_OU: '%s' [%i:%i]" % (lo_buf, lo_idx, p.index)
+
+	# Collect final leftover
+	lo_buf += payload[lo_idx:]
+	if debug:
+		print "OEND: '%s' [%i:%i]" % (lo_buf, lo_idx, p.index)
+
+	# Return tuple
+	if debug:
+		print (lo_buf.strip(), options)
+		sys.exit(0)
+
+	return (lo_buf.strip(), options)
+
+
+def parseParameters(filename, additional={}):
 	"""
 	"""
 
@@ -206,8 +301,9 @@ def parseParameters(filename):
 	p = IncompleteXMLParser()
 	p.loadFile(filename)
 
-	# Current gategory
+	# Current gategory and group
 	category = ""
+	group = ""
 
 	# Start scanning for parameters
 	tag = p.getNextTag()
@@ -222,18 +318,18 @@ def parseParameters(filename):
 
 			# Get parser for the body
 			tbuf = p.getTagBody()
-			p2 = IncompleteXMLParser(tbuf)
 
-			# Get location of the first option tag
-			while not p2.completed and (p2.getNextTag() != "option"):
-				pass
+			# Get options and body
+			(desc, options_list) = parmSplitOptions(tbuf)
 
 			# Prepare parameter
 			parm = { }
-			parm['desc'] = tbuf[0:p2.index-8]
+			parm.update(additional)
+			parm['short'] = genShort(attrib['name'])
+			parm['desc'] = ucfirst(desc)
 			parm['type'] = 'pick'
-			parm['category'] = category
-			parm['options'] = []
+			parm['subgroup'] = category
+			parm['group'] = group
 
 			# Pick min/max/default
 			pDec = 0
@@ -256,17 +352,14 @@ def parseParameters(filename):
 			# Store decimals
 			parm['dec'] = pDec
 
-			# Start collecting options
+			# Process options
 			v_min = None
 			v_max = None
-			while not p2.completed:
-
-				# Get attribute details
-				o_attr = p2.getTagAttrib()
-				o_body = p2.getTagBody()
+			parm['options'] = []
+			for o in options_list:
 
 				# Pick min/max
-				v = float(o_attr['value'])
+				v = float(o['value'])
 				if v_max is None:
 					v_min = v
 					v_max = v
@@ -279,11 +372,8 @@ def parseParameters(filename):
 				# Store option
 				parm['options'].append({
 						'value': v,
-						'desc': o_body
+						'desc': ucfirst(o['body'])
 					})
-
-				if p2.getNextTag() != "option":
-					break
 
 			# Store missing min/max default
 			if not 'min' in parm:
@@ -304,12 +394,14 @@ def parseParameters(filename):
 
 			# Get parser for the body
 			tbuf = p.getTagBody()
-			p2 = IncompleteXMLParser(tbuf)
 
 			# Prepare parameter
 			parm = { }
-			parm['desc'] = tbuf[0:p2.index-8]
-			parm['category'] = category
+			parm.update(additional)
+			parm['short'] = genShort(attrib['name'])
+			parm['desc'] = ucfirst(tbuf)
+			parm['subgroup'] = category
+			parm['group'] = group
 			parm['type'] = 'parm'
 
 			# Pick min/max/default
@@ -346,15 +438,17 @@ def parseParameters(filename):
 			tbuf = p.getTagBody()
 			p2 = IncompleteXMLParser(tbuf)
 
-			# Get location of the first option tag
-			while not p2.completed and (p2.getNextTag() != "option"):
-				pass
+			# Get options and body
+			(desc, options_list) = parmSplitOptions(tbuf)
 
 			# Prepare parameter
 			parm = { }
-			parm['desc'] = tbuf[0:p2.index-8]
+			parm.update(additional)
+			parm['short'] = genShort(attrib['name'])
+			parm['desc'] = ucfirst(desc)
 			parm['type'] = 'bool'
-			parm['category'] = category
+			parm['subgroup'] = category
+			parm['group'] = group
 			parm['options'] = []
 
 			if 'default' in attrib:
@@ -366,28 +460,26 @@ def parseParameters(filename):
 			parm['dec'] = 0
 
 			# Start collecting options
-			while not p2.completed:
-
-				# Get attribute details
-				o_attr = p2.getTagAttrib()
-				o_body = p2.getTagBody()
+			for o in options_list:
 
 				# Store option
 				parm['options'].append({
-						'value': (o_attr['value'].lower() == "on"),
-						'desc': o_body
+						'value': (o['value'].lower() == "on"),
+						'desc': ucfirst(o['body'])
 					})
-
-				if p2.getNextTag() != "option":
-					break
 
 			# Store on parameters
 			parameters[attrib['name']] = parm
 
-		elif tag == "h3":
+		elif (tag == "h3") or (tag == "h2"):
+
 			# [4] Change category
 			p.closeTag()
 			category = p.getTagBody()
+
+			# Update default category
+			if not group:
+				group = category
 
 		tag = p.getNextTag()
 
@@ -398,7 +490,7 @@ def parseXMLDoc(folder):
 	params = {}
 	for f in glob("%s/*.xml" % folder):
 		print "Parsing %s..." % f
-		params.update( parseParameters(f) )
+		params.update( parseParameters(f, { 'file': os.path.basename(f) }) )
 
 	return params
 
