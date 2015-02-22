@@ -519,7 +519,43 @@ class PostMortems(BaseModel):
 	data = TextField(default="")
 
 # -----------------------------------------------------
-#  Under development
+#  Under active development
+# -----------------------------------------------------
+
+class KnowledgeGrid(BaseModel):
+	"""
+	The knowledge grid
+	"""
+
+	#: Parent entry to KG
+	parent = ForeignKeyField('self', null=True)
+
+	#: The title of the knowledge grid element
+	title = CharField(max_length=128)
+	#: A short description for this element
+	desc = TextField(default="")
+	#: The knowledge grid element
+	title = CharField(max_length=128)
+	#: The book for more details regarding this tunable
+	book = CharField(max_length=128, default="")
+
+	#: Cost in credits for this element
+	cost = IntegerField(default=0)
+
+	#: The course related to this topic
+	s_course = CharField(max_length=128, default="")
+	#: The UI introduction related to this topic 
+	s_intro = CharField(max_length=128, default="")
+
+	#: Configurations to enable
+	e_config = TextField(default="")
+	#: Tunables to enable
+	e_tunables = TextField(default="")
+	#: Observables to enable
+	e_observables = TextField(default="")
+
+# -----------------------------------------------------
+#  Drafts
 # -----------------------------------------------------
 
 class QuestionaireResponses(BaseModel):
@@ -535,10 +571,6 @@ class QuestionaireResponses(BaseModel):
 
 	#: User's responses
 	response = TextField(default="{}")
-
-# -----------------------------------------------------
-#  Drafts
-# -----------------------------------------------------
 
 class TeamNotebook(BaseModel):
 	"""
