@@ -43,7 +43,7 @@ def parseFLATBuffer(buf, index=True):
 			# Empty line
 			pass
 
-		elif line.startswith("# BEGIN "):
+		elif "# BEGIN " in line:
 
 			# Ignore labels found some times in AIDA files
 			dat = line.split(" ")
@@ -52,13 +52,13 @@ def parseFLATBuffer(buf, index=True):
 
 			# Get additional section title
 			title = ""
-			if len(dat) > 2:
-				title = " ".join(dat[2:])
+			if len(dat) > 3:
+				title = " ".join(dat[3:])
 
 			# Allocate section record
 			activesection = { "d": { }, "v": [ ], "t": title }
 
-		elif line.startswith("# END ") and (section != None):
+		elif ("# END " in line) and (section != None):
 			# Section end
 			if index:
 				sections[section] = activesection
@@ -74,6 +74,10 @@ def parseFLATBuffer(buf, index=True):
 		elif section:
 			# Data inside section
 
+			# "SPECIAL" section is not parsable here
+			if section == "SPECIAL":
+				continue
+
 			# Try to split
 			data = line.split("=",1)
 
@@ -82,6 +86,12 @@ def parseFLATBuffer(buf, index=True):
 
 				# Split data values
 				data = FLATParser.WHITESPACE.split(line)
+
+				# Check for faulty values
+				if len(data) < 3:
+					continue
+
+				# Otherwise collect
 				activesection['v'].append( numpy.array(data, dtype=numpy.float64) )
 
 			else:
@@ -102,17 +112,17 @@ class FLATParser:
 	WHITESPACE = re.compile("\s+")
 
 	@staticmethod
-	def parseFileObject(fileobject):
+	def parseFileObject(fileobject, index=True):
 		"""
 		Function to read a FLAT file (by the file object descriptor) into python structures
 		"""
 
 		# Read entire file and use parseBuffer
-		return parseFLATBuffer(fileobject.read())
+		return parseFLATBuffer(fileobject.read(), index)
 
 
 	@staticmethod
-	def parse(filename):
+	def parse(filename, index=True):
 		"""
 		Function to read a FLAT file into python structures
 		"""
@@ -120,10 +130,10 @@ class FLATParser:
 		# Open file
 		with open(filename, 'r') as f:
 			# Use FileObject parser to read the file
-			return parseFLATBuffer(f.read())
+			return parseFLATBuffer(f.read(), index)
 
-	def parseBuffer(buf):
+	def parseBuffer(buf, index=True):
 		"""
 		Parse FLAT file from buffer
 		"""
-		return parseFLATBuffer(buf)
+		return parseFLATBuffer(buf, index)

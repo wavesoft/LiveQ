@@ -483,35 +483,66 @@ class Observable(BaseModel):
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
 	short = CharField(max_length=50)
-
-	#: Beam type where this observable is valid
-	beam = CharField(max_length=12, default="ee")
-	#: Beam energy where this observable is valid
-	energy = CharField(max_length=12, default="91.2")
-	#: Simulation process where this observable is valid
-	process = CharField(max_length=12, default="zhad")
+	#: The group this tunable belongs in
+	group = CharField(max_length=128)
+	#: The sub-group this tunable belongs in
+	subgroup = CharField(max_length=128)
+	#: The book for more details regarding this tunable
+	book = CharField(max_length=128, default="")
 
 	#: The human-readable name of the observable
 	title = CharField(max_length=128)
-	#: A short description for this observable
-	shortdesc = TextField(default="")
-	#: A long description for this observable
-	longdesc = TextField(default="")
-	#: A URL for the long description
-	urldesc = CharField(max_length=128, default="")
-	#: The UUID of the tutorial
-	tutorial = CharField(max_length=64, default="")
+	#: The rendered TeX title as an image
+	titleImg = TextField(default="")
+	#: The X-Label for the observable plot
+	labelX = CharField(max_length=128, default="")
+	#: The rendered TeX labelX as an image
+	labelXImg = TextField(default="")
+	#: The Y-Label for the observable plot
+	labelY = CharField(max_length=128, default="")
+	#: The rendered TeX labelY as an image
+	labelYImg = TextField(default="")
 
-	#: Image for the far-left side of the histogram
-	leftImg = CharField(max_length=128, default="")
-	#: Description for the far-left side of the histogram
-	leftDesc = TextField(default="")
+	#: Logarithmic Y axis
+	logY = IntegerField(default=1)
+	#: Additional plot info
+	plotInfo = TextField(default="")
+	#: Analysis where this belongs to
+	analysis = CharField(max_length=128,default="")
 
-	#: Image for the far-right side of the histogram
-	rightImg = CharField(max_length=128, default="")
-	#: Description for the far-right side of the histogram
-	rightDesc = TextField(default="")
+	#: Cuts
+	cuts = CharField(max_length=64, default="")
+	#: Parameters
+	params = CharField(max_length=64, default="")
+	#: Process
+	process = CharField(max_length=64, default="")
 
+	#: Accelerators (beam/energy) combinations
+	accelerators = TextField(default="")
+
+
+
+	def setAccelerators(self, tuples):
+		"""
+		Set the list of accelerator (beam/energy) combinations
+		"""
+
+		# Store accelerator tuples
+		self.accelerators = ""
+		for t in tuples:
+			# Add Comma
+			if self.accelerators:
+				self.accelerators += ","
+			# Store tuple
+			self.accelerators += "%s/%s" % t
+
+	def getAccelerators(self):
+		"""
+		Return the list of accelerator (beam/energy) combinations
+		"""
+
+		# Return accelerator tuples
+		return map(lambda x: x.split("/"), self.accelerators.split(","))
 
 class TunableToObservable(BaseModel):
 	"""

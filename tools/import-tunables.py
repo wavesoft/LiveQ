@@ -27,7 +27,7 @@ sys.path.append("../liveq-common")
 
 import json
 import os
-import util.pythiaTunables as Pythia
+import util.pythia as pythia
 from util.config import Config
 
 from liveq import handleSIGINT, exit
@@ -62,7 +62,7 @@ if not os.path.isdir("%s/xmldoc" % sys.argv[1]):
 	sys.exit(1)
 
 # Load tunables
-tunables = Pythia.parseXMLDoc("%s/xmldoc" % sys.argv[1])
+tunables = pythia.parseXMLDoc("%s/xmldoc" % sys.argv[1])
 
 # Import them
 for k,v in tunables.iteritems():
