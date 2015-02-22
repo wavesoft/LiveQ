@@ -52,7 +52,7 @@ def createBaseTables():
 		table.create_table(True)
 
 # -----------------------------------------------------
-#  Model Implementation
+#  In production
 # -----------------------------------------------------
 
 class User(BaseModel):
@@ -94,21 +94,6 @@ class User(BaseModel):
 		"""
 		return self.username
 
-class QuestionaireResponses(BaseModel):
-	"""
-	Answers to questionaires
-	"""
-
-	#: The user who completed this questionaire
-	user = ForeignKeyField(User)
-
-	#: The questionaire name
-	questionaire = CharField(max_length=128)
-
-	#: User's responses
-	response = TextField(default="{}")
-
-
 class AgentGroup(BaseModel):
 	"""
 	Agent groups class
@@ -143,7 +128,6 @@ class TeamMembers(BaseModel):
 	team = ForeignKeyField(Team)
 	#: The user role
 	status = CharField(max_length=6, default="user")
-
 
 class Jobs(BaseModel):
 	"""
@@ -239,14 +223,6 @@ class Jobs(BaseModel):
 		Update the names of the Observables
 		"""
 		self.observables = ",".join(data)
-
-class TeamNotebook(BaseModel):
-	"""
-	The shared notebook along teammates
-	"""
-
-	#: The team owning the book
-	team = ForeignKeyField(Team)
 
 class Agent(BaseModel):
 	"""
@@ -422,19 +398,6 @@ class Lab(BaseModel):
 		# Return answer
 		return ans
 
-class Tutorials(BaseModel):
-	"""
-	Tutorials for the user
-	"""
-
-	#: The UUID of the tutorial
-	uuid = CharField(max_length=128, index=True, unique=True)
-	#: The human-readable name of the tutorial
-	title = CharField(max_length=128)
-	#: A URL for the tutorial
-	url = CharField(max_length=128)
-
-
 class Tunable(BaseModel):
 	"""
 	Description for the tunables as an individual parameter
@@ -521,7 +484,6 @@ class Observable(BaseModel):
 	accelerators = TextField(default="")
 
 
-
 	def setAccelerators(self, tuples):
 		"""
 		Set the list of accelerator (beam/energy) combinations
@@ -544,6 +506,60 @@ class Observable(BaseModel):
 		# Return accelerator tuples
 		return map(lambda x: x.split("/"), self.accelerators.split(","))
 
+class PostMortems(BaseModel):
+	"""
+	The description of post-mortems received from the worker nodes
+	"""
+
+	#: The timestamp of the post-mortem
+	timestamp = IntegerField(default=0)
+	#: The agent from which the PM originates
+	agent = ForeignKeyField(Agent)
+	#: The post-mortem payload
+	data = TextField(default="")
+
+# -----------------------------------------------------
+#  Under development
+# -----------------------------------------------------
+
+class QuestionaireResponses(BaseModel):
+	"""
+	Answers to questionaires
+	"""
+
+	#: The user who completed this questionaire
+	user = ForeignKeyField(User)
+
+	#: The questionaire name
+	questionaire = CharField(max_length=128)
+
+	#: User's responses
+	response = TextField(default="{}")
+
+# -----------------------------------------------------
+#  Drafts
+# -----------------------------------------------------
+
+class TeamNotebook(BaseModel):
+	"""
+	The shared notebook along teammates
+	"""
+
+	#: The team owning the book
+	team = ForeignKeyField(Team)
+
+class Tutorials(BaseModel):
+	"""
+	Tutorials for the user
+	"""
+
+	#: The UUID of the tutorial
+	uuid = CharField(max_length=128, index=True, unique=True)
+	#: The human-readable name of the tutorial
+	title = CharField(max_length=128)
+	#: A URL for the tutorial
+	url = CharField(max_length=128)
+
 class TunableToObservable(BaseModel):
 	"""
 	The description of the link between the tunable and the observable
@@ -565,18 +581,6 @@ class TunableToObservable(BaseModel):
 
 	#: The importance of this relation
 	importance = IntegerField(default=0)
-
-class PostMortems(BaseModel):
-	"""
-	The description of post-mortems received from the worker nodes
-	"""
-
-	#: The timestamp of the post-mortem
-	timestamp = IntegerField(default=0)
-	#: The agent from which the PM originates
-	agent = ForeignKeyField(Agent)
-	#: The post-mortem payload
-	data = TextField(default="")
 
 class BookReference(BaseModel):
 	"""
