@@ -98,7 +98,7 @@ for k,v in tunables.iteritems():
 
 	# Serialize options
 	if 'options' in v:
-		t.options = json.dumps(v['options'])
+		t.setOptions(v['options'])
 	else:
 		t.options = '[]'
 

@@ -32,9 +32,9 @@ from liveq.models import Lab, Observable, TunableToObservable
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
-from webserver.common.minimacros import convertMiniMacros
-from webserver.config import Config
+from webserver.common.api import compileObservableHistoBuffers, compileTunableHistoBuffers
 
+from webserver.config import Config
 from webserver.h.api import APIInterface
 
 class LabSocketInterface(APIInterface):
@@ -297,9 +297,6 @@ class LabSocketInterface(APIInterface):
 			self.logger.error("Unable to locate lab with id '%s'" % labid)
 			return self.sendError("Unable to find a lab with the given ID")
 
-		# Create a histogram description instance for this lab
-		self.histodesc = Config.HISTODESC.forLab( self.lab )
-
 		# Open required bus channels
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 		self.jobChannel = Config.IBUS.openChannel("jobs")
@@ -330,108 +327,24 @@ class LabSocketInterface(APIInterface):
 		Send the first, configuration frame to the agent
 		"""
 
-		# Prepare the tunable and observable names, for
-		# locating links afterwards
-		l_tunables = []
-		l_observables = []
-
-		# Fetch description for the tunables
-		data = []
-		tunables = self.lab.getTunables()
-		for t in tunables:
-
-			# Skip untrimmed tunables 
-			if (len(self.trimTun) > 0) and (not t in self.trimTun):
-				continue
-
-			# Collect tunable names
-			l_tunables.append(t.name)
-
-			# Prepare record to send to javascript
-			data.append({
-					'name': t.name,
-					'title': t.title,
-					'short': t.short,
-					'desc': convertMiniMacros(t.shortdesc),
-					'url': t.urldesc,
-					'tut': t.tutorial,
-					'type': t.type,
-					'def': t.default,
-					'min': t.min,
-					'max': t.max,
-					'dec': t.dec
-				})
-
-		# Pack tunables in buffer
-		tunablesBuffer = js.packString(tornado.escape.json_encode(data))
+		# ==========================
+		#  Histograms (Observables)
+		# ==========================
 
 		# Fetch descriptions for the histograms
 		histo_ids = self.lab.getHistograms()
-		histoBuffers = []
-		for hid in histo_ids:
-
-			# Skip untrimmed histograms 
-			if (len(self.trimObs) > 0) and (not hid in self.trimObs):
-				continue
-
-			# Fetch histogram information from file
-			descRecord = self.histodesc.describeHistogram( hid )
-			if not descRecord:
-				self.sendError("Could not find description for histogram %s" % hid)
-				return
-
-			# Fetch user information from database
-			try:
-
-				# Fetch the matching observable record
-				observableRecord = Observable.get(
-					(Observable.name==hid) &
-					(Observable.energy==descRecord['energy']) &
-					(Observable.beam==descRecord['beam']) &
-					(Observable.process==descRecord['process'])
-					)
-
-				# Append extra fields
-				descRecord['title'] = str(observableRecord.title)
-				descRecord['short'] = str(observableRecord.short)
-				descRecord['shortdesc'] = str(observableRecord.shortdesc)
-				descRecord['leftdesc'] = str(observableRecord.leftDesc)
-				descRecord['rightdesc'] = str(observableRecord.rightDesc)
-				descRecord['urldesc'] = str(observableRecord.urldesc)
-
-			except Observable.DoesNotExist:
-				self.sendError("Could not find assisting information for histogram %s (e=%s, b=%s, p=%s)" % (hid, descRecord['energy'], descRecord['beam'], descRecord['process']))
-				return
-
-			# Collect observable names
-			l_observables.append(descRecord['id'])
-
-			# Compile to buffer and store on histoBuffers array
-			histoBuffers.append( js.packDescription(descRecord) )
-
-		# Collect links between tunables and observables
-		links = []
-		if l_observables and l_tunables:
-			entries = TunableToObservable.select().where( 
-					TunableToObservable.tunable << l_tunables, 
-					TunableToObservable.observable << l_observables
-				)
-			for e in entries:
-				links.append({
-						'tunable': e.tunable,
-						'observable': e.observable,
-						'title': e.title,
-						'shortdesc': e.shortdesc,
-						'urldesc': e.urldesc,
-						'importance': e.importance
-					})
-
-		linksBuffer = js.packString(tornado.escape.json_encode(links))
+		histo_ids = list(set(histo_ids) - set(self.trimObs))
+		histoBuffers = compileObservableHistoBuffers( histo_ids )
 
 		# Compile buffer and send
 		self.sendBuffer( 0x01, 
 				# Header must be 64-bit aligned
-				struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
+				struct.pack("<BBHI", 
+					2, 						# [8-bit]  Protocol
+					0, 						# [8-bit]  Flags
+					0, 						# [16-bit] Number of events
+					len(histoBuffers)		# [32-bit] Number of histograms
+				) + ''.join(histoBuffers)
 			)
 
 	def sendInterpolation(self, tunables):

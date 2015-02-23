@@ -27,7 +27,6 @@ import uuid
 
 from tornado.web import URLSpec
 from webserver.h.configure import ConfigHandler
-from webserver.h.labsocket import LabSocketHandler
 from webserver.h.apisocket import APISocketHandler
 from webserver.h.index import IndexHandler, PlayHandler, HelpHandler
 from webserver.config import Config

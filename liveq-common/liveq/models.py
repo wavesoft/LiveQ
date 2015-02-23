@@ -437,6 +437,18 @@ class Tunable(BaseModel):
 	#: A set of choices or additional options for the tunable
 	options = TextField(default="")
 
+	def getOptions(self):
+		"""
+		JSON-Decode options
+		"""
+		return json.loads(self.options)
+
+	def setOptions(self, options=[]):
+		"""
+		JSON-Encode options
+		"""
+		self.options = json.dumps(options)
+
 class Observable(BaseModel):
 	"""
 	The description of the ovservables
@@ -453,6 +465,8 @@ class Observable(BaseModel):
 	#: The book for more details regarding this tunable
 	book = CharField(max_length=128, default="")
 
+	#: Description
+	desc = TextField(default="")
 	#: The human-readable name of the observable
 	title = CharField(max_length=128)
 	#: The rendered TeX title as an image
@@ -482,7 +496,6 @@ class Observable(BaseModel):
 
 	#: Accelerators (beam/energy) combinations
 	accelerators = TextField(default="")
-
 
 	def setAccelerators(self, tuples):
 		"""

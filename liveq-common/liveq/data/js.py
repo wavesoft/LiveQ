@@ -102,25 +102,15 @@ def packHistogram(histo):
 	# Return buffer
 	return buf
 
-def packDescription(desc):
+def packDescription(desc, refHisto):
 	"""
 	Pack a histogram description, as obtained from HistoDescriptionLab.describeHistogram
 	"""
 
-	# Create a copy only with the useful info
-	uDesc = dict(desc)
-	del uDesc['files']
-
 	# Pack the useful info dictionary
-	buf = packString( json.dumps(uDesc) )
-
-	# Pack Title,X,Y pngs
-	buf += packFile( desc['files']['title'] )
-	buf += packFile( desc['files']['xlabel'] )
-	buf += packFile( desc['files']['ylabel'] )
+	buf = packString( json.dumps(desc) )
 
 	# Pack reference histogram
-	refHisto = Histogram.fromFLAT( desc['files']['ref'] )
 	buf += packHistogram( refHisto )
 
 	# Return buffer

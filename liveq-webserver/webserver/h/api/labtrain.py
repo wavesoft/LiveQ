@@ -36,6 +36,7 @@ from webserver.h.api import APIInterface
 
 from tornado.ioloop import IOLoop
 from webserver.common.training import OfflineSequence
+from webserver.common.api import compileObservableHistoBuffers
 
 class LabTrainInterface(APIInterface):
 
@@ -102,9 +103,6 @@ class LabTrainInterface(APIInterface):
 			# Open offline sequence
 			self.logger.info("Opening offline sequence '%s' with client v%s" % (param['sequence'], self.cversion))
 
-			# Open a histogram description instance without lab
-			self.histodesc = Config.HISTODESC.forLab( None )
-
 			# Store histogram names
 			self.observables = param['observables']
 
@@ -140,30 +138,18 @@ class LabTrainInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
+
 	def sendConfigurationFrame(self):
 		"""
 		Send the first, configuration frame to the agent
 		"""
 
+		# ==========================
+		#  Histograms (Observables)
+		# ==========================
+
 		# Fetch descriptions for the histograms
-		histoBuffers = []
-		for hid in self.observables:
-
-			# Fetch histogram information from file
-			descRecord = self.histodesc.describeHistogram( hid )
-			if not descRecord:
-				self.sendError("Could not find description for histogram %s" % hid)
-				return
-
-			# Fetch additional information from database
-			record = Config.CACHE.get("observables", hid)
-
-			# Update append information
-			for k,v in record['info'].iteritems():
-				descRecord[k] = v
-
-			# Compile to buffer and store on histoBuffers array
-			histoBuffers.append( js.packDescription(descRecord) )
+		histoBuffers = compileObservableHistoBuffers( self.observables )
 
 		# Blank tunables and links buffer
 		tunablesBuffer = js.packString("[]")

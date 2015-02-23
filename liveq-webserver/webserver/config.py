@@ -26,7 +26,6 @@ from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.cache import CacheConfig
-from liveq.data.histo.description import HistoDescription
 from liveq.models import createBaseTables
 
 """
@@ -36,7 +35,7 @@ class WebserverConfig:
 
 	SERVER_PORT = 8080
 	BASE_URL = "/vas"
-	HISTODESC_PATH = ""
+	HISTOREF_PATH = ""
 	TRAINSEQ_PATH = ""
 	HISTODESC = None
 	SSL = False
@@ -48,7 +47,7 @@ class WebserverConfig:
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
-		WebserverConfig.HISTODESC_PATH = config.get("webserver", "histodesc_path")
+		WebserverConfig.HISTOREF_PATH = config.get("webserver", "historef_path")
 		WebserverConfig.TRAINSEQ_PATH = config.get("webserver", "trainseq_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
 		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
@@ -56,9 +55,6 @@ class WebserverConfig:
 		WebserverConfig.SSL_CERTIFICATE = config.get("webserver", "ssl_certificate")
 		WebserverConfig.SSL_KEY = config.get("webserver", "ssl_key")
 		WebserverConfig.SSL_CA = config.get("webserver", "ssl_ca")
-
-		# Create a histogram description from the reference data path
-		WebserverConfig.HISTODESC = HistoDescription( WebserverConfig.HISTODESC_PATH )
 
 """
 Create a configuration for the JOB MANAGER based on the core config
