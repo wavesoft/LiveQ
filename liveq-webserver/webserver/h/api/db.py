@@ -22,6 +22,8 @@ import time
 import datetime
 import json
 
+import liveq.models
+
 from liveq.io.bus import Bus
 
 from webserver.h.api import APIInterface
@@ -36,6 +38,21 @@ class DatabaseInterface(APIInterface):
 		"""
 		APIInterface.__init__(self, socket, "db")
 
+		# Table names and mapping to the allowed models
+		self.tables = {
+			'tunable' : {
+				'model'  : liveq.models.Tunable,
+				'index'	 : 'name',
+				'access' : 'open'
+			},
+			'observable' : {
+				'model'  : liveq.models.Observable,
+				'index'	 : 'name',
+				'access' : 'open'
+			}
+		}
+
+
 	def ready(self):
 		"""
 		When socket is ready, get the user reference
@@ -43,6 +60,19 @@ class DatabaseInterface(APIInterface):
 		
 		# Keep a local reference of the user
 		self.user = self.socket.user
+
+	def get_document(self, docName):
+		"""
+		Return the given document
+		"""
+
+		# Check the table 
+		if not docName in self.table:
+			return sendError()
+
+		MODEL = 
+		fields = MODEL._meta.get_field_names()
+
 
 	def handleAction(self, action, param):
 		"""
