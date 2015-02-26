@@ -43,12 +43,14 @@ class DatabaseInterface(APIInterface):
 			'tunable' : {
 				'model'  : liveq.models.Tunable,
 				'index'	 : 'name',
-				'access' : 'open'
+				'read'   : None,
+				'write'  : ['admin']
 			},
 			'observable' : {
 				'model'  : liveq.models.Observable,
 				'index'	 : 'name',
-				'access' : 'open'
+				'read'   : None,
+				'write'  : ['admin']
 			}
 		}
 
@@ -61,26 +63,103 @@ class DatabaseInterface(APIInterface):
 		# Keep a local reference of the user
 		self.user = self.socket.user
 
-	def get_document(self, docName):
+	def get_table_record(self, docName, docIndex):
 		"""
-		Return the given document
+		Return the given table record
 		"""
 
 		# Check the table 
-		if not docName in self.table:
-			return sendError()
+		if not docName in self.tables:
+			return sendError("Table %s not found!" % docName)
 
-		MODEL = 
-		fields = MODEL._meta.get_field_names()
+		# Get table
+		tab = self.tables[docName]
 
+		# Check priviledges
+		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
+			return sendError("You are not authorized to access table %s" % docName)
+
+		# Query table
+		MODEL = tab['model']
+		FIELDS = MODEL._meta.get_field_names()
+		try:
+
+			# Try to get record
+			record = MODEL.get(MODEL.__dict__[tab['index']] == docIndex)
+
+			# Compile document
+			document = {}
+			for f in FIELDS:
+				document[f] = record.__dict__[f]
+
+			# Send data
+			self.sendResponse({
+				"status": "ok",
+				"doc": document
+				})
+
+
+		except MODEL.DoesNotExist:
+
+			# Does not exist
+			self.sendResponse({
+				"status": "error",
+				"error": "Document does not exist",
+				"error_id": "does-not-exist"
+				})
+
+
+	def update_table_record(self, docName, docIndex, docFields):
+		"""
+		Update the specified table record
+		"""
+
+		# Check the table 
+		if not docName in self.tables:
+			return sendError("Table %s not found!" % docName)
+
+		# Get table
+		tab = self.tables[docName]
+
+		# Check priviledges
+		if not (tab['write'] is None) and not self.user.inGroups(tab['write']):
+			return sendError("You are not authorized to access table %s" % docName)
+
+		# Query table
+		MODEL = tab['model']
+		FIELDS = MODEL._meta.get_field_names()
+
+		# Fetch or create new record
+		try:
+			# Try to get record
+			record = MODEL.get(MODEL.__dict__[tab['index']] == docIndex)
+
+		except MODEL.DoesNotExist:
+			# Allocate new record
+			record = MODEL()
+
+
+		# Update fields
+		for f in FIELDS:
+			if f in docFields:
+				record.__dict__[f] = docFields[f]
+
+		# Save record
+		record.save()
+
+		# Send data
+		self.sendResponse({
+			"status": "ok"
+			})
 
 	def handleAction(self, action, param):
 		"""
-		Handle chat actions
+		Handle database actions
 		"""
 		
-		if action == "tunable.get":
-			pass
+		if action == "table.get":
+			self.get_table_record(param['table'], param['index'])
 
-		pass
+		elif action == "table.set":
+			self.update_table_record(param['table'], param['index'], param['doc'])
 

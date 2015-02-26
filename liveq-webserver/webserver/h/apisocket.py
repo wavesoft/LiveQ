@@ -25,6 +25,9 @@ import struct
 import uuid
 import logging
 import base64
+import hashlib
+import random
+import string
 
 from webserver.h.api.chat import ChatInterface
 from webserver.h.api.course import CourseInterface
@@ -33,7 +36,7 @@ from webserver.h.api.labsocket import LabSocketInterface
 from webserver.h.api.labtrain import LabTrainInterface
 from webserver.h.api.db import DatabaseInterface
 
-from liveq.models import User
+from liveq.models import User, AnalyticsProfile
 from webserver.config import Config
 from tornado.ioloop import IOLoop
 import tornado.websocket
@@ -266,17 +269,28 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		if not user:
 			return
 
+		# Compile analytics profile
+		analytics = None
+		if user.analyticsProfile:
+			analytics = {
+				'uuid'				: user.analyticsProfile.uuid,
+				'gender' 			: user.analyticsProfile.gender,
+				'birthYear' 		: user.analyticsProfile.birthYear,
+				'audienceSource'	: user.analyticsProfile.audienceSource,
+				'audienceInterests'	: user.analyticsProfile.audienceInterests,
+				'lastEvent' 		: str(user.analyticsProfile.lastEvent),
+				'metrics' 			: json.loads(user.analyticsProfile.metrics),
+			}
+
 		# Send user profile
 		self.sendAction('account.profile', {
-				'username' 		: user.username,
-				'gender' 		: user.gender,
-				'birthdate'		: user.birthdate,
 				'email' 		: user.email,
-				'collectStats'	: user.collectStats,
 				'displayName' 	: user.displayName,
 				'avatar' 		: user.avatar,
 				'credits'		: user.credits,
-				'vars' 			: json.loads(user.variables)
+				'groups'		: user.groups,
+				'vars' 			: json.loads(user.variables),
+				'analytics'		: analytics
 			})
 
 	def sendNotification(self, message, msgType="info"):
@@ -302,17 +316,17 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 			# Fetch user entry
 			try:
-				userName = str(param['username']).lower()
-				user = User.get(User.username == userName)
+				email = str(param['email']).lower()
+				user = User.get(User.email == email)
 			except User.DoesNotExist:
 				self.sendAction('account.login.response', {
 						'status' : 'error',
-						'message': "User does not exist"
+						'message': "A user with this e-mail does not exist!"
 					})
 				return
 
-			# Validate user password
-			if user.password != param['password']:
+			# Validate user password, hashed with a client-generated challenge
+			if user.password != hashlib.sha1("%s:%s" % (user.salt, param['password'])).hexdigest():
 				self.sendAction('account.login.response', {
 						'status' : 'error',
 						'message': "Password mismatch"
@@ -334,11 +348,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 			# Fetch user profile
 			profile = param['profile']
-			userName = str(profile['username']).lower()
+			email = str(profile['email']).lower()
 
 			# Check if such user exist
 			try:
-				user = User.get(User.username == userName)
+				user = User.get(User.email == email)
 				self.sendAction('account.register.response', {
 						'status' : 'error',
 						'message': "A user with this name already exists!"
@@ -347,18 +361,37 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			except User.DoesNotExist:
 				pass
 
+			# Create a random secret
+			salt = "".join([random.choice(string.letters + string.digits) for x in range(0,50)])
+
 			# Create new user
 			user = User.create(
-				username=userName,
-				password=profile['password'],
-				gender=profile['gender'],
-				email=profile['email'],
-				birthdate=profile['birthdate'],
-				avatar=profile['avatar'],
-				collectStats=profile['research'],
+				email=email,
+				password=hashlib.sha1("%s:%s" % (salt, profile['password'])).hexdigest(),
+				salt=salt,
 				displayName=profile['displayName'],
+				avatar=profile['avatar'],
+				credits=0,
 				variables="{}"
 				)
+
+			# Check if we have to create a new analytics profile
+			if profile['analytics']:
+
+				# Create an analytics profile
+				aProfile = AnalyticsProfile.create(
+					uuid=uuid.uuid4().hex,
+					gender=profile['analytics']['gender'],
+					birthYear=profile['analytics']['birthYear'],
+					audienceSource=profile['analytics']['audienceSource'],
+					audienceInterests=profile['analytics']['audienceInterests'],
+					)
+				aProfile.save()
+
+				# Store analytics profile to the user's account
+				user.analyticsProfile = aProfile
+
+			# Save user
 			user.save()
 
 			# Success

@@ -45,8 +45,9 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
-					Tutorials, Tunable, Observable, TunableToObservable, TeamNotebook, QuestionaireResponses ]:
+	for table in [ AnalyticsProfile, User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
+					Tutorials, Tunable, Observable, TunableToObservable, TeamNotebook, QuestionaireResponses,
+					AnalyticsEvent ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -55,32 +56,49 @@ def createBaseTables():
 #  In production
 # -----------------------------------------------------
 
+class AnalyticsProfile(BaseModel):
+	"""
+	Additional fields for the analytics user profile
+	"""
+
+	#: Analytics UUID
+	uuid = CharField(max_length=128)
+
+	# Analytics fields
+	gender = CharField(max_length=6,default="")
+	birthYear = IntegerField(default=0)
+	audienceSource = CharField(max_length=68, default="")
+	audienceInterests = CharField(max_length=68, default="")
+
+	#: When was it created
+	created = DateTimeField(default=datetime.datetime.now)
+	#: Last time user performed an analytics-aware action
+	lastEvent = DateTimeField(default=datetime.datetime.now)
+
+	# Analytics metrics
+	metrics = TextField(default="{}")
+
 class User(BaseModel):
 	"""
 	The user registry
 	"""
 
-	#: The log-in username of the user
-	username = CharField(max_length=128)
 	#: The e-mail of the user
 	email = CharField(max_length=128)
+
 	#: The password
 	password = CharField(max_length=128)
+	#: The password hash
+	salt = CharField(max_length=50)
+
+	#: The permission groups this user has
+	groups = TextField(default="")
 
 	#: The display name
 	displayName = CharField(max_length=128)
 
-	#: Gender
-	gender = CharField(max_length=10)
-	#: Birthdate (timestamp)
-	birthdate = IntegerField()
-
 	#: User credits
 	credits = IntegerField(default=8)
-
-	#: Check if the user aggrees to participate to the
-	#: stats collection
-	collectStats = BooleanField(default=True)
 
 	#: The team avatar
 	avatar = CharField(max_length=128)
@@ -88,11 +106,88 @@ class User(BaseModel):
 	#: Variable parameters
 	variables = TextField(default="{}")
 
+	#: Link to analytics profile
+	analyticsProfile = ForeignKeyField(AnalyticsProfile, null=True, default=None)
+
 	def __str__(self):
 		"""
 		Stringify result
 		"""
-		return self.username
+		return self.displayName
+
+	def getGroups(self):
+		"""
+		Split groups
+		"""
+		return self.groups.split(",")
+
+	def setGroups(self, groups=[]):
+		"""
+		Update groups
+		"""
+		self.groups = ",".join(groups)
+
+	def joinGroup(self, name):
+		"""
+		Join a permission group
+		"""
+
+		# Lowercase name
+		name = name.lower()
+
+		# Join group
+		groups = self.getGroups()
+		if not name in groups:
+			groups.append(name)
+
+			# Update field
+			self.setGroups(groups)
+
+	def leaveGroup(self, name):
+		"""
+		Leave a permission group
+		"""
+
+		# Lowercase name
+		name = name.lower()
+
+		# Join group
+		groups = self.getGroups()
+		if name in groups:
+			i = groups.index(name)
+			del groups[i]
+
+			# Update field
+			self.setGroups(groups)
+
+	def inGroup(self, name):
+		"""
+		Check if the user is in this group
+		"""
+
+		# Fast comparison in the string
+		return (",%s," % name.lower()) in (",%s," % self.groups)
+
+	def inGroups(self, names, all=False):
+		"""
+		Check if user is in any or all of the given groups
+		"""
+
+		# Iterate over all names
+		for g in names:
+			if self.inGroup(g):
+				# Member of least one group? (when all=False)
+				if not all:
+					return True
+			else:
+				# Not a member of at least one group? (when all=True)
+				if all:
+					return False
+
+		# Not found?
+		# When all=True, return True
+		# When all=False, return False
+		return all
 
 class AgentGroup(BaseModel):
 	"""
@@ -529,6 +624,20 @@ class PostMortems(BaseModel):
 	#: The agent from which the PM originates
 	agent = ForeignKeyField(Agent)
 	#: The post-mortem payload
+	data = TextField(default="")
+
+class AnalyticsEvent(BaseModel):
+	"""
+	Aggregated user analytics
+	"""
+
+	#: Link to analytics profile
+	analyticsProfile = ForeignKeyField(AnalyticsProfile)
+	#: When this event happened
+	timestamp = DateTimeField(default=datetime.datetime.now)
+	#: Name of the event
+	name = CharField(max_length=128)
+	#: Data for this event
 	data = TextField(default="")
 
 # -----------------------------------------------------

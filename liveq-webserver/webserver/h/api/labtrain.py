@@ -158,7 +158,7 @@ class LabTrainInterface(APIInterface):
 		# Compile buffer and send
 		self.sendBuffer( 0x01, 
 				# Header must be 64-bit aligned
-				struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
+				struct.pack("<BBHI", 2, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
 			)
 
 	def trainSequence(self):

@@ -174,7 +174,8 @@ class AccountInterface(APIInterface):
 				# Send response
 				self.sendResponse({
 							"status": "error",
-							"message": "Credits already claimed"
+							"error_id": "credits-claimed",
+							"error": "Credits already claimed"
 						})
 				return
 
@@ -207,7 +208,8 @@ class AccountInterface(APIInterface):
 			if credits == 0:
 				self.sendResponse({
 							"status": "error",
-							"message": "No credits awarded"
+							"error_id": "no-credits-awarded",
+							"error": "No credits awarded"
 						})
 				return
 

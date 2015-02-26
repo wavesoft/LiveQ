@@ -32,6 +32,9 @@ class APIInterface:
 		self.isOpen = True
 		self.currentAction = ""
 
+		# Keep a local reference of the user
+		self.user = self.socket.user
+
 		# Open logger
 		self.logger = logging.getLogger("api.%s" % domain)
 
@@ -53,7 +56,7 @@ class APIInterface:
 
 	def ready(self):
 		"""
-		Cleanup logic when the socket is ready (handshake and user log-in completed)
+		Callback when the socket is ready (handshake and user log-in completed)
 		"""
 		pass
 
