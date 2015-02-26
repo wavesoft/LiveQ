@@ -51,6 +51,12 @@ class DatabaseInterface(APIInterface):
 				'index'	 : 'name',
 				'read'   : None,
 				'write'  : ['admin']
+			},
+			'knowledge_grid' : {
+				'model'  : liveq.models.KnowledgeGrid,
+				'index'	 : 'id',
+				'read'   : None,
+				'write'  : ['admin']
 			}
 		}
 
@@ -63,7 +69,7 @@ class DatabaseInterface(APIInterface):
 		# Keep a local reference of the user
 		self.user = self.socket.user
 
-	def get_table_record(self, docName, docIndex):
+	def get_table_record(self, docName, docIndex, expandJSON=True):
 		"""
 		Return the given table record
 		"""
@@ -82,6 +88,7 @@ class DatabaseInterface(APIInterface):
 		# Query table
 		MODEL = tab['model']
 		FIELDS = MODEL._meta.get_field_names()
+
 		try:
 
 			# Try to get record
@@ -90,7 +97,13 @@ class DatabaseInterface(APIInterface):
 			# Compile document
 			document = {}
 			for f in FIELDS:
-				document[f] = record.__dict__[f]
+				if (f in MODEL.JSON_FIELDS) and expandJSON:
+					if not record.__dict__[f]:
+						document[f] = {}
+					else:
+						document[f] = json.loads(record.__dict__[f])
+				else:
+					document[f] = record.__dict__[f]
 
 			# Send data
 			self.sendResponse({
@@ -109,7 +122,7 @@ class DatabaseInterface(APIInterface):
 				})
 
 
-	def update_table_record(self, docName, docIndex, docFields):
+	def update_table_record(self, docName, docIndex, docFields, expandJSON=True):
 		"""
 		Update the specified table record
 		"""
@@ -142,7 +155,13 @@ class DatabaseInterface(APIInterface):
 		# Update fields
 		for f in FIELDS:
 			if f in docFields:
-				record.__dict__[f] = docFields[f]
+				if (f in MODEL.JSON_FIELDS) and expandJSON:
+					if not docFields[f]:
+						record.__dict__[f] = ""
+					else:
+						record.__dict__[f] = json.dumps(docFields[f])
+				else:
+					record.__dict__[f] = docFields[f]
 
 		# Save record
 		record.save()

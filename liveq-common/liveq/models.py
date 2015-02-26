@@ -38,6 +38,9 @@ class BaseModel(Model):
 	class Meta:
 		database = DatabaseConfig.DB
 
+	#: Which fields should be encoded using JSON
+	JSON_FIELDS = []
+
 def createBaseTables():
 	"""
 	Create the database models in the ``liveq.models`` module, if
@@ -47,7 +50,7 @@ def createBaseTables():
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, AgentGroup, Team, TeamMembers, Jobs, Agent, AgentJobs, AgentMetrics, Lab, 
 					Tutorials, Tunable, Observable, TunableToObservable, TeamNotebook, QuestionaireResponses,
-					AnalyticsEvent ]:
+					AnalyticsEvent, KnowledgeGrid ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -60,6 +63,9 @@ class AnalyticsProfile(BaseModel):
 	"""
 	Additional fields for the analytics user profile
 	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['metrics']
 
 	#: Analytics UUID
 	uuid = CharField(max_length=128)
@@ -82,6 +88,9 @@ class User(BaseModel):
 	"""
 	The user registry
 	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['variables']
 
 	#: The e-mail of the user
 	email = CharField(max_length=128)
@@ -498,6 +507,9 @@ class Tunable(BaseModel):
 	Description for the tunables as an individual parameter
 	"""
 
+	#: JSON Fields in this model
+	JSON_FIELDS = ['options']
+
 	#: The name of variable of the tunable parameter
 	name = CharField(max_length=128, index=True, unique=True)
 	#: The short (iconic title)
@@ -631,6 +643,9 @@ class AnalyticsEvent(BaseModel):
 	Aggregated user analytics
 	"""
 
+	#: JSON Fields in this model
+	JSON_FIELDS = ['data']
+
 	#: Link to analytics profile
 	analyticsProfile = ForeignKeyField(AnalyticsProfile)
 	#: When this event happened
@@ -640,41 +655,41 @@ class AnalyticsEvent(BaseModel):
 	#: Data for this event
 	data = TextField(default="")
 
-# -----------------------------------------------------
-#  Under active development
-# -----------------------------------------------------
-
 class KnowledgeGrid(BaseModel):
 	"""
 	The knowledge grid
 	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['u_actions', 'u_parts']
 
 	#: Parent entry to KG
 	parent = ForeignKeyField('self', null=True)
 
 	#: The title of the knowledge grid element
 	title = CharField(max_length=128)
+
 	#: A short description for this element
 	desc = TextField(default="")
-	#: The knowledge grid element
-	title = CharField(max_length=128)
-	#: The book for more details regarding this tunable
-	book = CharField(max_length=128, default="")
+	#: An image chat accompanies the short description
+	descImage = CharField(max_length=128, default="")
+
+	#: The kind of the element
+	#: ([edu]cational, [int]erface, [exp]erience, [gam]e)
+	kind = CharField(max_length=3, default="edu")
+	#: Icon of the element
+	icon = CharField(max_length=128, default="study.png")
 
 	#: Cost in credits for this element
 	cost = IntegerField(default=0)
 
-	#: The course related to this topic
-	s_course = CharField(max_length=128, default="")
-	#: The UI introduction related to this topic 
-	s_intro = CharField(max_length=128, default="")
+	#: Enumeration of sequences to be performed upon
+	#: unlocking this item
+	u_actions = TextField(default="{}")
 
-	#: Configurations to enable
-	e_config = TextField(default="")
-	#: Tunables to enable
-	e_tunables = TextField(default="")
-	#: Observables to enable
-	e_observables = TextField(default="")
+	#: Enumeration of sequences to be performed upon
+	#: unlocking this item
+	u_parts = TextField(default="{}")
 
 # -----------------------------------------------------
 #  Drafts
