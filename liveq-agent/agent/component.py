@@ -45,6 +45,7 @@ class AgentComponent(Component):
 		# Setup logger
 		self.logger = logging.getLogger("agent")
 		self.logger.debug("Agent component started")
+		self.logger.info("Joining agent group '%s'" % Config.AGENT_GROUP)
 
 		# The slots where job instances are placed
 		self.slots = [None] * int(Config.AGENT_SLOTS)
