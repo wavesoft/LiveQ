@@ -151,14 +151,15 @@ class LabTrainInterface(APIInterface):
 		# Fetch descriptions for the histograms
 		histoBuffers = compileObservableHistoBuffers( self.observables )
 
-		# Blank tunables and links buffer
-		tunablesBuffer = js.packString("[]")
-		linksBuffer = js.packString("[]")
-
 		# Compile buffer and send
 		self.sendBuffer( 0x01, 
 				# Header must be 64-bit aligned
-				struct.pack("<BBHI", 2, 0, 0, len(histoBuffers)) + tunablesBuffer + linksBuffer + ''.join(histoBuffers)
+				struct.pack("<BBHI", 
+					2, 						# [8-bit]  Protocol
+					0, 						# [8-bit]  Flags (1=FromInterpolation)
+					0, 						# [16-bit] Number of events
+					len(histoBuffers)		# [32-bit] Number of histograms
+				) + ''.join(histoBuffers)
 			)
 
 	def trainSequence(self):
@@ -186,7 +187,13 @@ class LabTrainInterface(APIInterface):
 
 		# Compile buffer and send
 		self.sendBuffer( 0x02, 
-				struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+				# Header must be 64-bit aligned
+				struct.pack("<BBHI", 
+					2, 						# [8-bit]  Protocol
+					0, 						# [8-bit]  Flags (1=FromInterpolation)
+					0, 						# [16-bit] Number of events
+					len(histoBuffers)		# [32-bit] Number of histograms
+				) + ''.join(histoBuffers)
 			)
 
 		# Schedule next request

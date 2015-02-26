@@ -72,7 +72,7 @@ def packHistogram(histo):
 	"""
 	Serialize historgram so it can be optimally streamed to the browser.
 
-	Note: This function ensure 64-bit alignment of the data.
+	Note: This function ensures 64-bit alignment of the data.
 	"""
 
 	# Start with histogram name
@@ -105,6 +105,8 @@ def packHistogram(histo):
 def packDescription(desc, refHisto):
 	"""
 	Pack a histogram description, as obtained from HistoDescriptionLab.describeHistogram
+
+	Note: This function ensures 64-bit alignment of the data.
 	"""
 
 	# Pack the useful info dictionary

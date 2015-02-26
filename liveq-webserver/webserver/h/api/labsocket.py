@@ -228,9 +228,14 @@ class LabSocketInterface(APIInterface):
 
 		# Compile buffer and send
 		self.sendBuffer( 0x02, 
-				struct.pack("<BBHI", 1, 0, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+				# Header must be 64-bit aligned
+				struct.pack("<BBHI", 
+					2, 						# [8-bit]  Protocol
+					0, 						# [8-bit]  Flags (1=FromInterpolation)
+					0, 						# [16-bit] (Reserved)
+					len(histoBuffers)		# [32-bit] Number of histograms
+				) + ''.join(histoBuffers)
 			)
-
 
 	def onBusCompleted(self, data):
 		"""
@@ -406,8 +411,13 @@ class LabSocketInterface(APIInterface):
 
 			# Compile buffer and send
 			self.sendBuffer( 0x02, 
-					# Set interpolate flag on the frame
-					struct.pack("<BBHI", 1, 1, 0, len(histoBuffers)) + ''.join(histoBuffers) # Prefix with length (64-bit aligned)
+					# Header must be 64-bit aligned
+					struct.pack("<BBHI", 
+						2, 						# [8-bit]  Protocol
+						1, 						# [8-bit]  Flags (1=FromInterpolation)
+						0, 						# [16-bit] (Reserved)
+						len(histoBuffers)		# [32-bit] Number of histograms
+					) + ''.join(histoBuffers)
 				)
 
 			# Send status message
