@@ -19,8 +19,9 @@
 ################################################################
 
 # ----------
+import os
 import sys
-sys.path.append("../liveq-common")
+sys.path.append("%s/liveq-common" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 # ----------
 
 import logging
