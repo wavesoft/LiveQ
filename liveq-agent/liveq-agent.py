@@ -23,6 +23,7 @@ import sys
 sys.path.append("../liveq-common")
 # ----------
 
+import os
 import time
 import logging
 
@@ -38,7 +39,16 @@ runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.fromFile( "config/agent.conf.local", runtimeConfig )
+
+	# Override configuration from command-line
+	configFile = "config/agent.conf.local"
+	if len(sys.argv) > 1:
+		configFile = sys.argv[1]
+		if not os.path.isfile(configFile):
+			raise ConfigException("Config file %s does not exist" % configFile)
+
+	# Load config file
+	Config.fromFile( configFile, runtimeConfig )
 	PostMortem.addGlobalConfig("global", Config)
 	PostMortem.addGlobalInfo("version", "2.0")
 	
