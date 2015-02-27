@@ -33,7 +33,7 @@ runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.fromFile( "config/config.local", runtimeConfig )
+	Config.fromFile( "config/common.conf.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	exit(1)
