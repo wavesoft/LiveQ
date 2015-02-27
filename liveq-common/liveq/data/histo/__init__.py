@@ -331,6 +331,7 @@ class Histogram:
 			meta = {
 				'x': [ self.x, self.xErrMinus, self.xErrPlus ],
 				'logY': logY,
+				'coef': len(combCoeff),
 				'bins': self.bins,
 				'name': self.name,
 				'meta': self.meta
@@ -363,7 +364,7 @@ class Histogram:
 			toDegree = self.bins
 
 		# Too small degree to polyfit? Return 0
-		if (toDegree < fromDegree) or (toDegree == 1):
+		if (toDegree < fromDegree) or (toDegree <= 1):
 			return (0, 0, [])
 
 		# Perform polyfit

@@ -104,9 +104,6 @@ class InterpolatableCollection(dict):
 		# Create collection
 		self.clear()
 
-		# Calculate coefficient slice width
-		w = len(self.dataCoeff) / len(self.dataMeta)
-
 		# Rebuild histograms
 		ofs=0
 		for meta in self.dataMeta:
@@ -116,6 +113,7 @@ class InterpolatableCollection(dict):
 				continue
 
 			# Fetch coefficient slice and forward to next
+			w = int(meta['coef'])
 			coeff = self.dataCoeff[ofs:ofs+w]
 			ofs += w
 
@@ -123,7 +121,7 @@ class InterpolatableCollection(dict):
 			histo = Histogram.fromFit( coeff, meta )
 			self[histo.name] = histo
 
-	def regenFits( self, histograms=None ):
+	def regenFits( self, histograms=None, fitDegree=None ):
 		"""
 		(Re)generate dataCoeff and dataMeta from Histograms
 
@@ -144,8 +142,13 @@ class InterpolatableCollection(dict):
 		# Process histograms in array
 		for hname in histograms:
 
+			# Check if we have a fitDegree override
+			histoDegree=None
+			if not (fitDegree is None) and (hname in fitDegree):
+				histoDegree=fitDegree[hname]
+
 			# Fit histogram
-			coeff, meta = self[hname].polyFit()
+			coeff, meta = self[hname].polyFit(deg=histoDegree)
 
 			# Skip buggy histograms
 			if coeff is None:

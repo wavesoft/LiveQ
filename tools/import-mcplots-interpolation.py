@@ -13,7 +13,7 @@ import hashlib
 import uuid
 import glob
 
-from config import Config
+from util.config import Config
 
 from liveq import handleSIGINT, exit
 from liveq.events import GlobalEvents
@@ -24,7 +24,7 @@ from liveq.data.histo import Histogram
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
-from liveq.models import Agent, Lab
+from liveq.models import Lab, Observable
 from liveq.data.tune import Tune
 
 # Prepare runtime configuration
@@ -40,10 +40,28 @@ except ConfigException as e:
 # Hook sigint -> Shutdown
 handleSIGINT()
 
-# Read parameters from command line
-if len(sys.argv) < 2:
-	print("ERROR   Please specify a directory!")
-	exit(1)
+# Ensure we have at least one parameter
+if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
+	print "Interpolation Importing Tool - Import MCPots runs to interpolator"
+	print "Usage:"
+	print ""
+	print " import-mcplots-interpolation.py <lab ID> <path to mcplots jobs dir>"
+	print ""
+	sys.exit(1)
+
+# Check if the specified lab exists
+if not Lab.select().where(Lab.uuid == k).exists():
+	print "ERROR: Could not find lab %s!" % sys.argv[1]
+	sys.exit(1)
+
+# Check if we have directory
+if not os.path.isdir(sys.argv[2]):
+	print "ERROR: Could not find %s!" % sys.argv[2]
+	sys.exit(1)
+
+# Import LabID
+labID = sys.argv[1]
+baseDir = sys.argv[2]
 
 # Definition of the TarImport Component
 class TarImport(Component):
@@ -53,16 +71,16 @@ class TarImport(Component):
 		Initialize TarImport
 		"""
 		Component.__init__(self)
-		self.baseDir = sys.argv[1]
+		self.baseDir = baseDir
 
 		# Open lab 
 		try:
-			self.lab = Lab.get( Lab.uuid == Config.labID)
+			self.lab = Lab.get( Lab.uuid == labID )
 		except Lab.DoesNotExist:
 			self.lab = None
 
 		# Prepare the list of histograms to process
-		self.histogramQueue = glob.glob("%s/*%s" % (self.baseDir, suffix))
+		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
 
 	def readHistograms(self, tarObject):
 		"""
@@ -200,12 +218,22 @@ class TarImport(Component):
 		res = InterpolatableCollection(tune=Tune( tuneParam, labid=self.lab.uuid ))
 
 		# Select only the histograms used in this tune
+		degrees = {}
 		hipol = self.lab.getHistograms()
 		for h in histos:
+
+			# Store histogram
 			res.append(h)
 
+			# Get observable custom polyFit degree
+			try:
+				obs = Observable.get( Observable.name == h.name )
+				degrees[h.name] = obs.fitDegree
+			except Lab.DoesNotExist:
+				pass
+
 		# Generate fits for interpolation
-		res.regenFits()
+		res.regenFits( degrees )
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
