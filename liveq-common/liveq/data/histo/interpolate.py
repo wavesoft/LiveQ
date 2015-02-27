@@ -61,6 +61,26 @@ class InterpolatableCollection(dict):
 		#: The metadata
 		self.dataMeta = dataMeta
 
+	def __len__(self):
+		"""
+		Override len function in order to provide some information on
+		interpolated metadata.
+		"""
+
+		# Check if we have elements
+		eLen = dict.__len__(self)
+		if eLen > 0:
+			return eLen
+
+		# Check if we have coefficients
+		mLen = len(self.dataMeta)
+		if mLen > 0:
+			return mLen
+
+		# Otherwise we are really empty
+		return 0
+
+
 	def append(self, ihisto):
 		"""
 		Append an object in the collection and map them with their name

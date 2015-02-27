@@ -62,7 +62,7 @@ class TarImport(Component):
 			self.lab = None
 
 		# Prepare the list of histograms to process
-		self.histogramQueue = glob.glob("%s/*%s" % (Config.baseDir, suffix))
+		self.histogramQueue = glob.glob("%s/*%s" % (self.baseDir, suffix))
 
 	def readHistograms(self, tarObject):
 		"""

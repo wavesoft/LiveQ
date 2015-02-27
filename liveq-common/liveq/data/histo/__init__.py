@@ -245,92 +245,102 @@ class Histogram:
 	function.
 	"""
 	def polyFit(self, deg=10, meta=True, logY=None):
+		try:
 
-		# Check if we should use logY
-		if logY is None:
-			logY = True
-			if 'logY' in self.meta:
-				logY = self.meta['logY']
+			# Check if we should use logY
+			if logY is None:
+				logY = True
+				if 'logY' in self.meta:
+					logY = self.meta['logY']
 
-		# If we have a single bin, store the bin's value
-		# as coefficients
-		if self.bins == 1:
+			# If we have a single bin, store the bin's value
+			# as coefficients
+			if self.bins == 1:
 
-			# Coefficients = values
-			combCoeff = numpy.concatenate( [self.y, self.yErrPlus, self.yErrMinus, [0]*deg*3] )
+				# Coefficients = values
+				combCoeff = numpy.concatenate( [self.y, self.yErrPlus, self.yErrMinus, [0]*deg*3] )
 
-		else:
+			else:
 
-			# Keep only the y values that are non-zero
-			vy = [ ]
-			vyErrPlus = [ ]
-			vyErrMinus = [ ]
-			vx = [ ]
+				# Keep only the y values that are non-zero
+				vy = [ ]
+				vyErrPlus = [ ]
+				vyErrMinus = [ ]
+				vx = [ ]
 
-			# Process bins
-			i=0
-			for y in self.y:
+				# Process bins
+				i=0
+				for y in self.y:
 
-				# Skip zero y-bins
-				if y != 0:
-					if logY:
-						if y < 0:
+					# Skip zero y-bins
+					if y != 0:
+						if logY:
+							if y < 0:
+								vy.append(y)
+							else:
+								vy.append(numpy.log(y))
+
+							# Protect against zero values
+							if (y+self.yErrPlus[i]) <= 0:
+								vyErrPlus.append(0)
+							else:
+								vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+
+							# Protect against zero values
+							if (y-self.yErrMinus[i]) <= 0:
+								vyErrMinus.append(0)
+							else:
+								vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
+						else:
 							vy.append(y)
-						else:
-							vy.append(numpy.log(y))
+							vyErrPlus.append(y+self.yErrPlus[i])
+							vyErrMinus.append(y-self.yErrMinus[i])
 
-						# Protect against zero values
-						if (y+self.yErrPlus[i]) <= 0:
-							vyErrPlus.append(0)
-						else:
-							vyErrPlus.append(numpy.log(y+self.yErrPlus[i]))
+						# Collect sample
+						vx.append(self.x[i])
 
-						# Protect against zero values
-						if (y-self.yErrMinus[i]) <= 0:
-							vyErrMinus.append(0)
-						else:
-							vyErrMinus.append(numpy.log(y-self.yErrMinus[i]))
+					# Increase index
+					i += 1
+
+				# If we have no y-bins with values, return null
+				if len(vy) == 0:
+					if meta:
+						return (None, None)
 					else:
-						vy.append(y)
-						vyErrPlus.append(y+self.yErrPlus[i])
-						vyErrMinus.append(y-self.yErrMinus[i])
+						return None
 
-					# Collect sample
-					vx.append(self.x[i])
+				# Coefficents for the plot
+				coeff = numpy.polyfit( vx, vy, deg )
+				coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
+				coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
 
-				# Increase index
-				i += 1
+				# Calculate the combined coefficients
+				combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
 
-			# If we have no y-bins with values, return null
-			if len(vy) == 0:
-				if meta:
-					return (None, None)
-				else:
-					return None
+			# If we don't have metadata, return
+			if not meta:
+				return combCoeff
 
-			# Coefficents for the plot
-			coeff = numpy.polyfit( vx, vy, deg )
-			coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
-			coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
+			# Prepare metadata
+			meta = {
+				'x': [ self.x, self.xErrMinus, self.xErrPlus ],
+				'logY': logY,
+				'bins': self.bins,
+				'name': self.name,
+				'meta': self.meta
+			}
 
-			# Calculate the combined coefficients
-			combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
+			# Return coefficients and metadata
+			return (combCoeff, meta)
 
-		# If we don't have metadata, return
-		if not meta:
-			return combCoeff
+		# Catch exceptions
+		except Exception as e:
 
-		# Prepare metadata
-		meta = {
-			'x': [ self.x, self.xErrMinus, self.xErrPlus ],
-			'logY': logY,
-			'bins': self.bins,
-			'name': self.name,
-			'meta': self.meta
-		}
+			# Log exception
+			logging.error("Exception while trying to polyFit() histogram %s: %s" % (self.name, str(e)))
 
-		# Return coefficients and metadata
-		return (combCoeff, meta)
+			# On exception return None
+			return (None, None)
 
 	"""
 	Re-create the histogram from the coefficients and metadata specified
@@ -492,7 +502,6 @@ class Histogram:
 
 				# Look for set name
 				if (setName is None) or (setName == sName):
-					print "Importing %s" % sName
 				
 					# Process data points
 					for dPoint in dpSet:
@@ -578,8 +587,6 @@ class Histogram:
 				# Chomp path
 				if sPath[-1] == '/':
 					sPath = sPath[:-1]
-
-				print "Importing %s" % sName
 			
 				# Process data points
 				for dPoint in dpSet:
