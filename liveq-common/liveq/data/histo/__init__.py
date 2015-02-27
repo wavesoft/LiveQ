@@ -244,7 +244,7 @@ class Histogram:
 	Optionally it returns the metadata required to re-construct the histogram using Histogram.fromFit()
 	function.
 	"""
-	def polyFit(self, deg=6, meta=True, logY=None):
+	def polyFit(self, deg=4, meta=True, logY=None):
 		try:
 
 			# Check if we should use logY
