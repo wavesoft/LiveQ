@@ -69,6 +69,28 @@ class DatabaseInterface(APIInterface):
 		# Keep a local reference of the user
 		self.user = self.socket.user
 
+	def serialize(self, MODEL, record, expandJSON=True):
+		"""
+		Serialize the given record to a dictionary
+		"""
+
+		# Get model fields
+		FIELDS = MODEL._meta.get_field_names()
+
+		# Compile document
+		document = {}
+		for f in FIELDS:
+			if (f in MODEL.JSON_FIELDS) and expandJSON:
+				if not getattr(record, f):
+					document[f] = {}
+				else:
+					document[f] = json.loads(getattr(record, f))
+			else:
+				document[f] = getattr(record, f)
+
+		# Return document
+		return document
+
 	def get_table_record(self, docName, docIndex, expandJSON=True):
 		"""
 		Return the given table record
@@ -76,18 +98,17 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName)
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
-			return sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName)
 
 		# Query table
 		MODEL = tab['model']
-		FIELDS = MODEL._meta.get_field_names()
 
 		try:
 
@@ -95,15 +116,7 @@ class DatabaseInterface(APIInterface):
 			record = MODEL.get( getattr(MODEL,tab['index']) == docIndex )
 
 			# Compile document
-			document = {}
-			for f in FIELDS:
-				if (f in MODEL.JSON_FIELDS) and expandJSON:
-					if not getattr(record, f):
-						document[f] = {}
-					else:
-						document[f] = json.loads(getattr(record, f))
-				else:
-					document[f] = getattr(record, f)
+			document = self.serialize( MODEL, record, expandJSON=expandJSON )
 
 			# Send data
 			self.sendResponse({
@@ -129,14 +142,14 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName)
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['write'] is None) and not self.user.inGroups(tab['write']):
-			return sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName)
 
 		# Query table
 		MODEL = tab['model']
@@ -171,6 +184,39 @@ class DatabaseInterface(APIInterface):
 			"status": "ok"
 			})
 
+	def get_all_records(self, docName, expandJSON=True):
+		"""
+		Return all records
+		"""
+
+		# Check the table 
+		if not docName in self.tables:
+			return self.sendError("Table %s not found!" % docName)
+
+		# Get table
+		tab = self.tables[docName]
+
+		# Check priviledges
+		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
+			return self.sendError("You are not authorized to access table %s" % docName)
+
+		# Query table
+		MODEL = tab['model']
+
+		# Get all records
+		ans = []
+		for record in MODEL.select():
+
+			# Serialize document
+			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+
+		# Send data
+		self.sendResponse({
+			"status": "ok",
+			"docs": ans
+			})
+
+
 	def handleAction(self, action, param):
 		"""
 		Handle database actions
@@ -182,3 +228,5 @@ class DatabaseInterface(APIInterface):
 		elif action == "table.set":
 			self.update_table_record(param['table'], param['index'], param['doc'])
 
+		elif action == "table.all":
+			self.get_all_records(param['table'])
