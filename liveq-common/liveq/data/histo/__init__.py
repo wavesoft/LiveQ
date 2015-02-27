@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import warnings
 import logging
 import struct
 import numpy
@@ -310,9 +311,14 @@ class Histogram:
 						return None
 
 				# Coefficents for the plot
-				coeff = numpy.polyfit( vx, vy, deg )
-				coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
-				coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
+				with warnings.catch_warnings():
+					# Ignore 'poorly conditioned data' warnings
+					warnings.simplefilter('ignore', numpy.RankWarning)
+
+					# Calculate coefficients
+					coeff = numpy.polyfit( vx, vy, deg )
+					coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
+					coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
 
 				# Calculate the combined coefficients
 				combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
@@ -341,6 +347,57 @@ class Histogram:
 
 			# On exception return None
 			return (None, None)
+
+	"""
+	Try various polyFit degrees and pick the one most optimally fitting on the given set of data
+	"""
+	def polyFitScores(self, fromDegree=2, toDegree=20, tollerance=0.5, logY=None):
+
+		# Perform polyFit/fromFit and check chi2 values
+		scores = []
+		minScore = 10000000
+		minDegree = 0
+
+		# Wrap max to number of bins (worst case)
+		if toDegree > self.bins:
+			toDegree = self.bins
+
+		# Too small degree to polyfit? Return 0
+		if (toDegree < fromDegree) or (toDegree == 1):
+			return (0, 0, [])
+
+		# Perform polyfit
+		for i in range(fromDegree, toDegree+1):
+
+			# Perform polyFit
+			(coeff, meta) = self.polyFit(deg=i, logY=logY)
+
+			# Check for errors
+			if coeff is None:
+				continue
+
+			# Re-generate histogram
+			histo = Histogram.fromFit(coeff, meta)
+
+			# Check score
+			chi2 = histo.chi2ToReference(self)
+			scores.append((i, chi2))
+
+			# Find degree with minimum error
+			if chi2 < minScore:
+				minScore = chi2
+				minDegree = i
+
+		# Pick the smallest value within tollerance
+		for comb in scores:
+			# The first found has the smallest degree
+			if abs(comb[1] - minScore) <= tollerance:
+				# Return the given score
+				return (comb[0], comb[1], scores)
+
+		# Return tuple of (degree, scores)
+		return (minDegree, minScore, scores)
+
 
 	"""
 	Re-create the histogram from the coefficients and metadata specified
@@ -388,7 +445,6 @@ class Histogram:
 			yErrPlus=y-yErrPlus,
 			meta=meta['meta']
 			)
-
 
 	@staticmethod
 	def fromFLAT(filename):
@@ -465,7 +521,6 @@ class Histogram:
 					yErrPlus=values[4::5],
 					meta=vMeta
 				)
-
 
 	@staticmethod
 	def fromAIDA(filename, setName=None):
@@ -637,4 +692,67 @@ class Histogram:
 
 		# Create and return histogram
 		return ans
+
+	@staticmethod
+	def allFromYODA(filename):
+		"""
+		Create a list of histograms by reading the specified YODA file
+		"""
+
+		# Parse into structures depending on if file is a string
+		# or a file object
+		if isinstance(filename, str) or isinstance(filename, unicode):
+			data = FLATParser.parse(filename, index=False)
+		else:
+			data = FLATParser.parseFileObject(filename, index=False)
+
+		# Prepare response
+		ans = {}
+
+		# Parse sections
+		for section in data:
+
+			# Parse YODA_SCATTER2D sections
+			if section['n'] != 'YODA_SCATTER2D':
+				print "WARNING: Unknown section '%s' in YODA file" % section['n']
+				continue
+
+			# Get some metrics
+			name = section['t']
+			vBins = section['v']
+			if len(vBins) < 1:
+				print "WARNING: No bins in section '%s' of YODA file" % section['t']
+				continue
+
+			# Count number of bins and values
+			numBins = len(vBins)
+			numValues = len(vBins[0])
+
+			# Convert values into a flat 2D numpy array
+			values = numpy.array(vBins, dtype=numpy.float64).flatten()
+
+			# If we have:
+			# 6 values we have : xval	 xerr-	 xerr+	 yval	 yerr-	 yerr+
+
+			if numValues == 6:
+				# Extract parts and build histogram
+				ans[name] = Histogram(
+						bins=numBins,
+						name=name, 
+						x=values[::6],
+						xErrMinus=values[1::6],
+						xErrPlus=values[2::6],
+						y=values[3::6],
+						yErrMinus=values[4::6],
+						yErrPlus=values[5::6],
+						meta={}
+					)
+
+			else:
+				print "WARNING: Unknown number of values (%d) in section '%s' of YODA file" % (numValues, section['t'])
+				continue
+
+		# Return histograms in YODA file
+		return ans
+
 

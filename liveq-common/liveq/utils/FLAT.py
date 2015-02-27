@@ -85,7 +85,7 @@ def parseFLATBuffer(buf, index=True):
 			if len(data) == 1:
 
 				# Split data values
-				data = FLATParser.WHITESPACE.split(line)
+				data = FLATParser.WHITESPACE.split(line.strip())
 
 				# Check for faulty values
 				if len(data) < 3:

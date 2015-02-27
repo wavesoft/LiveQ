@@ -4,6 +4,7 @@ import yaml
 import glob
 
 import os
+from liveq.data.histo import Histogram
 from liveq.utils.FLAT import FLATParser
 
 def parsePlots(filename, additional={}):
@@ -45,6 +46,11 @@ def parseAnaInfo(filename):
 	# Return analysis info
 	return anainfo
 
+def parseRefHisto(filename):
+	"""
+	Load all the reference histograms from the given file
+	"""
+
 class Anainfo:
 	def __init__(self, rivetDatDir):
 		"""
@@ -53,6 +59,7 @@ class Anainfo:
 
 		# Initialize lookup indices
 		self.analyses = {}
+		self.fitAnalysis = {}
 		self.plots = {}
 		self.plot_wildcards = []
 
@@ -106,6 +113,36 @@ class Anainfo:
 
 			# Keep plots in the analysis
 			self.analyses[a_name]['plots'] = a_plots
+
+		# Then read all reference data and estimate polyFit score
+		files = glob.glob("%s/refdata/*.yoda" % rivetDatDir)
+		print "Estimating PolyFit degree from REF data..."
+		for f in files:
+
+			# Get analysis name
+			a_name = os.path.basename(f)[:-5]
+
+			# Get all histograms
+			histos = Histogram.allFromYODA(f)
+
+			# For each histogram, perform polyFit analysis
+			for k,h in histos.iteritems():
+
+				# Check if this is a logarithmic plot
+				isLogY = False
+				if k in self.plots:
+					if 'LogY' in self.plots[k]:
+						isLogY = (self.plots[k] == 1)
+
+				# Perform polyFit degree analysis
+				(degree, score, stats) = h.polyFitScores(logY=isLogY)
+
+				# Store results
+				self.fitAnalysis[k.replace("/REF", "")] = [degree, score, stats]
+
+				# Display warnings
+				if score > 8.0:
+					print "WARNING: Histogram %s could not be sufficiently polyFit'ed (chi2=%.2f,deg=%d)" % (k, score, degree)
 
 def loadData(baseDir):
 	"""

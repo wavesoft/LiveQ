@@ -65,6 +65,9 @@ if not os.path.isdir("%s/data/plotinfo" % sys.argv[1]):
 if not os.path.isdir("%s/data/anainfo" % sys.argv[1]):
 	print "ERROR: Could not find %s/data/anainfo!" % sys.argv[1]
 	sys.exit(1)
+if not os.path.isdir("%s/data/refdata" % sys.argv[1]):
+	print "ERROR: Could not find %s/data/refdata!" % sys.argv[1]
+	sys.exit(1)
 if not os.path.isfile("%s/scripts/mcprod/configuration/rivet-histograms.map" % sys.argv[2]):
 	print "ERROR: Could not find %s/scripts/mcprod/configuration/rivet-histograms.map" % sys.argv[2]
 	sys.exit(1)
@@ -95,6 +98,17 @@ for k,v in mcplotsHistograms.iteritems():
 
 	# Check if it exists
 	if Observable.select().where(Observable.name == k).exists():
+
+		# Update fid degress
+		if k in rivetData.fitAnalysis:
+			v = rivetData.fitAnalysis[k]
+			if not v is None:
+				t = Observable.get(Observable.name == k)
+				t.fitDegree = v[0]
+				t.save()
+				print "updated"
+				continue
+
 		print "exists"
 		continue
 
@@ -139,6 +153,16 @@ for k,v in mcplotsHistograms.iteritems():
 		except IOError:
 			print "(TeX Error)",
 		del plotDetails['YLabel']
+	if 'LogY' in plotDetails:
+		t.logY = int(plotDetails['LogY'])
+
+	# Store fidDegree
+	if k in rivetData.fitAnalysis:
+
+		# Store fitDegree from a successful fit analysis
+		v = rivetData.fitAnalysis[k]
+		if not v is None:
+			t.fitDegree = v[0]
 
 	# Store plot details
 	t.plotInfo = json.dumps(plotDetails)

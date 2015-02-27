@@ -591,6 +591,8 @@ class Observable(BaseModel):
 	logY = IntegerField(default=1)
 	#: Additional plot info
 	plotInfo = TextField(default="")
+	#: Polynomial fit score
+	fitDegree = IntegerField(default=10)
 	#: Analysis where this belongs to
 	analysis = CharField(max_length=128,default="")
 
@@ -690,6 +692,17 @@ class KnowledgeGrid(BaseModel):
 	#: Enumeration of sequences to be performed upon
 	#: unlocking this item
 	u_parts = TextField(default="{}")
+
+def Term(BaseModel):
+	"""
+	List of terms available for exploration
+	"""
+	
+	#: Term name
+	term = CharField(max_length=255)
+	#: The book for more details regarding this tunable
+	book = CharField(max_length=128, default="")
+
 
 # -----------------------------------------------------
 #  Drafts

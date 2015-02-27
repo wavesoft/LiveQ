@@ -80,7 +80,6 @@ class InterpolatableCollection(dict):
 		# Otherwise we are really empty
 		return 0
 
-
 	def append(self, ihisto):
 		"""
 		Append an object in the collection and map them with their name
@@ -204,8 +203,8 @@ class InterpolatableCollection(dict):
 		/ Header
 		+--------+-------------------------------------------+
 		|  uchar | Protocol version (current: 1)             |
+		|  uint  | Number of coefficients                    |
 		|  uint  | Pickled metadata size                     |
-		|  uint  | Numpy Float64 buffer size                 |
 		+--------+-------------------------------------------+
 		/ Coefficients
 		+--------+-------------------------------------------+
