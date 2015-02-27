@@ -104,6 +104,9 @@ class InterpolatableCollection(dict):
 		# Create collection
 		self.clear()
 
+		# Calculate coefficient slice width
+		w = len(self.dataCoeff) / len(self.dataMeta)
+
 		# Rebuild histograms
 		ofs=0
 		for meta in self.dataMeta:
@@ -156,12 +159,12 @@ class InterpolatableCollection(dict):
 				continue
 
 			# Append histogram coefficients on data coefficients
-			dataCoeff.append( coeff )
+			dataCoeff += coeff
 			self.dataMeta.append( meta )
 
 		# Convert to coefficients to numpy array and return 
 		# the mix of dataCoeff / dataMeta
-		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 ).flatten()
+		self.dataCoeff = numpy.array( dataCoeff, dtype=numpy.float64 )
 
 	@staticmethod
 	def fromPack( buf, decompress=True, decode=True ):

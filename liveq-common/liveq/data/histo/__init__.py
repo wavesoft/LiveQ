@@ -256,7 +256,7 @@ class Histogram:
 
 			# If we have a single bin, store the bin's value
 			# as coefficients
-			if self.bins == 1:
+			if (self.bins == 1) or (deg == 0):
 
 				# Coefficients = values
 				combCoeff = numpy.concatenate( [self.y, self.yErrPlus, self.yErrMinus, [0]*deg*3] )

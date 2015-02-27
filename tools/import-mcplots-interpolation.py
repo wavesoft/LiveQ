@@ -1,14 +1,15 @@
 #!/usr/bin/python
+
 # ----------
+import os
 import sys
-sys.path.append("../../liveq-common")
+sys.path.append("%s/liveq-common" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 # ----------
 
 import tarfile
 import logging
 import time
 import signal
-import sys
 import hashlib
 import uuid
 import glob
@@ -32,7 +33,7 @@ runtimeConfig = { }
 
 # Load configuration
 try:
-	Config.fromFile( "config.local", runtimeConfig )
+	Config.fromFile( "config/config.local", runtimeConfig )
 except ConfigException as e:
 	print("ERROR   Configuration exception: %s" % e)
 	exit(1)
@@ -50,7 +51,7 @@ if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
 	sys.exit(1)
 
 # Check if the specified lab exists
-if not Lab.select().where(Lab.uuid == k).exists():
+if not Lab.select().where(Lab.uuid == sys.argv[1]).exists():
 	print "ERROR: Could not find lab %s!" % sys.argv[1]
 	sys.exit(1)
 
@@ -233,7 +234,7 @@ class TarImport(Component):
 				pass
 
 		# Generate fits for interpolation
-		res.regenFits( degrees )
+		res.regenFits( fitDegree=degrees )
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
