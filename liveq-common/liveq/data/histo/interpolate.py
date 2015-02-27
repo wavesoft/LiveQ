@@ -159,7 +159,7 @@ class InterpolatableCollection(dict):
 				continue
 
 			# Append histogram coefficients on data coefficients
-			dataCoeff.append( numpy.array(coeff, dtype=np.float64) )
+			dataCoeff.append( numpy.array(coeff, dtype=numpy.float64) )
 			self.dataMeta.append( meta )
 
 		# Convert to coefficients to numpy array and return 
