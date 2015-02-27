@@ -64,6 +64,25 @@ if not os.path.isdir(sys.argv[2]):
 labID = sys.argv[1]
 baseDir = sys.argv[2]
 
+DEGREE_CACHE = {}
+def getPolyFitDegreeOf(name):
+	"""
+	Get polyFit degree for given histogram
+	"""
+
+	# Warm cache
+	if not name in DEGREE_CACHE:
+		try:
+			# Get fitDegree of given observable
+			obs = Observable.get( Observable.name == name )
+			DEGREE_CACHE[name] = obs.fitDegree
+		except Lab.DoesNotExist:
+			# Otherwise use None (Default)
+			DEGREE_CACHE[name] = None
+
+	# Return cached entry
+	return DEGREE_CACHE[name]
+
 # Definition of the TarImport Component
 class TarImport(Component):
 
@@ -78,7 +97,8 @@ class TarImport(Component):
 		try:
 			self.lab = Lab.get( Lab.uuid == labID )
 		except Lab.DoesNotExist:
-			self.lab = None
+			logging.error("Could not find a lab with ID '%s'" % labID)
+			sys.exit(1)
 
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
@@ -226,12 +246,8 @@ class TarImport(Component):
 			# Store histogram
 			res.append(h)
 
-			# Get observable custom polyFit degree
-			try:
-				obs = Observable.get( Observable.name == h.name )
-				degrees[h.name] = obs.fitDegree
-			except Lab.DoesNotExist:
-				pass
+			# Store histogram polyFit degree
+			degrees[h.name] = getPolyFitDegreeOf(h.name)
 
 		# Generate fits for interpolation
 		res.regenFits( fitDegree=degrees )
