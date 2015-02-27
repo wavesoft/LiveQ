@@ -92,18 +92,18 @@ class DatabaseInterface(APIInterface):
 		try:
 
 			# Try to get record
-			record = MODEL.get(MODEL.__dict__[tab['index']] == docIndex)
+			record = MODEL.get( getattr(MODEL,tab['index']) == docIndex )
 
 			# Compile document
 			document = {}
 			for f in FIELDS:
 				if (f in MODEL.JSON_FIELDS) and expandJSON:
-					if not record.__dict__[f]:
+					if not getattr(record, f):
 						document[f] = {}
 					else:
-						document[f] = json.loads(record.__dict__[f])
+						document[f] = json.loads(getattr(record, f))
 				else:
-					document[f] = record.__dict__[f]
+					document[f] = getattr(record, f)
 
 			# Send data
 			self.sendResponse({
@@ -145,7 +145,7 @@ class DatabaseInterface(APIInterface):
 		# Fetch or create new record
 		try:
 			# Try to get record
-			record = MODEL.get(MODEL.__dict__[tab['index']] == docIndex)
+			record = MODEL.get( getattr(MODEL,tab['index']) == docIndex )
 
 		except MODEL.DoesNotExist:
 			# Allocate new record
@@ -157,11 +157,11 @@ class DatabaseInterface(APIInterface):
 			if f in docFields:
 				if (f in MODEL.JSON_FIELDS) and expandJSON:
 					if not docFields[f]:
-						record.__dict__[f] = ""
+						setattr(record, f, "")
 					else:
-						record.__dict__[f] = json.dumps(docFields[f])
+						setattr(record, f, json.dumps(docFields[f]))
 				else:
-					record.__dict__[f] = docFields[f]
+					setattr(record, f, docFields[f])
 
 		# Save record
 		record.save()

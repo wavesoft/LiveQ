@@ -150,7 +150,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		"""
 
 		# Process input parameters
-		self.logger.info("got message %r", message)
+		self.logger.debug("got message %r", message)
 		parsed = tornado.escape.json_decode(message)
 
 		# Check for valid message
@@ -237,7 +237,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Send a named action, with an optional data dictionary
 		"""
 
-		self.logger.info("Sending %s (%r)" % (action, param))
+		self.logger.debug("Sending %s (%r)" % (action, param))
 
 		# Send text frame to websocket
 		self.write_message({
@@ -250,7 +250,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Send a binary payload to the socket
 		"""
 
-		self.logger.info("Sending binary frame  #%s (%s bytes)" % (frameID, len(data)))
+		self.logger.debug("Sending binary frame  #%s (%s bytes)" % (frameID, len(data)))
 
 		# Send a binary frame to WebSocket
 		self.write_message( 
