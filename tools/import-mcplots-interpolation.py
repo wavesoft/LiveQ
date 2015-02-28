@@ -311,11 +311,11 @@ class TarImport(Component):
 			logging.info("Completed!")
 			exit(0)
 		else:
-			# Every 100 imports, dump progress
+			# Every 50 imports, dump progress
 			currLength = len(self.histogramQueue)
-			if (currLength % 100) == 0:
+			if (currLength % 50) == 0:
 				itemsCompleted = self.queueLength - currLength
-				logging.info("%d/%d jobs imported (%.1f%)" % (itemsCompleted, self.queueLength, (100*itemsCompleted/self.queueLength)))
+				logging.info("%d/%d jobs imported (%.1f%%)" % (itemsCompleted, self.queueLength, 100*itemsCompleted/self.queueLength))
 
 		# Get next file
 		self.importFile( self.histogramQueue.pop() )
