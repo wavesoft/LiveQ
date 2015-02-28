@@ -315,10 +315,14 @@ class Histogram:
 					# Ignore 'poorly conditioned data' warnings
 					warnings.simplefilter('ignore', numpy.RankWarning)
 
+					# Use errors as weights
+					errSum = (vyErrPlus + vyErrMinus) / 2.0
+					errSum = 1 / errSum
+
 					# Calculate coefficients
-					coeff = numpy.polyfit( vx, vy, deg )
-					coeffPlus = numpy.polyfit( vx, vyErrPlus, deg )
-					coeffMinus = numpy.polyfit( vx, vyErrMinus, deg )
+					coeff = numpy.polyfit( vx, vy, deg, w=errSum )
+					coeffPlus = numpy.polyfit( vx, vyErrPlus, deg, w=errSum )
+					coeffMinus = numpy.polyfit( vx, vyErrMinus, deg, w=errSum )
 
 				# Calculate the combined coefficients
 				combCoeff = numpy.concatenate( [coeff, coeffPlus, coeffMinus] )
