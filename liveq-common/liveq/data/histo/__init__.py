@@ -316,7 +316,7 @@ class Histogram:
 					warnings.simplefilter('ignore', numpy.RankWarning)
 
 					# Use errors as weights
-					errSum = (vyErrPlus + vyErrMinus) / 2.0
+					errSum = (numpy.array(vyErrPlus) + numpy.array(vyErrMinus)) / 2.0
 					errSum = 1 / errSum
 
 					# Calculate coefficients
