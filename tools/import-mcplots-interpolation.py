@@ -299,7 +299,7 @@ class TarImport(Component):
 		# Generate fits for interpolation
 		try:
 			res.regenFits( fitDegree=degrees )
-		except Exception as e:
+		except Exception as ex:
 			traceback.print_exc()
 			logging.error("Could not generate fits for job %s (%s)" % (tarFile, str(ex)))
 			return
