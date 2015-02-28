@@ -271,7 +271,11 @@ class TarImport(Component):
 			degrees[h.name] = getPolyFitDegreeOf(h.name)
 
 		# Generate fits for interpolation
-		res.regenFits( fitDegree=degrees )
+		try:
+			res.regenFits( fitDegree=degrees )
+		except Exception as e:
+			logging.error("Could not generate fits for job %s (%s)" % (tarFile, str(ex)))
+			return
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
