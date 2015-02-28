@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import math
 import logging
 import numpy as np
 
@@ -94,10 +95,12 @@ class Tune(dict):
 		# Compare
 		return np.all( myVar == tuVar )
 
-	def getNeighborhoodID(self, labid=None):
+	def getNeighborhoodID(self, labid=None, offset=0):
 		"""
 		Generate a unique ID for the specified tune set that can be used
 		to address locations in buffered memory.
+
+		The optional parameter offset allows you to pick a neighbor node.
 		"""
 
 		# Use my local labID if not specified
@@ -110,10 +113,42 @@ class Tune(dict):
 		# Sort keys ascending
 		ksorted = sorted(self.keys())
 
+		# Apply offset
+		offsets = [0] * len(self)
+		if offset > 0:
+
+			# Get element index and amplitude
+			w = pow(3, len(self))
+			elmIndex = offset % w
+			elmAplitude = int(math.ceil(offset / w)) + 1
+
+			# Convert to base 3 and process
+			i = 0
+			b3Num = elmIndex
+			while True:
+
+				# Get current base and eminder
+				b3Rem = b3Num % 3
+				b3Num = b3Num // 3
+
+				# Update according to value
+				if b3Rem>0:
+					offsets[i] = (b3Rem*2 - 3) * elmAplitude
+
+				# Go to next item
+				i += 1
+
+				# Check if we reached the end
+				if b3Num < 3:
+					if b3Num>0:
+						offsets[i] = (b3Num*2 - 3) * elmAplitude
+					break
+
 		# Start processing parameter indices
-		for k in ksorted:
+		for i in range(0,len(ksorted)):
 
 			# Get tune value
+			k = ksorted[i]
 			v = self[k]
 
 			# Setup default tune value calculation variables
@@ -128,8 +163,9 @@ class Tune(dict):
 				vDecimals = int(tv['decimals'])
 				vRound = float(tv['round'])
 
-			# Append index value
-			tid += (":%." + str(vDecimals) + "f") % (float(v) / vRound)
+			# Calculate bin ID
+			tidx = (float(v) / vRound) + offsets[i]
+			tid += (":%." + str(vDecimals) + "f") % tidx
 
 		# Return the tune id
 		return tid

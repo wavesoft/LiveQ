@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# This script imports all tunables from a Pythia8 installation
+# This script imports all Tunables from a Pythia8 installation
 
 # ----------
 import os

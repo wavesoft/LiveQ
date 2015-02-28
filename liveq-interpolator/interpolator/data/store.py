@@ -233,13 +233,13 @@ class HistogramStore:
 		Config.STORE.set("tune-%s:m" % nid, mBuf )
 
 	@staticmethod
-	def getNeighborhood(tune):
+	def getNeighborhood(tune, offset=0):
 		"""
 		Return the nodes from the given neighborhood
 		"""
 
 		# Get neighborhood ID
-		nid = tune.getNeighborhoodID()
+		nid = tune.getNeighborhoodID(offset=offset)
 
 		vBuf = Config.STORE.get("tune-%s:v" % nid)
 		mBuf = Config.STORE.get("tune-%s:m" % nid)
@@ -248,7 +248,7 @@ class HistogramStore:
 		return HistogramStore._unpickle( vBuf, mBuf )
 
 	@staticmethod
-	def getInterpolator(tune, function='linear'):
+	def getInterpolator(tune, function='linear', minSamples=10, maxIterations=10):
 		"""
 		Return an initialized interpolator instance with the required
 		data from the appropriate neighborhoods.
@@ -258,6 +258,18 @@ class HistogramStore:
 
 		# Get neighborhood
 		data = HistogramStore.getNeighborhood(tune)
+
+		# If data are underpopulated, fetch neighbor bins
+		iterations = 0
+		while len(data) < minSamples:
+			iterations += 1
+
+			# Collect neighbor samples
+			data += HistogramStore.getNeighborhood(tune, offset=iterations)
+
+			# Check if we reached max iterations
+			if iterations > maxIterations:
+				break
 
 		# Iterate over items and create interpolation indices and data variables
 		datavalues = [ ]
