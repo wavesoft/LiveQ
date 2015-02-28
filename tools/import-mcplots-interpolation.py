@@ -100,11 +100,27 @@ class TarImport(Component):
 			logging.error("Could not find a lab with ID '%s'" % labID)
 			sys.exit(1)
 
+		# Get enumeration of tunables
+		self.tunables = sorted(self.lab.getTunableNames())
+
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
 
+	def validateTune(self, tune):
+		"""
+		Validate this tune against the lab
+		"""
+
+		# Get tune keys
+		tunableNames = sorted(tune.keys())
+
+		# Check if match excactly lab tunes
+		return (tunableNames == self.tunables)
+
+
 	def readHistograms(self, tarObject):
 		"""
+		Read histograms from tar object
 		"""
 
 		# Prepare collection
@@ -205,6 +221,11 @@ class TarImport(Component):
 			genFile.close()
 		except Exception as e:
 			logging.error("Could not load tune (%s)" % str(e))
+			return
+
+		# Validate tune
+		if not self.validateTune(tuneParam):
+			logging.error("Skipping due to tunable mismatch")
 			return
 
 		# Load jobdata from tar archive
