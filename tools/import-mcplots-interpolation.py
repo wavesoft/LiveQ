@@ -6,6 +6,7 @@ import sys
 sys.path.append("%s/liveq-common" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 # ----------
 
+import traceback
 import tarfile
 import logging
 import time
@@ -142,7 +143,7 @@ class TarImport(Component):
 			except Exception as e:
 				fInst.close()
 				logging.error("Exception while loading file %s (%s)" % (tarObject.name, str(e)))
-				continue
+				raise
 
 			# Report errors
 			if histo == None:
@@ -210,6 +211,7 @@ class TarImport(Component):
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
+			traceback.print_exc()
 			logging.error("Could not open archive (%s)" % str(e))
 			return
 
@@ -221,6 +223,7 @@ class TarImport(Component):
 			tuneParam = self.readTune(genFile)
 			genFile.close()
 		except Exception as e:
+			traceback.print_exc()
 			logging.error("Could not load tune (%s)" % str(e))
 			return
 
@@ -237,6 +240,7 @@ class TarImport(Component):
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
+			traceback.print_exc()
 			logging.error("Could not load job data (%s)" % str(e))
 			return
 
@@ -250,6 +254,7 @@ class TarImport(Component):
 		try:
 			histos = self.readHistograms(f)
 		except Exception as ex:
+			traceback.print_exc()
 			logging.error("Could not load histograms from %s (%s)" % (tarFile, str(ex)))
 			return
 
@@ -275,6 +280,7 @@ class TarImport(Component):
 		try:
 			res.regenFits( fitDegree=degrees )
 		except Exception as e:
+			traceback.print_exc()
 			logging.error("Could not generate fits for job %s (%s)" % (tarFile, str(ex)))
 			return
 
