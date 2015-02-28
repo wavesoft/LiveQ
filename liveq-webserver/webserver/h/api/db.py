@@ -216,6 +216,53 @@ class DatabaseInterface(APIInterface):
 			"docs": ans
 			})
 
+	def find_records(self, docName, docQuery, expandJSON=True):
+		"""
+		Return all records
+		"""
+
+		# Check the table 
+		if not docName in self.tables:
+			return self.sendError("Table %s not found!" % docName)
+
+		# Get table
+		tab = self.tables[docName]
+
+		# Check priviledges
+		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
+			return self.sendError("You are not authorized to access table %s" % docName)
+
+		# Query table
+		MODEL = tab['model']
+
+		# Build where query
+		whereFirst = True
+		whereQuery = None
+		for k,v in docQuery.iteritems():
+
+			# Query component
+			com = (getattr(MODEL,k) == v)
+
+			# Create or append
+			if whereFirst:
+				whereFirst = False
+				whereQuery = com
+			else:
+				whereQuery &= com
+
+		# Get all records
+		ans = []
+		for record in MODEL.select().where(whereQuery):
+
+			# Serialize document
+			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+
+		# Send data
+		self.sendResponse({
+			"status": "ok",
+			"docs": ans
+			})
+
 
 	def handleAction(self, action, param):
 		"""
@@ -230,3 +277,6 @@ class DatabaseInterface(APIInterface):
 
 		elif action == "table.all":
 			self.get_all_records(param['table'])
+
+		elif action == "table.find":
+			self.find_records(param['table'], param['query'])
