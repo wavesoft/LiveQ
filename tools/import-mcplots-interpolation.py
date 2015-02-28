@@ -105,6 +105,7 @@ class TarImport(Component):
 
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
+		self.queueLength = len(self.histogramQueue)
 
 	def validateTune(self, tune):
 		"""
@@ -303,9 +304,16 @@ class TarImport(Component):
 		if not self.histogramQueue:
 			logging.info("Completed!")
 			exit(0)
+		else:
+			# Every 100 imports, dump progress
+			currLength = len(self.histogramQueue)
+			if (currLength % 100) == 0:
+				itemsCompleted = self.queueLength - currLength
+				logging.info("%d/%d jobs imported (%.1f%)" % (itemsCompleted, self.queueLength, (100*itemsCompleted/self.queueLength)))
 
 		# Get next file
 		self.importFile( self.histogramQueue.pop() )
+
 
 # Run threaded
 TarImport.runThreaded()
