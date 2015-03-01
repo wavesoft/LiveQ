@@ -195,7 +195,7 @@ class InterpolatableCollection(dict):
 				ofs += w
 
 			# Replace
-			self.dataCoeff = trimCoeff
+			self.dataCoeff = numpy.hstack(trimCoeff)
 			self.dataMeta = trimMeta
 
 		elif (len(self.keys()) > 0):
