@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import random
 import time
 import snappy
 import numpy as np
@@ -248,7 +249,7 @@ class HistogramStore:
 		return HistogramStore._unpickle( vBuf, mBuf )
 
 	@staticmethod
-	def getInterpolator(tune, function='linear', minSamples=10, maxIterations=10):
+	def getInterpolator(tune, function='linear', minSamples=10, maxIterations=10, maxSamples=50):
 		"""
 		Return an initialized interpolator instance with the required
 		data from the appropriate neighborhoods.
@@ -270,6 +271,10 @@ class HistogramStore:
 			# Check if we reached max iterations
 			if iterations > maxIterations:
 				break
+
+		# Usually for more than maxSamples, Rbf behaves very slowly
+		if len(data) > maxSamples:
+			data = random.sample(data, maxSamples)
 
 		# Iterate over items and create interpolation indices and data variables
 		datavalues = [ ]
