@@ -20,6 +20,16 @@
 
 import logging
 
+class APIError(Exception):
+	"""
+	An error occured while processing an API request
+	"""
+	def __init__(self, message, code=None):
+		self.message = message
+		self.code = code
+	def __str__(self):
+		return repr(self.message)
+
 class APIInterface:
 
 	def __init__(self, socket, domain, binaryDomain=0x00):
@@ -113,7 +123,7 @@ class APIInterface:
 		# Send buffer, prefixing the binary domain
 		self.socket.sendBuffer( (frameID & 0xffff) | self.binaryDomain , data)
 
-	def sendError(self, message ):
+	def sendError(self, message, code="" ):
 		"""
 		Send action, automatically prefixing it with the appropriate
 		API domain suffix.
@@ -123,4 +133,4 @@ class APIInterface:
 			return
 
 		# Send error
-		self.socket.sendError("[%s] %s" % (self.domain, message))
+		self.socket.sendError( message, code, self.domain )

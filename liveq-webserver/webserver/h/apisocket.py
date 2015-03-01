@@ -29,15 +29,17 @@ import hashlib
 import random
 import string
 
+from WebSocket.h.api import APIError
 from webserver.h.api.chat import ChatInterface
 from webserver.h.api.course import CourseInterface
 from webserver.h.api.account import AccountInterface
 from webserver.h.api.labsocket import LabSocketInterface
 from webserver.h.api.labtrain import LabTrainInterface
 from webserver.h.api.db import DatabaseInterface
+from webserver.config import Config
+from webserver.common.users import HLUser
 
 from liveq.models import User, AnalyticsProfile
-from webserver.config import Config
 from tornado.ioloop import IOLoop
 import tornado.websocket
 
@@ -61,6 +63,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Initialize
 		self.remote_ip = ""
 		self.user = None
+		self.hl_user = None
 		self.connected = False
 		self.pingTimeout = None
 		self.pingTimer = None
@@ -216,7 +219,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Close
 		self.close()
 
-	def sendError(self, error):
+	def sendError(self, message, code="", domain="global"):
 		"""
 		Shorthand to respond with an error
 		"""
@@ -225,7 +228,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.write_message({
 				"action": "error",
 				"param": {
-					"message": error
+					"message": message,
+					"code": code,
+					"domain": domain
 				}
 			})
 
@@ -264,34 +269,13 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Send user profile information
 		"""
 
-		# Shorthand to user
-		user = self.user
-		if not user:
+		# Validate user
+		if not self.user:
 			return
 
-		# Compile analytics profile
-		analytics = None
-		if user.analyticsProfile:
-			analytics = {
-				'uuid'				: user.analyticsProfile.uuid,
-				'gender' 			: user.analyticsProfile.gender,
-				'birthYear' 		: user.analyticsProfile.birthYear,
-				'audienceSource'	: user.analyticsProfile.audienceSource,
-				'audienceInterests'	: user.analyticsProfile.audienceInterests,
-				'lastEvent' 		: str(user.analyticsProfile.lastEvent),
-				'metrics' 			: json.loads(user.analyticsProfile.metrics),
-			}
+		# Compile and send user profile
+		self.sendAction('account.profile', self.user.getProfile())
 
-		# Send user profile
-		self.sendAction('account.profile', {
-				'email' 		: user.email,
-				'displayName' 	: user.displayName,
-				'avatar' 		: user.avatar,
-				'credits'		: user.credits,
-				'groups'		: user.groups,
-				'vars' 			: json.loads(user.variables),
-				'analytics'		: analytics
-			})
 
 	def sendNotification(self, message, msgType="info"):
 		"""
@@ -334,7 +318,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				return
 
 			# Success
-			self.user = user
+			self.user = HLUser(user)
 			self.sendAction('account.login.response', {
 					'status' : 'ok'
 				})
@@ -355,7 +339,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				user = User.get(User.email == email)
 				self.sendAction('account.register.response', {
 						'status' : 'error',
-						'message': "A user with this name already exists!"
+						'message': "A user with this e-mail already exists!"
 					})
 				return
 			except User.DoesNotExist:
@@ -395,7 +379,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			user.save()
 
 			# Success
-			self.user = user
+			self.user = HLUser(user)
 			self.sendAction('account.register.response', {
 					'status' : 'ok'
 				})
@@ -407,17 +391,23 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 		else:
 
-			# Forward to API interfaces
-			handled = False
-			for i in self.interfaces:
-				# Check if this action can be handled by this action domain
-				if action[0:len(i.domain)+1] == "%s." % i.domain:
-					# Handle action
-					i.currentAction = action[len(i.domain)+1:]
-					i.handleAction(i.currentAction, param)
-					handled = True
-					break
+			# Forward to API interfaces and catch APIError
+			try:
+				handled = False
+				for i in self.interfaces:
+					# Check if this action can be handled by this action domain
+					if action[0:len(i.domain)+1] == "%s." % i.domain:
+						# Handle action
+						i.currentAction = action[len(i.domain)+1:]
+						i.handleAction(i.currentAction, param)
+						handled = True
+						break
 
-			# Not implemented
-			if not handled:
-				return self.sendError("Action '%s' is not implemented" % action)
+				# Not implemented
+				if not handled:
+					return self.sendError("Action '%s' is not implemented" % action)
+
+			except APIError as e:
+
+				# Forward API Errors
+				return self.sendError(e.value, e.code)

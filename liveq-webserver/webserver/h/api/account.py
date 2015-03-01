@@ -23,7 +23,9 @@ import datetime
 import json
 
 from liveq.io.bus import Bus
+from liveq.models import KnowledgeGrid
 
+from webserver.common.users import HLUserError
 from webserver.h.api import APIInterface
 from webserver.config import Config
 from tornado.ioloop import IOLoop
@@ -44,73 +46,15 @@ class AccountInterface(APIInterface):
 		# Keep a local reference of the user
 		self.user = self.socket.user
 
-	def setVariable(self, group, key, value):
-		"""
-		Set a user variable in the dynamic variables
-		"""
-		# Load variable dump
-		varDump = json.loads(self.user.variables)
-
-		# Update variable
-		if not group in varDump:
-			varDump[group] = {}
-		varDump[group][key] = value
-
-		# Put back
-		self.user.variables = json.dumps(varDump)
-
-	def getVariable(self, group, key, defValue=None):
-		"""
-		Set a user variable in the dynamic variables
-		"""
-		# Load variable dump
-		varDump = json.loads(self.user.variables)
-
-		# Update variable
-		if not group in varDump:
-			return defValue
-		if not key in varDump[group]:
-			return defValue
-
-		# Return
-		return varDump[group][key]
-
-	def delVariable(self, group, key):
-		"""
-		Set a user variable in the dynamic variables
-		"""
-		# Load variable dump
-		varDump = json.loads(self.user.variables)
-
-		# Update variable
-		if not group in varDump:
-			return
-		if not key in varDump[group]:
-			return
-
-		# Delete key
-		del varDump[group][key]
-
-		# Put back
-		self.user.variables = json.dumps(varDump)
-
 	def handleAction(self, action, param):
 		"""
 		Handle chat actions
 		"""
-		
-		##################################################
-		# Update user's dynamic variables
-		# ------------------------------------------------
-		if action == "variables":
-			# Update variable
-			self.user.variables = json.dumps(param['vars'])
-			self.user.save()
 
 		##################################################
 		# Request profile
 		# ------------------------------------------------
-		elif action == "profile":
+		if action == "profile":
 			# Send user profile event
 			self.socket.sendUserProfile()
 
@@ -127,7 +71,7 @@ class AccountInterface(APIInterface):
 			# Return save slot values or blank array if missing
 			self.sendResponse({ 
 					"status": "ok",
-					"values": self.getVariable("save_slots", param['id'], {})
+					"values": self.user.getVariable("save_slots", param['id'], {})
 				})
 
 
@@ -145,8 +89,7 @@ class AccountInterface(APIInterface):
 				return
 
 			# Set variable
-			self.setVariable( "save_slots", param['id'], param['values'] )
-			self.user.save()
+			self.user.setVariable( "save_slots", param['id'], param['values'] )
 
 			# Send response
 			self.sendResponse({ 
@@ -167,7 +110,7 @@ class AccountInterface(APIInterface):
 				return
 
 			# Get credits group
-			claims = self.getVariable("credit_claims", param['category'], {})
+			claims = self.user.getVariable("credit_claims", param['category'], {})
 
 			# Check if claim is placed
 			if param['claim'] in claims:
@@ -181,7 +124,7 @@ class AccountInterface(APIInterface):
 
 			# Accept this claim
 			claims[param['claim']] = 1
-			self.setVariable("credit_claims", param['category'], claims)
+			self.user.setVariable("credit_claims", param['category'], claims)
 
 			# Find how much credits it's worth
 			credits = 0
@@ -214,14 +157,13 @@ class AccountInterface(APIInterface):
 				return
 
 			# Place credits in user's profile
-			self.user.credits += credits
-			self.user.save()
+			self.user.points += points
 
 			# Reply with status and the new user profile
 			self.socket.sendUserProfile()
 			self.sendResponse({
 				"status": "ok",
-				"credits": credits
+				"points": points
 				})
 
 
@@ -236,9 +178,7 @@ class AccountInterface(APIInterface):
 				return
 
 			# Get credits group
-			self.delVariable("credit_claims", param['category'])
-			self.user.save()
-
+			self.user.delVariable("credit_claims", param['category'])
 
 		##################################################
 		# Unlock a particular knowlege with credits
@@ -250,32 +190,28 @@ class AccountInterface(APIInterface):
 				self.sendError("Missing 'id' parameter")
 				return
 
-			# Get knowledge record
-			knowledge = Config.CACHE.get("knowlege_grid", param['id'])
-			if not knowledge:
-				self.sendError("Could not locate specified knowledge")
+			# Lookup knowledge grid item
+			try:
+				knowledge = KnowledgeGrid.get( KnowledgeGrid.id == params['id'] )
+			except KnowledgeGrid.DoesNotExist:
+				self.sendError("Could not locate specified knowledge item")
 				return
 
 			# Check transaction
-			if self.user.credits >= knowledge['info']['cost']:
-				
-				# Consume the credits
-				self.user.credits -= knowledge['info']['cost']
-				# Mark this knowledge as explored
-				self.setVariable("explored_knowledge", param['id'], 1)
+			try:
 
-				# Delete the credits claim regarding estimations
-				self.delVariable("credit_claims", "estimate")
+				# Spend user points
+				self.user.spendPoints( knowledge.cost )
 
-				# Save user record
-				self.user.save()
+				# Expand knowledge
+				self.user.expandKnowledge( knowledge )
 
 				# Reply with status and the new user profile
 				self.socket.sendUserProfile()
 				self.sendResponse({ "status": "ok" })
 
+			except HLUserError as e:
 
-			# Missing credits?
-			else:				
-				self.sendError("You don't have enough credits in order to buy this item!")
+				# An error occured while trying to spend credits
+				self.sendError(e.message, e.code)
 

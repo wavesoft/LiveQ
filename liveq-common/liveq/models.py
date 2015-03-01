@@ -84,6 +84,107 @@ class AnalyticsProfile(BaseModel):
 	# Analytics metrics
 	metrics = TextField(default="{}")
 
+	def save(self, *args, **kwargs):
+		"""
+		Auto-update lastEvent on save
+		"""
+		self.lastEvent = datetime.datetime.now()
+		return super(AnalyticsProfile, self).save(*args, **kwargs)
+
+class KnowledgeGrid(BaseModel):
+	"""
+	The knowledge grid
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['u_actions', 'u_features']
+
+	#: Parent entry to KG
+	parent = ForeignKeyField('self', null=True)
+
+	#: The title of the knowledge grid element
+	title = CharField(max_length=128)
+
+	#: A short description for this element
+	desc = TextField(default="")
+	#: An image chat accompanies the short description
+	descImage = CharField(max_length=128, default="")
+
+	#: The kind of the element
+	#: ([edu]cational, [int]erface, [exp]erience, [gam]e)
+	kind = CharField(max_length=3, default="edu")
+	#: Icon of the element
+	icon = CharField(max_length=128, default="study.png")
+
+	#: Cost in credits for this element
+	cost = IntegerField(default=0)
+
+	#: The name of the trigger event that will cause
+	#: this knowledge grid element to be activated
+	#: automatically (assuming credit is available)
+	triggerEvent = CharField(max_length=128, default="")
+
+	#: Enumeration of sequences to be performed upon
+	#: unlocking this item
+	u_actions = TextField(default="{}")
+
+	#: Enumeration of features to be available upon
+	#: unlocking this item
+	u_features = TextField(default="{}")
+
+	def getActions(self):
+		"""
+		Return the unlockable Actions
+		"""		
+		return json.loads(self.u_actions)
+
+	def setActions(self, data):
+		"""
+		Define the unlockable Actions
+		"""
+		self.u_actions = json.dumps(data)
+
+	def getFeatures(self):
+		"""
+		Return the unlockable features
+		"""		
+		return json.loads(self.u_features)
+
+	def setFeatures(self, data):
+		"""
+		Define the unlockable features
+		"""
+		self.u_features = json.dumps(data)
+
+	@staticmethod
+	def getTotalFeatures(self, ofIDs=[]):
+		"""
+		Return the accummulated list of features
+		unlocked by the given list of knowedge grid items
+		"""
+
+		# Prepare features
+		features = {}
+
+		# Iterate over IDs
+		for kb in KnowledgeGrid.select().where( KnowledgeGrid.id << ofIDs ):
+
+			# Iterate over features
+			for k,v in kb.getFeatures().iteritems():
+
+				# Populate missing features dict
+				if not k in features:
+					features[k] = []
+
+				# Collect features
+				if type(v) is list:
+					features[k] += v
+				else:
+					features.append(v)
+
+		# Return list
+		return features
+
 class User(BaseModel):
 	"""
 	The user registry
@@ -91,6 +192,9 @@ class User(BaseModel):
 
 	#: JSON Fields in this model
 	JSON_FIELDS = ['variables']
+
+	# Log-in and profile
+	# -----------------------------------
 
 	#: The e-mail of the user
 	email = CharField(max_length=128)
@@ -106,14 +210,34 @@ class User(BaseModel):
 	#: The display name
 	displayName = CharField(max_length=128)
 
-	#: User credits
-	credits = IntegerField(default=8)
-
 	#: The team avatar
 	avatar = CharField(max_length=128)
 
+	# -----------------------------------
+	# Game elements
+	# -----------------------------------
+
+	#: User science points
+	points = IntegerField(default=8)
+
+	#: User accummulated science points
+	totalPoints = IntegerField(default=8)
+
+	#: Knowledge Grid elements explored
+	knowledge = TextField(default="")
+
+	#: Last explored knowledge item
+	lastKnowledge = ForeignKeyField(KnowledgeGrid, null=True, default=None)
+
+	# -----------------------------------
+	# Metadata and analytics
+	# -----------------------------------
+
 	#: Variable parameters
 	variables = TextField(default="{}")
+
+	#: Current state information
+	state = TextField(default="{}")
 
 	#: Link to analytics profile
 	analyticsProfile = ForeignKeyField(AnalyticsProfile, null=True, default=None)
@@ -197,6 +321,72 @@ class User(BaseModel):
 		# When all=True, return True
 		# When all=False, return False
 		return all
+
+	def getState(self, name, defValue=None):
+		"""
+		Return the value of a state variable
+		"""
+
+		# Load states
+		state = {}
+		if self.state:
+			state = json.loads(self.state)
+
+		# Return default if missing
+		if not name in state:
+			return defValue
+
+		# Return property
+		return state[name]
+
+	def setState(self, name, value):
+		"""
+		Update state property
+		"""
+
+		# Load states
+		state = {}
+		if self.state:
+			state = json.loads(self.state)
+
+		# Update
+		state[name] = value
+
+		# Save state
+		self.state = json.dumps(state)
+
+	def getKnowledge(self):
+		"""
+		Split knowledge
+		"""
+		return self.knowledge.split(",")
+
+	def setKnowledge(self, knowledgeItems=[]):
+		"""
+		Update knowledge
+		"""
+		self.knowledge = ",".join(knowledgeItems)
+
+	def addKnowledge(self, knowledgeNode):
+		"""
+		Add the specified explored knowledge in list
+		"""
+
+		# Require node
+		if not isinstance(knowledgeNode, KnowledgeGrid):
+			raise IOError("addKnowledge accepts instance of KnowledgeGrid as argument!")
+
+		# Exist if exists
+		if (",%d," % knowledgeNode.id) in (",%s," % self.knowledge):
+			return
+
+		# Append item in list
+		if self.knowledge:
+			self.knowledge += ","
+		self.knowledge += str(knowledgeNode.id)
+
+		# Update last knowledge item
+		self.lastKnowledge = knowledgeNode
 
 class AgentGroup(BaseModel):
 	"""
@@ -657,41 +847,6 @@ class AnalyticsEvent(BaseModel):
 	#: Data for this event
 	data = TextField(default="")
 
-class KnowledgeGrid(BaseModel):
-	"""
-	The knowledge grid
-	"""
-
-	#: JSON Fields in this model
-	JSON_FIELDS = ['u_actions', 'u_parts']
-
-	#: Parent entry to KG
-	parent = ForeignKeyField('self', null=True)
-
-	#: The title of the knowledge grid element
-	title = CharField(max_length=128)
-
-	#: A short description for this element
-	desc = TextField(default="")
-	#: An image chat accompanies the short description
-	descImage = CharField(max_length=128, default="")
-
-	#: The kind of the element
-	#: ([edu]cational, [int]erface, [exp]erience, [gam]e)
-	kind = CharField(max_length=3, default="edu")
-	#: Icon of the element
-	icon = CharField(max_length=128, default="study.png")
-
-	#: Cost in credits for this element
-	cost = IntegerField(default=0)
-
-	#: Enumeration of sequences to be performed upon
-	#: unlocking this item
-	u_actions = TextField(default="{}")
-
-	#: Enumeration of sequences to be performed upon
-	#: unlocking this item
-	u_parts = TextField(default="{}")
 
 def Term(BaseModel):
 	"""

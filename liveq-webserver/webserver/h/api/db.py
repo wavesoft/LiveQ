@@ -98,14 +98,14 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return self.sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName, "table-not-found")
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
-			return self.sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName, "not-authorized")
 
 		# Query table
 		MODEL = tab['model']
@@ -128,11 +128,7 @@ class DatabaseInterface(APIInterface):
 		except MODEL.DoesNotExist:
 
 			# Does not exist
-			self.sendResponse({
-				"status": "error",
-				"error": "Document does not exist",
-				"error_id": "does-not-exist"
-				})
+			self.sendError("Document does not exist", "doc-not-found")
 
 
 	def update_table_record(self, docName, docIndex, docFields, expandJSON=True):
@@ -142,14 +138,14 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return self.sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName, "table-not-found")
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['write'] is None) and not self.user.inGroups(tab['write']):
-			return self.sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName, "not-authorized")
 
 		# Query table
 		MODEL = tab['model']
@@ -191,14 +187,14 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return self.sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName, "table-not-found")
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
-			return self.sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName, "not-authorized")
 
 		# Query table
 		MODEL = tab['model']
@@ -223,14 +219,14 @@ class DatabaseInterface(APIInterface):
 
 		# Check the table 
 		if not docName in self.tables:
-			return self.sendError("Table %s not found!" % docName)
+			return self.sendError("Table %s not found!" % docName, "table-not-found")
 
 		# Get table
 		tab = self.tables[docName]
 
 		# Check priviledges
 		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
-			return self.sendError("You are not authorized to access table %s" % docName)
+			return self.sendError("You are not authorized to access table %s" % docName, "not-authorized")
 
 		# Query table
 		MODEL = tab['model']
