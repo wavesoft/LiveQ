@@ -361,11 +361,16 @@ class LabSocketInterface(APIInterface):
 		# Send status
 		self.sendStatus("Contacting interpolator", {"JOB_STATUS": "interpolating"})
 
+		# Histograms to trim for
+		trimObs = None
+		if self.trimObs:
+			trimObs = self.trimObs
+
 		# First ask interpolator
 		ans = self.ipolChannel.send("interpolate", {            
 				'lab': self.lab.uuid,
 				'parameters': tunables,
-				'histograms': self.lab.getHistograms()
+				'histograms': trimObs
 			}, waitReply=True, timeout=60)
 
 		# Check response
