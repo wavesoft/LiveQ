@@ -104,7 +104,7 @@ class Tune(dict):
 		"""
 
 		# Use my local labID if not specified
-		if not labid is None:
+		if labid is None:
 			labid = self.labid
 
 		# Start tune id with the lab id
