@@ -338,7 +338,7 @@ class LabSocketInterface(APIInterface):
 
 		# Fetch descriptions for the histograms
 		histo_ids = self.lab.getHistograms()
-		histo_ids = list(set(histo_ids) - set(self.trimObs))
+		histo_ids = list(set(histo_ids) & set(self.trimObs))
 		histoBuffers = compileObservableHistoBuffers( histo_ids )
 
 		# Compile buffer and send

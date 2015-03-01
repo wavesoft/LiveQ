@@ -295,7 +295,7 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
-	def toInterpolatableCollection(self, tune, histograms=None):
+	def toInterpolatableCollection(self, tune, histograms=None, fitDegree=None):
 		"""
 		Convert the intermediate histogram into a collection that can be interpolated
 
@@ -312,7 +312,7 @@ class IntermediateHistogramCollection(dict):
 				ans.append( hist.toHistogram() )
 
 		# Generate fits for interpolation
-		ans.regenFits()
+		ans.regenFits(fitDegree=fitDegree)
 
 		# Return answer
 		return ans

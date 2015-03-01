@@ -30,7 +30,7 @@ from jobmanager.config import Config
 from liveq.component import Component
 from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
-from liveq.models import Agent, AgentGroup, AgentMetrics
+from liveq.models import Agent, AgentGroup, AgentMetrics, Observable
 from liveq.reporting.postmortem import PostMortem
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
@@ -46,6 +46,9 @@ class JobManagerComponent(Component):
 		Setup job manager
 		"""
 		Component.__init__(self)
+
+		# Setup properties
+		self.degree_cache = {}
 
 		# Setup logger
 		self.logger = logging.getLogger("job-manager")
@@ -77,6 +80,38 @@ class JobManagerComponent(Component):
 
 		# Channel mapping
 		self.channels = { }
+
+	def getPolyFitDegreeOf(self, name):
+		"""
+		Get polyFit degree for given histogram
+		"""
+
+		# Warm cache
+		if not name in self.degree_cache:
+			try:
+				# Get fitDegree of given observable
+				obs = Observable.get( Observable.name == name )
+				self.degree_cache[name] = obs.fitDegree
+			except Lab.DoesNotExist:
+				# Otherwise use None (Default)
+				self.degree_cache[name] = None
+
+		# Return cached entry
+		return self.degree_cache[name]
+
+	def getHistogramPolyfitDegree(self, histoList):
+		"""
+		Return a dict with the polyFit degree for the given list of histograms
+		"""
+
+		# Iterate of histoList and create response
+		ans = {}
+		for k in histoList:
+			# Get polyfit degree of given histogram
+			ans[k] = self.getPolyFitDegreeOf(k)
+
+		# Return
+		return ans
 
 	def _setupChannelCallbacks(self, channel):
 		"""
@@ -219,7 +254,8 @@ class JobManagerComponent(Component):
 		# Create lower-quality (fitted) histograms, and send them
 		# to the interpolation database
 		tune = Tune( job.parameters['tune'], labid=job.lab.uuid )
-		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=job.lab.getHistograms())
+		histos = job.lab.getHistograms()
+		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=histos, fitDegree=self.getHistogramPolyfitDegree(histos))
 
 		# Send the resulting data to the interpolation database
 		self.ipolChannel.send("results", {
