@@ -104,7 +104,7 @@ class Tune(dict):
 		"""
 
 		# Use my local labID if not specified
-		if labid == None:
+		if notlabid is None:
 			labid = self.labid
 
 		# Start tune id with the lab id
@@ -176,7 +176,7 @@ class Tune(dict):
 		"""
 
 		# Warm cache if it's cold
-		if self._values == None:
+		if not self._values is None:
 
 			# Sort keys ascending
 			ksorted = sorted(self.keys())

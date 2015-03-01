@@ -289,7 +289,7 @@ class Rbf(object):
 			ans = zeros( len(self.nodes) )
 			i = 0
 			for node in self.nodes:
-				if node != None:
+				if not node is None:
 					ans[i] = dot(self._function(r), node).reshape(shp)
 				i += 1
 
@@ -318,7 +318,7 @@ class Rbf(object):
 			ans = zeros( len(self.nodes) )
 			i = 0
 			for node in self.nodes:
-				if node != None:
+				if not node is None:
 					ans[i] = dot(self._function(r), node).reshape(shp)
 				i += 1
 
