@@ -75,8 +75,13 @@ class InterpolatorComponent(Component):
 		# Generate a tune object
 		tune = Tune(data['parameters'], labid=data['lab'])
 
+		# Check if we have histogram trim
+		histoTrim = None
+		if 'histograms' in data:
+			histoTrim = data['histograms']
+
 		# Get an interpolator for this region
-		ipol = HistogramStore.getInterpolator(tune)
+		ipol = HistogramStore.getInterpolator(tune, histograms=histoTrim)
 		if not ipol:
 			self.ipolChannel.reply({
 					'result': 'error',
