@@ -23,7 +23,7 @@ import datetime
 import json
 
 from liveq.io.bus import Bus
-from liveq.models import KnowledgeGrid
+from webserver.models import KnowledgeGrid
 
 from webserver.common.users import HLUserError
 from webserver.h.api import APIInterface

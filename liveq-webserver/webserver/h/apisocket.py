@@ -29,7 +29,7 @@ import hashlib
 import random
 import string
 
-from WebSocket.h.api import APIError
+from webserver.h.api import APIError
 from webserver.h.api.chat import ChatInterface
 from webserver.h.api.course import CourseInterface
 from webserver.h.api.account import AccountInterface
@@ -39,7 +39,7 @@ from webserver.h.api.db import DatabaseInterface
 from webserver.config import Config
 from webserver.common.users import HLUser
 
-from liveq.models import User, AnalyticsProfile
+from webserver.models import User, AnalyticsProfile
 from tornado.ioloop import IOLoop
 import tornado.websocket
 

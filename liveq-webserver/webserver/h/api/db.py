@@ -23,6 +23,7 @@ import datetime
 import json
 
 import liveq.models
+import webserver.models
 
 from liveq.io.bus import Bus
 
@@ -53,7 +54,7 @@ class DatabaseInterface(APIInterface):
 				'write'  : ['admin']
 			},
 			'knowledge_grid' : {
-				'model'  : liveq.models.KnowledgeGrid,
+				'model'  : webserver.models.KnowledgeGrid,
 				'index'	 : 'id',
 				'read'   : None,
 				'write'  : ['admin']

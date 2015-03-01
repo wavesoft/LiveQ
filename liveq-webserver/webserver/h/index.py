@@ -23,8 +23,10 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from liveq.models import Lab, Observable, Tunable, Tutorials
 from webserver.common.minimacros import convertMiniMacros
+
+from liveq.models import Lab, Observable, Tunable
+from webserver.models import Tutorials
 
 """
 Root page handler

@@ -19,7 +19,7 @@
 
 import json
 
-from liveq.models import User, KnowledgeGrid
+from webserver.models import User, KnowledgeGrid
 
 class HLUserError(Exception):
 	"""
@@ -58,7 +58,7 @@ class HLUser:
 
 		# Load leaf knowledge grid nodes
 		self.leafKnowledge = []
-		for leaf_id in self.dbUser.getState('leaf_knowledge'):
+		for leaf_id in self.dbUser.getState('leaf_knowledge', []):
 
 			# Get and store
 			try:
@@ -256,6 +256,9 @@ class HLUser:
 
 		# Update and save
 		self.user.points += points
+		self.user.totalPoints += points
+
+		# Save record
 		self.user.save()
 
 	def getProfile(self):

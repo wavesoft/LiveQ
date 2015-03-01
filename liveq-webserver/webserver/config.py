@@ -27,6 +27,7 @@ from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.cache import CacheConfig
 from liveq.models import createBaseTables
+from webserver.models import createWebserverTables
 
 """
 Local configuration for the agent
@@ -82,3 +83,4 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 
 		# Ensure base tables exist
 		createBaseTables()
+		createWebserverTables()
