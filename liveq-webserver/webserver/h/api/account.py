@@ -241,7 +241,10 @@ class AccountInterface(APIInterface):
 
 				# Reply with status and the new user profile
 				self.socket.sendUserProfile()
-				self.sendResponse({ "status": "ok" })
+				self.sendResponse({
+					"status": "ok",
+					"knowledge": knowledge.serialize()
+					})
 
 			except HLUserError as e:
 

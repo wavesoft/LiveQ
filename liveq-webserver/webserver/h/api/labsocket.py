@@ -218,7 +218,12 @@ class LabSocketInterface(APIInterface):
 		histos = IntermediateHistogramCollection.fromPack( data['data'] )
 
 		# Keep only the subset we are interested in
-		histos = histos.subset( self.lab.getHistograms() )
+		obsNames = self.lab.getHistograms() 
+		if len(self.trimObs) > 0:
+			obsNames = self.trimObs
+
+		# Return subset of histos we are interested in
+		histos = histos.subset( obsNames )
 
 		# Pack them
 		histoBuffers = []

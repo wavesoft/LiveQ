@@ -59,8 +59,14 @@ class DatabaseInterface(APIInterface):
 				'read'   : None,
 				'write'  : ['admin']
 			},
-			'definition' : {
+			'definitions' : {
 				'model'  : webserver.models.Definition,
+				'index'	 : 'key',
+				'read'   : None,
+				'write'  : ['admin']
+			},
+			'first_time' : {
+				'model'  : webserver.models.FirstTime,
 				'index'	 : 'key',
 				'read'   : None,
 				'write'  : ['admin']
@@ -128,7 +134,8 @@ class DatabaseInterface(APIInterface):
 			# Send data
 			self.sendResponse({
 				"status": "ok",
-				"doc": document
+				"doc": document,
+				"index": tab['index']
 				})
 
 
@@ -216,7 +223,8 @@ class DatabaseInterface(APIInterface):
 		# Send data
 		self.sendResponse({
 			"status": "ok",
-			"docs": ans
+			"docs": ans,
+			"index": tab['index']
 			})
 
 	def get_multiple_records(self, docName, docIndices, expandJSON=True):
@@ -248,7 +256,8 @@ class DatabaseInterface(APIInterface):
 		# Send data
 		self.sendResponse({
 			"status": "ok",
-			"docs": ans
+			"docs": ans,
+			"index": tab['index']
 			})
 
 	def find_records(self, docName, docQuery, expandJSON=True):
@@ -295,7 +304,8 @@ class DatabaseInterface(APIInterface):
 		# Send data
 		self.sendResponse({
 			"status": "ok",
-			"docs": ans
+			"docs": ans,
+			"index": tab['index']
 			})
 
 

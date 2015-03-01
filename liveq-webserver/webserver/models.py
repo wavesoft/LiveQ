@@ -41,7 +41,7 @@ def createWebserverTables():
 
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, Team, TeamMembers, Tutorials, QuestionaireResponses, 
-				   AnalyticsEvent, KnowledgeGrid, Definition ]:
+				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -460,7 +460,6 @@ class Term(BaseModel):
 	#: The book for more details regarding this tunable
 	book = CharField(max_length=128, default="")
 
-
 class Definition(BaseModel):
 	"""
 	A list of key/value definitions, usually for the configuration
@@ -468,10 +467,21 @@ class Definition(BaseModel):
 	"""
 
 	#: The configuration key
-	key = CharField(max_length=64, primary_key=True)
+	key = CharField(max_length=128, primary_key=True)
 
 	#: The configuration value
 	value = TextField(default="")
+
+class FirstTime(BaseModel):
+	"""
+	A list of first-time definitions and their respective pop-up text
+	"""
+
+	#: The name of the first-time aid
+	key = CharField(max_length=128, primary_key=True)
+
+	#: The text to display
+	text = TextField(default="")
 
 # -----------------------------------------------------
 #  Drafts

@@ -41,6 +41,29 @@ class BaseModel(Model):
 	#: Which fields should be encoded using JSON
 	JSON_FIELDS = []
 
+	def serialize(self, expandJSON=True):
+		"""
+		Serialize the current record to a dictionary
+		"""
+
+		# Get model fields
+		FIELDS = self.__class__._meta.get_field_names()
+
+		# Compile document
+		document = {}
+		for f in FIELDS:
+			if (f in self.__class__.JSON_FIELDS) and expandJSON:
+				if not getattr(self, f):
+					document[f] = {}
+				else:
+					document[f] = json.loads(getattr(self, f))
+			else:
+				document[f] = getattr(self, f)
+
+		# Return document
+		return document
+
+
 def createBaseTables():
 	"""
 	Create the database models in the ``liveq.models`` module, if
