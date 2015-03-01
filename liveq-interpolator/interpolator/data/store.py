@@ -249,7 +249,7 @@ class HistogramStore:
 		return HistogramStore._unpickle( vBuf, mBuf )
 
 	@staticmethod
-	def getInterpolator(tune, function='linear', minSamples=10, maxIterations=10, maxSamples=50):
+	def getInterpolator(tune, function='linear', histograms=None, minSamples=10, maxIterations=10, maxSamples=50):
 		"""
 		Return an initialized interpolator instance with the required
 		data from the appropriate neighborhoods.
@@ -280,6 +280,10 @@ class HistogramStore:
 		datavalues = [ ]
 		indexvars = [ ]
 		for hc in data:
+
+			# Trim collection to the histograms of interest
+			if not histograms is None:
+				hc.trimTo(histograms)
 
 			# Fetch index cariables
 			datavalues.append(hc)

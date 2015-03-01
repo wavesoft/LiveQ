@@ -166,6 +166,49 @@ class InterpolatableCollection(dict):
 		# the mix of dataCoeff / dataMeta
 		self.dataCoeff = numpy.hstack(dataCoeff)
 
+	def trimTo( self, histograms ):
+		"""
+		Trim to the given subset of historams
+		"""
+
+		# Check if we should trim coefficients
+		# or histograms
+		if (len(self) == 0) and (len(self.dataMeta) > 0):
+			# Trim coefficients
+
+			trimCoeff = []
+			trimMeta = []
+			ofs = 0
+
+			# Iterate over metadata
+			for meta in self.dataMeta:
+
+				# Get coefficients width
+				w = int(meta['coef'])
+
+				# Collect histogram
+				if meta['name'] in histograms:
+					trimCoeff.append( self.dataCoeff[ofs:ofs+w] )
+					trimMeta.append( meta )
+
+				# Forward offset
+				ofs += w
+
+			# Replace
+			self.dataCoeff = trimCoeff
+			self.dataMeta = trimMeta
+
+		elif (len(self) > 0):
+			# Trim collection
+
+			# Iterate over keys
+			keys = self.keys()
+			for k in self.keys:
+
+				# Trim matching keys
+				if not k in histograms:
+					del self[k]
+
 	@staticmethod
 	def fromPack( buf, decompress=True, decode=True ):
 		"""
