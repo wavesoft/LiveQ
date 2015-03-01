@@ -173,7 +173,7 @@ class InterpolatableCollection(dict):
 
 		# Check if we should trim coefficients
 		# or histograms
-		if (len(self) == 0) and (len(self.dataMeta) > 0):
+		if (len(self.keys()) == 0) and (len(self.dataMeta) > 0):
 			# Trim coefficients
 
 			trimCoeff = []
@@ -198,7 +198,7 @@ class InterpolatableCollection(dict):
 			self.dataCoeff = trimCoeff
 			self.dataMeta = trimMeta
 
-		elif (len(self) > 0):
+		elif (len(self.keys()) > 0):
 			# Trim collection
 
 			# Iterate over keys
