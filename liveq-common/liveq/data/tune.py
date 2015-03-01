@@ -176,7 +176,7 @@ class Tune(dict):
 		"""
 
 		# Warm cache if it's cold
-		if not self._values is None:
+		if self._values is None:
 
 			# Sort keys ascending
 			ksorted = sorted(self.keys())
