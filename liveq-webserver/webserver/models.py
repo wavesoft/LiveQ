@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
 import datetime
 import json
 
@@ -40,7 +41,7 @@ def createWebserverTables():
 
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, Team, TeamMembers, Tutorials, QuestionaireResponses, 
-				   AnalyticsEvent, KnowledgeGrid ]:
+				   AnalyticsEvent, KnowledgeGrid, Definition ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -87,7 +88,7 @@ class KnowledgeGrid(BaseModel):
 	"""
 
 	#: JSON Fields in this model
-	JSON_FIELDS = ['u_actions', 'u_features']
+	JSON_FIELDS = ['actions', 'features']
 
 	#: Parent entry to KG
 	parent = ForeignKeyField('self', null=True)
@@ -116,38 +117,46 @@ class KnowledgeGrid(BaseModel):
 
 	#: Enumeration of sequences to be performed upon
 	#: unlocking this item
-	u_actions = TextField(default="{}")
+	actions = TextField(default="{}")
 
 	#: Enumeration of features to be available upon
 	#: unlocking this item
-	u_features = TextField(default="{}")
+	features = TextField(default="{}")
 
 	def getActions(self):
 		"""
 		Return the unlockable Actions
-		"""		
-		return json.loads(self.u_actions)
+		"""
+		try:
+			return json.loads(self.actions)
+		except ValueError as e:
+			logging.error("ValueError parsing 'actions' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setActions(self, data):
 		"""
 		Define the unlockable Actions
 		"""
-		self.u_actions = json.dumps(data)
+		self.actions = json.dumps(data)
 
 	def getFeatures(self):
 		"""
 		Return the unlockable features
-		"""		
-		return json.loads(self.u_features)
+		"""	
+		try:
+			return json.loads(self.features)
+		except ValueError as e:
+			logging.error("ValueError parsing 'features' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setFeatures(self, data):
 		"""
 		Define the unlockable features
 		"""
-		self.u_features = json.dumps(data)
+		self.features = json.dumps(data)
 
 	@staticmethod
-	def getTotalFeatures(self, ofIDs=[]):
+	def getTotalFeatures(id_list):
 		"""
 		Return the accummulated list of features
 		unlocked by the given list of knowedge grid items
@@ -157,20 +166,21 @@ class KnowledgeGrid(BaseModel):
 		features = {}
 
 		# Iterate over IDs
-		for kb in KnowledgeGrid.select().where( KnowledgeGrid.id << ofIDs ):
+		if len(id_list) > 0:
+			for kb in KnowledgeGrid.select().where( KnowledgeGrid.id << id_list ):
 
-			# Iterate over features
-			for k,v in kb.getFeatures().iteritems():
+				# Iterate over features
+				for k,v in kb.getFeatures().iteritems():
 
-				# Populate missing features dict
-				if not k in features:
-					features[k] = []
+					# Populate missing features dict
+					if not k in features:
+						features[k] = []
 
-				# Collect features
-				if type(v) is list:
-					features[k] += v
-				else:
-					features.append(v)
+					# Collect features
+					if type(v) is list:
+						features[k] += v
+					else:
+						features.append(v)
 
 		# Return list
 		return features
@@ -181,7 +191,7 @@ class User(BaseModel):
 	"""
 
 	#: JSON Fields in this model
-	JSON_FIELDS = ['variables']
+	JSON_FIELDS = ['variables', 'state']
 
 	# Log-in and profile
 	# -----------------------------------
@@ -320,7 +330,10 @@ class User(BaseModel):
 		# Load states
 		state = {}
 		if self.state:
-			state = json.loads(self.state)
+			try:
+				state = json.loads(self.state)
+			except ValueError as e:
+				logging.error("ValueError parsing 'state' of model '%s', key %s" % (self.__class__.__name__, self.id))
 
 		# Return default if missing
 		if not name in state:
@@ -337,7 +350,10 @@ class User(BaseModel):
 		# Load states
 		state = {}
 		if self.state:
-			state = json.loads(self.state)
+			try:
+				state = json.loads(self.state)
+			except ValueError as e:
+				logging.error("ValueError parsing 'state' of model '%s', key %s" % (self.__class__.__name__, self.id))
 
 		# Update
 		state[name] = value
@@ -349,13 +365,25 @@ class User(BaseModel):
 		"""
 		Split knowledge
 		"""
-		return self.knowledge.split(",")
+
+		# Check for missing knowledge
+		if not self.knowledge:
+			return []
+
+		# Return knowledge elements
+		return map(int, self.knowledge.split(","))
 
 	def setKnowledge(self, knowledgeItems=[]):
 		"""
 		Update knowledge
 		"""
 		self.knowledge = ",".join(knowledgeItems)
+
+	def hasKnowledge(self, knowledgeItemID):
+		"""
+		Check if the user knows this knowledge ID
+		"""
+		return (",%i," % knowledgeItemID) in (",%s," % self.knowledge)
 
 	def addKnowledge(self, knowledgeNode):
 		"""
@@ -422,7 +450,7 @@ class AnalyticsEvent(BaseModel):
 	#: Data for this event
 	data = TextField(default="")
 
-def Term(BaseModel):
+class Term(BaseModel):
 	"""
 	List of terms available for exploration
 	"""
@@ -432,6 +460,18 @@ def Term(BaseModel):
 	#: The book for more details regarding this tunable
 	book = CharField(max_length=128, default="")
 
+
+class Definition(BaseModel):
+	"""
+	A list of key/value definitions, usually for the configuration
+	of the game interface.
+	"""
+
+	#: The configuration key
+	key = CharField(max_length=64, primary_key=True)
+
+	#: The configuration value
+	value = TextField(default="")
 
 # -----------------------------------------------------
 #  Drafts

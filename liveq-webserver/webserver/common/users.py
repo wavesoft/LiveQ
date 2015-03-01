@@ -19,6 +19,7 @@
 
 import json
 
+from liveq.models import Tunable
 from webserver.models import User, KnowledgeGrid
 
 class HLUserError(Exception):
@@ -80,9 +81,11 @@ class HLUser:
 
 		# Get knowledgeGrid nodes discovered
 		kb_ids = self.dbUser.getKnowledge()
+		print "Got knowledge KBs: %r" % kb_ids
 
 		# Iterate over the currently explored knowledge grid features
 		feats = KnowledgeGrid.getTotalFeatures( kb_ids )
+		print "Got knowledge feats: %r" % feats
 
 		# Update knowledge features
 		if 'observables' in feats:
@@ -91,22 +94,23 @@ class HLUser:
 			self.dbUser.setState("tunables", feats['tunables'])
 		if 'parts' in feats:
 			self.dbUser.setState("parts", feats['parts'])
-		if 'beams' in feats:
-			self.dbUser.setState("beams", feats['beams'])
+		if 'config' in feats:
+			self.dbUser.setState("config", feats['config'])
 		if 'goals' in feats:
 			self.dbUser.setState("goals", feats['goals'])
 
 		# Find next leaf knowledge grid nodes
 		self.leafKnowledge = []
 		leaf_knowledge_ids = []
-		for leaf_node in KnowledgeGrid.select().where(
-				 (KnowledgeGrid.parent << kb_ids) &
-				~(KnowledgeGrid.ud << kb_ids)
-				):
+		if kb_ids:
+			for leaf_node in KnowledgeGrid.select().where(
+					 (KnowledgeGrid.parent << kb_ids) &
+					~(KnowledgeGrid.id << kb_ids)
+					):
 
-			# Collect them and ID
-			self.leafKnowledge.append( leaf_node )
-			leaf_knowledge_ids.append( leaf_node.id )
+				# Collect them and ID
+				self.leafKnowledge.append( leaf_node )
+				leaf_knowledge_ids.append( leaf_node.id )
 
 		# Update 'leaf_knowledge' state
 		self.dbUser.setState("leaf_knowledge", leaf_knowledge_ids)
@@ -121,7 +125,26 @@ class HLUser:
 		"""
 
 		# Re-select and get user record
-		self.user = User.get( User.id == self.user.id )
+		self.dbUser = User.get( User.id == self.dbUser.id )
+
+	def knows(self, kb_id):
+		"""
+		Check if the user knows this ID
+		"""
+
+		# Check with the database user
+		return self.dbUser.hasKnowledge(kb_id)
+
+	def setVariables(self, variables):
+		"""
+		Update user variables
+		"""
+
+		# Udpate variables
+		self.dbUser.variables = json.dumps(variables)
+
+		# Save record
+		self.dbUser.save()
 
 	def setVariable(self, group, key, value):
 		"""
@@ -261,6 +284,93 @@ class HLUser:
 		# Save record
 		self.user.save()
 
+	###################################
+	# In-game information queries
+	###################################
+
+	def getKnowledgeTree(self, getAll=False):
+		"""
+		Build and return the knowledge tree
+		"""
+		
+		# Synchronize
+		self.reload()
+
+		# Setup local properties
+		kgRoot = None
+		kgIndex = {}
+		kgElements = []
+
+		# Get active knowledge tree elements
+		kb_ids = self.dbUser.getKnowledge()
+		if not kb_ids:
+			# If there is no knowledge, pick the root node(s)
+			for kgElm in KnowledgeGrid.select().where( KnowledgeGrid.parent >> None ).limit(1).dicts():
+				# Add no children
+				kgElm['enabled'] = False
+				kgElm['children'] = []
+				# Return root
+				return kgElm
+
+			# Could not find even root!
+			return None
+
+		# Iterate over discovered knowledge 
+		for kgElm in KnowledgeGrid.select().where( KnowledgeGrid.id << kb_ids ).dicts():
+
+			# Store on index
+			kgElm['children'] = []
+			kgElm['enabled'] = True
+			kgIndex[kgElm['id']] = kgElm
+			kgElements.append(kgElm)
+
+			# Look for root
+			if not kgElm['parent']:
+				kgRoot = kgElm
+
+		# Lookup for leaf nodes of the discovered knowledge
+		for kgElm in KnowledgeGrid.select().where(
+			 (KnowledgeGrid.parent << kb_ids) &
+			~(KnowledgeGrid.id << kb_ids)
+			).dicts():
+
+			# Store on index
+			kgElm['children'] = []
+			kgElm['enabled'] = False
+			kgIndex[kgElm['id']] = kgElm
+			kgElements.append(kgElm)
+
+		# Nest children
+		for e in kgElements:
+			if e['parent']:
+				kgIndex[e['parent']]['children'].append(e)
+
+		# Return knowledge tree starting from root
+		print repr(kgRoot)
+		return kgRoot
+
+	def getTuningConfiguration(self):
+		"""
+		Build and return the user's tuning configuration
+		"""
+
+		# Synchronize
+		self.reload()
+
+		# Get tunables
+		tunOjects = []
+		tunNames = self.dbUser.getState("tunables", [])
+		if tunNames:
+			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
+				tunOjects.append( tun )
+
+		# Prepare configuration
+		return {
+			"configurations" : self.dbUser.getState("config", []),
+			"observables"    : self.dbUser.getState("observables", []),
+			"tunables"		 : tunOjects
+		}
+
 	def getProfile(self):
 		"""
 		Return user profile information
@@ -288,7 +398,8 @@ class HLUser:
 			'displayName' 	: user.displayName,
 			'avatar' 		: user.avatar,
 			'points'		: user.points,
-			'groups'		: user.groups,
+			'groups'		: user.getGroups(),
+			'knowledge'		: user.getKnowledge(),
 			'vars' 			: json.loads(user.variables),
 			'state' 		: json.loads(user.state),
 			'analytics'		: analytics

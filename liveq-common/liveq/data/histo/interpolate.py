@@ -203,7 +203,7 @@ class InterpolatableCollection(dict):
 
 			# Iterate over keys
 			keys = self.keys()
-			for k in self.keys:
+			for k in keys:
 
 				# Trim matching keys
 				if not k in histograms:

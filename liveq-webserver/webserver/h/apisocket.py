@@ -235,7 +235,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			})
 
 		# And log the error
-		self.logger.warn("[%s] %s" % (self.remote_ip, error))
+		self.logger.warn("[%s] %s" % (self.remote_ip, message))
 
 	def sendAction(self, action, param={}):
 		"""

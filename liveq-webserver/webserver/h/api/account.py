@@ -59,6 +59,13 @@ class AccountInterface(APIInterface):
 			self.socket.sendUserProfile()
 
 		##################################################
+		# User variables
+		# ------------------------------------------------
+		elif action == "variables":
+			# Update user variables
+			self.user.setVariables( param['vars'] )
+
+		##################################################
 		# Get a value from a save slot
 		# ------------------------------------------------
 		elif action == "save.get":
@@ -95,6 +102,28 @@ class AccountInterface(APIInterface):
 			self.sendResponse({ 
 					"status": "ok"
 					})
+
+		##################################################
+		# Return tuning configuration
+		# ------------------------------------------------
+		elif action == "data.tuning":
+
+			# Return tuning configuration
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getTuningConfiguration()
+				})
+
+		##################################################
+		# Return knowledge configuration
+		# ------------------------------------------------
+		elif action == "data.knowledge":
+
+			# Return knowledge configuration
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getKnowledgeTree()
+				})
 
 		##################################################
 		# Claim credits for a particular achievement
@@ -190,9 +219,13 @@ class AccountInterface(APIInterface):
 				self.sendError("Missing 'id' parameter")
 				return
 
+			# Check the user has already unlocked this item
+			if self.user.knows(param['id']):
+				self.sendResponse({ "status": "ok" })
+
 			# Lookup knowledge grid item
 			try:
-				knowledge = KnowledgeGrid.get( KnowledgeGrid.id == params['id'] )
+				knowledge = KnowledgeGrid.get( KnowledgeGrid.id == param['id'] )
 			except KnowledgeGrid.DoesNotExist:
 				self.sendError("Could not locate specified knowledge item")
 				return

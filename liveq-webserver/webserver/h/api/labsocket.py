@@ -129,7 +129,7 @@ class LabSocketInterface(APIInterface):
 			if 'observables' in param:
 				self.trimObs = parm['observables']
 			else:
-				self.trimObs = []
+				self.trimObs = self.user.getKnownObservables()
 
 			# Send configuration frame
 			self.sendConfigurationFrame()
@@ -366,7 +366,7 @@ class LabSocketInterface(APIInterface):
 				'lab': self.lab.uuid,
 				'parameters': tunables,
 				'histograms': self.lab.getHistograms()
-			}, waitReply=True, timeout=5)
+			}, waitReply=True, timeout=60)
 
 		# Check response
 		if not ans:

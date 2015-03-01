@@ -58,6 +58,12 @@ class DatabaseInterface(APIInterface):
 				'index'	 : 'id',
 				'read'   : None,
 				'write'  : ['admin']
+			},
+			'definition' : {
+				'model'  : webserver.models.Definition,
+				'index'	 : 'key',
+				'read'   : None,
+				'write'  : ['admin']
 			}
 		}
 
@@ -213,6 +219,38 @@ class DatabaseInterface(APIInterface):
 			"docs": ans
 			})
 
+	def get_multiple_records(self, docName, docIndices, expandJSON=True):
+		"""
+		Return multiple records
+		"""
+
+		# Check the table 
+		if not docName in self.tables:
+			return self.sendError("Table %s not found!" % docName, "table-not-found")
+
+		# Get table
+		tab = self.tables[docName]
+
+		# Check priviledges
+		if not (tab['read'] is None) and not self.user.inGroups(tab['read']):
+			return self.sendError("You are not authorized to access table %s" % docName, "not-authorized")
+
+		# Query table
+		MODEL = tab['model']
+
+		# Get all records
+		ans = []
+		for record in MODEL.select().where( getattr(MODEL,tab['index']) << docIndices ):
+
+			# Serialize document
+			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+
+		# Send data
+		self.sendResponse({
+			"status": "ok",
+			"docs": ans
+			})
+
 	def find_records(self, docName, docQuery, expandJSON=True):
 		"""
 		Return all records
@@ -274,6 +312,9 @@ class DatabaseInterface(APIInterface):
 
 		elif action == "table.all":
 			self.get_all_records(param['table'])
+
+		elif action == "table.multiple":
+			self.get_multiple_records(param['table'], param['indices'])
 
 		elif action == "table.find":
 			self.find_records(param['table'], param['query'])
