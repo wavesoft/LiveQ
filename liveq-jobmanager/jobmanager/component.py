@@ -559,6 +559,7 @@ class JobManagerComponent(Component):
 		# Reply success
 		self.jobChannel.reply({
 				'jid': job.id,
+				'dataChannel': dataChannel,
 				'result': 'scheduled'
 			})
 

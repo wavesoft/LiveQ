@@ -51,6 +51,14 @@ class HLUser:
 		# Cache my user name
 		self.name = user.displayName
 
+	def reload(self):
+		"""
+		Reload user record from the database
+		"""
+
+		# Re-select and get user record
+		self.dbUser = User.get( User.id == self.dbUser.id )
+
 	###################################
 	# Cache Loading Functions
 	###################################
@@ -121,14 +129,6 @@ class HLUser:
 	###################################
 	# High-level functions
 	###################################
-
-	def reload(self):
-		"""
-		Reload user record from the database
-		"""
-
-		# Re-select and get user record
-		self.dbUser = User.get( User.id == self.dbUser.id )
 
 	def knows(self, kb_id):
 		"""
@@ -214,6 +214,16 @@ class HLUser:
 
 		# Get known histograms state
 		return self.dbUser.getState("observables", [])
+
+	def getKnownTunables(self):
+		"""
+		Return a list of the tunable IDs that the user
+		is aware of. This is used for optimizing the interpolation
+		and simulation queries.
+		"""
+
+		# Get known histograms state
+		return self.dbUser.getState("tunables", [])
 
 	def getTriggerActions(self, name):
 		"""

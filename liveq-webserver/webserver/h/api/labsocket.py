@@ -125,7 +125,7 @@ class LabSocketInterface(APIInterface):
 			if 'tunables' in param:
 				self.trimTun = parm['tunables']
 			else:
-				self.trimTun = []
+				self.trimTun = self.user.getKnownTunables()
 			if 'observables' in param:
 				self.trimObs = parm['observables']
 			else:
@@ -134,13 +134,15 @@ class LabSocketInterface(APIInterface):
 			# Send configuration frame
 			self.sendConfigurationFrame()
 
-		elif action = "job.enum":
+		elif action == "job.enum":
 
 			# Enumerate jobs under the team
+			pass
 
-		elif action = "job.select":
+		elif action == "job.select":
 
 			# Switch currently focused job to the given ID
+			pass
 
 		elif action == "sim_start":
 
@@ -295,6 +297,33 @@ class LabSocketInterface(APIInterface):
 		"""
 		Focus LabSocket on the given job
 		"""
+
+	def deselectJob(self):
+		"""
+		Remove focus from the currently focused job ID
+		"""
+
+		# No job? Quit
+		if self.jobid is None:
+			return
+
+		# Clear job ID
+		self.jobid = None
+		self.job = None
+
+		# Unregister from the bus
+		if self.dataChannel:
+
+			# Disconnect and release data channel
+			self.dataChannel.off('job_data', self.onBusData)
+			self.dataChannel.off('job_completed', self.onBusCompleted)
+			self.dataChannel.close()
+
+			# Disconnect and release job channel
+			self.jobChannel.close()
+			self.jobChannel = None
+			self.dataChannel = None
+
 
 	def openLab(self, labid):
 		"""
