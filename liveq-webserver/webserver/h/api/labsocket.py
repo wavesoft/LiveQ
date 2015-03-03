@@ -134,6 +134,14 @@ class LabSocketInterface(APIInterface):
 			# Send configuration frame
 			self.sendConfigurationFrame()
 
+		elif action = "job.enum":
+
+			# Enumerate jobs under the team
+
+		elif action = "job.select":
+
+			# Switch currently focused job to the given ID
+
 		elif action == "sim_start":
 
 			# If we are already running a tune (jobid is defined), cancel and restart
@@ -282,6 +290,11 @@ class LabSocketInterface(APIInterface):
 	#                                 UTILITY FUNCTIONS
 	# --------------------------------------------------------------------------------
 	####################################################################################
+
+	def selectJob(self, jobid):
+		"""
+		Focus LabSocket on the given job
+		"""
 
 	def openLab(self, labid):
 		"""

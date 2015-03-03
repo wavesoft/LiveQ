@@ -68,7 +68,7 @@ class ChatInterface(APIInterface):
 		elif action == "chat":
 			# Send message to active chatroom
 			if self.chatroom != None:
-				self.chatroom.send("chat.chat", { 'user': self.user.displayName, 'message': param['message'] })
+				self.chatroom.send("chat.chat", { 'user': self.user.name, 'message': param['message'] })
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -128,10 +128,10 @@ class ChatInterface(APIInterface):
 
 			# Remove me from chatroom
 			key = "chat.%s" % self.chatroom.name
-			Config.STORE.srem(key, self.user.displayName)
+			Config.STORE.srem(key, self.user.name)
 
 			# Leave channel
-			self.chatroom.send('chat.leave', {'user':self.user.displayName})
+			self.chatroom.send('chat.leave', {'user':self.user.name})
 
 			# Unbind functions
 			self.chatroom.off('chat.enter', self.onChatroomEnter)
@@ -156,7 +156,7 @@ class ChatInterface(APIInterface):
 
 		# Add user in chatroom
 		key = "chat.%s" % self.chatroom.name
-		Config.STORE.sadd(key, self.user.displayName)
+		Config.STORE.sadd(key, self.user.name)
 
 		# Get users in the channel
 		roomUsers = list(Config.STORE.smembers(key))
@@ -168,4 +168,4 @@ class ChatInterface(APIInterface):
 
 		# Send presence
 		self.sendAction("presence", { 'users': roomUsers })
-		self.chatroom.send('chat.enter', {'user':self.user.displayName})
+		self.chatroom.send('chat.enter', {'user':self.user.name})

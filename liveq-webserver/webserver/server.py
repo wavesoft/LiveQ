@@ -29,6 +29,7 @@ from tornado.web import URLSpec
 from webserver.h.configure import ConfigHandler
 from webserver.h.apisocket import APISocketHandler
 from webserver.h.index import IndexHandler, PlayHandler, HelpHandler
+from webserver.h.tootr import TootrGetAnimation
 from webserver.config import Config
 
 """
@@ -45,6 +46,7 @@ class MCPlotsServer(tornado.web.Application):
 			URLSpec(r"%s/help" % Config.BASE_URL, 			HelpHandler, 			name="help"),
 			URLSpec(r"%s/config" % Config.BASE_URL, 		ConfigHandler, 			name="config"),
 			URLSpec(r"%s/apisocket" % Config.BASE_URL,		APISocketHandler, 		name="api"),
+			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,		TootrGetAnimation, 		name="tootr_anim"),
 		]
 
 		# Get root dir of files

@@ -41,7 +41,8 @@ def createWebserverTables():
 
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, Team, TeamMembers, Tutorials, QuestionaireResponses, 
-				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime ]:
+				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
+				   TootrInterfaceTutorial, Book ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -482,6 +483,77 @@ class FirstTime(BaseModel):
 
 	#: The text to display
 	text = TextField(default="")
+
+class TootrAnimation(BaseModel):
+	"""
+	TootR Animations for the user
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['lipsync','canvas','tweens']
+
+	#: The animation name
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: Narration voice
+	voice = CharField(max_length=128)
+	#: Narration voice ID
+	voice_id = CharField(max_length=128)
+
+	#: Narration Text
+	text = TextField()
+	#: Narration Audio URL
+	audio_url = CharField(max_length=128)
+
+	#: Lipsync information
+	lipsync = TextField(default="")
+	#: Animation canvas
+	canvas = TextField(default="")
+	#: Animation tween
+	tweens = TextField(default="")
+
+class TootrInterfaceTutorial(BaseModel):
+	"""
+	TootR interface tutorial for the user
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['aids']
+
+	#: The animation name
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: Tutorial title
+	title = CharField(max_length=128)
+	#: URL to the video
+	video = CharField(max_length=255)
+
+	#: Visual aids to focus and when
+	aids = TextField()
+
+class Book(BaseModel):
+	"""
+	Book definition
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['games', 'material']
+
+	#: The name of the book
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: Title of the book
+	title = CharField(max_length=128)
+	#: Short overview of the book
+	short = TextField(default="")
+
+	#: Lipsync information
+	description = TextField(default="")
+
+	#: List of games linked
+	games = TextField(default="[]")
+	#: List of material linked
+	material = TextField(default="[]")
 
 # -----------------------------------------------------
 #  Drafts

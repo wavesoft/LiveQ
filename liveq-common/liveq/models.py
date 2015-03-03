@@ -52,13 +52,17 @@ class BaseModel(Model):
 		# Compile document
 		document = {}
 		for f in FIELDS:
+			v = getattr(self, f)
 			if (f in self.__class__.JSON_FIELDS) and expandJSON:
-				if not getattr(self, f):
+				if not v:
 					document[f] = {}
 				else:
-					document[f] = json.loads(getattr(self, f))
+					document[f] = json.loads(v)
 			else:
-				document[f] = getattr(self, f)
+				if isinstance(v, Model):
+					document[f] = getattr(v, v._meta.primary_key.name)
+				else:
+					document[f] = v
 
 		# Return document
 		return document

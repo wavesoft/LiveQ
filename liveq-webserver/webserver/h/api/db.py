@@ -70,6 +70,24 @@ class DatabaseInterface(APIInterface):
 				'index'	 : 'key',
 				'read'   : None,
 				'write'  : ['admin']
+			},
+			'animations' : {
+				'model'  : webserver.models.TootrAnimation,
+				'index'	 : 'name',
+				'read'   : None,
+				'write'  : ['admin']
+			},
+			'tutorials' : {
+				'model'  : webserver.models.TootrInterfaceTutorial,
+				'index'	 : 'name',
+				'read'   : None,
+				'write'  : ['admin']
+			},
+			'books' : {
+				'model'  : webserver.models.Book,
+				'index'	 : 'name',
+				'read'   : None,
+				'write'  : ['admin']
 			}
 		}
 
@@ -81,28 +99,6 @@ class DatabaseInterface(APIInterface):
 		
 		# Keep a local reference of the user
 		self.user = self.socket.user
-
-	def serialize(self, MODEL, record, expandJSON=True):
-		"""
-		Serialize the given record to a dictionary
-		"""
-
-		# Get model fields
-		FIELDS = MODEL._meta.get_field_names()
-
-		# Compile document
-		document = {}
-		for f in FIELDS:
-			if (f in MODEL.JSON_FIELDS) and expandJSON:
-				if not getattr(record, f):
-					document[f] = {}
-				else:
-					document[f] = json.loads(getattr(record, f))
-			else:
-				document[f] = getattr(record, f)
-
-		# Return document
-		return document
 
 	def get_table_record(self, docName, docIndex, expandJSON=True):
 		"""
@@ -128,13 +124,10 @@ class DatabaseInterface(APIInterface):
 			# Try to get record
 			record = MODEL.get( getattr(MODEL,tab['index']) == docIndex )
 
-			# Compile document
-			document = self.serialize( MODEL, record, expandJSON=expandJSON )
-
 			# Send data
 			self.sendResponse({
 				"status": "ok",
-				"doc": document,
+				"doc": record.serialize( expandJSON=expandJSON ),
 				"index": tab['index']
 				})
 
@@ -218,7 +211,7 @@ class DatabaseInterface(APIInterface):
 		for record in MODEL.select():
 
 			# Serialize document
-			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+			ans.append( record.serialize( expandJSON=expandJSON ) )
 
 		# Send data
 		self.sendResponse({
@@ -251,7 +244,7 @@ class DatabaseInterface(APIInterface):
 		for record in MODEL.select().where( getattr(MODEL,tab['index']) << docIndices ):
 
 			# Serialize document
-			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+			ans.append( record.serialize( expandJSON=expandJSON ) )
 
 		# Send data
 		self.sendResponse({
@@ -299,7 +292,7 @@ class DatabaseInterface(APIInterface):
 		for record in MODEL.select().where(whereQuery):
 
 			# Serialize document
-			ans.append( self.serialize( MODEL, record, expandJSON=expandJSON ) )
+			ans.append( record.serialize( expandJSON=expandJSON ) )
 
 		# Send data
 		self.sendResponse({

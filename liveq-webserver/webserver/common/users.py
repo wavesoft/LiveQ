@@ -48,6 +48,9 @@ class HLUser:
 		# Preheat user cache
 		self.loadCache_Knowledge()
 
+		# Cache my user name
+		self.name = user.displayName
+
 	###################################
 	# Cache Loading Functions
 	###################################
