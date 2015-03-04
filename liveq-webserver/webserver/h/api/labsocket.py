@@ -77,18 +77,12 @@ class LabSocketInterface(APIInterface):
 			# Clear job ID
 			self.jobid = None
 
-		# Unregister from the bus
-		if self.dataChannel:
+		# Disconnect and release job channel
+		self.jobChannel.close()
+		self.jobChannel = None
 
-			# Disconnect and release data channel
-			self.dataChannel.off('job_data', self.onBusData)
-			self.dataChannel.off('job_completed', self.onBusCompleted)
-			self.dataChannel.close()
-
-			# Disconnect and release job channel
-			self.jobChannel.close()
-			self.jobChannel = None
-			self.dataChannel = None
+		# Deselect data channel
+		self.selectDataChannel( None )
 
 	def ready(self):
 		"""
@@ -157,9 +151,10 @@ class LabSocketInterface(APIInterface):
 
 			# Ask job manager to schedule a new job
 			ans = self.jobChannel.send('job_start', {
-				'lab': self.lab.uuid,
-				'group': 'global',
-				'dataChannel': self.dataChannel.name,
+				'lab'  : self.lab.uuid,
+				'group': self.user.resourceGroup,
+				'user' : self.user.id,
+				'team' : self.user.teamID,
 				'parameters': tunables
 			}, waitReply=True, timeout=5)
 
@@ -170,6 +165,9 @@ class LabSocketInterface(APIInterface):
 			# Check for error response
 			if ans['result'] == 'error':
 				return self.sendError("Unable to place a job request: %s" % ans['error'])
+
+			# Monitor the specified data channel
+			self.selectDataChannel( ans['dataChannel'] )
 
 			# Send status
 			self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
@@ -293,37 +291,40 @@ class LabSocketInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
-	def selectJob(self, jobid):
+	def selectDataChannel(self, channelID):
 		"""
-		Focus LabSocket on the given job
+		Switch channel to the given ID
 		"""
+
+		# Close previous
+		if self.dataChannel:
+
+			# Unbind events
+			self.dataChannel.off('job_data', self.onBusData)
+			self.dataChannel.off('job_status', self.onBusStatus)
+			self.dataChannel.off('job_completed', self.onBusCompleted)
+
+			# Disconnect and release job channel
+			self.dataChannel.close()
+			self.dataChannel = None
+
+		# Open new channel
+		if channelID:
+
+			# Open channel
+			self.dataChannel = Config.IBUS.openChannel(channelID, serve=True)
+
+			# Bind events
+			self.dataChannel.on('job_data', self.onBusData)
+			self.dataChannel.on('job_status', self.onBusStatus)
+			self.dataChannel.on('job_completed', self.onBusCompleted)
+
 
 	def deselectJob(self):
 		"""
 		Remove focus from the currently focused job ID
 		"""
-
-		# No job? Quit
-		if self.jobid is None:
-			return
-
-		# Clear job ID
-		self.jobid = None
-		self.job = None
-
-		# Unregister from the bus
-		if self.dataChannel:
-
-			# Disconnect and release data channel
-			self.dataChannel.off('job_data', self.onBusData)
-			self.dataChannel.off('job_completed', self.onBusCompleted)
-			self.dataChannel.close()
-
-			# Disconnect and release job channel
-			self.jobChannel.close()
-			self.jobChannel = None
-			self.dataChannel = None
-
+		pass
 
 	def openLab(self, labid):
 		"""
@@ -352,12 +353,7 @@ class LabSocketInterface(APIInterface):
 		# Open required bus channels
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 		self.jobChannel = Config.IBUS.openChannel("jobs")
-		self.dataChannel = Config.IBUS.openChannel("data-%s" % uuid.uuid4().hex, serve=True)
 
-		# Bind events
-		self.dataChannel.on('job_data', self.onBusData)
-		self.dataChannel.on('job_status', self.onBusStatus)
-		self.dataChannel.on('job_completed', self.onBusCompleted)
 
 	def sendStatus(self, message, varMetrics={}):
 		"""

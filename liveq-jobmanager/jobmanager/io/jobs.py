@@ -21,21 +21,29 @@ import logging
 import uuid
 import cPickle as pickle
 import random
+import json
 
 from jobmanager.config import Config
 
 from liveq.utils import deepupdate
-from liveq.models import Agent, Lab
+from liveq.models import Agent, Lab, JobQueue
 from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
 from liveq.reporting.lars import LARS
+
+#: Reason: Job is completed
+COMPLETED = JobQueue.COMPLETED
+#: Reason: Job is failed
+FAILED = JobQueue.FAILED
+#: Reason: Job was cancelled
+CANCELLED = JobQueue.CANCELLED
 
 class Job:
 	"""
 	Store interface with the job management
 	"""
 
-	def __init__(self, buf=None, id=None, dataChannel=None, lab=None, parameters=None, group=None):
+	def __init__(self, job):
 		"""
 		Initialize job by it's ID
 
@@ -44,60 +52,28 @@ class Job:
 		- By not defining the `buf`: Where a new Job will be allocated
 		"""
 
+		# Keep job instance
+		self.job = job
+		self.lab = job.lab
+		self.group = job.group
+		self.parameters = json.loads(job.parameters)
+
 		# Prepare/allocate new job ID if we haven't
 		# specified anything
-		self.id = id
+		self.id = str(self.job.id)
 		if not id:
-			self.id = uuid.uuid4().hex
 
 			# Send report to LARS
 			report = LARS.openGroup("labs/%s/jobs" % lab.uuid, self.id, alias=self.id)
 			report.add("active", 1)
 
-		# Prepare metadata
-		self.store_meta = {
-			'dataChannel': dataChannel,
-			'group': group,
-			'parameters': parameters
-		}
-
-		# If we have a lab specified, store it's UUID in the store_meta
-		if lab:
-			self.store_meta['lab_id'] = lab.uuid
-
-		# Synchronize metadata with the store
-		if not buf:
-			Config.STORE.set("job-%s:meta" % self.id, pickle.dumps(self.store_meta))
-		else:
-			self.store_meta = pickle.loads(buf)
-
-		# Populate static variables and fetch them
-		# from store if missing
-		self.dataChannel = dataChannel
-		self.group = group
-		self.parameters = parameters
-		self.lab = lab
-		if not group:
-			self.group = self.store_meta['group']
-		if not parameters:
-			self.parameters = self.store_meta['parameters']
-		if not lab:
-			lab_id = self.store_meta['lab_id']
-
-			# Create an instance to Lab model
-			try:
-				self.lab = Lab.get( Lab.uuid == lab_id)
-			except Lab.DoesNotExist:
-				self.lab = None
 
 		# Try to open channel
-		if not dataChannel:
-			dataChannel = self.store_meta['dataChannel']
-		if dataChannel:
+		if job.dataChannel:
 
 			# Fetch job channel
-			self.channel = Config.IBUS.openChannel(dataChannel)
-			self.dataChannel = dataChannel
+			self.channel = Config.IBUS.openChannel(job.dataChannel)
+			self.dataChannel = job.dataChannel
 
 		else:
 			self.channel = None
@@ -162,52 +138,17 @@ class Job:
 		# Return number of agents left
 		return len(histos)
 
-	def getMeta(self, name):
-		"""
-		Fetch metadata from store
-		"""
-
-		# Fetch buffer contents
-		buf = Config.STORE.get("job-%s:meta" % self.id)
-		if not buf:
-			return None
-
-		# Extract metadata
-		meta = pickle.loads(buf)
-
-		# Update metadata
-		if not name in meta:
-			return None
-		else:
-			return meta[name]
-
-	def setMeta(self, name, value):
-		"""
-		Set metadata to store
-		"""
-
-		# Fetch buffer contents
-		buf = Config.STORE.get("job-%s:meta" % self.id)
-		if not buf:
-			return None
-
-		# Extract metadata
-		meta = pickle.loads(buf)
-
-		# Update metadata
-		meta[name] = value
-
-		# Store
-		Config.STORE.set("job-%s:meta" % self.id, pickle.dumps(meta))
-
-	def release(self):
+	def release(self, reason=JobQueue.COMPLETED):
 		"""
 		Delete job and all of it's resources
 		"""
 
 		# Delete entries in the STORE
-		Config.STORE.delete("job-%s:meta" % self.id)
 		Config.STORE.delete("job-%s:histo" % self.id)
+
+		# Mark job as completed
+		self.job.status = reason
+		self.job.save()
 
 		# Close channel
 		self.channel.close()
@@ -251,7 +192,7 @@ class Job:
 # ------------------------------------------------------------
 ##############################################################
 
-def createJob( lab, parameters, group, dataChannel ):
+def createJob( lab, parameters, group, userID, teamID, dataChannel ):
 	"""
 	This function will create a new Job with a unique ID and will set-up
 	the response channel for the internal bus to `dataChannel`
@@ -281,12 +222,20 @@ def createJob( lab, parameters, group, dataChannel ):
 	mergedParameters['repoURL'] = labInst.repoURL
 	mergedParameters['histograms'] = labInst.getHistograms()
 
-	# Return a new job instance
-	return Job(
+	# Create a new job record
+	job = JobQueue.create(
 		lab=labInst,
 		group=group,
-		parameters=mergedParameters,
-		dataChannel=dataChannel)
+		dataChannel=dataChannel,
+		team_id=teamID,
+		user_id=userID,
+		userTunes=json.dumps(userTunes),
+		parameters=json.dumps(mergedParameters),
+		)
+
+	# Save and return
+	job.save()
+	return Job(job)
 
 def getJob( job_id ):
 	"""
@@ -294,21 +243,36 @@ def getJob( job_id ):
 	only if the given job exists.
 	"""
 
-	# Load job metadata
-	buf = Config.STORE.get("job-%s:meta" % job_id)
+	# Missing ID, return none
+	if not job_id:
+		return None
 
-	# Not exists, return None
-	if not buf:
+	# Lookup job by it's ID
+	try:
+		jobInst = JobQueue.get( JobQueue.id == int(job_id) )
+	except JobQueue.DoesNotExist:
+		# Not exists, return None
+		return None
+	except ValueError:
+		# Invalid integer, return None
 		return None
 
 	# Job exists, return instance
-	return Job(buf=buf, id=job_id)
+	return Job(jobInst)
 
 def hasJob( job_id ):
 	"""
 	Return TRUE if a job with this ID exists in the store
 	"""
 
-	# Load job metadata
-	buf = Config.STORE.get("job-%s:meta" % job_id)
-	return bool(buf)
+	# Missing ID, return false
+	if not job_id:
+		return False
+
+	# Return true if exists
+	try:
+		return JobQueue.select().where(JobQueue.id == int(job_id)).exists()
+	except ValueError:
+		# Invalid integer, return False
+		return False
+

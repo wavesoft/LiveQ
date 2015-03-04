@@ -18,6 +18,7 @@
 ################################################################
 
 import time
+import uuid
 import logging
 import datetime
 
@@ -266,7 +267,7 @@ class JobManagerComponent(Component):
 		scheduler.releaseJob( job )
 
 		# And then cleanup job
-		job.release()
+		job.release(reason=jobs.COMPLETED)
 
 	def abortMissingJob(self, job_id, agentChannel):
 		"""
@@ -528,7 +529,7 @@ class JobManagerComponent(Component):
 
 		self.logger.info("Got job request in IBUS")
 
-		if not all(x in message for x in ('lab', 'parameters', 'group', 'dataChannel')):
+		if not all(x in message for x in ('lab', 'parameters', 'group', 'user', 'team')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
 			self.jobChannel.reply({
 					'result': 'error',
@@ -538,12 +539,17 @@ class JobManagerComponent(Component):
 
 		# Fetch the lab ID and the user parameters
 		lab = message['lab']
+		userID = message['user']
+		teamID = message['team']
 		parameters = message['parameters']
 		group = message['group']
-		dataChannel = message['dataChannel'] # << The channel name in IBUS where we should dump the data
+
+		# Allocate a unique ID on the dataChannel
+		# That's the channel name in IBUS where we should dump the data
+		dataChannel = "data-%s" % uuid.uuid4().hex
 
 		# Create a new job descriptor
-		job = jobs.createJob( lab, parameters, group, dataChannel )
+		job = jobs.createJob( lab, parameters, group, userID, teamID, dataChannel )
 		if not job:
 			# Reply failure
 			self.jobChannel.reply({
@@ -612,7 +618,7 @@ class JobManagerComponent(Component):
 				agents.agentJobAborted(agent.uuid, job)
 
 		# And then cleanup job
-		job.release()
+		job.release(reason=jobs.CANCELLED)
 
 		# Reply status
 		self.jobChannel.reply({

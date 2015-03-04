@@ -20,7 +20,7 @@
 import json
 
 from liveq.models import Tunable
-from webserver.models import User, KnowledgeGrid
+from webserver.models import User, KnowledgeGrid, TeamMembers
 
 class HLUserError(Exception):
 	"""
@@ -48,8 +48,30 @@ class HLUser:
 		# Preheat user cache
 		self.loadCache_Knowledge()
 
-		# Cache my user name
+		# Cache my information
 		self.name = user.displayName
+		self.id = user.id
+
+		# Team-releated information
+		self.teamMembership = None
+		self.teamID = 0
+		self.resourceGroup = "global"
+
+		# Get team memebership
+		try:
+
+			# Get team membership
+			self.teamMembership = TeamMembers.get( TeamMembers.user == user )
+
+			# Cache details
+			self.team_id = self.teamMembership.team.id
+
+			# Get team's resource group
+			self.resourceGroup = self.teamMembership.team.agentGroup.uuid
+
+		except TeamMembers.DoesNotExist:
+			# Not in a team
+			pass
 
 	def reload(self):
 		"""

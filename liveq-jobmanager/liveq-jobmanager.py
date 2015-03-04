@@ -42,7 +42,7 @@ runtimeConfig = { }
 # Load configuration
 try:
 	Config.fromFile( "config/jobmanager.conf.local", runtimeConfig )
-except ConfigException as e:
+except Exception as e:
 	print("ERROR   Configuration exception: %s" % e)
 	exit(1)
 

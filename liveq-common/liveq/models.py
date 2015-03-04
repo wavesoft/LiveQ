@@ -75,7 +75,7 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ Jobs, AgentGroup, Agent, AgentJobs, AgentMetrics, Lab,
+	for table in [ AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, JobQueue,
 				   Tunable, Observable, TunableToObservable, PostMortems ]:
 
 		# Do nothing if the table is already there
@@ -85,44 +85,151 @@ def createBaseTables():
 #  In production
 # -----------------------------------------------------
 
-class Jobs(BaseModel):
+class Lab(BaseModel):
 	"""
-	Jobs
+	Lab reference description
+	"""
+
+	#: Add an additional UUID lookup index that allows
+	#: annonymization of the Lab IDs
+	uuid = CharField(max_length=128, index=True, unique=True)
+	#: The name of the lab
+	name = CharField(max_length=128)
+	#: The repository tag/version to checkout
+	repoTag = CharField()
+	#: The repository base that contains the software
+	repoURL = CharField()
+	#: The repository type that will be used
+	repoType = CharField(max_length=12, default="svn")
+	#: The non-tunable parameters for the job
+	fixedParameters = TextField()
+	#: The parameters the user can send
+	tunableParameters = TextField()
+	#: The observed histograms
+	histograms = TextField()
+	#: The type of the histograms
+	histogramType = CharField(max_length=12, default="FLAT")
+
+	def getParameters(self):
+		"""
+		Return the parsed parameters
+		"""
+		return json.loads(self.fixedParameters)
+
+	def setParameters(self, data):
+		"""
+		Update the fixed parameters
+		"""
+		self.fixedParameters = json.dumps(data)
+
+	def getTunableNames(self):
+		"""
+		Return the names of the tunables
+		"""
+		return str(self.tunableParameters).split(",")
+
+	def setTunableNames(self, data):
+		"""
+		Update the names of the tunables
+		"""
+		self.tunableParameters = ",".join(data)
+
+	def getHistograms(self):
+		"""
+		Return the names of the histograms to send to the user
+		"""
+		return str(self.histograms).split(",")
+		
+	def setHistograms(self, data):
+		"""
+		Set the names of the histograms to send to the user
+		"""
+		self.histograms = ",".join(data)
+
+	def getTunables(self):
+		"""
+		Return the configuration for the tunable parameters
+		"""
+
+		config = []
+		names = self.getTunableNames()
+		for name in names:
+
+			# Fetch the tunable record for every name
+			config.append( Tunable.get(name=name) )
+
+		# Return tunable configuration
+		return config
+
+	def formatTunables(self, tunables, asString=False):
+		"""
+		Format tunables
+		"""
+
+		# Prepare response
+		ans = { }
+
+		# Process tunables
+		cfgTunables = self.getTunables()
+		for t in cfgTunables:
+
+			# Get value
+			k = t.name
+			v = 0.0
+			if not k in tunables:
+				# If we don't have the value, get default
+				v = t.default
+			else:
+				# Otherwise, clamp to limits
+				v = min( t.max, max( t.min, float(tunables[k]) ) )
+
+			# Snap decimals when converting to string
+			if asString:
+				ans[k] = ("%." + str(t.dec) + "f") % v
+			else:
+				ans[k] = v
+
+		# Return answer
+		return ans
+
+class JobQueue(BaseModel):
+	"""
+	Queue of jobs pending in the LiveQ jobManager
 	"""
 
 	#: When the job was submitted
-	timestamp = IntegerField(default=0)
+	submitted = DateTimeField(default=datetime.datetime.now)
 
 	#: The channel name where real-time I/O is performed
-	channel = CharField(max_length=128)
+	dataChannel = CharField(max_length=128)
 
-	#: The tunable in this configuration
-	tunables = TextField(default="")
-	#: The observables in this configuration
-	observables = TextField(default="")
-
-	#: The tunable values of this configuration
-	tunableValues = TextField(default="")
-	#: The observable results of this configuration
-	observableValues = TextField(default="")
+	#: The tunes the user submitted for this job
+	userTunes = TextField(default="")
 
 	#: The team that owns this job
 	team_id = IntegerField(default=0)
+	#: The user who submitted this job
+	user_id = IntegerField(default=0)
 
-	#: The job status
-	status = CharField(max_length=4, default="PEND")
+	#: The agent group where to run this job
+	group = CharField(max_length=128)
+
+	#: The lab where this job is going to run into
+	lab = ForeignKeyField(Lab)
+
+	#: The actual parameters sent to agent
+	parameters = TextField(default="")
+
+	#: The job status (indexable)
+	status = IntegerField(max_length=2, default=0, index=True, unique=False)
 
 	#: Job status can be one of the following:
-	STATUS_ENUM = (
-		# Job not yet started
-		'PEND',
-		# Job currently running
-		'RUN',
-		# Job completed
-		'DONE',
-		# Job failed
-		'FAIL'
-	)
+	PENDING  	= 0
+	RUN  		= 1
+	COMPLETED  	= 2
+	FAILED  	= 3
+	CANCELLED   = 4
+	STALLED		= 5
 
 	def getTunableValues(self):
 		"""
@@ -252,113 +359,6 @@ class AgentMetrics(BaseModel):
 	jobs_failed = IntegerField(default=0)
 	#: Number of jobs aborted in this agent
 	jobs_aborted = IntegerField(default=0)
-
-class Lab(BaseModel):
-	"""
-	Lab reference description
-	"""
-
-	#: Add an additional UUID lookup index that allows
-	#: annonymization of the Lab IDs
-	uuid = CharField(max_length=128, index=True, unique=True)
-	#: The name of the lab
-	name = CharField(max_length=128)
-	#: The repository tag/version to checkout
-	repoTag = CharField()
-	#: The repository base that contains the software
-	repoURL = CharField()
-	#: The repository type that will be used
-	repoType = CharField(max_length=12, default="svn")
-	#: The non-tunable parameters for the job
-	fixedParameters = TextField()
-	#: The parameters the user can send
-	tunableParameters = TextField()
-	#: The observed histograms
-	histograms = TextField()
-	#: The type of the histograms
-	histogramType = CharField(max_length=12, default="FLAT")
-
-	def getParameters(self):
-		"""
-		Return the parsed parameters
-		"""
-		return json.loads(self.fixedParameters)
-
-	def setParameters(self, data):
-		"""
-		Update the fixed parameters
-		"""
-		self.fixedParameters = json.dumps(data)
-
-	def getTunableNames(self):
-		"""
-		Return the names of the tunables
-		"""
-		return str(self.tunableParameters).split(",")
-
-	def setTunableNames(self, data):
-		"""
-		Update the names of the tunables
-		"""
-		self.tunableParameters = ",".join(data)
-
-	def getHistograms(self):
-		"""
-		Return the names of the histograms to send to the user
-		"""
-		return str(self.histograms).split(",")
-		
-	def setHistograms(self, data):
-		"""
-		Set the names of the histograms to send to the user
-		"""
-		self.histograms = ",".join(data)
-
-	def getTunables(self):
-		"""
-		Return the configuration for the tunable parameters
-		"""
-
-		config = []
-		names = self.getTunableNames()
-		for name in names:
-
-			# Fetch the tunable record for every name
-			config.append( Tunable.get(name=name) )
-
-		# Return tunable configuration
-		return config
-
-	def formatTunables(self, tunables, asString=False):
-		"""
-		Format tunables
-		"""
-
-		# Prepare response
-		ans = { }
-
-		# Process tunables
-		cfgTunables = self.getTunables()
-		for t in cfgTunables:
-
-			# Get value
-			k = t.name
-			v = 0.0
-			if not k in tunables:
-				# If we don't have the value, get default
-				v = t.default
-			else:
-				# Otherwise, clamp to limits
-				v = min( t.max, max( t.min, float(tunables[k]) ) )
-
-			# Snap decimals when converting to string
-			if asString:
-				ans[k] = ("%." + str(t.dec) + "f") % v
-			else:
-				ans[k] = v
-
-		# Return answer
-		return ans
 
 class Tunable(BaseModel):
 	"""

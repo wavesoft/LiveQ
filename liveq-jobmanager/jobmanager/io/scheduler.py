@@ -29,7 +29,7 @@ from peewee import fn, RawQuery
 
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
 from liveq.utils.remotelock import RemoteLock
-from liveq.models import Agent, AgentGroup
+from liveq.models import Agent, AgentGroup, AgentJobs
 from liveq.reporting.lars import LARS
 
 logger = logging.getLogger("scheduler")
@@ -115,8 +115,8 @@ class GroupResources:
 
 		# Place query
 		query = Agent.select().where( 
-				(Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == "") &
-				(Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
+				(Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == "")
+		#	  & (Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
 			).limit(count)
 
 		# Fetch all elements

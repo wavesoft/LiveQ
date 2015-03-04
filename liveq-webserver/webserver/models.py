@@ -22,7 +22,7 @@ import datetime
 import json
 
 from peewee import *
-from liveq.models import BaseModel, Jobs, AgentGroup, Agent, \
+from liveq.models import BaseModel, JobQueue, AgentGroup, Agent, \
 						 AgentJobs, AgentMetrics, Lab, Tunable, \
 						 Observable, TunableToObservable, PostMortems
 
