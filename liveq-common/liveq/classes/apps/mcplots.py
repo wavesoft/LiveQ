@@ -44,6 +44,22 @@ from liveq.reporting.postmortem import PostMortem
 
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 
+def run_and_get(args):
+	"""
+	Run cmdline and return STDOUT
+	"""
+	output = ""
+
+	# Open process
+	proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+	# Read output
+	output = proc.stdout.read()
+	# Wait
+	proc.wait()
+
+	# Return output
+	return output
+
 class Config(AppConfigClass):
 	"""
 	Configuration implementation
@@ -134,10 +150,22 @@ class MCPlots(JobApplication):
 		envDict['LIVEQ_DATDIR'] = self.datdir
 
 		# Launch process in it's own process group
-		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE)
+		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 		self.logger.debug("Process started with PID=%i" % self.process.pid)
 
-		self.postmortem.addProcess(" ".join(args), self.process, stderr=True)
+		# Include details in the postmortem
+		self.postmortem.addInfo("env", envDict, "Process")
+		self.postmortem.addInfo("cwd", self.workdir, "Process")
+		self.postmortem.addInfo("tune", self.jobconfig['tune'], "Process")
+		self.postmortem.addInfo("histograms", self.jobconfig['histograms'], "Process")
+		self.postmortem.addInfo("revision", self.jobconfig['repoTag'], "Process")
+
+		# Include machine details in postmortem
+		self.postmortem.addInfo("memory", run_and_get(['free','-m']), "Machine")
+		self.postmortem.addInfo("disk", run_and_get(['df','-h']), "Machine")
+		self.postmortem.addInfo("uptime", run_and_get(['uptime']), "Machine")
+
+		self.postmortem.addProcess(" ".join(args), self.process, stderr=True, stdout=True)
 		self.logger.debug("Post-mortem for the process started")
 
 		# Start a monitor thread
