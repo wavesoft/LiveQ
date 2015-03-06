@@ -407,6 +407,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				if not handled:
 					return self.sendError("Action '%s' is not implemented" % action)
 
+			except KeyError as e:
+				
+				# Forward API Errors
+				return self.sendError("Missing argument %s on request" % str(e), "missing-argument")
+
 			except APIError as e:
 
 				# Forward API Errors

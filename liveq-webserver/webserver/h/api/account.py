@@ -133,8 +133,37 @@ class AccountInterface(APIInterface):
 			# Return paper status
 			self.sendResponse({
 					"status": "ok",
-					"data" : self.user.getPapers()
+					"data" : self.user.getPapers(param['query'])
 				})
+
+		##################################################
+		# Return a particular paper
+		# ------------------------------------------------
+		elif action == "papers.get":
+
+			# Return paper status
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getPaper(param['id'])
+				})
+
+		##################################################
+		# Update a particular paper
+		# ------------------------------------------------
+		elif action == "papers.update":
+
+			# Update paper
+			if not self.user.updatePaper(param['id'], param['fields']):
+
+				# Return paper status
+				self.sendResponse({
+						"status": "ok",
+					})
+
+			else:
+
+				# Return paper status
+				self.sendError('Could not update paper', 'update-error')
 
 		##################################################
 		# Claim credits for a particular achievement

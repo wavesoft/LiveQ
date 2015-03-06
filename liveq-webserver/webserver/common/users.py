@@ -323,10 +323,90 @@ class HLUser:
 	# In-game information queries
 	###################################
 
-	def getPapers(self, public=False):
+	def updatePaper(self, paper_id, fields):
+		"""
+		Update paper fields
+		"""
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			return False
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+
+			# You can read only team review papers
+			if paper.state != Paper.TEAM_REVIEW:
+				return None
+
+			# Validate team
+			if self.teamMembership is None:
+				return False
+			else:
+				if paper.team != self.teamMembership.team:
+					return False
+
+		else:
+
+			# User can edit only unpublished papers
+			if paper.status in [ Paper.PUBLISHED, Paper.REMOVED ]:
+				return False
+
+		# Update fields
+		for k,v in fields.iteritems():
+			if k in Paper.JSON_FIELDS:
+				setattr(paper, k, json.dumps(v))
+			else:
+				setattr(paper, k, v)
+		
+		# Save paper
+		paper.save()
+		return True				
+
+	def getPaper(self, paper_id):
+		"""
+		Return paper details with the given ID
+		"""
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			return None
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+
+			# You can read only team review papers
+			if paper.state != Paper.TEAM_REVIEW:
+				return None
+
+			# Validate team
+			if self.teamMembership is None:
+				return None
+			else:
+				if paper.team != self.teamMembership.team:
+					return None
+
+		# Serialize
+		return paper.serialize()
+
+	def getPapers(self, query={}):
 		"""
 		Return all the paper the user owns or can access
 		"""
+
+		# Check if we should list public
+		public=False
+		if 'public' in query:
+			public = bool(query['public'])
+
+		# Check for terms
+		terms=None
+		if 'terms' in query:
+			terms = str(query['terms'])
 
 		# Get all papers that the user has access to
 		whereQuery = (Paper.owner == self.dbUser)
@@ -337,6 +417,10 @@ class HLUser:
 		# Check if we should include public
 		if public:
 			whereQuery |= (Paper.status == Paper.PUBLISHED)
+
+		# Check if we should filter terms
+		if terms:
+			whereQuery &= ( (Paper.title ** terms) | (Paper.body ** terms) )
 
 		# Collect relevant paper
 		ans = []
