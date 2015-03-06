@@ -42,7 +42,7 @@ def createWebserverTables():
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, Team, TeamMembers, Tutorials, QuestionaireResponses, 
 				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
-				   TootrInterfaceTutorial, Book ]:
+				   TootrInterfaceTutorial, Book, Paper, PaperCitation ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -433,6 +433,119 @@ class TeamMembers(BaseModel):
 	team = ForeignKeyField(Team)
 	#: The user role
 	status = CharField(max_length=6, default="user")
+
+class Paper(BaseModel):
+	"""
+	The published/publishable papers
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['tunableValues']
+
+	#: The paper is draft
+	DRAFT = 0
+	#: The paper is released for a team review
+	TEAM_REVIEW = 1
+	#: The paper is published
+	PUBLISHED = 3
+	#: The paper is removed
+	REMOVED = 4
+
+	#: The main author (and owner) of the paper
+	owner = ForeignKeyField(User)
+
+	#: The team this paper was released under
+	team = ForeignKeyField(Team)
+
+	#: Title of the paper
+	title = TextField(max_length=255)
+
+	#: Body of the paper
+	body = TextField(default="")
+
+	#: The full list of the names of the authors
+	authors = TextField(default="")
+
+	#: The status of the paper
+	status = IntegerField(default=0, index=True, unique=False)
+
+	#: The ID of the archive directory that contains
+	#: the results
+	archive = CharField(max_length=128, default="")
+
+	#: Tunable values
+	tunableValues = TextField(default="{}")
+
+	#: The related lab ID
+	lab = ForeignKeyField(Lab)
+
+	#: Goodness of fit
+	fit = FloatField(default=0.0)
+
+	#: When was it created
+	created = DateTimeField(default=datetime.datetime.now)
+
+	#: Last time user changed something
+	lastEdited = DateTimeField(default=datetime.datetime.now)
+
+	def save(self, *args, **kwargs):
+		"""
+		Auto-update lastEdited on save
+		"""
+		self.lastEdited = datetime.datetime.now()
+		return super(AnalyticsProfile, self).save(*args, **kwargs)
+
+	def updateAuthors(self):
+		"""
+		Get all the names in the team
+		"""
+
+		# Put the name of the author first
+		self.authors = self.owner.displayName
+
+		# Get all the team members
+		for rec in TeamMembers.select().where( (TeamMembers.team == self.team) & (TeamMembers.user != self.owner) ):
+			# Update authors
+			if self.authors:
+				self.authors += ", "
+			self.authors += rec.displayName
+
+	def getTunableValues(self):
+		"""
+		Return the tunable configuration
+		"""		
+		return json.loads(self.tunableValues)
+
+	def setTunableValues(self, data):
+		"""
+		Return the tunable configuration
+		"""
+		self.tunableValues = json.dumps(data)
+
+	def countCitations(self):
+		"""
+		Count paper citations
+		"""
+
+		# Count citations towards this paper
+		rec = PaperCitation.select( fn.Count(PaperCitation.id).alias('count') ) \
+					.where( PaperCitation.citation == self )
+
+		# Return number
+		return rec.count
+
+class PaperCitation(BaseModel):
+	"""
+	"""
+
+	#: The user who initiated the citation
+	user = ForeignKeyField(User)
+
+	#: The team the user belonged the moment of the citation
+	team = ForeignKeyField(Team)
+
+	#: The cited paper
+	citation = ForeignKeyField(Paper)
 
 class AnalyticsEvent(BaseModel):
 	"""

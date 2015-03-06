@@ -61,8 +61,8 @@ class CourseInterface(APIInterface):
 		# Enter a particular courseroom
 		if action == "enter":
 
-			# Schedule a course in 5 minutes
-			delta = self.scheduleSync(2)
+			# Schedule a course every 5 seconds
+			delta = self.scheduleSync(5)
 
 			# Return course information
 			self.sendAction("info", {
@@ -94,14 +94,13 @@ class CourseInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 	
-	def scheduleSync( self, freq_min ):
+	def scheduleSync( self, freq_sec ):
 		"""
 		Schedule a sync callback when the interval hits the particular minute slot.
 		This function returns the time in seconds until the given time
 		"""
 
 		# Calculate how much time it takes until the next scheduled slot
-		freq_sec = freq_min * 60
 		delta = freq_sec - time.time() % freq_sec
 
 		# Remove the timeout timer

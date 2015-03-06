@@ -49,6 +49,7 @@ class LabSocketInterface(APIInterface):
 		self.lab = None
 		self.jobid = None
 		self.dataChannel = None
+		self.jobChannel = None
 
 		# Tunable/Observable Trim
 		self.trimObs = []
@@ -78,8 +79,9 @@ class LabSocketInterface(APIInterface):
 			self.jobid = None
 
 		# Disconnect and release job channel
-		self.jobChannel.close()
-		self.jobChannel = None
+		if self.jobChannel:
+			self.jobChannel.close()
+			self.jobChannel = None
 
 		# Deselect data channel
 		self.selectDataChannel( None )

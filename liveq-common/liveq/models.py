@@ -60,8 +60,13 @@ class BaseModel(Model):
 					document[f] = json.loads(v)
 			else:
 				if isinstance(v, Model):
+					# Foreign key? Get name
 					document[f] = getattr(v, v._meta.primary_key.name)
+				elif isinstance(v, datetime.datetime):
+					# Convert datetime to UTC Time
+					document[f] = str(v)
 				else:
+					# Otherwise keep it as it is
 					document[f] = v
 
 		# Return document

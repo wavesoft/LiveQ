@@ -20,7 +20,7 @@
 import json
 
 from liveq.models import Tunable
-from webserver.models import User, KnowledgeGrid, TeamMembers
+from webserver.models import User, KnowledgeGrid, TeamMembers, Paper
 
 class HLUserError(Exception):
 	"""
@@ -294,11 +294,11 @@ class HLUser:
 		self.reload()
 
 		# Check if we have points
-		if self.user.points >= points:
+		if self.dbUser.points >= points:
 
 			# Trim and save
-			self.user.points -= points
-			self.user.save()
+			self.dbUser.points -= points
+			self.dbUser.save()
 
 		else:
 			# Raise error
@@ -313,15 +313,38 @@ class HLUser:
 		self.reload()
 
 		# Update and save
-		self.user.points += points
-		self.user.totalPoints += points
+		self.dbUser.points += points
+		self.dbUser.totalPoints += points
 
 		# Save record
-		self.user.save()
+		self.dbUser.save()
 
 	###################################
 	# In-game information queries
 	###################################
+
+	def getPapers(self, public=False):
+		"""
+		Return all the paper the user owns or can access
+		"""
+
+		# Get all papers that the user has access to
+		whereQuery = (Paper.owner == self.dbUser)
+		if not self.teamMembership is None:
+			whereQuery |= ((Paper.team == self.teamMembership.team) & (Paper.status << [ Paper.PUBLISHED, Paper.TEAM_REVIEW ]))
+		whereQuery &= (Paper.status != Paper.REMOVED)
+
+		# Check if we should include public
+		if public:
+			whereQuery |= (Paper.status == Paper.PUBLISHED)
+
+		# Collect relevant paper
+		ans = []
+		for row in Paper.select().where( whereQuery ):
+			ans.append(row.serialize())
+
+		# Return
+		return ans
 
 	def getKnowledgeTree(self, getAll=False):
 		"""
@@ -429,6 +452,7 @@ class HLUser:
 
 		# Send user profile
 		return {
+			'id'			: user.id,
 			'email' 		: user.email,
 			'displayName' 	: user.displayName,
 			'avatar' 		: user.avatar,

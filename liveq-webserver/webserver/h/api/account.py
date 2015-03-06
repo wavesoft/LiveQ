@@ -126,6 +126,17 @@ class AccountInterface(APIInterface):
 				})
 
 		##################################################
+		# Return papers status
+		# ------------------------------------------------
+		elif action == "papers.list":
+
+			# Return paper status
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getPapers()
+				})
+
+		##################################################
 		# Claim credits for a particular achievement
 		# ------------------------------------------------
 		elif action == "credits.claim":
