@@ -18,6 +18,7 @@
 ################################################################
 
 import json
+import uuid
 
 from liveq.models import Tunable
 from webserver.models import User, KnowledgeGrid, TeamMembers, Paper
@@ -57,6 +58,10 @@ class HLUser:
 		self.teamID = 0
 		self.resourceGroup = "global"
 
+		# Allocate unique token to the user
+		self.token = UserTokens(user=self.dbUser, token=uuid.uuid4().hex)
+		self.token.save()
+
 		# Get team memebership
 		try:
 
@@ -80,6 +85,15 @@ class HLUser:
 
 		# Re-select and get user record
 		self.dbUser = User.get( User.id == self.dbUser.id )
+
+	def cleanup(self):
+		"""
+		User disconnected, perform cleanup
+		"""
+
+		# Delete token
+		self.token.delete_instance()
+
 
 	###################################
 	# Cache Loading Functions
@@ -545,6 +559,7 @@ class HLUser:
 			'knowledge'		: user.getKnowledge(),
 			'vars' 			: json.loads(user.variables),
 			'state' 		: json.loads(user.state),
-			'analytics'		: analytics
+			'analytics'		: analytics,
+			'token'			: self.token.token
 			}
 

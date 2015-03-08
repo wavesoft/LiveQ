@@ -143,6 +143,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			i.isOpen = False
 			i.close()
 
+		# Disconnect user
+		if self.user:
+			self.user.cleanup()
+			self.user = None
+
 		# We are no longer connected
 		self.connected = False
 		self.logger.info("[%s] Socket closed", self.remote_ip)

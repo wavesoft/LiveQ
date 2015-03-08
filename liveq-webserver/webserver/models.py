@@ -40,7 +40,7 @@ def createWebserverTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ AnalyticsProfile, User, Team, TeamMembers, Tutorials, QuestionaireResponses, 
+	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, QuestionaireResponses, 
 				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
 				   TootrInterfaceTutorial, Book, Paper, PaperCitation ]:
 
@@ -406,6 +406,18 @@ class User(BaseModel):
 
 		# Update last knowledge item
 		self.lastKnowledge = knowledgeNode
+
+
+class UserTokens(BaseModel):
+	"""
+	Quick-login authentication tokens for users
+	"""
+	
+	#: User token
+	user = ForeignKeyField(User)
+
+	#: Token
+	token = CharField(max_length=128, index=True, unique=True)
 
 class Team(BaseModel):
 	"""

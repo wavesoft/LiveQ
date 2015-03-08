@@ -205,6 +205,9 @@ class JobQueue(BaseModel):
 	#: When the job was submitted
 	submitted = DateTimeField(default=datetime.datetime.now)
 
+	#: Last time user performed an analytics-aware action
+	lastEvent = DateTimeField(default=datetime.datetime.now)
+
 	#: The channel name where real-time I/O is performed
 	dataChannel = CharField(max_length=128)
 
@@ -291,6 +294,13 @@ class JobQueue(BaseModel):
 		Update the names of the Observables
 		"""
 		self.observables = ",".join(data)
+
+	def save(self, *args, **kwargs):
+		"""
+		Auto-update lastEvent on save
+		"""
+		self.lastEvent = datetime.datetime.now()
+		return super(JobQueue, self).save(*args, **kwargs)
 
 class AgentGroup(BaseModel):
 	"""
