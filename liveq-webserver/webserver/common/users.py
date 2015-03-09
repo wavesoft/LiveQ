@@ -352,7 +352,7 @@ class HLUser:
 		if paper.owner != self.dbUser:
 
 			# You can read only team review papers
-			if paper.state != Paper.TEAM_REVIEW:
+			if paper.status != Paper.TEAM_REVIEW:
 				return None
 
 			# Validate team
@@ -394,7 +394,7 @@ class HLUser:
 		if paper.owner != self.dbUser:
 
 			# You can read only team review papers
-			if paper.state != Paper.TEAM_REVIEW:
+			if paper.status != Paper.TEAM_REVIEW:
 				return None
 
 			# Validate team
