@@ -21,7 +21,7 @@ import json
 import uuid
 
 from liveq.models import Tunable
-from webserver.models import User, KnowledgeGrid, TeamMembers, Paper
+from webserver.models import User, KnowledgeGrid, TeamMembers, Paper, UserTokens
 
 class HLUserError(Exception):
 	"""

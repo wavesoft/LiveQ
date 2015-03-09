@@ -38,6 +38,7 @@ from webserver.h.api.labtrain import LabTrainInterface
 from webserver.h.api.db import DatabaseInterface
 from webserver.config import Config
 from webserver.common.users import HLUser
+from webserver.common.forum import registerForumUser
 
 from webserver.models import User, AnalyticsProfile
 from tornado.ioloop import IOLoop
@@ -338,6 +339,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			# Fetch user profile
 			profile = param['profile']
 			email = str(profile['email']).lower()
+
+			# Create a forum user with the same information
+			registerForumUser(
+					email, profile['password'], title=profile['displayName']
+				)
 
 			# Check if such user exist
 			try:

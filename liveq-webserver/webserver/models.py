@@ -430,6 +430,8 @@ class Team(BaseModel):
 	name = CharField(max_length=128)
 	#: The team avatar
 	avatar = CharField(max_length=128)
+	#: The team description
+	description = TextField(default="")
 
 	#: The related agent group
 	agentGroup = ForeignKeyField(AgentGroup)
@@ -470,7 +472,7 @@ class Paper(BaseModel):
 	team = ForeignKeyField(Team)
 
 	#: Title of the paper
-	title = TextField(max_length=255)
+	title = CharField(max_length=255)
 
 	#: Body of the paper
 	body = TextField(default="")

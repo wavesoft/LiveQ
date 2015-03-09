@@ -58,9 +58,30 @@ class WebserverConfig:
 		WebserverConfig.SSL_CA = config.get("webserver", "ssl_ca")
 
 """
+Synchronization with the forum
+"""
+class ForumConfig:
+
+	FORUM_DB = None
+	FORUM_SERVER = None
+	FORUM_USER = None
+	FORUM_PASSWORD = None
+	FORUM_ENGINE = None
+	FORUM_DB_PREFIX = "mybb_"
+
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
+		ForumConfig.FORUM_DB = config.get("forum", "database")
+		ForumConfig.FORUM_SERVER = config.get("forum", "server")
+		ForumConfig.FORUM_USER = config.get("forum", "username")
+		ForumConfig.FORUM_PASSWORD = config.get("forum", "password")
+		ForumConfig.FORUM_ENGINE = config.get("forum", "engine")
+		ForumConfig.FORUM_DB_PREFIX = config.get("forum", "prefix")
+
+"""
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig):
+class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -80,6 +101,7 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		WebserverConfig.fromConfig( config, runtimeConfig )
+		ForumConfig.fromConfig( config, runtimeConfig )
 
 		# Ensure base tables exist
 		createBaseTables()
