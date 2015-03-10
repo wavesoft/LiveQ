@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis

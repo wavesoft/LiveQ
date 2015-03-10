@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -32,6 +32,7 @@ import sys
 
 from webserver.config import Config
 from webserver.server import MCPlotsServer
+from webserver.common.userevents import UserEvents
 
 import tornado.options
 import tornado.ioloop
@@ -62,6 +63,11 @@ define("ssl_key", default=Config.SSL_KEY, help="The host certificate key for the
 define("ssl_ca", default=Config.SSL_CA, help="The CA certificate", type=str)
 define("ssl", default=Config.SSL, help="Set to 1 to enable SSL", type=bool)
 
+def cron():
+
+	# Processed queued user events
+	UserEvents.processQueuedEvents()
+
 def main():
 
 	# Parse cmdline and start Tornado Server
@@ -83,6 +89,10 @@ def main():
 		})
 		logging.info("Starting HTTPS server on port %s" % options.ssl_port)
 		https_server.listen(options.ssl_port)
+
+	# Register a cron job for processing periodical events
+	cronTimer = tornado.ioloop.PeriodicCallback( cron, 1000 )
+	cronTimer.start()
 
 	# Start the main loop
 	tornado.ioloop.IOLoop.instance().start()
