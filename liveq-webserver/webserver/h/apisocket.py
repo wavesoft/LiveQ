@@ -39,6 +39,7 @@ from webserver.h.api.db import DatabaseInterface
 from webserver.config import Config
 from webserver.common.users import HLUser
 from webserver.common.forum import registerForumUser
+from webserver.common.userevents import UserEvents
 
 from webserver.models import User, AnalyticsProfile
 from tornado.ioloop import IOLoop
@@ -68,6 +69,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.connected = False
 		self.pingTimeout = None
 		self.pingTimer = None
+		self.userevents = None
 
 		# Multiple API interfaces
 		self.interfaces = [
@@ -294,6 +296,16 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				"message": message
 			})
 
+	def sendEvent(self, event):
+		"""
+		Forward the specified event to the user
+		"""
+
+		# Send event
+		self.sendAction("ui.event", {
+				"event": event
+			})
+
 	def handleAction(self, action, param):
 		"""
 		Handle the specified incoming action from the javascript interface
@@ -329,6 +341,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 					'status' : 'ok'
 				})
 			self.sendUserProfile()
+
+			# Listen for user events
+			self.user.receiveEvents( self.sendEvent )
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:
@@ -395,6 +410,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 					'status' : 'ok'
 				})
 			self.sendUserProfile()
+
+			# Listen for user events
+			self.user.receiveEvents( self.sendEvent )
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:

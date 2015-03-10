@@ -153,7 +153,7 @@ class AccountInterface(APIInterface):
 		elif action == "papers.update":
 
 			# Update paper
-			if not self.user.updatePaper(param['id'], param['fields']):
+			if self.user.updatePaper(param['id'], param['fields']):
 
 				# Return paper status
 				self.sendResponse({
@@ -164,6 +164,17 @@ class AccountInterface(APIInterface):
 
 				# Return paper status
 				self.sendError('Could not update paper', 'update-error')
+
+		##################################################
+		# Get a particular book
+		# ------------------------------------------------
+		elif action == "books.get":
+
+			# Get a particular book
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getBook(param['id'])
+				})
 
 		##################################################
 		# Claim credits for a particular achievement

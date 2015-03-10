@@ -42,7 +42,7 @@ def createWebserverTables():
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, QuestionaireResponses, 
 				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
-				   TootrInterfaceTutorial, Book, Paper, PaperCitation ]:
+				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -227,8 +227,14 @@ class User(BaseModel):
 	#: Knowledge Grid elements explored
 	knowledge = TextField(default="")
 
+	#: Visited books
+	visitedBooks = TextField(default="")
+
 	#: Last explored knowledge item
 	lastKnowledge = ForeignKeyField(KnowledgeGrid, null=True, default=None)
+
+	#: Current paper
+	activePaper_id = IntegerField(default=0)
 
 	# -----------------------------------
 	# Metadata and analytics
@@ -407,6 +413,44 @@ class User(BaseModel):
 		# Update last knowledge item
 		self.lastKnowledge = knowledgeNode
 
+	def getVisitedBooks(self):
+		"""
+		Split visited books terms
+		"""
+
+		# Check for missing knowledge
+		if not self.visitedBooks:
+			return []
+
+		# Return visitedBooks elements
+		return map(int, self.visitedBooks.split(","))
+
+	def setVisitedBooks(self, visitedBookIDs=[]):
+		"""
+		Update visitedBooks
+		"""
+		self.visitedBooks = ",".join(visitedBookIDs)
+
+	def hasVisitedBook(self, bookID):
+		"""
+		Check if the user knows this book ID
+		"""
+		return (",%i," % bookID) in (",%s," % self.visitedBooks)
+
+	def visitBook(self, bookID):
+		"""
+		Add the specified book ID in list
+		"""
+
+		# Exist if exists
+		if (",%i," % bookID) in (",%s," % self.visitedBooks):
+			return
+
+		# Append item in list
+		if self.visitedBooks:
+			self.visitedBooks += ","
+		self.visitedBooks += str(bookID)
+
 
 class UserTokens(BaseModel):
 	"""
@@ -507,7 +551,7 @@ class Paper(BaseModel):
 		Auto-update lastEdited on save
 		"""
 		self.lastEdited = datetime.datetime.now()
-		return super(AnalyticsProfile, self).save(*args, **kwargs)
+		return super(Paper, self).save(*args, **kwargs)
 
 	def updateAuthors(self):
 		"""
@@ -682,9 +726,69 @@ class Book(BaseModel):
 	#: List of material linked
 	material = TextField(default="[]")
 
+
+class BookQuestion(BaseModel):
+	"""
+	A question regarding a specific book
+	"""
+
+	#: The book this question refers to
+	book = ForeignKeyField(Book)
+
+	#: The title of this question
+	question = CharField(max_length=255, default="")
+
+	#: List of answers from which to pick
+	answers = TextField(default="[]")
+
+	#: The correct answer index
+	correct = IntegerField(default=0)
+
+	#: The difficulty of this question
+	difficulty = IntegerField(default=0)
+
+
+class BookQuestionAnswer(BaseModel):
+	"""
+	Answer on a book question
+	"""
+
+	#: The user answering the question
+	user = ForeignKeyField(User)
+
+	#: The question being answered
+	question = ForeignKeyField(BookQuestion)
+
+	#: The answer the user gave
+	answer = IntegerField(default=0)
+
+	#: The number of trials on this question so far
+	trials = IntegerField(default=0)
+
+	#: The time he/she provided the answer
+	when = DateTimeField(default=datetime.datetime.now)
+
+	def save(self, *args, **kwargs):
+		"""
+		Auto-update answerTimestamp on save
+		"""
+		self.answerTimestamp = datetime.datetime.now()
+		return super(BookQuestionAnswer, self).save(*args, **kwargs)
+
 # -----------------------------------------------------
 #  Drafts
 # -----------------------------------------------------
+
+class EventQueue(BaseModel):
+	"""
+	Events pending for each user
+	"""
+
+	#: The user whose event queue is this
+	user_id = IntegerField(default=0, index=True, unique=False)
+
+	#: The event payload
+	event = TextField(default="{}")
 
 class QuestionaireResponses(BaseModel):
 	"""

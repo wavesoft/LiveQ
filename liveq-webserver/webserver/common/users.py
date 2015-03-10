@@ -19,9 +19,18 @@
 
 import json
 import uuid
+import logging
 
 from liveq.models import Tunable
-from webserver.models import User, KnowledgeGrid, TeamMembers, Paper, UserTokens
+from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book
+from webserver.common.userevents import UserEvents
+
+#: The user hasn't visited this book
+BOOK_UNKNOWN = 0
+#: The user knows this book
+BOOK_KNOWN = 1
+#: The user has mastered this book
+BOOK_MASTERED = 2
 
 class HLUserError(Exception):
 	"""
@@ -46,6 +55,9 @@ class HLUser:
 		# Keep user object
 		self.dbUser = user
 
+		# Create logger
+		self.logger = logging.getLogger("user(%s)" % str(user))
+
 		# Preheat user cache
 		self.loadCache_Knowledge()
 
@@ -57,6 +69,10 @@ class HLUser:
 		self.teamMembership = None
 		self.teamID = 0
 		self.resourceGroup = "global"
+
+		# Receive user events
+		self.userEvents = UserEvents.forUser( self.id )
+		self.userEventsListener = None
 
 		# Allocate unique token to the user
 		self.token = UserTokens(user=self.dbUser, token=uuid.uuid4().hex)
@@ -86,14 +102,31 @@ class HLUser:
 		# Re-select and get user record
 		self.dbUser = User.get( User.id == self.dbUser.id )
 
+	def receiveEvents(self, callback):
+		"""
+		Fire the specified callback when a user event arrives.
+		"""
+
+		# Unregister pevious callback
+		if self.userEventsListener != None:
+			self.userEvents.removeListener( self.userEventsListener )
+
+		# Receive events for this user
+		self.userEvents.addListener( callback )
+		self.userEventsListener = callback
+
 	def cleanup(self):
 		"""
 		User disconnected, perform cleanup
 		"""
 
+		# Unregister events callback & release userEvents
+		if self.userEventsListener != None:
+			self.userEvents.removeListener( self.userEventsListener )
+		self.userEvents.release()
+
 		# Delete token
 		self.token.delete_instance()
-
 
 	###################################
 	# Cache Loading Functions
@@ -333,6 +366,11 @@ class HLUser:
 		# Save record
 		self.dbUser.save()
 
+	def getBookStatus(self, book):
+		"""
+		Return the status (BOOK_UNKNOWN, BOOK_KNOWN, BOOK_MASTERED)
+		"""
+
 	###################################
 	# In-game information queries
 	###################################
@@ -346,6 +384,7 @@ class HLUser:
 		try:
 			paper = Paper.get( Paper.id == int(paper_id) )
 		except Paper.DoesNotExist:
+			self.logger.warn("Cannot update paper %s: Not found!" % paper_id)
 			return False
 
 		# Validate permissions
@@ -353,19 +392,23 @@ class HLUser:
 
 			# You can read only team review papers
 			if paper.status != Paper.TEAM_REVIEW:
+				self.logger.warn("Cannot update paper %s: Not in team review!" % paper_id)
 				return None
 
 			# Validate team
 			if self.teamMembership is None:
+				self.logger.warn("Cannot update paper %s: Not in team!" % paper_id)
 				return False
 			else:
 				if paper.team != self.teamMembership.team:
+					self.logger.warn("Cannot update paper %s: Not member of team!" % paper_id)
 					return False
 
 		else:
 
 			# User can edit only unpublished papers
 			if paper.status in [ Paper.PUBLISHED, Paper.REMOVED ]:
+				self.logger.warn("Cannot update paper %s: Published or Removed!" % paper_id)
 				return False
 
 		# Update fields
@@ -405,9 +448,39 @@ class HLUser:
 					return None
 
 		# Serialize
-		return paper.serialize()
+		return paper.serialize(expandForeigns=["team"])
 
-	def getPapers(self, query={}):
+	def getBook(self, id):
+		"""
+		Return the specified book details, including user-specific information
+		"""
+		pass
+
+	def getBookStatistics(self):
+		"""
+		Return the user book statistics
+		"""
+
+		# Get all books
+		books = []
+		for book in Book.select():
+
+			# Check user's status on this book
+			pass
+
+	def getBookQuestions(self):
+		"""
+		Return the book questions
+		"""
+		pass
+
+	def replyBookQuestions(self):
+		"""
+		Reply the book questions
+		"""
+		pass
+
+	def getPapers(self, query={}, limit=50):
 		"""
 		Return all the paper the user owns or can access
 		"""
@@ -438,8 +511,28 @@ class HLUser:
 
 		# Collect relevant paper
 		ans = []
-		for row in Paper.select().where( whereQuery ):
+		teamIDs = []
+		for row in Paper.select().where( whereQuery ).limit(limit):
+
+			# Collect rows
 			ans.append(row.serialize())
+
+			# Collect team IDs
+			if not row._data['team'] in teamIDs:
+				teamIDs.append( row._data['team'] )
+
+		# Resolve team names
+		teams = {}
+		for tid in teamIDs:
+			try:
+				team = Team.select( Team.name ).where( Team.id == tid ).limit(1).get()
+				teams[tid] = team.name
+			except Team.DoesNotExist:
+				teams[tid] = ""
+
+		# Insert in results
+		for i in range(0, len(ans)):
+			ans[i]['team_name'] = teams[ans[i]['team']]
 
 		# Return
 		return ans
@@ -557,6 +650,7 @@ class HLUser:
 			'points'		: user.points,
 			'groups'		: user.getGroups(),
 			'knowledge'		: user.getKnowledge(),
+			'activePaper'	: user.activePaper_id,
 			'vars' 			: json.loads(user.variables),
 			'state' 		: json.loads(user.state),
 			'analytics'		: analytics,

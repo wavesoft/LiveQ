@@ -41,7 +41,7 @@ class BaseModel(Model):
 	#: Which fields should be encoded using JSON
 	JSON_FIELDS = []
 
-	def serialize(self, expandJSON=True):
+	def serialize(self, expandJSON=True, expandForeigns=[]):
 		"""
 		Serialize the current record to a dictionary
 		"""
@@ -60,8 +60,16 @@ class BaseModel(Model):
 					document[f] = json.loads(v)
 			else:
 				if isinstance(v, Model):
-					# Foreign key? Get name
-					document[f] = getattr(v, v._meta.primary_key.name)
+
+					# If we are asked to expand this foreign key, 
+					# do it now.
+					if (expandForeigns == True) or (f in expandForeigns):
+						# Expand foreign key? Serialize
+						document[f] = v.serialize()
+					else:
+						# Foreign key? Just get the raw key value
+						document[f] = self._data[f]  #getattr(v, v._meta.primary_key.name)
+
 				elif isinstance(v, datetime.datetime):
 					# Convert datetime to UTC Time
 					document[f] = str(v)
