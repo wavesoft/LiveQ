@@ -58,7 +58,7 @@ class TarAnalyze:
 
 		# Open csv file
 		self.csvFile = open(csvFile, 'w')
-		self.csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage")
+		self.csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
 
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
@@ -133,7 +133,7 @@ class TarAnalyze:
 
 		# Prepare CSV Record
 		self.csvFile.write(
-				"%s,%s,%d,%s,%s,%s" % (
+				"%s,%s,%d,%s,%s,%s\n" % (
 					jobData['USER_ID'], 
 					jobData['exitcode'],
 					jobDataInfo.mtime, 
@@ -142,6 +142,7 @@ class TarAnalyze:
 					jobData['diskusage']
 				)
 			)
+		self.csvFile.flush()
 
 	def run(self):
 		"""
