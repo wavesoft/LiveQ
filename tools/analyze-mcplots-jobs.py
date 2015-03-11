@@ -118,71 +118,77 @@ def importFile(args):
 
 # Run threaded
 if __name__ == '__main__':
+	try:
 
-	# Ensure we have at least one parameter
-	if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
-		print "Analyze MCPlot job completion statistics"
-		print "Usage:"
-		print ""
-		print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
-		print ""
-		sys.exit(1)
+		# Ensure we have at least one parameter
+		if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
+			print "Analyze MCPlot job completion statistics"
+			print "Usage:"
+			print ""
+			print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
+			print ""
+			sys.exit(1)
 
-	# Check if we have directory
-	if not os.path.isdir(sys.argv[1]):
-		print "ERROR: Could not find %s!" % sys.argv[2]
-		sys.exit(1)
+		# Check if we have directory
+		if not os.path.isdir(sys.argv[1]):
+			print "ERROR: Could not find %s!" % sys.argv[2]
+			sys.exit(1)
 
-	# Get base dir and csv file
-	baseDir = sys.argv[1]
-	csvFilename = sys.argv[2]
+		# Get base dir and csv file
+		baseDir = sys.argv[1]
+		csvFilename = sys.argv[2]
 
-	# Open csv file
-	if csvFilename[0] == "+":
-		# Append
-		csvFile = open(csvFilename[1:], 'a')
-	else:
-		# Open for writing
-		csvFile = open(csvFilename, 'w')
-		csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
+		# Open csv file
+		if csvFilename[0] == "+":
+			# Append
+			csvFile = open(csvFilename[1:], 'a')
+		else:
+			# Open for writing
+			csvFile = open(csvFilename, 'w')
+			csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
 
-	# Prepare the list of histograms to process
-	histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
-	numCompleted = 0
-	numTotal = len(histogramQueue)
+		# Prepare the list of histograms to process
+		histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
+		numCompleted = 0
+		numTotal = len(histogramQueue)
 
-	# Create a process manager to serve the output queue
-	manager = Manager()
-	outputQueue = manager.Queue()
+		# Create a process manager to serve the output queue
+		manager = Manager()
+		outputQueue = manager.Queue()
 
-	# Run a pool of 8 workers
-	pool = Pool(8)
-	r = pool.map_async( 
-		importFile, 
-		[(x, outputQueue) for x in histogramQueue]
-	)
+		# Run a pool of 8 workers
+		pool = Pool(8)
+		r = pool.map_async( 
+			importFile, 
+			[(x, outputQueue) for x in histogramQueue]
+		)
 
-	# Wait all workers to complete and print queue output
-	while not r.ready() and not outputQueue.empty():
+		# Wait all workers to complete and print queue output
+		while not r.ready() and not outputQueue.empty():
 
-		# Get element (blocking)
-		q = outputQueue.get(True)
+			# Get element (blocking)
+			q = outputQueue.get(True)
 
-		# Get and log result
-		result = q[0]
-		sys.stdout.write(result)
-		sys.stdout.flush()
-
-		# In case of successful processing, log line
-		if result == ".":
-			csvFile.write("%s\n" % result[1:])
-
-		# Display progress every once in a while
-		numCompleted += 1
-		if (numCompleted % 500) == 0:
-			sys.stdout.write("\n%d/%d jobs imported (%.1f%%)\n" % (numCompleted, numTotal, 100*numCompleted/numTotal))
+			# Get and log result
+			result = q[0]
+			sys.stdout.write(result)
 			sys.stdout.flush()
 
-	# We are completed
-	csvFile.close()
-	print "\nCompleted!"
+			# In case of successful processing, log line
+			if result == ".":
+				csvFile.write("%s\n" % result[1:])
+
+			# Display progress every once in a while
+			numCompleted += 1
+			if (numCompleted % 500) == 0:
+				sys.stdout.write("\n%d/%d jobs imported (%.1f%%)\n" % (numCompleted, numTotal, 100*numCompleted/numTotal))
+				sys.stdout.flush()
+
+		# We are completed
+		csvFile.close()
+		print "\nCompleted!"
+
+	except Exception as e:
+		traceback.print_exc()
+		print e
+		return
