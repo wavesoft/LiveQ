@@ -43,6 +43,7 @@ def handleResult(result):
 	"""
 	Handle result
 	"""
+	global numCompleted
 
 	# Prin status
 	sys.stdout.write(result)
@@ -80,7 +81,11 @@ def importFile(tarFile):
 	"""
 	Open tarfile
 	"""
+	global csvFile
+	global csvLock
+
 	try:
+
 		# Open tar file
 		f = None
 		try:
