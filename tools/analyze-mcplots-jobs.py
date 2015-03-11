@@ -183,7 +183,7 @@ if __name__ == '__main__':
 			# Display progress every once in a while
 			numCompleted += 1
 			if (numCompleted % 500) == 0:
-				sys.stdout.write("(%.1f%%)" % (100*numCompleted/numTotal))
+				sys.stdout.write("[%i%%]" % (int(100*numCompleted/numTotal)))
 				sys.stdout.flush()
 
 		# We are completed
