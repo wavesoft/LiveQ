@@ -74,8 +74,10 @@ def importFile(args):
 			return
 
 		# Get jobdata record from tar archive
-		jobDataInfo = f.getmember("./jobdata")
-		if not jobDataInfo:
+		jobDataInfo = None
+		try:
+			jobDataInfo = f.getmember("./jobdata")
+		except Exception as e:
 			outputQueue.put("?")
 			return
 
