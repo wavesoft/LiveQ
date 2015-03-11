@@ -102,14 +102,14 @@ class TarAnalyze:
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
-			print "!"
+			print "!",
 			sys.stdout.flush()
 			return
 
 		# Get jobdata record from tar archive
 		jobDataInfo = f.getmember("./jobdata")
 		if not jobDataInfo:
-			print "?"
+			print "?",
 			sys.stdout.flush()
 			return
 
@@ -121,7 +121,7 @@ class TarAnalyze:
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
-			print "?"
+			print "?",
 			sys.stdout.flush()
 			return
 
@@ -130,7 +130,7 @@ class TarAnalyze:
 
 		# Check for required parameters
 		if not 'USER_ID' in jobData:
-			print "X"
+			print "X",
 			sys.stdout.flush()
 			return
 
@@ -148,7 +148,7 @@ class TarAnalyze:
 		self.csvFile.flush()
 
 		# File is imported
-		print "."
+		print ".",
 		sys.stdout.flush()
 
 	def run(self):
