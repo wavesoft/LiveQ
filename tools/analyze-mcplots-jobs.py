@@ -158,8 +158,8 @@ if __name__ == '__main__':
 		manager = Manager()
 		outputQueue = manager.Queue()
 
-		# Run a pool of 10 workers
-		pool = Pool(10)
+		# Run a pool of 4 workers
+		pool = Pool(4)
 		r = pool.map_async( 
 			importFile, 
 			[(x, outputQueue) for x in histogramQueue]
