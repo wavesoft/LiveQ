@@ -28,41 +28,8 @@ import time
 import datetime
 import glob
 
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 from threading import Thread, Lock
-
-# Global progress variables
-numTotal = 0
-numCompleted = 0
-
-# Create a mutex access to the file
-csvLock = Lock()
-csvFile = None
-
-def init_vars(numToComplete):
-	"""
-	Initialize variables
-	"""
-	global numCompleted
-	global numTotal
-
-	numCompleted = 0
-	numTotal = numToComplete
-
-def handleResult(result):
-	"""
-	Handle result
-	"""
-	global numCompleted
-
-	# Prin status
-	sys.stdout.write(result)
-	sys.stdout.flush()
-
-	# Display progress every once in a while
-	numCompleted += 1
-	if (numCompleted % 500) == 0:
-		print "\n%d/%d jobs imported (%.1f%%)" % (numCompleted, numTotal, 100*numCompleted/numTotal)
 
 def readConfig(fileObject):
 	"""
@@ -87,12 +54,13 @@ def readConfig(fileObject):
 	# Return 
 	return ans
 
-def importFile(tarFile):
+def importFile(args):
 	"""
 	Open tarfile
 	"""
-	global csvFile
-	global csvLock
+
+	tarFile = args[0]
+	outputQueue = args[1]
 
 	try:
 
@@ -102,13 +70,13 @@ def importFile(tarFile):
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
-			handleResult("!")
+			outputQueue.put("!")
 			return
 
 		# Get jobdata record from tar archive
 		jobDataInfo = f.getmember("./jobdata")
 		if not jobDataInfo:
-			handleResult("?")
+			outputQueue.put("?")
 			return
 
 		# Load jobdata
@@ -119,7 +87,7 @@ def importFile(tarFile):
 			jobData = readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
-			handleResult("-")
+			outputQueue.put("-")
 			return
 
 		# Close tarfile
@@ -127,34 +95,26 @@ def importFile(tarFile):
 
 		# Check for required parameters
 		if not 'USER_ID' in jobData:
-			handleResult("X")
+			outputQueue.put("X")
 			return
 
 		# Prepare CSV Record
-		csvLock.acquire()
-		try:
-			csvFile.write(
-					"%s,%s,%d,%s,%s,%s\n" % (
-						jobData['USER_ID'], 
-						jobData['exitcode'],
-						jobDataInfo.mtime, 
-						datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
-						jobData['cpuusage'],
-						jobData['diskusage']
-					)
+		outputQueue.put(
+				".%s,%s,%d,%s,%s,%s" % (
+					jobData['USER_ID'], 
+					jobData['exitcode'],
+					jobDataInfo.mtime, 
+					datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
+					jobData['cpuusage'],
+					jobData['diskusage']
 				)
-			csvFile.flush()
-		finally:
-			csvLock.release()
-
-		# File is imported
-		handleResult(".")
-		return
+			)
 
 	except Exception as e:
 		traceback.print_exc()
 		print e
 		return
+
 
 # Run threaded
 if __name__ == '__main__':
@@ -188,19 +148,40 @@ if __name__ == '__main__':
 
 	# Prepare the list of histograms to process
 	histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
-	init_vars( len(histogramQueue) )
+	numCompleted = 0
+	numTotal = len(histogramQueue)
 
-	# Create a pool of 8 workers
+	# Create a process manager to serve the output queue
+	manager = Manager()
+	outputQueue = manager.Queue()
+
+	# Run a pool of 8 workers
 	pool = Pool(8)
-
-	# Run pool
 	r = pool.map_async( 
 		importFile, 
-		histogramQueue
+		[(x, outputQueue) for x in histogramQueue]
 	)
 
-	# Wait all workers to complete
-	r.wait()
+	# Wait all workers to complete and print queue output
+	while not r.ready() and not outputQueue.empty():
+
+		# Get element (blocking)
+		q = outputQueue.get(True)
+
+		# Get and log result
+		result = q[0]
+		sys.stdout.write(result)
+		sys.stdout.flush()
+
+		# In case of successful processing, log line
+		if result == ".":
+			csvFile.write("%s\n" % result[1:])
+
+		# Display progress every once in a while
+		numCompleted += 1
+		if (numCompleted % 500) == 0:
+			sys.stdout.write("\n%d/%d jobs imported (%.1f%%)\n" % (numCompleted, numTotal, 100*numCompleted/numTotal))
+			sys.stdout.flush()
 
 	# We are completed
 	csvFile.close()
