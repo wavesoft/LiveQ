@@ -177,6 +177,7 @@ if __name__ == '__main__':
 			# In case of successful processing, log line
 			if result == ".":
 				csvFile.write("%s\n" % result[1:])
+				csvFile.flush()
 
 			# Display progress every once in a while
 			numCompleted += 1
