@@ -156,8 +156,8 @@ if __name__ == '__main__':
 		manager = Manager()
 		outputQueue = manager.Queue()
 
-		# Run a pool of 8 workers
-		pool = Pool(8)
+		# Run a pool of 10 workers
+		pool = Pool(10)
 		r = pool.map_async( 
 			importFile, 
 			[(x, outputQueue) for x in histogramQueue]
@@ -177,7 +177,6 @@ if __name__ == '__main__':
 			# In case of successful processing, log line
 			if result == ".":
 				csvFile.write("%s\n" % q[1:])
-				csvFile.flush()
 
 			# Display progress every once in a while
 			numCompleted += 1
