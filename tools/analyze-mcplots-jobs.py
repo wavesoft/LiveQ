@@ -164,7 +164,7 @@ if __name__ == '__main__':
 		)
 
 		# Wait all workers to complete and print queue output
-		while not r.ready() and not outputQueue.empty():
+		while not r.ready() or not outputQueue.empty():
 
 			# Get element (blocking)
 			q = outputQueue.get(True)
@@ -191,4 +191,3 @@ if __name__ == '__main__':
 	except Exception as e:
 		traceback.print_exc()
 		print e
-		return
