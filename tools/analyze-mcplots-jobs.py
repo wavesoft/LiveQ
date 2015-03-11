@@ -24,7 +24,6 @@ import os
 import sys
 import traceback
 import tarfile
-import logging
 import time
 import datetime
 import glob
@@ -34,7 +33,7 @@ if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
 	print "Analyze MCPlot job completion statistics"
 	print "Usage:"
 	print ""
-	print " import-mcplots-interpolation.py <path to mcplots jobs dir> <csv file>"
+	print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
 	print ""
 	sys.exit(1)
 
@@ -97,23 +96,21 @@ class TarAnalyze:
 		Open tarfile
 		"""
 
-		# Log
-		logging.info("Importing %s" % tarFile)
-
 		# Open tar file
 		f = None
 		try:
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
-			traceback.print_exc()
-			logging.error("Could not open archive (%s)" % str(e))
+			print "!"
+			sys.stdout.flush()
 			return
 
 		# Get jobdata record from tar archive
 		jobDataInfo = f.getmember("./jobdata")
 		if not jobDataInfo:
-			logging.error("Could not find ./jobdata file in archive")
+			print "?"
+			sys.stdout.flush()
 			return
 
 		# Load jobdata
@@ -124,8 +121,8 @@ class TarAnalyze:
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
-			traceback.print_exc()
-			logging.error("Could not load job data (%s)" % str(e))
+			print "?"
+			sys.stdout.flush()
 			return
 
 		# Close tarfile
@@ -133,7 +130,8 @@ class TarAnalyze:
 
 		# Check for required parameters
 		if not 'USER_ID' in jobData:
-			logging.warn("Skipping due to missing 'USER_ID'")
+			print "X"
+			sys.stdout.flush()
 			return
 
 		# Prepare CSV Record
@@ -148,6 +146,10 @@ class TarAnalyze:
 				)
 			)
 		self.csvFile.flush()
+
+		# File is imported
+		print "."
+		sys.stdout.flush()
 
 	def run(self):
 		"""
@@ -165,15 +167,15 @@ class TarAnalyze:
 
 		# Check if we are done
 		if not self.histogramQueue:
-			logging.info("Completed!")
+			print "\nCompleted!"
 			self.csvFile.close()
 			exit(0)
 		else:
-			# Every 50 imports, dump progress
+			# Every 100 imports, dump progress
 			currLength = len(self.histogramQueue)
-			if (currLength % 50) == 0:
+			if (currLength % 100) == 0:
 				itemsCompleted = self.queueLength - currLength
-				logging.info("%d/%d jobs imported (%.1f%%)" % (itemsCompleted, self.queueLength, 100*itemsCompleted/self.queueLength))
+				print "\n%d/%d jobs imported (%.1f%%)" % (itemsCompleted, self.queueLength, 100*itemsCompleted/self.queueLength)
 
 		# Get next file
 		self.importFile( self.histogramQueue.pop() )
