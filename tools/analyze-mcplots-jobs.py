@@ -27,7 +27,9 @@ import tarfile
 import time
 import datetime
 import glob
+
 from multiprocessing import Pool
+from threading import Thread, Lock
 
 # Ensure we have at least one parameter
 if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
@@ -47,6 +49,9 @@ if not os.path.isdir(sys.argv[1]):
 baseDir = sys.argv[1]
 csvFile = sys.argv[2]
 
+# Create a mutex access to the file
+csvLock = Lock()
+
 # Open csv file
 if csvFile[0] == "+":
 	# Append
@@ -60,6 +65,20 @@ else:
 histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
 numTotal = len(histogramQueue)
 numCompleted = 0
+
+def handleResult(result):
+	"""
+	Handle result
+	"""
+
+	# Prin status
+	system.stdout.write(result)
+	system.stdout.flush()
+
+	# Display progress every once in a while
+	numCompleted += 1
+	if (numCompleted % 500) == 0:
+		print "\n%d/%d jobs imported (%.1f%%)" % (numCompleted, numTotal, 100*numCompleted/numTotal)
 
 def readConfig(fileObject):
 	"""
@@ -124,17 +143,21 @@ def importFile(tarFile):
 		return
 
 	# Prepare CSV Record
-	csvFile.write(
-			"%s,%s,%d,%s,%s,%s\n" % (
-				jobData['USER_ID'], 
-				jobData['exitcode'],
-				jobDataInfo.mtime, 
-				datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
-				jobData['cpuusage'],
-				jobData['diskusage']
+	csvLock.acquire()
+	try:
+		csvFile.write(
+				"%s,%s,%d,%s,%s,%s\n" % (
+					jobData['USER_ID'], 
+					jobData['exitcode'],
+					jobDataInfo.mtime, 
+					datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
+					jobData['cpuusage'],
+					jobData['diskusage']
+				)
 			)
-		)
-	csvFile.flush()
+		csvFile.flush()
+	finally:
+		csvLock.release()
 
 	# File is imported
 	handleResult(".")
