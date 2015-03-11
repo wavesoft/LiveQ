@@ -108,6 +108,9 @@ class ConfigEditBookHandler(tornado.web.RequestHandler):
 		book.games = self.get_body_argument("games", "")
 		book.material = self.get_body_argument("material", "")
 
+		# Save book
+		book.save()
+
 		# Check which books to delete
 		del_questions = { }
 		for q in book.selectQuestions():
@@ -138,10 +141,7 @@ class ConfigEditBookHandler(tornado.web.RequestHandler):
 
 		# Delete books
 		for q in del_questions.values():
-			q.delete_instance()
-
-		# Save book
-		book.save()
+			q.delete_instance(True)
 
 		# Redirect
 		self.redirect( self.reverse_url('config.books') )
@@ -161,7 +161,7 @@ class ConfigDeleteBookHandler(tornado.web.RequestHandler):
 			book = Book.get( Book.id == int(book_id) )
 
 			# Delete instance
-			book.delete_instance()
+			book.delete_instance(True)
 
 		# Redirect
 		self.redirect( self.reverse_url('config.books') )
