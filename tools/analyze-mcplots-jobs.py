@@ -181,7 +181,7 @@ if __name__ == '__main__':
 			# Display progress every once in a while
 			numCompleted += 1
 			if (numCompleted % 500) == 0:
-				sys.stdout.write("\n%d/%d jobs imported (%.1f%%)\n" % (numCompleted, numTotal, 100*numCompleted/numTotal))
+				sys.stdout.write("(%.1f%%)" % (100*numCompleted/numTotal))
 				sys.stdout.flush()
 
 		# We are completed
