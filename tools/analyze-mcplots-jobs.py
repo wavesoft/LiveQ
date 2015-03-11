@@ -27,6 +27,7 @@ import tarfile
 import time
 import datetime
 import glob
+from multiprocessing import Pool
 
 # Ensure we have at least one parameter
 if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
@@ -66,7 +67,11 @@ class TarAnalyze:
 
 		# Prepare the list of histograms to process
 		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
-		self.queueLength = len(self.histogramQueue)
+		self.numTotal = len(self.histogramQueue)
+		self.numCompleted = 0
+
+		# Create a pool of 8 workers
+		self.pool = Pool(8)
 
 	def readConfig(self, fileObject):
 		"""
@@ -102,15 +107,13 @@ class TarAnalyze:
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
-			sys.stdout.write("!")
-			sys.stdout.flush()
+			self.handleResult("!")
 			return
 
 		# Get jobdata record from tar archive
 		jobDataInfo = f.getmember("./jobdata")
 		if not jobDataInfo:
-			sys.stdout.write("?")
-			sys.stdout.flush()
+			self.handleResult("?")
 			return
 
 		# Load jobdata
@@ -121,8 +124,7 @@ class TarAnalyze:
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
-			sys.stdout.write("?")
-			sys.stdout.flush()
+			self.handleResult("-")
 			return
 
 		# Close tarfile
@@ -130,8 +132,7 @@ class TarAnalyze:
 
 		# Check for required parameters
 		if not 'USER_ID' in jobData:
-			sys.stdout.write("X")
-			sys.stdout.flush()
+			self.handleResult("X")
 			return
 
 		# Prepare CSV Record
@@ -148,38 +149,25 @@ class TarAnalyze:
 		self.csvFile.flush()
 
 		# File is imported
-		sys.stdout.write(".")
-		sys.stdout.flush()
+		self.handleResult(".")
+		return
 
 	def run(self):
 		"""
 		Bind setup
 		"""
 
-		# Run component
-		while True:
-			self.step()
+		# Run pool
+		r = self.pool.map_async( 
+			self.importFile, 
+			self.histogramQueue
+		)
 
-	def step(self):
-		"""
-		Process next action in the component
-		"""
-
-		# Check if we are done
-		if not self.histogramQueue:
-			print "\nCompleted!"
-			self.csvFile.close()
-			exit(0)
-		else:
-			# Every 500 imports, dump progress
-			currLength = len(self.histogramQueue)
-			if (currLength % 500) == 0:
-				itemsCompleted = self.queueLength - currLength
-				print "\n%d/%d jobs imported (%.1f%%)" % (itemsCompleted, self.queueLength, 100*itemsCompleted/self.queueLength)
-
-		# Get next file
-		self.importFile( self.histogramQueue.pop() )
+		# Wait all workers to complete
+		r.wait()
+		print "\nCompleted!"
 
 
 # Run threaded
-TarAnalyze().run()
+if __name__ == '__main__':
+	TarAnalyze().run()
