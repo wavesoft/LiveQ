@@ -31,41 +31,6 @@ import glob
 from multiprocessing import Pool
 from threading import Thread, Lock
 
-# Ensure we have at least one parameter
-if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
-	print "Analyze MCPlot job completion statistics"
-	print "Usage:"
-	print ""
-	print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
-	print ""
-	sys.exit(1)
-
-# Check if we have directory
-if not os.path.isdir(sys.argv[1]):
-	print "ERROR: Could not find %s!" % sys.argv[2]
-	sys.exit(1)
-
-# Get base dir and csv file
-baseDir = sys.argv[1]
-csvFile = sys.argv[2]
-
-# Create a mutex access to the file
-csvLock = Lock()
-
-# Open csv file
-if csvFile[0] == "+":
-	# Append
-	csvFile = open(csvFile[1:], 'a')
-else:
-	# Open for writing
-	csvFile = open(csvFile, 'w')
-	csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
-
-# Prepare the list of histograms to process
-histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
-numTotal = len(histogramQueue)
-numCompleted = 0
-
 def handleResult(result):
 	"""
 	Handle result
@@ -166,6 +131,41 @@ def importFile(tarFile):
 
 # Run threaded
 if __name__ == '__main__':
+
+	# Ensure we have at least one parameter
+	if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
+		print "Analyze MCPlot job completion statistics"
+		print "Usage:"
+		print ""
+		print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
+		print ""
+		sys.exit(1)
+
+	# Check if we have directory
+	if not os.path.isdir(sys.argv[1]):
+		print "ERROR: Could not find %s!" % sys.argv[2]
+		sys.exit(1)
+
+	# Get base dir and csv file
+	baseDir = sys.argv[1]
+	csvFilename = sys.argv[2]
+
+	# Create a mutex access to the file
+	csvLock = Lock()
+
+	# Open csv file
+	if csvFilename[0] == "+":
+		# Append
+		csvFile = open(csvFilename[1:], 'a')
+	else:
+		# Open for writing
+		csvFile = open(csvFilename, 'w')
+		csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
+
+	# Prepare the list of histograms to process
+	histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
+	numTotal = len(histogramQueue)
+	numCompleted = 0
 
 	# Create a pool of 8 workers
 	pool = Pool(8)
