@@ -47,14 +47,13 @@ if not os.path.isdir(sys.argv[1]):
 baseDir = sys.argv[1]
 csvFile = sys.argv[2]
 
-# Definition of the TarAnalyze Component
+# Definition of the TarAnalyze Class
 class TarAnalyze:
 
 	def __init__(self, suffix=".tgz"):
 		"""
 		Initialize TarAnalyze
 		"""
-		Component.__init__(self)
 		self.baseDir = baseDir
 
 		# Open csv file
@@ -171,4 +170,4 @@ class TarAnalyze:
 
 
 # Run threaded
-TarAnalyze.run()
+TarAnalyze().run()
