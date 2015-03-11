@@ -72,62 +72,66 @@ def importFile(tarFile):
 	"""
 	Open tarfile
 	"""
-
-	# Open tar file
-	f = None
 	try:
-		# Try to open the tarfile
-		f = tarfile.open(tarFile)
-	except Exception as e:
-		handleResult("!")
-		return
+		# Open tar file
+		f = None
+		try:
+			# Try to open the tarfile
+			f = tarfile.open(tarFile)
+		except Exception as e:
+			handleResult("!")
+			return
 
-	# Get jobdata record from tar archive
-	jobDataInfo = f.getmember("./jobdata")
-	if not jobDataInfo:
-		handleResult("?")
-		return
+		# Get jobdata record from tar archive
+		jobDataInfo = f.getmember("./jobdata")
+		if not jobDataInfo:
+			handleResult("?")
+			return
 
-	# Load jobdata
-	jobData = None
-	try:
-		# Open tune config
-		jobDataFile = f.extractfile(jobDataInfo)
-		jobData = readConfig(jobDataFile)
-		jobDataFile.close()
-	except Exception as e:
-		handleResult("-")
-		return
+		# Load jobdata
+		jobData = None
+		try:
+			# Open tune config
+			jobDataFile = f.extractfile(jobDataInfo)
+			jobData = readConfig(jobDataFile)
+			jobDataFile.close()
+		except Exception as e:
+			handleResult("-")
+			return
 
-	# Close tarfile
-	f.close()
+		# Close tarfile
+		f.close()
 
-	# Check for required parameters
-	if not 'USER_ID' in jobData:
-		handleResult("X")
-		return
+		# Check for required parameters
+		if not 'USER_ID' in jobData:
+			handleResult("X")
+			return
 
-	# Prepare CSV Record
-	csvLock.acquire()
-	try:
-		csvFile.write(
-				"%s,%s,%d,%s,%s,%s\n" % (
-					jobData['USER_ID'], 
-					jobData['exitcode'],
-					jobDataInfo.mtime, 
-					datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
-					jobData['cpuusage'],
-					jobData['diskusage']
+		# Prepare CSV Record
+		csvLock.acquire()
+		try:
+			csvFile.write(
+					"%s,%s,%d,%s,%s,%s\n" % (
+						jobData['USER_ID'], 
+						jobData['exitcode'],
+						jobDataInfo.mtime, 
+						datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
+						jobData['cpuusage'],
+						jobData['diskusage']
+					)
 				)
-			)
-		csvFile.flush()
-	finally:
-		csvLock.release()
+			csvFile.flush()
+		finally:
+			csvLock.release()
 
-	# File is imported
-	handleResult(".")
-	return
+		# File is imported
+		handleResult(".")
+		return
 
+	except Exception as e:
+		traceback.print_exc()
+		print e
+		return
 
 # Run threaded
 if __name__ == '__main__':
