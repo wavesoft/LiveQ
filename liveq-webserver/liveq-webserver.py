@@ -33,6 +33,7 @@ import sys
 from webserver.config import Config
 from webserver.server import MCPlotsServer
 from webserver.common.userevents import UserEvents
+from webserver.common.books import BookKeywordCache
 
 import tornado.options
 import tornado.ioloop
@@ -93,6 +94,9 @@ def main():
 	# Register a cron job for processing periodical events
 	cronTimer = tornado.ioloop.PeriodicCallback( cron, 1000 )
 	cronTimer.start()
+
+	# Populate initial keyword cache
+	BookKeywordCache.update()
 
 	# Start the main loop
 	tornado.ioloop.IOLoop.instance().start()

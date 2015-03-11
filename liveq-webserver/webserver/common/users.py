@@ -24,6 +24,7 @@ import logging
 from liveq.models import Tunable
 from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book
 from webserver.common.userevents import UserEvents
+from webserver.common.books import BookKeywordCache
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -450,11 +451,27 @@ class HLUser:
 		# Serialize
 		return paper.serialize(expandForeigns=["team"])
 
-	def getBook(self, id):
+	def getBook(self, bookName):
 		"""
 		Return the specified book details, including user-specific information
 		"""
-		pass
+		
+		# First, fetch book
+		try:
+			book = Book.get( Book.name == bookName )
+		except Book.DoesNotExist:
+			return None
+
+		# Keyword replacement template
+		tpl = '<a href="do:viewBook(\'%(name)s\')" data-book="%(name)s" class="book-link" title="%(title)s">%(word)s</a>'
+
+		# Then, serialize and replace body hyperlinks
+		book = book.serialize()
+		book['short'] = BookKeywordCache.replaceKeywords( book['short'], tpl )
+		book['description'] = BookKeywordCache.replaceKeywords( book['description'], tpl )
+
+		# Return book
+		return book
 
 	def getBookStatistics(self):
 		"""

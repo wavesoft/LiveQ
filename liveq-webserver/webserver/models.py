@@ -713,6 +713,9 @@ class Book(BaseModel):
 	#: The name of the book
 	name = CharField(max_length=128, index=True, unique=True)
 
+	#: A list of keyword aliases for this book
+	aliases = TextField(default="")
+
 	#: Title of the book
 	title = CharField(max_length=128)
 	#: Short overview of the book
@@ -726,6 +729,19 @@ class Book(BaseModel):
 	#: List of material linked
 	material = TextField(default="[]")
 
+	def getAliases(self):
+		"""
+		Return the different aliases of this book
+		"""
+		if not self.aliases:
+			return []
+		return self.aliases.split(",")
+
+	def setAliases(self, aliases=[]):
+		"""
+		Update aliases of this book
+		"""
+		self.aliases = ",".join(aliases)
 
 class BookQuestion(BaseModel):
 	"""

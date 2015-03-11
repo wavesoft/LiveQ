@@ -26,6 +26,7 @@ from liveq.io.bus import Bus
 from webserver.models import KnowledgeGrid
 
 from webserver.common.users import HLUserError
+
 from webserver.h.api import APIInterface
 from webserver.config import Config
 from tornado.ioloop import IOLoop
@@ -173,7 +174,7 @@ class AccountInterface(APIInterface):
 			# Get a particular book
 			self.sendResponse({
 					"status": "ok",
-					"data" : self.user.getBook(param['id'])
+					"data" : self.user.getBook(param['name'])
 				})
 
 		##################################################
