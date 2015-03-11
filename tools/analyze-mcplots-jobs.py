@@ -31,6 +31,14 @@ import glob
 from multiprocessing import Pool
 from threading import Thread, Lock
 
+# Global progress variables
+numTotal = 0
+numCompleted = 0
+
+# Create a mutex access to the file
+csvLock = Lock()
+csvFile = None
+
 def handleResult(result):
 	"""
 	Handle result
@@ -153,9 +161,6 @@ if __name__ == '__main__':
 	# Get base dir and csv file
 	baseDir = sys.argv[1]
 	csvFilename = sys.argv[2]
-
-	# Create a mutex access to the file
-	csvLock = Lock()
 
 	# Open csv file
 	if csvFilename[0] == "+":
