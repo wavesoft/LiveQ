@@ -26,9 +26,9 @@ import os.path
 import uuid
 
 from tornado.web import URLSpec
-from webserver.h.configure import ConfigHandler
+from webserver.h.configure import *
 from webserver.h.apisocket import APISocketHandler
-from webserver.h.index import IndexHandler, PlayHandler, HelpHandler
+from webserver.h.index import IndexHandler
 from webserver.h.tootr import TootrGetAnimation
 from webserver.config import Config
 
@@ -40,13 +40,14 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			URLSpec(r"%s" % Config.BASE_URL, 				IndexHandler),
-			URLSpec(r"%s/" % Config.BASE_URL, 				IndexHandler, 			name="index"),
-			URLSpec(r"%s/play" % Config.BASE_URL, 			PlayHandler, 			name="play"),
-			URLSpec(r"%s/help" % Config.BASE_URL, 			HelpHandler, 			name="help"),
-			URLSpec(r"%s/config" % Config.BASE_URL, 		ConfigHandler, 			name="config"),
-			URLSpec(r"%s/apisocket" % Config.BASE_URL,		APISocketHandler, 		name="api"),
-			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,		TootrGetAnimation, 		name="tootr_anim"),
+			URLSpec(r"%s" % Config.BASE_URL, 					IndexHandler),
+			URLSpec(r"%s/" % Config.BASE_URL, 					IndexHandler, 			name="index"),
+			URLSpec(r"%s/config" % Config.BASE_URL, 			ConfigHandler, 			name="config"),
+			URLSpec(r"%s/config/books" % Config.BASE_URL, 		ConfigBooksHandler, 	name="config.books"),
+			URLSpec(r"%s/config/books/edit" % Config.BASE_URL, 	ConfigEditBookHandler, 	name="config.books.edit"),
+			URLSpec(r"%s/config/books/del" % Config.BASE_URL, 	ConfigEditBookHandler, 	name="config.books.del"),
+			URLSpec(r"%s/apisocket" % Config.BASE_URL,			APISocketHandler, 		name="api"),
+			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,			TootrGetAnimation, 		name="tootr.anim"),
 		]
 
 		# Get root dir of files

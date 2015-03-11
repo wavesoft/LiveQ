@@ -463,7 +463,7 @@ class HLUser:
 			return None
 
 		# Keyword replacement template
-		tpl = '<a href="do:viewBook(\'%(name)s\')" data-book="%(name)s" class="book-link" title="%(title)s">%(word)s</a>'
+		tpl = '<a href="javascript:;" data-book="%(name)s" class="book-link" title="%(title)s">%(word)s</a>'
 
 		# Then, serialize and replace body hyperlinks
 		book = book.serialize()

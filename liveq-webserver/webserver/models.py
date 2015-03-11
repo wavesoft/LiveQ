@@ -711,13 +711,13 @@ class Book(BaseModel):
 	JSON_FIELDS = ['games', 'material']
 
 	#: The name of the book
-	name = CharField(max_length=128, index=True, unique=True)
+	name = CharField(max_length=128, index=True, unique=True, default="")
 
 	#: A list of keyword aliases for this book
 	aliases = TextField(default="")
 
 	#: Title of the book
-	title = CharField(max_length=128)
+	title = CharField(max_length=128, default="")
 	#: Short overview of the book
 	short = TextField(default="")
 
@@ -743,10 +743,21 @@ class Book(BaseModel):
 		"""
 		self.aliases = ",".join(aliases)
 
+	def selectQuestions(self):
+		"""
+		Return book questions query
+		"""
+
+		# Return query
+		return BookQuestion.select().where(BookQuestion.book == self)
+
 class BookQuestion(BaseModel):
 	"""
 	A question regarding a specific book
 	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['answers']
 
 	#: The book this question refers to
 	book = ForeignKeyField(Book)

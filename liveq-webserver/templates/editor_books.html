@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Configure</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1>Books</h1>
+      <p>The following table contains all the different books currently registered in the database.</p>
+      <p> <a href="{{ reverse_url("config.books.edit") }}" class="btn btn-success" > <span class="glyphicon glyphicon-plus"></span> Add new</a></p>
+      <hr />
+      <table class="table table-condensed" width="100%">
+        <tr>
+          <th width="70">Book ID</th>
+          <th width="200">Book Name</th>
+          <th>Aliases</th>
+          <th width="200">Actions</th>
+        </tr>
+        {% for book in books %}
+        <tr>
+          <td>{{ book['id'] }}</td>
+          <td>{{ book['name'] }}</td>
+          <td>
+            {% for alias in book['aliases'] %}
+            <span class="label label-default">{{ alias }}</span>
+            {% end %}
+          </td>
+          <td><a href="{{ reverse_url("config.books.edit") }}?book={{ book['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
+        </tr>
+        {% end %}
+      </table>
+
+    </div>
+
+  </body>
+</html>

@@ -80,8 +80,6 @@ class BookKeywordCache:
 				# Get the keyword
 				kw = body[i:j]
 
-				print ">> FOUND KW: %s" % kw
-
 				# Check if we have it on store
 				if kw in BookKeywordCache.KEYWORDS:
 					v = BookKeywordCache.KEYWORDS[kw]

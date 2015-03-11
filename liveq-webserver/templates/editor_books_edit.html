@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Configure</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+    <script type="text/javascript">
+    var ListEditor = function(suffix) {
+
+      this.input = $(".le_data_"+suffix);
+      this.elmList = $(".le_list_"+suffix);
+      this.elmTitle = $(".le_title_"+suffix);
+      this.elmDesc = $(".le_desc_"+suffix);
+      this.elmLink = $(".le_link_"+suffix);
+      this.btnAdd = $(".le_add_"+suffix);
+      this.btnRemove = $(".le_remove_"+suffix);
+      this.btnVisit = $(".le_visit_"+suffix);
+
+      // Regenerate list
+      this.updateList = function() {
+        this.elmList.empty();
+        for (var i=0; i<this.data.length; i++) {
+          var selCss = "";
+          if (i == this.selected) selCss = "active";
+          // Add item on list
+          var elm = $('<a href="javascript:;" class="list-group-item '+selCss+'">' + this.data[i].title + '</a>')
+            .appendTo(this.elmList);
+
+          // Handle click
+          elm.click((function(idx, elm) {
+              return function(e) {
+                e.preventDefault();
+                this.selected = idx;
+                this.loadValues();
+                this.elmList.find(".active").removeClass("active");
+                elm.addClass("active");
+                setTimeout((function() {
+                  this.elmTitle.focus();
+                }).bind(this), 100);
+              }
+            })(i, elm).bind(this))
+        }
+      }
+
+      // Apply currently focused element
+      this.applyValues = function() {
+        if (!this.data[this.selected]) return;
+        this.data[this.selected].title = this.elmTitle.val();
+        this.data[this.selected].short = this.elmDesc.val();
+        this.data[this.selected].url = this.elmLink.val();
+        this.input.val( JSON.stringify(this.data) );
+        this.elmList.find(".active").text(this.elmTitle.val());
+        this.btnVisit.attr("href", this.elmLink.val());
+      }
+
+      // Load values from the currently focused element
+      this.loadValues = function() {
+        if (!this.data[this.selected]) {
+          this.elmTitle.val("");
+          this.elmDesc.val("");
+          this.elmLink.val("");
+          this.btnVisit.attr("href", "javascript:;");
+
+          this.elmTitle.attr("disabled", "disabled");
+          this.elmDesc.attr("disabled", "disabled");
+          this.elmLink.attr("disabled", "disabled");
+          this.btnVisit.attr("disabled", "disabled");
+          this.btnRemove.attr("disabled", "disabled");
+        } else {
+          this.elmTitle.val(this.data[this.selected].title );
+          this.elmDesc.val(this.data[this.selected].short);
+          this.elmLink.val(this.data[this.selected].url);
+          this.btnVisit.attr("href", this.data[this.selected].url);
+
+          this.elmTitle.removeAttr("disabled");
+          this.elmDesc.removeAttr("disabled");
+          this.elmLink.removeAttr("disabled");
+          this.btnVisit.removeAttr("disabled");
+          this.btnRemove.removeAttr("disabled");
+        }
+      }
+
+      // Handle events
+      this.btnAdd.click((function(e) {
+        e.preventDefault();
+        this.selected = this.data.length;
+        this.data.push({ 'title': 'New '+suffix, 'short': '', 'url': '' });
+        this.updateList();
+        this.loadValues();
+        this.elmTitle.focus();
+      }).bind(this));
+      this.btnRemove.click((function(e) {
+        e.preventDefault();
+        this.data.splice( this.selected, 1 );
+        this.selected = 0;
+        this.updateList();
+        this.loadValues();
+      }).bind(this));
+
+      // Hook events
+      this.elmTitle.keyup(this.applyValues.bind(this));
+      this.elmDesc.keyup(this.applyValues.bind(this));
+      this.elmLink.keyup(this.applyValues.bind(this));
+      this.elmTitle.blur(this.applyValues.bind(this));
+      this.elmDesc.blur(this.applyValues.bind(this));
+      this.elmLink.blur(this.applyValues.bind(this));
+
+      // Load data
+      this.data = JSON.parse( this.input.val() );
+      this.selected = 0;
+      this.updateList();
+      this.loadValues();
+    }
+
+
+    var Question = function(editor, qid) {
+      this.editor = editor;
+      this.id = -1;
+      this.qDom = $('<div class="well"></div>').appendTo(editor.elmHost);
+
+      // Add question
+      var qHost =   $('<div class="input-group"></div>').appendTo(this.qDom);
+                    $('<span class="input-group-addon"><strong>Q:</strong></span>').appendTo(qHost);
+      this.eTitle = $('<input style="font-weight: bold;" type="text" class="form-control"></input>').appendTo(qHost);
+      $('<hr />').appendTo(this.qDom);
+
+      this.eList = $('<ol></ol>').appendTo($('<div class="container"></div>')).appendTo(this.qDom);
+      this.answerInputs = [];
+
+      this.liHolder = $('<li></li>').appendTo(this.eList);
+      this.btnAdd = $('<button type="button" class="btn btn-sm btn-link"><span class="glyphicon glyphicon-plus"></span> Add another</button>').appendTo(this.liHolder);
+      this.btnRemove = $('<button type="button" class="btn btn-sm btn-danger"><span class="glyphicon glyphicon-remove"></span> Remove this question</button>')
+        .appendTo( $('<div class="text-right"></div>').appendTo(this.qDom) );
+
+      // Remove button
+      this.btnRemove.click((function(e) {
+        e.preventDefault();
+        this.qDom.remove();
+        this.editor.removeQuestion( this );
+      }).bind(this));
+      // Add button
+      this.btnAdd.click((function(e) {
+        e.preventDefault();
+        this.addAnser("").focus();
+      }).bind(this));
+      // Changes on the question field triggers update
+      this.eTitle.keyup(function() { editor.applyValues(); });
+      this.eTitle.blur(function() { editor.applyValues(); });
+
+      this.addAnser = function(value, checked) {
+        var idx = this.answerInputs.length,
+            host = $('<li class="form-inline"></li>'),
+            grp = $('<div class="input-group col-xs-6"></div>').appendTo(host),
+            defAddon = $('<span class="input-group-addon"></span>').appendTo(grp),
+            optCorrect = $('<input type="radio" name="q_'+editor.suffix+'_'+qid+'" value="'+idx+'"></input>').appendTo(defAddon),
+            input = $('<input type="text" class="form-control"></input>').val(value).appendTo(grp),
+            rem = $('<a href="javascript:;">Remove</a>');
+
+            $('<span class="input-group-addon"></span>').append(rem).appendTo(grp);
+
+        // Put on list
+        this.liHolder.before( host );
+        // Check first checkbox
+        if ((idx == 0) || checked) 
+          optCorrect.attr( "checked", "checked" );
+
+        // Store on objects
+        this.answerInputs.push([ input, optCorrect ]);
+        // Register remove click
+        rem.click((function(e) {
+          e.preventDefault();
+          for (var i=0; i<this.answerInputs.length; i++) {
+            if (this.answerInputs[i][0].is(input)) {
+              this.answerInputs.splice(i, 1);
+              break;
+            }
+          }
+          host.remove();
+        }).bind(this));
+        // Register updates
+        input.keyup(function() { editor.applyValues(); });
+        input.blur(function() { editor.applyValues(); });
+        optCorrect.click(function() { editor.applyValues(); });
+        // Return object
+        return input;
+      }
+
+      this.toJSON = function() {
+        // Create record
+        var obj = { 'question': "", 'answers': [], 'correct': 0, 'id': -1 };
+        obj['question'] = this.eTitle.val();
+        // Update questions
+        var corr = 0;
+        for (var i=0; i<this.answerInputs.length; i++) {
+          obj['answers'].push( this.answerInputs[i][0].val() )
+          if (this.answerInputs[i][1].is(":checked"))
+            corr = i;
+        }
+        // Return object
+        obj['correct'] = corr;
+        obj['id'] = this.id;
+        return obj;
+      }
+
+      this.fromJSON = function(json) {
+        // Update ID
+        this.id = json['id'] || -1;
+        // Update title
+        this.eTitle.val( json['question'] );
+        // Put questions
+        this.liHolder.find("li.form-inline").remove();
+        this.answerInputs = [];
+        var answers = json['answers'];
+        for (var i=0; i<answers.length; i++) {
+          this.addAnser( answers[i], (i == json['correct']) );
+        }
+      }
+
+    }
+
+    var QuestionsEditor = function(suffix) {
+
+      this.suffix = suffix;
+      this.input = $(".q_data_"+suffix);
+      this.elmHost = $(".q_host_"+suffix);
+      this.btnAdd = $(".q_add_"+suffix);
+      this.questions = [];
+
+      this.loadValues = function() {
+        var entries = JSON.parse(this.input.val());
+        this.elmHost.empty();
+        this.questions = [];
+        for (var i=0; i<entries.length; i++) {
+          var q = new Question(this, i);
+          q.fromJSON(entries[i]);
+          this.questions.push(q);
+        }
+      }
+
+      this.applyValues = function() {
+        var entries = [];
+        for (var i=0; i<this.questions.length; i++) {
+          entries.push( this.questions[i].toJSON() );
+        }
+        this.input.val( JSON.stringify(entries) );
+      }
+
+      this.removeQuestion = function(q) {
+        var idx = this.questions.indexOf(q);
+        this.questions.splice(idx, 1);
+        this.applyValues();
+      }
+
+      this.btnAdd.click((function(e) {
+        e.preventDefault();
+        this.questions.push(new Question(this, this.questions.length));
+      }).bind(this));
+      this.loadValues();
+
+    }
+    $(function() {
+      new ListEditor("resource");
+      new ListEditor("material");
+      new QuestionsEditor("questions");
+    });
+    </script>
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1><span class="glyphicon glyphicon-book"></span> Edit Book</h1>
+      <p>From this form you can edit the book deteails.</p>
+
+      <form class="form-horizontal" action="{{ reverse_url("config.books.edit") }}?book={{ book.id }}" method="post">
+
+        <div class="form-group">
+          <label for="inputName" class="col-sm-2 control-label">Term</label>
+          <div class="col-sm-10">
+            <input type="text" name="name" class="form-control" id="inputName" placeholder="Name" value="{{ book.name }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+          <div class="col-sm-10">
+            <input type="text" name="title" class="form-control" id="inputTitle" placeholder="Title" value="{{ book.title }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputAliases" class="col-sm-2 control-label">Aliases</label>
+          <div class="col-sm-10">
+            <input type="text" name="aliases" class="form-control" id="inputAliases" placeholder="alias,alias, ..." value="{{ book.aliases }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputShort" class="col-sm-2 control-label">Short</label>
+          <div class="col-sm-10">
+            <textarea class="form-control" rows="3" name="short" id="inputShort">{{ book.short }}</textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputBody" class="col-sm-2 control-label">Book Body</label>
+          <div class="col-sm-10">
+            <textarea class="form-control tinymce" rows="10" name="description" id="inputBody">{{ book.description }}</textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputMaterial" class="col-sm-2 control-label">Material</label>
+          <div class="col-sm-10">
+            <textarea class="hidden le_data_material" name="games" id="inputgames">{{ book.games }}</textarea>
+
+            <div class="content">
+                <div class="row">
+                  <div class="col-xs-4">
+                    <div class="list-group le_list_material">
+                    </div>
+                    <div>
+                      <button class="btn btn-default btn-sm le_add_material" style="width: 100%"><span class="glyphicon glyphicon-plus"></span> Add new Material</button>
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+
+                    <div class="form-group">
+                      <label for="inputMaterialTitle" class="col-sm-2 control-label">Name:</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control le_title_material" id="inputMaterialTitle" placeholder="(Name)" />
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="inputMaterialDesc" class="col-sm-2 control-label">Description:</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control le_desc_material" id="inputMaterialDesc" placeholder="(Description)" />
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="inputMaterialLink" class="col-sm-2 control-label">Link:</label>
+                      <div class="col-sm-10">
+                        <div class="input-group">
+                          <input type="text" class="form-control le_link_material" id="inputMaterialLink" placeholder="http://..." />
+                          <span class="input-group-addon">
+                            <a href="javascript:;" target="_blank" class="le_visit_material"><span class="glyphicon glyphicon-share"></span></a>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-default btn-sm btn-danger pull-right le_remove_material"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+
+                  </div>
+                </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputResearch" class="col-sm-2 control-label">Research</label>
+          <div class="col-sm-10">
+            <textarea class="hidden le_data_resource" name="material" id="inputResearch">{{ book.material }}</textarea>
+
+            <div class="content">
+                <div class="row">
+                  <div class="col-xs-4">
+                    <div class="list-group le_list_resource">
+                    </div>
+                    <div>
+                      <button class="btn btn-default btn-sm le_add_resource" style="width: 100%"><span class="glyphicon glyphicon-plus"></span> Add new Material</button>
+                    </div>
+                  </div>
+                  <div class="col-xs-8">
+
+                    <div class="form-group">
+                      <label for="inputMaterialTitle" class="col-sm-2 control-label">Name:</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control le_title_resource" id="inputMaterialTitle" placeholder="(Name)">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="inputMaterialDesc" class="col-sm-2 control-label">Description:</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control le_desc_resource" id="inputMaterialDesc" placeholder="(Description)">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="inputMaterialLink" class="col-sm-2 control-label">Link:</label>
+                      <div class="col-sm-10">
+                        <div class="input-group">
+                          <input type="text" class="form-control le_link_resource" id="inputMaterialLink" placeholder="http://...">
+                          <span class="input-group-addon">
+                            <a href="javascript:;" target="_blank" class="le_visit_resource"><span class="glyphicon glyphicon-share"></span></a>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button class="btn btn-default btn-sm btn-danger pull-right le_remove_resource"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+
+                  </div>
+                </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="bookQuestions" class="col-sm-2 control-label">Questions</label>
+          <div class="col-sm-10">
+            <textarea class="hidden q_data_questions" name="book_questions" id="bookQuestions">{{ book_questions }}</textarea>
+
+            <div class="q_host_questions">
+            </div>
+
+            <button class="btn btn-default btn-sm q_add_questions"><span class="glyphicon glyphicon-plus"></span> Add new Question</button>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <a href="{{ reverse_url("config.books.del") }}?book={{ book.id }}" class="btn btn-danger pull-right"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+
+            <button type="submit" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span> Save Book</button>
+            <a href="{{ reverse_url("config.books") }}" class="btn btn-default">Cancel</a>
+          </div>
+        </div>
+
+        {% raw xsrf_form_html() %}
+      </form>
+
+    </div>
+
+  </body>
+</html>
