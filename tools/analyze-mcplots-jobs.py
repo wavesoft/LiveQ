@@ -39,6 +39,16 @@ numCompleted = 0
 csvLock = Lock()
 csvFile = None
 
+def init_vars(numToComplete):
+	"""
+	Initialize variables
+	"""
+	global numCompleted
+	global numTotal
+
+	numCompleted = 0
+	numTotal = numToComplete
+
 def handleResult(result):
 	"""
 	Handle result
@@ -178,8 +188,7 @@ if __name__ == '__main__':
 
 	# Prepare the list of histograms to process
 	histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
-	numTotal = len(histogramQueue)
-	numCompleted = 0
+	init_vars( len(histogramQueue) )
 
 	# Create a pool of 8 workers
 	pool = Pool(8)
