@@ -168,8 +168,13 @@ if __name__ == '__main__':
 		# Wait all workers to complete and print queue output
 		while not r.ready() or not outputQueue.empty():
 
-			# Get element (blocking)
-			q = outputQueue.get(True)
+			# Get element
+			if r.ready():
+				# Drain when completed
+				q = outputQueue.get(False)
+			else:
+				# Blocking when running
+				q = outputQueue.get(True)
 
 			# Get and log result
 			result = q[0]
