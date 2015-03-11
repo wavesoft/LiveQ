@@ -47,127 +47,115 @@ if not os.path.isdir(sys.argv[1]):
 baseDir = sys.argv[1]
 csvFile = sys.argv[2]
 
-# Definition of the TarAnalyze Class
-class TarAnalyze:
+# Open csv file
+if csvFile[0] == "+":
+	# Append
+	csvFile = open(csvFile[1:], 'a')
+else:
+	# Open for writing
+	csvFile = open(csvFile, 'w')
+	csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
 
-	def __init__(self, suffix=".tgz"):
-		"""
-		Initialize TarAnalyze
-		"""
-		self.baseDir = baseDir
+# Prepare the list of histograms to process
+histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
+numTotal = len(histogramQueue)
+numCompleted = 0
 
-		# Open csv file
-		if csvFile[0] == "+":
-			# Append
-			self.csvFile = open(csvFile[1:], 'a')
-		else:
-			# Open for writing
-			self.csvFile = open(csvFile, 'w')
-			self.csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
+# Create a pool of 8 workers
+pool = Pool(8)
 
-		# Prepare the list of histograms to process
-		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
-		self.numTotal = len(self.histogramQueue)
-		self.numCompleted = 0
+def readConfig(fileObject):
+	"""
+	Read key/value configuration from fileObject
+	"""
 
-		# Create a pool of 8 workers
-		self.pool = Pool(8)
+	# Read all lines
+	ans = {}
+	for l in fileObject.readlines():
+		# Trim newline
+		l = l[0:-1]
+		# Skip blank lines
+		if not l:
+			continue
+		# Skip invalid lines
+		if not '=' in l:
+			continue
+		# Split on '='
+		kv = l.split("=")
+		ans[kv[0]] = kv[1]
 
-	def readConfig(self, fileObject):
-		"""
-		Read key/value configuration from fileObject
-		"""
+	# Return 
+	return ans
 
-		# Read all lines
-		ans = {}
-		for l in fileObject.readlines():
-			# Trim newline
-			l = l[0:-1]
-			# Skip blank lines
-			if not l:
-				continue
-			# Skip invalid lines
-			if not '=' in l:
-				continue
-			# Split on '='
-			kv = l.split("=")
-			ans[kv[0]] = kv[1]
+def importFile(tarFile):
+	"""
+	Open tarfile
+	"""
 
-		# Return 
-		return ans
-
-	def importFile(self, tarFile):
-		"""
-		Open tarfile
-		"""
-
-		# Open tar file
-		f = None
-		try:
-			# Try to open the tarfile
-			f = tarfile.open(tarFile)
-		except Exception as e:
-			self.handleResult("!")
-			return
-
-		# Get jobdata record from tar archive
-		jobDataInfo = f.getmember("./jobdata")
-		if not jobDataInfo:
-			self.handleResult("?")
-			return
-
-		# Load jobdata
-		jobData = None
-		try:
-			# Open tune config
-			jobDataFile = f.extractfile(jobDataInfo)
-			jobData = self.readConfig(jobDataFile)
-			jobDataFile.close()
-		except Exception as e:
-			self.handleResult("-")
-			return
-
-		# Close tarfile
-		f.close()
-
-		# Check for required parameters
-		if not 'USER_ID' in jobData:
-			self.handleResult("X")
-			return
-
-		# Prepare CSV Record
-		self.csvFile.write(
-				"%s,%s,%d,%s,%s,%s\n" % (
-					jobData['USER_ID'], 
-					jobData['exitcode'],
-					jobDataInfo.mtime, 
-					datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
-					jobData['cpuusage'],
-					jobData['diskusage']
-				)
-			)
-		self.csvFile.flush()
-
-		# File is imported
-		self.handleResult(".")
+	# Open tar file
+	f = None
+	try:
+		# Try to open the tarfile
+		f = tarfile.open(tarFile)
+	except Exception as e:
+		handleResult("!")
 		return
 
-	def run(self):
-		"""
-		Bind setup
-		"""
+	# Get jobdata record from tar archive
+	jobDataInfo = f.getmember("./jobdata")
+	if not jobDataInfo:
+		handleResult("?")
+		return
 
-		# Run pool
-		r = self.pool.map_async( 
-			self.importFile, 
-			self.histogramQueue
+	# Load jobdata
+	jobData = None
+	try:
+		# Open tune config
+		jobDataFile = f.extractfile(jobDataInfo)
+		jobData = readConfig(jobDataFile)
+		jobDataFile.close()
+	except Exception as e:
+		handleResult("-")
+		return
+
+	# Close tarfile
+	f.close()
+
+	# Check for required parameters
+	if not 'USER_ID' in jobData:
+		handleResult("X")
+		return
+
+	# Prepare CSV Record
+	csvFile.write(
+			"%s,%s,%d,%s,%s,%s\n" % (
+				jobData['USER_ID'], 
+				jobData['exitcode'],
+				jobDataInfo.mtime, 
+				datetime.datetime.fromtimestamp(jobDataInfo.mtime).strftime('%Y-%m-%d %H:%M:%S'),
+				jobData['cpuusage'],
+				jobData['diskusage']
+			)
 		)
+	csvFile.flush()
 
-		# Wait all workers to complete
-		r.wait()
-		print "\nCompleted!"
+	# File is imported
+	handleResult(".")
+	return
 
 
 # Run threaded
 if __name__ == '__main__':
-	TarAnalyze().run()
+
+	# Run pool
+	r = pool.map_async( 
+		importFile, 
+		histogramQueue
+	)
+
+	# Wait all workers to complete
+	r.wait()
+
+	# We are completed
+	csvFile.close()
+	print "\nCompleted!"
