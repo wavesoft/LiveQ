@@ -37,8 +37,8 @@ def handleResult(result):
 	"""
 
 	# Prin status
-	system.stdout.write(result)
-	system.stdout.flush()
+	sys.stdout.write(result)
+	sys.stdout.flush()
 
 	# Display progress every once in a while
 	numCompleted += 1
