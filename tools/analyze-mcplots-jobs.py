@@ -61,9 +61,6 @@ histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
 numTotal = len(histogramQueue)
 numCompleted = 0
 
-# Create a pool of 8 workers
-pool = Pool(8)
-
 def readConfig(fileObject):
 	"""
 	Read key/value configuration from fileObject
@@ -146,6 +143,9 @@ def importFile(tarFile):
 
 # Run threaded
 if __name__ == '__main__':
+
+	# Create a pool of 8 workers
+	pool = Pool(8)
 
 	# Run pool
 	r = pool.map_async( 
