@@ -60,6 +60,10 @@ class TarAnalyze:
 		self.csvFile = open(csvFile, 'w')
 		self.csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage")
 
+		# Prepare the list of histograms to process
+		self.histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
+		self.queueLength = len(self.histogramQueue)
+
 	def readConfig(self, fileObject):
 		"""
 		Read key/value configuration from fileObject
