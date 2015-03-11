@@ -166,15 +166,17 @@ if __name__ == '__main__':
 		)
 
 		# Wait all workers to complete and print queue output
-		while not r.ready() or not outputQueue.empty():
+		while (not r.ready()) or (not outputQueue.empty()):
 
 			# Get element
-			if r.ready():
+			try:
 				# Drain when completed
 				q = outputQueue.get(False)
-			else:
-				# Blocking when running
-				q = outputQueue.get(True)
+
+			except Queue.Empty:
+				# Queue is empty, retry in a while
+				time.sleep(0.1)
+				continue
 
 			# Get and log result
 			result = q[0]
