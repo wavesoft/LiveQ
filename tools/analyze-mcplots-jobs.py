@@ -102,14 +102,14 @@ class TarAnalyze:
 			# Try to open the tarfile
 			f = tarfile.open(tarFile)
 		except Exception as e:
-			print "!",
+			sys.stdout.write("!")
 			sys.stdout.flush()
 			return
 
 		# Get jobdata record from tar archive
 		jobDataInfo = f.getmember("./jobdata")
 		if not jobDataInfo:
-			print "?",
+			sys.stdout.write("?")
 			sys.stdout.flush()
 			return
 
@@ -121,7 +121,7 @@ class TarAnalyze:
 			jobData = self.readConfig(jobDataFile)
 			jobDataFile.close()
 		except Exception as e:
-			print "?",
+			sys.stdout.write("?")
 			sys.stdout.flush()
 			return
 
@@ -130,7 +130,7 @@ class TarAnalyze:
 
 		# Check for required parameters
 		if not 'USER_ID' in jobData:
-			print "X",
+			sys.stdout.write("X")
 			sys.stdout.flush()
 			return
 
@@ -148,7 +148,7 @@ class TarAnalyze:
 		self.csvFile.flush()
 
 		# File is imported
-		print ".",
+		sys.stdout.write(".")
 		sys.stdout.flush()
 
 	def run(self):
@@ -171,9 +171,9 @@ class TarAnalyze:
 			self.csvFile.close()
 			exit(0)
 		else:
-			# Every 100 imports, dump progress
+			# Every 500 imports, dump progress
 			currLength = len(self.histogramQueue)
-			if (currLength % 100) == 0:
+			if (currLength % 500) == 0:
 				itemsCompleted = self.queueLength - currLength
 				print "\n%d/%d jobs imported (%.1f%%)" % (itemsCompleted, self.queueLength, 100*itemsCompleted/self.queueLength)
 
