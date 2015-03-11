@@ -57,7 +57,7 @@ else:
 	csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
 
 # Prepare the list of histograms to process
-histogramQueue = glob.glob("%s/*%s" % (baseDir, suffix))
+histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
 numTotal = len(histogramQueue)
 numCompleted = 0
 
