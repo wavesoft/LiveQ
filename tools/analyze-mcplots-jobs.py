@@ -173,7 +173,7 @@ if __name__ == '__main__':
 				# Drain when completed
 				q = outputQueue.get(False)
 
-			except Queue.Empty:
+			except Exception:
 				# Queue is empty, retry in a while
 				time.sleep(0.1)
 				continue
