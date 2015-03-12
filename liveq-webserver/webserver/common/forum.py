@@ -86,5 +86,5 @@ def registerForumUser(email, password, usergroup=2, title=""):
 	# Create user
 	c.execute(
 		"INSERT INTO %susers (username,password,salt,loginkey,email,usertitle,usergroup,allownotices,receivepms,pmnotice,pmnotify,showimages,showvideos,showsigs,showavatars,showquickreply,showredirect,timezone)\
-		 VALUES ('%s', '%s', '%s', '%s', '%s', %i, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)"
+		 VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %i, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)"
 		% ( ForumConfig.FORUM_DB_PREFIX, email, uPass, uSalt, loginKey, email, title, usergroup ) )
