@@ -392,13 +392,13 @@ class Tunable(BaseModel):
 	JSON_FIELDS = ['options']
 
 	#: The name of variable of the tunable parameter
-	name = CharField(max_length=128, index=True, unique=True)
+	name = CharField(max_length=128, index=True, unique=True, default="")
 	#: The short (iconic title)
-	short = CharField(max_length=50)
+	short = CharField(max_length=50, default="")
 	#: The group this tunable belongs in
-	group = CharField(max_length=128)
+	group = CharField(max_length=128, default="")
 	#: The sub-group this tunable belongs in
-	subgroup = CharField(max_length=128)
+	subgroup = CharField(max_length=128, default="")
 	#: The book for more details regarding this tunable
 	book = CharField(max_length=128, default="")
 	#: The human-readable name of the tunable
