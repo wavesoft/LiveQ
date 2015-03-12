@@ -133,6 +133,12 @@ class HLUser:
 		# Delete token
 		self.token.delete_instance()
 
+	def __str__(self):
+		"""
+		Get user name
+		"""
+		return "#%i" % self.id
+
 	###################################
 	# Cache Loading Functions
 	###################################

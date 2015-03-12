@@ -174,7 +174,7 @@ class ConfigTunablesHandler(tornado.web.RequestHandler):
 
 		# Get all tunables
 		tunables = []
-		for b in Tunable.select().dicts():
+		for b in Tunable.select().order_by( Tunable.book.desc() ).dicts():
 
 			# Collect
 			tunables.append(b)

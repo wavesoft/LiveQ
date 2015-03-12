@@ -18,6 +18,7 @@
 ################################################################
 
 import re
+import collections
 from webserver.models import Book
 
 class BookKeywordCache:
@@ -31,6 +32,9 @@ class BookKeywordCache:
 
 	#: The list of keywords that can be overwritten and their respective book
 	KEYWORDS = {}
+
+	#: The size of the scanning frame for keywords
+	KEYWORD_FRAME_SIZE = 0
 
 	#: Regex to match text anchor
 	RE_ANCHOR = re.compile(r"[\s!,.\-&+\"'\(\)\[\]\{\}]+")
@@ -53,18 +57,92 @@ class BookKeywordCache:
 					'name': book.name
 				}
 
-			# Store keywords
-			for kw in keywords:
+			# Store keywords (in lower case)
+			for kw in map(unicode.lower, keywords):
 				BookKeywordCache.KEYWORDS[kw.lower()] = book.id
+
+		# Sort by size of the key in descending order
+		BookKeywordCache.KEYWORDS = collections.OrderedDict(
+				sorted(BookKeywordCache.KEYWORDS.iteritems(), key=lambda x: -len(x[0]))
+			)
+
+		# Maximum length is set to maximum frame size
+		BookKeywordCache.KEYWORD_FRAME_SIZE = len(BookKeywordCache.KEYWORDS.keys()[0])
 
 		# Create binary search algorithm
 		# TODO
 
 	@staticmethod
+	def getKeyword(kw, excludeKeywords=[], excludeBooks=[]):
+		"""
+		Lookup on keyword database to check for a keyword replacement
+		and respond the templated replacement
+		"""
+
+		# Lowercase keyword
+		kw = kw.lower()
+
+		# Ignore matching keywords
+		if kw in excludeKeywords:
+			return None
+
+		# Ignore missing keywords
+		if not kw in BookKeywordCache.KEYWORDS:
+			return None
+
+		# Ignore matching books
+		v = BookKeywordCache.KEYWORDS[kw]
+		if v in excludeBooks:
+			return None
+
+		# Return book
+		return v
+
+	@staticmethod
+	def scanKeyword(textFrame, excludeKeywords=[], excludeBooks=[]):
+		"""
+		Lookup a keyword using the given text frame as source
+		"""
+
+		# Lowercase whole frame
+		textFrame = textFrame.lower()
+
+		# Run linear scan over the frame
+		for k,v in BookKeywordCache.KEYWORDS.iteritems():
+			# Match keywords, ignoring excluded
+			if (textFrame[0:len(k)] == k) and not (k in excludeKeywords):
+				# Exclude books
+				if v in excludeBooks:
+					continue
+
+				# Return book and match offset
+				return (v, len(k))
+
+		# Not found
+		return (None, 0)
+
+	@staticmethod
+	def applyTemplate(book, word, template):
+		"""
+		Apply the specified template to the book
+		"""
+
+		# If details are missing return word
+		if not book in BookKeywordCache.BOOK_DETAILS:
+			return word
+
+		# Apply template
+		return template % {
+				'book': book,
+				'name': BookKeywordCache.BOOK_DETAILS[book]['name'],
+				'word': word
+			}
+
+	@staticmethod
 	def replaceKeywords(body, template='<a href="#%(name)s)">%(word)s</a>', exclude=[]):
 
 		# Rreplace only once
-		once = []
+		usedBooks = []
 
 		# Start from the beginning
 		i = 0
@@ -76,55 +154,39 @@ class BookKeywordCache:
 			if body[i-2:i] == "[[":
 				j = body.find("]]", i)
 
-				# Get the keyword
-				kw = body[i:j]
+				# Extract keyword
+				word = body[i:j]
 
-				# Check if we have it on store
-				if (kw in BookKeywordCache.KEYWORDS) and not (kw in exclude):
-					v = BookKeywordCache.KEYWORDS[kw]
-
-					# Calculate replacement
-					rpw = template % {
-							'book': v,
-							'name': BookKeywordCache.BOOK_DETAILS[v]['name'],
-							'word': body[i:i+l]
-						}
-
-				else:
-					# Remobe brackets
-					rpw = kw
+				# Replace book
+				book = BookKeywordCache.getKeyword(word, exclude, usedBooks)
+				if book:
+					# Marke used books
+					usedBooks.append(book)
+					# Replace matched word
+					word = BookKeywordCache.applyTemplate(book, word, template)
 
 				# Replace & forward
-				body = body[0:i-2] + rpw + body[j+2:]
-				i = j+2
+				body = body[0:i-2] + word + body[j+2:]
+				i += len(word)
 
 			else:
 
-				# Check if a keyword matches at the current anchor
-				for k,v in BookKeywordCache.KEYWORDS.iteritems():
-					if (body[i:i+len(k)].lower() == k) and not (k in exclude):
+				# Lookup keyword from frame
+				(book, size) = BookKeywordCache.scanKeyword(
+					body[i:i+BookKeywordCache.KEYWORD_FRAME_SIZE],
+					exclude, usedBooks
+					)
 
-						# Replace only once
-						if k in once:
-							break
-						once.append(k)
+				# If we have a book, replace it
+				if book:
+					# Marke used books
+					usedBooks.append(book)
+					# Replace matched word
+					word = BookKeywordCache.applyTemplate(book, body[i:i+size], template)
 
-						# get keyword length
-						l = len(k)
-
-						# Calculate replacement
-						rpw = template % {
-								'book': v,
-								'name': BookKeywordCache.BOOK_DETAILS[v]['name'],
-								'word': body[i:i+l]
-							}
-
-						# Replace & forward index
-						body = body[0:i] + rpw + body[i+l:]
-						i += len(rpw)-1
-
-						# Exit loop
-						break
+					# Replace & forward
+					body = body[0:i] + word + body[i+size:]
+					i += len(word)
 
 			# Get next match on current position
 			m = BookKeywordCache.RE_ANCHOR.search(body, i+1)
