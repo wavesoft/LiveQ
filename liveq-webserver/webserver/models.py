@@ -716,8 +716,6 @@ class Book(BaseModel):
 	#: A list of keyword aliases for this book
 	aliases = TextField(default="")
 
-	#: Title of the book
-	title = CharField(max_length=128, default="")
 	#: Short overview of the book
 	short = TextField(default="")
 
@@ -735,7 +733,7 @@ class Book(BaseModel):
 		"""
 		if not self.aliases:
 			return []
-		return self.aliases.split(",")
+		return self.aliases.lower().split(",")
 
 	def setAliases(self, aliases=[]):
 		"""

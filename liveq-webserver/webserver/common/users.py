@@ -22,9 +22,10 @@ import uuid
 import logging
 
 from liveq.models import Tunable
-from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book
+from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book, BookQuestion
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
+from webserver.common.triggers import Triggers
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -74,6 +75,9 @@ class HLUser:
 		# Receive user events
 		self.userEvents = UserEvents.forUser( self.id )
 		self.userEventsListener = None
+
+		# Get a reference to user triggers
+		self.triggers = Triggers( self.dbUser )
 
 		# Allocate unique token to the user
 		self.token = UserTokens(user=self.dbUser, token=uuid.uuid4().hex)
@@ -199,6 +203,14 @@ class HLUser:
 	###################################
 	# High-level functions
 	###################################
+
+	def trigger(self, action, **kwargs):
+		"""
+		Fire a particular trigger
+		"""
+
+		# Forward trigger request
+		self.triggers.trigger( action, **kwargs )
 
 	def knows(self, kb_id):
 		"""
@@ -463,12 +475,16 @@ class HLUser:
 			return None
 
 		# Keyword replacement template
-		tpl = '<a href="javascript:;" data-book="%(name)s" class="book-link" title="%(title)s">%(word)s</a>'
+		tpl = '<a href="javascript:;" data-book="%(name)s" class="book-link" title="%(name)s">%(word)s</a>'
+
+		# Get keywors (to ignore when replacing keywords)
+		ignoreKw = book.getAliases()
+		ignoreKw.append( book.name.lower() )
 
 		# Then, serialize and replace body hyperlinks
 		book = book.serialize()
-		book['short'] = BookKeywordCache.replaceKeywords( book['short'], tpl )
-		book['description'] = BookKeywordCache.replaceKeywords( book['description'], tpl )
+		book['short'] = BookKeywordCache.replaceKeywords( book['short'], tpl, ignoreKw )
+		book['description'] = BookKeywordCache.replaceKeywords( book['description'], tpl, ignoreKw )
 
 		# Return book
 		return book
@@ -478,12 +494,68 @@ class HLUser:
 		Return the user book statistics
 		"""
 
-		# Get all books
+		# Get user's visited books
+		userBooks = self.dbUser.getVisitedBooks()
+
+		# Get questions of each book the user has visited
+		questions = {}
+		bookMetrics = {}
+		if len(userBooks) > 0 :
+			for q in BookQuestion.select().where( BookQuestion.book << userBooks ):
+				book_id = q._data['book']
+
+				# Ensure records
+				if not book_id in bookMetrics:
+					bookMetrics[book_id] = {
+						'questions': [],
+						'correct': 0,
+						'trials': 0
+					}
+
+				# Store question
+				bookMetrics[book_id]['questions'].append(q)
+
+				# Cache question
+				questions[q.id] = q
+
+			# Get metrics on these questions
+			for q in BookQuestion.select().where( BookQuestion.user == self.dbUser ):
+
+				# Get reference question
+				question_id = q._data['question']
+				qRef = questions[question_id]
+				book_id = qRef._data['book']
+
+				# Count correct answers
+				if (qRef.correct == q.answer):
+					bookMetrics[book_id]['correct'] += 1
+
+				# Collect trials
+				bookMetrics[book_id]['trials'] += q.trials
+
+		# Populate all books
 		books = []
-		for book in Book.select():
+		for book in Book.select(Book.id, Book.name).dicts():
 
 			# Check user's status on this book
-			pass
+			if book['id'] in bookMetrics:
+				qLen = len(bookMetrics[book['id']]['questions'])
+				qCorrect = bookMetrics[book['id']]['correct']
+
+				# Answered more than half? Mastered!
+				if qCorrect >= qLen/2:
+					state = 2
+				else:
+					state = 1
+			else:
+				state = 0
+
+			# Add book state
+			book['state'] = state
+			books.append(book)
+
+		# Return books
+		return books
 
 	def getBookQuestions(self):
 		"""
@@ -496,6 +568,12 @@ class HLUser:
 		Reply the book questions
 		"""
 		pass
+
+	def getBookMetrics(self):
+		"""
+		Query all books explored by the user and their current
+		question status.
+		"""
 
 	def getPapers(self, query={}, limit=50):
 		"""

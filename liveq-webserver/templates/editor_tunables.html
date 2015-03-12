@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Configure</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1>Tunables</h1>
+      <p>The following table contains all the different tunables currently registered in the database.</p>
+      <p> <a href="{{ reverse_url("config.tunables.edit") }}" class="btn btn-success" > <span class="glyphicon glyphicon-plus"></span> Add new</a></p>
+      <hr />
+      <table class="table table-condensed" width="100%">
+        <tr>
+          <th width="70">Tunable ID</th>
+          <th width="200">Short</th>
+          <th width="200">Book</th>
+          <th>Name</th>
+          <th width="200">Actions</th>
+        </tr>
+        {% for tunable in tunables %}
+        <tr>
+          <td>{{ tunable['id'] }}</td>
+          <td>{{ tunable['short'] }}</td>
+          <td>{{ tunable['book'] }}</td>
+          <td>{{ tunable['name'] }}</td>
+          <td><a href="{{ reverse_url("config.tunables.edit") }}?tunable={{ tunable['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
+        </tr>
+        {% end %}
+      </table>
+
+    </div>
+
+  </body>
+</html>

@@ -67,6 +67,23 @@ class AccountInterface(APIInterface):
 			self.user.setVariables( param['vars'] )
 
 		##################################################
+		# Trigger an arbitrary action
+		# ------------------------------------------------
+		elif action == "trigger":
+
+			# Pop event
+			event = param['event']
+			del param['event']
+
+			# Forward trigger
+			self.user.trigger( event, **param )
+
+			# Send response
+			self.sendResponse({ 
+					"status": "ok"
+					})
+
+		##################################################
 		# Get a value from a save slot
 		# ------------------------------------------------
 		elif action == "save.get":
@@ -138,9 +155,12 @@ class AccountInterface(APIInterface):
 				})
 
 		##################################################
-		# Return a particular paper
+		# Read a particular paper
 		# ------------------------------------------------
-		elif action == "papers.get":
+		elif action == "papers.read":
+
+			# Trigger action
+			self.user.trigger("paper.read", paper=param['id'])
 
 			# Return paper status
 			self.sendResponse({
@@ -156,6 +176,9 @@ class AccountInterface(APIInterface):
 			# Update paper
 			if self.user.updatePaper(param['id'], param['fields']):
 
+				# Trigger action
+				self.user.trigger("paper.update", paper=param['id'], fields=param['fields'])
+
 				# Return paper status
 				self.sendResponse({
 						"status": "ok",
@@ -169,12 +192,26 @@ class AccountInterface(APIInterface):
 		##################################################
 		# Get a particular book
 		# ------------------------------------------------
-		elif action == "books.get":
+		elif action == "books.read":
+
+			# Trigger action
+			self.user.trigger("book.read", book=param['name'])
+
+			# Read a particular book
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getBook(param['name'])
+				})
+
+		##################################################
+		# Get a books profile
+		# ------------------------------------------------
+		elif action == "profile.books":
 
 			# Get a particular book
 			self.sendResponse({
 					"status": "ok",
-					"data" : self.user.getBook(param['name'])
+					"data" : self.user.getBookStatistics()
 				})
 
 		##################################################

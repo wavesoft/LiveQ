@@ -41,13 +41,16 @@ class MCPlotsServer(tornado.web.Application):
 		# Setup handlers
 		handlers = [
 			URLSpec(r"%s" % Config.BASE_URL, 					IndexHandler),
-			URLSpec(r"%s/" % Config.BASE_URL, 					IndexHandler, 			name="index"),
-			URLSpec(r"%s/config" % Config.BASE_URL, 			ConfigHandler, 			name="config"),
-			URLSpec(r"%s/config/books" % Config.BASE_URL, 		ConfigBooksHandler, 	name="config.books"),
-			URLSpec(r"%s/config/books/edit" % Config.BASE_URL, 	ConfigEditBookHandler, 	name="config.books.edit"),
-			URLSpec(r"%s/config/books/del" % Config.BASE_URL, 	ConfigDeleteBookHandler,name="config.books.del"),
-			URLSpec(r"%s/apisocket" % Config.BASE_URL,			APISocketHandler, 		name="api"),
-			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,			TootrGetAnimation, 		name="tootr.anim"),
+			URLSpec(r"%s/" % Config.BASE_URL, 					IndexHandler, 				name="index"),
+			URLSpec(r"%s/config" % Config.BASE_URL, 			ConfigHandler, 				name="config"),
+			URLSpec(r"%s/config/books" % Config.BASE_URL, 		ConfigBooksHandler, 		name="config.books"),
+			URLSpec(r"%s/config/books/edit" % Config.BASE_URL, 	ConfigEditBookHandler, 		name="config.books.edit"),
+			URLSpec(r"%s/config/books/del" % Config.BASE_URL, 	ConfigDeleteBookHandler,	name="config.books.del"),
+			URLSpec(r"%s/config/tun" % Config.BASE_URL, 		ConfigTunablesHandler, 		name="config.tunables"),
+			URLSpec(r"%s/config/tun/edit" % Config.BASE_URL, 	ConfigEditTunableHandler, 	name="config.tunables.edit"),
+			URLSpec(r"%s/config/tun/del" % Config.BASE_URL, 	ConfigDeleteTunableHandler,	name="config.tunables.del"),
+			URLSpec(r"%s/apisocket" % Config.BASE_URL,			APISocketHandler, 			name="api"),
+			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,			TootrGetAnimation, 			name="tootr.anim"),
 		]
 
 		# Get root dir of files

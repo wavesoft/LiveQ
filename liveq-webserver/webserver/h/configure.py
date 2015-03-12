@@ -24,7 +24,7 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from webserver.models import Book, BookQuestion
+from webserver.models import Book, BookQuestion, Tunable, Observable
 
 """
 Lab configuration page handler
@@ -101,7 +101,6 @@ class ConfigEditBookHandler(tornado.web.RequestHandler):
 
 		# Update fields
 		book.name = self.get_body_argument("name", "")
-		book.title = self.get_body_argument("title", "")
 		book.aliases = self.get_body_argument("aliases", "")
 		book.short = self.get_body_argument("short", "")
 		book.description = self.get_body_argument("description", "")
@@ -165,3 +164,103 @@ class ConfigDeleteBookHandler(tornado.web.RequestHandler):
 
 		# Redirect
 		self.redirect( self.reverse_url('config.books') )
+
+
+"""
+Tunables configuration handler
+"""
+class ConfigTunablesHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Get all tunables
+		tunables = []
+		for b in Tunable.select().dicts():
+
+			# Collect
+			tunables.append(b)
+
+		# Render
+		self.render("editor_tunables.html", 
+			navbar=getNavbarData(),
+			tunables=tunables
+		)
+
+"""
+Edit Tunable handler
+"""
+class ConfigEditTunableHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Check if user requested a tunable
+		tunable_id = self.get_argument("tunable", None)
+		if tunable_id is None:
+			# Create new tunable if not exists
+			tunable = Tunable()
+		else:
+			# Resume previous tunable if already exists
+			tunable = Tunable.get( Tunable.id == int(tunable_id) )
+
+		# Get all books
+		books = Book.select( Book.id, Book.name )[:]
+
+		# Render
+		self.render("editor_tunables_edit.html", 
+			navbar=getNavbarData(),
+			tunable=tunable,
+			books=books
+			)
+
+	def post(self):
+
+		# Get fields
+		tunable_id = self.get_argument("tunable", None)
+		if tunable_id == "None":
+			# Create new tunable if not exists
+			tunable = Tunable()
+		elif tunable_id is None:
+			# Error
+			return
+		else:
+			# Resume previous tunable if already exists
+			tunable = Tunable.get( Tunable.id == int(tunable_id) )
+
+		# Update fields
+		tunable.name = self.get_body_argument("name", "")
+		tunable.short = self.get_body_argument("short", "")
+		tunable.title = self.get_body_argument("title", "")
+		tunable.group = self.get_body_argument("group", "")
+		tunable.subgroup = self.get_body_argument("subgroup", "")
+		tunable.book = self.get_body_argument("book", "")
+		tunable.units = self.get_body_argument("units", "")
+		tunable.desc = self.get_body_argument("desc", "")
+		tunable.default = float(self.get_body_argument("default", "0.0"))
+		tunable.min = float(self.get_body_argument("min", "0.0"))
+		tunable.max = float(self.get_body_argument("max", "0.0"))
+		tunable.dec = int(self.get_body_argument("dec", "0.0"))
+
+		# Save tunable
+		tunable.save()
+
+		# Redirect
+		self.redirect( self.reverse_url('config.tunables') )
+
+
+"""
+Edit Tunable handler
+"""
+class ConfigDeleteTunableHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Check if user requested a tunable
+		tunable_id = self.get_argument("tunable", None)
+		if not tunable_id is None:
+
+			# Resume previous tunable if already exists
+			tunable = tunable.get( tunable.id == int(tunable_id) )
+
+			# Delete instance
+			tunable.delete_instance(True)
+
+		# Redirect
+		self.redirect( self.reverse_url('config.tunables') )
+

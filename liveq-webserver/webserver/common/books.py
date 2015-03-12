@@ -42,7 +42,7 @@ class BookKeywordCache:
 		"""
 
 		# Process all books
-		for book in Book.select(Book.id, Book.name, Book.title, Book.aliases):
+		for book in Book.select(Book.id, Book.name, Book.aliases):
 
 			# Get all keywords
 			keywords = book.getAliases()
@@ -50,8 +50,7 @@ class BookKeywordCache:
 
 			# Store on book details
 			BookKeywordCache.BOOK_DETAILS[book.id] = {
-					'name': book.name,
-					'title': book.title
+					'name': book.name
 				}
 
 			# Store keywords
@@ -62,7 +61,7 @@ class BookKeywordCache:
 		# TODO
 
 	@staticmethod
-	def replaceKeywords(body, template='<a href="#%(name)s)">%(word)s</a>'):
+	def replaceKeywords(body, template='<a href="#%(name)s)">%(word)s</a>', exclude=[]):
 
 		# Rreplace only once
 		once = []
@@ -81,26 +80,29 @@ class BookKeywordCache:
 				kw = body[i:j]
 
 				# Check if we have it on store
-				if kw in BookKeywordCache.KEYWORDS:
+				if (kw in BookKeywordCache.KEYWORDS) and not (kw in exclude):
 					v = BookKeywordCache.KEYWORDS[kw]
 
 					# Calculate replacement
 					rpw = template % {
 							'book': v,
-							'title': BookKeywordCache.BOOK_DETAILS[v]['title'],
 							'name': BookKeywordCache.BOOK_DETAILS[v]['name'],
 							'word': body[i:i+l]
 						}
 
-					# Replace & forward
-					body = body[0:i-2] + rpw + body[j+2:]
-					i = j+2
+				else:
+					# Remobe brackets
+					rpw = kw
+
+				# Replace & forward
+				body = body[0:i-2] + rpw + body[j+2:]
+				i = j+2
 
 			else:
 
 				# Check if a keyword matches at the current anchor
 				for k,v in BookKeywordCache.KEYWORDS.iteritems():
-					if body[i:i+len(k)].lower() == k:
+					if (body[i:i+len(k)].lower() == k) and not (k in exclude):
 
 						# Replace only once
 						if k in once:
@@ -113,7 +115,6 @@ class BookKeywordCache:
 						# Calculate replacement
 						rpw = template % {
 								'book': v,
-								'title': BookKeywordCache.BOOK_DETAILS[v]['title'],
 								'name': BookKeywordCache.BOOK_DETAILS[v]['name'],
 								'word': body[i:i+l]
 							}
