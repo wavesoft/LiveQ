@@ -80,6 +80,7 @@ class HLUser:
 
 		# Preheat user cache
 		self.loadCache_Knowledge()
+		self.loadCache_Books()
 
 		# Cache my information
 		self.name = user.displayName
@@ -124,6 +125,10 @@ class HLUser:
 
 		# Re-select and get user record
 		self.dbUser = User.get( User.id == self.dbUser.id )
+
+		# Reload caches
+		self.loadCache_Knowledge()
+		self.loadCache_Books()
 
 	def receiveEvents(self, callback):
 		"""
@@ -179,6 +184,19 @@ class HLUser:
 			except:
 				pass
 
+	def loadCache_Books(self):
+		"""
+		Reload books state cache
+		"""
+
+		# Reset
+		self.bookState = {}
+
+		# Convert string key to integer
+		for k,v in self.dbUser.getState("books", {}).iteritems():
+			self.bookState[int(k)] = v
+
+
 	###################################
 	# Cache Updating Functions
 	###################################
@@ -224,7 +242,7 @@ class HLUser:
 		# Update 'leaf_knowledge' state
 		self.dbUser.setState("leaf_knowledge", leaf_knowledge_ids)
 
-	def updateCache_books(self):
+	def updateCache_Books(self):
 		"""
 		Update the user's status on each book
 		"""
@@ -237,27 +255,28 @@ class HLUser:
 
 			# Cache status
 			self.dbUser.setState("books", {})
+			self.bookState = {}
 
 		else:
 
 			# Prepare variables
 			questions = {}
-			bookMetrics = {}
+			bookState = {}
 
 			# Collect questions
 			for q in BookQuestion.select().where( BookQuestion.book << userBooks ):
 				book_id = q._data['book']
 
 				# Ensure records
-				if not book_id in bookMetrics:
-					bookMetrics[book_id] = {
+				if not book_id in bookState:
+					bookState[book_id] = {
 						'questions': 0,
 						'correct': 0,
 						'trials': 0
 					}
 
 				# Store question
-				bookMetrics[book_id]['questions'] += 1
+				bookState[book_id]['questions'] += 1
 
 				# Cache question
 				questions[q.id] = q
@@ -272,13 +291,14 @@ class HLUser:
 
 				# Count correct answers
 				if (qRef.correct == q.answer):
-					bookMetrics[book_id]['correct'] += 1
+					bookState[book_id]['correct'] += 1
 
 				# Collect trials
-				bookMetrics[book_id]['trials'] += q.trials
+				bookState[book_id]['trials'] += q.trials
 
 			# Cache status
-			self.dbUser.setState("books", bookMetrics)
+			self.dbUser.setState("books", bookState)
+			self.bookState = bookState
 
 
 	###################################
@@ -440,7 +460,7 @@ class HLUser:
 			self.dbUser.visitBook(book.id)
 
 			# Update book cache
-			self.updateCache_books();
+			self.updateCache_Books();
 
 			# Save 
 			self.dbUser.save()
@@ -594,9 +614,6 @@ class HLUser:
 		Return the user book statistics
 		"""
 
-		# Get book state from cache
-		bookState = self.dbUser.getState("books", {})
-
 		# Get user's visited books
 		userBooks = self.dbUser.getVisitedBooks()
 
@@ -605,9 +622,9 @@ class HLUser:
 		for book in Book.select(Book.id, Book.name).dicts():
 
 			# Check user's status on this book
-			if book['id'] in bookState:
-				qLen = bookState[book['id']]['questions']
-				qCorrect = bookState[book['id']]['correct']
+			if book['id'] in self.bookState:
+				qLen = self.bookState[book['id']]['questions']
+				qCorrect = self.bookState[book['id']]['correct']
 
 				# Answered more than half? Mastered!
 				if qCorrect >= qLen/2:
@@ -634,17 +651,19 @@ class HLUser:
 		Return the book questions
 		"""
 
-		# Get book state from cache
-		bookState = self.dbUser.getState("books", {})
-
 		# Get user's visited books
 		nonMasteredBooks = self.dbUser.getVisitedBooks()
 
 		# Remove mastered books from nonMasteredBooks
-		for k,v in bookState.iteritems():
+		for k,v in self.bookState.iteritems():
 			if v['correct'] >= v['questions']/2:
-				i = nonMasteredBooks.indexOf(v)
-				del nonMasteredBooks[i]
+				print "??? Removing mastered book %i" % k
+				try:
+					i = nonMasteredBooks.index(k)
+					del nonMasteredBooks[i]
+				except ValueError:
+					print "??? (Not found)"
+					continue
 
 		# If nothing to query, return none
 		if not nonMasteredBooks:
@@ -660,14 +679,25 @@ class HLUser:
 			questions[q.id] = q.serialize()
 			questions[q.id]['trials'] = 0
 
-		# Get all answers for these questions
+		# If no questions, return none
+		if not questions:
+			return None
+
+		# Get trials and remove correct responses on the above answers
 		maxTrials = 0
 		for ans in BookQuestionAnswer.select(
-				BookQuestionAnswer.trials
+				BookQuestionAnswer.trials,
+				BookQuestionAnswer.answer,
+				BookQuestionAnswer.question
 			).where(
 				(BookQuestionAnswer.user == self.dbUser) &
 				(BookQuestionAnswer.question << questions.keys())
 			):
+
+			# Skip correct answers
+			if ans.answer == questions[ans._data['question']]['correct']:
+				del questions[ans._data['question']]
+				continue
 
 			# Append trial counters on questions
 			questions[ans._data['question']]['trials'] = ans.trials
@@ -681,11 +711,11 @@ class HLUser:
 		# Otherwise, compile a random set
 		else:
 
-			# Generate question weights
+			# Generate question weights, basing on trials
 			questions = questions.values()
 			qWeights = map(lambda x: maxTrials-x['trials']+1, questions)
 
-			# Start collecting unique indices
+			# Start collecting weighted random indices
 			indices = []
 			n = None
 			while (len(indices) < count):
@@ -699,11 +729,34 @@ class HLUser:
 			return map(lambda x: questions[x], indices)
 
 
-	def replyBookQuestions(self):
+	def handleBookQuestionAnswers(self, replies):
 		"""
 		Reply the book questions
 		"""
-		pass
+
+		# Process replies individually
+		for reply in replies:
+
+			# Get or create record
+			try:
+				q = BookQuestionAnswer.get(
+						(BookQuestionAnswer.user == self.dbUser) &
+						(BookQuestionAnswer.question == reply['id'])
+					)
+			except BookQuestionAnswer.DoesNotExist:
+				q = BookQuestionAnswer(
+					user=self.dbUser,
+					question=reply['id']
+				)
+			
+			# Update
+			q.trials += 1
+			q.answer = reply['choice']
+			q.save()
+
+		# Update cache
+		self.updateCache_Books()
+		self.dbUser.save()
 
 	def getPapers(self, query={}, limit=50):
 		"""

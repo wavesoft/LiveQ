@@ -217,6 +217,18 @@ class AccountInterface(APIInterface):
 					"data" : self.user.getBookQuestions()
 				})
 
+		##################################################
+		# Handle answers to book question
+		# ------------------------------------------------
+		elif action == "books.answers":
+
+			# Handle answers
+			self.user.handleBookQuestionAnswers( param['answers'] )
+			
+			# Send OK
+			self.sendResponse({
+					"status": "ok",
+				})
 
 		##################################################
 		# Get a books profile
