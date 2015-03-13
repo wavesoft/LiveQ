@@ -197,11 +197,26 @@ class AccountInterface(APIInterface):
 			# Trigger action
 			self.user.trigger("book.read", book=param['name'])
 
+			# Mark book as read
+			self.user.markBookAsRead( param['name'] )
+
 			# Read a particular book
 			self.sendResponse({
 					"status": "ok",
 					"data" : self.user.getBook(param['name'])
 				})
+
+		##################################################
+		# Get a book questions
+		# ------------------------------------------------
+		elif action == "books.questions":
+
+			# Read a particular book
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getBookQuestions()
+				})
+
 
 		##################################################
 		# Get a books profile

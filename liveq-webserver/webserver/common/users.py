@@ -20,9 +20,10 @@
 import json
 import uuid
 import logging
+import random
 
 from liveq.models import Tunable
-from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book, BookQuestion
+from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book, BookQuestion, BookQuestionAnswer
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
@@ -33,6 +34,23 @@ BOOK_UNKNOWN = 0
 BOOK_KNOWN = 1
 #: The user has mastered this book
 BOOK_MASTERED = 2
+
+def weighted_choice(weights):
+	"""
+	Return the index based on weighted random choice
+	of the given set of weights
+	"""
+	totals = []
+	running_total = 0
+
+	for w in weights:
+		running_total += w
+		totals.append(running_total)
+
+	rnd = random.random() * running_total
+	for i, total in enumerate(totals):
+		if rnd < total:
+			return i
 
 class HLUserError(Exception):
 	"""
@@ -206,6 +224,63 @@ class HLUser:
 		# Update 'leaf_knowledge' state
 		self.dbUser.setState("leaf_knowledge", leaf_knowledge_ids)
 
+	def updateCache_books(self):
+		"""
+		Update the user's status on each book
+		"""
+
+		# Get user's visited books
+		userBooks = self.dbUser.getVisitedBooks()
+
+		# Get questions of each book the user has visited
+		if len(userBooks) == 0 :
+
+			# Cache status
+			self.dbUser.setState("books", {})
+
+		else:
+
+			# Prepare variables
+			questions = {}
+			bookMetrics = {}
+
+			# Collect questions
+			for q in BookQuestion.select().where( BookQuestion.book << userBooks ):
+				book_id = q._data['book']
+
+				# Ensure records
+				if not book_id in bookMetrics:
+					bookMetrics[book_id] = {
+						'questions': 0,
+						'correct': 0,
+						'trials': 0
+					}
+
+				# Store question
+				bookMetrics[book_id]['questions'] += 1
+
+				# Cache question
+				questions[q.id] = q
+
+			# Collect metrics on answers
+			for q in BookQuestionAnswer.select().where( BookQuestionAnswer.user == self.dbUser ):
+
+				# Get reference question
+				question_id = q._data['question']
+				qRef = questions[question_id]
+				book_id = qRef._data['book']
+
+				# Count correct answers
+				if (qRef.correct == q.answer):
+					bookMetrics[book_id]['correct'] += 1
+
+				# Collect trials
+				bookMetrics[book_id]['trials'] += q.trials
+
+			# Cache status
+			self.dbUser.setState("books", bookMetrics)
+
+
 	###################################
 	# High-level functions
 	###################################
@@ -347,6 +422,30 @@ class HLUser:
 		# Save user record
 		self.dbUser.save()
 
+	def markBookAsRead(self, bookName):
+		"""
+		User has read the specified book
+		"""
+
+		# Get book by name
+		try:
+			book = Book.get( Book.name == bookName )
+		except Book.DoesNotExist:
+			return
+
+		# If this book does not exist in user's knowledge, update it
+		if not self.dbUser.hasVisitedBook(book.id):
+
+			# Update visited book
+			self.dbUser.visitBook(book.id)
+
+			# Update book cache
+			self.updateCache_books();
+
+			# Save 
+			self.dbUser.save()
+
+
 	def spendPoints(self, points=0):
 		"""
 		Spend the given ammount of science points
@@ -384,11 +483,6 @@ class HLUser:
 
 		# Save record
 		self.dbUser.save()
-
-	def getBookStatus(self, book):
-		"""
-		Return the status (BOOK_UNKNOWN, BOOK_KNOWN, BOOK_MASTERED)
-		"""
 
 	###################################
 	# In-game information queries
@@ -500,86 +594,115 @@ class HLUser:
 		Return the user book statistics
 		"""
 
+		# Get book state from cache
+		bookState = self.dbUser.getState("books", {})
+
 		# Get user's visited books
 		userBooks = self.dbUser.getVisitedBooks()
-
-		# Get questions of each book the user has visited
-		questions = {}
-		bookMetrics = {}
-		if len(userBooks) > 0 :
-			for q in BookQuestion.select().where( BookQuestion.book << userBooks ):
-				book_id = q._data['book']
-
-				# Ensure records
-				if not book_id in bookMetrics:
-					bookMetrics[book_id] = {
-						'questions': [],
-						'correct': 0,
-						'trials': 0
-					}
-
-				# Store question
-				bookMetrics[book_id]['questions'].append(q)
-
-				# Cache question
-				questions[q.id] = q
-
-			# Get metrics on these questions
-			for q in BookQuestion.select().where( BookQuestion.user == self.dbUser ):
-
-				# Get reference question
-				question_id = q._data['question']
-				qRef = questions[question_id]
-				book_id = qRef._data['book']
-
-				# Count correct answers
-				if (qRef.correct == q.answer):
-					bookMetrics[book_id]['correct'] += 1
-
-				# Collect trials
-				bookMetrics[book_id]['trials'] += q.trials
 
 		# Populate all books
 		books = []
 		for book in Book.select(Book.id, Book.name).dicts():
 
 			# Check user's status on this book
-			if book['id'] in bookMetrics:
-				qLen = len(bookMetrics[book['id']]['questions'])
-				qCorrect = bookMetrics[book['id']]['correct']
+			if book['id'] in bookState:
+				qLen = bookState[book['id']]['questions']
+				qCorrect = bookState[book['id']]['correct']
 
 				# Answered more than half? Mastered!
 				if qCorrect >= qLen/2:
 					state = 2
 				else:
 					state = 1
+
+			elif book['id'] in userBooks:
+				# Just seen
+				state = 1
 			else:
+				# Not yet seen
 				state = 0
 
 			# Add book state
 			book['state'] = state
 			books.append(book)
 
-		# Return books
-		return books
+		# Return books sorted by state
+		return sorted( books, lambda x,y: y['state']-x['state'] )
 
-	def getBookQuestions(self):
+	def getBookQuestions(self, count=5):
 		"""
 		Return the book questions
 		"""
-		pass
+
+		# Get book state from cache
+		bookState = self.dbUser.getState("books", {})
+
+		# Get user's visited books
+		nonMasteredBooks = self.dbUser.getVisitedBooks()
+
+		# Remove mastered books from nonMasteredBooks
+		for k,v in bookState.iteritems():
+			if v['correct'] >= v['questions']/2:
+				i = nonMasteredBooks.indexOf(v)
+				del nonMasteredBooks[i]
+
+		# If nothing to query, return none
+		if not nonMasteredBooks:
+			return None
+
+		# Get all questions for non-mastered, visited books
+		questions = {}
+		for q in BookQuestion.select().where(
+				(BookQuestion.book << nonMasteredBooks)
+			).dicts():
+
+			# Store question indexed
+			questions[q['id']] = q
+			questions[q['id']]['trials'] = 0
+
+		# Get all answers for these questions
+		maxTrials = 0
+		for ans in BookQuestionAnswer.select(
+				BookQuestionAnswer.trials
+			).where(
+				(BookQuestionAnswer.user == self.dbUser) &
+				(BookQuestionAnswer.book << nonMasteredBooks)
+			):
+
+			# Append trial counters on questions
+			questions[ans._data['question']]['trials'] = ans.trials
+			if ans.trials > maxTrials:
+				maxTrials = ans.trials
+
+		# If we have limited choices, just return the set
+		if len(questions) <= count:
+			return questions.values()
+
+		# Otherwise, compile a random set
+		else:
+
+			# Generate question weights
+			qWeights = map(lambda x: maxTrials-x['trials']+1, questions.iteritems())
+
+			# Start collecting inuque indices
+			indices = []
+			n = None
+			while (len(indices) < count):
+				# Get random element
+				n = weighted_choice(qWeights)
+				# If n is not in indices, add it
+				if (n not in indices):
+					indices.append(n)
+
+			# Return subset of questions
+			return map(lambda x: questions[x], indices)
+
 
 	def replyBookQuestions(self):
 		"""
 		Reply the book questions
 		"""
 		pass
-
-	def getBookMetrics(self):
-		"""
-		Query all books explored by the user and their current
-		question status.
-		"""
 
 	def getPapers(self, query={}, limit=50):
 		"""

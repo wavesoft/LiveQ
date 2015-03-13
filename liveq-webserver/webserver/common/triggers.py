@@ -17,6 +17,29 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+class TriggerCache:
+
+	#: Trigger tree
+	TRIGGER_TREE = {}
+
+	#: Trigger
+	TRIGGER_NODES = []
+
+	@staticmethod
+	def update():
+		"""
+		Update trigger cache
+		"""
+		pass
+
+class TriggerHandlers:
+
+	def book_read(self, book=0):
+		"""
+		Handle book read
+		"""
+		pass
+
 class Triggers:
 
 	def __init__(self, user):
@@ -31,5 +54,5 @@ class Triggers:
 		"""
 		Trigger the specified trigger with the appropriate arguments
 		"""
-		pass
+		
 

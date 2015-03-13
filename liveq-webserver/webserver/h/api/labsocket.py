@@ -416,7 +416,7 @@ class LabSocketInterface(APIInterface):
 				'lab': self.lab.uuid,
 				'parameters': tunables,
 				'histograms': trimObs
-			}, waitReply=True, timeout=60)
+			}, waitReply=True, timeout=1)
 
 		# Check response
 		if not ans:
