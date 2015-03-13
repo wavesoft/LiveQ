@@ -654,11 +654,11 @@ class HLUser:
 		questions = {}
 		for q in BookQuestion.select().where(
 				(BookQuestion.book << nonMasteredBooks)
-			).dicts():
+			):
 
 			# Store question indexed
-			questions[q['id']] = q
-			questions[q['id']]['trials'] = 0
+			questions[q.id] = q.serialize()
+			questions[q.id]['trials'] = 0
 
 		# Get all answers for these questions
 		maxTrials = 0
@@ -666,7 +666,7 @@ class HLUser:
 				BookQuestionAnswer.trials
 			).where(
 				(BookQuestionAnswer.user == self.dbUser) &
-				(BookQuestionAnswer.book << nonMasteredBooks)
+				(BookQuestionAnswer.question << questions.keys())
 			):
 
 			# Append trial counters on questions
@@ -682,9 +682,10 @@ class HLUser:
 		else:
 
 			# Generate question weights
-			qWeights = map(lambda x: maxTrials-x['trials']+1, questions.iteritems())
+			questions = questions.values()
+			qWeights = map(lambda x: maxTrials-x['trials']+1, questions)
 
-			# Start collecting inuque indices
+			# Start collecting unique indices
 			indices = []
 			n = None
 			while (len(indices) < count):
