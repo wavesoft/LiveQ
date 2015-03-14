@@ -20,6 +20,7 @@
 import time
 import logging
 
+from geoip import geolite2
 from jobmanager.config import Config
 
 from liveq.models import Agent, AgentGroup, AgentMetrics, PostMortems
@@ -133,6 +134,10 @@ def updateHandshake(uid, attrib):
 	version = 1
 	ip = ""
 
+	# Default lat/lng is at CERN
+	lat = 46.205498
+	lng = 6.152344
+
 	# Update parameters from the attribs received
 	if "group" in attrib:
 		group = attrib['group']
@@ -142,8 +147,15 @@ def updateHandshake(uid, attrib):
 		features = attrib['features']
 	if "version" in attrib:
 		version = int(attrib['version'])
+
+	# Update IP and geolocation
 	if "ip" in attrib:
-		ip = int(attrib['ip'])
+		ip = attrib['ip']
+
+		# Geolocate IP
+		match = geolite2.lookup(ip)
+		if not (match is None):
+			(lat, lng) = match.location
 
 	# Fetch references
 	groupEntry = getAgentGroup(group)
@@ -156,6 +168,7 @@ def updateHandshake(uid, attrib):
 	agentEntry.features = features
 	agentEntry.version = version
 	agentEntry.ip = ip
+	agentEntry.latlng = "%.5f,%s" % (lat,lng)
 
 	# The agent is now active
 	agentEntry.state = 1

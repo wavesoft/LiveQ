@@ -170,7 +170,8 @@ class Job:
 
 		# Send status message
 		self.sendStatus("Acquired agent %s" % agent.uuid, varMetrics={
-				"agent_added": agent.uuid
+				"agent_added": agent.uuid,
+				"agent_added_latlng": agent.latlng
 			})
 
 	def removeAgentInfo(self, agent):

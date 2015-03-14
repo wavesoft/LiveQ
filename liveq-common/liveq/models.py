@@ -344,6 +344,8 @@ class Agent(BaseModel):
 
 	#: Agent's IP Address
 	ip = CharField(max_length=45, index=True, unique=True)
+	#: Lattitude and longitude
+	latlng = CharField(max_length=20, index=True, unique=True)
 
 	#: The timestamp of the last activity of the agent
 	lastActivity = IntegerField(default=0)
