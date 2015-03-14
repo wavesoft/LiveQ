@@ -342,6 +342,9 @@ class Agent(BaseModel):
 	#: Add an additional UUID lookup index
 	uuid = CharField(max_length=128, index=True, unique=True)
 
+	#: Agent's IP Address
+	ip = CharField(max_length=45, index=True, unique=True)
+
 	#: The timestamp of the last activity of the agent
 	lastActivity = IntegerField(default=0)
 	#: The feature string responded by the entity at discovery

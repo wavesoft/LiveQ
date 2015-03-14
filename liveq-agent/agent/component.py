@@ -19,6 +19,7 @@
 
 import time
 import logging
+import urllib2
 
 from agent.config import Config
 from agent.io.jobmanagers import JobManagers
@@ -64,6 +65,18 @@ class AgentComponent(Component):
 		# Setup tool callbacks for the jobmanagers
 		self.jobmanagers.handshakeFn(self.sendHandshake)
 
+	def getPublicIP(self):
+		"""
+		Try to identify the user's public IP
+		"""
+		try:
+			# ipify is a free service for programmatically looking-up
+			# the client's IP address.
+			response = urllib2.urlopen('http://api.ipify.org/', timeout=30)
+			return response.read()
+		except Exception:
+			return ""
+
 	def sendHandshake(self, channel):
 		"""
 		Send handshake to the first available server channel
@@ -81,7 +94,8 @@ class AgentComponent(Component):
 				'version': AgentComponent.VERSION,
 				'slots': Config.AGENT_SLOTS,
 				'free_slots': free_slots,
-				'group': Config.AGENT_GROUP
+				'group': Config.AGENT_GROUP,
+				'ip' : self.getPublicIP()
 			})
 
 		except BusChannelException as e:

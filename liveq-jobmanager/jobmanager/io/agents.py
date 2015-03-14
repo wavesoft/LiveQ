@@ -131,6 +131,7 @@ def updateHandshake(uid, attrib):
 	features = ""
 	slots = 1
 	version = 1
+	ip = ""
 
 	# Update parameters from the attribs received
 	if "group" in attrib:
@@ -141,6 +142,8 @@ def updateHandshake(uid, attrib):
 		features = attrib['features']
 	if "version" in attrib:
 		version = int(attrib['version'])
+	if "ip" in attrib:
+		ip = int(attrib['ip'])
 
 	# Fetch references
 	groupEntry = getAgentGroup(group)
@@ -152,6 +155,7 @@ def updateHandshake(uid, attrib):
 	agentEntry.slots = slots
 	agentEntry.features = features
 	agentEntry.version = version
+	agentEntry.ip = ip
 
 	# The agent is now active
 	agentEntry.state = 1
@@ -163,6 +167,7 @@ def updateHandshake(uid, attrib):
 	report.set("features", features)
 	report.set("version", version)
 	report.set("group", group)
+	report.set("ip", ip)
 
 	# Save entry
 	agentEntry.save()
