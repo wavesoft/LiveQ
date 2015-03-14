@@ -79,6 +79,9 @@ class JobManagerComponent(Component):
 		# Open the interpolator channel were we are dumping the final results
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 
+		# Open the results manager channel where we are dumping the final results
+		self.resultsChannel = Config.IBUS.openChannel("results")
+
 		# Channel mapping
 		self.channels = { }
 
@@ -183,17 +186,31 @@ class JobManagerComponent(Component):
 				self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
 				agents.agentJobAborted(agent.uuid, job)
 
+			# Calculate run-time parameters for this group of agents
+			# that are about to start. This is defining the number
+			# of events we have to run in order to accumulate to the 
+			# maxium events requested
+			if len(a_start) > 0:
+
+				# The getBatchRuntimeConfig function will return a list
+				# of configurations, one for each agent in the baatch
+				runtimeConfig = job.getBatchRuntimeConfig( a_start )
+
 			# Then, start the job on a_start
 			for agent in a_start:
 
 				# Send status
 				job.sendStatus("Starting job on worker %s" % agent.uuid)
 
+				# Merge with runtime config
+				config = dict(job.parameters)
+				config.update( agent.getRuntime() )
+
 				# Get channel and send start (synchronous)
 				agentChannel = self.getAgentChannel( agent.uuid )
 				ans = agentChannel.send('job_start', {
 						'jid': job.id,
-						'config': job.parameters
+						'config': config
 					}, waitReply=True)
 
 				# Log results
@@ -214,7 +231,7 @@ class JobManagerComponent(Component):
 				if ans['result'] == "ok":
 
 					job.addAgentInfo(agent)
-					self.logger.info("Successfuly started job %s on %s" % ( job.id, agent.uuid ))
+					self.logger.info("Successfuly started job %s on %s (events=%i)" % ( job.id, agent.uuid, config['events'] ))
 
 				else:
 
@@ -252,15 +269,11 @@ class JobManagerComponent(Component):
 				'data': histoCollection.pack()
 			})
 
-		# Create lower-quality (fitted) histograms, and send them
-		# to the interpolation database
-		tune = Tune( job.parameters['tune'], labid=job.lab.uuid )
-		histos = job.lab.getHistograms()
-		ipolHistograms = histoCollection.toInterpolatableCollection(tune, histograms=histos, fitDegree=self.getHistogramPolyfitDegree(histos))
-
-		# Send the resulting data to the interpolation database
-		self.ipolChannel.send("results", {
-				'data': ipolHistograms.pack()
+		# Send the resulting data to the results database
+		self.resultsChannel.send("results_put", {
+				'jid': job.id,
+				'result': 0,
+				'data': histoCollection.pack()
 			})
 
 		# Cleanup job from scheduler
@@ -357,7 +370,8 @@ class JobManagerComponent(Component):
 		if message['free_slots'] > 0:
 			agent = agents.getAgent(channel.name)
 			if agent:
-				agent.activeJob = ""
+				agent.activeJob = 0
+				agent.setRuntime( None )
 				agent.save()
 
 		# Send agent report to LARS
@@ -387,7 +401,6 @@ class JobManagerComponent(Component):
 		"""
 		Callback when we receive data from a job agent
 		"""
-		self.logger.info("[%s] Got data" % channel.name)
 
 		# Send agent report to LARS
 		report = LARS.openGroup("agents", channel.name, alias=channel.name)
@@ -401,8 +414,8 @@ class JobManagerComponent(Component):
 
 		# Fetch job class
 		job = jobs.getJob(jid)
-		if not job:
-			self.logger.warn("[%s] The job %s does not exist" % (channel.name, jid))
+		if (not job) or (job.getStatus() == jobs.CANCELLED):
+			self.logger.warn("[%s] The job %s does not exist or is cancelled" % (channel.name, jid))
 			self.abortMissingJob(jid, channel)
 			report.openGroup("errors").add("wrong-job-id", 1)
 			return
@@ -423,6 +436,8 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 			report.openGroup("errors").add("merge-error", 1)
 			return
+
+		self.logger.info("[%s] Got data for job %s (events=%i)" % (channel.name, jid, job.getEvents()))
 
 		# Send status
 		job.sendStatus("Processing data from %s" % channel.name, varMetrics={

@@ -88,8 +88,8 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ AgentGroup, Agent, AgentJobs, AgentMetrics, Lab, JobQueue,
-				   Tunable, Observable, TunableToObservable, PostMortems ]:
+	for table in [ AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable, TunableToObservable, 
+				   PostMortems, JobQueue ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -205,6 +205,19 @@ class Lab(BaseModel):
 		# Return answer
 		return ans
 
+	def getEventCount(self, defaultEvents=100000):
+		"""
+		Return number of events from parameters
+		"""
+
+		# Check if missing
+		params = self.getParameters()
+		if not 'events' in params:
+			return defaultEvents
+
+		# Return events
+		return params['events']
+
 class JobQueue(BaseModel):
 	"""
 	Queue of jobs pending in the LiveQ jobManager
@@ -238,6 +251,9 @@ class JobQueue(BaseModel):
 
 	#: The job status (indexable)
 	status = IntegerField(max_length=2, default=0, index=True, unique=False)
+
+	#: Events processed
+	events = IntegerField(default=0)
 
 	#: Job status can be one of the following:
 	PENDING  	= 0
@@ -344,23 +360,39 @@ class Agent(BaseModel):
 
 	#: The group where it belongs to
 	group = ForeignKeyField(AgentGroup, related_name='groups')
+
 	#: The job currently running on the agent
-	activeJob = CharField(default="")
+	activeJob = IntegerField(default=0)
+	#: The number of events on these workers
+	activeJobEvents = IntegerField(default=0)
+	#: The job emtadata
+	activeJobRuntime = TextField(default="{}")
 
 	#: The owner ID of this agent
 	owner_id = IntegerField(default=0)
 
-class AgentJobs(BaseModel):
-	"""
-	Agent/Job/Group binding for addressing 
-	"""
+	def getRuntime(self):
+		"""
+		Get runtime configuration
+		"""
+		if not self.activeJobRuntime:
+			return {}
+		return json.loads(self.activeJobRuntime)
 
-	#: The related agent
-	agent = ForeignKeyField(Agent)
-	#: The related group
-	group = ForeignKeyField(AgentGroup)
-	#: Job ID
-	jobid = CharField(default="")
+	def setRuntime(self, runtime):
+		"""
+		Update runtime configuration
+		"""
+		if not runtime:
+			# Reset runtime
+			self.activeJobRuntime = ""
+			self.activeJobEvents = 0
+		else:
+			# Update runtime
+			self.activeJobRuntime = json.dumps(runtime)
+			# Update runtime events
+			if 'events' in runtime:
+				self.activeJobEvents = int(runtime['events'])
 
 class AgentMetrics(BaseModel):
 	"""

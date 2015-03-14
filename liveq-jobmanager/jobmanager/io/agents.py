@@ -84,7 +84,7 @@ def getAgentFromJob(jid):
 
 	# Try to fetch agent
 	try:
-		return Agent.get(Agent.activeJob==jid)
+		return Agent.get(Agent.activeJob == int(jid))
 	except Agent.DoesNotExist:
 		# Return none if missing
 		return None
@@ -240,7 +240,7 @@ def agentJobSucceeded(uid, job):
 	report.openGroup("jobs").add("completed", 1)
 
 
-def agentJobSent(uid, job):
+def agentJobSent(uid, job, jobConfig={}):
 	"""
 	This function is called when we submit a job request to an agent.
 	This updates the agent metrics.

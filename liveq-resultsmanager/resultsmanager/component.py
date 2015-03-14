@@ -70,6 +70,10 @@ class ResultsManagerComponent(Component):
 		# Log request
 		self.logger.info("Got job request in IBUS")
 
+		# Load job metadata
+		meta = message['meta']
+		data = IntermediateHistogramCollection.fromPach( message['data'] )
+
 
 	def onBusResultsGet(self, message):
 		"""

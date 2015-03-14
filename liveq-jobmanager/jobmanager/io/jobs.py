@@ -24,6 +24,7 @@ import random
 import json
 
 from jobmanager.config import Config
+from peewee import fn
 
 from liveq.utils import deepupdate
 from liveq.models import Agent, Lab, JobQueue
@@ -37,6 +38,8 @@ COMPLETED = JobQueue.COMPLETED
 FAILED = JobQueue.FAILED
 #: Reason: Job was cancelled
 CANCELLED = JobQueue.CANCELLED
+# :Reason: Job stalled
+STALLED = JobQueue.STALLED
 
 class Job:
 	"""
@@ -98,8 +101,15 @@ class Job:
 		# Put it back
 		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(histos))
 
-		# Merge and return histograms
-		return intermediateCollectionMerge( histos.values() )
+		# Merge histograms
+		hc = intermediateCollectionMerge( histos.values() )
+
+		# Update number of events in the job files
+		self.job.events = hc.countEvents()
+		self.job.save()
+
+		# Return collection
+		return hc
 
 	def getHistograms(self):
 		"""
@@ -186,6 +196,78 @@ class Job:
 				'vars': varMetrics
 			})
 
+	def getRemainingEvents(self):
+		"""
+		Get number of events remaining
+		"""
+
+		# Calculate how many events do active workers are processing
+		counters = Agent.select( fn.Sum( Agent.activeJobEvents ).alias('events') ) \
+						.where( Agent.activeJob == self.job.id ) \
+						.get()
+
+		# Handle None cases
+		if counters.events is None:
+			counters.events = 0
+
+		# Get target events
+		targetEvents = self.lab.getEventCount()
+
+		# Check how many events are left
+		return targetEvents - self.job.events - counters.events
+
+	def getBatchRuntimeConfig(self, agents):
+		"""
+		Get the runtime configuration for the agents in the given batch
+		"""
+
+		# Prepare configurations
+		configs = []
+
+		# Calculate number of events to divide along workers
+		totalEvents = self.getRemainingEvents()
+		eventsPerWorker = totalEvents / len(agents)
+
+		# Process agents
+		random.seed()
+		for a in agents:
+
+			# Compensate remainder of events
+			events = eventsPerWorker
+			if totalEvents < eventsPerWorker:
+				events = totalEvents
+			else:
+				totalEvents -= eventsPerWorker
+
+			# Append agent config
+			configs.append({
+					'seed': int(random.random()*65535),
+					'events' : events
+				})
+
+		# Return configs
+		return configs
+
+	def setStatus(self, status):
+		"""
+		Update job status
+		"""
+		# Update stateus
+		self.job.status = status
+		self.job.save()
+
+	def getStatus(self):
+		"""
+		Get job status
+		"""
+		return self.job.status
+
+	def getEvents(self):
+		"""
+		Return number of events so far
+		"""
+		return self.job.events
+
 ##############################################################
 # ------------------------------------------------------------
 #  INTERFACE FUNCTIONS
@@ -212,15 +294,19 @@ def createJob( lab, parameters, group, userID, teamID, dataChannel ):
 	# Deep merge lab default parameters and user's parameters
 	mergedParameters = deepupdate( { "tune": userTunes } , labInst.getParameters() )
 
-	# Create new seed
-	random.seed()
-	mergedParameters['seed'] = int(random.random()*65535)
-
 	# Put more lab information in the parameters
 	mergedParameters['repoTag'] = labInst.repoTag
 	mergedParameters['repoType'] = labInst.repoType
 	mergedParameters['repoURL'] = labInst.repoURL
 	mergedParameters['histograms'] = labInst.getHistograms()
+
+	# Extract events
+	events = 10000
+	try:
+		if 'events' in parameters:
+			events = int(parameters['events'])
+	except Exception:
+		pass
 
 	# Create a new job record
 	job = JobQueue.create(
@@ -231,6 +317,7 @@ def createJob( lab, parameters, group, userID, teamID, dataChannel ):
 		user_id=userID,
 		userTunes=json.dumps(userTunes),
 		parameters=json.dumps(mergedParameters),
+		events=0,
 		)
 
 	# Save and return

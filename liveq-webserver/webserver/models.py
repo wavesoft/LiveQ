@@ -23,7 +23,7 @@ import json
 
 from peewee import *
 from liveq.models import BaseModel, JobQueue, AgentGroup, Agent, \
-						 AgentJobs, AgentMetrics, Lab, Tunable, \
+						 AgentMetrics, Lab, Tunable, \
 						 Observable, TunableToObservable, PostMortems
 
 from liveq.config.database import DatabaseConfig

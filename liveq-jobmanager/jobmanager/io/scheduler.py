@@ -19,6 +19,7 @@
 
 import sys
 import time
+import json
 
 import logging
 import jobmanager.io.agents as agents
@@ -29,7 +30,7 @@ from peewee import fn, RawQuery
 
 from liveq.utils.fsm import StoredFSM, state_handler, event_handler
 from liveq.utils.remotelock import RemoteLock
-from liveq.models import Agent, AgentGroup, AgentJobs
+from liveq.models import Agent, AgentGroup
 from liveq.reporting.lars import LARS
 
 logger = logging.getLogger("scheduler")
@@ -54,6 +55,9 @@ class GroupResources:
 		Fetch initial data 
 		"""
 
+		# Calculate the cooldown time after a failure
+		time_retry = time.time() - Config.FAIL_DELAY
+
 		# Keep references
 		self.semaphore = semaphore
 
@@ -62,16 +66,23 @@ class GroupResources:
 		self.gid = self.group.id
 
 		# Count total
-		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) ).tuples().execute().next()
+		values = Agent.select( fn.Count("id") ).where( 
+					(Agent.state == 1) & (Agent.group == self.group) 
+				).tuples().execute().next()
 		self.total = values[0]
 
 		# Count free
-		values = Agent.select( fn.Count("id") ).where( (Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob == "") ).tuples().execute().next()
+		values = Agent.select( fn.Count("id") ).where( 
+					(Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob == 0) 
+				  & (Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
+				).tuples().execute().next()
 		self.free = values[0]
 		self.used = self.total - self.free
 
 		# Count individual
-		values = Agent.select( fn.Count( fn.Distinct( Agent.activeJob ) ) ).where( (Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob != "") ).tuples().execute().next()
+		values = Agent.select( fn.Count( fn.Distinct( Agent.activeJob ) ) ).where( 
+					(Agent.state == 1) & (Agent.group == self.group) & (Agent.activeJob != 0) 
+				).tuples().execute().next()
 		self.individual = values[0]
 
 		# Debug metrics
@@ -115,8 +126,8 @@ class GroupResources:
 
 		# Place query
 		query = Agent.select().where( 
-				(Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == "")
-		#	  & (Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
+				(Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == 0)
+			  & (Agent.fail_timestamp < time_retry) & (Agent.fail_count < Config.FAIL_LIMIT)
 			).limit(count)
 
 		# Fetch all elements
@@ -149,9 +160,6 @@ class GroupResources:
 			if qualifiedJob.njobs < 2:
 				continue
 
-			# Get the job id
-			jid = qualifiedJob.activeJob
-
 			# If we need less agents than trimdown, reduce it
 			if (count - numTrimmed) < trimdown:
 				trimdown = count - numTrimmed
@@ -164,7 +172,7 @@ class GroupResources:
 				trimdown = qualifiedJob.njobs - 1
 
 			# Fetch the entries for disposable jobs
-			query = Agent.select().where( (Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == jid) ).limit(trimdown)
+			query = Agent.select().where( (Agent.group == self.group) & (Agent.state == 1) & (Agent.activeJob == qualifiedJob.activeJob) ).limit(trimdown)
 			trimAgents = query[:]
 
 			# Since activeJob will be overwritten, use a different
@@ -255,8 +263,9 @@ def handleLoss( agent ):
 		return
 
 	# Get job ID & Remove job from agent
-	job_id = agent.activeJob
-	agent.activeJob = ""
+	job_id = agent._data['activeJob']
+	agent.activeJob = 0
+	agent.setRuntime( None )
 	agent.save()
 
 	# Return a job instance
@@ -292,6 +301,9 @@ def handleLoss( agent ):
 
 		else:
 
+			# Make as stale
+			job.setStatus( jobs.STALLED )
+
 			# Send status
 			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
 
@@ -302,14 +314,19 @@ def handleLoss( agent ):
 	return False
 
 
-def markForJob(agents, job_id):
+def markForJob(agents, job_id, agent_runtimes):
 	"""
 	Mark the array of agents in the list as being under the given job_id control
 	"""
 
 	# Just loop, update and save
 	for agent in agents:
+		# Set job ID
 		agent.activeJob = job_id
+		# Set runtime configuration
+		if len(agent_runtimes) > 0:
+			agent.setRuntime( agent_runtimes.pop(0) )
+		# Save
 		agent.save()
 
 	# Return again the agents array
@@ -389,9 +406,11 @@ def process():
 		logger.info("Job %s processed. Removing from group" % job.id)
 		popQueuedJob()
 
-		# Release lock and return resultset
+		# Release lock
 		res.release()
-		return (job, [], markForJob(slots, job.id))
+
+		# Calculate runtime config
+		return (job, [], markForJob(slots, job.id, job.getBatchRuntimeConfig( slots )))
 
 	# Nope, check if we can also dispose some
 	d_slots = res.getDisposable( totalSlots - usedSlots )
@@ -406,7 +425,7 @@ def process():
 
 			# Activate the already acquired number of slots
 			res.release()
-			return (job, [], markForJob(slots, job.id))
+			return (job, [], markForJob(slots, job.id, job.getBatchRuntimeConfig( slots )))
 
 		else:
 			res.release()
@@ -428,7 +447,7 @@ def process():
 
 	# Release and return resultset
 	res.release()
-	return (job, d_slots, markForJob(slots, job.id))
+	return (job, d_slots, markForJob(slots, job.id, job.getBatchRuntimeConfig( slots )))
 
 
 ##############################################################
@@ -477,7 +496,8 @@ def releaseFromJob( agent_id, job ):
 	agent = agents.getAgent(agent_id)
 
 	# Remove the job binding
-	agent.activeJob = ""
+	agent.activeJob = 0
+	agent.setRuntime( None )
 	agent.save()
 
 def requestJob( job ):
@@ -499,7 +519,7 @@ def releaseJob( job ):
 	
 	# Clear the record on the agents that have active jobs
 	logger.info("Releasing job %s" % job.id)
-	numUpdated = Agent.update( activeJob="" ).where( Agent.activeJob == job.id ).execute()
+	numUpdated = Agent.update( activeJob=0 ).where( Agent.activeJob == job.id ).execute()
 
 def abortJob( job ):
 	"""

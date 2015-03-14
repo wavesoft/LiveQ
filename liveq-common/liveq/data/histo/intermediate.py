@@ -317,6 +317,19 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
+	def countEvents(self):
+		"""
+		Summarize the total number of events in the histograms
+		"""
+
+		# Find a histogram with event information
+		for hist in self.values():
+			if hist.nevts > 0:
+				return hist.nevts
+
+		# Return 
+		return 0
+
 
 class IntermediateHistogram:
 	"""
