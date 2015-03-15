@@ -114,11 +114,13 @@ class Tune(dict):
 		real_key = {}
 		ksorted = []
 		for k in self.keys():
+
+			lk = k.lower()
 			sk = k
 
 			# Get alias for sorting key
-			if k.lower() in TuneAddressingConfig.TUNE_CONFIG:
-				sk = TuneAddressingConfig.TUNE_CONFIG[k]['alias']
+			if lk in TuneAddressingConfig.TUNE_CONFIG:
+				sk = TuneAddressingConfig.TUNE_CONFIG[lk]['alias']
 
 			# Store real key lookup
 			real_key[sk] = k
@@ -172,10 +174,11 @@ class Tune(dict):
 			vRound = TuneAddressingConfig.TUNE_DEFAULT_ROUND
 
 			# Get tune-tuning per tune parameter
-			if k.lower() in TuneAddressingConfig.TUNE_CONFIG:
+			lk = k.lower()
+			if lk in TuneAddressingConfig.TUNE_CONFIG:
 
 				# Get parameters
-				tv = TuneAddressingConfig.TUNE_CONFIG[k]
+				tv = TuneAddressingConfig.TUNE_CONFIG[lk]
 				vDecimals = int(tv['decimals'])
 				vRound = float(tv['round'])
 
