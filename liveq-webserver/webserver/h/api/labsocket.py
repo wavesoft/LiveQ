@@ -119,6 +119,9 @@ class LabSocketInterface(APIInterface):
 			else:
 				self.trimObs = self.user.getKnownObservables()
 
+			# Reset state
+			self.selectDataChannel( None )
+
 		##################################################
 		# Enumerate jobs in user's / team's gropu
 		# ------------------------------------------------
@@ -136,12 +139,14 @@ class LabSocketInterface(APIInterface):
 			try:
 				job = JobQueue.select().where( JobQueue.id == int(param['jid']) ).get()
 			except JobQueue.DoesNotExist:
-				return sendError("A job with the specified ID dies not exist!", "not-exists")
+				return self.sendError("A job with the specified ID dies not exist!", "not-exists")
+			except Exception:
+				return self.sendError("Invalid 'jid' parameter specified", "invalid")
 
 			# Validate job access permissions
 			if job.user_id != self.user.id:
 				if job.team_id != self.user.teamID:
-					return sendError("You don't have permission to access this job details!", "access-denied")
+					return self.sendError("You don't have permission to access this job details!", "access-denied")
 
 			# Looks good, switch to given job
 			self.switchToJob( job )
@@ -184,7 +189,7 @@ class LabSocketInterface(APIInterface):
 			self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
 
 			# The job started, switch to that job
-			self.switchToJob( ans['jid'] )
+			self.switchToJob( ans['jid'] )			
 
 		##################################################
 		# Estimate the results of the specified job
@@ -218,15 +223,28 @@ class LabSocketInterface(APIInterface):
 			try:
 				job = JobQueue.select().where( JobQueue.id == int(param['jid']) ).get()
 			except JobQueue.DoesNotExist:
-				return sendError("A job with the specified ID dies not exist!", "not-exists")
+				return self.sendError("A job with the specified ID dies not exist!", "not-exists")
+			except Exception:
+				return self.sendError("Invalid 'jid' parameter specified", "invalid")
 
 			# Validate job access permissions
 			if job.user_id != self.user.id:
 				if job.team_id != self.user.teamID:
-					return sendError("You don't have permission to access this job details!", "access-denied")
+					return self.sendError("You don't have permission to access this job details!", "access-denied")
 
 			# Abort job
 			self.abortJob( job.id )
+
+			# Remove from list
+			self.sendAction("job.removed", { 'job': job.serialize() })
+
+		##################################################
+		# Deselect an active job
+		# ------------------------------------------------
+		elif action == "job.deselect":
+
+			# Deselect data channel
+			self.selectDataChannel( None )
 
 		else:
 
@@ -302,6 +320,14 @@ class LabSocketInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
+	def getAgents(self, job):
+		"""
+		Return agent configuration for the specified job
+		"""
+
+		# Return agent UUID and coordinates
+		return Agent.select( Agent.uuid, Agent.latlng ).where( Agent.activeJob == job ).dicts()[:]
+
 	def selectDataChannel(self, channelID):
 		"""
 		Switch channel to the given ID
@@ -339,7 +365,7 @@ class LabSocketInterface(APIInterface):
 		jobRef = job
 		if not (jobRef is None) and not isinstance(job, JobQueue):
 			try:
-				jobRef = JobQueue.select().where( JobQueue.id == job )
+				jobRef = JobQueue.select().where( JobQueue.id == job ).get()
 			except JobQueue.DoesNotExist:
 				jobRef = None
 				return False
@@ -362,7 +388,8 @@ class LabSocketInterface(APIInterface):
 		# Serialize job
 		jobData = jobRef.serialize()
 		self.sendAction("job.details", {
-				'job': jobData
+				'job': jobData,
+				'agents': self.getAgents( jobRef )
 			})
 
 		# Connect to the specified data channel
@@ -380,7 +407,10 @@ class LabSocketInterface(APIInterface):
 		"""
 
 		# Select team jobs
-		jobs = JobQueue.select().where( JobQueue.team == self.user.teamID )
+		jobs = JobQueue.select().where( 
+				((JobQueue.team_id == self.user.teamID) | (JobQueue.user_id == self.user.id))
+			  & (JobQueue.status << [ JobQueue.PENDING, JobQueue.RUN, JobQueue.STALLED ])
+			)
 
 		# Send jobs
 		for job in jobs:
