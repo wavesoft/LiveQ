@@ -687,8 +687,8 @@ class HLUser:
 				qLen = self.bookState[book['id']]['questions']
 				qCorrect = self.bookState[book['id']]['correct']
 
-				# Answered more than half? Mastered!
-				if qCorrect >= qLen/2:
+				# Answered all? Mastered!
+				if qCorrect >= qLen:
 					state = 2
 				else:
 					state = 1
@@ -717,7 +717,7 @@ class HLUser:
 
 		# Remove mastered books from nonMasteredBooks
 		for k,v in self.bookState.iteritems():
-			if v['correct'] >= v['questions']/2:
+			if v['correct'] >= v['questions']:
 				print "??? Removing mastered book %i" % k
 				try:
 					i = nonMasteredBooks.index(k)
