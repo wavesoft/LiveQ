@@ -27,6 +27,7 @@ from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, User
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
+from webserver.common.fancytitles import createFancyTitle
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -85,6 +86,8 @@ class HLUser:
 		# Cache my information
 		self.name = user.displayName
 		self.id = user.id
+		self.lab = user.lab
+		self.activePaper_id = user.activePaper_id
 
 		# Team-releated information
 		self.teamMembership = None
@@ -109,7 +112,7 @@ class HLUser:
 			self.teamMembership = TeamMembers.get( TeamMembers.user == user )
 
 			# Cache details
-			self.team_id = self.teamMembership.team.id
+			self.teamID = self.teamMembership.team.id
 
 			# Get team's resource group
 			self.resourceGroup = self.teamMembership.team.agentGroup.uuid
@@ -508,6 +511,46 @@ class HLUser:
 	# In-game information queries
 	###################################
 
+	def deletePaper(self, paper_id):
+		"""
+		Delete a particular paper
+		"""
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			self.logger.warn("Cannot update paper %s: Not found!" % paper_id)
+			return False
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+
+			# You can read only team review papers
+			if paper.status != Paper.TEAM_REVIEW:
+				self.logger.warn("Cannot update paper %s: Not in team review!" % paper_id)
+				return None
+
+			# Validate team
+			if self.teamMembership is None:
+				self.logger.warn("Cannot update paper %s: Not in team!" % paper_id)
+				return False
+			else:
+				if paper.team != self.teamMembership.team:
+					self.logger.warn("Cannot update paper %s: Not member of team!" % paper_id)
+					return False
+
+		else:
+
+			# User can edit only unpublished papers
+			if paper.status in [ Paper.PUBLISHED, Paper.REMOVED ]:
+				self.logger.warn("Cannot update paper %s: Published or Removed!" % paper_id)
+				return False
+
+	 	# Delete paper
+	 	paper.delete_instance()
+	 	return True
+
 	def updatePaper(self, paper_id, fields):
 		"""
 		Update paper fields
@@ -581,6 +624,24 @@ class HLUser:
 					return None
 
 		# Serialize
+		return paper.serialize(expandForeigns=["team"])
+
+	def createPaper(self):
+		"""
+		Create and return a new paper record
+		"""
+
+		# Create new paper
+		paper = Paper.create(
+			owner=self.dbUser, 
+			team=self.teamID,
+			status=Paper.DRAFT,
+			title=createFancyTitle(),
+			lab=self.dbUser._data['lab'], # << Do not resolve lab ID
+			)
+
+		# Save and return
+		paper.save()
 		return paper.serialize(expandForeigns=["team"])
 
 	def getBook(self, bookName):
@@ -790,7 +851,7 @@ class HLUser:
 		# Collect relevant paper
 		ans = []
 		teamIDs = []
-		for row in Paper.select().where( whereQuery ).limit(limit):
+		for row in Paper.select().where( whereQuery ).order_by( Paper.fit ).limit(limit):
 
 			# Collect rows
 			ans.append(row.serialize())
@@ -808,9 +869,10 @@ class HLUser:
 			except Team.DoesNotExist:
 				teams[tid] = ""
 
-		# Insert in results
+		# Append visual assistance
 		for i in range(0, len(ans)):
 			ans[i]['team_name'] = teams[ans[i]['team']]
+			ans[i]['fit_formatted'] = "%.4f" % ans[i]['fit']
 
 		# Return
 		return ans

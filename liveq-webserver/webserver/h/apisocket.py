@@ -41,7 +41,7 @@ from webserver.common.users import HLUser
 from webserver.common.forum import registerForumUser
 from webserver.common.userevents import UserEvents
 
-from webserver.models import User, AnalyticsProfile
+from webserver.models import User, Lab, AnalyticsProfile
 from tornado.ioloop import IOLoop
 import tornado.websocket
 
@@ -374,6 +374,13 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			# Create a random secret
 			salt = "".join([random.choice(string.letters + string.digits) for x in range(0,50)])
 
+			# Get the default lab
+			try:
+				defaultLab = Lab.select( Lab.id ).where( Lab.default == 1 ).get()
+			except Lab.DoesNotExist:
+				self.sendEvent('Server not configured properly: Missing default lab for the new user!', 'server-error')
+				return
+
 			# Create new user
 			user = User.create(
 				email=email,
@@ -382,7 +389,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				displayName=profile['displayName'],
 				avatar=profile['avatar'],
 				credits=0,
-				variables="{}"
+				variables="{}",
+				lab=defaultLab.id,
 				)
 
 			# Check if we have to create a new analytics profile

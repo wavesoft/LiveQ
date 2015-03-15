@@ -218,6 +218,9 @@ class User(BaseModel):
 	# Game elements
 	# -----------------------------------
 
+	#: Currently ctive lab
+	lab = ForeignKeyField(Lab)
+
 	#: User science points
 	points = IntegerField(default=8)
 

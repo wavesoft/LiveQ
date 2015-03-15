@@ -28,7 +28,7 @@ import liveq.data.histo.io as io
 
 import tornado.escape
 
-from liveq.models import Lab, Observable, TunableToObservable
+from liveq.models import Lab, Observable, TunableToObservable, Agent, JobQueue
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 
@@ -47,9 +47,10 @@ class LabSocketInterface(APIInterface):
 
 		# Setup local variables
 		self.lab = None
-		self.jobid = None
+		self.job = None
 		self.dataChannel = None
 		self.jobChannel = None
+		self.ipolChannel = None
 
 		# Tunable/Observable Trim
 		self.trimObs = []
@@ -67,21 +68,15 @@ class LabSocketInterface(APIInterface):
 		"""
 		self.logger.info("Socket closed")
 
-		# If we have a running tune, cancel it
-		if self.jobid:
-
-			# Ask job manager to cancel the job
-			ans = self.jobChannel.send('job_cancel', {
-				'jid': self.jobid
-			})
-
-			# Clear job ID
-			self.jobid = None
-
 		# Disconnect and release job channel
 		if self.jobChannel:
 			self.jobChannel.close()
 			self.jobChannel = None
+
+		# Disconnect and release interpolation channel
+		if self.ipolChannel:
+			self.ipolChannel.close()
+			self.ipolChannel = None
 
 		# Deselect data channel
 		self.selectDataChannel( None )
@@ -94,28 +89,25 @@ class LabSocketInterface(APIInterface):
 		# Keep a local reference of the user
 		self.user = self.socket.user
 
-
 	def handleAction(self, action, param):
 		"""
 		Handle labsocket actions
 		"""
 		
-		# Process actions
+		##################################################
+		# Open (handshake) with a Lab Socket
+		# ------------------------------------------------
 		if action == "open":
 
 			# Get client API version
+			# (0.1a did not support protocol version information)
 			self.cversion = "0.1a"
 			if 'version' in param:
 				self.cversion = param['version']
 
-			# Open lab socket
-			self.openLab(param['labid'])
-			if not self.lab:
-				return
-
 			# We have a handshake with the agent.
 			# Fetch configuration and send configuration frame
-			self.logger.info("Opening lab %s with client v%s" % (param['labid'], self.cversion))
+			self.logger.info("Handshake with client v%s" % self.cversion)
 
 			# Check if we have trim parameters
 			if 'tunables' in param:
@@ -127,26 +119,45 @@ class LabSocketInterface(APIInterface):
 			else:
 				self.trimObs = self.user.getKnownObservables()
 
-			# Send configuration frame
-			self.sendConfigurationFrame()
-
+		##################################################
+		# Enumerate jobs in user's / team's gropu
+		# ------------------------------------------------
 		elif action == "job.enum":
 
-			# Enumerate jobs under the team
-			pass
+			# Send job listing
+			self.sendJobListing()
 
+		##################################################
+		# Focus on the job with the given ID
+		# ------------------------------------------------
 		elif action == "job.select":
 
 			# Switch currently focused job to the given ID
-			pass
+			try:
+				job = JobQueue.select().where( JobQueue.id == int(param['jid']) ).get()
+			except JobQueue.DoesNotExist:
+				return sendError("A job with the specified ID dies not exist!", "not-exists")
 
-		elif action == "sim_start":
+			# Validate job access permissions
+			if job.user_id != self.user.id:
+				if job.team_id != self.user.teamID:
+					return sendError("You don't have permission to access this job details!", "access-denied")
 
-			# If we are already running a tune (jobid is defined), cancel and restart
-			self.abortJob()
+			# Looks good, switch to given job
+			self.switchToJob( job )
+
+		##################################################
+		# Submit a new job to the liveQ workers
+		# ------------------------------------------------
+		elif action == "job.submit":
+
+			# Switch to the user's lab
+			if not self.switchLab( self.user.lab ):
+				self.sendError("Cannot resolve user's lab", "not-found")
+				return False
 
 			# Format user tunables
-			tunables = self.lab.formatTunables( param )
+			tunables = self.lab.formatTunables( param['parameters'] )
 
 			# Send status
 			self.sendStatus("Contacting job manager", {"JOB_STATUS": "starting"})
@@ -157,6 +168,7 @@ class LabSocketInterface(APIInterface):
 				'group': self.user.resourceGroup,
 				'user' : self.user.id,
 				'team' : self.user.teamID,
+				'paper': self.user.activePaper_id,
 				'parameters': tunables
 			}, waitReply=True, timeout=5)
 
@@ -168,19 +180,21 @@ class LabSocketInterface(APIInterface):
 			if ans['result'] == 'error':
 				return self.sendError("Unable to place a job request: %s" % ans['error'])
 
-			# Monitor the specified data channel
-			self.selectDataChannel( ans['dataChannel'] )
-
 			# Send status
 			self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
 
-			# The job started, save the tune job ID
-			self.jobid = ans['jid']
+			# The job started, switch to that job
+			self.switchToJob( ans['jid'] )
 
+		##################################################
+		# Estimate the results of the specified job
+		# ------------------------------------------------
+		elif action == "job.estimate":
 
-		elif action == "sim_estimate":
-			# We requested just an estimate.
-			# No need to have full job management
+			# Switch to the user's lab
+			if not self.switchLab( self.user.lab ):
+				self.sendError("Cannot resolve user's lab", "not-found")
+				return False
 
 			# Fetch parameters
 			tunables = param['parameters']
@@ -195,14 +209,24 @@ class LabSocketInterface(APIInterface):
 			if not self.sendInterpolation(tunables):
 				self.sendError("Could not estimate result")
 
-		elif action == "sim_abort":
+		##################################################
+		# Abort action with the specifeid id
+		# ------------------------------------------------
+		elif action == "job.abort":
 
-			# If we don't have a running tune, don't do anything
-			if not self.jobid:
-				return
+			# Switch currently focused job to the given ID
+			try:
+				job = JobQueue.select().where( JobQueue.id == int(param['jid']) ).get()
+			except JobQueue.DoesNotExist:
+				return sendError("A job with the specified ID dies not exist!", "not-exists")
+
+			# Validate job access permissions
+			if job.user_id != self.user.id:
+				if job.team_id != self.user.teamID:
+					return sendError("You don't have permission to access this job details!", "access-denied")
 
 			# Abort job
-			self.abortJob()
+			self.abortJob( job.id )
 
 		else:
 
@@ -219,10 +243,6 @@ class LabSocketInterface(APIInterface):
 		"""
 		[Bus Event] Data available
 		"""
-
-		# If we have no job, ignore
-		if not self.jobid:
-			return
 
 		# Create a histogram collection from the data buffer
 		histos = IntermediateHistogramCollection.fromPack( data['data'] )
@@ -257,24 +277,13 @@ class LabSocketInterface(APIInterface):
 		[Bus Event] Simulation completed
 		"""
 
-		# If we have no job, ignore
-		if not self.jobid:
-			return
-
 		# Forward event to the user socket
-		self.sendAction( "sim_completed", { 'result': data['result'] } )
-
-		# Reset tune
-		self.jobid = None
+		self.sendAction( "job.completed", { 'result': data['result'] } )
 
 	def onBusStatus(self, data):
 		"""
 		[Bus Status] Forward bus message 
 		"""
-
-		# If we have no job, ignore
-		if not self.jobid:
-			return
 
 		# Extract parameters
 		pMessage = ""
@@ -321,14 +330,67 @@ class LabSocketInterface(APIInterface):
 			self.dataChannel.on('job_status', self.onBusStatus)
 			self.dataChannel.on('job_completed', self.onBusCompleted)
 
-
-	def deselectJob(self):
+	def switchToJob(self, job, refresh=False):
 		"""
-		Remove focus from the currently focused job ID
+		Switch focus to the given job
 		"""
-		pass
 
-	def openLab(self, labid):
+		# Switch or query job object
+		jobRef = job
+		if not (jobRef is None) and not isinstance(job, JobQueue):
+			try:
+				jobRef = JobQueue.select().where( JobQueue.id == job )
+			except JobQueue.DoesNotExist:
+				jobRef = None
+				return False
+
+		# Fire deactivate on previous job
+		if (self.job != None):
+			if (jobRef is None) or (self.job.id != jobRef.id):
+				self.sendAction("job.deactivate", { 'jid': self.job.id })
+
+		# If we are focusing to None, just deactivate
+		if jobRef == None:
+			self.selectDataChannel(None)
+		else:
+			self.job = jobRef
+
+		# Switch to the job's lab
+		if not self.switchLab( jobRef.lab ):
+			return False
+
+		# Serialize job
+		jobData = jobRef.serialize()
+		self.sendAction("job.details", {
+				'job': jobData
+			})
+
+		# Connect to the specified data channel
+		self.selectDataChannel( jobData['dataChannel'] )
+
+		# Re-send histograms of the given job
+		if refresh:
+			self.jobChannel.send('job_refresh', { 
+					'jid': jobRef.id 
+				})
+
+	def sendJobListing(self):
+		"""
+		Send the job listing
+		"""
+
+		# Select team jobs
+		jobs = JobQueue.select().where( JobQueue.team == self.user.teamID )
+
+		# Send jobs
+		for job in jobs:
+
+			# Serialize and send
+			self.sendAction("job.added", {
+					'job': job.serialize()
+				})
+
+	def switchLab(self, lab):
 		"""
 		Open socket
 
@@ -337,25 +399,44 @@ class LabSocketInterface(APIInterface):
 		the messages regarding this lab.
 		"""
 
-		self.logger.info( "Lab socket '%s' requested" % labid )
+		# Act accordingly if lab is instance or number
+		if isinstance(lab, Lab):
 
-		# Reset local variables
-		self.job = None
-		self.jobid = None
-		self.dataChannel = None
+			# Don't do anything if lab is already selected
+			if not (self.lab is None) and (self.lab.id == lab.id):
+				return True
 
-		# Try to find a lab with the given ID
-		try:
-			self.lab = Lab.get(Lab.uuid == labid)
-		except Lab.DoesNotExist:
-			self.lab = None
-			self.logger.error("Unable to locate lab with id '%s'" % labid)
-			return self.sendError("Unable to find a lab with the given ID")
+			# Switch lab
+			self.logger.info( "Labsocket switching to lab #%i" % lab.id )
+			self.lab = lab
 
-		# Open required bus channels
-		self.ipolChannel = Config.IBUS.openChannel("interpolate")
-		self.jobChannel = Config.IBUS.openChannel("jobs")
+		else:
 
+			# Don't do anything if lab is already selected
+			if not (self.lab is None) and (self.lab.id == lab):
+				return True
+
+			# Switch lab
+			self.logger.info( "Labsocket switching to lab #%i" % lab )
+			try:
+				self.lab = Lab.get( Lab.id == lab )
+			except Lab.DoesNotExist:
+				self.lab = None
+				self.logger.error("Unable to locate lab with id '%i'" % lab)
+				self.sendError("Unable to find a lab with the given ID")
+				return False
+
+		# Open required bus channels if not already open
+		if not self.ipolChannel:
+			self.ipolChannel = Config.IBUS.openChannel("interpolate")
+		if not self.jobChannel:
+			self.jobChannel = Config.IBUS.openChannel("jobs")
+
+		# Send configuration frame
+		self.sendConfigurationFrame()
+
+		# We are good
+		return True
 
 	def sendStatus(self, message, varMetrics={}):
 		"""
@@ -366,7 +447,7 @@ class LabSocketInterface(APIInterface):
 		"""
 
 		# Send the status message
-		self.sendAction("status", {
+		self.sendAction("job.status", {
 			"message": message,
 			"vars": varMetrics
 		})
@@ -416,7 +497,7 @@ class LabSocketInterface(APIInterface):
 				'lab': self.lab.uuid,
 				'parameters': tunables,
 				'histograms': trimObs
-			}, waitReply=True, timeout=1)
+			}, waitReply=True, timeout=10)
 
 		# Check response
 		if not ans:
@@ -459,12 +540,17 @@ class LabSocketInterface(APIInterface):
 				# Pack buffers
 				histoBuffers.append( js.packHistogram(h) )
 
+			# Prepare flags
+			flags = 1 # (1=FromInterpolation)
+			if ans['exact']:
+				flags |= 2 # (2=Exact match)
+
 			# Compile buffer and send
 			self.sendBuffer( 0x02, 
 					# Header must be 64-bit aligned
 					struct.pack("<BBHI", 
 						2, 						# [8-bit]  Protocol
-						1, 						# [8-bit]  Flags (1=FromInterpolation)
+						flags, 					# [8-bit]  Flags (1=FromInterpolation)
 						0, 						# [16-bit] (Reserved)
 						len(histoBuffers)		# [32-bit] Number of histograms
 					) + ''.join(histoBuffers)
@@ -473,37 +559,21 @@ class LabSocketInterface(APIInterface):
 			# Send status message
 			self.sendStatus("Got interpolated results", {"INTERPOLATION": "1"})
 
-			# Check if we found excact match
-			if ans['exact']:
-
-				# Let interface know that this is the real answer
-				self.sendAction( "sim_completed", { 'result': data['result'] } )
-
-				# Don't store any jobID
-				self.jobid = None
-
-				# And exit
-				return True
-
-		# Never reached
+		# Successful
 		return True
 
 
-	def abortJob(self):
+	def abortJob(self, jobid):
 		"""
 		Abort a previously running job
 		"""
 
-		# Make sure we have a job
-		if not self.jobid:
-			return
-
 		# Send status
-		self.sendStatus("Aborting previous job", {"JOB_STATUS": "aborting"})
+		self.sendStatus("Aborting job #%i" % jobid, {"JOB_STATUS": "aborting"})
 
 		# Ask job manager to cancel a job
 		ans = self.jobChannel.send('job_cancel', {
-			'jid': self.jobid
+			'jid': jobid
 		}, waitReply=True)
 
 		# Check for I/O failure on the bus
@@ -517,5 +587,12 @@ class LabSocketInterface(APIInterface):
 		# Send status
 		self.sendStatus("Job aborted", {"JOB_STATUS": "aborted"})
 
-		# Clear job ID
-		self.jobid = None
+		# If this was the job we were currently running at
+		# then disconnect from the job
+		if self.job.id == jobid:
+
+			# Delelect data channel
+			self.selectDataChannel( None )
+
+			# Reset job ID
+			self.job = None

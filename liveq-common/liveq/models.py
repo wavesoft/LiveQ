@@ -108,6 +108,8 @@ class Lab(BaseModel):
 	uuid = CharField(max_length=128, index=True, unique=True)
 	#: The name of the lab
 	name = CharField(max_length=128)
+	#: If this lab is default to new users
+	default = IntegerField(default=0)
 	#: The repository tag/version to checkout
 	repoTag = CharField()
 	#: The repository base that contains the software
@@ -250,7 +252,7 @@ class JobQueue(BaseModel):
 	parameters = TextField(default="")
 
 	#: The job status (indexable)
-	status = IntegerField(max_length=2, default=0, index=True, unique=False)
+	status = IntegerField(default=0, index=True, unique=False)
 
 	#: Events processed
 	events = IntegerField(default=0)

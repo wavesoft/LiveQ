@@ -95,10 +95,11 @@ class APIInterface:
 		"""
 		# If we are not open, ignore it
 		if not self.isOpen:
-			return
+			return False
 
 		# Send action
 		self.socket.sendAction("%s.%s.response" % (self.domain, self.currentAction), param)
+		return True
 
 	def sendAction(self, action, param={}):
 		"""
@@ -107,10 +108,11 @@ class APIInterface:
 		"""
 		# If we are not open, ignore it
 		if not self.isOpen:
-			return
+			return False
 
 		# Send action
 		self.socket.sendAction("%s.%s" % (self.domain, action), param)
+		return True
 
 	def sendBuffer(self, frameID, data):
 		"""
@@ -118,10 +120,11 @@ class APIInterface:
 		"""
 		# If we are not open, ignore it
 		if not self.isOpen:
-			return
+			return False
 
 		# Send buffer, prefixing the binary domain
 		self.socket.sendBuffer( (frameID & 0xffff) | self.binaryDomain , data)
+		return True
 
 	def sendError(self, message, code="" ):
 		"""
@@ -130,7 +133,11 @@ class APIInterface:
 		"""
 		# If we are not open, ignore it
 		if not self.isOpen:
-			return
+			return False
 
 		# Send error
 		self.socket.sendError( message, code, self.domain )
+
+		# Returning false helping using the one-liner:
+		# 'return sendError()'' in case of errors
+		return False

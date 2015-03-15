@@ -75,6 +75,7 @@ class JobManagerComponent(Component):
 		self.jobChannel = Config.IBUS.openChannel("jobs")
 		self.jobChannel.on('job_start', self.onBusJobStart)
 		self.jobChannel.on('job_cancel', self.onBusJobCancel)
+		self.jobChannel.on('job_refresh', self.onBusJobRefresh)
 
 		# Open the interpolator channel were we are dumping the final results
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
@@ -639,3 +640,52 @@ class JobManagerComponent(Component):
 		self.jobChannel.reply({
 				'result': 'ok'
 			})
+
+	def onBusJobRefresh(self, message):
+		"""
+		Callback when the remote end requests a re-send of the current histogram stack
+		"""
+
+		# Validate arguments
+		if not 'jid' in message:
+			self.logger.warn("Missing parameters on 'job_refresh' message on IBUS!")
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'Missing parameters on \'job_refresh\' message!'
+				})
+			return
+
+		# Fetch JID from request
+		jid = message['jid']
+		self.logger.info("Requesting refresh of job #%s" % jid)
+
+		# Fetch job class
+		job = jobs.getJob(jid)
+		if not job:
+			self.logger.warn("[IBUS] The job %s does not exist" % jid)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "The job %s does not exist" % jid
+				})
+			return
+
+		# Get the merged histograms from the job store
+		histos = job.getHistograms()
+		if histos == None:
+			job.sendStatus("Unable to merge histograms")
+			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+			return
+
+		# Send data on job channel
+		job.channel.send("job_data", {
+				'jid': jid,
+				'data': histos.pack()
+			})
+
+		# If we are completed, send job_compelted + histograms
+		if job.getStatus() == jobs.COMPLETED:
+			job.channel.send("job_completed", {
+					'jid': job.id,
+					'result': 0,
+					'data': histoCollection.pack()
+				})

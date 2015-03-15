@@ -169,6 +169,39 @@ class AccountInterface(APIInterface):
 				})
 
 		##################################################
+		# Create a new paper
+		# ------------------------------------------------
+		elif action == "papers.create":
+
+			# Make sure user is member of a team
+			if self.user.teamID == 0:
+				self.sendError("You must be member of a team before you can create a paper!", "not-in-team")
+
+			# Return paper status
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.createPaper()
+				})
+
+		##################################################
+		# Delete a particular paper
+		# ------------------------------------------------
+		elif action == "papers.delete":
+
+			# Delete paper
+			if self.user.deletePaper(param['id']):
+
+				# Return paper status
+				self.sendResponse({
+						"status": "ok",
+					})
+
+			else:
+
+				# Return paper status
+				self.sendError('Could not delete paper', 'delete-error')
+
+		##################################################
 		# Update a particular paper
 		# ------------------------------------------------
 		elif action == "papers.update":
