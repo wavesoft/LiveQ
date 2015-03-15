@@ -123,7 +123,8 @@ class TuneAddressingConfig(ComponentClassConfig):
 					# Prepare new entries
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]] = {
 						'round': TuneAddressingConfig.TUNE_DEFAULT_ROUND,
-						'decimals': TuneAddressingConfig.TUNE_DEFAULT_DECIMALS
+						'decimals': TuneAddressingConfig.TUNE_DEFAULT_DECIMALS,
+						'alias' : nk[1]
 					}
 
 				# Update variables
@@ -131,4 +132,6 @@ class TuneAddressingConfig(ComponentClassConfig):
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['round'] = float(v)
 				elif nk[0] == 'decimals':
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['decimals'] = int(v)
+				elif nk[0] == 'alias':
+					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['alias'] = v
 

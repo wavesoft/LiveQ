@@ -110,8 +110,24 @@ class Tune(dict):
 		# Start tune id with the lab id
 		tid = str(labid)
 
+		# Generate aliased keys for proper sorting
+		real_key = {}
+		ksorted = []
+		for k in self.keys():
+			sk = k
+
+			# Get alias for sorting key
+			if k in TuneAddressingConfig.TUNE_CONFIG:
+				sk = TuneAddressingConfig.TUNE_CONFIG[k]['alias']
+
+			# Store real key lookup
+			real_key[sk] = k
+
+			# Keep aliased key for sorting
+			ksorted.append(sk)
+
 		# Sort keys ascending
-		ksorted = sorted(self.keys())
+		ksorted = sorted(ksorted)
 
 		# Apply offset
 		offsets = [0] * len(self)
@@ -148,7 +164,7 @@ class Tune(dict):
 		for i in range(0,len(ksorted)):
 
 			# Get tune value
-			k = ksorted[i]
+			k = real_key[ksorted[i]]
 			v = self[k]
 
 			# Setup default tune value calculation variables
