@@ -110,6 +110,9 @@ class TuneAddressingConfig(ComponentClassConfig):
 
 			else:
 
+				# Replace '/' with ':'
+				k = k.replace('/', ':')
+
 				# Split name and kind
 				nk = k.split("-",1)
 

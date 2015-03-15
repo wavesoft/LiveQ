@@ -117,7 +117,7 @@ class Tune(dict):
 			sk = k
 
 			# Get alias for sorting key
-			if k in TuneAddressingConfig.TUNE_CONFIG:
+			if k.lower() in TuneAddressingConfig.TUNE_CONFIG:
 				sk = TuneAddressingConfig.TUNE_CONFIG[k]['alias']
 
 			# Store real key lookup
@@ -172,7 +172,7 @@ class Tune(dict):
 			vRound = TuneAddressingConfig.TUNE_DEFAULT_ROUND
 
 			# Get tune-tuning per tune parameter
-			if k in TuneAddressingConfig.TUNE_CONFIG:
+			if k.lower() in TuneAddressingConfig.TUNE_CONFIG:
 
 				# Get parameters
 				tv = TuneAddressingConfig.TUNE_CONFIG[k]
