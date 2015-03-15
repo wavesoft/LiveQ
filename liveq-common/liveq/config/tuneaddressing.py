@@ -133,5 +133,6 @@ class TuneAddressingConfig(ComponentClassConfig):
 				elif nk[0] == 'decimals':
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['decimals'] = int(v)
 				elif nk[0] == 'alias':
+					logging.info("Using index '%s' for parameter %s" % (v,nk[1]))
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['alias'] = v
 
