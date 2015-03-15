@@ -234,6 +234,9 @@ class JobManagerComponent(Component):
 					job.addAgentInfo(agent)
 					self.logger.info("Successfuly started job %s on %s (events=%i)" % ( job.id, agent.uuid, config['events'] ))
 
+					# Job is running
+					job.setStatus( jobs.RUN )
+
 				else:
 
 					job.sendStatus("Could not start: %s" % ans['error'])

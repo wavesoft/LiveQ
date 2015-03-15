@@ -32,6 +32,8 @@ from liveq.data.histo.sum import intermediateCollectionMerge
 from liveq.utils.remotelock import RemoteLock
 from liveq.reporting.lars import LARS
 
+#: Reason: Job is running
+RUN = JobQueue.RUN
 #: Reason: Job is completed
 COMPLETED = JobQueue.COMPLETED
 #: Reason: Job is failed
@@ -254,8 +256,9 @@ class Job:
 		Update job status
 		"""
 		# Update stateus
-		self.job.status = status
-		self.job.save()
+		if self.job.status != status:
+			self.job.status = status
+			self.job.save()
 
 	def getStatus(self):
 		"""

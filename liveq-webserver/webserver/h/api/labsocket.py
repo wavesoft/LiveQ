@@ -51,6 +51,7 @@ class LabSocketInterface(APIInterface):
 		self.dataChannel = None
 		self.jobChannel = None
 		self.ipolChannel = None
+		self.sentConfigFrame = False
 
 		# Tunable/Observable Trim
 		self.trimObs = []
@@ -121,6 +122,7 @@ class LabSocketInterface(APIInterface):
 
 			# Reset state
 			self.selectDataChannel( None )
+			self.sentConfigFrame = False
 
 		##################################################
 		# Enumerate jobs in user's / team's gropu
@@ -149,7 +151,7 @@ class LabSocketInterface(APIInterface):
 					return self.sendError("You don't have permission to access this job details!", "access-denied")
 
 			# Looks good, switch to given job
-			self.switchToJob( job )
+			self.switchToJob( job, refresh=True )
 
 		##################################################
 		# Submit a new job to the liveQ workers
@@ -200,6 +202,11 @@ class LabSocketInterface(APIInterface):
 			if not self.switchLab( self.user.lab ):
 				self.sendError("Cannot resolve user's lab", "not-found")
 				return False
+
+			# Send configuation frame only once
+			if not self.sentConfigFrame:
+				# Send configuration frame
+				self.sendConfigurationFrame()
 
 			# Fetch parameters
 			tunables = param['parameters']
@@ -342,7 +349,7 @@ class LabSocketInterface(APIInterface):
 			self.dataChannel.off('job_completed', self.onBusCompleted)
 
 			# Disconnect and release job channel
-			self.dataChannel.close()
+			#self.dataChannel.close()
 			self.dataChannel = None
 
 		# Open new channel
@@ -384,6 +391,9 @@ class LabSocketInterface(APIInterface):
 		# Switch to the job's lab
 		if not self.switchLab( jobRef.lab ):
 			return False
+
+		# Send configuration frame
+		self.sendConfigurationFrame()
 
 		# Serialize job
 		jobData = jobRef.serialize()
@@ -462,9 +472,6 @@ class LabSocketInterface(APIInterface):
 		if not self.jobChannel:
 			self.jobChannel = Config.IBUS.openChannel("jobs")
 
-		# Send configuration frame
-		self.sendConfigurationFrame()
-
 		# We are good
 		return True
 
@@ -507,6 +514,9 @@ class LabSocketInterface(APIInterface):
 					len(histoBuffers)		# [32-bit] Number of histograms
 				) + ''.join(histoBuffers)
 			)
+
+		# We did send a configuration frame
+		self.sentConfigFrame = True
 
 	def sendInterpolation(self, tunables):
 		"""
@@ -620,6 +630,9 @@ class LabSocketInterface(APIInterface):
 		# If this was the job we were currently running at
 		# then disconnect from the job
 		if self.job.id == jobid:
+
+			# Deactivate job
+			self.sendAction("job.deactivate", { 'jid': jobid })
 
 			# Delelect data channel
 			self.selectDataChannel( None )
