@@ -89,11 +89,11 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
-    def check_origin(self, origin):
-    	"""
-    	Allow test4theory.cern.ch as domain 
-    	"""
-        return bool(re.match(r'^.*?test4theory\.cern\.ch', origin))
+	def check_origin(self, origin):
+		"""
+		Allow test4theory.cern.ch as domain 
+		"""
+		return bool(re.match(r'^.*?test4theory\.cern\.ch', origin))
 
 	def allow_draft76(self):
 		"""
