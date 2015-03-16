@@ -71,7 +71,7 @@ def getDBCursor():
 	# Return a cursor
 	return sql.cursor()
 
-def registerForumUser(email, password, usergroup=2, title=""):
+def registerForumUser(email, displayName, password, usergroup=2, title=""):
 	"""
 	Create a new user record in myBB for the given user
 	"""
@@ -91,7 +91,7 @@ def registerForumUser(email, password, usergroup=2, title=""):
 	c.execute(
 		"INSERT INTO %susers (username,password,salt,loginkey,email,usertitle,usergroup,allownotices,receivepms,pmnotice,pmnotify,showimages,showvideos,showsigs,showavatars,showquickreply,showredirect,timezone)\
 		 VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %i, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)"
-		% ( ForumConfig.FORUM_DB_PREFIX, email, uPass, uSalt, loginKey, email, title, usergroup ) )
+		% ( ForumConfig.FORUM_DB_PREFIX, displayName, uPass, uSalt, loginKey, email, title, usergroup ) )
 
 def uidFromUser(user):
 	"""

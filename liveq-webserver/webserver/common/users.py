@@ -190,7 +190,7 @@ class HLUser:
 
 		# Create a forum user with the same information
 		registerForumUser(
-				email, profile['password'], title=profile['displayName']
+				email, profile['displayName'], profile['password']
 			)
 
 		# -----------------
