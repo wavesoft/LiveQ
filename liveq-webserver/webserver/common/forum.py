@@ -17,9 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import logging
-import MySQLdb
+# Try to import either MySQLdb or pymysql
+try:
+	import MySQLdb as MySQL
+except ImportError:
+	import pymysql as MySQL
 
+import logging
 import random
 import hashlib
 import string
@@ -58,8 +62,8 @@ def getDBCursor():
 
 	# Connect to SQL
 	try:
-		sql = MySQLdb.connect( ForumConfig.FORUM_SERVER, ForumConfig.FORUM_USER, \
-							   ForumConfig.FORUM_PASSWORD, ForumConfig.FORUM_DB )
+		sql = MySQL.connect( ForumConfig.FORUM_SERVER, ForumConfig.FORUM_USER, \
+							 ForumConfig.FORUM_PASSWORD, ForumConfig.FORUM_DB )
 	except Exception as e:
 		logger.exception(e)
 		return None
