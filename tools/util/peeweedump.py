@@ -1,4 +1,3 @@
-#!/bin/bash
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,41 +17,37 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-TEX_STRING="$1"
-if [ -z "$1" ]; then
-	echo "Please specify TeX string to compile"
-	exit 1
-fi
+import _mysql
+from peewee import InsertQuery
 
-TEX_IMAGE="$2"
-if [ -z "$2" ]; then
-	echo "Please specify the output format"
-	exit 1
-fi
+def SQLExport( toFile, peeweeModel, records, batchSize=50 ):
+	"""
+	Create one or multiple insert queries for the specified records
+	"""
 
-cat <<EOF > temp-formula.tex
-\nonstopmode
-\documentclass[border=1pt]{standalone}
-\usepackage{amsmath}
-\usepackage{varwidth}
-\begin{document}
-\begin{varwidth}{\linewidth}
-${TEX_STRING}
-\end{varwidth}
-\end{document}
-EOF
+	# Add a comment regarding the model name
+	toFile.write("-- Model: %s (%s)\n" % (peeweeModel.__name__, peeweeModel._meta.name))
+	toFile.write("-- --------------------------------\n\n")
 
-# Conver to PDF
-pdflatex "\input{temp-formula.tex}" > /dev/null
-if [ $? -ne 0 ]; then
-	echo "-- Error --"
-	exit 1
-fi
+	# Collect rows
+	rows = []
+	for rec in records:
+		rows.append( rec._data )
 
-# And then to image
-#convert -density 400 temp-formula.pdf -resize 1000x${TEX_HEIGHT} ${TEX_IMAGE}
-#convert -trim temp-formula.pdf -sharpen 0x1.0 ${TEX_IMAGE}
-convert -trim -density 90 temp-formula.pdf -sharpen 0x1 ${TEX_IMAGE}
+	print "Dumping %s : %i records" % (str(peeweeModel.__name__), len(rows))
 
-# Cleanup
-rm temp-formula.*
+	# Insert in batches
+	ofs = 0
+	toFile.write("BEGIN;\n")
+	while ofs < len(rows):
+
+		# Creqte the InsertQuery
+		iq = peeweeModel.insert_many( rows[ofs:ofs+batchSize] )
+		ofs += batchSize
+
+		# Insert
+		sql = iq.sql()
+		sqlStr = sql[0] % tuple(map(lambda x: "'%s'" % _mysql.escape_string(unicode(x).encode('utf-8')), sql[1]))
+		toFile.write("REPLACE %s;\n" % sqlStr[7:])
+
+	toFile.write("COMMIT;\n")

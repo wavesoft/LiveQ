@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/python
 ################################################################
 # LiveQ - An interactive volunteering computing batch system
 # Copyright (C) 2013 Ioannis Charalampidis
@@ -18,41 +18,39 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-TEX_STRING="$1"
-if [ -z "$1" ]; then
-	echo "Please specify TeX string to compile"
-	exit 1
-fi
+# This script imports all Tunables from a Pythia8 installation
 
-TEX_IMAGE="$2"
-if [ -z "$2" ]; then
-	echo "Please specify the output format"
-	exit 1
-fi
+# ----------
+import os
+import sys
+sys.path.append("%s/liveq-common" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+# ----------
 
-cat <<EOF > temp-formula.tex
-\nonstopmode
-\documentclass[border=1pt]{standalone}
-\usepackage{amsmath}
-\usepackage{varwidth}
-\begin{document}
-\begin{varwidth}{\linewidth}
-${TEX_STRING}
-\end{varwidth}
-\end{document}
-EOF
+import json
+import os
+import util.pythia as pythia
+from util.config import Config
 
-# Conver to PDF
-pdflatex "\input{temp-formula.tex}" > /dev/null
-if [ $? -ne 0 ]; then
-	echo "-- Error --"
-	exit 1
-fi
+from liveq import handleSIGINT, exit
+from liveq.exceptions import ConfigException
 
-# And then to image
-#convert -density 400 temp-formula.pdf -resize 1000x${TEX_HEIGHT} ${TEX_IMAGE}
-#convert -trim temp-formula.pdf -sharpen 0x1.0 ${TEX_IMAGE}
-convert -trim -density 90 temp-formula.pdf -sharpen 0x1 ${TEX_IMAGE}
+from liveq.models import *
+from webserver.models import *
 
-# Cleanup
-rm temp-formula.*
+# Prepare runtime configuration
+runtimeConfig = { }
+
+# Load configuration
+try:
+	Config.fromFile( "config/common.conf.local", runtimeConfig )
+except ConfigException as e:
+	print("ERROR   Configuration exception: %s" % e)
+	exit(1)
+
+# Hook CTRL+C
+handleSIGINT()
+
+# Open interpreter
+import code
+code.interact(local=locals())
