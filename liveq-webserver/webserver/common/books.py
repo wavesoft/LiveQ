@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import logging
 import re
 import collections
 from webserver.models import Book
@@ -45,6 +46,10 @@ class BookKeywordCache:
 		Update cache by loading all the book keywords in the database
 		"""
 
+		# Reset fields
+		BookKeywordCache.KEYWORDS = {}
+		BookKeywordCache.BOOK_DETAILS = {}
+
 		# Process all books
 		for book in Book.select(Book.id, Book.name, Book.aliases):
 
@@ -60,6 +65,12 @@ class BookKeywordCache:
 			# Store keywords (in lower case)
 			for kw in map(unicode.lower, keywords):
 				BookKeywordCache.KEYWORDS[kw.lower()] = book.id
+
+		# If empty, raise warning
+		if len(BookKeywordCache.KEYWORDS) == 0:
+			logger = logging.getLogger("book-keywords")
+			logger.warn("The books database is empty!")
+			return
 
 		# Sort by size of the key in descending order
 		BookKeywordCache.KEYWORDS = collections.OrderedDict(
