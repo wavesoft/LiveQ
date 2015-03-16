@@ -23,7 +23,7 @@ import datetime
 import json
 
 from liveq.io.bus import Bus
-from webserver.models import KnowledgeGrid
+from webserver.models import KnowledgeGrid, MachinePart
 
 from webserver.common.users import HLUserError
 
@@ -141,6 +141,18 @@ class AccountInterface(APIInterface):
 			self.sendResponse({
 					"status": "ok",
 					"data" : self.user.getKnowledgeTree()
+				})
+
+		##################################################
+		# Return profile paper status
+		# ------------------------------------------------
+		elif action == "papers.profile":
+
+			# Return paper status
+			self.sendResponse({
+					"status": "ok",
+					"user" : self.user.getUnpublishedPapers(),
+					"team" : self.user.getTeamPapers()
 				})
 
 		##################################################
@@ -275,6 +287,24 @@ class AccountInterface(APIInterface):
 				})
 
 		##################################################
+		# Get machine parts
+		# ------------------------------------------------
+		elif action == "parts.details":
+
+			# Lookup stage
+			try:
+				part = MachinePart.get( MachinePart.name == param['part'] )
+			except MachinePart.DoesNotExist:
+				self.sendError("The specified machine part does not exist!", "not-exists")
+				return
+
+			# Return details
+			self.sendResponse({
+					"status": "ok",
+					"data" : self.user.getMachinePartDetails(part)
+				})
+
+		##################################################
 		# Claim credits for a particular achievement
 		# ------------------------------------------------
 		elif action == "credits.claim":
@@ -376,7 +406,7 @@ class AccountInterface(APIInterface):
 			try:
 				knowledge = KnowledgeGrid.get( KnowledgeGrid.id == param['id'] )
 			except KnowledgeGrid.DoesNotExist:
-				self.sendError("Could not locate specified knowledge item")
+				self.sendError("Could not locate specified knowledge item", "not-exists")
 				return
 
 			# Check transaction

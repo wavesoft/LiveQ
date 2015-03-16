@@ -22,8 +22,11 @@ import uuid
 import logging
 import random
 
+from peewee import fn, JOIN_LEFT_OUTER
+from webserver.common.forum import registerForumUser
+
 from liveq.models import Tunable
-from webserver.models import User, Team, KnowledgeGrid, TeamMembers, Paper, UserTokens, Book, BookQuestion, BookQuestionAnswer
+from webserver.models import *
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
@@ -121,6 +124,109 @@ class HLUser:
 			# Not in a team
 			pass
 
+	@staticmethod
+	def register(self, profile):
+		"""
+		Register a new user
+
+		@throws KeyError - If the user already exists
+		@throws Lab.DoesNotExist - When there is no default lab in the datbase
+		"""
+
+		# Fetch user profile
+		email = str(profile['email']).lower()
+
+		# Check if such user exist
+		try:
+			user = User.get(User.email == email)
+			raise KeyError("user")
+		except User.DoesNotExist:
+			pass
+
+		# Create a random secret
+		salt = "".join([random.choice(string.letters + string.digits) for x in range(0,50)])
+
+		# Get the default lab
+		defaultLab = Lab.select( Lab.id ).where( Lab.default == 1 ).get()
+
+		# -----------------
+		#  User Profile
+		# -----------------
+
+		# Create new user
+		user = User.create(
+			email=email,
+			password=hashlib.sha1("%s:%s" % (salt, profile['password'])).hexdigest(),
+			salt=salt,
+			displayName=profile['displayName'],
+			avatar=profile['avatar'],
+			credits=0,
+			variables="{}",
+			lab=defaultLab.id,
+			)
+
+		# Check if we have to create a new analytics profile
+		if profile['analytics']:
+
+			# Create an analytics profile
+			aProfile = AnalyticsProfile.create(
+				uuid=uuid.uuid4().hex,
+				gender=profile['analytics']['gender'],
+				birthYear=profile['analytics']['birthYear'],
+				audienceSource=profile['analytics']['audienceSource'],
+				audienceInterests=profile['analytics']['audienceInterests'],
+				)
+			aProfile.save()
+
+			# Store analytics profile to the user's account
+			user.analyticsProfile = aProfile
+
+		# Save user
+		user.save()
+
+		# -----------------
+		#  Forum Sync
+		# -----------------
+
+		# Create a forum user with the same information
+		registerForumUser(
+				email, profile['password'], title=profile['displayName']
+			)
+
+		# -----------------
+		#  Team Membership
+		# -----------------
+
+		# Create default user membership
+		team = TeamMembers.create(
+			user=user,
+			team=Config.GAME_DEFAULT_TEAM,
+			status=TeamMembers.USER,
+			)
+		team.save()
+
+		# -----------------
+		#  Default paper
+		# -----------------
+
+		# Create a default paper for the user
+		paper = Paper.create(
+			owner=user,
+			team=team,
+			title="%s first paper" % profile['displayName'],
+			body=".. you can keep your notes here ..",
+			status=Paper.DRAFT,
+			lab=defaultLab,
+			)
+		paper.save()
+
+		# Update user's default paper
+		user.activePaper_id = paper
+		user.save()
+
+		# Return an HLUser instance mapped to this user
+		return HLUser(user)
+
 	def reload(self):
 		"""
 		Reload user record from the database
@@ -209,6 +315,17 @@ class HLUser:
 		User the user's knowledge information
 		"""
 
+		# Prepare features array
+		observables = []
+		tunables = []
+		parts = []
+		config = []
+		goals = []
+
+		# ==============================
+		#  Get knowledgegrid (features)
+		# ==============================
+
 		# Get knowledgeGrid nodes discovered
 		kb_ids = self.dbUser.getKnowledge()
 		print "Got knowledge KBs: %r" % kb_ids
@@ -219,15 +336,48 @@ class HLUser:
 
 		# Update knowledge features
 		if 'observables' in feats:
-			self.dbUser.setState("observables", feats['observables'])
+			observables.append( feats['observables'] )
 		if 'tunables' in feats:
-			self.dbUser.setState("tunables", feats['tunables'])
+			tunables.append( feats['tunables'])
 		if 'parts' in feats:
-			self.dbUser.setState("parts", feats['parts'])
+			parts.append( feats['parts'])
 		if 'config' in feats:
-			self.dbUser.setState("config", feats['config'])
+			config.append( feats['config'])
 		if 'goals' in feats:
-			self.dbUser.setState("goals", feats['goals'])
+			goals.append( feats['goals'])
+
+		# ==============================
+		#  Get unlocked machine parts
+		# ==============================
+
+		# Iterate over unlocked parts
+		for part in self.dbUser.getMachineParts():
+
+			# Get features
+			feats = part.getFeatures()
+
+			# Update knowledge features
+			if 'observables' in feats:
+				observables.append( feats['observables'] )
+			if 'tunables' in feats:
+				tunables.append( feats['tunables'])
+			if 'parts' in feats:
+				parts.append( feats['parts'])
+			if 'config' in feats:
+				config.append( feats['config'])
+			if 'goals' in feats:
+				goals.append( feats['goals'])
+
+		# ==============================
+		#  Aggregate
+		# ==============================
+
+		# Update features
+		self.dbUser.setState("observables", observables)
+		self.dbUser.setState("tunables", tunables)
+		self.dbUser.setState("parts", parts)
+		self.dbUser.setState("config", config)
+		self.dbUser.setState("goals", goals)
 
 		# Find next leaf knowledge grid nodes
 		self.leafKnowledge = []
@@ -510,6 +660,70 @@ class HLUser:
 	###################################
 	# In-game information queries
 	###################################
+
+	def getMachinePartsOverview(self):
+		"""
+		Return an overview of machine parts
+		"""
+
+		# Get all machine parts
+		for part in MachinePart \
+					.select( \
+						MachinePart.name, \
+						fn.Count(MachinePartStage.id).alias("parts"), \
+						fn.Count(MachinePartStageUnlock.id).alias("unlocked") \
+						) \
+					.join( MachinePartStage ) \
+					.join( MachinePartStageUnlock, JOIN_LEFT_OUTER ) \
+					.where( ):
+			pass
+
+	def getMachinePartDetails(self, part):
+		"""
+		Get the machine part details of the specified machine part
+		"""
+
+		# Quit on invalid input
+		if not part:
+			return []
+
+		# Get all stages unlocked by the user
+		unlocked = {}
+		for part in MachinePartStageUnlock.select().where( MachinePartStageUnlock.user == self.dbUser ):
+			unlocked[part._data['stage']] = True
+
+		# Select all levels on the specified part
+		stages = []
+		for stage in MachinePartStage.select().where( MachinePartStage.part == part ).order_by( MachinePartStage.order ).dicts():
+
+			# Check if level is unlocked
+			is_unlocked = False
+			if stage['id'] in unlocked:
+				is_unlocked = True
+
+			# Comple and return
+			stage['locked'] = not is_unlocked
+			stages.append( stage )
+
+		# Serialize machine part
+		partData = part.serialize()
+		partData['stages'] = stages
+
+		# Return
+		return partData
+
+	def countPapers(self):
+		"""
+		Count how namy papers does the user have
+		"""
+
+		# Count users
+		counters = Paper.select( fn.Count(Paper.id).alias("papers") ).where( Paper.owner == self.dbUser ).get()
+		if counters is None:
+			return 0
+
+		# Return counters
+		return counters.papers
 
 	def deletePaper(self, paper_id):
 		"""
@@ -819,6 +1033,71 @@ class HLUser:
 		self.updateCache_Books()
 		self.dbUser.save()
 
+	def getTeamCitedPapers(self):
+		"""
+		Get papers team has cited
+		"""
+
+		# This only works if member of team
+		if self.teamMembership is None:
+			return []
+
+		# Collect relevant papers
+		ans = []
+		for p in PaperCitation.select().where( PaperCitation.team == self.teamMembership.team ):
+
+			# Append additional information
+			book = p.citation.serialize()
+			book['citations'] = p.countCitations()
+			book['team_name'] = p.team.name
+			book['fit_formatted'] = "%.4f" % p.fit
+			ans.append( book )
+
+		# Return answer
+		return ans
+
+	def getUnpublishedPapers(self):
+		"""
+		Return the full list of unpublished user papers
+		"""
+
+		# Collect relevant papers
+		ans = []
+		for p in Paper.select().where( (Paper.owner == self.dbUser) & (Paper.status << [ Paper.DRAFT, Paper.TEAM_REVIEW ]) ):
+
+			# Append additional information
+			book = p.serialize()
+			book['fit_formatted'] = "%.4f" % p.fit
+			ans.append( book )
+
+		# Return
+		return ans
+
+	def getTeamPapers(self):
+		"""
+		Return the full list of team papers
+		"""
+
+		# This only works if member of team
+		if self.teamMembership is None:
+			return []
+
+		# Collect relevant papers
+		ans = []
+		for p in Paper.select().where(
+				((Paper.team == self.teamMembership.team) & (Paper.status << [ Paper.PUBLISHED, Paper.TEAM_REVIEW ]))
+			  & (Paper.owner != self.dbUser)
+			):
+
+			# Append additional information
+			book = p.serialize()
+			book['citations'] = p.countCitations()
+			book['fit_formatted'] = "%.4f" % p.fit
+			ans.append( book )
+
+		# Return
+		return ans
+
 	def getPapers(self, query={}, limit=50):
 		"""
 		Return all the paper the user owns or can access
@@ -834,9 +1113,19 @@ class HLUser:
 		if 'terms' in query:
 			terms = str(query['terms'])
 
+		# Check for cited papers
+		cited=False
+		if 'cited' in query:
+			cited = bool(query['cited'])
+
+		# Check for only-owner papers
+		ownerOnly=False
+		if 'mine' in query:
+			ownerOnly = bool(query['mine'])
+
 		# Get all papers that the user has access to
 		whereQuery = (Paper.owner == self.dbUser)
-		if not self.teamMembership is None:
+		if not (self.teamMembership is None) and not ownerOnly:
 			whereQuery |= ((Paper.team == self.teamMembership.team) & (Paper.status << [ Paper.PUBLISHED, Paper.TEAM_REVIEW ]))
 		whereQuery &= (Paper.status != Paper.REMOVED)
 
@@ -859,6 +1148,18 @@ class HLUser:
 			# Collect team IDs
 			if not row._data['team'] in teamIDs:
 				teamIDs.append( row._data['team'] )
+
+		# If asked, collect cited papers
+		if cited:
+			for row in PaperCitation.select().where( PaperCitation.team == self.teamMembership.team ):
+
+				# Collect paper
+				paper = row.paper
+				ans.append(paper.serialize())
+
+				# Collect team IDs
+				if not paper._data['team'] in teamIDs:
+					teamIDs.append( paper._data['team'] )
 
 		# Resolve team names
 		teams = {}
@@ -950,6 +1251,7 @@ class HLUser:
 		tunOjects = []
 		tunNames = self.dbUser.getState("tunables", [])
 		if tunNames:
+			print ">>> %r <<<" % tunNames
 			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
 				tunOjects.append( tun )
 
@@ -981,6 +1283,11 @@ class HLUser:
 				'metrics' 			: json.loads(user.analyticsProfile.metrics),
 			}
 
+		# Get team name
+		teamName = ""
+		if not (self.teamMembership is None):
+			teamName = self.teamMembership.team.name
+
 		# Send user profile
 		return {
 			'id'			: user.id,
@@ -994,6 +1301,8 @@ class HLUser:
 			'vars' 			: json.loads(user.variables),
 			'state' 		: json.loads(user.state),
 			'analytics'		: analytics,
-			'token'			: self.token.token
+			'token'			: self.token.token,
+			'papers'		: self.countPapers(),
+			'team'			: teamName,
 			}
 

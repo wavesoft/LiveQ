@@ -38,10 +38,9 @@ from webserver.h.api.labtrain import LabTrainInterface
 from webserver.h.api.db import DatabaseInterface
 from webserver.config import Config
 from webserver.common.users import HLUser
-from webserver.common.forum import registerForumUser
 from webserver.common.userevents import UserEvents
 
-from webserver.models import User, Lab, AnalyticsProfile
+from webserver.models import User, Lab, AnalyticsProfile, TeamMembers
 from tornado.ioloop import IOLoop
 import tornado.websocket
 
@@ -353,67 +352,32 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 			# Fetch user profile
 			profile = param['profile']
-			email = str(profile['email']).lower()
 
-			# Create a forum user with the same information
-			registerForumUser(
-					email, profile['password'], title=profile['displayName']
-				)
-
-			# Check if such user exist
+			# Try to register user
 			try:
-				user = User.get(User.email == email)
+
+				# Register and return user instance
+				self.user = HLUser.register( profile )
+
+			except KeyError:			
+
+				# Check for existing user exceptions
 				self.sendAction('account.register.response', {
 						'status' : 'error',
 						'message': "A user with this e-mail already exists!"
 					})
 				return
-			except User.DoesNotExist:
-				pass
 
-			# Create a random secret
-			salt = "".join([random.choice(string.letters + string.digits) for x in range(0,50)])
-
-			# Get the default lab
-			try:
-				defaultLab = Lab.select( Lab.id ).where( Lab.default == 1 ).get()
 			except Lab.DoesNotExist:
-				self.sendEvent('Server not configured properly: Missing default lab for the new user!', 'server-error')
+
+				# Lab does not exist? Configuration error
+				self.sendError(
+					'Server not configured properly: Missing default lab for the new user!', 
+					'server-error'
+				)
 				return
 
-			# Create new user
-			user = User.create(
-				email=email,
-				password=hashlib.sha1("%s:%s" % (salt, profile['password'])).hexdigest(),
-				salt=salt,
-				displayName=profile['displayName'],
-				avatar=profile['avatar'],
-				credits=0,
-				variables="{}",
-				lab=defaultLab.id,
-				)
-
-			# Check if we have to create a new analytics profile
-			if profile['analytics']:
-
-				# Create an analytics profile
-				aProfile = AnalyticsProfile.create(
-					uuid=uuid.uuid4().hex,
-					gender=profile['analytics']['gender'],
-					birthYear=profile['analytics']['birthYear'],
-					audienceSource=profile['analytics']['audienceSource'],
-					audienceInterests=profile['analytics']['audienceInterests'],
-					)
-				aProfile.save()
-
-				# Store analytics profile to the user's account
-				user.analyticsProfile = aProfile
-
-			# Save user
-			user.save()
-
 			# Success
-			self.user = HLUser(user)
 			self.sendAction('account.register.response', {
 					'status' : 'ok'
 				})

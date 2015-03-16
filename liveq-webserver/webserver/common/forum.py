@@ -88,3 +88,43 @@ def registerForumUser(email, password, usergroup=2, title=""):
 		"INSERT INTO %susers (username,password,salt,loginkey,email,usertitle,usergroup,allownotices,receivepms,pmnotice,pmnotify,showimages,showvideos,showsigs,showavatars,showquickreply,showredirect,timezone)\
 		 VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %i, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)"
 		% ( ForumConfig.FORUM_DB_PREFIX, email, uPass, uSalt, loginKey, email, title, usergroup ) )
+
+def uidFromUser(user):
+	"""
+	Lookup the specified forum user from the 
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return None
+
+def getUserPMs(uid):
+	"""
+	Get the private messages of the specified user
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return None
+
+	# Lookup PMS
+	c.execute(
+		"SELECT fromid, subject, datetime FROM %sprivatemessages WHERE (status == 0) AND (uid = %i)"
+		% ( ForumConfig.FORUM_DB_PREFIX, uid )
+		)
+
+	# Start fetching
+	messages = []
+	row = c.fetchone()
+	while row:
+		messages.append({
+				'from': row[0],
+				'subject': row[1],
+				'datetime': row[2]
+			})
+		row = c.fetchone()
+
+	# Return messages
+	return messages

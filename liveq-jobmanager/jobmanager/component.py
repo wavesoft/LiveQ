@@ -548,7 +548,7 @@ class JobManagerComponent(Component):
 
 		self.logger.info("Got job request in IBUS")
 
-		if not all(x in message for x in ('lab', 'parameters', 'group', 'user', 'team')):
+		if not all(x in message for x in ('lab', 'parameters', 'group', 'user', 'team', 'paper')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
 			self.jobChannel.reply({
 					'result': 'error',
@@ -560,6 +560,7 @@ class JobManagerComponent(Component):
 		lab = message['lab']
 		userID = message['user']
 		teamID = message['team']
+		paperID = message['paper']
 		parameters = message['parameters']
 		group = message['group']
 
@@ -568,7 +569,7 @@ class JobManagerComponent(Component):
 		dataChannel = "data-%s" % uuid.uuid4().hex
 
 		# Create a new job descriptor
-		job = jobs.createJob( lab, parameters, group, userID, teamID, dataChannel )
+		job = jobs.createJob( lab, parameters, group, userID, teamID, paperID, dataChannel )
 		if not job:
 			# Reply failure
 			self.jobChannel.reply({

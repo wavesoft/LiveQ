@@ -278,7 +278,7 @@ class Job:
 # ------------------------------------------------------------
 ##############################################################
 
-def createJob( lab, parameters, group, userID, teamID, dataChannel ):
+def createJob( lab, parameters, group, userID, teamID, paperID, dataChannel ):
 	"""
 	This function will create a new Job with a unique ID and will set-up
 	the response channel for the internal bus to `dataChannel`
@@ -319,6 +319,7 @@ def createJob( lab, parameters, group, userID, teamID, dataChannel ):
 		dataChannel=dataChannel,
 		team_id=teamID,
 		user_id=userID,
+		paper_id=paperID,
 		userTunes=json.dumps(userTunes),
 		parameters=json.dumps(mergedParameters),
 		events=0,

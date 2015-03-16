@@ -42,7 +42,8 @@ def createWebserverTables():
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, QuestionaireResponses, 
 				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
-				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation ]:
+				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation,
+				   MachinePart, MachinePartStage, MachinePartStageUnlock ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -454,6 +455,16 @@ class User(BaseModel):
 			self.visitedBooks += ","
 		self.visitedBooks += str(bookID)
 
+	def getMachineParts(self):
+		"""
+		Get machine parts
+		"""
+
+		# Return machine parts query
+		return MachinePartStageUnlock \
+					.select( MachinePartStage ) \
+					.join( MachinePartStage ) \
+					.where( MachinePartStageUnlock.user == self )
 
 class UserTokens(BaseModel):
 	"""
@@ -488,12 +499,22 @@ class TeamMembers(BaseModel):
 	User - Team correlations
 	"""
 
+	#: Role: Regular user
+	USER = 0
+	#: Role: Moederator
+	MODERATOR = 1
+	#: Role: Administrator
+	ADMIN = 2
+	#: Role: Owner of the group
+	OWNER = 3
+
 	#: The related user
 	user = ForeignKeyField(User)
 	#: The related team
 	team = ForeignKeyField(Team)
 	#: The user role
-	status = CharField(max_length=6, default="user")
+	status = IntegerField(default=0)
+
 
 class Paper(BaseModel):
 	"""
@@ -590,9 +611,11 @@ class Paper(BaseModel):
 
 		# Count citations towards this paper
 		rec = PaperCitation.select( fn.Count(PaperCitation.id).alias('count') ) \
-					.where( PaperCitation.citation == self )
+					.where( PaperCitation.citation == self ).get()
 
 		# Return number
+		if not rec.count:
+			return 0
 		return rec.count
 
 class PaperCitation(BaseModel):
@@ -802,6 +825,95 @@ class BookQuestionAnswer(BaseModel):
 		"""
 		self.answerTimestamp = datetime.datetime.now()
 		return super(BookQuestionAnswer, self).save(*args, **kwargs)
+
+class MachinePart(BaseModel):
+	"""
+	Description for each one of the machine parts
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['prefixes']
+
+	#: The machine part name
+	name = CharField(max_length=128, index=True, unique=True)
+
+	#: The machine part title
+	title = CharField(max_length=255, default="")
+	#: The machine part short description
+	description = TextField()
+	#: Prefixes
+	prefixes = TextField(default="[]")
+
+	#: The related animation
+	animation = CharField(max_length=255, default="")
+
+	#: The relevant book
+	book = ForeignKeyField(Book, null=True, default=None)
+
+class MachinePartStage(BaseModel):
+	"""
+	The unlockable stages for each machine part
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['actions', "features"]
+
+	#: Relevant machine part
+	part = ForeignKeyField(MachinePart)
+
+	#: The order
+	order = IntegerField(default=0)
+
+	#: The name of the stage
+	name = CharField(max_length=128)
+
+	#: The name of the trigger event that will cause
+	#: this knowledge grid element to be activated
+	#: automatically (assuming credit is available)
+	triggerEvent = CharField(max_length=128, default="")
+
+	#: Enumeration of sequences to be performed upon
+	#: unlocking this item
+	actions = TextField(default="{}")
+
+	#: Enumeration of features to be available upon
+	#: unlocking this item
+	features = TextField(default="{}")
+
+	def getFeatures(self):
+		"""
+		Return the unlocked features
+		"""
+		try:
+			return json.loads(self.features)
+		except ValueError as e:
+			logging.error("ValueError parsing 'features' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def getActions(self):
+		"""
+		Return the unlocked actions
+		"""
+		try:
+			return json.loads(self.actions)
+		except ValueError as e:
+			logging.error("ValueError parsing 'actions' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+
+class MachinePartStageUnlock(BaseModel):
+	"""
+	The unlock status of each machine part statage
+	"""
+
+	#: The link to the stage
+	stage = ForeignKeyField(MachinePartStage)
+
+	#: The user who unlocked it
+	user = ForeignKeyField(User)
+
+	#: When was it was unlocked
+	unlockeddate = DateTimeField(default=datetime.datetime.now)
 
 # -----------------------------------------------------
 #  Drafts

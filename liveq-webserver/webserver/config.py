@@ -78,10 +78,23 @@ class ForumConfig:
 		ForumConfig.FORUM_ENGINE = config.get("forum", "engine")
 		ForumConfig.FORUM_DB_PREFIX = config.get("forum", "prefix")
 
+
+"""
+Game-specific configuration
+"""
+class GameConfig:
+
+	GAME_DEFAULT_TEAM = 0
+
+	@staticmethod
+	def fromConfig(config, runtimeConfig):
+		GameConfig.GAME_DEFAULT_TEAM = config.get("game", "default_team")
+
+
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig):
+class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig, GameConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -102,6 +115,7 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		WebserverConfig.fromConfig( config, runtimeConfig )
 		ForumConfig.fromConfig( config, runtimeConfig )
+		GameConfig.fromConfig( config, runtimeConfig )
 
 		# Ensure base tables exist
 		createBaseTables()
