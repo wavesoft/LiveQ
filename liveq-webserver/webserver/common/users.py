@@ -92,7 +92,7 @@ class HLUser:
 		HLUser.USERS.append( self )
 
 		# Preheat user cache
-		self.loadCache_Knowledge()
+		self.loadCache_Achievements()
 		self.loadCache_Books()
 
 		# Cache my information
@@ -235,10 +235,18 @@ class HLUser:
 
 		# Update user's default paper
 		user.activePaper_id = paper.id
+
+		# Wrapt he user in an HLUser instance
+		hluser = HLUser(user)
+
+		# Initialize caches
+		hluser.updateCache_Achievements()
+		hluser.updateCache_Books()
+		hluser.updateCache_Feats()
 		user.save()
 
-		# Return an HLUser instance mapped to this user
-		return HLUser(user)
+		# Return hluser
+		return hluser
 
 	def reload(self):
 		"""
@@ -249,7 +257,7 @@ class HLUser:
 		self.dbUser = User.get( User.id == self.dbUser.id )
 
 		# Reload caches
-		self.loadCache_Knowledge()
+		self.loadCache_Achievements()
 		self.loadCache_Books()
 
 	def receiveEvents(self, callback):
@@ -290,23 +298,63 @@ class HLUser:
 		return "#%i" % self.id
 
 	###################################
+	# Handle action
+	###################################
+
+	def handleAction(self, actionRecord):
+		"""
+		Handle the specified action record
+		"""
+
+		# Make sure we have at least 'action'
+		if not 'action' in actionRecord:
+			return False
+
+		# Handle different cases
+		action = actionRecord['action']
+
+		# ====================================
+		# Give credits to the user
+		# ------------------------------------
+		if action == "points":
+		# ====================================
+
+			# Validate
+			if not 'value' in actionRecord:
+				return False
+
+			# Give points to the user
+			self.earnPoints( int(actionRecord['value']) )
+
+		# ====================================
+		# Display the specified event
+		# ------------------------------------
+		elif action == "event":
+		# ====================================
+
+			# Forward record as-is for notification
+			del actionRecord['action']
+			self.userEvents.send(actionRecord)
+
+
+	###################################
 	# Cache Loading Functions
 	###################################
 
-	def loadCache_Knowledge(self):
+	def loadCache_Achievements(self):
 		"""
-		Build knowledge grid nodes from their ids
+		Build achievements grid nodes from their ids
 		"""
 
-		# Load leaf knowledge grid nodes
-		self.leafKnowledge = []
-		for leaf_id in self.dbUser.getState('leaf_knowledge', []):
+		# Load leaf achievements grid nodes
+		self.leafAchievements = []
+		for leaf_id in self.dbUser.getState('leaf_achievements', []):
 
 			# Get and store
 			try:
-				# Collect leaf knowledge
-				self.leafKnowledge.append(
-						KnowledgeGrid.get( KnowledgeGrid.id == leaf_id )
+				# Collect leaf achievements
+				self.leafAchievements.append(
+						Achievement.get( Achievement.id == leaf_id )
 					)
 			except:
 				pass
@@ -359,9 +407,10 @@ class HLUser:
 		# Update state
 		self.dbUser.setState("partcounters", parts )
 
-	def updateCache_Knowledge(self):
+	def updateCache_Feats(self):
 		"""
-		User the user's knowledge information
+		User the user's features, as obtained by machine
+		parts and achievements.
 		"""
 
 		# Prepare features array
@@ -371,9 +420,9 @@ class HLUser:
 		config = []
 		goals = []
 
-		# ==============================
-		# Get exposed machine parts
-		# ==============================
+		# =================================
+		#  Get features from machine parts
+		# =================================
 
 		# Get unique unlocked machine parts
 		for p in MachinePart.select() \
@@ -385,19 +434,19 @@ class HLUser:
 			# Put in the observables
 			parts.append( p.name )
 
-		# ==============================
-		#  Get knowledgegrid (features)
-		# ==============================
+		# ================================
+		#  Get features from achievements
+		# ================================
 
-		# Get knowledgeGrid nodes discovered
-		kb_ids = self.dbUser.getKnowledge()
-		print "Got knowledge KBs: %r" % kb_ids
+		# Get Achievement nodes discovered
+		a_ids = self.dbUser.getAchievements()
+		print "Got achievements: %r" % a_ids
 
-		# Iterate over the currently explored knowledge grid features
-		feats = KnowledgeGrid.getTotalFeatures( kb_ids )
-		print "Got knowledge feats: %r" % feats
+		# Iterate over the currently explored achievement grid features
+		feats = Achievement.getTotalFeatures( a_ids )
+		print "Got achievement feats: %r" % feats
 
-		# Update knowledge features
+		# Update achievement features
 		if 'observables' in feats:
 			observables += feats['observables']
 		if 'tunables' in feats:
@@ -419,7 +468,7 @@ class HLUser:
 			# Get features
 			feats = stage.getFeatures()
 
-			# Update knowledge features
+			# Update machine part features
 			if 'observables' in feats:
 				observables += feats['observables']
 			if 'tunables' in feats:
@@ -443,21 +492,31 @@ class HLUser:
 		self.dbUser.setState("config", list(set(config)) )
 		self.dbUser.setState("goals", list(set(goals)) )
 
-		# Find next leaf knowledge grid nodes
-		self.leafKnowledge = []
-		leaf_knowledge_ids = []
-		if kb_ids:
-			for leaf_node in KnowledgeGrid.select().where(
-					 (KnowledgeGrid.parent << kb_ids) &
-					~(KnowledgeGrid.id << kb_ids)
+	def updateCache_Achievements(self):
+		"""
+		User the user's achievements information
+		"""
+
+		# Get Achievement nodes discovered
+		a_ids = self.dbUser.getAchievements()
+		print "Got achievements: %r" % a_ids
+
+		# Find next leaf achievements grid nodes
+		self.leafAchievements = []
+		leaf_achievements_id = []
+		if a_ids:
+			for leaf_node in Achievement.select().where(
+					 (Achievement.parent << a_ids) &
+					~(Achievement.id << a_ids)
 					):
 
 				# Collect them and ID
-				self.leafKnowledge.append( leaf_node )
-				leaf_knowledge_ids.append( leaf_node.id )
+				self.leafAchievements.append( leaf_node )
+				leaf_achievements_id.append( leaf_node.id )
 
-		# Update 'leaf_knowledge' state
-		self.dbUser.setState("leaf_knowledge", leaf_knowledge_ids)
+		# Update 'leaf_achievements' state
+		self.dbUser.setState("leaf_achievements", leaf_achievements_id)
+
 
 	def updateCache_Books(self):
 		"""
@@ -530,13 +589,13 @@ class HLUser:
 		# Forward trigger request
 		self.triggers.trigger( action, **kwargs )
 
-	def knows(self, kb_id):
+	def achieved(self, a_id):
 		"""
-		Check if the user knows this ID
+		Check if the user achieved this achievement ID
 		"""
 
 		# Check with the database user
-		return self.dbUser.hasKnowledge(kb_id)
+		return self.dbUser.hasAchievement(a_id)
 
 	def setVariables(self, variables):
 		"""
@@ -634,27 +693,33 @@ class HLUser:
 		# Prepare response
 		ans = []
 
-		# Look if that triggers a leaf knowledge element
-		for kb in self.leafKnowledge:
+		# Look if that triggers a leaf achievement element
+		for kb in self.leafAchievements:
 			if kb.triggerEvent == name:
 				ans.append({
-						'action': 'knowledge',
+						'action': 'achievement',
 						'id': kb.id
 					})
 
 		# Return list
 		return ans
 
-	def expandKnowledge(self, kgItem):
+	def enableAchievement(self, aItem):
 		"""
-		Expand users knowledge by unlocking the specified item
+		Enable the specified achievements
 		"""
 
 		# Include item in user's list of knowledges
-		self.dbUser.addKnowledge( kgItem )
+		self.dbUser.addAchievement( aItem )
 
-		# Update knowledge cache
-		self.updateCache_Knowledge()
+		# Update achievement & features cache
+		self.updateCache_Achievements()
+		self.updateCache_Feats()
+
+		# Handle achievement actions
+		actions = aItem.getActions()
+		for aRec in actions:
+			self.handleAction(aRec)
 
 		# Save user record
 		self.dbUser.save()
@@ -670,7 +735,7 @@ class HLUser:
 		except Book.DoesNotExist:
 			return
 
-		# If this book does not exist in user's knowledge, update it
+		# If this book does not exist in user's books, update it
 		if not self.dbUser.hasVisitedBook(book.id):
 
 			# Update visited book
@@ -788,8 +853,8 @@ class HLUser:
 		unlock.save()
 
 		# Update cache
-		self.updateCache_Knowledge()
 		self.updateCache_MachinePart()
+		self.updateCache_Feats()
 		self.dbUser.save()
 
 		# Fire event
@@ -833,6 +898,10 @@ class HLUser:
 		# Serialize machine part
 		partData = part.serialize()
 		partData['stages'] = stages
+
+		# Get book name
+		if partData['book']:
+			partData['book'] = part.book.name
 
 		# Return
 		return partData
@@ -1303,66 +1372,51 @@ class HLUser:
 		# Return
 		return ans
 
-	def getKnowledgeTree(self, getAll=False):
+	def getAchievementsTree(self):
 		"""
-		Build and return the knowledge tree
+		Build and return the achievements tree as a nested list
+		of parent/children dicts.
 		"""
 		
 		# Synchronize
 		self.reload()
 
 		# Setup local properties
-		kgRoot = None
-		kgIndex = {}
-		kgElements = []
+		aRoot = None
+		aIndex = {}
+		aElements = []
 
-		# Get active knowledge tree elements
-		kb_ids = self.dbUser.getKnowledge()
-		if not kb_ids:
-			# If there is no knowledge, pick the root node(s)
-			for kgElm in KnowledgeGrid.select().where( KnowledgeGrid.parent >> None ).limit(1).dicts():
-				# Add no children
-				kgElm['enabled'] = False
-				kgElm['children'] = []
-				# Return root
-				return kgElm
+		# Get all achievements unlocked by the user
+		userAchievements = self.dbUser.getAchievements()
 
-			# Could not find even root!
-			return None
+		# Get all achievements as dictionaries
+		aElements = Achievement.select(
+				Achievement.id,
+				Achievement.parent,
+				Achievement.name,
+				Achievement.desc,
+				Achievement.icon
+			).dicts()[:]
 
-		# Iterate over discovered knowledge 
-		for kgElm in KnowledgeGrid.select().where( KnowledgeGrid.id << kb_ids ).dicts():
-
-			# Store on index
-			kgElm['children'] = []
-			kgElm['enabled'] = True
-			kgIndex[kgElm['id']] = kgElm
-			kgElements.append(kgElm)
-
+		# Put each one in index and create 'children' list
+		for elm in aElements:
+			# Create children
+			elm['children'] = []
+			# Check if this is enabled
+			elm['enabled'] = (elm['id'] in userAchievements)
+			# Keep on index
+			aIndex[elm['id']] = elm
 			# Look for root
-			if not kgElm['parent']:
-				kgRoot = kgElm
+			if elm['parent'] is None:
+				aRoot = elm
 
-		# Lookup for leaf nodes of the discovered knowledge
-		for kgElm in KnowledgeGrid.select().where(
-			 (KnowledgeGrid.parent << kb_ids) &
-			~(KnowledgeGrid.id << kb_ids)
-			).dicts():
+		# Nest items
+		for elm in aElements:
+			# Put on paren'ts children
+			aIndex[elm['parent']]['children'].append( elm )
 
-			# Store on index
-			kgElm['children'] = []
-			kgElm['enabled'] = False
-			kgIndex[kgElm['id']] = kgElm
-			kgElements.append(kgElm)
-
-		# Nest children
-		for e in kgElements:
-			if e['parent']:
-				kgIndex[e['parent']]['children'].append(e)
-
-		# Return knowledge tree starting from root
-		print repr(kgRoot)
-		return kgRoot
+		# Return root
+		return aRoot
 
 	def getTuningConfiguration(self):
 		"""
@@ -1421,7 +1475,7 @@ class HLUser:
 			'avatar' 		: user.avatar,
 			'points'		: user.points,
 			'groups'		: user.getGroups(),
-			'knowledge'		: user.getKnowledge(),
+			'achievements'	: user.getAchievements(),
 			'activePaper'	: user.activePaper_id,
 			'vars' 			: json.loads(user.variables),
 			'state' 		: json.loads(user.state),

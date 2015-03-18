@@ -41,7 +41,7 @@ def createWebserverTables():
 
 	# Create the tables in the basic model
 	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, QuestionaireResponses, 
-				   AnalyticsEvent, KnowledgeGrid, Definition, FirstTime, TootrAnimation,
+				   AnalyticsEvent, Achievement, Definition, FirstTime, TootrAnimation,
 				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation,
 				   MachinePart, MachinePartStage, MachinePartStageUnlock ]:
 
@@ -84,62 +84,88 @@ class AnalyticsProfile(BaseModel):
 		self.lastEvent = datetime.datetime.now()
 		return super(AnalyticsProfile, self).save(*args, **kwargs)
 
-class KnowledgeGrid(BaseModel):
+class Achievement(BaseModel):
 	"""
-	The knowledge grid
+	The achievements grid
 	"""
 
 	#: JSON Fields in this model
-	JSON_FIELDS = ['actions', 'features']
+	JSON_FIELDS = ['triggers', 'unlockActions', 'clickActions', 'features']
 
 	#: Parent entry to KG
 	parent = ForeignKeyField('self', null=True)
 
-	#: The title of the knowledge grid element
-	title = CharField(max_length=128)
+	#: The name of the achievement element
+	name = CharField(max_length=128)
 
 	#: A short description for this element
 	desc = TextField(default="")
-	#: An image chat accompanies the short description
-	descImage = CharField(max_length=128, default="")
 
-	#: The kind of the element
-	#: ([edu]cational, [int]erface, [exp]erience, [gam]e)
-	kind = CharField(max_length=3, default="edu")
 	#: Icon of the element
 	icon = CharField(max_length=128, default="study.png")
 
-	#: Cost in credits for this element
-	cost = IntegerField(default=0)
-
-	#: The name of the trigger event that will cause
-	#: this knowledge grid element to be activated
-	#: automatically (assuming credit is available)
-	triggerEvent = CharField(max_length=128, default="")
+	#: Acceptable triggers for unlocking this achievement
+	triggers = TextField(default="[{'trigger':'click'}]")
 
 	#: Enumeration of sequences to be performed upon
 	#: unlocking this item
-	actions = TextField(default="{}")
+	unlockActions = TextField(default="[]")
+
+	#: Enumeration of sequences to be performed upon
+	#: clicking on this item
+	clickActions = TextField(default="[]")
 
 	#: Enumeration of features to be available upon
 	#: unlocking this item
-	features = TextField(default="{}")
+	features = TextField(default="[]")
 
-	def getActions(self):
+	def getTriggers(self):
+		"""
+		Return the unlockable triggers
+		"""
+		try:
+			return json.loads(self.triggers)
+		except ValueError as e:
+			logging.error("ValueError parsing 'triggers' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setTriggers(self, data):
+		"""
+		Define the unlockable triggers
+		"""
+		self.triggers = json.dumps(data)
+
+	def getUnlockActions(self):
 		"""
 		Return the unlockable Actions
 		"""
 		try:
-			return json.loads(self.actions)
+			return json.loads(self.unlockActions)
 		except ValueError as e:
-			logging.error("ValueError parsing 'actions' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			logging.error("ValueError parsing 'unlockActions' of model '%s', key %s" % (self.__class__.__name__, self.id))
 			return {}
 
-	def setActions(self, data):
+	def setUnlockActions(self, data):
 		"""
 		Define the unlockable Actions
 		"""
-		self.actions = json.dumps(data)
+		self.unlockActions = json.dumps(data)
+
+	def getClickActions(self):
+		"""
+		Return the clickable Actions
+		"""
+		try:
+			return json.loads(self.clickActions)
+		except ValueError as e:
+			logging.error("ValueError parsing 'clickActions' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setClickActions(self, data):
+		"""
+		Define the clickable Actions
+		"""
+		self.clickActions = json.dumps(data)
 
 	def getFeatures(self):
 		"""
@@ -161,7 +187,7 @@ class KnowledgeGrid(BaseModel):
 	def getTotalFeatures(id_list):
 		"""
 		Return the accummulated list of features
-		unlocked by the given list of knowedge grid items
+		unlocked by the given list of achievements grid items
 		"""
 
 		# Prepare features
@@ -169,7 +195,7 @@ class KnowledgeGrid(BaseModel):
 
 		# Iterate over IDs
 		if len(id_list) > 0:
-			for kb in KnowledgeGrid.select().where( KnowledgeGrid.id << id_list ):
+			for kb in Achievement.select().where( Achievement.id << id_list ):
 
 				# Iterate over features
 				for k,v in kb.getFeatures().iteritems():
@@ -228,14 +254,14 @@ class User(BaseModel):
 	#: User accummulated science points
 	totalPoints = IntegerField(default=8)
 
-	#: Knowledge Grid elements explored
-	knowledge = TextField(default="")
+	#: Achievements elements explored
+	achievements = TextField(default="")
 
 	#: Visited books
 	visitedBooks = TextField(default="")
 
-	#: Last explored knowledge item
-	lastKnowledge = ForeignKeyField(KnowledgeGrid, null=True, default=None)
+	#: Last explored achievement
+	lastAchievement = ForeignKeyField(Achievement, null=True, default=None)
 
 	#: Current paper
 	activePaper_id = IntegerField(default=0)
@@ -372,57 +398,57 @@ class User(BaseModel):
 		# Save state
 		self.state = json.dumps(state)
 
-	def getKnowledge(self):
+	def getAchievements(self):
 		"""
-		Split knowledge
+		Split achievements
 		"""
 
-		# Check for missing knowledge
-		if not self.knowledge:
+		# Check for missing achievements
+		if not self.achievements:
 			return []
 
-		# Return knowledge elements
-		return map(int, self.knowledge.split(","))
+		# Return achievements elements
+		return map(int, self.achievements.split(","))
 
-	def setKnowledge(self, knowledgeItems=[]):
+	def setAchievements(self, achievementsItems=[]):
 		"""
-		Update knowledge
+		Update achievements
 		"""
-		self.knowledge = ",".join(knowledgeItems)
+		self.achievements = ",".join(achievementsItems)
 
-	def hasKnowledge(self, knowledgeItemID):
+	def hasAchievement(self, achievementsItemID):
 		"""
-		Check if the user knows this knowledge ID
+		Check if the user knows this achievements ID
 		"""
-		return (",%i," % knowledgeItemID) in (",%s," % self.knowledge)
+		return (",%i," % achievementsItemID) in (",%s," % self.achievements)
 
-	def addKnowledge(self, knowledgeNode):
+	def addAchievement(self, achievementNode):
 		"""
-		Add the specified explored knowledge in list
+		Add the specified explored achievement in list
 		"""
 
 		# Require node
-		if not isinstance(knowledgeNode, KnowledgeGrid):
-			raise IOError("addKnowledge accepts instance of KnowledgeGrid as argument!")
+		if not isinstance(achievementNode, Achievement):
+			raise IOError("addAchievement accepts instance of Achievement as argument!")
 
 		# Exist if exists
-		if (",%d," % knowledgeNode.id) in (",%s," % self.knowledge):
+		if (",%d," % achievementNode.id) in (",%s," % self.achievements):
 			return
 
 		# Append item in list
-		if self.knowledge:
-			self.knowledge += ","
-		self.knowledge += str(knowledgeNode.id)
+		if self.achievements:
+			self.achievements += ","
+		self.achievements += str(achievementNode.id)
 
-		# Update last knowledge item
-		self.lastKnowledge = knowledgeNode
+		# Update last achievements item
+		self.lastAchievement = achievementNode
 
 	def getVisitedBooks(self):
 		"""
 		Split visited books terms
 		"""
 
-		# Check for missing knowledge
+		# Check for missing books
 		if not self.visitedBooks:
 			return []
 
@@ -455,16 +481,21 @@ class User(BaseModel):
 			self.visitedBooks += ","
 		self.visitedBooks += str(bookID)
 
-	def getMachineParts(self):
+	def getUnlockedPartStages(self):
 		"""
 		Get machine parts
 		"""
 
-		# Return machine parts query
-		return MachinePartStageUnlock \
-					.select( MachinePartStage ) \
-					.join( MachinePartStage ) \
+		# Get all unlocked stages
+		unlocked_stages = MachinePartStageUnlock \
+					.select( MachinePartStageUnlock.stage ) \
 					.where( MachinePartStageUnlock.user == self )
+
+		# Get all machine parts that derrive from the above unlocked stages
+		return MachinePartStage \
+				.select() \
+				.where( MachinePartStage.id << unlocked_stages )
+
 
 class UserTokens(BaseModel):
 	"""
@@ -867,8 +898,14 @@ class MachinePartStage(BaseModel):
 	#: The name of the stage
 	name = CharField(max_length=128)
 
+	#: The cost of this stage 
+	cost = IntegerField(default=0)
+
+	#: The relevant book for this machine part stage
+	book = ForeignKeyField(Book, null=True, default=None)
+
 	#: The name of the trigger event that will cause
-	#: this knowledge grid element to be activated
+	#: this achievement element to be activated
 	#: automatically (assuming credit is available)
 	triggerEvent = CharField(max_length=128, default="")
 

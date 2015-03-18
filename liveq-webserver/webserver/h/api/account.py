@@ -23,7 +23,7 @@ import datetime
 import json
 
 from liveq.io.bus import Bus
-from webserver.models import KnowledgeGrid, MachinePart
+from webserver.models import MachinePart
 
 from webserver.common.users import HLUserError
 
@@ -130,17 +130,6 @@ class AccountInterface(APIInterface):
 			self.sendResponse({
 					"status": "ok",
 					"data" : self.user.getTuningConfiguration()
-				})
-
-		##################################################
-		# Return knowledge configuration
-		# ------------------------------------------------
-		elif action == "data.knowledge":
-
-			# Return knowledge configuration
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getKnowledgeTree()
 				})
 
 		##################################################
@@ -329,128 +318,13 @@ class AccountInterface(APIInterface):
 				self.sendError(e.message, e.code)
 
 		##################################################
-		# Claim credits for a particular achievement
+		# Request the achievements tree
 		# ------------------------------------------------
-		elif action == "credits.claim":
+		elif action == "achievements.tree":
 
-			# Check for missing parameters
-			if not 'claim' in param:
-				self.sendError("Missing 'claim' parameter")
-				return
-			if not 'category' in param:
-				self.sendError("Missing 'category' parameter")
-				return
-
-			# Get credits group
-			claims = self.user.getVariable("credit_claims", param['category'], {})
-
-			# Check if claim is placed
-			if param['claim'] in claims:
-				# Send response
-				self.sendResponse({
-							"status": "error",
-							"error_id": "credits-claimed",
-							"error": "Credits already claimed"
-						})
-				return
-
-			# Accept this claim
-			claims[param['claim']] = 1
-			self.user.setVariable("credit_claims", param['category'], claims)
-
-			# Find how much credits it's worth
-			credits = 0
-			if param['category'] == "estimate":
-				if param['claim'] == "perfect":
-					credits = 8
-				elif param['claim'] == "good":
-					credits = 4
-				elif param['claim'] == "fair":
-					credits = 2
-				else:
-					credits = 1
-			elif param['category'] == "run":
-				if param['claim'] == "perfect":
-					credits = 16
-				elif param['claim'] == "good":
-					credits = 8
-				elif param['claim'] == "fair":
-					credits = 4
-				else:
-					credits = 2
-
-			# Check if this action gives no credit
-			if credits == 0:
-				self.sendResponse({
-							"status": "error",
-							"error_id": "no-credits-awarded",
-							"error": "No credits awarded"
-						})
-				return
-
-			# Place credits in user's profile
-			self.user.points += points
-
-			# Reply with status and the new user profile
-			self.socket.sendUserProfile()
+			# Return achievements tree
 			self.sendResponse({
 				"status": "ok",
-				"points": points
+				"data": self.user.getAchievementsTree()
 				})
-
-
-		##################################################
-		# Reset the claims of a particular achievement
-		# ------------------------------------------------
-		elif action == "credits.reset":
-
-			# Check for missing parameters
-			if not 'category' in param:
-				self.sendError("Missing 'category' parameter")
-				return
-
-			# Get credits group
-			self.user.delVariable("credit_claims", param['category'])
-
-		##################################################
-		# Unlock a particular knowlege with credits
-		# ------------------------------------------------
-		elif action == "knowledge.unlock":
-
-			# Check for missing parameters
-			if not 'id' in param:
-				self.sendError("Missing 'id' parameter")
-				return
-
-			# Check the user has already unlocked this item
-			if self.user.knows(param['id']):
-				self.sendResponse({ "status": "ok" })
-
-			# Lookup knowledge grid item
-			try:
-				knowledge = KnowledgeGrid.get( KnowledgeGrid.id == param['id'] )
-			except KnowledgeGrid.DoesNotExist:
-				self.sendError("Could not locate specified knowledge item", "not-exists")
-				return
-
-			# Check transaction
-			try:
-
-				# Spend user points
-				self.user.spendPoints( knowledge.cost )
-
-				# Expand knowledge
-				self.user.expandKnowledge( knowledge )
-
-				# Reply with status and the new user profile
-				self.socket.sendUserProfile()
-				self.sendResponse({
-					"status": "ok",
-					"knowledge": knowledge.serialize()
-					})
-
-			except HLUserError as e:
-
-				# An error occured while trying to spend credits
-				self.sendError(e.message, e.code)
 

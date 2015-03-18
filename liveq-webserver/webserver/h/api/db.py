@@ -53,8 +53,8 @@ class DatabaseInterface(APIInterface):
 				'read'   : None,
 				'write'  : ['admin']
 			},
-			'knowledge_grid' : {
-				'model'  : webserver.models.KnowledgeGrid,
+			'achievement' : {
+				'model'  : webserver.models.Achievement,
 				'index'	 : 'id',
 				'read'   : None,
 				'write'  : ['admin']
