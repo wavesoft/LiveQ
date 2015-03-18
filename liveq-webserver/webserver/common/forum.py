@@ -71,6 +71,32 @@ def getDBCursor():
 	# Return a cursor
 	return sql.cursor()
 
+def forumUsernameExists(displayName):
+	"""
+	Check if such user exists
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return None
+
+	# Lookup users with that username
+	c.execute(
+		"SELECT COUNT(*) FROM %susers WHERE (username = '%s')"
+		% ( ForumConfig.FORUM_DB_PREFIX, displayName )
+		)
+
+	# Start fetching
+	row = c.fetchone()
+	if not row:
+		return False
+	if not row[0]:
+		return False
+
+	# User exists
+	return True
+
 def registerForumUser(email, displayName, password, usergroup=2, title=""):
 	"""
 	Create a new user record in myBB for the given user
@@ -115,7 +141,7 @@ def getUserPMs(uid):
 
 	# Lookup PMS
 	c.execute(
-		"SELECT fromid, subject, datetime FROM %sprivatemessages WHERE (status == 0) AND (uid = %i)"
+		"SELECT fromid, subject, datetime FROM %sprivatemessages WHERE (status = 0) AND (uid = %i)"
 		% ( ForumConfig.FORUM_DB_PREFIX, uid )
 		)
 

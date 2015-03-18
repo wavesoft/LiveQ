@@ -305,6 +305,30 @@ class AccountInterface(APIInterface):
 				})
 
 		##################################################
+		# Unlock the specified machine part
+		# ------------------------------------------------
+		elif action == "parts.unlock":
+
+			# Cach exceptions
+			try:
+
+				# Unlock machine part
+				self.user.unlockMachinePartStage(param['id'])
+
+				# Return paper status
+				self.sendResponse({
+						"status": "ok",
+					})
+
+				# Resend user profile
+				self.socket.sendUserProfile()
+
+			except HLUserError as e:
+
+				# An error occured while trying to spend credits
+				self.sendError(e.message, e.code)
+
+		##################################################
 		# Claim credits for a particular achievement
 		# ------------------------------------------------
 		elif action == "credits.claim":

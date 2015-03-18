@@ -21,12 +21,15 @@ import json
 import uuid
 import logging
 import random
+import string
+import hashlib
 
 from peewee import fn, JOIN_LEFT_OUTER
-from webserver.common.forum import registerForumUser
+from webserver.common.forum import registerForumUser, forumUsernameExists
 
 from liveq.models import Tunable
 from webserver.models import *
+from webserver.config import Config
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
@@ -71,6 +74,9 @@ class HLUser:
 	Collection of high-level operations on the user object
 	"""
 
+	#: The instances of all the user objects in the server
+	USERS = []
+
 	def __init__(self, user):
 		"""
 		Create a new instance of the user object
@@ -81,6 +87,9 @@ class HLUser:
 
 		# Create logger
 		self.logger = logging.getLogger("user(%s)" % str(user))
+
+		# Place user object in users array
+		HLUser.USERS.append( self )
 
 		# Preheat user cache
 		self.loadCache_Knowledge()
@@ -125,7 +134,7 @@ class HLUser:
 			pass
 
 	@staticmethod
-	def register(self, profile):
+	def register(profile):
 		"""
 		Register a new user
 
@@ -139,9 +148,13 @@ class HLUser:
 		# Check if such user exist
 		try:
 			user = User.get(User.email == email)
-			raise KeyError("user")
+			raise KeyError("e-mail")
 		except User.DoesNotExist:
 			pass
+
+		# Check if such username exists in the forum
+		if forumUsernameExists(profile['displayName']):
+			raise KeyError("in-game name")
 
 		# Create a random secret
 		salt = "".join([random.choice(string.letters + string.digits) for x in range(0,50)])
@@ -198,12 +211,12 @@ class HLUser:
 		# -----------------
 
 		# Create default user membership
-		team = TeamMembers.create(
+		teamMembership = TeamMembers.create(
 			user=user,
 			team=Config.GAME_DEFAULT_TEAM,
 			status=TeamMembers.USER,
 			)
-		team.save()
+		teamMembership.save()
 
 		# -----------------
 		#  Default paper
@@ -212,7 +225,7 @@ class HLUser:
 		# Create a default paper for the user
 		paper = Paper.create(
 			owner=user,
-			team=team,
+			team=Config.GAME_DEFAULT_TEAM,
 			title="%s first paper" % profile['displayName'],
 			body=".. you can keep your notes here ..",
 			status=Paper.DRAFT,
@@ -221,7 +234,7 @@ class HLUser:
 		paper.save()
 
 		# Update user's default paper
-		user.activePaper_id = paper
+		user.activePaper_id = paper.id
 		user.save()
 
 		# Return an HLUser instance mapped to this user
@@ -264,6 +277,11 @@ class HLUser:
 
 		# Delete token
 		self.token.delete_instance()
+
+		# Remove from users array
+		i = HLUser.USERS.index( self )
+		if i >= 0:
+			del HLUser.USERS[i]
 
 	def __str__(self):
 		"""
@@ -310,6 +328,37 @@ class HLUser:
 	# Cache Updating Functions
 	###################################
 
+	def updateCache_MachinePart(self):
+		"""
+		Update the cache regarding machine parts
+		"""
+
+		# Count levels per machine part
+		partCounters = {}
+
+		# Select all machine parts
+		parts = { }
+		for p in MachinePartStage.select(
+			MachinePart.name.alias("part_name"),
+				fn.Count(MachinePartStage.id).alias("total"),
+				fn.Count(MachinePartStageUnlock.id).alias("unlocked")
+				) \
+			.join( MachinePart ) \
+			.switch( MachinePartStage ) \
+			.join( MachinePartStageUnlock ) \
+			.where(
+					(MachinePartStageUnlock.user == self.dbUser)
+				) \
+			.group_by( MachinePartStage.id ):
+
+			parts[p.part.name] = {
+				"total": p.total,
+				"unlocked": p.unlocked
+			}
+
+		# Update state
+		self.dbUser.setState("partcounters", parts )
+
 	def updateCache_Knowledge(self):
 		"""
 		User the user's knowledge information
@@ -321,6 +370,20 @@ class HLUser:
 		parts = []
 		config = []
 		goals = []
+
+		# ==============================
+		# Get exposed machine parts
+		# ==============================
+
+		# Get unique unlocked machine parts
+		for p in MachinePart.select() \
+			.join( MachinePartStage ) \
+			.join( MachinePartStageUnlock ) \
+			.where( MachinePartStageUnlock.user == self.dbUser ) \
+			.group_by( MachinePart.id ):
+
+			# Put in the observables
+			parts.append( p.name )
 
 		# ==============================
 		#  Get knowledgegrid (features)
@@ -336,48 +399,49 @@ class HLUser:
 
 		# Update knowledge features
 		if 'observables' in feats:
-			observables.append( feats['observables'] )
+			observables += feats['observables']
 		if 'tunables' in feats:
-			tunables.append( feats['tunables'])
+			tunables += feats['tunables']
 		if 'parts' in feats:
-			parts.append( feats['parts'])
+			parts += feats['parts']
 		if 'config' in feats:
-			config.append( feats['config'])
+			config += feats['config']
 		if 'goals' in feats:
-			goals.append( feats['goals'])
+			goals += feats['goals']
 
 		# ==============================
 		#  Get unlocked machine parts
 		# ==============================
 
-		# Iterate over unlocked parts
-		for part in self.dbUser.getMachineParts():
+		# Iterate over unlocked part stages
+		for stage in self.dbUser.getUnlockedPartStages():
 
 			# Get features
-			feats = part.getFeatures()
+			feats = stage.getFeatures()
 
 			# Update knowledge features
 			if 'observables' in feats:
-				observables.append( feats['observables'] )
+				observables += feats['observables']
 			if 'tunables' in feats:
-				tunables.append( feats['tunables'])
+				tunables += feats['tunables']
 			if 'parts' in feats:
-				parts.append( feats['parts'])
+				parts += feats['parts']
 			if 'config' in feats:
-				config.append( feats['config'])
+				config += feats['config']
 			if 'goals' in feats:
-				goals.append( feats['goals'])
+				goals += feats['goals']
+
 
 		# ==============================
 		#  Aggregate
 		# ==============================
 
-		# Update features
-		self.dbUser.setState("observables", observables)
-		self.dbUser.setState("tunables", tunables)
-		self.dbUser.setState("parts", parts)
-		self.dbUser.setState("config", config)
-		self.dbUser.setState("goals", goals)
+		# Update features (remove duplicates)
+		self.dbUser.setState("observables", list(set(observables)) )
+		self.dbUser.setState("tunables", list(set(tunables)) )
+		self.dbUser.setState("parts", list(set(parts)) )
+		self.dbUser.setState("config", list(set(config)) )
+		self.dbUser.setState("goals", list(set(goals)) )
 
 		# Find next leaf knowledge grid nodes
 		self.leafKnowledge = []
@@ -657,6 +721,14 @@ class HLUser:
 		# Save record
 		self.dbUser.save()
 
+		# Fire event
+		self.userEvents.send({
+			"type"   : "flash",
+			"icon"   : "flash-icons/labo.png",
+			"title"  : "Science Points",
+			"message": "You have just earned <em>%i</em> science points!" % points
+			})
+
 	###################################
 	# In-game information queries
 	###################################
@@ -678,6 +750,59 @@ class HLUser:
 					.where( ):
 			pass
 
+	def unlockMachinePartStage(self, stage_id):
+		"""
+		Unlock the specified machine part ID
+		"""
+
+		# Get stage
+		try:
+			stage = MachinePartStage.get( MachinePartStage.id == stage_id )
+		except MachinePartStage.DoesNotExist:
+			return False
+
+		# Validate order
+		if stage.order > 0:
+
+			# If the preceding item is not unlocked, fire error
+			if not MachinePartStage.select() \
+				.join( MachinePartStageUnlock ) \
+				.where( MachinePartStageUnlock.user == self.dbUser ) \
+				.where( MachinePartStage.order == (stage.order - 1) ) \
+				.exists():
+
+				# The user hasn't unlocked the previous item
+				raise HLError("You must unlock the preceding item before unlocking this one!", "usage-error")
+
+
+		# Spend points
+		# (This will fire an HLError if the 
+		#  points cannot be spent()
+		self.spendPoints( stage.cost )
+
+		# Unlock this stage
+		unlock = MachinePartStageUnlock.create(
+			stage=stage,
+			user=self.dbUser
+			)
+		unlock.save()
+
+		# Update cache
+		self.updateCache_Knowledge()
+		self.updateCache_MachinePart()
+		self.dbUser.save()
+
+		# Fire event
+		self.userEvents.send({
+			"type"   : "flash",
+			"icon"   : "flash-icons/unlock.png",
+			"title"  : "Unlocked Stage",
+			"message": "You have just unlocked stage <em>%s</em>!" % stage.name
+			})
+
+		# We are good
+		return True
+
 	def getMachinePartDetails(self, part):
 		"""
 		Get the machine part details of the specified machine part
@@ -689,8 +814,8 @@ class HLUser:
 
 		# Get all stages unlocked by the user
 		unlocked = {}
-		for part in MachinePartStageUnlock.select().where( MachinePartStageUnlock.user == self.dbUser ):
-			unlocked[part._data['stage']] = True
+		for unlockPart in MachinePartStageUnlock.select().where( MachinePartStageUnlock.user == self.dbUser ):
+			unlocked[unlockPart._data['stage']] = True
 
 		# Select all levels on the specified part
 		stages = []

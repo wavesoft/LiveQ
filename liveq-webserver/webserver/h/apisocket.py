@@ -28,7 +28,7 @@ import logging
 import base64
 import hashlib
 import random
-import string
+import traceback
 
 from webserver.h.api import APIError
 from webserver.h.api.chat import ChatInterface
@@ -291,7 +291,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.sendAction('account.profile', self.user.getProfile())
 
 
-	def sendNotification(self, message, msgType="info"):
+	def sendNotification(self, message, msgType="info", title="", icon=""):
 		"""
 		Push a notification to the user
 		"""
@@ -299,6 +299,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Send notification action
 		self.sendAction("ui.notification", {
 				"type": msgType,
+				"title": title,
+				"icon": icon,
 				"message": message
 			})
 
@@ -307,10 +309,24 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Forward the specified event to the user
 		"""
 
-		# Send event
-		self.sendAction("ui.event", {
-				"event": event
-			})
+		# If we don't even have a message, that's not for us
+		if not 'message' in event:
+			return
+
+		# Extract parameters from the event and fire notification
+		n_message = event['message']
+		n_type = "info"
+		n_title = ""
+		n_icon = ""
+		if 'type' in event:
+			n_type = event['type']
+		if 'title' in event:
+			n_title = event['title']
+		if 'icon' in event:
+			n_icon = event['icon']
+
+		# Send notification
+		self.sendNotification( n_message, n_type, n_title, n_icon )
 
 	def handleAction(self, action, param):
 		"""
@@ -366,12 +382,12 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				# Register and return user instance
 				self.user = HLUser.register( profile )
 
-			except KeyError:			
+			except KeyError as e:
 
 				# Check for existing user exceptions
 				self.sendAction('account.register.response', {
 						'status' : 'error',
-						'message': "A user with this e-mail already exists!"
+						'message': "A user with this %s already exists!" % str(e)
 					})
 				return
 
@@ -418,6 +434,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			except KeyError as e:
 				
 				# Forward API Errors
+				traceback.print_exc()
 				return self.sendError("Missing argument %s on request" % str(e), "missing-argument")
 
 			except APIError as e:
