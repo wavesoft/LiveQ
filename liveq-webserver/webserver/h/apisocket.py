@@ -256,6 +256,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Send a named action, with an optional data dictionary
 		"""
 
+		self.logger.info("Sending action %s" % action)
 		self.logger.debug("Sending %s (%r)" % (action, param))
 
 		# Send text frame to websocket

@@ -85,10 +85,12 @@ Game-specific configuration
 class GameConfig:
 
 	GAME_DEFAULT_TEAM = 0
+	GAME_EXAM_COOLDOWN = 0
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
-		GameConfig.GAME_DEFAULT_TEAM = config.get("game", "default_team")
+		GameConfig.GAME_DEFAULT_TEAM = int(config.get("game", "default_team"))
+		GameConfig.GAME_EXAM_COOLDOWN = int(config.get("game", "exam_cooldown"))
 
 
 """

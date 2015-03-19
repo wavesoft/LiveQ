@@ -51,255 +51,256 @@ class AccountInterface(APIInterface):
 		"""
 		Handle chat actions
 		"""
+		try:
 
-		##################################################
-		# Request profile
-		# ------------------------------------------------
-		if action == "profile":
-			# Send user profile event
-			self.socket.sendUserProfile()
+			##################################################
+			# Request profile
+			# ------------------------------------------------
+			if action == "profile":
+				# Send user profile event
+				self.socket.sendUserProfile()
 
-		##################################################
-		# User variables
-		# ------------------------------------------------
-		elif action == "variables":
-			# Update user variables
-			self.user.setVariables( param['vars'] )
+			##################################################
+			# User variables
+			# ------------------------------------------------
+			elif action == "variables":
+				# Update user variables
+				self.user.setVariables( param['vars'] )
 
-		##################################################
-		# Trigger an arbitrary action
-		# ------------------------------------------------
-		elif action == "trigger":
+			##################################################
+			# Trigger an arbitrary action
+			# ------------------------------------------------
+			elif action == "trigger":
 
-			# Pop event
-			event = param['event']
-			del param['event']
+				# Pop event
+				event = param['event']
+				del param['event']
 
-			# Forward trigger
-			self.user.trigger( event, **param )
+				# Forward trigger
+				self.user.trigger( event, **param )
 
-			# Send response
-			self.sendResponse({ 
-					"status": "ok"
+				# Send response
+				self.sendResponse({ 
+						"status": "ok"
+						})
+
+			##################################################
+			# Get a value from a save slot
+			# ------------------------------------------------
+			elif action == "save.get":
+
+				# Check for missing parameters
+				if not 'id' in param:
+					self.sendError("Missing 'id' parameter")
+					return
+
+				# Return save slot values or blank array if missing
+				self.sendResponse({ 
+						"status": "ok",
+						"values": self.user.getVariable("save_slots", param['id'], {})
 					})
 
-		##################################################
-		# Get a value from a save slot
-		# ------------------------------------------------
-		elif action == "save.get":
 
-			# Check for missing parameters
-			if not 'id' in param:
-				self.sendError("Missing 'id' parameter")
-				return
+			##################################################
+			# Set a value to a save slot
+			# ------------------------------------------------
+			elif action == "save.set":
 
-			# Return save slot values or blank array if missing
-			self.sendResponse({ 
-					"status": "ok",
-					"values": self.user.getVariable("save_slots", param['id'], {})
-				})
+				# Check for missing parameters
+				if not 'id' in param:
+					self.sendError("Missing 'id' parameter")
+					return
+				if not 'values' in param:
+					self.sendError("Missing 'values' parameter")
+					return
 
+				# Set variable
+				self.user.setVariable( "save_slots", param['id'], param['values'] )
 
-		##################################################
-		# Set a value to a save slot
-		# ------------------------------------------------
-		elif action == "save.set":
+				# Send response
+				self.sendResponse({ 
+						"status": "ok"
+						})
 
-			# Check for missing parameters
-			if not 'id' in param:
-				self.sendError("Missing 'id' parameter")
-				return
-			if not 'values' in param:
-				self.sendError("Missing 'values' parameter")
-				return
-
-			# Set variable
-			self.user.setVariable( "save_slots", param['id'], param['values'] )
-
-			# Send response
-			self.sendResponse({ 
-					"status": "ok"
-					})
-
-		##################################################
-		# Return tuning configuration
-		# ------------------------------------------------
-		elif action == "data.tuning":
-
+			##################################################
 			# Return tuning configuration
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getTuningConfiguration()
-				})
+			# ------------------------------------------------
+			elif action == "data.tuning":
 
-		##################################################
-		# Return profile paper status
-		# ------------------------------------------------
-		elif action == "papers.profile":
+				# Return tuning configuration
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getTuningConfiguration()
+					})
 
-			# Return paper status
-			self.sendResponse({
-					"status": "ok",
-					"user" : self.user.getUnpublishedPapers(),
-					"team" : self.user.getTeamPapers()
-				})
-
-		##################################################
-		# Return papers status
-		# ------------------------------------------------
-		elif action == "papers.list":
-
-			# Return paper status
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getPapers(param['query'])
-				})
-
-		##################################################
-		# Read a particular paper
-		# ------------------------------------------------
-		elif action == "papers.read":
-
-			# Trigger action
-			self.user.trigger("paper.read", paper=param['id'])
-
-			# Return paper status
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getPaper(param['id'])
-				})
-
-		##################################################
-		# Create a new paper
-		# ------------------------------------------------
-		elif action == "papers.create":
-
-			# Make sure user is member of a team
-			if self.user.teamID == 0:
-				self.sendError("You must be member of a team before you can create a paper!", "not-in-team")
-
-			# Return paper status
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.createPaper()
-				})
-
-		##################################################
-		# Delete a particular paper
-		# ------------------------------------------------
-		elif action == "papers.delete":
-
-			# Delete paper
-			if self.user.deletePaper(param['id']):
+			##################################################
+			# Return profile paper status
+			# ------------------------------------------------
+			elif action == "papers.profile":
 
 				# Return paper status
 				self.sendResponse({
 						"status": "ok",
+						"user" : self.user.getUnpublishedPapers(),
+						"team" : self.user.getTeamPapers()
 					})
 
-			else:
+			##################################################
+			# Return papers status
+			# ------------------------------------------------
+			elif action == "papers.list":
 
 				# Return paper status
-				self.sendError('Could not delete paper', 'delete-error')
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getPapers(param['query'])
+					})
 
-		##################################################
-		# Update a particular paper
-		# ------------------------------------------------
-		elif action == "papers.update":
-
-			# Update paper
-			if self.user.updatePaper(param['id'], param['fields']):
+			##################################################
+			# Read a particular paper
+			# ------------------------------------------------
+			elif action == "papers.read":
 
 				# Trigger action
-				self.user.trigger("paper.update", paper=param['id'], fields=param['fields'])
+				self.user.trigger("paper.read", paper=param['id'])
 
 				# Return paper status
 				self.sendResponse({
 						"status": "ok",
+						"data" : self.user.getPaper(param['id'])
 					})
 
-			else:
+			##################################################
+			# Create a new paper
+			# ------------------------------------------------
+			elif action == "papers.create":
+
+				# Make sure user is member of a team
+				if self.user.teamID == 0:
+					self.sendError("You must be member of a team before you can create a paper!", "not-in-team")
 
 				# Return paper status
-				self.sendError('Could not update paper', 'update-error')
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.createPaper()
+					})
 
-		##################################################
-		# Get a particular book
-		# ------------------------------------------------
-		elif action == "books.read":
+			##################################################
+			# Delete a particular paper
+			# ------------------------------------------------
+			elif action == "papers.delete":
 
-			# Trigger action
-			self.user.trigger("book.read", book=param['name'])
+				# Delete paper
+				if self.user.deletePaper(param['id']):
 
-			# Mark book as read
-			self.user.markBookAsRead( param['name'] )
+					# Return paper status
+					self.sendResponse({
+							"status": "ok",
+						})
 
-			# Read a particular book
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getBook(param['name'])
-				})
+				else:
 
-		##################################################
-		# Get a book questions
-		# ------------------------------------------------
-		elif action == "books.questions":
+					# Return paper status
+					self.sendError('Could not delete paper', 'delete-error')
 
-			# Read a particular book
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getBookQuestions()
-				})
+			##################################################
+			# Update a particular paper
+			# ------------------------------------------------
+			elif action == "papers.update":
 
-		##################################################
-		# Handle answers to book question
-		# ------------------------------------------------
-		elif action == "books.answers":
+				# Update paper
+				if self.user.updatePaper(param['id'], param['fields']):
 
-			# Handle answers
-			self.user.handleBookQuestionAnswers( param['answers'] )
-			
-			# Send OK
-			self.sendResponse({
-					"status": "ok",
-				})
+					# Trigger action
+					self.user.trigger("paper.update", paper=param['id'], fields=param['fields'])
 
-		##################################################
-		# Get a books profile
-		# ------------------------------------------------
-		elif action == "profile.books":
+					# Return paper status
+					self.sendResponse({
+							"status": "ok",
+						})
 
+				else:
+
+					# Return paper status
+					self.sendError('Could not update paper', 'update-error')
+
+			##################################################
 			# Get a particular book
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getBookStatistics()
-				})
+			# ------------------------------------------------
+			elif action == "books.read":
 
-		##################################################
-		# Get machine parts
-		# ------------------------------------------------
-		elif action == "parts.details":
+				# Trigger action
+				self.user.trigger("book.read", book=param['name'])
 
-			# Lookup stage
-			try:
-				part = MachinePart.get( MachinePart.name == param['part'] )
-			except MachinePart.DoesNotExist:
-				self.sendError("The specified machine part does not exist!", "not-exists")
-				return
+				# Mark book as read
+				self.user.markBookAsRead( param['name'] )
 
-			# Return details
-			self.sendResponse({
-					"status": "ok",
-					"data" : self.user.getMachinePartDetails(part)
-				})
+				# Read a particular book
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getBook(param['name'])
+					})
 
-		##################################################
-		# Unlock the specified machine part
-		# ------------------------------------------------
-		elif action == "parts.unlock":
+			##################################################
+			# Get a book exam
+			# ------------------------------------------------
+			elif action == "books.exam":
 
-			# Cach exceptions
-			try:
+				# Read a particular book
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getBookExam()
+					})
+
+			##################################################
+			# Handle answers to book question
+			# ------------------------------------------------
+			elif action == "books.answers":
+
+				# Handle answers
+				self.user.handleBookQuestionAnswers( param['answers'] )
+				
+				# Send OK
+				self.sendResponse({
+						"status": "ok",
+					})
+
+				# Send user profile
+				self.socket.sendUserProfile()
+
+			##################################################
+			# Get a books profile
+			# ------------------------------------------------
+			elif action == "profile.books":
+
+				# Get a particular book
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getBookStatistics()
+					})
+
+			##################################################
+			# Get machine parts
+			# ------------------------------------------------
+			elif action == "parts.details":
+
+				# Lookup stage
+				try:
+					part = MachinePart.get( MachinePart.name == param['part'] )
+				except MachinePart.DoesNotExist:
+					self.sendError("The specified machine part does not exist!", "not-exists")
+					return
+
+				# Return details
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getMachinePartDetails(part)
+					})
+
+			##################################################
+			# Unlock the specified machine part
+			# ------------------------------------------------
+			elif action == "parts.unlock":
 
 				# Unlock machine part
 				self.user.unlockMachinePartStage(param['id'])
@@ -312,19 +313,23 @@ class AccountInterface(APIInterface):
 				# Resend user profile
 				self.socket.sendUserProfile()
 
-			except HLUserError as e:
 
-				# An error occured while trying to spend credits
-				self.sendError(e.message, e.code)
+			##################################################
+			# Request the achievements tree
+			# ------------------------------------------------
+			elif action == "achievements.tree":
 
-		##################################################
-		# Request the achievements tree
-		# ------------------------------------------------
-		elif action == "achievements.tree":
+				# Return achievements tree
+				self.sendResponse({
+					"status": "ok",
+					"data": self.user.getAchievementsTree()
+					})
 
-			# Return achievements tree
-			self.sendResponse({
-				"status": "ok",
-				"data": self.user.getAchievementsTree()
-				})
+		#######################################################
+		# Handle all exceptions
+		# -----------------------------------------------------
+		except HLUserError as e:
+
+			# An error occured while trying to spend credits
+			self.sendError(e.message, e.code)
 

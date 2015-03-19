@@ -17,6 +17,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import copy
+import time
 import json
 import uuid
 import logging
@@ -29,7 +31,7 @@ from webserver.common.forum import registerForumUser, forumUsernameExists
 
 from liveq.models import Tunable
 from webserver.models import *
-from webserver.config import Config
+from webserver.config import GameConfig
 from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
@@ -213,7 +215,7 @@ class HLUser:
 		# Create default user membership
 		teamMembership = TeamMembers.create(
 			user=user,
-			team=Config.GAME_DEFAULT_TEAM,
+			team=GameConfig.GAME_DEFAULT_TEAM,
 			status=TeamMembers.USER,
 			)
 		teamMembership.save()
@@ -225,7 +227,7 @@ class HLUser:
 		# Create a default paper for the user
 		paper = Paper.create(
 			owner=user,
-			team=Config.GAME_DEFAULT_TEAM,
+			team=GameConfig.GAME_DEFAULT_TEAM,
 			title="%s first paper" % profile['displayName'],
 			body=".. you can keep your notes here ..",
 			status=Paper.DRAFT,
@@ -298,7 +300,7 @@ class HLUser:
 		return "#%i" % self.id
 
 	###################################
-	# Handle action
+	# General purpose action handling
 	###################################
 
 	def handleAction(self, actionRecord):
@@ -420,9 +422,8 @@ class HLUser:
 		config = []
 		goals = []
 
-		# =================================
-		#  Get features from machine parts
-		# =================================
+		# Get features from machine parts
+		# --------------------------------
 
 		# Get unique unlocked machine parts
 		for p in MachinePart.select() \
@@ -434,17 +435,14 @@ class HLUser:
 			# Put in the observables
 			parts.append( p.name )
 
-		# ================================
 		#  Get features from achievements
-		# ================================
+		# --------------------------------
 
 		# Get Achievement nodes discovered
 		a_ids = self.dbUser.getAchievements()
-		print "Got achievements: %r" % a_ids
 
 		# Iterate over the currently explored achievement grid features
 		feats = Achievement.getTotalFeatures( a_ids )
-		print "Got achievement feats: %r" % feats
 
 		# Update achievement features
 		if 'observables' in feats:
@@ -458,9 +456,8 @@ class HLUser:
 		if 'goals' in feats:
 			goals += feats['goals']
 
-		# ==============================
 		#  Get unlocked machine parts
-		# ==============================
+		# --------------------------------
 
 		# Iterate over unlocked part stages
 		for stage in self.dbUser.getUnlockedPartStages():
@@ -481,9 +478,8 @@ class HLUser:
 				goals += feats['goals']
 
 
-		# ==============================
 		#  Aggregate
-		# ==============================
+		# --------------------------------
 
 		# Update features (remove duplicates)
 		self.dbUser.setState("observables", list(set(observables)) )
@@ -499,8 +495,7 @@ class HLUser:
 
 		# Get Achievement nodes discovered
 		a_ids = self.dbUser.getAchievements()
-		print "Got achievements: %r" % a_ids
-
+	
 		# Find next leaf achievements grid nodes
 		self.leafAchievements = []
 		leaf_achievements_id = []
@@ -580,6 +575,44 @@ class HLUser:
 	###################################
 	# High-level functions
 	###################################
+
+	def setCooldown(self, name, offset):
+		"""
+		Set a cooldown timer for the user on the given offset of seconds from now
+		"""
+
+		# Synchronize
+		self.reload()
+
+		# Get state cooldowns
+		cooldowns = self.dbUser.getState("cooldown", {})
+		cooldowns[name] = int(time.time()) + offset
+		self.dbUser.setState("cooldown", cooldowns)
+
+		# Save record
+		self.dbUser.save()
+
+	def isCooldownExpired(self, name):
+		"""
+		Check if a cooldown timer has expired
+		"""
+
+		# Synchronize
+		self.reload()
+
+		# Get cooldown
+		cooldowns = self.dbUser.getState("cooldown", {})
+		if not name in cooldowns:
+			return True
+
+		# Check if time has passed
+		if (time.time() > cooldowns[name]):
+			# Cleanup upon expiry
+			del cooldowns[name]
+			return True
+
+		# We haven't expired yet
+		return False
 
 	def trigger(self, action, **kwargs):
 		"""
@@ -788,7 +821,7 @@ class HLUser:
 
 		# Fire event
 		self.userEvents.send({
-			"type"   : "flash",
+			"type"   : "success",
 			"icon"   : "flash-icons/labo.png",
 			"title"  : "Science Points",
 			"message": "You have just earned <em>%i</em> science points!" % points
@@ -837,7 +870,7 @@ class HLUser:
 				.exists():
 
 				# The user hasn't unlocked the previous item
-				raise HLError("You must unlock the preceding item before unlocking this one!", "usage-error")
+				raise HLUserError("You must unlock the preceding item before unlocking this one!", "usage-error")
 
 
 		# Spend points
@@ -1115,10 +1148,14 @@ class HLUser:
 		# Return books sorted by state
 		return sorted( books, lambda x,y: y['state']-x['state'] )
 
-	def getBookQuestions(self, count=5):
+	def getBookExam(self, count=5):
 		"""
-		Return the book questions
+		Return a new book exam
 		"""
+
+		# Require a book-exam cooldown timer
+		if not self.isCooldownExpired("book-exam"):
+			raise HLUserError("You will have to wait a bit more until you are able to take another exam", "wait")
 
 		# Get user's visited books
 		nonMasteredBooks = self.dbUser.getVisitedBooks()
@@ -1126,12 +1163,10 @@ class HLUser:
 		# Remove mastered books from nonMasteredBooks
 		for k,v in self.bookState.iteritems():
 			if v['correct'] >= v['questions']:
-				print "??? Removing mastered book %i" % k
 				try:
 					i = nonMasteredBooks.index(k)
 					del nonMasteredBooks[i]
 				except ValueError:
-					print "??? (Not found)"
 					continue
 
 		# If nothing to query, return none
@@ -1203,6 +1238,13 @@ class HLUser:
 		Reply the book questions
 		"""
 
+		# Don't do anything if we don't really have replies
+		if not replies:
+			return
+
+		# Copy the user's book status
+		oBookState = copy.deepcopy(self.bookState)
+
 		# Process replies individually
 		for reply in replies:
 
@@ -1223,9 +1265,43 @@ class HLUser:
 			q.answer = reply['choice']
 			q.save()
 
+
 		# Update cache
 		self.updateCache_Books()
 		self.dbUser.save()
+
+		# Update cooldown timer
+		self.setCooldown("book-exam", GameConfig.GAME_EXAM_COOLDOWN)
+
+		print "<<< %r" % oBookState
+		print ">>> %r" % self.bookState
+
+		# If any of the books just become 'mastered', it
+		# happened because of our answer. Trigger the 'mastered'
+		# event.
+		for k,v in oBookState.iteritems():
+			nv = self.bookState[k]
+
+			# Check if they were/is mastered
+			wasMastered = (v['questions'] ==  v['correct'])
+			isMastered = (nv['questions'] == nv['correct'])
+
+			# Check if the question is now mastered
+			if not wasMastered and isMastered:
+
+				# Get book details
+				book = Book.get( Book.id == k )
+
+				# Fire event
+				self.userEvents.send({
+					"type"   : "flash",
+					"icon"   : "flash-icons/books.png",
+					"title"  : "Mastered topic",
+					"message": "You have just mastered the topic <em>%s</em>!" % book.name
+					})
+
+				# Give 5 points
+				self.earnPoints(5)
 
 	def getTeamCitedPapers(self):
 		"""
@@ -1430,7 +1506,6 @@ class HLUser:
 		tunOjects = []
 		tunNames = self.dbUser.getState("tunables", [])
 		if tunNames:
-			print ">>> %r <<<" % tunNames
 			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
 				tunOjects.append( tun )
 
@@ -1482,6 +1557,7 @@ class HLUser:
 			'analytics'		: analytics,
 			'token'			: self.token.token,
 			'papers'		: self.countPapers(),
+			'servertime'	: int(time.time()),
 			'team'			: teamName,
 			}
 
