@@ -1434,12 +1434,20 @@ class HLUser:
 
 		# If asked, prepend the user's active paper
 		if active:
-			# Prepend active paper
-			paper = self.dbUser.activePaper.serialize()
-			paper['active'] = True
-			ans.insert( 0, paper )
-			if not self.teamID in teamIDs:
-				self.teamIDs.append( self.teamID )
+			try:
+				# Get paper
+				paperObject = Paper.get( Paper.id == self.dbUser.activePaper_id )
+
+				# Prepend active paper
+				paper = paperObject.serialize()
+				paper['active'] = True
+				ans.insert( 0, paper )
+				if not self.teamID in teamIDs:
+					self.teamIDs.append( self.teamID )
+
+			except Paper.DoesNotExist:
+				self.logger.warn("User's active paper does not exist!")
+				pass
 
 		# If asked, collect cited papers
 		if cited:
