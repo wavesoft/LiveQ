@@ -225,6 +225,15 @@ class DatabaseInterface(APIInterface):
 		Return multiple records
 		"""
 
+		# Missing doc indices? Return 
+		if (not docIndices) or (len(docIndices) == 0):
+			self.sendResponse({
+				"status": "ok",
+				"docs": [],
+				"index": ""
+				})
+			return
+
 		# Check the table 
 		if not docName in self.tables:
 			return self.sendError("Table %s not found!" % docName, "table-not-found")

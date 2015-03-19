@@ -75,6 +75,11 @@ with open(sys.argv[1], 'w') as toFile:
 	toFile.write("SET NAMES utf8;\n");
 	toFile.write("SET FOREIGN_KEY_CHECKS = 0;\n\n");
 
+	# Public agent group
+	SQLExport(toFile, AgentGroup, AgentGroup.select().where(
+		AgentGroup.id == 1
+		))
+
 	# Dump all books
 	SQLExport(toFile, Book, Book.select())
 
@@ -83,6 +88,9 @@ with open(sys.argv[1], 'w') as toFile:
 
 	# Dump all definitions
 	SQLExport(toFile, Definition, Definition.select())
+
+	# Dump all definitions
+	SQLExport(toFile, FirstTime, FirstTime.select())
 
 	# Dump all labs
 	SQLExport(toFile, Lab, Lab.select())

@@ -133,6 +133,8 @@ class HLUser:
 
 		except TeamMembers.DoesNotExist:
 			# Not in a team
+
+			self.logger.warn("Not a member of a team! This might cause an unhandled exception somewhere...")
 			pass
 
 	@staticmethod
@@ -187,9 +189,12 @@ class HLUser:
 			aProfile = AnalyticsProfile.create(
 				uuid=uuid.uuid4().hex,
 				gender=profile['analytics']['gender'],
-				birthYear=profile['analytics']['birthYear'],
-				audienceSource=profile['analytics']['audienceSource'],
-				audienceInterests=profile['analytics']['audienceInterests'],
+				ageGroup=profile['analytics']['ageGroup'],
+				occupation=profile['analytics']['occupation'],
+				knowledge=profile['analytics']['knowledge'],
+				foundout=profile['analytics']['foundout'],
+				hopes=profile['analytics']['hopes'],
+				similar=profile['analytics']['similar'],
 				)
 			aProfile.save()
 
@@ -934,7 +939,10 @@ class HLUser:
 
 		# Get book name
 		if partData['book']:
-			partData['book'] = part.book.name
+			try:
+				partData['book'] = part.book.name
+			except Book.DoesNotExist:
+				partData['book'] = ""
 
 		# Return
 		return partData
@@ -1378,6 +1386,11 @@ class HLUser:
 		if 'public' in query:
 			public = bool(query['public'])
 
+		# Check if we should include active
+		active=True
+		if 'active' in query:
+			active = bool(query['active'])
+
 		# Check for terms
 		terms=None
 		if 'terms' in query:
@@ -1418,6 +1431,15 @@ class HLUser:
 			# Collect team IDs
 			if not row._data['team'] in teamIDs:
 				teamIDs.append( row._data['team'] )
+
+		# If asked, prepend the user's active paper
+		if active:
+			# Prepend active paper
+			paper = self.dbUser.activePaper.serialize()
+			paper['active'] = True
+			ans.insert( 0, paper )
+			if not self.teamID in teamIDs:
+				self.teamIDs.append( self.teamID )
 
 		# If asked, collect cited papers
 		if cited:
@@ -1527,15 +1549,7 @@ class HLUser:
 		# Compile analytics profile
 		analytics = None
 		if user.analyticsProfile:
-			analytics = {
-				'uuid'				: user.analyticsProfile.uuid,
-				'gender' 			: user.analyticsProfile.gender,
-				'birthYear' 		: user.analyticsProfile.birthYear,
-				'audienceSource'	: user.analyticsProfile.audienceSource,
-				'audienceInterests'	: user.analyticsProfile.audienceInterests,
-				'lastEvent' 		: str(user.analyticsProfile.lastEvent),
-				'metrics' 			: json.loads(user.analyticsProfile.metrics),
-			}
+			analytics = user.analyticsProfile.serialize()
 
 		# Get team name
 		teamName = ""

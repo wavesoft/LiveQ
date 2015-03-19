@@ -65,9 +65,12 @@ class AnalyticsProfile(BaseModel):
 
 	# Analytics fields
 	gender = CharField(max_length=6,default="")
-	birthYear = IntegerField(default=0)
-	audienceSource = CharField(max_length=68, default="")
-	audienceInterests = CharField(max_length=68, default="")
+	ageGroup = IntegerField(default=0)
+	occupation = CharField(max_length=128, default="")
+	knowledge = CharField(max_length=128, default="")
+	foundout = TextField()
+	hopes = TextField()
+	similar = IntegerField(default=0)
 
 	#: When was it created
 	created = DateTimeField(default=datetime.datetime.now)

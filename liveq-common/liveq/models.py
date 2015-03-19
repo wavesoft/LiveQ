@@ -19,6 +19,7 @@
 
 import datetime
 import json
+import traceback
 
 from peewee import *
 from liveq.config.database import DatabaseConfig
@@ -52,30 +53,35 @@ class BaseModel(Model):
 		# Compile document
 		document = {}
 		for f in FIELDS:
-			v = getattr(self, f)
-			if (f in self.__class__.JSON_FIELDS) and expandJSON:
-				if not v:
-					document[f] = {}
-				else:
-					document[f] = json.loads(v)
-			else:
-				if isinstance(v, Model):
-
-					# If we are asked to expand this foreign key, 
-					# do it now.
-					if (expandForeigns == True) or (f in expandForeigns):
-						# Expand foreign key? Serialize
-						document[f] = v.serialize()
+			try:
+				v = getattr(self, f)
+				if (f in self.__class__.JSON_FIELDS) and expandJSON:
+					if not v:
+						document[f] = {}
 					else:
-						# Foreign key? Just get the raw key value
-						document[f] = self._data[f]  #getattr(v, v._meta.primary_key.name)
-
-				elif isinstance(v, datetime.datetime):
-					# Convert datetime to UTC Time
-					document[f] = str(v)
+						document[f] = json.loads(v)
 				else:
-					# Otherwise keep it as it is
-					document[f] = v
+					if isinstance(v, Model):
+
+						# If we are asked to expand this foreign key, 
+						# do it now.
+						if (expandForeigns == True) or (f in expandForeigns):
+							# Expand foreign key? Serialize
+							document[f] = v.serialize()
+						else:
+							# Foreign key? Just get the raw key value
+							document[f] = self._data[f]  #getattr(v, v._meta.primary_key.name)
+
+					elif isinstance(v, datetime.datetime):
+						# Convert datetime to UTC Time
+						document[f] = str(v)
+					else:
+						# Otherwise keep it as it is
+						document[f] = v
+
+			except DoesNotExist:
+				traceback.print_exc()
+				document[f] = None
 
 		# Return document
 		return document
@@ -347,9 +353,9 @@ class Agent(BaseModel):
 	uuid = CharField(max_length=128, index=True, unique=True)
 
 	#: Agent's IP Address
-	ip = CharField(max_length=45, index=True, unique=True)
+	ip = CharField(max_length=45, default="")
 	#: Lattitude and longitude
-	latlng = CharField(max_length=20, index=True, unique=True)
+	latlng = CharField(max_length=20, default="")
 
 	#: The timestamp of the last activity of the agent
 	lastActivity = IntegerField(default=0)
