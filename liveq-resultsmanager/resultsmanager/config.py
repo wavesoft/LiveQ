@@ -30,9 +30,12 @@ class ResultsManagerConfig:
 	Local configuration for the results manager
 	"""
 
+	#: The directory where the job output will be dumped
+	RESULTS_DIR=""
+
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
-		pass
+		WebserverConfig.RESULTS_DIR = config.get("resultsmanager", "results_dir")
 
 """
 Create a configuration for the JOB MANAGER based on the core config

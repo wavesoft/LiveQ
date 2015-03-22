@@ -26,7 +26,7 @@ from jobmanager.config import Config
 
 from liveq.component import Component
 from liveq.io.bus import BusChannelException
-from liveq.models import Agent, AgentGroup, AgentMetrics, Observable
+from liveq.models import JobResult
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.tune import Tune
 
@@ -74,6 +74,8 @@ class ResultsManagerComponent(Component):
 		meta = message['meta']
 		data = IntermediateHistogramCollection.fromPach( message['data'] )
 
+		# Create job result record
+		
 
 	def onBusResultsGet(self, message):
 		"""
@@ -82,3 +84,4 @@ class ResultsManagerComponent(Component):
 
 		# Log request
 		self.logger.info("Got job request in IBUS")
+
