@@ -49,7 +49,7 @@ class EventBroadcastWrapper(EventDispatcher):
 		# Unregister wrapper
 		i = self.channel.wrappers.index( self )
 		if i >= 0:
-			logger.info("[%s] Released wrapper" % self.channelName)
+			logger.info("[%s] Released wrapper" % self.channel.channelName)
 			del self.channel.wrappers[i]
 
 		# If that was the last, close channel
