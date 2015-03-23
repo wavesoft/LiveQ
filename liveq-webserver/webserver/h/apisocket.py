@@ -48,9 +48,6 @@ import tornado.websocket
 #: Ping interval (ms)
 PING_INTERVAL = datetime.timedelta(0,2)
 
-#: Ping timeout (ms)
-PING_TIMEOUT = datetime.timedelta(0,60)
-
 class APISocketHandler(tornado.websocket.WebSocketHandler):
 	"""
 	API I/O Socket handler
@@ -67,7 +64,6 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.user = None
 		self.hl_user = None
 		self.connected = False
-		self.pingTimeout = None
 		self.pingTimer = None
 		self.userevents = None
 
@@ -130,10 +126,6 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		if msg != "io.keepalive":
 			self.logger.warn("[%s] Got invalid PONG reply!", self.remote_ip)
 			return
-
-		# Remove the timeout timer
-		if self.pingTimeout:
-			IOLoop.instance().remove_timeout(self.pingTimeout)
 
 		# Schedule next ping
 		self.pingTimer = IOLoop.instance().add_timeout(PING_INTERVAL, self.scheduledPing)        
@@ -213,25 +205,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Send a ping request
 		try:
 			self.ping("io.keepalive")
-
-			# Schedule a timeout timer
-			self.pingTimeout = IOLoop.instance().add_timeout(PING_TIMEOUT, self.pingTimeoutCallback)
-			self.pingTimer = None
-
 		except:
 			pass
 
-
-	def pingTimeoutCallback(self):
-		"""
-		The socket timed out
-		"""
-
-		# Timeout while waiting for pong
-		self.logger.warn("[%s] Socket connection timeout", self.remote_ip)
-
-		# Close
-		self.close()
 
 	def sendError(self, message, code="", domain="global"):
 		"""
