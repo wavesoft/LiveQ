@@ -82,8 +82,9 @@ class LabSocketInterface(APIInterface):
 			self.ipolChannel = None
 
 		# Release notifications channel
-		self.notificationsChannel.close()
-		self.notificationsChannel = None
+		if self.notificationsChannel:
+			self.notificationsChannel.close()
+			self.notificationsChannel = None
 
 		# Deselect data channel
 		self.selectDataChannel( None )
