@@ -49,7 +49,7 @@ import tornado.websocket
 PING_INTERVAL = datetime.timedelta(0,2)
 
 #: Ping timeout (ms)
-PING_TIMEOUT = datetime.timedelta(0,10)
+PING_TIMEOUT = datetime.timedelta(0,60)
 
 class APISocketHandler(tornado.websocket.WebSocketHandler):
 	"""
