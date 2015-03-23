@@ -785,6 +785,12 @@ class HLUser:
 			# Save 
 			self.dbUser.save()
 
+			# Trigger notification
+			self.userEvents.send({
+				"type"   : "info",
+				"title"  : "Knowledge explored",
+				"message": "That's the first time you see the term <em>%s</em>" % bookName
+				})
 
 	def spendPoints(self, points=0):
 		"""
@@ -831,6 +837,23 @@ class HLUser:
 			"title"  : "Science Points",
 			"message": "You have just earned <em>%i</em> science points!" % points
 			})
+
+
+	def getJob(self, job_id):
+		"""
+		Check if the specified job belongs to the specified user
+		and return the job record.
+		"""
+
+		# Check if the specified job from the jobQueue belongs
+		# to the user with our current ID
+		try:
+			return JobQueue.select() \
+				.where( JobQueue.id == int(job_id) ) \
+				.where( JobQueue.user_id == int(self.id) ) \
+				.get()
+		except JobQueue.DoesNotExist:
+			return None
 
 	###################################
 	# In-game information queries

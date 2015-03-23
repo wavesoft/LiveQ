@@ -28,6 +28,7 @@ import liveq.data.histo.io as io
 
 import tornado.escape
 
+from liveq.io.eventbroadcast import EventBroadcast
 from liveq.models import Lab, Observable, TunableToObservable, Agent, JobQueue
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
@@ -52,6 +53,7 @@ class LabSocketInterface(APIInterface):
 		self.jobChannel = None
 		self.ipolChannel = None
 		self.sentConfigFrame = False
+		self.notificationsChannel = None
 
 		# Tunable/Observable Trim
 		self.trimObs = []
@@ -79,6 +81,10 @@ class LabSocketInterface(APIInterface):
 			self.ipolChannel.close()
 			self.ipolChannel = None
 
+		# Release notifications channel
+		self.notificationsChannel.close()
+		self.notificationsChannel = None
+
 		# Deselect data channel
 		self.selectDataChannel( None )
 
@@ -89,6 +95,10 @@ class LabSocketInterface(APIInterface):
 
 		# Keep a local reference of the user
 		self.user = self.socket.user
+
+		# Open a notifications channel
+		self.notificationsChannel = EventBroadcast.forChannel("notifications")
+		self.notificationsChannel.on('job.completed', self.ntfJobCompleted)
 
 	def handleAction(self, action, param):
 		"""
@@ -129,8 +139,21 @@ class LabSocketInterface(APIInterface):
 		# ------------------------------------------------
 		elif action == "job.enum":
 
-			# Send job listing
 			self.sendJobListing()
+			# # Reply with the job listing
+			# ans = []
+
+			# # Select team jobs
+			# jobs = JobQueue.select().where( 
+			# 		((JobQueue.team_id == self.user.teamID) | (JobQueue.user_id == self.user.id))
+			# 	  & (JobQueue.status << [ JobQueue.PENDING, JobQueue.RUN, JobQueue.STALLED ])
+			# 	).dicts()[:]
+
+			# # Send response
+			# self.sendResponse({ 
+			# 		"status": "ok",
+			# 		"jobs": jobs
+			# 		})
 
 		##################################################
 		# Focus on the job with the given ID
@@ -192,6 +215,12 @@ class LabSocketInterface(APIInterface):
 
 			# The job started, switch to that job
 			self.switchToJob( ans['jid'] )			
+
+			# Send response
+			self.sendResponse({ 
+					"status": "ok",
+					"jid": ans['jid']
+					})
 
 		##################################################
 		# Estimate the results of the specified job
@@ -263,6 +292,26 @@ class LabSocketInterface(APIInterface):
 	#                               MESSAGE BUS CALLBACKS
 	# --------------------------------------------------------------------------------
 	####################################################################################
+
+	def ntfJobCompleted(self, data):
+		"""
+		[Notification] A job is completed
+		"""
+
+		# Handle errors
+		if not 'jid' in data:
+			return
+
+		# Check if this job belongs to this user
+		job = self.user.getJob(data['jid'])
+		if job:
+
+			# Send user event
+			self.user.userEvents.send({
+				"type"   : "info",
+				"title"  : "Validation",
+				"message": "Your validation job #%i is completed!" % job.id
+				})
 
 	def onBusData(self, data):
 		"""
@@ -397,6 +446,7 @@ class LabSocketInterface(APIInterface):
 
 		# Serialize job
 		jobData = jobRef.serialize()
+		jobData['maxEvents'] = self.lab.getEventCount()
 		self.sendAction("job.details", {
 				'job': jobData,
 				'agents': self.getAgents( jobRef )
@@ -639,3 +689,4 @@ class LabSocketInterface(APIInterface):
 
 			# Reset job ID
 			self.job = None
+

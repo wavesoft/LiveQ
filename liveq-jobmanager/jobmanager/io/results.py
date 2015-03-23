@@ -17,28 +17,12 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import os
+import cPickle as pickle
+import logging
 
-from webserver.config import Config
-from liveq.data.histo import Histogram
+logger = logging.getLogger("results")
 
-def loadReferenceHistogram(histoPath):
+def dump():
 	"""
-	Load reference data for the given histogram
 	"""
-
-	# Strip heading slash
-	if histoPath[0] == "/":
-		histoPath = histoPath[1:]
-
-	# Convert slashes to underscores
-	histoPath = histoPath.replace("/", "_")
-
-	# Lookup if such historam exists
-	histoPath = "%s/%s.dat" % (Config.HISTOREF_PATH, histoPath)
-	if not os.path.isfile(histoPath):
-		return None
-
-	# Load histogram
-	return Histogram.fromFLAT( histoPath )
-
+	

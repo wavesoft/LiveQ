@@ -249,6 +249,7 @@ def peekQueueJob():
 		# Otherwise we do have an instance in place
 		return job
 
+
 def handleLoss( agent ):
 	"""
 	Handle the fact that we lost the given agent unexpecidly.
@@ -256,7 +257,6 @@ def handleLoss( agent ):
 	This function returns TRUE if by removing this agent the job is complete
 	and can be finalized.
 	"""
-	global pendingCompletedJobs
 	
 	# Check if it has an active job
 	if not agent.activeJob:
@@ -280,38 +280,11 @@ def handleLoss( agent ):
 	# how many agents are left in the array
 	agentDataCount = job.removeAgentData( job_id )
 
-	# Check if that was the last agent handling this job
-	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == job_id) ).execute().next()
-
 	# Send status
 	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % values.count, {"RES_SLOTS":values.count})
 
-	# Check if we were left with nothing
-	if values.count == 0:
-
-		# Check if this job has already some data piled in it's
-		# histogram buffer. If that's the case, we can consider the 
-		# job completed (with less agents that requested)
-		if agentDataCount > 0:
-
-			# Mark the job as completed, by placing it on the
-			# pendingCompletedJobs array, whose contents will
-			# be fetched in the process loop
-			pendingCompletedJobs.append( job )
-
-		else:
-
-			# Make as stale
-			job.setStatus( jobs.STALLED )
-
-			# Send status
-			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
-
-			# Re-place job on queue with highest priority
-			Config.STORE.rpush( "scheduler:queue", job_id )
-
-	# Return FALSE to denote that the job is re-scheduled
-	return False
+	# Check if it's completed, or re-schedule
+	return completeOrReschedule(job)
 
 
 def markForJob(agents, job_id, agent_runtimes):
@@ -520,6 +493,53 @@ def releaseJob( job ):
 	# Clear the record on the agents that have active jobs
 	logger.info("Releasing job %s" % job.id)
 	numUpdated = Agent.update( activeJob=0 ).where( Agent.activeJob == job.id ).execute()
+
+def completeOrReschedule( job ):
+	"""
+	Check if the specified job is completed and if not, re-schedule for execution.
+	This function returns TRUE if the job is completed or FALSE otherwise
+	"""
+	global pendingCompletedJobs
+
+	# Check if that was the last agent handling this job
+	values = Agent.select( fn.Count("id").alias("count") ).where( (Agent.state == 1) & (Agent.activeJob == job.id) ).execute().next()
+
+	logger.info("Complete or reschedule job %s with %i agents?" % (job.id, values.count))
+
+	# Check if we were left with nothing
+	if values.count == 0:
+
+		# Check if the job is completed
+		if job.isCompleted():
+			logger.info("Job %s is completed" % job.id)
+
+			# Mark the job as completed, by placing it on the
+			# pendingCompletedJobs array, whose contents will
+			# be fetched in the process loop
+			pendingCompletedJobs.append( job )
+
+			# Job is completed
+			return True
+
+		else:
+			logger.info("Job %s is not completed, rescheduling" % job.id)
+
+			# Make as stale
+			job.setStatus( jobs.STALLED )
+
+			# Send status
+			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
+
+			# Re-place job on queue with highest priority
+			Config.STORE.rpush( "scheduler:queue", job.id )
+
+			# Job is re-scheduled
+			return False
+
+	# If we do have workers, the job is still running, return False
+	else:
+		logger.info("Job %s has more active workers" % job.id)
+		return False
 
 def abortJob( job ):
 	"""

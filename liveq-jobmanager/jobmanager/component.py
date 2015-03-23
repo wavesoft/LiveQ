@@ -29,13 +29,17 @@ import jobmanager.io.agents as agents
 from jobmanager.config import Config
 
 from liveq.component import Component
+from liveq.io.eventbroadcast import EventBroadcast
 from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
 from liveq.models import Agent, AgentGroup, AgentMetrics, Observable
+
 from liveq.reporting.postmortem import PostMortem
-from liveq.data.histo.intermediate import IntermediateHistogramCollection
-from liveq.data.tune import Tune
 from liveq.reporting.lars import LARS
+
+from liveq.data.tune import Tune
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.reference import collectionChi2Reference
 
 class JobManagerComponent(Component):
 	"""
@@ -82,6 +86,9 @@ class JobManagerComponent(Component):
 
 		# Open the results manager channel where we are dumping the final results
 		self.resultsChannel = Config.IBUS.openChannel("results")
+
+		# Open a global notifications channel
+		self.notificationsChannel = EventBroadcast.forChannel("notifications")
 
 		# Channel mapping
 		self.channels = { }
@@ -232,7 +239,7 @@ class JobManagerComponent(Component):
 				if ans['result'] == "ok":
 
 					job.addAgentInfo(agent)
-					self.logger.info("Successfuly started job %s on %s (events=%i)" % ( job.id, agent.uuid, config['events'] ))
+					self.logger.info("Successfuly started job %s on %s (runEvents=%i)" % ( job.id, agent.uuid, config['events'] ))
 
 					# Job is running
 					job.setStatus( jobs.RUN )
@@ -259,17 +266,22 @@ class JobManagerComponent(Component):
 			histoCollection = job.getHistograms()
 			if histoCollection == None:
 				job.sendStatus("Unable to merge histograms")
-				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, job.id))
+				self.logger.warn("[%s] Unable to merge histograms of job %s" % (job.channel.name, job.id))
 				return
 
 		# Send status
 		job.sendStatus("All workers have finished. Collecting final results.")
+
+		# Calculate chi2 of the collection
+		print "}}} %r" % histoCollection
+		chi2fit = collectionChi2Reference( histoCollection )
 
 		# If ALL histograms have state=2 (completed), it means that the
 		# job is indeed completed. Reply to the job channel the final job data
 		job.channel.send("job_completed", {
 				'jid': job.id,
 				'result': 0,
+				'fit': chi2fit,
 				'data': histoCollection.pack()
 			})
 
@@ -277,11 +289,19 @@ class JobManagerComponent(Component):
 		self.resultsChannel.send("results_put", {
 				'jid': job.id,
 				'result': 0,
+				'fit': chi2fit,
 				'data': histoCollection.pack()
 			})
 
 		# Cleanup job from scheduler
 		scheduler.releaseJob( job )
+
+		# Send job completion event
+		self.notificationsChannel.broadcast("job.completed", {
+				'jid': job.id,
+				'fit': chi2fit,
+				'result': 0
+			})
 
 		# And then cleanup job
 		job.release(reason=jobs.COMPLETED)
@@ -516,26 +536,27 @@ class JobManagerComponent(Component):
 				self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
 				return
 
+			# Register the agent job success
+			agents.agentJobSucceeded( channel.name, job )
+
 			# Free this agent from the given job, allowing
 			# scheduler logic to process the free resource
 			scheduler.releaseFromJob( channel.name, job )
 
-			# If all jobs are completed, forward the job_completed event,
-			# otherwise fire the job_data event.
-			if histos.state == 2:
+			# Check if the job is completed
+			if scheduler.completeOrReschedule(job):
 
 				# Job is completed
 				self.notifyJobCompleted( job, histoCollection=histos )
 				self.logger.info("All workers of job %s have finished" % jid)
 
 			else:
+
+				# Otherwise just send intermediate data
 				job.channel.send("job_data", {
 						'jid': jid,
 						'data': histos.pack()
 					})
-
-			# Register the agent job success
-			agents.agentJobSucceeded( channel.name, job )
 
 	# =========================
 	# Internal Bus Callbacks
@@ -677,7 +698,7 @@ class JobManagerComponent(Component):
 		histos = job.getHistograms()
 		if histos == None:
 			job.sendStatus("Unable to merge histograms")
-			self.logger.warn("[%s] Unable to merge histograms of job %s" % (channel.name, jid))
+			self.logger.warn("[%s] Unable to merge histograms of job %s" % (job.channel.name, jid))
 			return
 
 		# Send data on job channel

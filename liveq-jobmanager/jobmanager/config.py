@@ -24,6 +24,7 @@ from liveq.config.database import DatabaseConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.externalbus import ExternalBusConfig
+from liveq.config.histograms import HistogramsConfig
 from liveq.models import createBaseTables
 
 class JobManagerConfig:
@@ -56,7 +57,7 @@ class JobManagerConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, ExternalBusConfig, JobManagerConfig):
+class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, ExternalBusConfig, JobManagerConfig, HistogramsConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -76,6 +77,7 @@ class Config(CoreConfig, DatabaseConfig, StoreConfig, InternalBusConfig, Externa
 		InternalBusConfig.fromConfig( config, runtimeConfig )
 		ExternalBusConfig.fromConfig( config, runtimeConfig )
 		JobManagerConfig.fromConfig( config, runtimeConfig )
+		HistogramsConfig.fromConfig( config, runtimeConfig )
 
 		# Create core models on the database
 		createBaseTables()

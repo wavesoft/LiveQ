@@ -150,6 +150,8 @@ def intermediateCollectionMerge(collections):
 	# If the collections list contains only 1 histogram, return it as-is
 	if len(collections) == 1:
 		return collections[0]
+	elif len(collections) < 1:
+		return None
 
 	# Create a response collection
 	ans = IntermediateHistogramCollection()

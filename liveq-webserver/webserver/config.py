@@ -26,6 +26,7 @@ from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.cache import CacheConfig
+from liveq.config.histograms import HistogramsConfig
 from liveq.models import createBaseTables
 from webserver.models import createWebserverTables
 
@@ -36,7 +37,6 @@ class WebserverConfig:
 
 	SERVER_PORT = 8080
 	BASE_URL = "/vas"
-	HISTOREF_PATH = ""
 	TRAINSEQ_PATH = ""
 	HISTODESC = None
 	SSL = False
@@ -48,7 +48,6 @@ class WebserverConfig:
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
-		WebserverConfig.HISTOREF_PATH = config.get("webserver", "historef_path")
 		WebserverConfig.TRAINSEQ_PATH = config.get("webserver", "trainseq_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
 		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
@@ -96,7 +95,7 @@ class GameConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig, GameConfig):
+class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig, GameConfig, HistogramsConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -118,7 +117,8 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 		WebserverConfig.fromConfig( config, runtimeConfig )
 		ForumConfig.fromConfig( config, runtimeConfig )
 		GameConfig.fromConfig( config, runtimeConfig )
-
+		HistogramsConfig.fromConfig( config, runtimeConfig )
+		
 		# Ensure base tables exist
 		createBaseTables()
 		createWebserverTables()

@@ -104,6 +104,7 @@ class Job:
 		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(histos))
 
 		# Merge histograms
+		print ">> Merge %r" % histos.keys()
 		hc = intermediateCollectionMerge( histos.values() )
 
 		# Update number of events in the job files
@@ -127,6 +128,7 @@ class Job:
 			histos = pickle.loads(buf)
 
 		# Merge and return histograms
+		print ">> GET: Merge %r" % histos.keys()
 		return intermediateCollectionMerge( histos.values() )
 
 	def removeAgentData(self, agent):
@@ -271,6 +273,14 @@ class Job:
 		Return number of events so far
 		"""
 		return self.job.events
+
+	def isCompleted(self):
+		"""
+		Check if the job is completed
+		"""
+
+		# If we don't have remaining events, return True
+		return (self.getRemainingEvents() <= 0)
 
 ##############################################################
 # ------------------------------------------------------------

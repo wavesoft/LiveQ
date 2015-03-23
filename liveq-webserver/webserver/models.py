@@ -23,7 +23,7 @@ import json
 
 from peewee import *
 from liveq.models import BaseModel, JobQueue, AgentGroup, Agent, \
-						 AgentMetrics, Lab, Tunable, \
+						 AgentMetrics, Lab, Tunable, JobResult, \
 						 Observable, TunableToObservable, PostMortems
 
 from liveq.config.database import DatabaseConfig
@@ -910,7 +910,7 @@ class MachinePartStage(BaseModel):
 	#: The name of the trigger event that will cause
 	#: this achievement element to be activated
 	#: automatically (assuming credit is available)
-	triggerEvent = CharField(max_length=128, default="")
+	triggerEvent = CharField(max_length=128, default="{}")
 
 	#: Enumeration of sequences to be performed upon
 	#: unlocking this item

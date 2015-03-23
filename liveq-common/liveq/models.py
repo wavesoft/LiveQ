@@ -95,7 +95,7 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable, TunableToObservable, 
-				   PostMortems, JobQueue ]:
+				   PostMortems, JobQueue, JobResult ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -335,6 +335,24 @@ class JobQueue(BaseModel):
 		"""
 		self.lastEvent = datetime.datetime.now()
 		return super(JobQueue, self).save(*args, **kwargs)
+
+class JobResult(BaseModel):
+	"""
+	Results records
+	"""
+
+	#: Date received
+	date = DateTimeField(default=datetime.datetime.now)
+
+	#: Fit score
+	fit = FloatField(default=0.0)
+
+	#: Tunables
+	values = TextField(default="")
+
+	#: Metadata
+	meta = TextField(default="")
+
 
 class AgentGroup(BaseModel):
 	"""

@@ -21,8 +21,8 @@ import tornado.escape
 import liveq.data.js as js
 
 from liveq.models import Observable, Tunable
+from liveq.data.histo.reference import loadReferenceHistogram
 
-from webserver.common.reference import loadReferenceHistogram
 from webserver.common.minimacros import convertMiniMacros
 
 def compileObservableHistoBuffers(histo_ids):
