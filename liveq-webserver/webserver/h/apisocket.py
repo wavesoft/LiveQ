@@ -238,18 +238,21 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Shorthand to respond with an error
 		"""
 
-		# Send the error message
-		self.write_message({
-				"action": "error",
-				"param": {
-					"message": message,
-					"code": code,
-					"domain": domain
-				}
-			})
-
 		# And log the error
 		self.logger.warn("[%s] %s" % (self.remote_ip, message))
+
+		# Send the error message
+		try:
+			self.write_message({
+					"action": "error",
+					"param": {
+						"message": message,
+						"code": code,
+						"domain": domain
+					}
+				})
+		except WebSocketClosedError as e:
+			self.logger.warn("Sending on a closed socket!")
 
 	def sendAction(self, action, param={}):
 		"""
@@ -260,10 +263,13 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.logger.debug("Sending %s (%r)" % (action, param))
 
 		# Send text frame to websocket
-		self.write_message({
-				"action": action,
-				"param": param
-			})
+		try:
+			self.write_message({
+					"action": action,
+					"param": param
+				})
+		except WebSocketClosedError as e:
+			self.logger.warn("Sending on a closed socket!")
 
 	def sendBuffer(self, frameID, data):
 		"""
@@ -273,11 +279,14 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.logger.debug("Sending binary frame  #%s (%s bytes)" % (frameID, len(data)))
 
 		# Send a binary frame to WebSocket
-		self.write_message( 
-			# Header MUST be 64-bit aligned
-			struct.pack("<II", frameID, 0)+data, 
-			binary=True
-		)
+		try:
+			self.write_message( 
+				# Header MUST be 64-bit aligned
+				struct.pack("<II", frameID, 0)+data, 
+				binary=True
+			)
+		except WebSocketClosedError as e:
+			self.logger.warn("Sending on a closed socket!")
 
 	def sendUserProfile(self):
 		"""
