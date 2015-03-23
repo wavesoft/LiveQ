@@ -92,7 +92,7 @@ def collectionChi2Reference(histoCollection):
 	for histo in histoCollection.values():
 		chi2value = histoChi2Reference( histo )
 		if chi2value > 0.0:
-			chi2sum += 
+			chi2sum += chi2value
 			chi2count += 1
 
 	# Return average
