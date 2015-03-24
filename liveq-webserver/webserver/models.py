@@ -632,7 +632,17 @@ class Paper(BaseModel):
 		"""
 		Return the tunable configuration
 		"""		
-		return json.loads(self.tunableValues)
+
+		# Missing? Return blank
+		if not self.tunableValues:
+			return {}
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.tunableValues)
+		except ValueError as e:
+			logging.error("ValueError parsing 'tunableValues' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setTunableValues(self, data):
 		"""

@@ -135,7 +135,17 @@ class Lab(BaseModel):
 		"""
 		Return the parsed parameters
 		"""
-		return json.loads(self.fixedParameters)
+
+		# Missing? Return blank
+		if not self.fixedParameters:
+			return {}
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.fixedParameters)
+		except ValueError as e:
+			logging.error("ValueError parsing 'fixedParameters' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setParameters(self, data):
 		"""
@@ -286,7 +296,17 @@ class JobQueue(BaseModel):
 		"""
 		Return the tunable configuration
 		"""		
-		return json.loads(self.userTunes)
+
+		# Missing? Return blank
+		if not self.userTunes:
+			return {}
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.userTunes)
+		except ValueError as e:
+			logging.error("ValueError parsing 'userTunes' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setTunableValues(self, data):
 		"""
@@ -347,9 +367,17 @@ class JobQueue(BaseModel):
 		"""
 		Return the results metadata
 		"""
+
+		# Missing? Return blank
 		if not self.resultsMeta:
 			return {}
-		return json.loads(self.resultsMeta)
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.resultsMeta)
+		except ValueError as e:
+			logging.error("ValueError parsing 'resultsMeta' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 class AgentGroup(BaseModel):
 	"""
@@ -405,9 +433,17 @@ class Agent(BaseModel):
 		"""
 		Get runtime configuration
 		"""
+
+		# Missing? Return blank
 		if not self.activeJobRuntime:
 			return {}
-		return json.loads(self.activeJobRuntime)
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.activeJobRuntime)
+		except ValueError as e:
+			logging.error("ValueError parsing 'activeJobRuntime' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setRuntime(self, runtime):
 		"""
@@ -491,7 +527,17 @@ class Tunable(BaseModel):
 		"""
 		JSON-Decode options
 		"""
-		return json.loads(self.options)
+
+		# Missing? Return blank
+		if not self.options:
+			return {}
+
+		# Erroreus? Renurn blank
+		try:
+			return json.loads(self.options)
+		except ValueError as e:
+			logging.error("ValueError parsing 'options' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
 
 	def setOptions(self, options=[]):
 		"""
