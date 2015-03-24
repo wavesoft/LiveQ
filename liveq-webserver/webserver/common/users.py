@@ -1061,6 +1061,25 @@ class HLUser:
 		except JobQueue.DoesNotExist:
 			return None
 
+	def getJobDetails(self, job_id):
+		"""
+		Return the details for the specified job
+		"""
+
+		# Try to get job
+		job = self.getJob(job_id)
+		if not job:
+			raise HLError("Could not access job %s" % job_id, "not-exists")
+
+		# Serialize
+		job_dict = job.serialize()
+
+		# Get details regarding the agents
+		job_dict['agents'] = Agent.select().where( Agent.activeJob == job_id ).dicts()[:]
+		
+		# Return results
+		return job_dict
+
 	###################################
 	# In-game information queries
 	###################################
@@ -1337,6 +1356,15 @@ class HLUser:
 		paper_dict['active'] = (paper_id == self.dbUser.activePaper_id)
 		paper_dict['citations'] = paper.countCitations()
 		paper_dict['cost'] = cost_estimation_function( paper_dict['citations'] )
+
+		# Get details for the job record
+		if paper.job_id != 0:
+
+			# Get relevant job
+			job = JobQueue.select( JobQueue.lastEvent ).where( JobQueue.id == paper.job_id ).get()
+
+			# Include the time the job was updated
+			paper_dict['results_date'] = job.lastEvent
 
 		# Return paper details
 		return paper_dict

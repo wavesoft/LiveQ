@@ -40,11 +40,11 @@ def dump(job, histograms):
 
 	# Dump packed data
 	with open(dumpPath, "wb") as f:
-		f.write( histograms.pack(encode=False, compress=False) )
+		f.write( histograms.pack() )
 
-def load(job_id):
+def loadRaw(job_id):
 	"""
-	Load results
+	Load raw payload without decoding to histograms
 	"""
 
 	# Normalize job ID
@@ -65,5 +65,19 @@ def load(job_id):
 		if not payload:
 			return None
 
-		# Return collection from pack
-		return IntermediateHistogramCollection.fromPack(payload, decode=False, decompress=False)
+		# Return payload
+		return payload
+
+def load(job_id):
+	"""
+	Load results
+	"""
+
+	# Load raw payload
+	payload = loadRaw(job_id)
+	if not payload:
+		return None
+
+	# Return collection from pack
+	return IntermediateHistogramCollection.fromPack(payload)
+

@@ -81,6 +81,7 @@ class JobManagerComponent(Component):
 		self.jobChannel.on('job_start', self.onBusJobStart)
 		self.jobChannel.on('job_cancel', self.onBusJobCancel)
 		self.jobChannel.on('job_refresh', self.onBusJobRefresh)
+		self.jobChannel.on('job_results', self.onBusJobResults)
 
 		# Open the interpolator channel were we are dumping the final results
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
@@ -718,3 +719,37 @@ class JobManagerComponent(Component):
 					'result': 0,
 					'data': histoCollection.pack()
 				})
+
+	def onBusJobResults(self, message):
+		"""
+		Return job results
+		"""
+
+		# Validate arguments
+		if not 'jid' in message:
+			self.logger.warn("Missing parameters on 'job_results' message on IBUS!")
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'Missing parameters on \'job_results\' message!'
+				})
+			return
+
+		# Fetch JID from request
+		jid = message['jid']
+		self.logger.info("Requesting results of job #%s" % jid)
+
+		# Fetch raw payload
+		payload = results.getRaw(jid)
+		if not payload:
+			self.logger.warn("Could not load results payload for job %s!" % jid)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': 'Could not load results payload for job %s!' % jid
+				})
+			return
+
+		# Send raw payload
+		self.jobChannel.reply({
+				'result': 'ok',
+				'data': payload
+			})

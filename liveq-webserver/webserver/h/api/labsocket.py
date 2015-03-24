@@ -272,6 +272,58 @@ class LabSocketInterface(APIInterface):
 			# Deselect data channel
 			self.selectDataChannel( None )
 
+		##################################################
+		# Return details for the specified job
+		# ------------------------------------------------
+		elif action == "job.details":
+
+			# Return details of the specified job
+			self.sendResponse({ 
+					"status": "ok",
+					"data": self.user.getJobDetails(param['jid'])
+					})
+
+		##################################################
+		# Return results for the specified job
+		# ------------------------------------------------
+		elif action == "job.results":
+
+			# Get job record
+			job = self.user.getJob( param['jid'] )
+			if not job:
+				return self.sendError("Could not fetch details of the specified job!")
+
+			# Switch to the user's lab
+			if not self.switchLab( self.user.lab ):
+				self.sendError("Cannot resolve user's lab", "not-found")
+				return False
+
+			# Send configuation frame only once
+			if not self.sentConfigFrame:
+				# Send configuration frame
+				self.sendConfigurationFrame()
+
+			# Ask job manager to fetch the results of the specifeid job
+			ans = self.jobChannel.send('job_results', {
+				'jid': param['jid']
+			}, waitReply=True)
+
+			# Check for I/O failure on the bus
+			if not ans:
+				return self.sendError("Unable to contact the job manager")
+
+			# Check for error response
+			if ans['result'] == 'error':
+				return self.sendError("Unable to fetch results of the job: %s" % ans['error'])
+
+			# Send bus data
+			self.onBusData( ans )
+
+			# Return details of the specified job
+			self.sendResponse({ 
+				"status": "ok"
+				})
+
 		else:
 
 			# Unknown request
@@ -491,6 +543,9 @@ class LabSocketInterface(APIInterface):
 			self.ipolChannel = Config.IBUS.openChannel("interpolate")
 		if not self.jobChannel:
 			self.jobChannel = Config.IBUS.openChannel("jobs")
+
+		# Reset configFrameSent
+		self.sentConfigFrame = False
 
 		# We are good
 		return True
