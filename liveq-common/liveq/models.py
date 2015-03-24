@@ -95,7 +95,7 @@ def createBaseTables():
 
 	# Create the tables in the basic model
 	for table in [ AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable, TunableToObservable, 
-				   PostMortems, JobQueue, JobResult ]:
+				   PostMortems, JobQueue ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -265,6 +265,15 @@ class JobQueue(BaseModel):
 	#: Events processed
 	events = IntegerField(default=0)
 
+	#: The status change is acknowledged
+	acknowledged = IntegerField(default=1)
+
+	# The fit score of the completed job
+	fit = FloatField(default=0.0)
+
+	# The metadata of the completed job
+	resultsMeta = TextField(default="")
+
 	#: Job status can be one of the following:
 	PENDING  	= 0
 	RUN  		= 1
@@ -336,23 +345,31 @@ class JobQueue(BaseModel):
 		self.lastEvent = datetime.datetime.now()
 		return super(JobQueue, self).save(*args, **kwargs)
 
-class JobResult(BaseModel):
-	"""
-	Results records
-	"""
+	def isAcknowledged(self):
+		"""
+		Check if the job is acknowledged
+		"""
+		return bool(self.acknowledged)
 
-	#: Date received
-	date = DateTimeField(default=datetime.datetime.now)
+	def acknowledge(self):
+		"""
+		Acknowledge the status change
+		"""
+		self.acknowledged = 1
 
-	#: Fit score
-	fit = FloatField(default=0.0)
+	def setResultsMeta(self, metadata):
+		"""
+		Store the results metadata
+		"""
+		self.resultsMeta = json.dumps(metadata)
 
-	#: Tunables
-	values = TextField(default="")
-
-	#: Metadata
-	meta = TextField(default="")
-
+	def getResultsMeta(self, metadata):
+		"""
+		Return the results metadata
+		"""
+		if not self.resultsMeta:
+			return {}
+		return json.loads(self.resultsMeta)
 
 class AgentGroup(BaseModel):
 	"""

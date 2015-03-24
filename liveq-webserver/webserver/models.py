@@ -23,7 +23,7 @@ import json
 
 from peewee import *
 from liveq.models import BaseModel, JobQueue, AgentGroup, Agent, \
-						 AgentMetrics, Lab, Tunable, JobResult, \
+						 AgentMetrics, Lab, Tunable, \
 						 Observable, TunableToObservable, PostMortems
 
 from liveq.config.database import DatabaseConfig
@@ -585,18 +585,20 @@ class Paper(BaseModel):
 	#: The status of the paper
 	status = IntegerField(default=0, index=True, unique=False)
 
-	#: The ID of the archive directory that contains
-	#: the results
-	archive = CharField(max_length=128, default="")
+	#: The job who produced this result
+	job_id = IntegerField(default=0)
 
 	#: Tunable values
 	tunableValues = TextField(default="{}")
 
-	#: The related lab ID
+	#: The related lab ID 
 	lab = ForeignKeyField(Lab)
 
-	#: Goodness of fit
+	#: Goodness of fit (imported from job record for cache)
 	fit = FloatField(default=0.0)
+
+	#: Best fit so far
+	bestFit = FloatField(default=0.0)
 
 	#: When was it created
 	created = DateTimeField(default=datetime.datetime.now)

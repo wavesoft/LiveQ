@@ -53,6 +53,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 	API I/O Socket handler
 	"""
 
+	#: Public access to the list of open sessions
+	SESSIONS = [ ]
+
 	def __init__(self, application, request, **kwargs):
 		"""
 		Override constructor in order to initialize local variables
@@ -66,6 +69,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		self.connected = False
 		self.pingTimer = None
 		self.userevents = None
+		self.cronTimer = None
 
 		# Multiple API interfaces
 		self.interfaces = [
@@ -113,9 +117,19 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# Start ping timer
 		self.pingTimer = IOLoop.instance().add_timeout(PING_INTERVAL, self.scheduledPing)
 
+		# Register a cron job for processing periodical events
+		self.cronTimer = tornado.ioloop.PeriodicCallback( self.on_cron, 5000 )
+		self.cronTimer.start()
+
 		# Open interfaces
 		for i in self.interfaces:
 			i.open()
+
+		# Register on open sessions
+		APISocketHandler.SESSIONS.append( self )
+
+		# Check for cron jobs now
+		self.on_cron()
 
 	def on_pong(self, msg):
 		"""
@@ -148,6 +162,16 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		if self.user:
 			self.user.cleanup()
 			self.user = None
+
+		# Unregister from open sessions
+		i = APISocketHandler.SESSIONS.index( self )
+		if i >= 0:
+			del APISocketHandler.SESSIONS[i]
+
+		# Stop cron timer
+		if not self.cronTimer is None:
+			self.cronTimer.stop()
+			self.cronTimer = None
 
 		# We are no longer connected
 		self.connected = False
@@ -186,6 +210,19 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 		# Handle action
 		self.handleAction( action, param )
+
+	def on_cron(self):
+		"""
+		Fired periodically to update various information
+		"""
+
+		# Wait until we have a user object
+		if not self.user:
+			return
+
+		# Check for changes
+		self.user.checkForNAckJobs()
+		self.user.checkForNewPMs()
 
 	####################################################################################
 	# --------------------------------------------------------------------------------
@@ -290,6 +327,30 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				"message": message
 			})
 
+	def handleEvent(self, event):
+		"""
+		Handle the specified event
+		"""
+
+		# Check invalid event format
+		if not 'type' in event:
+			return
+
+		# Handle server-side events
+		if event['type'] == "server":
+
+			# Check invalid event format
+			if not 'event' in event:
+				return
+
+			# Handle profile change events
+			if event['event'] == "profile.changed":
+				self.sendUserProfile()
+
+		else:
+			# Otherwise pass to client
+			self.sendEvent( event )
+
 	def sendEvent(self, event):
 		"""
 		Forward the specified event to the user
@@ -351,7 +412,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			self.sendUserProfile()
 
 			# Listen for user events
-			self.user.receiveEvents( self.sendEvent )
+			self.user.receiveEvents( self.handleEvent )
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:
@@ -393,7 +454,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			self.sendUserProfile()
 
 			# Listen for user events
-			self.user.receiveEvents( self.sendEvent )
+			self.user.receiveEvents( self.handleEvent )
 
 			# Let all interface know that we are ready
 			for i in self.interfaces:

@@ -28,7 +28,6 @@ import liveq.data.histo.io as io
 
 import tornado.escape
 
-from liveq.io.eventbroadcast import EventBroadcast
 from liveq.models import Lab, Observable, TunableToObservable, Agent, JobQueue
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
@@ -53,7 +52,6 @@ class LabSocketInterface(APIInterface):
 		self.jobChannel = None
 		self.ipolChannel = None
 		self.sentConfigFrame = False
-		self.notificationsChannel = None
 
 		# Tunable/Observable Trim
 		self.trimObs = []
@@ -81,11 +79,6 @@ class LabSocketInterface(APIInterface):
 			self.ipolChannel.close()
 			self.ipolChannel = None
 
-		# Release notifications channel
-		if self.notificationsChannel:
-			self.notificationsChannel.close()
-			self.notificationsChannel = None
-
 		# Deselect data channel
 		self.selectDataChannel( None )
 
@@ -96,10 +89,6 @@ class LabSocketInterface(APIInterface):
 
 		# Keep a local reference of the user
 		self.user = self.socket.user
-
-		# Open a notifications channel
-		self.notificationsChannel = EventBroadcast.forChannel("notifications")
-		self.notificationsChannel.on('job.completed', self.ntfJobCompleted)
 
 	def handleAction(self, action, param):
 		"""
@@ -294,26 +283,6 @@ class LabSocketInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
-	def ntfJobCompleted(self, data):
-		"""
-		[Notification] A job is completed
-		"""
-
-		# Handle errors
-		if not 'jid' in data:
-			return
-
-		# Check if this job belongs to this user
-		job = self.user.getJob(data['jid'])
-		if job:
-
-			# Send user event
-			self.user.userEvents.send({
-				"type"   : "info",
-				"title"  : "Validation",
-				"message": "Your validation job #%i is completed!" % job.id
-				})
-
 	def onBusData(self, data):
 		"""
 		[Bus Event] Data available
@@ -469,9 +438,9 @@ class LabSocketInterface(APIInterface):
 
 		# Select team jobs
 		jobs = JobQueue.select().where( 
-				((JobQueue.team_id == self.user.teamID) | (JobQueue.user_id == self.user.id))
+				(JobQueue.user_id == self.user.id)
 			  & (JobQueue.status << [ JobQueue.PENDING, JobQueue.RUN, JobQueue.STALLED ])
-			)
+			).order_by( JobQueue.id, JobQueue.status )
 
 		# Send jobs
 		for job in jobs:

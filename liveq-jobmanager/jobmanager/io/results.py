@@ -17,12 +17,53 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import os
 import cPickle as pickle
 import logging
 
+from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from jobmanager.config import Config
+
 logger = logging.getLogger("results")
 
-def dump():
+def dump(job, histograms):
 	"""
+	Dump the given histograms relevalt to the specified job
+	to the storage directory.
 	"""
-	
+
+	# Normalize job ID
+	jobID = "job-%s" % str(job.id)
+
+	# Base directory where we are going to dump the data
+	dumpPath = "%s/%s.bin" % (Config.RESULTS_PATH, jobID)
+
+	# Dump packed data
+	with open(dumpPath, "wb") as f:
+		f.write( histograms.pack(encode=False, compress=False) )
+
+def load(job_id):
+	"""
+	Load results
+	"""
+
+	# Normalize job ID
+	jobID = "job-%s" % str(job.id)
+
+	# Base directory where we are going to read the data
+	dumpPath = "%s/%s.bin" % (Config.RESULTS_PATH, jobID)
+
+	# If we don't have such file, return None
+	if not os.path.exists(dumpPath):
+		return None
+
+	# Load histograms from file
+	with open(dumpPath, "rb") as f:
+
+		# Read payload
+		payload = f.read()
+		if not payload:
+			return None
+
+		# Return collection from pack
+		return IntermediateHistogramCollection.fromPack(payload, decode=False, decompress=False)

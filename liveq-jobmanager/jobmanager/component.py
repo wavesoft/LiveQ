@@ -25,6 +25,7 @@ import datetime
 import jobmanager.io.jobs as jobs
 import jobmanager.io.scheduler as scheduler
 import jobmanager.io.agents as agents
+import jobmanager.io.results as results
 
 from jobmanager.config import Config
 
@@ -85,7 +86,7 @@ class JobManagerComponent(Component):
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 
 		# Open the results manager channel where we are dumping the final results
-		self.resultsChannel = Config.IBUS.openChannel("results")
+		#self.resultsChannel = Config.IBUS.openChannel("results")
 
 		# Open a global notifications channel
 		self.notificationsChannel = EventBroadcast.forChannel("notifications")
@@ -273,11 +274,15 @@ class JobManagerComponent(Component):
 		job.sendStatus("All workers have finished. Collecting final results.")
 
 		# Calculate chi2 of the collection
-		print "}}} %r" % histoCollection
 		chi2fit = collectionChi2Reference( histoCollection )
 
-		# If ALL histograms have state=2 (completed), it means that the
-		# job is indeed completed. Reply to the job channel the final job data
+		# Store the results
+		results.dump( job, histoCollection )
+
+		# Update information on the job
+		job.updateResults( chi2=chi2fit )
+
+		# Reply to the job channel the final job data
 		job.channel.send("job_completed", {
 				'jid': job.id,
 				'result': 0,
@@ -286,15 +291,12 @@ class JobManagerComponent(Component):
 			})
 
 		# Send the resulting data to the results database
-		self.resultsChannel.send("results_put", {
-				'jid': job.id,
-				'result': 0,
-				'fit': chi2fit,
-				'data': histoCollection.pack()
-			})
-
-		# Cleanup job from scheduler
-		scheduler.releaseJob( job )
+		# self.resultsChannel.send("results_put", {
+		# 		'jid': job.id,
+		# 		'result': 0,
+		# 		'fit': chi2fit,
+		# 		'data': histoCollection.pack()
+		# 	})
 
 		# Send job completion event
 		self.notificationsChannel.broadcast("job.completed", {
@@ -302,6 +304,9 @@ class JobManagerComponent(Component):
 				'fit': chi2fit,
 				'result': 0
 			})
+
+		# Cleanup job from scheduler
+		scheduler.releaseJob( job )
 
 		# And then cleanup job
 		job.release(reason=jobs.COMPLETED)
@@ -547,7 +552,6 @@ class JobManagerComponent(Component):
 			if scheduler.completeOrReschedule(job):
 
 				# Job is completed
-				self.notifyJobCompleted( job, histoCollection=histos )
 				self.logger.info("All workers of job %s have finished" % jid)
 
 			else:

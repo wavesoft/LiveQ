@@ -22,6 +22,7 @@ import threading
 import tornado.escape
 import tornado.web
 import tornado.websocket
+import tornado.ioloop
 import os.path
 import uuid
 
@@ -32,11 +33,27 @@ from webserver.h.index import IndexHandler
 from webserver.h.tootr import TootrGetAnimation
 from webserver.config import Config
 
-"""
-Tornado Application class of the LiveQ Server
-"""
-class MCPlotsServer(tornado.web.Application):
+from webserver.common.books import BookKeywordCache
+from webserver.common.userevents import UserEvents
+
+from liveq.io.eventbroadcast import EventBroadcast
+
+class VirtualAtomSmasherServer(tornado.web.Application):
+	"""
+	Tornado Application class of the LiveQ Server
+	"""
+
+	#: Universal notifications channel
+	NOTIFICATIONS_CHANNEL = None
+
 	def __init__(self):
+		"""
+		Initialize the virtual atom smasher server
+		"""
+
+		##########################################
+		# Tornado Configuration
+		##########################################
 
 		# Setup handlers
 		handlers = [
@@ -67,3 +84,51 @@ class MCPlotsServer(tornado.web.Application):
 
 		# Setup tornado application
 		tornado.web.Application.__init__(self, handlers, **settings)
+
+		##########################################
+		# VAS Configuration
+		##########################################
+
+		# Register a cron job for processing periodical events
+		self.cronTimer = tornado.ioloop.PeriodicCallback( self.cronJobs, 1000 )
+		self.cronTimer.start()
+
+		# Open a notifications channel
+		VirtualAtomSmasherServer.NOTIFICATIONS_CHANNEL = EventBroadcast.forChannel("notifications")
+
+		# Listen for global notifications of interest
+		VirtualAtomSmasherServer.NOTIFICATIONS_CHANNEL.on('job.completed', self.onNotification_JobCompleted)
+
+		# Populate initial keyword cache
+		BookKeywordCache.update()
+
+	def cronJobs(self):
+		"""
+		Process queued event for the active users
+		"""
+
+		# Processed queued user events
+		UserEvents.processQueuedEvents()
+
+	def onNotification_JobCompleted(self, data):
+		"""
+		Handle notification message
+		"""
+
+		# Handle errors
+		if not 'jid' in data:
+			return
+
+		# # Send notification if matching
+		# job = session.user.getJob(data['jid'])
+		# if job:
+
+		# 	# Send user event
+		# 	self.user.userEvents.send({
+		# 		"type"   : "info",
+		# 		"title"  : "Validation",
+		# 		"message": "Your validation job #%i is completed!" % job.id
+		# 		}, important=True)
+
+		pass
+

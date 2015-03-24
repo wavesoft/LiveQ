@@ -114,6 +114,15 @@ class Job:
 		# Return collection
 		return hc
 
+	def updateResults(self, chi2=0.0):
+		"""
+		Update the results of this job
+		"""
+
+		# Update chi2 score
+		self.job.fit = chi2
+		self.job.save()
+
 	def getHistograms(self):
 		"""
 		Get and merge all the histograms in the stack
@@ -160,8 +169,9 @@ class Job:
 		# Delete entries in the STORE
 		Config.STORE.delete("job-%s:histo" % self.id)
 
-		# Mark job as completed
+		# Mark job as completed & remove acknowledgemenet
 		self.job.status = reason
+		self.job.acknowledged = 0
 		self.job.save()
 
 		# Close channel
@@ -260,6 +270,7 @@ class Job:
 		# Update stateus
 		if self.job.status != status:
 			self.job.status = status
+			self.job.acknowledged = 0
 			self.job.save()
 
 	def getStatus(self):

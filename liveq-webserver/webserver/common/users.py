@@ -25,6 +25,7 @@ import logging
 import random
 import string
 import hashlib
+import math
 
 from peewee import fn, JOIN_LEFT_OUTER
 from webserver.common.forum import registerForumUser, forumUsernameExists
@@ -60,6 +61,21 @@ def weighted_choice(weights):
 	for i, total in enumerate(totals):
 		if rnd < total:
 			return i
+
+def cost_estimation_function( citations, maxCost=100, maxCitations=10 ):
+	"""
+	Increase the cost logarithmically up to maxCost within the span of maxCitations
+	"""
+
+	# Calculate cost
+	cost = int( (math.log10((citations / maxCitations)+0.1)+1) * maxCost )
+
+	# Wrap to max
+	if cost > maxCost:
+		cost = maxCost
+
+	# Return cost
+	return cost
 
 class HLUserError(Exception):
 	"""
@@ -578,6 +594,177 @@ class HLUser:
 
 
 	###################################
+	# Polling functions
+	###################################
+
+	def checkForNAckJobs(self):
+		"""
+		Check for not-acknowledged jobs
+		"""
+
+		# Get the list of jobs with acknowledged = 0 flag
+		nackJobList = []
+		for job in JobQueue.select( 
+				JobQueue.id, 
+				JobQueue.status,
+				JobQueue.paper_id,
+				JobQueue.fit
+			).where(
+				(JobQueue.user_id == self.id)
+			  & (JobQueue.acknowledged == 0)
+			):
+
+			# Store ID of job for later update
+			nackJobList.append( job.id )
+
+			# Trigger events
+			if job.status == JobQueue.COMPLETED:
+
+				# Give credits
+				self.earnPoints(2, "for completing a simulation")
+
+				# Job is completed, update paper
+				try:
+					paper = Paper.get( Paper.id == job.paper_id )
+				except Paper.DoesNotExist:
+					self.logger.warn("Cannot update paper %s with the results!" % job.paper_id)
+					continue
+
+				# Update paper score
+				fitBefore = paper.bestFit
+				fitAfter = job.fit
+
+				# If there was no previous fit, assume it
+				# was a really big number
+				if fitBefore == 0.0:
+					fitBefore = 10000000000
+
+				# Import properties into the paper
+				paper.fit = fitAfter
+				paper.job_id = job.id
+
+				# Check for better score
+				if fitAfter < fitBefore:
+
+					# Update best fit
+					paper.bestFit = fitAfter
+
+					# Check which cases are we in
+					if (fitAfter < 1.0) and ((fitBefore >= 1.0) and (fitBefore < 4.0)):
+
+						# 4.0 -> 1.0 Great [Give extra 20 points]
+
+						# Give 20 points
+						self.earnPoints(20, "for a perfect match")
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-3.png",
+							"title"  : "Perfect Match",
+							"message": "Your simulation scored <em>%.4f</em>, which is better than your previous attempt!" % fitAfter
+							})
+
+					elif (fitAfter < 1.0) and (fitBefore > 4.0):
+
+						# +4.0 -> 1.0 Superb [Give 30 points]
+
+						# Give 20 points
+						self.earnPoints(30, "for a perfect match, right away!")
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-3.png",
+							"title"  : "Perfect Match",
+							"message": "Your simulation scored <em>%.4f</em>, right away! That's amazing!" % fitAfter
+							})
+
+					elif (fitAfter < 1.0):
+
+						# <1.0 to a better <1.0? [Give 5 points]
+
+						# Give 5 points
+						self.earnPoints(5, "for a better match!")
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-3.png",
+							"title"  : "Amazing!",
+							"message": "You got even better on your already perfect score, with <em>%.4f</em>" % fitAfter
+							})
+
+					elif (fitAfter < 4.0) and (fitBefore >= 4.0):
+
+						# +4.0 -> 4.0 Good [Give 10 points]
+
+						# Give 20 points
+						self.earnPoints(10, "for a good match")
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-1.png",
+							"title"  : "Good Match",
+							"message": "Your simulation scored <em>%.4f</em>, which is a really good result." % fitAfter
+							})
+
+					else:
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-6.png",
+							"title"  : "Bad Match",
+							"message": "Your simulation scored <em>%.4f</em>. You need to bring this below <em>4.000</em>." % fitAfter
+							})
+
+				else:
+
+					# Send notification
+					self.userEvents.send({
+						"type"   : "flash",
+						"icon"   : "avatars/model-7.png",
+						"title"  : "Not good",
+						"message": "Your simulation scored <em>%.4f</em> which is not better than the current best score of <em>%.4f</em>." % (fitAfter, fitBefore)
+						})
+
+				# Save paper
+				paper.save()
+
+
+			else:
+
+				# Calculate status message
+				statusMsg = [
+					"is pending execution", 
+					"has started",
+					"has completed",
+					"has failed",
+					"was cancelled",
+					"is stalled"
+				]
+
+				# Send event
+				self.userEvents.send({
+					"type"   : "info",
+					"title"  : "Job Queue",
+					"message": "Your job with id #%i %s" % (job.id, statusMsg[job.status])
+					})
+
+		# Acknowledge all jobs
+		if len(nackJobList) > 0:
+			# Acknowledge these IDs
+			JobQueue.update(acknowledged=1).where(JobQueue.id << nackJobList).execute()
+
+	def checkForNewPMs(self):
+		"""
+		Check for unread PMs
+		"""
+		pass
+
+	###################################
 	# High-level functions
 	###################################
 
@@ -815,7 +1002,7 @@ class HLUser:
 			# Raise error
 			raise HLUserError("You don't have enough science points", "not-enough-points")
 
-	def earnPoints(self, points=0):
+	def earnPoints(self, points=0, reason=""):
 		"""
 		Earn the given ammount of science points
 		"""
@@ -830,14 +1017,23 @@ class HLUser:
 		# Save record
 		self.dbUser.save()
 
+		# If we have a reason, prepend a space
+		if reason:
+			reason = " " + reason
+
 		# Fire event
 		self.userEvents.send({
 			"type"   : "success",
 			"icon"   : "flash-icons/labo.png",
 			"title"  : "Science Points",
-			"message": "You have just earned <em>%i</em> science points!" % points
+			"message": "You have just earned <em>%i</em> science points%s!" % (points, reason)
 			})
 
+		# Inform server that the profile has changed
+		self.userEvents.send({
+			"type" 	 : "server",
+			"event"	 : "profile.changed"
+			})
 
 	def getJob(self, job_id):
 		"""
@@ -970,6 +1166,35 @@ class HLUser:
 		# Return
 		return partData
 
+	def focusPaper(self, paper_id):
+		"""
+		Make the paper with the specified paper ID to be user's active paper
+		"""
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			raise HLUserError("The specified paper does not exist!", "not-found")
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+			raise HLUserError("You can only focus your paper!", "not-authorized")
+
+		# Sync
+		self.reload()
+
+		# Update user's active paper
+		self.dbUser.activePaper_id = paper_id
+		self.dbUser.save()
+
+		# Send notification
+		self.userEvents.send({
+			"type"   : "success",
+			"title"  : "Active paper",
+			"message": "You are now working on paper <em>%s</em>." % paper.title
+			})
+
 	def countPapers(self):
 		"""
 		Count how namy papers does the user have
@@ -1096,7 +1321,15 @@ class HLUser:
 					return None
 
 		# Serialize
-		return paper.serialize(expandForeigns=["team"])
+		paper_dict = paper.serialize(expandForeigns=["team"])
+
+		# Include attribute about ownership
+		paper_dict['active'] = (paper_id == self.dbUser.activePaper_id)
+		paper_dict['citations'] = paper.countCitations()
+		paper_dict['cost'] = cost_estimation_function( paper_dict['citations'] )
+
+		# Return paper details
+		return paper_dict
 
 	def createPaper(self):
 		"""
@@ -1304,8 +1537,8 @@ class HLUser:
 		# Update cooldown timer
 		self.setCooldown("book-exam", GameConfig.GAME_EXAM_COOLDOWN)
 
-		print "<<< %r" % oBookState
-		print ">>> %r" % self.bookState
+		# Give 5 points for successfully taking the quiz
+		self.earnPoints(2, "for taking a quiz")
 
 		# If any of the books just become 'mastered', it
 		# happened because of our answer. Trigger the 'mastered'
@@ -1331,8 +1564,45 @@ class HLUser:
 					"message": "You have just mastered the topic <em>%s</em>!" % book.name
 					})
 
-				# Give 5 points
-				self.earnPoints(5)
+				# Give 5 points for mastering the topic
+				self.earnPoints(8, "for mastering the topic")
+
+	def citePaper(self, paper_id):
+		"""
+		Cite the specified paper
+		"""
+
+		# This only works if member of team
+		if self.teamMembership is None:
+			raise HLUserError("You must be a member of a team before citing a paper", "not-team-member")
+
+		# Try to get paper
+		try:
+			paper = Paper.get( Paper.id == paper_id )
+		except Paper.DoesNotExist:
+			raise HLUserError("The specified paper does not exist", "not-exist")
+
+		# Estimate cost
+		cost = cost_estimation_function( paper.countCitations() )
+
+		# Check if user can spend these money
+		self.spendPoints( cost )
+
+		# Cite the paper
+		citation = PaperCitation.create(
+			user=self.dbUser,
+			team=self.teamMembership.team,
+			citation=paper
+			)
+		citation.save()
+
+		# Notify user
+		self.userEvents.send({
+			"type"   : "flash",
+			"icon"   : "flash-icons/books.png",
+			"title"  : "Cited paper",
+			"message": "You have cited paper <em>%s</em>!" % paper.title
+			})
 
 	def getTeamCitedPapers(self):
 		"""
@@ -1404,13 +1674,8 @@ class HLUser:
 		Return all the paper the user owns or can access
 		"""
 
-		# Check if we should list public
-		public=False
-		if 'public' in query:
-			public = bool(query['public'])
-
 		# Check if we should include active
-		active=True
+		active=False
 		if 'active' in query:
 			active = bool(query['active'])
 
@@ -1429,15 +1694,29 @@ class HLUser:
 		if 'mine' in query:
 			ownerOnly = bool(query['mine'])
 
-		# Get all papers that the user has access to
-		whereQuery = (Paper.owner == self.dbUser)
-		if not (self.teamMembership is None) and not ownerOnly:
-			whereQuery |= ((Paper.team == self.teamMembership.team) & (Paper.status << [ Paper.PUBLISHED, Paper.TEAM_REVIEW ]))
-		whereQuery &= (Paper.status != Paper.REMOVED)
+		# Check if we should list public only
+		publicOnly=False
+		if 'public' in query:
+			publicOnly = bool(query['public'])
 
-		# Check if we should include public
-		if public:
-			whereQuery |= (Paper.status == Paper.PUBLISHED)
+		# Check if we should calculate cost
+		calculateCost=False
+		if 'cost' in query:
+			calculateCost = bool(query['cost'])
+
+		# Get all papers that the user has access to
+		if not publicOnly:
+			# User papers
+			whereQuery = (Paper.owner == self.dbUser)
+			# Team papers
+			if (not (self.teamMembership is None) and not ownerOnly):
+				whereQuery |= ((Paper.team == self.teamMembership.team) & (Paper.status << [ Paper.PUBLISHED, Paper.TEAM_REVIEW ]))
+		else:
+			# Public papers
+			whereQuery = (Paper.status == Paper.PUBLISHED)
+
+		# Exclude removed papers
+		whereQuery &= (Paper.status != Paper.REMOVED)
 
 		# Check if we should filter terms
 		if terms:
@@ -1449,7 +1728,17 @@ class HLUser:
 		for row in Paper.select().where( whereQuery ).order_by( Paper.fit ).limit(limit):
 
 			# Collect rows
-			ans.append(row.serialize())
+			paper = row.serialize()
+
+			# Mark row as active or inactive
+			paper['active'] = (row.id == self.dbUser.activePaper_id)
+
+			# If we are calculating cost, count citations
+			if calculateCost:
+				paper['citations'] = row.countCitations()
+
+			# Store on response
+			ans.append(paper)
 
 			# Collect team IDs
 			if not row._data['team'] in teamIDs:
@@ -1458,19 +1747,40 @@ class HLUser:
 		# If asked, prepend the user's active paper
 		if active:
 			try:
+
 				# Get paper
 				paperObject = Paper.get( Paper.id == self.dbUser.activePaper_id )
 
 				# Prepend active paper
 				paper = paperObject.serialize()
 				paper['active'] = True
+
+				# If we are calculating cost, count citations
+				if calculateCost:
+					paper['citations'] = row.countCitations()
+
+				# Insert ro
 				ans.insert( 0, paper )
 				if not self.teamID in teamIDs:
-					self.teamIDs.append( self.teamID )
+					teamIDs.append( self.teamID )
 
 			except Paper.DoesNotExist:
 				self.logger.warn("User's active paper does not exist!")
 				pass
+
+		# Ensure focused paper (if any) is on top
+		for i in range(0,len(ans)):
+			if ans[i]['id'] == self.dbUser.activePaper_id:
+
+				# Swap with first element if not
+				# the first already
+				if i != 0:
+					tmp = ans[0]
+					ans[0] = ans[i]
+					ans[i] = tmp
+
+				# Don't continue
+				break
 
 		# If asked, collect cited papers
 		if cited:
@@ -1497,6 +1807,10 @@ class HLUser:
 		for i in range(0, len(ans)):
 			ans[i]['team_name'] = teams[ans[i]['team']]
 			ans[i]['fit_formatted'] = "%.4f" % ans[i]['fit']
+
+			# If we are calculating cost, apply cost estimation function now
+			if calculateCost:
+				ans[i]['cost'] = cost_estimation_function( ans[i]['citations'] )
 
 		# Return
 		return ans

@@ -281,7 +281,7 @@ def handleLoss( agent ):
 	agentDataCount = job.removeAgentData( job_id )
 
 	# Send status
-	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % values.count, {"RES_SLOTS":values.count})
+	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % agentDataCount, {"RES_SLOTS":agentDataCount})
 
 	# Check if it's completed, or re-schedule
 	return completeOrReschedule(job)

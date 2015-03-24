@@ -171,6 +171,25 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Focus on a particular paper
+			# ------------------------------------------------
+			elif action == "papers.focus":
+
+				# Focus on paper
+				self.user.focusPaper(param['id'])
+
+				# Trigger action
+				self.user.trigger("paper.focus", paper=param['id'])
+
+				# Send response
+				self.sendResponse({
+						"status": "ok"
+					})
+
+				# Update the user profile
+				self.socket.sendUserProfile()
+
+			##################################################
 			# Create a new paper
 			# ------------------------------------------------
 			elif action == "papers.create":
@@ -223,6 +242,22 @@ class AccountInterface(APIInterface):
 
 					# Return paper status
 					self.sendError('Could not update paper', 'update-error')
+
+			##################################################
+			# Cite a particular paper
+			# ------------------------------------------------
+			elif action == "papers.cite":
+
+				# Cite paper
+				self.user.citePaper(param['id'])
+
+				# Trigger action
+				self.user.trigger("paper.cite", paper=param['id'])
+
+				# Return paper status
+				self.sendResponse({
+						"status": "ok"
+					})
 
 			##################################################
 			# Get a particular book

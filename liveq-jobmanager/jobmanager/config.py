@@ -45,6 +45,9 @@ class JobManagerConfig:
 	#: The time after a node is considered invalid will be re-tried
 	FAIL_RETRY_DELAY = 86400
 
+	#: Results directory
+	RESULTS_PATH = ""
+
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 
@@ -53,6 +56,7 @@ class JobManagerConfig:
 		JobManagerConfig.FAIL_DELAY = config.getint("jobmanager", "failure_delay")
 		JobManagerConfig.FAIL_LIMIT = config.getint("jobmanager", "failure_limit")
 		JobManagerConfig.FAIL_RETRY_DELAY = config.getint("jobmanager", "failure_retry_delay")
+		JobManagerConfig.RESULTS_PATH = config.get("jobmanager", "results_path")
 
 """
 Create a configuration for the JOB MANAGER based on the core config
