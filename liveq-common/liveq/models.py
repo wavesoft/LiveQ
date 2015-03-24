@@ -286,13 +286,13 @@ class JobQueue(BaseModel):
 		"""
 		Return the tunable configuration
 		"""		
-		return json.loads(self.tunableValues)
+		return json.loads(self.userTunes)
 
 	def setTunableValues(self, data):
 		"""
 		Return the tunable configuration
 		"""
-		self.tunableValues = json.dumps(data)
+		self.userTunes = json.dumps(data)
 
 	def getObservableValues(self):
 		"""

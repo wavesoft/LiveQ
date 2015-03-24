@@ -650,6 +650,9 @@ class HLUser:
 				paper.fit = fitAfter
 				paper.job_id = job.id
 
+				# Import tunbles from the job
+				paper.setTunableValues( job.getTunableValues() )
+
 				# Check for better score
 				if fitAfter < fitBefore:
 
