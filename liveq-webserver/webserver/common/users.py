@@ -245,11 +245,18 @@ class HLUser:
 		#  Default paper
 		# -----------------
 
+		# Calculate paper name
+		paperSuffix = profile['displayName']
+		if paperSuffix.endswith("s"):
+			paperSuffix += "' "
+		else:
+			paperSuffix += "'s "
+
 		# Create a default paper for the user
 		paper = Paper.create(
 			owner=user,
 			team=GameConfig.GAME_DEFAULT_TEAM,
-			title="%s first paper" % profile['displayName'],
+			title="%s first paper" % paperSuffix,
 			body=".. you can keep your notes here ..",
 			status=Paper.DRAFT,
 			lab=defaultLab,
