@@ -294,26 +294,6 @@ class JobQueue(BaseModel):
 		"""
 		self.userTunes = json.dumps(data)
 
-	def getObservableValues(self):
-		"""
-		Return the observable histograms data
-		"""
-		# Return blank if no histograms included
-		if not self.observableValues:
-			return IntermediateHistogramCollection()
-		else:
-			return IntermediateHistogramCollection.fromPack(self.observableValues)
-
-	def setObservableValues(self, intermediateHistogramCollection):
-		"""
-		Set the observable histogram data
-		"""
-		# Get a subset of the observables that we are monitoring
-		sset = intermediateHistogramCollection.subset(this.getObservableNames())
-		# Pack and store
-		self.observableValues = sset.pack()
-
-
 	def getTunableNames(self):
 		"""
 		Return the names of the tunables
