@@ -2058,6 +2058,7 @@ class HLUser:
 			'displayName' 	: user.displayName,
 			'avatar' 		: user.avatar,
 			'points'		: user.points,
+			'totalPoints'	: user.totalPoints,
 			'groups'		: user.getGroups(),
 			'achievements'	: user.getAchievements(),
 			'activePaper'	: user.activePaper_id,
