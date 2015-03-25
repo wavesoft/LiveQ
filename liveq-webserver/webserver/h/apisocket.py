@@ -264,7 +264,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 						"domain": domain
 					}
 				})
-		except WebSocketClosedError as e:
+		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.warn("Sending on a closed socket!")
 
 	def sendAction(self, action, param={}):
@@ -281,7 +281,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 					"action": action,
 					"param": param
 				})
-		except WebSocketClosedError as e:
+		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.warn("Sending on a closed socket!")
 
 	def sendBuffer(self, frameID, data):
@@ -298,7 +298,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				struct.pack("<II", frameID, 0)+data, 
 				binary=True
 			)
-		except WebSocketClosedError as e:
+		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.warn("Sending on a closed socket!")
 
 	def sendUserProfile(self):
@@ -484,7 +484,20 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				traceback.print_exc()
 				return self.sendError("Missing argument %s on request" % str(e), "missing-argument")
 
+			except TypeError as e:
+
+				# Forward API Errors
+				traceback.print_exc()
+				return self.sendError("Wrong type of argument on request (%s)" % str(e), "wrong-argument")
+
 			except APIError as e:
 
 				# Forward API Errors
 				return self.sendError(e.value, e.code)
+
+			except Exception as e:
+
+				# Burry exception
+				traceback.print_exc()
+				return self.sendError("Error processing request (%s)" % str(e), "unhandled-exception")
+

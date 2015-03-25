@@ -241,6 +241,9 @@ class JobQueue(BaseModel):
 	Queue of jobs pending in the LiveQ jobManager
 	"""
 
+	#: JSON Fields in this model
+	JSON_FIELDS = ['userTunes', 'resultsMeta']
+
 	#: When the job was submitted
 	submitted = DateTimeField(default=datetime.datetime.now)
 

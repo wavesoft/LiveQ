@@ -1075,7 +1075,30 @@ class HLUser:
 		job_dict = job.serialize()
 
 		# Get details regarding the agents
-		job_dict['agents'] = Agent.select().where( Agent.activeJob == job_id ).dicts()[:]
+		agents = []
+		for a in Agent.select().where( Agent.activeJob == job_id ):
+			
+			# Serialize agent record
+			agent = a.serialize()
+			
+			# Split the agent UUID
+			idparts = agent['uuid'].split("/")
+			if len(idparts) > 0:
+				agent['uuid'] = idparts[1]
+
+			# Append to agents
+			agents.append( agent )
+
+		# Get relevant paper
+		paper = {}
+		try:
+			paper = Paper.get( Paper.id == job.paper_id ).serialize()
+		except Paper.DoesNotExist:
+			pass
+
+		# Update records
+		job_dict['agents'] = agents
+		job_dict['paper'] = paper
 		
 		# Return results
 		return job_dict
@@ -1364,7 +1387,7 @@ class HLUser:
 			job = JobQueue.select( JobQueue.lastEvent ).where( JobQueue.id == paper.job_id ).get()
 
 			# Include the time the job was updated
-			paper_dict['results_date'] = job.lastEvent
+			paper_dict['results_date'] = str(job.lastEvent)
 
 		# Return paper details
 		return paper_dict
