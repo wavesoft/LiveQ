@@ -499,6 +499,19 @@ class User(BaseModel):
 				.select() \
 				.where( MachinePartStage.id << unlocked_stages )
 
+	def countPapers(self):
+		"""
+		Count the number of papers of the current user
+		"""
+
+		# Count papers with this user as owner
+		rec = Paper.select( fn.Count(Paper.id).alias('count') ) \
+					.where( Paper.owner == self ).get()
+
+		# Return number
+		if not rec.count:
+			return 0
+		return rec.count
 
 class UserTokens(BaseModel):
 	"""

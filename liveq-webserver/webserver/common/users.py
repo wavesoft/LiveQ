@@ -1713,6 +1713,70 @@ class HLUser:
 		# Return answer
 		return ans
 
+	def getTeamDetails(self, team_id=None):
+		"""
+		Return details for the specified team
+		"""
+
+		# Use user's team if team_id is missing
+		if team_id is None:
+
+			# This only works if member of team
+			if self.teamMembership is None:
+				return None
+
+			# Get user
+			team = self.teamMembership.team
+
+		else:
+
+			# Get team
+			try:
+				team = Team.get( Team.id == team_id )
+			except Team.DoesNotExist:
+				raise HLError("The specified team does not exist", "not-exist")
+
+		# Get members
+		myMembershipState = 0
+		members = []
+		for member in TeamMembers.select( 
+				TeamMembers,
+				User.displayName, 
+				User.points, 
+				User.totalPoints, 
+				User.id
+			).where( TeamMembers.team == team ).join( User ):
+
+			# Collect members
+			members.append({
+				"id": member.user.id,
+				"name": member.user.displayName,
+				"points": member.user.points,
+				"totalPoints": member.user.totalPoints,
+				"papers": member.user.countPapers(),
+				})
+
+			# Check if I am part of this membership
+			if member.user.id == self.id:
+				myMembershipState = member.status
+
+		# Serialize team
+		team_dict = team.serialize()
+		team_dict['members'] = members
+
+		# Select options
+		team_dict['is_moderator'] = False
+		team_dict['is_admin'] = False
+		team_dict['is_owner'] = False
+		if myMembershipState >= 1:
+			team_dict['is_moderator'] = True
+		if myMembershipState >= 2:
+			team_dict['is_admin'] = True
+		if myMembershipState >= 3:
+			team_dict['is_owner'] = True
+
+		return team_dict
+
 	def getUnpublishedPapers(self):
 		"""
 		Return the full list of unpublished user papers

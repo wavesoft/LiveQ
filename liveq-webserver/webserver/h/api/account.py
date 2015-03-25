@@ -145,6 +145,17 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Return team details
+			# ------------------------------------------------
+			elif action == "team.details":
+
+				# Return team details
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getTeamDetails()
+					})
+
+			##################################################
 			# Return profile paper status
 			# ------------------------------------------------
 			elif action == "papers.profile":
