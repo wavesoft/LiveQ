@@ -87,13 +87,15 @@ def collectionChi2Reference(histoCollection):
 	# Prepare properties
 	chi2sum = 0
 	chi2count = 0
+	chi2list = {}
 
 	# Iterate in the collection
 	for histo in histoCollection.values():
 		chi2value = histoChi2Reference( histo )
+		chi2list[histo.name] = chi2value
 		if chi2value > 0.0:
 			chi2sum += chi2value
 			chi2count += 1
 
-	# Return average
-	return chi2sum / chi2count
+	# Return average and list
+	return (chi2sum / chi2count, chi2list)

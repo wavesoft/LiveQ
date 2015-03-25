@@ -366,7 +366,7 @@ class JobQueue(BaseModel):
 		"""
 		self.resultsMeta = json.dumps(metadata)
 
-	def getResultsMeta(self, metadata):
+	def getResultsMeta(self):
 		"""
 		Return the results metadata
 		"""
@@ -381,6 +381,16 @@ class JobQueue(BaseModel):
 		except ValueError as e:
 			logging.error("ValueError parsing 'resultsMeta' of model '%s', key %s" % (self.__class__.__name__, self.id))
 			return {}
+
+	def updateResultsMeta(self, key, value):
+		"""
+		Update the results metadata
+		"""
+
+		# Update metadata key
+		results = self.getResultsMeta()
+		results[key] = value
+		self.setResultsMeta( results )
 
 class AgentGroup(BaseModel):
 	"""

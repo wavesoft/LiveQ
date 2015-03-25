@@ -275,13 +275,13 @@ class JobManagerComponent(Component):
 		job.sendStatus("All workers have finished. Collecting final results.")
 
 		# Calculate chi2 of the collection
-		chi2fit = collectionChi2Reference( histoCollection )
+		(chi2fit, chi2list) = collectionChi2Reference( histoCollection )
 
 		# Store the results
 		results.dump( job, histoCollection )
 
 		# Update information on the job
-		job.updateResults( chi2=chi2fit )
+		job.updateResults( chi2=chi2fit, chi2list=chi2list )
 
 		# Reply to the job channel the final job data
 		job.channel.send("job_completed", {

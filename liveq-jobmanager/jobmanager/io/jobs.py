@@ -114,13 +114,18 @@ class Job:
 		# Return collection
 		return hc
 
-	def updateResults(self, chi2=0.0):
+	def updateResults(self, chi2=0.0, chi2list={}):
 		"""
 		Update the results of this job
 		"""
 
 		# Update chi2 score
 		self.job.fit = chi2
+
+		# Store the list of chi2 fits
+		self.job.updateResultsMeta('fitscores', chi2list)
+
+		# Save job record
 		self.job.save()
 
 	def getHistograms(self):
