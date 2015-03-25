@@ -119,7 +119,7 @@ def registerForumUser(email, displayName, password, usergroup=2, title=""):
 		 VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %i, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)"
 		% ( ForumConfig.FORUM_DB_PREFIX, displayName, uPass, uSalt, loginKey, email, title, usergroup ) )
 
-def uidFromUser(user):
+def forumUidFromUser(user):
 	"""
 	Lookup the specified forum user from the 
 	"""
@@ -129,7 +129,19 @@ def uidFromUser(user):
 	if c is None:
 		return None
 
-def getUserPMs(uid):
+	# Lookup users with that username
+	c.execute(
+		"SELECT `uid` FROM %susers WHERE (username = '%s')"
+		% ( ForumConfig.FORUM_DB_PREFIX, user.displayName )
+		)
+
+	# Fetch user ID
+	row = c.fetchone()
+	if not row:
+		return 0
+	return row[0]
+
+def forumUserUnreadPMs(uid):
 	"""
 	Get the private messages of the specified user
 	"""
@@ -141,8 +153,18 @@ def getUserPMs(uid):
 
 	# Lookup PMS
 	c.execute(
-		"SELECT fromid, subject, datetime FROM %sprivatemessages WHERE (status = 0) AND (uid = %i)"
-		% ( ForumConfig.FORUM_DB_PREFIX, uid )
+		"SELECT %sprivatemessages.pmid,\
+			    %sprivatemessages.fromid, \
+				%sprivatemessages.subject, \
+				%sprivatemessages.dateline, \
+				%susers.username\
+				FROM %sprivatemessages INNER JOIN %susers ON %sprivatemessages.fromid = %susers.uid\
+				WHERE (status = 0) AND (%sprivatemessages.uid = %i)\
+				ORDER BY %sprivatemessages.pmid DESC"
+		% ( ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, uid, ForumConfig.FORUM_DB_PREFIX )
 		)
 
 	# Start fetching
@@ -150,9 +172,11 @@ def getUserPMs(uid):
 	row = c.fetchone()
 	while row:
 		messages.append({
-				'from': row[0],
-				'subject': row[1],
-				'datetime': row[2]
+				'id': row[0],
+				'fromid': row[1],
+				'subject': row[2],
+				'dateline': row[3],
+				'from': row[4]
 			})
 		row = c.fetchone()
 

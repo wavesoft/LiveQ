@@ -68,6 +68,17 @@ class AccountInterface(APIInterface):
 				self.user.setVariables( param['vars'] )
 
 			##################################################
+			# User private messages
+			# ------------------------------------------------
+			elif action == "messages":
+
+				# Send response
+				self.sendResponse({ 
+						"status": "ok",
+						"messages": self.user.getUserMessages()
+						})
+
+			##################################################
 			# Trigger an arbitrary action
 			# ------------------------------------------------
 			elif action == "trigger":

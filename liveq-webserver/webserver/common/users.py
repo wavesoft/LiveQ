@@ -28,7 +28,7 @@ import hashlib
 import math
 
 from peewee import fn, JOIN_LEFT_OUTER
-from webserver.common.forum import registerForumUser, forumUsernameExists
+from webserver.common.forum import registerForumUser, forumUsernameExists, forumUidFromUser, forumUserUnreadPMs
 
 from liveq.models import Tunable
 from webserver.models import *
@@ -118,6 +118,10 @@ class HLUser:
 		self.id = user.id
 		self.lab = user.lab
 		self.activePaper_id = user.activePaper_id
+
+		# Keep a cache of acknowledged PM reads
+		self.forumUserID = forumUidFromUser( self.dbUser )
+		self.forumAcknowledgedPMs = []
 
 		# Team-releated information
 		self.teamMembership = None
@@ -772,7 +776,20 @@ class HLUser:
 		"""
 		Check for unread PMs
 		"""
-		pass
+
+		# Notify not-acknowledged PMs
+		for pm in self.getUserMessages():
+			if not pm['id'] in self.forumAcknowledgedPMs:
+
+				# Send event
+				self.userEvents.send({
+					"type"   : "info",
+					"title"  : "Private Message",
+					"message": "You have a new message from <strong>%s</strong> with subject <em>%s</em>" % (pm['from'], pm['subject'])
+					})
+
+				# Acknowledge notification of the PM
+				self.forumAcknowledgedPMs.append( pm['id'] )
 
 	###################################
 	# High-level functions
@@ -1106,6 +1123,14 @@ class HLUser:
 	###################################
 	# In-game information queries
 	###################################
+
+	def getUserMessages(self):
+		"""
+		Return a list of user PMs
+		"""
+
+		# Return unread PMs
+		return forumUserUnreadPMs( self.forumUserID )
 
 	def getMachinePartsOverview(self):
 		"""
