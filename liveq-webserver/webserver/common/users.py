@@ -1406,13 +1406,51 @@ class HLUser:
 		paper_dict['cost'] = cost_estimation_function( paper_dict['citations'] )
 
 		# Get details for the job record
+		observables = []
 		if paper.job_id != 0:
 
 			# Get relevant job
-			job = JobQueue.select( JobQueue.lastEvent ).where( JobQueue.id == paper.job_id ).get()
+			job = JobQueue.select( JobQueue.lastEvent, JobQueue.resultsMeta ).where( JobQueue.id == paper.job_id ).get()
 
 			# Include the time the job was updated
 			paper_dict['results_date'] = str(job.lastEvent)
+
+			# Parse results meta
+			resultsMeta = {}
+			if job.resultsMeta:
+				try:
+					resultsMeta = json.loads( job.resultsMeta )
+				except ValueError:
+					pass
+
+			# Process observables metadata
+			if 'fitscores' in resultsMeta:
+
+				# Get all histogram IDs
+				histo_ids = resultsMeta['fitscores'].keys()
+
+				# Get known histograms
+				is_known = self.getKnownObservables()
+
+				# Get observable details
+				for histo in Observable.select( Observable.name, Observable.title, Observable.short ).where( Observable.name << histo_ids ):
+
+					# Skip unknown histograms
+					if not histo.name in is_known:
+						continue
+
+					# Get fit
+					chi2 = resultsMeta['fitscores'][histo.name]
+
+					# Store on observables
+					observables.append({
+						"id": histo.name,
+						"title": histo.title,
+						"fit": "%.4f" % chi2
+						})
+
+		# Update observables
+		paper_dict['observables'] = observables
 
 		# Return paper details
 		return paper_dict
