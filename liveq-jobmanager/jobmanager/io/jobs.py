@@ -104,7 +104,6 @@ class Job:
 		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(histos))
 
 		# Merge histograms
-		print ">> Merge %r" % histos.keys()
 		hc = intermediateCollectionMerge( histos.values() )
 
 		# Update number of events in the job files
@@ -142,7 +141,6 @@ class Job:
 			histos = pickle.loads(buf)
 
 		# Merge and return histograms
-		print ">> GET: Merge %r" % histos.keys()
 		return intermediateCollectionMerge( histos.values() )
 
 	def removeAgentData(self, agent):
@@ -156,15 +154,33 @@ class Job:
 			return 0
 
 		# Unpickle
-		histos = pickle.loads(buf)
-		if agent in histos:
-			del histos[agent]
+		stockUsed = 0
+		agentHistograms = pickle.loads(buf)
+		if agent in agentHistograms:
+
+			# Get stockpile & combine agent data in there
+			stock = agentHistograms[agent]
+			if 'stock' in agentHistograms:
+				stock = intermediateCollectionMerge(
+						[ agentHistograms['stock'], stock ]
+					)
+
+			# Update stockpile
+			agentHistograms['stock'] = stock
+			stockUsed = 1
+
+			# Delete agent record
+			del agentHistograms[agent]
 
 		# Pickle and put back
-		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(histos))
+		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(agentHistograms))
+
+		# Update number of events in the job files
+		self.job.events = agentHistograms.countEvents()
+		self.job.save()
 
 		# Return number of agents left
-		return len(histos)
+		return len(agentHistograms) - stockUsed
 
 	def release(self, reason=JobQueue.COMPLETED):
 		"""
