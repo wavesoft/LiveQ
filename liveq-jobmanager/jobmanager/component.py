@@ -40,6 +40,7 @@ from liveq.reporting.lars import LARS
 
 from liveq.data.tune import Tune
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.interpolate import InterpolatableCollection
 from liveq.data.histo.reference import collectionChi2Reference
 
 class JobManagerComponent(Component):
