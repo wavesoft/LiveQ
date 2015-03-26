@@ -284,6 +284,12 @@ class Job:
 		"""
 		return self.job.status
 
+	def getTunableValues(self):
+		"""
+		Get tunable values
+		"""
+		return self.job.getTunableValues()
+
 	def getEvents(self):
 		"""
 		Return number of events so far

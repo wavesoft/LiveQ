@@ -257,6 +257,38 @@ class JobManagerComponent(Component):
 		# Delay a bit
 		time.sleep(5)
 
+	def sendResultsToInterpolator(self, lab, tuneParam, histograms):
+		"""
+		Fit and send resutls to interpolator
+		"""
+
+		# Prepare the interpolatable collection that will
+		# collect the data to send to the interpolator
+		res = InterpolatableCollection(tune=Tune( tuneParam, labid=lab.uuid ))
+
+		# Select only the histograms used in this tune
+		degrees = {}
+		for h in histograms.values():
+
+			# Store histogram
+			res.append(h)
+
+			# Store histogram polyFit degree
+			degrees[h.name] = self.getPolyFitDegreeOf(h.name)
+
+		# Generate fits for interpolation
+		try:
+			res.regenFits( fitDegree=degrees )
+		except Exception as ex:
+			traceback.print_exc()
+			logging.error("Could not generate fits for job %s (%s)" % (tarFile, str(ex)))
+			return
+
+		# Send the resulting data to the interpolation database
+		self.ipolChannel.send("results", {
+				'data': res.pack()
+			})
+
 	def notifyJobCompleted(self, job, histoCollection=None):
 		"""
 		Notify all the interested entities that the given job is completed
@@ -278,7 +310,7 @@ class JobManagerComponent(Component):
 		(chi2fit, chi2list) = collectionChi2Reference( histoCollection )
 
 		# Store the results
-		results.dump( job, histoCollection )
+		results.dump( histoCollection )
 
 		# Update information on the job
 		job.updateResults( chi2=chi2fit, chi2list=chi2list )
@@ -291,13 +323,12 @@ class JobManagerComponent(Component):
 				'data': histoCollection.pack()
 			})
 
-		# Send the resulting data to the results database
-		# self.resultsChannel.send("results_put", {
-		# 		'jid': job.id,
-		# 		'result': 0,
-		# 		'fit': chi2fit,
-		# 		'data': histoCollection.pack()
-		# 	})
+		# Send data to interpolator
+		self.sendResultsToInterpolator( 
+			job.lab,
+			job.getTunableValues(),
+			histoCollection
+			)
 
 		# Send job completion event
 		self.notificationsChannel.broadcast("job.completed", {
