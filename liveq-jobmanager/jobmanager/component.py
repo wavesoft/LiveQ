@@ -310,7 +310,7 @@ class JobManagerComponent(Component):
 		(chi2fit, chi2list) = collectionChi2Reference( histoCollection )
 
 		# Store the results
-		results.dump( histoCollection )
+		results.dump( job.getTunableValues(), histoCollection )
 
 		# Update information on the job
 		job.updateResults( chi2=chi2fit, chi2list=chi2list )
