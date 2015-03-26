@@ -1113,9 +1113,17 @@ class HLUser:
 		except Paper.DoesNotExist:
 			pass
 
+		# Keep only the tunables that the user knows
+		tunables = {}
+		is_known = self.getKnownTunables()
+		for k,v in job_dict['userTunes'].iteritems():
+			if k in is_known:
+				tunables[k] = v
+
 		# Update records
 		job_dict['agents'] = agents
 		job_dict['paper'] = paper
+		job_dict['userTunes'] = tunables
 		
 		# Return results
 		return job_dict
