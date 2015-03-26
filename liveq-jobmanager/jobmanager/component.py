@@ -257,14 +257,14 @@ class JobManagerComponent(Component):
 		# Delay a bit
 		time.sleep(5)
 
-	def sendResultsToInterpolator(self, lab, tuneParam, histograms):
+	def sendResultsToInterpolator(self, job, histograms):
 		"""
 		Fit and send resutls to interpolator
 		"""
 
 		# Prepare the interpolatable collection that will
 		# collect the data to send to the interpolator
-		res = InterpolatableCollection(tune=Tune( tuneParam, labid=lab.uuid ))
+		res = InterpolatableCollection(tune=Tune( job.getTunableValues(), labid=job.lab.uuid ))
 
 		# Select only the histograms used in this tune
 		degrees = {}
@@ -310,7 +310,7 @@ class JobManagerComponent(Component):
 		(chi2fit, chi2list) = collectionChi2Reference( histoCollection )
 
 		# Store the results
-		results.dump( job.getTunableValues(), histoCollection )
+		results.dump( job, histoCollection )
 
 		# Update information on the job
 		job.updateResults( chi2=chi2fit, chi2list=chi2list )
@@ -325,8 +325,7 @@ class JobManagerComponent(Component):
 
 		# Send data to interpolator
 		self.sendResultsToInterpolator( 
-			job.lab,
-			job.getTunableValues(),
+			job,
 			histoCollection
 			)
 
