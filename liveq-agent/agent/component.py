@@ -17,6 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import os
 import time
 import logging
 import urllib2
@@ -24,6 +25,7 @@ import urllib2
 from agent.config import Config
 from agent.io.jobmanagers import JobManagers
 
+from liveq import exit
 from liveq.io.bus import BusChannelException
 from liveq.component import Component
 
@@ -61,6 +63,7 @@ class AgentComponent(Component):
 		# Bind incoming message handlers
 		self.jobmanagers.on('job_start', self.cmdJobStart)
 		self.jobmanagers.on('job_cancel', self.cmdJobCancel)
+		self.jobmanagers.on('agent_control', self.cmdAgentControl)
 
 		# Setup tool callbacks for the jobmanagers
 		self.jobmanagers.handshakeFn(self.sendHandshake)
@@ -114,6 +117,26 @@ class AgentComponent(Component):
 			})
 		return False
 
+	def cmdAgentControl(self, message):
+		"""
+		Control agent
+		"""
+		action = None
+
+		# Get action
+		if 'action' in message:
+			action = message['action']
+
+		# Handle action
+		if action == "restart":
+			# Return 100, that the wrapper script
+			# should interpret as "re-run script"
+			exit(100)
+
+		elif action == "reboot":
+			# Return 101, that the wrapper script
+			# should interpret as system reboot
+			exit(101)
 
 	def cmdJobStart(self, message):
 		"""

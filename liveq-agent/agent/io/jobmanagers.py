@@ -58,6 +58,9 @@ class JobManagers:
 		# The last agent used by the pickFree function.
 		self.lastAgent = ""
 
+		# The last agent we sent a handshake to
+		self.lastHandshakeTarget = ""
+
 		# Flag to mark if a handshake is completed
 		self.handshakeCompleted = False
 
@@ -212,7 +215,7 @@ class JobManagers:
 		"""
 		Callback when we have a handshake acknowlegement from the server
 		"""
-		self.logger.info("Got handshake response");
+		self.logger.info("We found a jobmanager at %s" % self.lastHandshakeTarget);
 
 		# The handshake is completed
 		self.handshakeCompleted	= True
@@ -282,6 +285,9 @@ class JobManagers:
 				if not target_jid:
 					self.logger.warn("No job mangers found to send handshake")
 					return
+
+				# Keep the jid of the last handshake target
+				self.lastHandshakeTarget = target_jid
 
 				# Open channel and call the handshake function
 				outputChannel = Config.EBUS.openChannel(target_jid)
