@@ -272,18 +272,21 @@ class JobManagerComponent(Component):
 		degrees = {}
 		for h in histograms.values():
 
+			# Get histogram
+			histo = h.toHistogram()
+
 			# Store histogram
-			res.append(h)
+			res.append( histo )
 
 			# Store histogram polyFit degree
-			degrees[h.name] = self.getPolyFitDegreeOf(h.name)
+			degrees[histo.name] = self.getPolyFitDegreeOf(histo.name)
 
 		# Generate fits for interpolation
 		try:
 			res.regenFits( fitDegree=degrees )
 		except Exception as ex:
 			traceback.print_exc()
-			logging.error("Could not generate fits for job %s (%s)" % (tarFile, str(ex)))
+			logging.error("Could not generate fits for job %s (%s)" % (job.id, str(ex)))
 			return
 
 		# Send the resulting data to the interpolation database
