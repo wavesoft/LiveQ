@@ -21,6 +21,7 @@ import time
 import uuid
 import logging
 import datetime
+import traceback
 
 import jobmanager.io.jobs as jobs
 import jobmanager.io.scheduler as scheduler
