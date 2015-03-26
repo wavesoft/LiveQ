@@ -312,13 +312,13 @@ class Job:
 		"""
 		return self.job.events
 
-	def isCompleted(self):
+	def isCompleted(self, tollerance=10):
 		"""
 		Check if the job is completed
 		"""
 
 		# If we don't have remaining events, return True
-		return (self.getRemainingEvents() <= 0)
+		return (self.getRemainingEvents() <= tollerance)
 
 ##############################################################
 # ------------------------------------------------------------
