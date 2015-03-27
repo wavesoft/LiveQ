@@ -105,7 +105,7 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 		BookKeywordCache.update()
 
 		# Handle SIGUSR1
-		GlobalEvents.on("signal.usr1", self.sigUSR1Handler)
+		GlobalEvents.System.on("signal.usr1", self.sigUSR1Handler)
 
 
 	def sigUSR1Handler(self):
