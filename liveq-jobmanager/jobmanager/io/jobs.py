@@ -143,9 +143,9 @@ class Job:
 		# Merge and return histograms
 		return intermediateCollectionMerge( histos.values() )
 
-	def removeAgentData(self, agent):
+	def stockAllAgentData(self):
 		"""
-		Remove data from the given agent from the histogram
+		Summarize all the results from all workers to 'stock'
 		"""
 
 		# Fetch histogram buffer from store
@@ -154,12 +154,39 @@ class Job:
 			return 0
 
 		# Unpickle
+		agentHistograms = pickle.loads(buf)
+
+		# Check if everything is already stocked
+		if (len(agentHistograms) == 1) and ('stock' in agentHistograms):
+			return
+
+		# Combine ALL histograms to 'stock'
+		stock = intermediateCollectionMerge( agentHistograms.values() )
+		agentHistograms = { 'stock': stock }
+
+		# Pickle and put back
+		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(agentHistograms))
+
+	def stockAgentData(self, agent):
+		"""
+		Stock the already collected agent data out of the tree
+		"""
+
+		# Fetch histogram buffer from store
+		buf = Config.STORE.get("job-%s:histo" % self.id)
+		if not buf:
+			return 0
+
+		# Get agent id
+		agent_id = agent.uuid
+
+		# Unpickle
 		stockUsed = 0
 		agentHistograms = pickle.loads(buf)
-		if agent in agentHistograms:
+		if agent_id in agentHistograms:
 
 			# Get stockpile & combine agent data in there
-			stock = agentHistograms[agent]
+			stock = agentHistograms[agent_id]
 			if 'stock' in agentHistograms:
 				stock = intermediateCollectionMerge(
 						[ agentHistograms['stock'], stock ]
@@ -170,14 +197,10 @@ class Job:
 			stockUsed = 1
 
 			# Delete agent record
-			del agentHistograms[agent]
+			del agentHistograms[agent_id]
 
 		# Pickle and put back
 		Config.STORE.set("job-%s:histo" % self.id, pickle.dumps(agentHistograms))
-
-		# Update number of events in the job files
-		self.job.events = agentHistograms.countEvents()
-		self.job.save()
 
 		# Return number of agents left
 		return len(agentHistograms) - stockUsed

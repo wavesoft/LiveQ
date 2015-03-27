@@ -219,24 +219,30 @@ class JobManagerComponent(Component):
 
 			# First, cancel the job on the given a_cancel agents
 			for agent in a_cancel:
+				try:
 
-				# Send status
-				job.sendStatus("Aborting job on worker %s" % agent.uuid)
+					# Send status
+					job.sendStatus("Aborting job on worker %s" % agent.uuid)
 
-				# Get channel and send cancellations (synchronous)
-				agentChannel = self.getAgentChannel( agent.uuid )
-				ans = agentChannel.send('job_cancel', {
-						'jid': agent.jobToCancel
-					})
+					# Get channel and send cancellations (synchronous)
+					agentChannel = self.getAgentChannel( agent.uuid )
+					ans = agentChannel.send('job_cancel', {
+							'jid': agent.jobToCancel
+						})
 
-				# Let job2cancel know that it has lost an agent
-				job2c = jobs.getJob(agent.jobToCancel)
-				if job2c:
-					job2c.removeAgentInfo(agent)
+					# Let job2cancel know that it has lost an agent
+					job2c = jobs.getJob(agent.jobToCancel)
+					if job2c:
+						job2c.stockAgentData(agent)
+						job2c.removeAgentInfo(agent)
 
-				# Assume aborted
-				self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
-				agents.agentJobAborted(agent.uuid, job)
+					# Assume aborted
+					self.logger.info("Successfuly cancelled job %s on %s" % ( agent.jobToCancel, agent.uuid ))
+					agents.agentJobAborted(agent.uuid, job)
+
+				except Exception as e:
+					traceback.print_exc()
+					self.logger.error("Exception while cancelling job: %s" % str(e))
 
 			# Calculate run-time parameters for this group of agents
 			# that are about to start. This is defining the number

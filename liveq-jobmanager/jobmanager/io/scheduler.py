@@ -278,7 +278,7 @@ def handleLoss( agent ):
 
 	# Remove agent data from the job and check
 	# how many agents are left in the array
-	agentDataCount = job.removeAgentData( job_id )
+	agentDataCount = job.stockAgentData( agent )
 
 	# Send status
 	job.sendStatus("A worker from our group has gone offline. We have %i slots left" % agentDataCount, {"RES_SLOTS":agentDataCount})
@@ -479,6 +479,10 @@ def releaseFromJob( agent_id, job ):
 
 	# Get the agent record that matches the given ID
 	agent = agents.getAgent(agent_id)
+
+	# Remove agent and stock data
+	job.removeAgentInfo( agent )
+	job.stockAgentData( agent )
 
 	# Remove the job binding
 	agent.activeJob = 0
