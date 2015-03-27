@@ -363,6 +363,18 @@ def process():
 	totalSlots = res.fairShare
 	usedSlots = 0
 
+	# Count the maximum number of workers to acuire in order
+	# not to drop below 
+	eventsLeft = job.getRemainingEvents()
+	maxWorkers = eventsLeft / Config.MIN_EVENT_THRESSHOLD
+	if maxWorkers < 1:
+		maxWorkers = 1
+
+	# Cap 'totalSlots'
+	if maxWorkers < totalSlots:
+		logger.info("Going to use %i slots because we have %i events left" % (maxWorkers, eventsLeft))
+		totalSlots = maxWorkers
+
 	# Try to occupy free slots
 	slots = res.getFree( totalSlots )
 	usedSlots += len( slots )

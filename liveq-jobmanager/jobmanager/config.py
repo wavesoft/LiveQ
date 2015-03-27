@@ -48,6 +48,10 @@ class JobManagerConfig:
 	#: Results directory
 	RESULTS_PATH = ""
 
+	#: Minimum event thresshold below which we are not going to start
+	#: a job in a worker
+	MIN_EVENT_THRESSHOLD = 1000
+
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 
@@ -57,6 +61,7 @@ class JobManagerConfig:
 		JobManagerConfig.FAIL_LIMIT = config.getint("jobmanager", "failure_limit")
 		JobManagerConfig.FAIL_RETRY_DELAY = config.getint("jobmanager", "failure_retry_delay")
 		JobManagerConfig.RESULTS_PATH = config.get("jobmanager", "results_path")
+		JobManagerConfig.MIN_EVENT_THRESSHOLD = config.getint("jobmanager", "min_event_thresshold")
 
 """
 Create a configuration for the JOB MANAGER based on the core config
