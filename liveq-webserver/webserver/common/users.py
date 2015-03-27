@@ -619,6 +619,7 @@ class HLUser:
 				JobQueue.id, 
 				JobQueue.status,
 				JobQueue.paper_id,
+				JobQueue.userTunes,
 				JobQueue.fit
 			).where(
 				(JobQueue.user_id == self.id)
@@ -655,7 +656,9 @@ class HLUser:
 				paper.job_id = job.id
 
 				# Import tunbles from the job
+				print ">>> Setting tunables: %r" % job.getTunableValues()
 				paper.setTunableValues( job.getTunableValues() )
+				print ">>> Setted to tunables: %r" % paper.getTunableValues()
 
 				# Check for better score
 				if fitAfter < fitBefore:
