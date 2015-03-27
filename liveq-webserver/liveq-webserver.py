@@ -38,7 +38,7 @@ import tornado.ioloop
 import tornado.httpserver
 from tornado.options import define, options
 
-from liveq import handleSIGINT, exit
+from liveq import handleSIGINT, handleSIGUSR1, exit
 from liveq.exceptions import ConfigException
 
 # Prepare runtime configuration
