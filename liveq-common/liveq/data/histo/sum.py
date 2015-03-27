@@ -51,6 +51,13 @@ def intermediateMerge(histograms):
 	if not type(histograms) is list:
 		return None
 
+	# Remove empty histograms but leave at least one
+	while (i < len(histograms)) and len(histograms) > 1:
+		if histograms[i].bins == 0:
+			del histograms[i]
+		else:
+			i += 1
+
 	# If it's only 1 histogram, return it as-is
 	if len(histograms) == 1:
 		return histograms[0]

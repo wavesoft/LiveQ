@@ -103,6 +103,10 @@ class JobManagerComponent(Component):
 		and/or create missing histograms using reference values.
 		"""
 
+		# Log information
+		logAdded = []
+		logRemoved = []
+
 		# Prepare histograms to add
 		createHistograms = list(requiredHistograms)
 
@@ -112,7 +116,7 @@ class JobManagerComponent(Component):
 
 			# Check if this should not be there
 			if not k in requiredHistograms:
-				self.logger.warn("Removed histogram %s during adaptation" % k)
+				logRemoved.append(h)
 				del collection[k]
 
 			# Otherwise remove from the histograms to create
@@ -122,8 +126,12 @@ class JobManagerComponent(Component):
 
 		# Create missing histograms
 		for h in createHistograms:
-			self.logger.warn("Added blank histogram %s during adaptation" % h)
 			collection[h] = IntermediateHistogram.empty( h )
+			logAdded.append(h)
+
+		# Log
+		self.logger.info("Adapt removed: %s" % logRemoved.join(","))
+		self.logger.info("Adapt   added: %s" % logAdded.join(","))
 
 		# Return the updated collection
 		return collection
