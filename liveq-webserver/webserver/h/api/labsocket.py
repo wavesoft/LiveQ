@@ -37,6 +37,16 @@ from webserver.common.api import compileObservableHistoBuffers, compileTunableHi
 from webserver.config import Config
 from webserver.h.api import APIInterface
 
+class LabSocketError(Exception):
+	"""
+	An error occured in a high-level user-action
+	"""
+	def __init__(self, message, code=None):
+		self.message = message
+		self.code = code
+	def __str__(self):
+		return repr(self.message)
+
 class LabSocketInterface(APIInterface):
 
 	def __init__(self, socket):
@@ -237,8 +247,10 @@ class LabSocketInterface(APIInterface):
 			tunables = self.lab.formatTunables( tunables )
 
 			# Send interpolation
-			if not self.sendInterpolation(tunables):
-				self.sendError("Could not estimate result")
+			try:
+				self.sendInterpolation(tunables):
+			except LabSocketError as e:
+				self.sendError( e.message, e.code )
 
 		##################################################
 		# Abort action with the specifeid id
@@ -621,8 +633,8 @@ class LabSocketInterface(APIInterface):
 			self.sendStatus("Could not contact interpolator", {"INTERPOLATION": "0"})
 			self.logger.warn("Could not contact interpolator")
 
-			# If we asked only for interpolation, return
-			return False
+			# Send error
+			raise LabSocketError("Could not contact interpolation server", "not-alive")
 
 		elif ans['result'] != 'ok':
 
@@ -630,8 +642,8 @@ class LabSocketInterface(APIInterface):
 			self.sendStatus("Could not interpolate (%s)" % ans['error'])
 			self.logger.warn("Could not interpolate (%s)" % ans['error'])
 
-			# If we asked only for interpolation, return
-			return False
+			# Send error
+			raise LabSocketError("Could not request interpolation: %s" % ans['error'], "request-error")
 
 		else:
 
