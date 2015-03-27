@@ -40,7 +40,7 @@ from liveq.reporting.postmortem import PostMortem
 from liveq.reporting.lars import LARS
 
 from liveq.data.tune import Tune
-from liveq.data.histo.intermediate import IntermediateHistogramCollection
+from liveq.data.histo.intermediate import IntermediateHistogramCollection, IntermediateHistogram
 from liveq.data.histo.interpolate import InterpolatableCollection
 from liveq.data.histo.reference import collectionChi2Reference
 
@@ -97,6 +97,37 @@ class JobManagerComponent(Component):
 		# Channel mapping
 		self.channels = { }
 
+	def adaptCollection(self, collection, requiredHistograms):
+		"""
+		Trim histograms that does not belong to requiredHistograms
+		and/or create missing histograms using reference values.
+		"""
+
+		# Prepare histograms to add
+		createHistograms = list(requiredHistograms)
+
+		# Delete excess histograms
+		keys = collection.keys()
+		for k in keys:
+
+			# Check if this should not be there
+			if not k in requiredHistograms:
+				self.logger.warn("Removed histogram %s during adaptation" % k)
+				del collection[k]
+
+			# Otherwise remove from the histograms to create
+			elif k in createHistograms:
+				i = createHistograms.index(k)
+				del createHistograms[i]
+
+		# Create missing histograms
+		for h in createHistograms:
+			self.logger.warn("Added blank histogram %s during adaptation" % h)
+			collection[h] = IntermediateHistogram.empty( h )
+
+		# Return the updated collection
+		return collection
+
 	def getPolyFitDegreeOf(self, name):
 		"""
 		Get polyFit degree for given histogram
@@ -108,7 +139,7 @@ class JobManagerComponent(Component):
 				# Get fitDegree of given observable
 				obs = Observable.get( Observable.name == name )
 				self.degree_cache[name] = obs.fitDegree
-			except Lab.DoesNotExist:
+			except Observable.DoesNotExist:
 				# Otherwise use None (Default)
 				self.degree_cache[name] = None
 
@@ -492,6 +523,9 @@ class JobManagerComponent(Component):
 			self.logger.warn("[%s] Could not parse data for job %s" % (channel.name, jid))
 			report.openGroup("errors").add("unpack-error", 1)
 			return
+
+		# Adapt histogram collection to the lab tunables
+		agentHistos = self.adaptCollection( agentHistos, job.lab.getObservableNames() )
 
 		# Merge histograms with other histograms of the same job
 		# and return resulting histogram collection

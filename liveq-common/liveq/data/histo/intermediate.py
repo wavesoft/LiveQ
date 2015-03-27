@@ -493,6 +493,15 @@ class IntermediateHistogram:
 			)
 
 	@staticmethod
+	def empty(name):
+		"""
+		Create an empty intermediate histogram witih the given name
+		"""
+
+		# Return an empty histogram
+		return IntermediateHistogram(name=name)
+
+	@staticmethod
 	def fromFLAT(filename):
 		"""
 		Create an intermediate histogram by reading the specified FLAT file
