@@ -248,7 +248,7 @@ class LabSocketInterface(APIInterface):
 
 			# Send interpolation
 			try:
-				self.sendInterpolation(tunables):
+				self.sendInterpolation(tunables)
 			except LabSocketError as e:
 				self.sendError( e.message, e.code )
 
