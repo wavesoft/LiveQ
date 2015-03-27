@@ -115,7 +115,7 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 
 		# Fire notification to all sessions
 		for sess in APISocketHandler.SESSIONS:
-			sess.sendNotification("The server is going to be restarted in 30 seconds and you will be disconnected. Refresh to join again.", "error", "Server Message")
+			sess.sendNotification("The server is going to be restarted in 30 seconds! Refresh to join again.", "critical", "Server")
 
 	def cronJobs(self):
 		"""
