@@ -106,6 +106,7 @@ class JobManagerComponent(Component):
 		# Log information
 		logAdded = []
 		logRemoved = []
+		numBefore = len(collection)
 
 		# Prepare histograms to add
 		createHistograms = list(requiredHistograms)
@@ -130,9 +131,9 @@ class JobManagerComponent(Component):
 			logAdded.append(h)
 
 		# Log
-		self.logger.info("Adapt REM: %s" % ",".join(logRemoved))
-		self.logger.info("Adapt ADD: %s" % ",".join(logAdded))
-		self.logger.info("Adapt to: %i" % len(collection))
+		self.logger.debug("Adapt REM: %s" % ",".join(logRemoved))
+		self.logger.debug("Adapt ADD: %s" % ",".join(logAdded))
+		self.logger.info("Adapting collection from %i to %i histograms" % (numBefore, len(collection)))
 
 		# Return the updated collection
 		return collection
