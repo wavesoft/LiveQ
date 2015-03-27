@@ -184,6 +184,10 @@ class Histogram:
 		TODO: Parallellize on numpy
 		"""
 
+		# If me or refHist is empty, do nothing
+		if (refHisto.bins == 0) or (self.bins == 0):
+			return 0.0
+
 		# Validate binsize
 		if refHisto.bins != self.bins:
 			raise ValueError("The specified reference histogram does not have the same bin size!")
