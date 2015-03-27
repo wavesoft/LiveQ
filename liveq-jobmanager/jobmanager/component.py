@@ -116,7 +116,7 @@ class JobManagerComponent(Component):
 
 			# Check if this should not be there
 			if not k in requiredHistograms:
-				logRemoved.append(h)
+				logRemoved.append(k)
 				del collection[k]
 
 			# Otherwise remove from the histograms to create
@@ -130,8 +130,9 @@ class JobManagerComponent(Component):
 			logAdded.append(h)
 
 		# Log
-		self.logger.info("Adapt removed: %s" % logRemoved.join(","))
-		self.logger.info("Adapt   added: %s" % logAdded.join(","))
+		self.logger.info("Adapt REM: %s" % ",".join(logRemoved))
+		self.logger.info("Adapt ADD: %s" % ",".join(logAdded))
+		self.logger.info("Adapt to: %i" % len(collection))
 
 		# Return the updated collection
 		return collection

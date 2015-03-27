@@ -25,6 +25,7 @@ import tornado.websocket
 import tornado.ioloop
 import os.path
 import uuid
+import signal
 
 from tornado.web import URLSpec
 from webserver.h.configure import *
@@ -101,6 +102,22 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 
 		# Populate initial keyword cache
 		BookKeywordCache.update()
+
+		# Handle SIGUSR1
+		signal.signal(signal.SIGUSR1, self.sigUSR1Handler)
+
+
+	def sigUSR1Handler(self, signum, frame):
+		"""
+		When SIGUSR1 is received, alert all users for an imminent reboot
+		"""
+		
+		# Log
+		logging.info("** Caught USR1 signal. Alerting users for an imminent reboot **")
+
+		# Fire notification to all sessions
+		for sess in APISocketHandler.SESSIONS:
+			sess.sendNotification("The server is going to be restarted in 30 seconds and you will be disconnected. Refresh to join again.", "error", "Server Message")
 
 	def cronJobs(self):
 		"""

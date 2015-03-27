@@ -52,6 +52,7 @@ def intermediateMerge(histograms):
 		return None
 
 	# Remove empty histograms but leave at least one
+	i = 0
 	while (i < len(histograms)) and len(histograms) > 1:
 		if histograms[i].bins == 0:
 			del histograms[i]
