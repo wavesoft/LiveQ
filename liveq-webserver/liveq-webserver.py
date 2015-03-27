@@ -54,6 +54,9 @@ except ConfigException as e:
 # Hook CTRL+C
 handleSIGINT()
 
+# Hook SIGUSR1
+handleSIGUSR1()
+
 # Setup port defaults
 define("port", default=Config.SERVER_PORT, help="Port to listen for incoming connections", type=int)
 define("ssl_port", default=Config.SSL_PORT, help="The SSL Port to use (if equal to 'port', HTTP will be disabled)", type=int)

@@ -41,6 +41,20 @@ def handleSIGINT():
 	# Register sigint handler
 	signal.signal(signal.SIGINT, signal_handler)
 
+def handleSIGUSR1():
+	"""
+	Register a (SIGUSR1) handler and raise a system-wide ``signal.usr1`` signal
+	that is used for alerting an imminent shutdown.
+	"""
+
+	# Register CTRL+C Handler
+	def signal_handler(signum, frame):
+		logging.info("** Caught USR1 signal. Alerting users for an imminent reboot **")
+		GlobalEvents.System.trigger('signal.usr1')
+
+	# Register sigint handler
+	signal.signal(signal.SIGUSR1, signal_handler)
+
 def exit(code):
 	"""
 	Internal function to gracefully exit.

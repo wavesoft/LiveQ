@@ -38,6 +38,7 @@ from webserver.common.books import BookKeywordCache
 from webserver.common.userevents import UserEvents
 
 from liveq.io.eventbroadcast import EventBroadcast
+from liveq.events import GlobalEvents
 
 class VirtualAtomSmasherServer(tornado.web.Application):
 	"""
@@ -104,16 +105,13 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 		BookKeywordCache.update()
 
 		# Handle SIGUSR1
-		signal.signal(signal.SIGUSR1, self.sigUSR1Handler)
+		GlobalEvents.on("signal.usr1", self.sigUSR1Handler)
 
 
-	def sigUSR1Handler(self, signum, frame):
+	def sigUSR1Handler(self):
 		"""
 		When SIGUSR1 is received, alert all users for an imminent reboot
 		"""
-		
-		# Log
-		logging.info("** Caught USR1 signal. Alerting users for an imminent reboot **")
 
 		# Fire notification to all sessions
 		for sess in APISocketHandler.SESSIONS:
