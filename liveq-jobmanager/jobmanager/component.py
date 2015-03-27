@@ -525,7 +525,7 @@ class JobManagerComponent(Component):
 			return
 
 		# Adapt histogram collection to the lab tunables
-		agentHistos = self.adaptCollection( agentHistos, job.lab.getObservableNames() )
+		agentHistos = self.adaptCollection( agentHistos, job.lab.getHistograms() )
 
 		# Merge histograms with other histograms of the same job
 		# and return resulting histogram collection
