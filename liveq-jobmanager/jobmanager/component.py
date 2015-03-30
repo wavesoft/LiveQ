@@ -540,6 +540,11 @@ class JobManagerComponent(Component):
 			report.openGroup("errors").add("unpack-error", 1)
 			return
 
+		# DEBUG: Discard final histograms
+		if agentHistos.state == 2:
+			self.logger.info("[%s] *HACK* Discarding final histograms for job %s" % (channel.name, jid))
+			return
+
 		# Adapt histogram collection to the lab tunables
 		agentHistos = self.adaptCollection( agentHistos, job.lab.getHistograms() )
 
