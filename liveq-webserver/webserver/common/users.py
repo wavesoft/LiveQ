@@ -25,6 +25,7 @@ import logging
 import random
 import string
 import hashlib
+import datetime
 import math
 
 from peewee import fn, JOIN_LEFT_OUTER
@@ -157,6 +158,8 @@ class HLUser:
 			self.logger.warn("Not a member of a team! This might cause an unhandled exception somewhere...")
 			pass
 
+		self.updateCache_MachinePart()
+
 	@staticmethod
 	def register(profile):
 		"""
@@ -281,6 +284,38 @@ class HLUser:
 
 		# Return hluser
 		return hluser
+
+	def reset(self):
+		"""
+		Reset status and progress fields
+		"""
+
+		# Update analytics profile
+		if not self.dbUser.analyticsProfile is None:
+
+			# Update the date when this profile was reset
+			self.dbUser.analyticsProfile.updateMetric("reset", str(datetime.datetime.now()) )
+			self.dbUser.analyticsProfile.save()
+
+		# Delete user tokens
+		UserTokens.delete()\
+			.where( UserTokens.user == self.dbUser ) \
+			.execute()
+
+		# Delete from team membership
+		TeamMembers.delete()\
+			.where( TeamMembers.user == self.dbUser ) \
+			.execute()
+
+		# Delete unlocked stage information
+		MachinePartStageUnlock.delete()\
+			.where( MachinePartStageUnlock.user == self.dbUser ) \
+			.execute()
+
+		# Delete papers
+		Paper.delete()\
+			.where( Paper.owner == self.dbUser ) \
+			.execute()
 
 	def reload(self):
 		"""
@@ -420,23 +455,56 @@ class HLUser:
 
 		# Select all machine parts
 		parts = { }
-		for p in MachinePartStage.select(
-			MachinePart.name.alias("part_name"),
+		for p in MachinePart.select(
+				MachinePart,
 				fn.Count(MachinePartStage.id).alias("total"),
-				fn.Count(MachinePartStageUnlock.id).alias("unlocked")
-				) \
-			.join( MachinePart ) \
-			.switch( MachinePartStage ) \
-			.join( MachinePartStageUnlock ) \
-			.where(
-					(MachinePartStageUnlock.user == self.dbUser)
-				) \
-			.group_by( MachinePartStage.id ):
+			) \
+			.group_by( MachinePart.id ) \
+			.join( MachinePartStage ):
 
-			parts[p.part.name] = {
+			# Get part IDs
+			p_ids = []
+
+			# Get all unlocked parts
+			for up in MachinePartStageUnlock \
+				.select(
+					MachinePartStageUnlock.id, 
+					MachinePartStageUnlock.stage, 
+					MachinePartStageUnlock.user,
+					MachinePartStage.id.alias("stage_part_id")
+				 ) \
+				.join( MachinePartStage ) \
+				.where(
+					  (MachinePartStage.part == p)
+					& (MachinePartStageUnlock.user == self.dbUser)
+				):
+
+				# Collect IDs
+				p_ids.append(up.id)
+
+			# Count unlockable parts
+			whereQuery = (MachinePartStage.part == p) \
+					  &  (MachinePartStage.cost <= self.dbUser.points)
+			if len(p_ids) > 0:
+				whereQuery &= ~(MachinePartStage.id << p_ids)
+			unlockable = MachinePartStage.select(
+					fn.count( MachinePartStage.id )
+				)\
+				.where(whereQuery) \
+				.limit(1) \
+				.scalar()
+
+			# Unlockable is at max 1
+			if unlockable > 1:
+				unlockable = 1
+
+			# Update total
+			parts[p.name] = {
 				"total": p.total,
-				"unlocked": p.unlocked
+				"unlocked": len(p_ids),
+				"unlockable": unlockable
 			}
+
 
 		# Update state
 		self.dbUser.setState("partcounters", parts )

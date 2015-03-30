@@ -87,6 +87,34 @@ class AnalyticsProfile(BaseModel):
 		self.lastEvent = datetime.datetime.now()
 		return super(AnalyticsProfile, self).save(*args, **kwargs)
 
+	def getMetrics(self):
+		"""
+		Load the user metrics
+		"""
+		try:
+			return json.loads(self.metrics)
+		except ValueError as e:
+			logging.error("ValueError parsing 'metrics' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setMetrics(self, metrics):
+		"""
+		Update the user metrics
+		"""
+
+		# Update metrics
+		self.metrics = json.dumps(metrics)
+
+	def updateMetric(self, key, value):
+		"""
+		Update a metric value
+		"""
+
+		# Get update and set
+		metrics = self.getMetrics()
+		metrics[key] = value
+		self.setMetrics(metrics)
+
 class Achievement(BaseModel):
 	"""
 	The achievements grid

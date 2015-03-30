@@ -27,7 +27,8 @@ sys.path.append("%s/liveq-common" % os.path.dirname(os.path.dirname(os.path.real
 sys.path.append("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 # ----------
 
-import argparse
+#import argparse
+import traceback
 import json
 import os
 import util.pythia as pythia
@@ -38,6 +39,8 @@ from liveq.exceptions import ConfigException
 
 from liveq.models import *
 from webserver.models import *
+
+from webserver.common.users import HLUser
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -52,13 +55,100 @@ except ConfigException as e:
 # Hook CTRL+C
 handleSIGINT()
 
-# Prepare argument parser
-parser = argparse.ArgumentParser(prog='admin.py', description='LiveQ Administration Command-Line interface.')
-parser.add_argument('command', type=str, nargs='?',
-                   help='the command to process')
-args = parser.parse_args()
+def help():
+	"""
+	Show help screen
+	"""
 
-# Dispatch command
-if args.command == "deluser"
+	print "usage: admin.py [command] [..]"
+	print ""
+	print "LiveQ Administration Command-Line interface"
+	print ""
+	print "commands:"
+	print "  udelete [userid|username] 	Delete the specified user from the database."
+	print "  ureset [userid|username] 	Reset the user profile."
+	print ""
+	exit(1)
+
+def user_from_uid(uid):
+	"""
+	Return user object
+	"""
+
+	# Get according to type
+	try:
+		if uid.isdigit():
+			return User.get( User.id == int(uid) )
+		elif "@" in uid:
+			return User.get( User.email == uid )
+		else:
+			return User.get( User.displayName == uid )
+	except User.DoesNotExist:
+		print "ERROR: User '%s' could not be found!" % uid
+		exit(1)
+
+def cmd_deluser(uid):
+	"""
+	Delete user 
+	"""
+
+	# Get user
+	user = user_from_uid(uid)
+
+	# Delete user
+	user.delete_instance(recursive=True)
+
+	# Inform user
+	print "INFO: User '%s' deleted!" % uid
+
+def cmd_resetuser(uid):
+	"""
+	Reset user
+	"""
+
+	# Get user
+	user = user_from_uid(uid)
+
+	# Get high-level interface to this user
+	hluser = HLUser(user)
+
+	# Reset
+	hluser.reset()
+
+	# Inform user
+	print "INFO: User '%s' was reset!" % uid
+
+
+# # Prepare argument parser
+# parser = argparse.ArgumentParser(prog='admin.py', description='LiveQ Administration Command-Line interface.')
+# parser.add_argument('command', type=str, nargs='?',
+#                   help='the command to process')
+# args = parser.parse_args()
+
+# Handle commands
+if len(sys.argv) < 2:
+	help()
+
+# Get command
+args = list(sys.argv[1:])
+command = args.pop(0)
+
+# Handle command
+try:
+	if command == "udelete":
+		
+		# Forward command
+		cmd_deluser( *args )
+
+	else:
+
+		print "ERROR: Unknown command '%s'" % command
+		exit(1)
+
+except Exception as e:
+
+	print "ERROR: %s Exception while handling your request! %s" % (e.__class__.__name__, str(e))
+	traceback.print_exc()
+	exit(2)	
 
 
