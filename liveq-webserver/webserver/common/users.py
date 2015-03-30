@@ -133,7 +133,7 @@ class HLUser:
 		self.userEventsListener = None
 
 		# Get a reference to user triggers
-		self.triggers = Triggers( self.dbUser )
+		self.triggers = Triggers( self )
 
 		# Allocate unique token to the user
 		self.token = UserTokens(user=self.dbUser, token=uuid.uuid4().hex)
@@ -797,6 +797,72 @@ class HLUser:
 	###################################
 	# High-level functions
 	###################################
+
+	def getHybridUserState_Hack(self):
+		"""
+		Return user state, hacking the 'hard_config' in it
+		"""
+
+		# Merge 'hard_config' to 'config'
+		state = self.dbUser.getState()
+		if 'hard_config' in state:
+
+			# Get or create config
+			if 'config' in state:
+				config = state['config']
+			else:
+				config = {}
+
+			# Update config
+			config += state['hard_config']
+
+			# Delete hard config
+			del state['hard_config']
+			state['config'] = config
+
+		# Return state
+		return state
+
+	def hasConfigEnabled(self, name):
+		"""
+		Check if the user has this configuration enabled
+		"""
+
+		# Get state
+		state = self.getHybridUserState_Hack()
+
+		# Check for obvious cases
+		if not 'config' in state:
+			return False
+		if not name in state['config']:
+			return False
+
+		# Got it!
+		return True
+
+	def enableConfig(self, name):
+		"""
+		Enable that particular configuration option
+		"""
+
+		# Sync user
+		self.reload()
+
+		# Get user state
+		state = self.dbUser.getState("hard_config", {})
+
+		# Enable state
+		state[name] = 1
+
+		# Update user state
+		self.dbUser.setState("hard_config", state)
+		self.dbUser.save()
+
+		# Inform server that the profile has changed
+		self.userEvents.send({
+			"type" 	 : "server",
+			"event"	 : "profile.changed"
+			})
 
 	def setCooldown(self, name, offset):
 		"""
@@ -2112,7 +2178,7 @@ class HLUser:
 			'achievements'	: user.getAchievements(),
 			'activePaper'	: user.activePaper_id,
 			'vars' 			: json.loads(user.variables),
-			'state' 		: json.loads(user.state),
+			'state' 		: self.getHybridUserState_Hack(),
 			'analytics'		: analytics,
 			'token'			: self.token.token,
 			'papers'		: self.countPapers(),

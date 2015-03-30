@@ -362,7 +362,7 @@ class User(BaseModel):
 		# When all=False, return False
 		return all
 
-	def getState(self, name, defValue=None):
+	def getState(self, name=None, defValue=None):
 		"""
 		Return the value of a state variable
 		"""
@@ -374,6 +374,11 @@ class User(BaseModel):
 				state = json.loads(self.state)
 			except ValueError as e:
 				logging.error("ValueError parsing 'state' of model '%s', key %s" % (self.__class__.__name__, self.id))
+
+		# If we don't have a name, return
+		# the whole state record
+		if name is None:
+			return state
 
 		# Return default if missing
 		if not name in state:

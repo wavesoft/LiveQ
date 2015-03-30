@@ -54,5 +54,23 @@ class Triggers:
 		"""
 		Trigger the specified trigger with the appropriate arguments
 		"""
-		
 
+		# When a value change enable estimation 
+		if name == "tuning.values.change":
+
+			# Enable interpolation option
+			if not self.user.hasConfigEnabled("sim-interpolate"):
+				self.user.enableConfig("sim-interpolate")	
+
+		elif name == "tuning.values.estimate":
+
+			# Enable interpolation option
+			if not self.user.hasConfigEnabled("sim-validate"):
+				self.user.enableConfig("sim-validate")	
+
+				# Trigger video introduction
+				print ">>> >SENDING TUTORIAL"
+				self.user.userEvents.send({
+					"type"  : "tutorial",
+					"name"	: "general.action.estimate"
+					})
