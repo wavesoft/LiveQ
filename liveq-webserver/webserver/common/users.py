@@ -765,7 +765,7 @@ class HLUser:
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-3.png",
+							"icon"   : "models/good.png",
 							"title"  : "Perfect Match",
 							"message": "Your simulation scored <em>%.4f</em>, which is better than your previous attempt!" % fitAfter
 							})
@@ -780,7 +780,7 @@ class HLUser:
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-3.png",
+							"icon"   : "models/perfect.png",
 							"title"  : "Perfect Match",
 							"message": "Your simulation scored <em>%.4f</em>, right away! That's amazing!" % fitAfter
 							})
@@ -795,7 +795,7 @@ class HLUser:
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-3.png",
+							"icon"   : "models/good.png",
 							"title"  : "Amazing!",
 							"message": "You got even better on your already perfect score, with <em>%.4f</em>" % fitAfter
 							})
@@ -810,19 +810,24 @@ class HLUser:
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-1.png",
+							"icon"   : "models/fair.png",
 							"title"  : "Good Match",
 							"message": "Your simulation scored <em>%.4f</em>, which is a really good result." % fitAfter
 							})
 
 					elif (fitAfter < 4.0):
 
+						# <4.0 to a better <4.0? [Give 2 points]
+
+						# Give 2 points
+						self.earnPoints(2, "for a better match!")
+
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-6.png",
+							"icon"   : "models/fair.png",
 							"title"  : "Good Match",
-							"message": "Your simulation scored <em>%.4f</em>. Can you bring it below <em>4.000</em>?" % fitAfter
+							"message": "Your simulation scored <em>%.4f</em>. Can you bring it below <em>1.000</em>?" % fitAfter
 							})
 
 					else:
@@ -830,7 +835,7 @@ class HLUser:
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
-							"icon"   : "avatars/model-6.png",
+							"icon"   : "models/bad.png",
 							"title"  : "Bad Match",
 							"message": "Your simulation scored <em>%.4f</em>. You need to bring this below <em>4.000</em>." % fitAfter
 							})
@@ -840,7 +845,7 @@ class HLUser:
 					# Send notification
 					self.userEvents.send({
 						"type"   : "flash",
-						"icon"   : "avatars/model-7.png",
+						"icon"   : "models/acceptable.png",
 						"title"  : "Not good",
 						"message": "Your simulation scored <em>%.4f</em> which is not better than the current best score of <em>%.4f</em>." % (fitAfter, fitBefore)
 						})
