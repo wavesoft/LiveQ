@@ -320,7 +320,7 @@ class JobManagerComponent(Component):
 		for h in histograms.values():
 
 			# Get histogram
-			histo = h.toHistogram()
+			histo = h.toHistogram().normalize()
 
 			# Store histogram
 			res.append( histo )
@@ -542,7 +542,7 @@ class JobManagerComponent(Component):
 
 		# DEBUG: Discard final histograms
 		if agentHistos.state == 2:
-			self.logger.info("[%s] *HACK* Discarding final histograms for job %s" % (channel.name, jid))
+			self.logger.info("[%s] *HACK* Discarding normalized final histograms for job %s" % (channel.name, jid))
 			return
 
 		# Adapt histogram collection to the lab tunables
