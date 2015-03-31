@@ -220,7 +220,7 @@ def deferJob(job):
 
 	# Remove the last entry
 	logger.info("Defering job %s on queue '%s'" % (job.id, job.group))
-	Config.STORE.rpush( "scheduler:queue:%s" % job.group )
+	Config.STORE.rpush( "scheduler:queue:%s" % job.group, job.id )
 
 def popQueuedJob():
 	"""
