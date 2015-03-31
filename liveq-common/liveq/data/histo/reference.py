@@ -51,6 +51,7 @@ def loadReferenceHistogram(histoPath):
 	# Lookup if such historam exists
 	histoPath = "%s/%s.dat" % (HistogramsConfig.HISTOREF_PATH, histoPath)
 	if not os.path.isfile(histoPath):
+		print "%s not found" % histoPath
 		return None
 
 	# Load & Cache histogram
@@ -71,7 +72,7 @@ def histoChi2Reference(histo):
 
 	# Return chi2 fit to reference
 	try:
-		normHisto = histo.toHistogram()
+		normHisto = histo.toHistogram().normalize()
 		return normHisto.chi2ToReference( ref )
 	except Exception as e:
 		logging.error("Exception while calculating chi2 of histogram %s: %s" % (str(histo.name), str(e)))
