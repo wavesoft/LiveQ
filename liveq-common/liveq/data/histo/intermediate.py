@@ -216,6 +216,18 @@ class IntermediateHistogramCollection(dict):
 		# Return answer
 		return ans
 
+	@staticmethod
+	def fromPackFile(filename, decompress=True, decode=True):
+		"""
+		The read a packed dataset from the specified file
+		"""
+
+		# Open file
+		with open(filename, 'rb') as f:
+
+			# Read and unpack
+			return IntermediateHistogramCollection.fromPack( f.read() )
+
 	def pack(self, encode=True, compress=True):
 		"""
 		Generate a packed version of the data that can be streamed
@@ -277,6 +289,18 @@ class IntermediateHistogramCollection(dict):
 
 		# Return buffer
 		return buf
+
+	def packToFile(self, filename, encode=True, compress=True):
+		"""
+		Pack and store to the specified file
+		"""
+
+		# Open file
+		with open(filename, 'wb') as f:
+
+			# Dump
+			f.write( self.pack(encode, compress) )
+
 
 	def subset(self, names):
 		"""
