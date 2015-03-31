@@ -311,7 +311,7 @@ class Job:
 		"""
 		Update job status
 		"""
-		# Update stateus
+		# Update status
 		if self.job.status != status:
 			self.job.status = status
 			self.job.acknowledged = 0

@@ -43,6 +43,9 @@ logger = logging.getLogger("scheduler")
 #:
 pendingCompletedJobs = [ ]
 
+#: The last index in the agent group list
+lastGroupIndex = 0
+
 class GroupResources:
 	"""
 	This class is used as a 'smart pointer' to the database groups. Instead of fetching
@@ -210,43 +213,68 @@ def measureResources(group, lock=False):
 	# Then create and return a GroupUsage instance
 	return GroupResources(group, semaphore)
 
-def popQueuedJob():
+def deferJob(job):
 	"""
-	Remove the last entry form queue (after a successful peek)
+	Put job back in queue with high priority
 	"""
 
 	# Remove the last entry
-	Config.STORE.rpop( "scheduler:queue" )
+	logger.info("Defering job %s on queue '%s'" % (job.id, job.group))
+	Config.STORE.rpush( "scheduler:queue:%s" % job.group )
 
-def peekQueueJob():
+def popQueuedJob():
 	"""
-	Peek the next item without removing it
+	Pop the next item from the first available queue
 	"""
+	global lastGroupIndex
+
+	# Get all agent groups
+	groups = agents.getAgentGroups()
+
+	# Offset index
+	groupOffset = 0
 
 	# Loop until successful
 	while True:
 
-		# First, pop a job from store
-		job_id = Config.STORE.lrange( "scheduler:queue", -1, -1 )
+		# Check if we ran out of groups
+		if groupOffset >= len(groups):
 
-		# If no jobs are left, exit
-		if not job_id:
+			# Slide offset frame
+			lastGroupIndex += 1
+			if lastGroupIndex >= len(groups):
+				lastGroupIndex = 0
+
+			# Return no job
 			return None
 
-		# Fetch item from list
-		job_id = job_id[0]
+		# Get the next group ID to check, shifted
+		# by the last group index, in order to provide
+		# a fair-share among all groups
+		gid = (lastGroupIndex + groupOffset) % len(groups)
+		groupOffset += 1
+
+		# First, pop a job from store
+		job_id = Config.STORE.rpop( "scheduler:queue:%s" % groups[gid] )
+
+		# If no jobs are left, continue
+		if not job_id:
+			continue
 
 		# Try to fetch the job entry
 		job = jobs.getJob( job_id )
 
 		# If the job was not resolved, try next
 		if not job:
-			# Remove the faulty entry
-			logger.warn("Could not load job %s. Removing from group" % job_id)
-			Config.STORE.rpop( "scheduler:queue" )
+			# Ignore faulty entries
+			logger.warn("Could not load job %s. Ignoring." % job_id)
+			# Remain on the same group
+			groupOffset -= 1
 			continue
 
 		# Otherwise we do have an instance in place
+		logger.info("Popped job %s from queue '%s'" % (job.id, job.group))
+		lastGroupIndex = gid
 		return job
 
 
@@ -335,8 +363,8 @@ def process():
 	If there was nothing to process, the function will return a tuple of tree Nones
 	"""
 
-	# Peek item on the right side
-	job = peekQueueJob()
+	# Pop an item from queue
+	job = popQueuedJob()
 
 	# Check if there is nothing to process
 	if job == None:
@@ -349,6 +377,9 @@ def process():
 	# Check if there is absolutely no free space
 	if not res.fitsAnother():
 		job.sendStatus("No free workers to place job. Will try later.", {"RES_SLOTS": "0"})
+
+		# Put job back in queue
+		self.deferJob( job )
 		res.release()
 		return (None,None,None)
 
@@ -388,8 +419,7 @@ def process():
 		job.sendStatus("Job will start on %i free workers" % usedSlots, {"RES_SLOTS":usedSlots})
 
 		# Successful handling of the job. Pop it
-		logger.info("Job %s processed. Removing from group" % job.id)
-		popQueuedJob()
+		logger.info("Job %s processed" % job.id)
 
 		# Release lock
 		res.release()
@@ -406,13 +436,17 @@ def process():
 		if usedSlots > 0:
 
 			# Send status
-			job.sendStatus("Job will start on %i free workers" % usedSlots, {"RES_SLOTS":usedSlots})
+			job.sendStatus("Job will start on %i disposable workers" % usedSlots, {"RES_SLOTS":usedSlots})
 
 			# Activate the already acquired number of slots
 			res.release()
 			return (job, [], markForJob(slots, job.id, job.getBatchRuntimeConfig( slots )))
 
 		else:
+
+			# No free slots, even by disposing
+			# Put job back in queue
+			self.deferJob( job )
 			res.release()
 			return (None,None,None)
 
@@ -425,7 +459,6 @@ def process():
 
 	# Successful handling of the job. Pop it
 	logger.info("Job %s processed. Removing from group" % job.id)
-	popQueuedJob()
 
 	# Send status
 	job.sendStatus("Job will start on %i workers" % len(slots), {"RES_SLOTS":len(slots)})
@@ -496,8 +529,8 @@ def requestJob( job ):
 	"""
 	
 	# Place job on queue
-	logger.info("Placing job %s on queue" % job.id)
-	Config.STORE.lpush( "scheduler:queue", job.id )
+	logger.info("Placing job %s on queue '%s'" % (job.id, job.group))
+	Config.STORE.lpush( "scheduler:queue:%s" % job.group, job.id )
 	return True
 
 def releaseJob( job ):
@@ -547,7 +580,7 @@ def completeOrReschedule( job ):
 			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
 
 			# Re-place job on queue with highest priority
-			Config.STORE.rpush( "scheduler:queue", job.id )
+			self.deferJob( job )
 
 			# Job is re-scheduled
 			return False

@@ -18,6 +18,7 @@
 ################################################################
 
 import time
+import traceback
 import logging
 
 from geoip import geolite2
@@ -30,11 +31,41 @@ from liveq.reporting.lars import LARS
 #: The name of the default group to use
 DEFAULT_GROUP = "global"
 
+#: The cached list of agent groups
+AGENT_GROUPS = []
+
 ##############################################################
 # ------------------------------------------------------------
 #  INTERFACE FUNCTIONS
 # ------------------------------------------------------------
 ##############################################################
+
+def getAgentGroups(invalidateCache=False):
+	"""
+	Return an array of agent groups that contain agents in them
+	"""
+	global AGENT_GROUPS
+
+	# Check if they are cached
+	if (len(AGENT_GROUPS) > 0) and not invalidateCache:
+		return AGENT_GROUPS
+
+	# Fetch them
+	try:
+		
+		# Fetch and cache the agent groups
+		groups = AgentGroup.select( AgentGroup.uuid ).tuples()[:]
+		AGENT_GROUPS = map(lambda x: x[0], groups)
+
+		# Return the list
+		print ">>> %r" % AGENT_GROUPS
+		return AGENT_GROUPS
+
+	except Exception as e:
+		traceback.print_exc()
+		logging.error("Exception while fetching agent groups: %s" % str(e))
+		return []
+
 
 def getAgentGroup(gid):
 	"""
@@ -116,7 +147,6 @@ def updatePresence(uid, state=1):
 	# Save entry
 	agentEntry.save()
 
-
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
 	report.set("presence", state)
@@ -160,6 +190,11 @@ def updateHandshake(uid, attrib):
 	# Fetch references
 	groupEntry = getAgentGroup(group)
 	agentEntry = getAgent(uid)
+
+	# If this group is not cached, reload 
+	# agent group cache
+	if not group in AGENT_GROUPS:
+		self.getAgentGroups( invalidateCache=True )
 
 	# Update fields
 	agentEntry.lastActivity = time.time()
