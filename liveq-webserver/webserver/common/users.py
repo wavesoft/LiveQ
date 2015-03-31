@@ -681,6 +681,9 @@ class HLUser:
 		Check for not-acknowledged jobs
 		"""
 
+		# Get known observables
+		knownObservables = self.getKnownObservables()
+
 		# Get the list of jobs with acknowledged = 0 flag
 		nackJobList = []
 		for job in JobQueue.select( 
@@ -688,7 +691,8 @@ class HLUser:
 				JobQueue.status,
 				JobQueue.paper_id,
 				JobQueue.userTunes,
-				JobQueue.fit
+				JobQueue.fit,
+				JobQueue.resultsMeta
 			).where(
 				(JobQueue.user_id == self.id)
 			  & (JobQueue.acknowledged == 0)
@@ -712,21 +716,37 @@ class HLUser:
 
 				# Update paper score
 				fitBefore = paper.bestFit
-				fitAfter = job.fit
 
 				# If there was no previous fit, assume it
 				# was a really big number
 				if fitBefore == 0.0:
 					fitBefore = 10000000000
 
+				# Calculate fit on known observables
+				jobMeta = job.getResultsMeta()
+				fitAfter = 0.0
+				fitCount = 0
+				if 'fitscores' in jobMeta:
+
+					# Collect only known histograms
+					for k,v in jobMeta['fitscores'].iteritems():
+						if k in knownObservables:
+							if v > 0.0:
+								fitAfter += v
+								fitCount += 1
+
+					# Average
+					fitAfter /= fitCount
+				else:
+					fitAfter = job.fit
+
+
 				# Import properties into the paper
 				paper.fit = fitAfter
 				paper.job_id = job.id
 
 				# Import tunbles from the job
-				print ">>> Setting tunables: %r" % job.getTunableValues()
 				paper.setTunableValues( job.getTunableValues() )
-				print ">>> Setted to tunables: %r" % paper.getTunableValues()
 
 				# Check for better score
 				if fitAfter < fitBefore:
@@ -735,7 +755,7 @@ class HLUser:
 					paper.bestFit = fitAfter
 
 					# Check which cases are we in
-					if (fitAfter < 1.0) and ((fitBefore >= 1.0) and (fitBefore < 4.0)):
+					if (fitAfter < 1.0) and ((fitBefore >= 1.0) and (fitBefore <= 4.0)):
 
 						# 4.0 -> 1.0 Great [Give extra 20 points]
 
@@ -793,6 +813,16 @@ class HLUser:
 							"icon"   : "avatars/model-1.png",
 							"title"  : "Good Match",
 							"message": "Your simulation scored <em>%.4f</em>, which is a really good result." % fitAfter
+							})
+
+					elif (fitAfter < 4.0):
+
+						# Send notification
+						self.userEvents.send({
+							"type"   : "flash",
+							"icon"   : "avatars/model-6.png",
+							"title"  : "Good Match",
+							"message": "Your simulation scored <em>%.4f</em>. Can you bring it below <em>4.000</em>?" % fitAfter
 							})
 
 					else:

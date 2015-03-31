@@ -65,6 +65,10 @@ def histoChi2Reference(histo):
 	of the histogram and return the chi2 fit.
 	"""
 
+	# If histogram is empty return 0.0
+	if (histo.bins == 0):
+		return 0.0
+
 	# Get reference histogram
 	ref = loadReferenceHistogram( histo.name )
 	if not ref:
