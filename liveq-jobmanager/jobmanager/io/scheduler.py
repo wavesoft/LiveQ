@@ -379,7 +379,7 @@ def process():
 		job.sendStatus("No free workers to place job. Will try later.", {"RES_SLOTS": "0"})
 
 		# Put job back in queue
-		self.deferJob( job )
+		deferJob( job )
 		res.release()
 		return (None,None,None)
 
@@ -446,7 +446,7 @@ def process():
 
 			# No free slots, even by disposing
 			# Put job back in queue
-			self.deferJob( job )
+			deferJob( job )
 			res.release()
 			return (None,None,None)
 
@@ -580,7 +580,7 @@ def completeOrReschedule( job ):
 			job.sendStatus("There are no free workers in the queue. The job is re-scheduled with high priority")
 
 			# Re-place job on queue with highest priority
-			self.deferJob( job )
+			deferJob( job )
 
 			# Job is re-scheduled
 			return False
