@@ -127,7 +127,7 @@ class HLUser:
 		# Team-releated information
 		self.teamMembership = None
 		self.teamID = 0
-		self.resourceGroup = "global"
+		self.resourceGroup = None
 
 		# Receive user events
 		self.userEvents = UserEvents.forUser( self.id )
@@ -150,7 +150,7 @@ class HLUser:
 			self.teamID = self.teamMembership.team.id
 
 			# Get team's resource group
-			self.resourceGroup = self.teamMembership.team.agentGroup.uuid
+			self.resourceGroup = self.teamMembership.team.agentGroup
 
 		except TeamMembers.DoesNotExist:
 			# Not in a team
@@ -859,11 +859,11 @@ class HLUser:
 				# Calculate status message
 				statusMsg = [
 					"is pending execution", 
-					"has started",
+					"got some workers",
 					"has completed",
 					"has failed",
 					"was cancelled",
-					"is stalled"
+					"has no more active workers"
 				]
 
 				# Send event
@@ -1907,6 +1907,89 @@ class HLUser:
 			"title"  : "Cited paper",
 			"message": "You have cited paper <em>%s</em>!" % paper.title
 			})
+
+	def requestToJoinTeam(self, team_id):
+		"""
+		Switch user membership to the specified team
+		"""
+
+		# Create membership if missing
+		if not self.teamMembership:
+			self.teamMembership = TeamMembers.create(
+				user=self.dbUser,
+				status=TeamMembers.USER,
+				)
+
+		# Update membership
+		self.teamMembership.team = team_id
+		self.teamMembership.save()
+
+		# Cache details
+		self.teamID = self.teamMembership.team.id
+		self.resourceGroup = self.teamMembership.team.agentGroup
+
+		# Send notification
+		self.userEvents.send({
+			"type"   : "info",
+			"title"  : "Changed Team",
+			"message": "You are now member of the team <strong>%s</strong>" % self.teamMembership.team.name
+			})
+
+		# Inform server that the profile has changed
+		self.userEvents.send({
+			"type" 	 : "server",
+			"event"	 : "profile.changed"
+			})
+
+	def getTeamListing(self):
+		"""
+		Return list of all teams
+		"""
+
+		# Scan all teams
+		ans = []
+		for t in Team \
+			.select(
+				Team,
+				fn.Count( TeamMembers.id ).alias("members"),
+				fn.Count( Paper.id ).alias("papers")
+			) \
+			.join( TeamMembers, JOIN_LEFT_OUTER) \
+			.switch( Team ) \
+			.join( Paper, JOIN_LEFT_OUTER) \
+			.group_by( Team.id ) \
+			.dicts():
+
+			# Collect team
+			ans.append(t)
+
+		# Return teams
+		return ans
+
+	def getTeamResources(self):
+		"""
+		Query all worker nodes of our current team
+		"""
+
+		# This only works if member of team
+		if self.teamMembership is None:
+			return []
+
+		# Collect relevant agents
+		ans = []
+		for p in Agent \
+			.select(
+				Agent, AgentMetrics
+			) \
+			.join( AgentMetrics ) \
+			.where( Agent.group == self.resourceGroup ) \
+			.dicts():
+
+			# Append additional information
+			ans.append(p)
+
+		# Return answer
+		return ans
 
 	def getTeamCitedPapers(self):
 		"""

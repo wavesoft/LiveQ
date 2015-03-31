@@ -156,6 +156,30 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Return team listing
+			# ------------------------------------------------
+			elif action == "team.listing":
+
+				# Return team details
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getTeamListing()
+					})
+
+			##################################################
+			# Switch user to the specified team
+			# ------------------------------------------------
+			elif action == "team.join":
+
+				# Switch to given team
+				self.user.requestToJoinTeam( param['team'] )
+
+				# Return success
+				self.sendResponse({
+						"status": "ok"
+					})
+
+			##################################################
 			# Return profile paper status
 			# ------------------------------------------------
 			elif action == "papers.profile":
