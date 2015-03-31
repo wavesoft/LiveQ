@@ -177,6 +177,30 @@ class LabSocketInterface(APIInterface):
 			self.switchToJob( job, refresh=True )
 
 		##################################################
+		# Verify job submission
+		# ------------------------------------------------
+		elif action == "job.verify":
+
+			# Check if there is an active job with the same paper
+			if JobQueue.select().where(
+					(JobQueue.status << [ JobQueue.PENDING, JobQueue.RUN, JobQueue.STALLED ])
+				  & (JobQueue.paper_id == self.user.activePaper_id)
+				  & (JobQueue.user_id == self.user.id)
+				).exists():
+
+				# Send conflict warning
+				self.sendResponse({
+					"status"  : "conflict"
+					})
+
+			else:
+
+				# We are good
+				self.sendResponse({
+					"status"  : "ok"
+					})
+
+		##################################################
 		# Submit a new job to the liveQ workers
 		# ------------------------------------------------
 		elif action == "job.submit":
@@ -195,7 +219,7 @@ class LabSocketInterface(APIInterface):
 			# Ask job manager to schedule a new job
 			ans = self.jobChannel.send('job_start', {
 				'lab'  : self.lab.uuid,
-				'group': self.user.resourceGroup,
+				'group': self.user.resourceGroup.uuid,
 				'user' : self.user.id,
 				'team' : self.user.teamID,
 				'paper': self.user.activePaper_id,

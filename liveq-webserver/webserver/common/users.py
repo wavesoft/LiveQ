@@ -2155,6 +2155,11 @@ class HLUser:
 		if 'cost' in query:
 			calculateCost = bool(query['cost'])
 
+		# Check for the sort key
+		sortKey=None
+		if 'sort' in query:
+			sortKey = str(query['sort'])
+
 		# Get all papers that the user has access to
 		if not publicOnly:
 			# User papers
@@ -2173,16 +2178,43 @@ class HLUser:
 		if terms:
 			whereQuery &= ( (Paper.title ** terms) | (Paper.body ** terms) )
 
-		# Collect relevant paper
+		# If asked, collect cited papers
 		ans = []
 		teamIDs = []
+		isCited = {}
+		if cited:
+			for row in PaperCitation.select().where( PaperCitation.team == self.teamMembership.team ):
+
+				# Collect paper
+				paper = row.citation
+				paper_dict = paper.serialize()
+				paper_dict['cited'] = True
+				ans.append(paper_dict)
+
+				# If we are calculating cost, count citations
+				if calculateCost:
+					paper_dict['citations'] = paper.countCitations()
+
+				# Mark as cited
+				isCited[paper.id] = True
+
+				# Collect team IDs
+				if not paper._data['team'] in teamIDs:
+					teamIDs.append( paper._data['team'] )
+
+		# Collect relevant paper
 		for row in Paper.select().where( whereQuery ).order_by( Paper.fit ).limit(limit):
 
 			# Collect rows
 			paper = row.serialize()
 
+			# Skip if cited
+			if paper['id'] in isCited:
+				continue
+
 			# Mark row as active or inactive
 			paper['active'] = (row.id == self.dbUser.activePaper_id)
+			paper['cited'] = False
 
 			# If we are calculating cost, count citations
 			if calculateCost:
@@ -2233,18 +2265,6 @@ class HLUser:
 				# Don't continue
 				break
 
-		# If asked, collect cited papers
-		if cited:
-			for row in PaperCitation.select().where( PaperCitation.team == self.teamMembership.team ):
-
-				# Collect paper
-				paper = row.paper
-				ans.append(paper.serialize())
-
-				# Collect team IDs
-				if not paper._data['team'] in teamIDs:
-					teamIDs.append( paper._data['team'] )
-
 		# Resolve team names
 		teams = {}
 		for tid in teamIDs:
@@ -2262,6 +2282,18 @@ class HLUser:
 			# If we are calculating cost, apply cost estimation function now
 			if calculateCost:
 				ans[i]['cost'] = cost_estimation_function( ans[i]['citations'] )
+
+		# Sort if requested
+		if not sortKey is None:
+
+			# Check the sort direction
+			sortReverse = False
+			if sortKey[0] in "-+":
+				sortReverse = (sortKey[0] == "-")
+				sortKey = sortKey[1:]
+
+			# Apply sorting
+			ans = sorted(ans, key=lambda x: x[sortKey], reverse=sortReverse)
 
 		# Return
 		return ans
