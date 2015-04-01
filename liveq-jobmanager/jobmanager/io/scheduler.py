@@ -272,6 +272,14 @@ def popQueuedJob():
 			groupOffset -= 1
 			continue
 
+		# If the job was cancelled, discard it
+		if job.getStatus() == jobs.CANCELLED:
+			# Log
+			logger.warn("Discarding cancelled job %s" % job_id)
+			# Remain on the same group
+			groupOffset -= 1
+			continue
+
 		# Otherwise we do have an instance in place
 		logger.info("Popped job %s from queue '%s'" % (job.id, job.group))
 		lastGroupIndex = gid
