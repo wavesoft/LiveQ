@@ -40,10 +40,11 @@ def createWebserverTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, QuestionaireResponses, 
+	for table in [ AnalyticsProfile, User, UserTokens, Team, TeamMembers, Tutorials, 
 				   AnalyticsEvent, Achievement, Definition, FirstTime, TootrAnimation,
 				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation,
-				   MachinePart, MachinePartStage, MachinePartStageUnlock ]:
+				   MachinePart, MachinePartStage, MachinePartStageUnlock,
+				   Questionnaire, QuestionnaireResponses ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -1013,6 +1014,76 @@ class MachinePartStageUnlock(BaseModel):
 	#: When was it was unlocked
 	unlockeddate = DateTimeField(default=datetime.datetime.now)
 
+
+class Questionnaire(BaseModel):
+	"""
+	Evaluation or arbitrary questionnaire 
+	"""
+
+	JSON_FIELDS = ['questions']
+
+	#: The title of the questionnaire
+	title = CharField(max_length=256)
+
+	#: A short description
+	description = TextField()
+
+	#: The questions as a JSON object
+	questions = TextField(default="{}")
+
+	def getQuestions(self):
+		"""
+		Load the user questions
+		"""
+		try:
+			return json.loads(self.questions)
+		except ValueError as e:
+			logging.error("ValueError parsing 'questions' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setQuestions(self, questions):
+		"""
+		Update the user questions
+		"""
+
+		# Update questions
+		self.questions = json.dumps(questions)
+
+class QuestionnaireResponses(BaseModel):
+	"""
+	Responses to questionnaires
+	"""
+
+	JSON_FIELDS = ['responses']
+
+	#: The user responding to this questionnaire
+	user = ForeignKeyField(User)
+
+	#: The questionnaire he/she has responded to
+	to = ForeignKeyField(Questionnaire)
+
+	#: The responses as a JSON object
+	responses = TextField(default="{}")
+
+	def getResponses(self):
+		"""
+		Load the user responses
+		"""
+		try:
+			return json.loads(self.responses)
+		except ValueError as e:
+			logging.error("ValueError parsing 'responses' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setResponses(self, responses):
+		"""
+		Update the user responses
+		"""
+
+		# Update responses
+		self.responses = json.dumps(responses)
+
+
 # -----------------------------------------------------
 #  Drafts
 # -----------------------------------------------------
@@ -1028,19 +1099,6 @@ class EventQueue(BaseModel):
 	#: The event payload
 	event = TextField(default="{}")
 
-class QuestionaireResponses(BaseModel):
-	"""
-	Answers to questionaires
-	"""
-
-	#: The user who completed this questionaire
-	user = ForeignKeyField(User)
-
-	#: The questionaire name
-	questionaire = CharField(max_length=128)
-
-	#: User's responses
-	response = TextField(default="{}")
 
 class Tutorials(BaseModel):
 	"""
@@ -1071,4 +1129,5 @@ class BookReference(BaseModel):
 
 	#: The URL to the publication
 	url = CharField(max_length=255, default="")
+
 

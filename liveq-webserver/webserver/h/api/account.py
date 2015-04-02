@@ -26,6 +26,7 @@ from liveq.io.bus import Bus
 from webserver.models import MachinePart
 
 from webserver.common.users import HLUserError
+from webserver.common.evaluation import UserEvaluation
 
 from webserver.h.api import APIInterface
 from webserver.config import Config
@@ -340,6 +341,45 @@ class AccountInterface(APIInterface):
 
 				# Handle answers
 				self.user.handleBookQuestionAnswers( param['answers'] )
+				
+				# Send OK
+				self.sendResponse({
+						"status": "ok",
+					})
+
+				# Send user profile
+				self.socket.sendUserProfile()
+
+			##################################################
+			# Get learning evaluation questions
+			# ------------------------------------------------
+			elif action == "learning.evaluation":
+
+				# Get a learning evaluation handler
+				evaluation = UserEvaluation(self.user)
+
+				# For now we have only pre-evaluation
+				questionnaire_id = 1
+
+				# Read a particular book
+				self.sendResponse({
+						"status": "ok",
+						"data" : {
+							"questions": evaluation.getQuestions(questionnaire_id),
+							"id": questionnaire_id
+						}
+					})
+
+			##################################################
+			# Handle answers to learning evaluation
+			# ------------------------------------------------
+			elif action == "learning.answers":
+
+				# Get a learning evaluation handler
+				evaluation = UserEvaluation(self.user)
+
+				# Handle answers
+				evaluation.handleAnswers( param['answers'], param['id'] )
 				
 				# Send OK
 				self.sendResponse({

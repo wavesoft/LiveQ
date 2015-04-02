@@ -117,3 +117,6 @@ with open(sys.argv[1], 'w') as toFile:
 
 	# Dump all tunables
 	SQLExport(toFile, Tunable, Tunable.select())
+
+	# Export Questionnaires
+	SQLExport(toFile, Questionnaire, Questionnaire.select())
