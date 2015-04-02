@@ -27,6 +27,8 @@ from liveq.config.internalbus import InternalBusConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.cache import CacheConfig
 from liveq.config.histograms import HistogramsConfig
+from liveq.config.email import EmailConfig
+
 from liveq.models import createBaseTables
 from webserver.models import createWebserverTables
 
@@ -95,7 +97,7 @@ class GameConfig:
 """
 Create a configuration for the JOB MANAGER based on the core config
 """
-class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig, GameConfig, HistogramsConfig):
+class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverConfig, DatabaseConfig, ForumConfig, GameConfig, HistogramsConfig, EmailConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -118,6 +120,7 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 		ForumConfig.fromConfig( config, runtimeConfig )
 		GameConfig.fromConfig( config, runtimeConfig )
 		HistogramsConfig.fromConfig( config, runtimeConfig )
+		EmailConfig.fromConfig( config, runtimeConfig )
 		
 		# Ensure base tables exist
 		createBaseTables()

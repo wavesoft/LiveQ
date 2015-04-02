@@ -212,3 +212,41 @@ class AppConfigClass(ComponentClassConfig):
 
 		raise NotImplementedError("The AppConfigClass did not implement the instance() function")
 
+class EmailConfigClass(ComponentClassConfig):
+	"""
+	Email clients configuration class
+	"""
+	
+	@staticmethod
+	def fromClass(cls,cfg):
+		"""
+		Instantiate a config class from the package specified
+		"""
+
+		# Try to load the specified package
+		try:
+			mod = __import__(cls, fromlist=['']);
+		except ImportError as e:
+			raise ConfigException("Unable to load package %s (%s)" % (cls, e) )
+
+		# Make sure we have the required classes inside
+		if not hasattr(mod, "Config"):
+			raise ConfigException("The store package %s has no configuration class defined" % cls)
+
+		# Validate integrity
+		if not issubclass(mod.Config, EmailConfigClass):
+			raise ConfigException("The class %s.Config is not an application configuration" % cls)			
+
+		# Instantiate (safely)
+		inst = mod.Config(cfg)
+
+		# Return instance
+		return inst
+
+	def instance(self, runtimeConfig):
+		"""
+		Overridable function to create a store
+		"""
+
+		raise NotImplementedError("The EmailConfigClass did not implement the instance() function")
+
