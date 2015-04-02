@@ -31,13 +31,19 @@ from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
 
 from liveq.config.classes import EmailConfigClass
+from liveq.classes.mail import CommonMailClass
 
-class SendmailClass:
+class SendmailClass(CommonMailClass):
 
 	def __init__(self, config):
 		"""
 		Initialize coudhDB record
 		"""
+
+		# Initialize common mail class
+		CommonMailClass.__init__(self)
+
+		# Keep local reference of te configuration
 		self.config = config
 
 	def send( self, recepients, subject, text=None, html=None, macros=None ):

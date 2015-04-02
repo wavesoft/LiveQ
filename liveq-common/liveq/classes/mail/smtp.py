@@ -31,18 +31,24 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from liveq.config.classes import EmailConfigClass
+from liveq.classes.mail import CommonMailClass
 
-class SMTPClass:
+class SMTPClass(CommonMailClass):
 
 	def __init__(self, config):
 		"""
 		Initialize coudhDB record
 		"""
+
+		# Initialize common mail class
+		CommonMailClass.__init__(self)
+
+		# Keep local reference of te configuration
 		self.config = config
 
 	def send( self, recepients, subject, text=None, html=None, macros=None ):
 		"""
-		Send an e-mail
+		Send an e-mail right now
 		"""
 
 		# Open e-mail logger
