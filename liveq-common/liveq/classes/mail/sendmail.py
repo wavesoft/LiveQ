@@ -40,7 +40,7 @@ class SendmailClass:
 		"""
 		self.config = config
 
-	def send( recepients, subject, text=None, html=None, macros=None ):
+	def send( self, recepients, subject, text=None, html=None, macros=None ):
 		"""
 		Send an e-mail
 		"""

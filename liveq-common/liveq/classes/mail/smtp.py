@@ -40,7 +40,7 @@ class SMTPClass:
 		"""
 		self.config = config
 
-	def send( recepients, subject, text=None, html=None, macros=None ):
+	def send( self, recepients, subject, text=None, html=None, macros=None ):
 		"""
 		Send an e-mail
 		"""
@@ -63,10 +63,11 @@ class SMTPClass:
 				macros = [ macros ]
 
 		# Open a connection to the SMTP server
-		smtp = smtplib.SMTP( self.config.SMTP )
+		smtp = smtplib.SMTP( self.config.SMTP, self.config.SMTP_PORT )
 
 		# Log-in to the SMTP server if it's required
 		if self.config.SMTP_USERNAME:
+			smtp.starttls()
 			smtp.login( self.config.SMTP_USERNAME, self.config.SMTP_PASSWORD )
 
 		# Repeat this for every recepient
@@ -81,7 +82,9 @@ class SMTPClass:
 				msg['To'] = to
 
 				# Pick personalization macros
-				macroRecord = macros[ i % len(macros) ]
+				macroRecord = {}
+				if not macros is None:
+					macros[ i % len(macros) ]
 				i += 1
 
 				# Check for TEXT version
@@ -138,6 +141,9 @@ class Config(EmailConfigClass):
 
 		#: Password for the SMTP server
 		self.SMTP_PASSWORD = config['smtp_password']
+
+		#: SMTP Port
+		self.SMTP_PORT = int(config['smtp_port'])
 
 	def instance(self, runtimeConfig):
 		"""

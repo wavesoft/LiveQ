@@ -34,6 +34,9 @@ class EmailConfig:
 	EMAIL_CLASS = ""
 
 	#: The application configuration
+	EMAIL_CONFIG = None
+
+	#: The EMAIL Class
 	EMAIL = None
 
 	@staticmethod
@@ -46,5 +49,6 @@ class EmailConfig:
 
 		# Populate app classes
 		EmailConfig.EMAIL_CLASS = config.get("email", "class")
-		EmailConfig.EMAIL = EmailConfigClass.fromClass( EmailConfig.EMAIL_CLASS, config._sections["email"] )
+		EmailConfig.EMAIL_CONFIG = EmailConfigClass.fromClass( EmailConfig.EMAIL_CLASS, config._sections["email"] )
+		EmailConfig.EMAIL = EmailConfig.EMAIL_CONFIG.instance( runtimeConfig )
 
