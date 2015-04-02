@@ -103,6 +103,7 @@ class SMTPClass:
 
 				# sendmail function takes 3 arguments: sender's address, recipient's address
 				# and message to send - here it is sent as one string.
+				logger.info("Sending e-mail to '%s' with subject '%s'" % (to, subject))
 				smtp.sendmail(self.config.FROM, to, msg.as_string())
 
 				# Count successful transmissions

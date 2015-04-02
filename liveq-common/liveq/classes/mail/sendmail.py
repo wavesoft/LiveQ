@@ -96,6 +96,7 @@ class SendmailClass:
 					msg.attach(part)
 
 				# Popen and pipe to sendmail
+				logger.info("Sending e-mail to '%s' with subject '%s'" % (to, subject))
 				p = Popen([ self.config.SENDMAIL_BIN, "-t", "-oi"], stdin=PIPE)
 				p.communicate(msg.as_string())
 
