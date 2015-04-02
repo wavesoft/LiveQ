@@ -68,10 +68,6 @@ class SendmailClass(CommonMailClass):
 			if not type(macros) is list:
 				macros = [ macros ]
 
-		# Log-in to the SMTP server if it's required
-		if self.config.SMTP_USERNAME:
-			smtp.login( self.config.SMTP_USERNAME, self.config.SMTP_PASSWORD )
-
 		# Repeat this for every recepient
 		i = 0
 		for to in recepients:
@@ -84,7 +80,9 @@ class SendmailClass(CommonMailClass):
 				msg['To'] = to
 
 				# Pick personalization macros
-				macroRecord = macros[ i % len(macros) ]
+				macroRecord = {}
+				if not macros is None:
+					macroRecord = macros[ i % len(macros) ]
 				i += 1
 
 				# Check for TEXT version

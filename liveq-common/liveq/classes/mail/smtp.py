@@ -90,7 +90,7 @@ class SMTPClass(CommonMailClass):
 				# Pick personalization macros
 				macroRecord = {}
 				if not macros is None:
-					macros[ i % len(macros) ]
+					macroRecord = macros[ i % len(macros) ]
 				i += 1
 
 				# Check for TEXT version
