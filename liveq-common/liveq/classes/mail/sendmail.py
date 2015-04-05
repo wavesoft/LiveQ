@@ -46,75 +46,38 @@ class SendmailClass(CommonMailClass):
 		# Keep local reference of te configuration
 		self.config = config
 
-	def send( self, recepients, subject, text=None, html=None, macros=None ):
+	def _send(self, me, to, subject, textPart=None, htmlPart=None ):
 		"""
-		Send an e-mail
+		Send the specified e-mail
 		"""
-
-		# Open e-mail logger
+		
+		# Get a logger
 		logger = logging.getLogger("email.sendmail")
 
-		# Successful mail sent
-		success = 0
+		# Create message container - the correct MIME type is multipart/alternative.
+		msg = MIMEMultipart('alternative')
+		msg['Subject'] = subject
+		msg['From'] = me
+		msg['To'] = to
 
-		# Make sure recepients is an array
-		if type(recepients) is str:
-			recepients = [recepients]
+		# Check for TEXT version
+		if not textPart is None:
 
-		# Prepare macros
-		if not macros is None:
+			# Create TEXT multipart
+			part = MIMEText(textPart, 'plain')
+			msg.attach(part)
 
-			# Make sure macros is an array
-			if not type(macros) is list:
-				macros = [ macros ]
+		# Check for HTML version
+		if not htmlPart is None:
 
-		# Repeat this for every recepient
-		i = 0
-		for to in recepients:
-			try:
+			# Create HTML multipart
+			part = MIMEText(htmlPart, 'html')
+			msg.attach(part)
 
-				# Create message container - the correct MIME type is multipart/alternative.
-				msg = MIMEMultipart('alternative')
-				msg['Subject'] = subject
-				msg['From'] = self.config.FROM
-				msg['To'] = to
-
-				# Pick personalization macros
-				macroRecord = {}
-				if not macros is None:
-					macroRecord = macros[ i % len(macros) ]
-				i += 1
-
-				# Check for TEXT version
-				if not text is None:
-
-					# Create TEXT multipart
-					part = MIMEText(text % macroRecord, 'plain')
-					msg.attach(part)
-
-				# Check for HTML version
-				if not html is None:
-
-					# Create HTML multipart
-					part = MIMEText(html % macroRecord, 'html')
-					msg.attach(part)
-
-				# Popen and pipe to sendmail
-				logger.info("Sending e-mail to '%s' with subject '%s'" % (to, subject))
-				p = Popen([ self.config.SENDMAIL_BIN, "-t", "-oi"], stdin=PIPE)
-				p.communicate(msg.as_string())
-
-				# Count successful transmissions
-				success += 1
-
-			except Exception as e:
-
-				# Trap exceptions
-				traceback.print_exc()
-				logging.error("Exception sending an e-mail %s: %s" % ( e.__class__.__name__, str(e) ))
-
-		# Return successful mail sent
-		return success		
+		# Popen and pipe to sendmail
+		logger.debug("Invoking sendmail binary %s" % self.config.SENDMAIL_BIN)
+		p = Popen([ self.config.SENDMAIL_BIN, "-t", "-oi"], stdin=PIPE)
+		p.communicate(msg.as_string())
 
 class Config(EmailConfigClass):
 	"""

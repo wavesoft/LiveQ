@@ -46,86 +46,84 @@ class SMTPClass(CommonMailClass):
 		# Keep local reference of te configuration
 		self.config = config
 
-	def send( self, recepients, subject, text=None, html=None, macros=None ):
+		# Local SMTP instance
+		self.smtp = None
+
+	def _queue_startDrain(self):
 		"""
-		Send an e-mail right now
+		We started draining the queue
 		"""
 
-		# Open e-mail logger
+		# Get a logger
 		logger = logging.getLogger("email.smtp")
-
-		# Successful mail sent
-		success = 0
-
-		# Make sure recepients is an array
-		if type(recepients) is str:
-			recepients = [recepients]
-
-		# Prepare macros
-		if not macros is None:
-
-			# Make sure macros is an array
-			if not type(macros) is list:
-				macros = [ macros ]
-
+		
 		# Open a connection to the SMTP server
-		smtp = smtplib.SMTP( self.config.SMTP, self.config.SMTP_PORT )
+		logger.debug("Connecting to SMTP Server %s:%i" % (self.config.SMTP, self.config.SMTP_PORT))
+		self.smtp = smtplib.SMTP( self.config.SMTP, self.config.SMTP_PORT )
 
 		# Log-in to the SMTP server if it's required
 		if self.config.SMTP_USERNAME:
-			smtp.starttls()
-			smtp.login( self.config.SMTP_USERNAME, self.config.SMTP_PASSWORD )
+			logger.debug("Starting TLS and logging-in")
+			self.smtp.starttls()
+			self.smtp.login( self.config.SMTP_USERNAME, self.config.SMTP_PASSWORD )
 
-		# Repeat this for every recepient
-		i = 0
-		for to in recepients:
-			try:
+	def _queue_endDrain(self):
+		"""
+		We finished draining the queue
+		"""
 
-				# Create message container - the correct MIME type is multipart/alternative.
-				msg = MIMEMultipart('alternative')
-				msg['Subject'] = subject
-				msg['From'] = self.config.FROM
-				msg['To'] = to
-
-				# Pick personalization macros
-				macroRecord = {}
-				if not macros is None:
-					macroRecord = macros[ i % len(macros) ]
-				i += 1
-
-				# Check for TEXT version
-				if not text is None:
-
-					# Create TEXT multipart
-					part = MIMEText(text % macroRecord, 'plain')
-					msg.attach(part)
-
-				# Check for HTML version
-				if not html is None:
-
-					# Create HTML multipart
-					part = MIMEText(html % macroRecord, 'html')
-					msg.attach(part)
-
-				# sendmail function takes 3 arguments: sender's address, recipient's address
-				# and message to send - here it is sent as one string.
-				logger.info("Sending e-mail to '%s' with subject '%s'" % (to, subject))
-				smtp.sendmail(self.config.FROM, to, msg.as_string())
-
-				# Count successful transmissions
-				success += 1
-
-			except Exception as e:
-
-				# Trap exceptions
-				traceback.print_exc()
-				logging.error("Exception sending an e-mail %s: %s" % ( e.__class__.__name__, str(e) ))
+		# Get a logger
+		logger = logging.getLogger("email.smtp")
 
 		# Logout from the SMTP server
-		smtp.quit()
+		logger.debug("Disconnecting from SMTP server")
+		self.smtp.quit()
+		self.smtp = None
 
-		# Return successful mail sent
-		return success		
+	def _send(self, me, to, subject, textPart=None, htmlPart=None ):
+		"""
+		Send the specified e-mail
+		"""
+		
+		# Get a logger
+		logger = logging.getLogger("email.smtp")
+
+		# Reuire an SMTP instance, so if we haven't
+		# got one, acquire one now
+		withoutQueue = False
+		if not self.smtp:
+			# Get an SMTP server and disconnect when done
+			self._queue_startDrain()
+			withoutQueue = True
+
+		# Create message container - the correct MIME type is multipart/alternative.
+		msg = MIMEMultipart('alternative')
+		msg['Subject'] = subject
+		msg['From'] = me
+		msg['To'] = to
+
+		# Check for TEXT version
+		if not textPart is None:
+
+			# Create TEXT multipart
+			part = MIMEText(textPart, 'plain')
+			msg.attach(part)
+
+		# Check for HTML version
+		if not htmlPart is None:
+
+			# Create HTML multipart
+			part = MIMEText(htmlPart, 'html')
+			msg.attach(part)
+
+		# sendmail function takes 3 arguments: sender's address, recipient's address
+		# and message to send - here it is sent as one string.
+		logger.debug("Sending message via SMTP")
+		self.smtp.sendmail(me, to, msg.as_string())
+
+		# Disconnect if logged-in without queue
+		if withoutQueue:
+			self._queue_endDrain()
 
 class Config(EmailConfigClass):
 	"""
