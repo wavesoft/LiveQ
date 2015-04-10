@@ -110,6 +110,7 @@ def deleteForumReflection(user, wipe=False):
 
 	# Get forum user ID
 	uid = forumUidFromUser(user)
+	print ">>> FORUM USER FOR USER %s = %i" % (user, uid)
 
 	# Delete using the user ID as key
 	c.execute(

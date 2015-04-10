@@ -50,17 +50,18 @@ class MailActivateHandler(tornado.web.RequestHandler):
 
 			# Activate inactive user (bit 0 not set)
 			user = tok.user
-			if (user.state & 1) == 0:
+			if (user.status & 1) == 0:
 
 				# Activate
-				user.state |= 1
+				user.status |= 1
 				user.save()
 
 				# Success
 				self.render(
 					"redirect.html", 
-					url="",
-					message="Welcome %s! Your e-mail address is now fully validated!" % user.displayName
+					url=self.reverse_url('index'),
+					title="Verified!",
+					message="Welcome %s! Your e-mail address is now verified! You can continue to the game" % user.displayName
 					)
 
 			else:

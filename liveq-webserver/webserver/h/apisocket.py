@@ -408,6 +408,9 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 					})
 				return
 
+			# Check if user account has expired
+			
+
 			# Success
 			self.user = HLUser(user)
 			self.sendAction('account.login.response', {
@@ -431,7 +434,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			try:
 
 				# Register and return user instance
-				self.user = HLUser.register( profile, self.reverse_url("account.activate") )
+				self.user = HLUser.register( profile, Config.BASE_URL + self.reverse_url("account.activate") )
 
 			except KeyError as e:
 

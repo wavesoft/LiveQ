@@ -38,7 +38,8 @@ Local configuration for the agent
 class WebserverConfig:
 
 	SERVER_PORT = 8080
-	BASE_URL = "/vas"
+	BASE_URL = ""
+	BASE_PATH = "/vas"
 	VAS_URL = ""
 	TRAINSEQ_PATH = ""
 	HISTODESC = None
@@ -54,6 +55,7 @@ class WebserverConfig:
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.TRAINSEQ_PATH = config.get("webserver", "trainseq_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
+		WebserverConfig.BASE_PATH = config.get("webserver", "base_path")
 		WebserverConfig.VAS_URL = config.get("webserver", "vas_url")
 		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
 		WebserverConfig.SSL_PORT = config.get("webserver", "ssl_port")

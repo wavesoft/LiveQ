@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Virtual Atom Smasher :: Error</title>
+    {% include "chunks/head-common.html" %}
+	<link rel="stylesheet" href="{{ static_url("css/status.css") }}">
+	<meta http-equiv="refresh" value="5,url={{ url }}" />
+  </head>
+  <body>
+
+    <div class="container">
+    	<div class="row">
+	    	<div class="col-sm-3"></div>
+	    	<div class="col-sm-6 content-focus">
+	    		<h1>{{ title }}</h1>
+	    		<p>{{ message }}</p>
+	    		<p class="text-center">
+	    			<a href="{{ url }}" class="btn btn-default">
+	    			Click here to continue
+	    			</a>
+	    		</p>
+	    	</div>
+	    	<div class="col-sm-3"></div>
+    	</div>
+
+    </div>
+
+  </body>
+</html>
