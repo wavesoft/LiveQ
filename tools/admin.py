@@ -47,16 +47,6 @@ from webserver.common.email import EMailTemplate
 # Prepare runtime configuration
 runtimeConfig = { }
 
-# Load configuration
-try:
-	Config.fromFile( "config/common.conf.local", runtimeConfig )
-except ConfigException as e:
-	print("ERROR: Configuration exception: %s" % e)
-	exit(1)
-
-# Hook CTRL+C
-handleSIGINT()
-
 ################################################################
 # Helper functions
 ################################################################
@@ -129,7 +119,7 @@ def user_from_uid(uid):
 # Administration Commands definition
 ################################################################
 
-@command("udelete", args=["uid|email|name"], help="Delete the specified user from the database.")
+@command("deluser", args=["uid|email|name"], help="Delete the specified user from the database.")
 def cmd_deluser(uid):
 	"""
 	Delete user 
@@ -147,7 +137,7 @@ def cmd_deluser(uid):
 	# Inform user
 	print "INFO: User '%s' deleted!" % uid
 
-@command("ureset", args=["uid|email|name"], help="Reset the user profile.")
+@command("resetuser", args=["uid|email|name"], help="Reset the user profile.")
 def cmd_resetuser(uid):
 	"""
 	Reset user
@@ -166,9 +156,9 @@ def cmd_resetuser(uid):
 	print "INFO: User '%s' was reset!" % uid
 
 @command("batchmail", args=[ "template", "target|list" ], help="Send the specified e-mail template to the specified batch of e-mails.")
-def cmd_alpha_invite(template, target):
+def cmd_batch_mail(template, target):
 	"""
-	Reset user
+	Send a batch message to the specified list of recepients
 	"""
 
 	# Prepare e-mail list
@@ -227,6 +217,24 @@ def cmd_alpha_invite(template, target):
 	# Inform user
 	print "INFO: E-mails were sent!"
 
+@command("sendvalidation", help="Send the e-mail validation mail to all users that are not yet validated.")
+def cmd_alpha_invite():
+	"""
+	Re-send activation e-mail to users that have not yet activated their e-mail
+	"""
+
+	# Load template
+	with open("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
+		print "INFO: Loading e-mail template from '%s'" % template
+		tpl = EMailTemplate(f.read())
+
+
+	# Select all the user sith non-validated e-mails
+	for user in User.select().where( User.status == 0 ):
+
+		# Send e-mails
+		print "INFO: Requesting user '%s' to activate the e-mail '%s'" % (user, user.email)
+
 
 ################################################################
 # Administration Interface Entry Point
@@ -254,6 +262,16 @@ if __name__ == "__main__":
 
 			# Get command
 			cmd = COMMAND_REGISTRY[command]
+
+			# Load configuration
+			try:
+				Config.fromFile( "config/common.conf.local", runtimeConfig )
+			except ConfigException as e:
+				print("ERROR: Configuration exception: %s" % e)
+				exit(1)
+
+			# Hook CTRL+C
+			handleSIGINT()
 
 			# Require specified number of arguments
 			if len(args) < len(cmd['args']):
