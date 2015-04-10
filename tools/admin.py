@@ -41,6 +41,7 @@ from liveq.models import *
 from webserver.models import *
 
 from webserver.common.users import HLUser
+from webserver.common.forum import deleteForumReflection
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -109,6 +110,9 @@ def cmd_resetuser(uid):
 	# Get user
 	user = user_from_uid(uid)
 
+	# First delete forum reflection
+	deleteForumReflection(user)
+
 	# Get high-level interface to this user
 	hluser = HLUser(user)
 
@@ -139,6 +143,7 @@ try:
 		
 		# Forward command
 		cmd_deluser( *args )
+		exit(0)
 
 	else:
 

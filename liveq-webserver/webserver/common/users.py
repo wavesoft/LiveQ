@@ -38,6 +38,7 @@ from webserver.common.userevents import UserEvents
 from webserver.common.books import BookKeywordCache
 from webserver.common.triggers import Triggers
 from webserver.common.fancytitles import createFancyTitle
+from webserver.common.email import EMail
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -161,7 +162,7 @@ class HLUser:
 		self.updateCache_MachinePart()
 
 	@staticmethod
-	def register(profile):
+	def register(profile, activateUrl):
 		"""
 		Register a new user
 
@@ -281,6 +282,20 @@ class HLUser:
 		hluser.updateCache_Books()
 		hluser.updateCache_Feats()
 		user.save()
+
+		# -----------------
+		# Validation e-mail
+		# -----------------
+
+		# Create a user activation mail token for this user
+		token = UserActivationMailToken.forUser(user)
+
+		# Prepare e-mail macros
+		macros = user.serialize()
+		macros['activateurl'] = "%s?token=%s" % (activateUrl, token.token)
+
+		# Send e-mail confirmation mail
+		EMail.queue( email, "verify", macros=macros )
 
 		# Return hluser
 		return hluser

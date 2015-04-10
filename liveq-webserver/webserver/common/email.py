@@ -93,8 +93,8 @@ class EMail:
 		"""
 
 		# Check for cache
-		if template in EMail.cache:
-			return EMail.cache[ template ]
+		if template in EMail.CACHE:
+			return EMail.CACHE[ template ]
 
 		# Ensure it exists
 		fileName = "%s/%s.tpl" % ( WebserverConfig.EMAIL_PATH, template )
@@ -108,7 +108,7 @@ class EMail:
 			tpl = EMailTemplate(f.read())
 
 			# Cache and return template
-			EMail.cache[ template ] = tpl
+			EMail.CACHE[ template ] = tpl
 			return tpl
 
 	@staticmethod

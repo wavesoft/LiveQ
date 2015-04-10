@@ -431,7 +431,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			try:
 
 				# Register and return user instance
-				self.user = HLUser.register( profile )
+				self.user = HLUser.register( profile, self.reverse_url("account.activate") )
 
 			except KeyError as e:
 

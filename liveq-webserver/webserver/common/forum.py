@@ -97,6 +97,26 @@ def forumUsernameExists(displayName):
 	# User exists
 	return True
 
+def deleteForumReflection(user, wipe=False):
+	"""
+	Delete the username (or the entire user content if wipe=True) from
+	the forum database
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return None
+
+	# Get forum user ID
+	uid = forumUidFromUser(user)
+
+	# Delete using the user ID as key
+	c.execute(
+		"DELETE FROM %susers\
+		 WHERE uid = %i"
+		% ( ForumConfig.FORUM_DB_PREFIX, uid ) )
+
 def registerForumUser(email, displayName, password, usergroup=2, title=""):
 	"""
 	Create a new user record in myBB for the given user
