@@ -135,7 +135,7 @@ def cmd_deluser(uid):
 	user.delete_instance(recursive=True)
 
 	# Inform user
-	print "INFO: User '%s' deleted!" % uid
+	print "SUCCESS: User '%s' deleted!" % uid
 
 @command("resetuser", args=["uid|email|name"], help="Reset the user profile.")
 def cmd_resetuser(uid):
@@ -153,7 +153,7 @@ def cmd_resetuser(uid):
 	hluser.reset()
 
 	# Inform user
-	print "INFO: User '%s' was reset!" % uid
+	print "SUCCESS: User '%s' was reset!" % uid
 
 @command("batchmail", args=[ "template", "target|list" ], help="Send the specified e-mail template to the specified batch of e-mails.")
 def cmd_batch_mail(template, target):
@@ -199,7 +199,7 @@ def cmd_batch_mail(template, target):
 		exit(1)
 
 	# Inform about submission
-	print "INFO: Sending invitations to %i target(s)" % len(targets)
+	print "INFO: Sending e-mails to %i target(s)" % len(targets)
 
 	# Load template
 	with open(template, 'r') as f:
@@ -215,7 +215,7 @@ def cmd_batch_mail(template, target):
 		)
 
 	# Inform user
-	print "INFO: E-mails were sent!"
+	print "SUCCESS: E-mails were sent!"
 
 @command("sendvalidation", help="Send the e-mail validation mail to all users that are not yet validated.")
 def cmd_alpha_invite():
@@ -224,8 +224,9 @@ def cmd_alpha_invite():
 	"""
 
 	# Load template
-	with open("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'r') as f:
-		print "INFO: Loading e-mail template from '%s'" % template
+	mailTpl = "%s/liveq-webserver/config/email/verify.tpl" % os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+	with open(mailTpl, 'r') as f:
+		print "INFO: Loading e-mail template from '%s'" % mailTpl
 		tpl = EMailTemplate(f.read())
 
 
