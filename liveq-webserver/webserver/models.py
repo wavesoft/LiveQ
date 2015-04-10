@@ -20,6 +20,8 @@
 import logging
 import datetime
 import json
+import random
+import string
 
 from peewee import *
 from liveq.models import BaseModel, JobQueue, AgentGroup, Agent, \
@@ -253,6 +255,7 @@ class User(BaseModel):
 	#: JSON Fields in this model
 	JSON_FIELDS = ['variables', 'state']
 
+	# -----------------------------------
 	# Log-in and profile
 	# -----------------------------------
 
@@ -272,6 +275,12 @@ class User(BaseModel):
 
 	#: The team avatar
 	avatar = CharField(max_length=128)
+
+	#: The date the account was created
+	created = DateTimeField(default=datetime.datetime.now)
+
+	#: The global status flags of the account
+	status = IntegerField(default=0)
 
 	# -----------------------------------
 	# Game elements
@@ -546,6 +555,33 @@ class User(BaseModel):
 		if not rec.count:
 			return 0
 		return rec.count
+
+class UserActivationMailToken(BaseModel):
+	"""
+	The user's e-mail activation token
+	"""
+
+	#: The relevant user
+	user = ForeignKeyField(User)
+
+	#: The user token
+	token = CharField(max_length=64, index=True, unique=True)
+
+	@staticmethod
+	def forUser(user):
+		"""
+		Create a new user activation e-mail token for the
+		specified user.
+		"""
+
+		# Create new random token
+		token = "".join([random.choice(string.letters) for x in range(0,64)])
+
+		# Create and return
+		return UserActivationMailToken.create(
+				user=user,
+				token=token
+				)
 
 class UserTokens(BaseModel):
 	"""

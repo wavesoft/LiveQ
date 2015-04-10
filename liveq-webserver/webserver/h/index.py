@@ -31,6 +31,13 @@ from webserver.models import Tutorials
 """
 Root page handler
 """
+class VASRedirectHandler(tornado.web.RequestHandler):
+	def get(self):
+		self.redirect( Config.VAS_URL )
+
+"""
+Root page handler
+"""
 class IndexHandler(tornado.web.RequestHandler):
 	def get(self):
 		self.render(

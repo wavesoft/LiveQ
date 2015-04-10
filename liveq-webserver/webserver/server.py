@@ -30,8 +30,9 @@ import signal
 from tornado.web import URLSpec
 from webserver.h.configure import *
 from webserver.h.apisocket import APISocketHandler
-from webserver.h.index import IndexHandler
+from webserver.h.index import *
 from webserver.h.tootr import TootrGetAnimation
+from webserver.h.account import *
 from webserver.config import Config
 
 from webserver.common.books import BookKeywordCache
@@ -59,8 +60,8 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			URLSpec(r"%s" % Config.BASE_URL, 					IndexHandler),
-			URLSpec(r"%s/" % Config.BASE_URL, 					IndexHandler, 				name="index"),
+			URLSpec(r"%s" % Config.BASE_URL, 					VASRedirectHandler),
+			URLSpec(r"%s/" % Config.BASE_URL, 					VASRedirectHandler, 		name="index"),
 			URLSpec(r"%s/config" % Config.BASE_URL, 			ConfigHandler, 				name="config"),
 			URLSpec(r"%s/config/books" % Config.BASE_URL, 		ConfigBooksHandler, 		name="config.books"),
 			URLSpec(r"%s/config/books/edit" % Config.BASE_URL, 	ConfigEditBookHandler, 		name="config.books.edit"),
@@ -70,6 +71,7 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 			URLSpec(r"%s/config/tun/del" % Config.BASE_URL, 	ConfigDeleteTunableHandler,	name="config.tunables.del"),
 			URLSpec(r"%s/apisocket" % Config.BASE_URL,			APISocketHandler, 			name="api"),
 			URLSpec(r"%s/tootr/anim" % Config.BASE_URL,			TootrGetAnimation, 			name="tootr.anim"),
+			URLSpec(r"%s/account/activate" % Config.BASE_URL,	MailActivateHandler,		name="account.activate"),
 		]
 
 		# Get root dir of files

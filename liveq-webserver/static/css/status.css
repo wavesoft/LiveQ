@@ -1,0 +1,21 @@
+/* CSS For the status pages */
+body {
+  font: sans-serif;
+  padding-top: 40px;
+  background: url(../img/background-detector.jpg) #000000 no-repeat center center;
+  background-attachment: fixed;
+}
+.content-focus {
+  border-radius: 20px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #efefef;
+}
+.content-focus pre {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #eee;
+}
+.center {
+  margin: 50px auto 0;
+}

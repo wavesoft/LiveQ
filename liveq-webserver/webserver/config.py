@@ -39,6 +39,7 @@ class WebserverConfig:
 
 	SERVER_PORT = 8080
 	BASE_URL = "/vas"
+	VAS_URL = ""
 	TRAINSEQ_PATH = ""
 	HISTODESC = None
 	SSL = False
@@ -46,12 +47,14 @@ class WebserverConfig:
 	SSL_CERTIFICATE = ""
 	SSL_KEY = ""
 	SSL_CA = ""
+	EMAIL_PATH = ""
 
 	@staticmethod
 	def fromConfig(config, runtimeConfig):
 		WebserverConfig.SERVER_PORT = config.get("webserver", "port")
 		WebserverConfig.TRAINSEQ_PATH = config.get("webserver", "trainseq_path")
 		WebserverConfig.BASE_URL = config.get("webserver", "base_url")
+		WebserverConfig.VAS_URL = config.get("webserver", "vas_url")
 		WebserverConfig.SSL = (int(config.get("webserver", "ssl")) == 1)
 		WebserverConfig.SSL_PORT = config.get("webserver", "ssl_port")
 		WebserverConfig.SSL_CERTIFICATE = config.get("webserver", "ssl_certificate")
@@ -121,7 +124,10 @@ class Config(CoreConfig, CacheConfig, StoreConfig, InternalBusConfig, WebserverC
 		GameConfig.fromConfig( config, runtimeConfig )
 		HistogramsConfig.fromConfig( config, runtimeConfig )
 		EmailConfig.fromConfig( config, runtimeConfig )
-		
+
+		# Update e-mail directory		
+		WebserverConfig.EMAIL_PATH = "%s/email" % os.path.dirname(os.path.realpath(confFile))
+
 		# Ensure base tables exist
 		createBaseTables()
 		createWebserverTables()
