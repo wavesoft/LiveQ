@@ -42,6 +42,7 @@ from liveq.models import *
 from webserver.models import *
 from webserver.common.users import HLUser
 from webserver.common.forum import deleteForumReflection
+from webserver.common.email import EMailTemplate
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -50,11 +51,27 @@ runtimeConfig = { }
 try:
 	Config.fromFile( "config/common.conf.local", runtimeConfig )
 except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
+	print("ERROR: Configuration exception: %s" % e)
 	exit(1)
 
 # Hook CTRL+C
 handleSIGINT()
+
+################################################################
+# Helper functions
+################################################################
+
+# Helper for collecting commands
+COMMAND_REGISTRY = {}
+def command(command, args=[], help=""):
+	def decorator(f):
+		COMMAND_REGISTRY[command] = {
+			'fn': f,
+			'args': args,
+			'help': help
+		}
+		return f
+	return decorator
 
 def help():
 	"""
@@ -64,10 +81,30 @@ def help():
 	print "usage: admin.py [command] [..]"
 	print ""
 	print "LiveQ Administration Command-Line interface"
+	print "The following commands are available:"
 	print ""
-	print "commands:"
-	print "  udelete [userid|username] 	Delete the specified user from the database."
-	print "  ureset [userid|username] 	Reset the user profile."
+
+	# Find the longest command in the list
+	maxlen = 5
+	for cmd in COMMAND_REGISTRY.keys():
+		if len(cmd) > maxlen:
+			maxlen = len(cmd)
+
+	# Print commands
+	for cmd, details in COMMAND_REGISTRY.iteritems():
+
+		# Print command
+		sys.stdout.write((" %%%is " % maxlen) % cmd,)
+
+		# If arguments, dump them in the same line
+		if len(details['args']) > 0:
+			for a in details['args']:
+				sys.stdout.write("[%s] " % a)
+			sys.stdout.write("\n")
+			sys.stdout.write(" " * (maxlen+2))
+
+		# Then write help text
+		print "%s" % details['help']
 	print ""
 	exit(1)
 
@@ -88,6 +125,11 @@ def user_from_uid(uid):
 		print "ERROR: User '%s' could not be found!" % uid
 		exit(1)
 
+################################################################
+# Administration Commands definition
+################################################################
+
+@command("udelete", args=["uid|email|name"], help="Delete the specified user from the database.")
 def cmd_deluser(uid):
 	"""
 	Delete user 
@@ -105,6 +147,7 @@ def cmd_deluser(uid):
 	# Inform user
 	print "INFO: User '%s' deleted!" % uid
 
+@command("ureset", args=["uid|email|name"], help="Reset the user profile.")
 def cmd_resetuser(uid):
 	"""
 	Reset user
@@ -122,38 +165,111 @@ def cmd_resetuser(uid):
 	# Inform user
 	print "INFO: User '%s' was reset!" % uid
 
+@command("batchmail", args=[ "template", "target|list" ], help="Send the specified e-mail template to the specified batch of e-mails.")
+def cmd_alpha_invite(template, target):
+	"""
+	Reset user
+	"""
 
-# # Prepare argument parser
-# parser = argparse.ArgumentParser(prog='admin.py', description='LiveQ Administration Command-Line interface.')
-# parser.add_argument('command', type=str, nargs='?',
-#                   help='the command to process')
-# args = parser.parse_args()
+	# Prepare e-mail list
+	targets = [target]
 
-# Handle commands
-if len(sys.argv) < 2:
-	help()
-
-# Get command
-args = list(sys.argv[1:])
-command = args.pop(0)
-
-# Handle command
-try:
-	if command == "udelete":
-		
-		# Forward command
-		cmd_deluser( *args )
-		exit(0)
-
-	else:
-
-		print "ERROR: Unknown command '%s'" % command
+	# Check if template is a file
+	if not os.path.isfile(template):
+		print "ERROR: '%s' is not a filename! Expecting an e-mail template" % template
 		exit(1)
 
-except Exception as e:
+	# Check if target is a file
+	if os.path.isfile(target):
+		print "INFO: Reading e-mails from %s" % target
 
-	print "ERROR: %s Exception while handling your request! %s" % (e.__class__.__name__, str(e))
-	traceback.print_exc()
-	exit(2)	
+		# Reset e-mail list
+		targets = []
+
+		# Read e-mails from list
+		with open(target, 'r') as f:
+			for line in f:
+
+				# Chomp eol for linux and windows
+				if line[:-1] == "\n":
+					line = line[0:-1]
+				if line[:-1] == "\r":
+					line = line[0:-1]
+
+				# Check if this is a valid e-mail
+				if not '@' in line:
+					print "WARNING: Skipping line '%s' because is not a valid e-mail" % line
+					continue
+
+				# Put on list
+				targets.append( line )
+
+	elif not '@' in target:
+		print "ERROR: '%s' is not a filename (list of e-mails) nor an e-mail address!"
+		exit(1)
+
+	# Inform about submission
+	print "INFO: Sending invitations to %i target(s)" % len(targets)
+
+	# Load template
+	with open(template, 'r') as f:
+		print "INFO: Loading e-mail template from '%s'" % template
+		tpl = EMailTemplate(f.read())
+
+	# Send now
+	Config.EMAIL.send(
+		targets,
+		tpl.subject,
+		tpl.text,
+		tpl.html,
+		)
+
+	# Inform user
+	print "INFO: E-mails were sent!"
+
+
+################################################################
+# Administration Interface Entry Point
+################################################################
+
+if __name__ == "__main__":
+
+	# Handle commands
+	if len(sys.argv) < 2:
+		help()
+
+	# Get command
+	args = list(sys.argv[1:])
+	command = args.pop(0)
+
+	# Handle command
+	try:
+
+		# Lookup command
+		if not command in COMMAND_REGISTRY:
+			print "ERROR: Unknown command '%s'" % command
+			exit(1)
+
+		else:
+
+			# Get command
+			cmd = COMMAND_REGISTRY[command]
+
+			# Require specified number of arguments
+			if len(args) < len(cmd['args']):
+				print "ERROR: Incorrect number of arguments! Expecting %i" % len(cmd['args'])
+				exit(1)
+
+			# Call function
+			cmd['fn']( *args )
+
+			# Exit
+			exit(0)	
+
+	except Exception as e:
+
+		print "ERROR: %s Exception while handling your request! %s" % (e.__class__.__name__, str(e))
+		traceback.print_exc()
+		exit(2)	
 
 
