@@ -27,11 +27,12 @@ from liveq.config.database import DatabaseConfig
 from liveq.config.histograms import HistogramsConfig
 from liveq.config.email import EmailConfig
 from liveq.models import createBaseTables
+from webserver.config import ForumConfig
 
 """
-Create a configuration for the TOOLS based on the core config
+Create a configuration for the TOOLS based on the core config plus webserver forum
 """
-class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, HistogramsConfig, EmailConfig):
+class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, HistogramsConfig, EmailConfig, ForumConfig):
 
 	"""
 	Update class variables by reading the config file
@@ -51,6 +52,7 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, Histogr
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		HistogramsConfig.fromConfig( config, runtimeConfig )
 		EmailConfig.fromConfig( config, runtimeConfig )
+		ForumConfig.fromConfig( config, runtimeConfig )
 
 		# Ensure base tables exist
 		createBaseTables()

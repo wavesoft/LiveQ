@@ -32,14 +32,14 @@ import traceback
 import json
 import os
 import util.pythia as pythia
-from util.config import Config
+from util.wsconfig import Config
 
 from liveq import handleSIGINT, exit
 from liveq.exceptions import ConfigException
 
 from liveq.models import *
-from webserver.models import *
 
+from webserver.models import *
 from webserver.common.users import HLUser
 from webserver.common.forum import deleteForumReflection
 
@@ -96,6 +96,9 @@ def cmd_deluser(uid):
 	# Get user
 	user = user_from_uid(uid)
 
+	# First delete forum reflection
+	deleteForumReflection(user)
+
 	# Delete user
 	user.delete_instance(recursive=True)
 
@@ -109,9 +112,6 @@ def cmd_resetuser(uid):
 
 	# Get user
 	user = user_from_uid(uid)
-
-	# First delete forum reflection
-	deleteForumReflection(user)
 
 	# Get high-level interface to this user
 	hluser = HLUser(user)
