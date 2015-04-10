@@ -59,7 +59,7 @@ if (len(sys.argv) < 2) or (not sys.argv[1]):
 	print ""
 	print " dump-game-db.py <path to sql file>"
 	print ""
-	sys.exit(1)
+	exit(1)
 
 # Start dumping
 with open(sys.argv[1], 'w') as toFile:
@@ -120,3 +120,6 @@ with open(sys.argv[1], 'w') as toFile:
 
 	# Export Questionnaires
 	SQLExport(toFile, Questionnaire, Questionnaire.select())
+
+# We are done, exit now
+exit(0)
