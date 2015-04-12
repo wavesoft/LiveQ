@@ -60,18 +60,18 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 
 		# Setup handlers
 		handlers = [
-			URLSpec(r"%s" % Config.BASE_PATH, 					VASRedirectHandler),
-			URLSpec(r"%s/" % Config.BASE_PATH, 					VASRedirectHandler, 		name="index"),
-			URLSpec(r"%s/config" % Config.BASE_PATH, 			ConfigHandler, 				name="config"),
-			URLSpec(r"%s/config/books" % Config.BASE_PATH, 		ConfigBooksHandler, 		name="config.books"),
-			URLSpec(r"%s/config/books/edit" % Config.BASE_PATH, ConfigEditBookHandler, 		name="config.books.edit"),
-			URLSpec(r"%s/config/books/del" % Config.BASE_PATH, 	ConfigDeleteBookHandler,	name="config.books.del"),
-			URLSpec(r"%s/config/tun" % Config.BASE_PATH, 		ConfigTunablesHandler, 		name="config.tunables"),
-			URLSpec(r"%s/config/tun/edit" % Config.BASE_PATH, 	ConfigEditTunableHandler, 	name="config.tunables.edit"),
-			URLSpec(r"%s/config/tun/del" % Config.BASE_PATH, 	ConfigDeleteTunableHandler,	name="config.tunables.del"),
-			URLSpec(r"%s/apisocket" % Config.BASE_PATH,			APISocketHandler, 			name="api"),
-			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,		TootrGetAnimation, 			name="tootr.anim"),
-			URLSpec(r"%s/account/activate" % Config.BASE_PATH,	MailActivateHandler,		name="account.activate"),
+			URLSpec(r"%s" % Config.BASE_PATH, 						VASRedirectHandler),
+			URLSpec(r"%s/" % Config.BASE_PATH, 						VASRedirectHandler, 		name="index"),
+			URLSpec(r"%s/config" % Config.BASE_PATH, 				ConfigHandler, 				name="config"),
+			URLSpec(r"%s/config/books" % Config.BASE_PATH, 			ConfigBooksHandler, 		name="config.books"),
+			URLSpec(r"%s/config/books/edit" % Config.BASE_PATH, 	ConfigEditBookHandler, 		name="config.books.edit"),
+			URLSpec(r"%s/config/books/del" % Config.BASE_PATH, 		ConfigDeleteBookHandler,	name="config.books.del"),
+			URLSpec(r"%s/config/tun" % Config.BASE_PATH, 			ConfigTunablesHandler, 		name="config.tunables"),
+			URLSpec(r"%s/config/tun/edit" % Config.BASE_PATH, 		ConfigEditTunableHandler, 	name="config.tunables.edit"),
+			URLSpec(r"%s/config/tun/del" % Config.BASE_PATH, 		ConfigDeleteTunableHandler,	name="config.tunables.del"),
+			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,			TootrGetAnimation, 			name="tootr.anim"),
+			URLSpec(r"%s/api/io" % Config.BASE_PATH,				APISocketHandler, 			name="api"),
+			URLSpec(r"%s/api/account/activate" % Config.BASE_PATH,	MailActivateHandler,		name="account.activate"),
 		]
 
 		# Get root dir of files
@@ -117,7 +117,7 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 
 		# Fire notification to all sessions
 		for sess in APISocketHandler.SESSIONS:
-			sess.sendNotification("The server is going to be restarted in 30 seconds! Refresh to join again.", "critical", "Server")
+			sess.sendNotification("The server is going to be restarted for maintenance! If disconnected, refresh in a few minutes!", "critical", "Server")
 
 	def cronJobs(self):
 		"""
