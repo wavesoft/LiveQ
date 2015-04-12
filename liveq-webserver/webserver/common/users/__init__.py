@@ -41,6 +41,7 @@ from webserver.common.users.exceptions import HLUserError
 from webserver.common.users.papers import HLUser_Papers
 from webserver.common.users.books import HLUser_Books
 from webserver.common.users.team import HLUser_Team
+from webserver.common.users.job import HLUser_Job
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -50,7 +51,7 @@ BOOK_KNOWN = 1
 BOOK_MASTERED = 2
 
 
-class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team):
+class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 	"""
 	Collection of high-level operations on the user object
 	"""
@@ -1179,72 +1180,6 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team):
 			"type" 	 : "server",
 			"event"	 : "profile.changed"
 			})
-
-	def getJob(self, job_id):
-		"""
-		Check if the specified job belongs to the specified user
-		and return the job record.
-		"""
-
-		# Check if the specified job from the jobQueue belongs
-		# to the user with our current ID
-		try:
-			return JobQueue.select() \
-				.where( JobQueue.id == int(job_id) ) \
-				.where( JobQueue.user_id == int(self.id) ) \
-				.get()
-		except JobQueue.DoesNotExist:
-			return None
-
-	def getJobDetails(self, job_id):
-		"""
-		Return the details for the specified job
-		"""
-
-		# Try to get job
-		job = self.getJob(job_id)
-		if not job:
-			raise HLUserError("Could not access job %s" % job_id, "not-exists")
-
-		# Serialize
-		job_dict = job.serialize()
-
-		# Get details regarding the agents
-		agents = []
-		for a in Agent.select().where( Agent.activeJob == job_id ):
-			
-			# Serialize agent record
-			agent = a.serialize()
-			
-			# Split the agent UUID
-			idparts = agent['uuid'].split("/")
-			if len(idparts) > 0:
-				agent['uuid'] = idparts[1]
-
-			# Append to agents
-			agents.append( agent )
-
-		# Get relevant paper
-		paper = {}
-		try:
-			paper = Paper.get( Paper.id == job.paper_id ).serialize()
-		except Paper.DoesNotExist:
-			pass
-
-		# Keep only the tunables that the user knows
-		tunables = {}
-		is_known = self.getKnownTunables()
-		for k,v in job_dict['userTunes'].iteritems():
-			if k in is_known:
-				tunables[k] = v
-
-		# Update records
-		job_dict['agents'] = agents
-		job_dict['paper'] = paper
-		job_dict['userTunes'] = tunables
-		
-		# Return results
-		return job_dict
 
 	###################################
 	# In-game information queries
