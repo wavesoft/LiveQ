@@ -594,8 +594,35 @@ class HLUser_Papers:
 		if job.paper_id != paper_id:
 			raise HLUserError("You can only select jobs targeting the specified paper!", "not-authorized")
 
+		# Make sure job is completed
+		if job.status != JobQueue.COMPLETED:
+			raise HLUserError("You can only select jobs that are completed", "not-completed")
+
+		# Get known observables
+		knownObservables = self.getKnownObservables()
+
+		# Calculate fit on known observables
+		jobMeta = job.getResultsMeta()
+		fitScore = 0.0
+		fitCount = 0
+		if 'fitscores' in jobMeta:
+			# Collect only known histograms
+			for k,v in jobMeta['fitscores'].iteritems():
+				if k in knownObservables:
+					if v > 0.0:
+						fitScore += v
+						fitCount += 1
+			# Average
+			fitScore /= fitCount
+		else:
+			fitScore = job.fit
+
 		# Update paper record
-		paper.job_id = job_id
+		paper.job_id = job.id
+		paper.setTunableValues( job.getTunableValues() )
+		paper.fit = fitScore
+
+		# Save
 		paper.save()
 
 		# We are good
