@@ -65,6 +65,7 @@ class HLUser_Papers:
 		self.reload()
 
 		# Update user's active paper
+		self.activePaper_id = paper_id
 		self.dbUser.activePaper_id = paper_id
 		self.dbUser.save()
 
@@ -365,10 +366,10 @@ class HLUser_Papers:
 			return None
 
 		# Validate permissions
-		if paper.owner != self.dbUser:
+		if (paper.owner != self.dbUser):
 
 			# You can read only team review papers
-			if paper.status != Paper.TEAM_REVIEW:
+			if not (paper.status in [ Paper.TEAM_REVIEW, Paper.PUBLISHED ]):
 				return None
 
 			# Validate team
@@ -507,3 +508,95 @@ class HLUser_Papers:
 
 		# Return
 		return ans
+
+	def getPaperResults(self, paper_id=None, completedOnly=True):
+		"""
+		Return summary of results regarding the specified paper
+		"""
+
+		# If Paper_id is not specified, use active paper
+		if not paper_id:
+			paper_id = self.activePaper_id
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			raise HLUserError("The specified paper does not exist!", "not-found")
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+			raise HLUserError("You can only read your paper!", "not-authorized")
+
+		# Prepqre select query
+		whereQuery = (JobQueue.paper_id == paper_id)
+		if completedOnly:
+			whereQuery &= (JobQueue.status == JobQueue.COMPLETED)
+
+		# Collect summary of jobs for this paper
+		jobsList = []
+		for run in JobQueue.select( JobQueue.id, JobQueue.status, JobQueue.lastEvent, JobQueue.resultsMeta ).where( whereQuery ).order_by( JobQueue.id.desc() ):
+
+			# Get results meta
+			resultsMeta = run.getResultsMeta()
+
+			# Process fit for known observables
+			fit = 0.0
+			if 'fitscores' in resultsMeta:
+
+				# Get known histograms
+				histo_ids = self.getKnownObservables()
+
+				# Calculate average chi2 fit for these histograms
+				for histo in histo_ids:
+					fit += resultsMeta['fitscores'][histo]
+
+				# Average
+				fit /= len(histo_ids)
+
+			# Collect entry
+			jobsList.append({
+				'id' 		: run.id,
+				'status' 	: run.status,
+				'lastEvent'	: str(run.lastEvent),
+				'fit'		: "%0.4f" % fit,
+				})
+
+		# Serialize paper record
+		p = paper.serialize()
+		p['jobs'] = jobsList
+
+		# Return result details
+		return p
+
+	def makePaperJobDefault(self, paper_id, job_id):
+		"""
+		Make the specified job as the default job for the specified paper
+		"""
+
+		# Fetch paper
+		try:
+			paper = Paper.get( Paper.id == int(paper_id) )
+		except Paper.DoesNotExist:
+			raise HLUserError("The specified paper does not exist!", "not-found")
+
+		# Validate permissions
+		if paper.owner != self.dbUser:
+			raise HLUserError("You can only modify your paper!", "not-authorized")
+
+		# Fetch job
+		try:
+			job = JobQueue.get( JobQueue.id == int(job_id) )
+		except JobQueue.DoesNotExist:
+			raise HLUserError("The specified job does not exist!", "not-found")
+
+		# Validate permissions
+		if job.paper_id != paper_id:
+			raise HLUserError("You can only select jobs targeting the specified paper!", "not-authorized")
+
+		# Update paper record
+		paper.job_id = job_id
+		paper.save()
+
+		# We are good
+		return True

@@ -91,3 +91,65 @@ class HLUser_Job:
 		# Return results
 		return job_dict
 
+	def getJobResults(self, job_id):
+		"""
+		Return a summary of the results of the specified job
+		"""
+
+		# Try to get job record
+		job = self.getJob(job_id)
+		if not job:
+			raise HLUserError("Could not access job %s" % job_id, "not-exists")
+
+		# Get results metadata
+		resultsMeta = job.getResultsMeta()
+
+		# Process observables metadata
+		observables = []
+		if 'fitscores' in resultsMeta:
+
+			# Get all histogram IDs
+			histo_ids = resultsMeta['fitscores'].keys()
+
+			# Get known histograms
+			is_known = self.getKnownObservables()
+
+			# Get observable details
+			for histo in Observable.select( Observable.name, Observable.title, Observable.short ).where( Observable.name << histo_ids ):
+
+				# Skip unknown histograms
+				if not histo.name in is_known:
+					continue
+
+				# Get fit
+				chi2 = resultsMeta['fitscores'][histo.name]
+
+				# Store on observables
+				observables.append({
+					"id": histo.name,
+					"title": histo.title,
+					"fit": "%.4f" % chi2
+					})
+
+		# Process tunables
+		tunables = []
+		for k, v in job.getTunableValues().iteritems():
+
+			# Collect flat version of tunables which is easier to render
+			# (at least with the mustache template engine)
+			tunables.append({
+				"name": k,
+				"value": v
+			})
+
+		# Prepare response record
+		return {
+			"tunables": tunables,
+			"observables": observables,
+
+			"status": job.status,
+			"events": job.events,
+			"submitted": str(job.submitted),
+			"lastEvent": str(job.lastEvent),
+		}
+

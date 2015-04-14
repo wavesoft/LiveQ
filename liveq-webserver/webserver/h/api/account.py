@@ -181,15 +181,50 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Get job results
+			# ------------------------------------------------
+			elif action == "job.results":
+
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getJobResults(param['id'])
+					})
+
+			##################################################
+			# Return paper results
+			# ------------------------------------------------
+			elif action == "papers.results":
+
+				# Return a summary of paper results
+				self.sendResponse({
+						"status" : "ok",
+						"data"   : self.user.getPaperResults()
+					})
+
+			##################################################
+			# Mark job as paper's default job
+			# ------------------------------------------------
+			elif action == "papers.set.defaultjob":
+
+				# Make job paper's default
+				self.user.makePaperJobDefault( param['id'], param['job'] )
+
+				# Return success
+				self.sendResponse({
+						"status" : "ok",
+					})
+
+
+			##################################################
 			# Return profile paper status
 			# ------------------------------------------------
 			elif action == "papers.profile":
 
 				# Return paper status
 				self.sendResponse({
-						"status": "ok",
-						"user" : self.user.getUnpublishedPapers(),
-						"team" : self.user.getTeamPapers()
+						"status" : "ok",
+						"user"   : self.user.getUnpublishedPapers(),
+						"team"   : self.user.getTeamPapers()
 					})
 
 			##################################################
