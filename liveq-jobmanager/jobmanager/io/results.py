@@ -48,7 +48,7 @@ def loadRaw(job_id):
 	"""
 
 	# Normalize job ID
-	jobID = "job-%s" % str(job.id)
+	jobID = "job-%s" % str(job_id)
 
 	# Base directory where we are going to read the data
 	dumpPath = "%s/%s.bin" % (Config.RESULTS_PATH, jobID)

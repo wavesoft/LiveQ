@@ -829,7 +829,7 @@ class JobManagerComponent(Component):
 		self.logger.info("Requesting results of job #%s" % jid)
 
 		# Fetch raw payload
-		payload = results.getRaw(jid)
+		payload = results.loadRaw(jid)
 		if not payload:
 			self.logger.warn("Could not load results payload for job %s!" % jid)
 			self.jobChannel.reply({

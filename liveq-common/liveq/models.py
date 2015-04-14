@@ -261,7 +261,7 @@ class JobQueue(BaseModel):
 	#: The user who submitted this job
 	user_id = IntegerField(default=0)
 	#: The paper to update after completion
-	paper_id = IntegerField(default=0)
+	paper_id = IntegerField(default=0, index=True, unique=False)
 
 	#: The agent group where to run this job
 	group = CharField(max_length=128)
