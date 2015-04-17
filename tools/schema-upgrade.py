@@ -31,13 +31,13 @@ import time
 import os
 import util.pythia as pythia
 from util.config import Config
-from util.peeweedump import SQLExport
+from data.schemapatches import SchemaPatches
 
 from liveq import handleSIGINT, exit
 from liveq.exceptions import ConfigException
 
 from liveq.models import *
-from webserver.models import *
+from playhouse.migrate import *
 
 # Prepare runtime configuration
 runtimeConfig = { }
@@ -52,3 +52,47 @@ except ConfigException as e:
 # Hook CTRL+C
 handleSIGINT()
 
+# Identify the current database version
+try:
+	verInfo = DBInfo.get(key="version")
+except DBInfo.DoesNotExist:
+	verInfo = DBInfo.create(
+		key="version",
+		val="0"
+		)
+dbVersion = int(verInfo.val)
+
+# Get the schema patches
+patches = SchemaPatches()
+
+# Sort all the patch_XXXX functions from
+# the schema patches class
+functions = sorted([x for x in dir(patches) if x[0:6] == "patch_"], key=lambda x: int(x[6:]))
+newVersion = len(functions)
+
+# Check if there is nothing to do
+if dbVersion < newVersion:
+
+	# Notify
+	print "Will upgrade from version %i to %i" % (dbVersion, newVersion)
+
+	# Create migrator
+	migrator = SqliteMigrator( Config.DB )
+
+	# Perform patches
+	for i in range(dbVersion, newVersion):
+
+		# Run patch in a transaction
+		with Config.DB.transaction():
+			print "Applying patch %i..." % (i+1)
+			getattr(patches, functions[i])(migrator)
+
+# Update version record
+verInfo.val = "%i" % len(functions)
+verInfo.save()
+
+# We are done
+print "Your database is now on version %i" % newVersion
+
+# We are done, exit
+exit(0)

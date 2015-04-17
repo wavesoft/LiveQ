@@ -94,8 +94,8 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable, TunableToObservable, 
-				   PostMortems, JobQueue ]:
+	for table in [ DBInfo, AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable,
+				   TunableToObservable, PostMortems, JobQueue ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -103,6 +103,17 @@ def createBaseTables():
 # -----------------------------------------------------
 #  In production
 # -----------------------------------------------------
+
+class DBInfo(BaseModel):
+	"""
+	Database information
+	"""
+
+	#: Information key
+	key = CharField(max_length=10, primary_key=True)
+
+	#: The value
+	val = CharField(max_length=255)
 
 class Lab(BaseModel):
 	"""
