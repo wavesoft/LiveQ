@@ -73,6 +73,12 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		# Place user object in users array
 		HLUser.USERS.append( self )
 
+		# Anonymous user UUID when analytics is disabled
+		self.analyticsTrackID = uuid.uuid4().hex
+		self.analyticsProfile = user.analyticsProfile
+		if not self.analyticsProfile is None:
+			self.analyticsTrackID = self.analyticsProfile.uuid
+
 		# Preheat user cache
 		self.loadCache_Achievements()
 		self.loadCache_Books()
@@ -181,6 +187,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 				foundout=profile['analytics']['foundout'],
 				hopes=profile['analytics']['hopes'],
 				similar=profile['analytics']['similar'],
+				similar_more=profile['analytics']['similar_more'],
 				)
 			aProfile.save()
 
@@ -1382,7 +1389,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 		# Compile analytics profile
 		analytics = None
-		if user.analyticsProfile:
+		if self.analyticsProfile:
 			analytics = user.analyticsProfile.serialize()
 
 		# Get team name
@@ -1392,6 +1399,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 		# Send user profile
 		return {
+			'trackid'		: self.analyticsTrackID,
 			'id'			: user.id,
 			'email' 		: user.email,
 			'displayName' 	: user.displayName,

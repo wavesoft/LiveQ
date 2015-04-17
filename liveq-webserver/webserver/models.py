@@ -74,6 +74,7 @@ class AnalyticsProfile(BaseModel):
 	foundout = TextField()
 	hopes = TextField()
 	similar = IntegerField(default=0)
+	similar_more = TextField()
 
 	#: When was it created
 	created = DateTimeField(default=datetime.datetime.now)
