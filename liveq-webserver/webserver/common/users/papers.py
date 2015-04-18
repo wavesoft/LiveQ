@@ -26,13 +26,13 @@ from webserver.models import *
 from webserver.common.users.exceptions import HLUserError
 from webserver.common.fancytitles import createFancyTitle
 
-def cost_estimation_function( citations, maxCost=100, maxCitations=10 ):
+def cost_estimation_function( citations, maxCost=1000, maxCitations=100, minCost=25 ):
 	"""
 	Increase the cost logarithmically up to maxCost within the span of maxCitations
 	"""
 
 	# Calculate cost
-	cost = int( (math.log10((citations / maxCitations)+0.1)+1) * maxCost )
+	cost = int( (math.log10((citations / maxCitations)+0.1)+1) * maxCost ) + minCost
 
 	# Wrap to max
 	if cost > maxCost:
