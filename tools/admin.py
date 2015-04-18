@@ -32,6 +32,8 @@ import traceback
 import json
 import os
 import util.pythia as pythia
+
+from util import print_table
 from util.wsconfig import Config
 
 from liveq import handleSIGINT, exit
@@ -94,7 +96,7 @@ def help():
 			sys.stdout.write(" " * (maxlen+2))
 
 		# Then write help text
-		print "%s" % details['help']
+		print "%s\n" % details['help']
 	print ""
 	exit(1)
 
@@ -155,7 +157,7 @@ def cmd_resetuser(uid):
 	# Inform user
 	print "SUCCESS: User '%s' was reset!" % uid
 
-@command("batchmail", args=[ "template", "target|list" ], help="Send the specified e-mail template to the specified batch of e-mails.")
+@command("batchmail", args=[ "template", "email|file" ], help="Send the specified e-mail template to the specified batch of e-mails.")
 def cmd_batch_mail(template, target):
 	"""
 	Send a batch message to the specified list of recepients
@@ -237,7 +239,39 @@ def cmd_alpha_invite():
 		print "INFO: Requesting user '%s' to activate the e-mail '%s'" % (user, user.email)
 
 
-################################################################
+@command("workersonline", help="Display a list of all the on-line worker nodes")
+def cmd_onlineworkers():
+	"""
+	List the on-line worker nodes along with other information
+	"""
+
+	# Banner
+	print "The following workers are on-line:"
+	print ""
+
+	# Table
+	print_table(
+		Agent\
+			.select( Agent, AgentGroup.uuid.alias("group_uuid") )
+			.where( Agent.state == 1 )
+			.join( AgentGroup )
+			.dicts(),
+		["id", "uuid", "ip", "version", "lastActivity", "group_uuid", "fail_count", "activeJob"],
+		["ID", "Agent Jabber ID", "IP", "Ver", "Last Activity", "Group", "Fail", "Job"]
+		)
+
+	# Footer
+	print ""
+
+@command("workerspurbeidle", help="Purge idle workers")
+def cmd_workers_purge_idle():
+	"""
+	"""
+
+	# Get all idle workers
+	q = Agent.lastActivity
+
+#####################s###########################################
 # Administration Interface Entry Point
 ################################################################
 

@@ -45,7 +45,10 @@ runtimeConfig = { }
 try:
 	Config.fromFile( "config/common.conf.local", runtimeConfig )
 except ConfigException as e:
-	print("ERROR   Configuration exception: %s" % e)
+	print("ERROR: Configuration exception: %s" % e)
+	exit(1)
+except Exception as e:
+	print("ERROR: Unhandled exception: %s" % e)
 	exit(1)
 
 # Hook CTRL+C
@@ -54,3 +57,6 @@ handleSIGINT()
 # Open interpreter
 import code
 code.interact(local=locals())
+
+# Exit when done
+exit(0)
