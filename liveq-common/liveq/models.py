@@ -20,6 +20,9 @@
 import datetime
 import json
 import traceback
+import logging
+
+from liveq import exit
 
 from peewee import *
 from liveq.config.database import DatabaseConfig
@@ -94,11 +97,19 @@ def createBaseTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ DBInfo, AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable,
-				   TunableToObservable, PostMortems, JobQueue ]:
+	try:
+		for table in [ DBInfo, AgentGroup, Agent, AgentMetrics, Lab, Tunable, Observable,
+					   TunableToObservable, PostMortems, JobQueue ]:
 
-		# Do nothing if the table is already there
-		table.create_table(True)
+			# Do nothing if the table is already there
+			table.create_table(True)
+
+	except Exception as e:
+
+		# Handle errors
+		traceback.print_exc()
+		logging.error("Could not create database tables! %s" % str(e))
+		exit(1)
 
 # -----------------------------------------------------
 #  In production
