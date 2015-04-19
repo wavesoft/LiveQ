@@ -238,6 +238,27 @@ def cmd_alpha_invite():
 		# Send e-mails
 		print "INFO: Requesting user '%s' to activate the e-mail '%s'" % (user, user.email)
 
+@command("listusers", help="Display a list of all the registered users")
+def cmd_listusers():
+	"""
+	List users in the database
+	"""
+
+	# Banner
+	print "The following users are registered:"
+	print ""
+
+	# Table
+	print_table(
+		User\
+			.select( User.id, User.displayName, User.email, User.points, User.totalPoints )
+			.dicts(),
+		["id", "displayName", "email", "points", "totalPoints" ],
+		["ID", "Display Name", "E-Mail", "Points", "Total Points" ]
+		)
+
+	# Footer
+	print ""
 
 @command("workersonline", help="Display a list of all the on-line worker nodes")
 def cmd_onlineworkers():
@@ -263,7 +284,7 @@ def cmd_onlineworkers():
 	# Footer
 	print ""
 
-@command("workerspurbeidle", help="Purge idle workers")
+@command("workerspurgeidle", help="Purge idle workers")
 def cmd_workers_purge_idle():
 	"""
 	"""
