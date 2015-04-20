@@ -138,4 +138,5 @@ class TuneAddressingConfig(ComponentClassConfig):
 				elif nk[0] == 'alias':
 					logging.info("Using index '%s' for parameter %s" % (v,nk[1]))
 					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['alias'] = v
-
+				elif nk[0] == 'fix':
+					TuneAddressingConfig.TUNE_CONFIG[nk[1]]['fix'] = float(v)

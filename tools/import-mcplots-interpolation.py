@@ -192,6 +192,11 @@ class TarImport(Component):
 			# Put on response
 			ans[kv[0]] = float(kv[1])
 
+		# HACK: Fix a special problematic case
+		if 'StringFlav::probSQtoQQ' in ans:
+			del ans['StringFlav::probSQtoQQ']
+			ans['StringFlav:probSQtoQQ'] = 0.915
+
 		# Return dictionary
 		return ans
 
