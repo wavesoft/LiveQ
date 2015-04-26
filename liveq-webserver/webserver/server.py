@@ -28,11 +28,11 @@ import uuid
 import signal
 
 from tornado.web import URLSpec
+from webserver.h.index import *
+from webserver.h.account import *
 from webserver.h.configure import *
 from webserver.h.apisocket import APISocketHandler
-from webserver.h.index import *
 from webserver.h.tootr import TootrGetAnimation
-from webserver.h.account import *
 from webserver.config import Config
 
 from webserver.common.books import BookKeywordCache
@@ -61,17 +61,20 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 		# Setup handlers
 		handlers = [
 			URLSpec(r"%s" % Config.BASE_PATH, 						VASRedirectHandler),
-			URLSpec(r"%s/" % Config.BASE_PATH, 						VASRedirectHandler, 		name="index"),
-			URLSpec(r"%s/config" % Config.BASE_PATH, 				ConfigHandler, 				name="config"),
-			URLSpec(r"%s/config/books" % Config.BASE_PATH, 			ConfigBooksHandler, 		name="config.books"),
-			URLSpec(r"%s/config/books/edit" % Config.BASE_PATH, 	ConfigEditBookHandler, 		name="config.books.edit"),
-			URLSpec(r"%s/config/books/del" % Config.BASE_PATH, 		ConfigDeleteBookHandler,	name="config.books.del"),
-			URLSpec(r"%s/config/tun" % Config.BASE_PATH, 			ConfigTunablesHandler, 		name="config.tunables"),
-			URLSpec(r"%s/config/tun/edit" % Config.BASE_PATH, 		ConfigEditTunableHandler, 	name="config.tunables.edit"),
-			URLSpec(r"%s/config/tun/del" % Config.BASE_PATH, 		ConfigDeleteTunableHandler,	name="config.tunables.del"),
-			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,			TootrGetAnimation, 			name="tootr.anim"),
-			URLSpec(r"%s/api/io" % Config.BASE_PATH,				APISocketHandler, 			name="api"),
-			URLSpec(r"%s/api/account/activate" % Config.BASE_PATH,	MailActivateHandler,		name="account.activate"),
+			URLSpec(r"%s/" % Config.BASE_PATH, 						VASRedirectHandler, 			name="index"),
+			URLSpec(r"%s/config" % Config.BASE_PATH, 				ConfigHandler, 					name="config"),
+			URLSpec(r"%s/config/books" % Config.BASE_PATH, 			ConfigBooksHandler, 			name="config.books"),
+			URLSpec(r"%s/config/books/edit" % Config.BASE_PATH, 	ConfigEditBookHandler, 			name="config.books.edit"),
+			URLSpec(r"%s/config/books/del" % Config.BASE_PATH, 		ConfigDeleteBookHandler,		name="config.books.del"),
+			URLSpec(r"%s/config/tun" % Config.BASE_PATH, 			ConfigTunablesHandler, 			name="config.tunables"),
+			URLSpec(r"%s/config/tun/edit" % Config.BASE_PATH, 		ConfigEditTunableHandler, 		name="config.tunables.edit"),
+			URLSpec(r"%s/config/tun/del" % Config.BASE_PATH, 		ConfigDeleteTunableHandler,		name="config.tunables.del"),
+			URLSpec(r"%s/config/obs" % Config.BASE_PATH, 			ConfigObservablesHandler, 		name="config.observables"),
+			URLSpec(r"%s/config/obs/edit" % Config.BASE_PATH, 		ConfigEditObservableHandler, 	name="config.observables.edit"),
+			URLSpec(r"%s/config/obs/del" % Config.BASE_PATH, 		ConfigDeleteObservableHandler,	name="config.observables.del"),
+			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,			TootrGetAnimation, 				name="tootr.anim"),
+			URLSpec(r"%s/api/io" % Config.BASE_PATH,				APISocketHandler, 				name="api"),
+			URLSpec(r"%s/api/account/activate" % Config.BASE_PATH,	MailActivateHandler,			name="account.activate"),
 		]
 
 		# Get root dir of files

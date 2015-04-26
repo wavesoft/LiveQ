@@ -246,7 +246,7 @@ class ConfigEditTunableHandler(tornado.web.RequestHandler):
 
 
 """
-Edit Tunable handler
+Delete Tunable handler
 """
 class ConfigDeleteTunableHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -263,4 +263,106 @@ class ConfigDeleteTunableHandler(tornado.web.RequestHandler):
 
 		# Redirect
 		self.redirect( self.reverse_url('config.tunables') )
+
+
+"""
+Observable configuration handler
+"""
+class ConfigObservablesHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Get all tunables
+		observables = []
+		for b in Observable.select().order_by( Observable.book.desc() ).dicts():
+
+			# Collect
+			observables.append(b)
+
+		# Render
+		self.render("editor_observables.html", 
+			navbar=getNavbarData(),
+			observables=observables
+		)
+
+"""
+Edit Observable handler
+"""
+class ConfigEditObservableHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Check if user requested a tunable
+		observable_id = self.get_argument("observable", None)
+		if observable_id is None:
+			# Create new observable if not exists
+			observable = Observable()
+		else:
+			# Resume previous observable if already exists
+			observable = Observable.get( Observable.id == int(observable_id) )
+
+		# Get all books
+		books = Book.select( Book.id, Book.name )[:]
+
+		# Render
+		self.render("editor_observables_edit.html", 
+			navbar=getNavbarData(),
+			observable=observable,
+			books=books
+			)
+
+	def post(self):
+
+		# Get fields
+		observable_id = self.get_argument("observable", None)
+		if observable_id == "None":
+			# Create new observable if not exists
+			observable = Observable()
+		elif observable_id is None:
+			# Error
+			return
+		else:
+			# Resume previous observable if already exists
+			observable = Observable.get( Observable.id == int(observable_id) )
+
+		# Update fields
+		observable.name = self.get_body_argument("name", "")
+		observable.short = self.get_body_argument("short", "")
+		observable.title = self.get_body_argument("title", "")
+		observable.group = self.get_body_argument("group", "")
+		observable.subgroup = self.get_body_argument("subgroup", "")
+		observable.book = self.get_body_argument("book", "")
+		observable.desc = self.get_body_argument("desc", "")
+		observable.analysis = self.get_body_argument("analysis", "")
+		observable.labelX = self.get_body_argument("labelX", "")
+		observable.labelY = self.get_body_argument("labelY", "")
+		observable.logY = int(self.get_body_argument("logY", ""))
+		observable.process = self.get_body_argument("process", "")
+		observable.cuts = self.get_body_argument("cuts", "")
+		observable.params = self.get_body_argument("params", "")
+		observable.accelerators = self.get_body_argument("accelerators", "")
+
+		# Save tunable
+		observable.save()
+
+		# Redirect
+		self.redirect( self.reverse_url('config.observables') )
+
+
+"""
+Delete Observables handler
+"""
+class ConfigDeleteObservableHandler(tornado.web.RequestHandler):
+	def get(self):
+
+		# Check if user requested a tunable
+		observable_id = self.get_argument("observable", None)
+		if not observable_id is None:
+
+			# Resume previous observable if already exists
+			observable = Observable.get( Observable.id == int(observable_id) )
+
+			# Delete instance
+			observable.delete_instance(True)
+
+		# Redirect
+		self.redirect( self.reverse_url('config.observables') )
 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Observables</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1>Observables</h1>
+      <p>The following table contains all the different observables (Histograms) currently registered in the database.</p>
+      <p> <a href="{{ reverse_url("config.observables.edit") }}" class="btn btn-success" > <span class="glyphicon glyphicon-plus"></span> Add new</a></p>
+      <hr />
+      <table class="table table-condensed" width="100%">
+        <tr>
+          <th width="70">Observable ID</th>
+          <th width="100">Short</th>
+          <th width="200">Book</th>
+          <th>Name</th>
+          <th width="200">Actions</th>
+        </tr>
+        {% for observable in observables %}
+        <tr>
+          <td>{{ observable['id'] }}</td>
+          <td>{{ observable['short'] }}</td>
+          <td>{{ observable['book'] }}</td>
+          <td>{{ observable['name'] }}</td>
+          <td><a href="{{ reverse_url("config.observables.edit") }}?observable={{ observable['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
+        </tr>
+        {% end %}
+      </table>
+
+    </div>
+
+  </body>
+</html>

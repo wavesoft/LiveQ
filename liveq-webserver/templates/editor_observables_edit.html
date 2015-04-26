@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Edit Observable</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1><span class="glyphicon glyphicon-wrench"></span> Edit Observable</h1>
+      <p>From this form you can edit the observable deteails.</p>
+
+      <form class="form-horizontal" action="{{ reverse_url("config.observables.edit") }}?observable={{ observable.id }}" method="post">
+
+        <div class="form-group">
+          <label for="inputName" class="col-sm-2 control-label">Observable<br /><small>/&lt;Analysis&gt;/&lt;Histogram&gt;</small></label>
+          <div class="col-sm-10">
+            <input type="text" name="name" class="form-control" id="inputName" placeholder="(Observable code name)" value="{{ observable.name }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputShort" class="col-sm-2 control-label">Short (Iconic) Name</label>
+          <div class="col-sm-10">
+            <input type="text" name="short" class="form-control" id="inputShort" placeholder="(ex. TsAs)" value="{{ observable.short }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputAnalysis" class="col-sm-2 control-label">Analysis</label>
+          <div class="col-sm-10">
+            <input type="text" name="analysis" class="form-control" id="inputAnalysis" placeholder="(Rivet Analysis)" value="{{ observable.analysis }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputGroup" class="col-sm-2 control-label">Group</label>
+          <div class="col-sm-10">
+            <input type="text" name="group" class="form-control" id="inputGroup" placeholder="Short representation" value="{{ observable.group }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputSubgroup" class="col-sm-2 control-label">Sub-group</label>
+          <div class="col-sm-10">
+            <input type="text" name="subgroup" class="form-control" id="inputSubgroup" placeholder="Sub-group" value="{{ observable.subgroup }}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputBody" class="col-sm-2 control-label">Description</label>
+          <div class="col-sm-10">
+            <textarea class="form-control tinymce" rows="10" name="desc" id="inputBody">{{ observable.desc }}</textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputMaterial" class="col-sm-2 control-label">Plot</label>
+          <div class="col-sm-10">
+
+            <div class="form-group">
+              <label for="inputTitle" class="col-sm-2 control-label">Title</label>
+              <div class="col-sm-10">
+                <input type="text" name="title" class="form-control" id="inputTitle" placeholder="(observable title)" value="{{ observable.title }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputXAxis" class="col-sm-2 control-label">X-Axis Label</label>
+              <div class="col-sm-10">
+                <input type="text" name="labelX" class="form-control" id="inputXAxis" placeholder="(x-axis title)" value="{{ observable.labelX }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputYAxis" class="col-sm-2 control-label">Y-Axis Label</label>
+              <div class="col-sm-10">
+                <input type="text" name="labelY" class="form-control" id="inputYAxis" placeholder="(y-axis title)" value="{{ observable.labelY }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputBook" class="col-sm-2 control-label">Y Scale</label>
+              <div class="col-sm-10">
+                <select name="logY" class="form-control" id="inputBook" >
+                  <option value="0" {% if (observable.logY == 0)  %}selected="selected"{% end %}>Linear</option>
+                  <option value="1" {% if (observable.logY == 1)  %}selected="selected"{% end %}>Logarithmic</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputMaterial" class="col-sm-2 control-label">Valid Simulations</label>
+          <div class="col-sm-10">
+
+            <div class="form-group">
+              <label for="inputProcess" class="col-sm-2 control-label">Process</label>
+              <div class="col-sm-10">
+                <input type="text" name="process" class="form-control" id="inputProcess" placeholder="" value="{{ observable.process }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputCuts" class="col-sm-2 control-label">Cuts</label>
+              <div class="col-sm-10">
+                <input type="text" name="cuts" class="form-control" id="inputCuts" placeholder="" value="{{ observable.cuts }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputParams" class="col-sm-2 control-label">Parameters</label>
+              <div class="col-sm-10">
+                <input type="text" name="params" class="form-control" id="inputParams" placeholder="" value="{{ observable.params }}">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputAccel" class="col-sm-2 control-label">Accelerators</label>
+              <div class="col-sm-10">
+                <input type="text" name="accelerators" class="form-control" id="inputAccel" placeholder="" value="{{ observable.accelerators }}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="inputBook" class="col-sm-2 control-label">Book</label>
+          <div class="col-sm-10">
+            <select name="book" class="form-control" id="inputBook" >
+              <option value="" {% if (observable.book == "")  %}selected="selected"{% end %}>(No book assigned)</option>
+              {% for book in books %}
+              <option value="{{ book.name }}" {% if (observable.book == book.name)  %}selected="selected"{% end %}>{{ book.name }}</option>
+              {% end %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <a href="{{ reverse_url("config.observables.del") }}?observable={{ observable.id }}" class="btn btn-danger pull-right"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+
+            <button type="submit" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span> Save Book</button>
+            <a href="{{ reverse_url("config.observables") }}" class="btn btn-default">Cancel</a>
+          </div>
+        </div>
+
+        {% raw xsrf_form_html() %}
+      </form>
+
+    </div>
+
+  </body>
+</html>
