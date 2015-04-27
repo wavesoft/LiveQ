@@ -24,19 +24,21 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from webserver.models import Book, BookQuestion, Tunable, Observable
+from webserver.models import Book, BookQuestion, Tunable, Observable, MachinePart, MachinePartStage
 
-"""
-Lab configuration page handler
-"""
 class ConfigHandler(tornado.web.RequestHandler):
+	"""
+	Lab configuration page handler
+	"""
+
 	def get(self):
 		self.render("configure.html", navbar=getNavbarData())
 
-"""
-Books configuration handler
-"""
 class ConfigBooksHandler(tornado.web.RequestHandler):
+	"""
+	Books configuration handler
+	"""
+
 	def get(self):
 
 		# Get all books
@@ -58,10 +60,11 @@ class ConfigBooksHandler(tornado.web.RequestHandler):
 			books=books
 		)
 
-"""
-Edit book handler
-"""
 class ConfigEditBookHandler(tornado.web.RequestHandler):
+	"""
+	Edit book handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a book
@@ -146,10 +149,11 @@ class ConfigEditBookHandler(tornado.web.RequestHandler):
 		self.redirect( self.reverse_url('config.books') )
 
 
-"""
-Edit book handler
-"""
 class ConfigDeleteBookHandler(tornado.web.RequestHandler):
+	"""
+	Edit book handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a book
@@ -166,10 +170,11 @@ class ConfigDeleteBookHandler(tornado.web.RequestHandler):
 		self.redirect( self.reverse_url('config.books') )
 
 
-"""
-Tunables configuration handler
-"""
 class ConfigTunablesHandler(tornado.web.RequestHandler):
+	"""
+	Tunables configuration handler
+	"""
+
 	def get(self):
 
 		# Get all tunables
@@ -185,10 +190,11 @@ class ConfigTunablesHandler(tornado.web.RequestHandler):
 			tunables=tunables
 		)
 
-"""
-Edit Tunable handler
-"""
 class ConfigEditTunableHandler(tornado.web.RequestHandler):
+	"""
+	Edit Tunable handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a tunable
@@ -245,10 +251,11 @@ class ConfigEditTunableHandler(tornado.web.RequestHandler):
 		self.redirect( self.reverse_url('config.tunables') )
 
 
-"""
-Delete Tunable handler
-"""
 class ConfigDeleteTunableHandler(tornado.web.RequestHandler):
+	"""
+	Delete Tunable handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a tunable
@@ -265,15 +272,24 @@ class ConfigDeleteTunableHandler(tornado.web.RequestHandler):
 		self.redirect( self.reverse_url('config.tunables') )
 
 
-"""
-Observable configuration handler
-"""
 class ConfigObservablesHandler(tornado.web.RequestHandler):
+	"""
+	Observable configuration handler
+	"""
+
 	def get(self):
+
+		# Pick sort key
+		sort = self.get_argument("sort", "book")
+		try:
+			order_key = getattr( Observable, sort )
+		except AttributeError:
+			sort = "book"
+			order_key = getattr( Observable, sort )
 
 		# Get all tunables
 		observables = []
-		for b in Observable.select().order_by( Observable.book.desc() ).dicts():
+		for b in Observable.select().order_by( order_key.desc() ).dicts():
 
 			# Collect
 			observables.append(b)
@@ -284,10 +300,11 @@ class ConfigObservablesHandler(tornado.web.RequestHandler):
 			observables=observables
 		)
 
-"""
-Edit Observable handler
-"""
 class ConfigEditObservableHandler(tornado.web.RequestHandler):
+	"""
+	Edit Observable handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a tunable
@@ -347,10 +364,11 @@ class ConfigEditObservableHandler(tornado.web.RequestHandler):
 		self.redirect( self.reverse_url('config.observables') )
 
 
-"""
-Delete Observables handler
-"""
 class ConfigDeleteObservableHandler(tornado.web.RequestHandler):
+	"""
+	Delete Observables handler
+	"""
+
 	def get(self):
 
 		# Check if user requested a tunable
@@ -366,3 +384,34 @@ class ConfigDeleteObservableHandler(tornado.web.RequestHandler):
 		# Redirect
 		self.redirect( self.reverse_url('config.observables') )
 
+class ConfigLevelsHandler(tornado.web.RequestHandler):
+	"""
+	Levels configuration
+	"""
+
+	def get(self):
+
+		# Levels structure
+		levels = []
+
+		# Iterate over machine parts
+		for part in MachinePart.select():
+
+			# Iterate over stages
+			stages = []
+			for stage in MachinePartStage.select().where( MachinePartStage.part == part ).dicts():
+
+				# Collect stages
+				stages.append( stage )
+
+			# Update stages
+			levels.append({
+				'part': part.serialize(),
+				'stages': stages
+				})
+
+		# Render
+		self.render("editor_levels.html", 
+			navbar=getNavbarData(),
+			levels=levels,
+			)

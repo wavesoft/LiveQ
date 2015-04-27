@@ -72,6 +72,8 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 			URLSpec(r"%s/config/obs" % Config.BASE_PATH, 			ConfigObservablesHandler, 		name="config.observables"),
 			URLSpec(r"%s/config/obs/edit" % Config.BASE_PATH, 		ConfigEditObservableHandler, 	name="config.observables.edit"),
 			URLSpec(r"%s/config/obs/del" % Config.BASE_PATH, 		ConfigDeleteObservableHandler,	name="config.observables.del"),
+			URLSpec(r"%s/config/levels" % Config.BASE_PATH, 		ConfigLevelsHandler, 			name="config.levels"),
+			URLSpec(r"%s/config/stage/edit" % Config.BASE_PATH, 	ConfigLevelsHandler, 			name="config.stage.edit"),
 			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,			TootrGetAnimation, 				name="tootr.anim"),
 			URLSpec(r"%s/api/io" % Config.BASE_PATH,				APISocketHandler, 				name="api"),
 			URLSpec(r"%s/api/account/activate" % Config.BASE_PATH,	MailActivateHandler,			name="account.activate"),

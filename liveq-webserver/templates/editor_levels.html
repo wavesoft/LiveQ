@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>LiveQ Framework :: Levels</title>
+    {% include "chunks/head-common.html" %}
+    {% include "chunks/head-ui-configure.html" %}
+    <script type="text/javascript">
+
+    var StageGroup = function( hostDOM ) {
+
+    };
+
+    </script>
+  </head>
+  <body>
+
+    <div class="container">
+      {% include "chunks/body-navbar.html" %}
+
+      <h1>Levels</h1>
+      <p>The following list contains all the individual machine parts and their respective unlockable parameters.</p>
+
+      {% for level in levels %}
+
+        <h3>{{ level['part']['title'] }}</h3>
+
+        <table class="table table-condensed">
+          <tr>
+            <th width="70">Order</th>
+            <th>Name</th>
+            <th width="200">Cost</th>
+            <th width="200">Actions</th>
+          </tr>
+          {% for stage in level['stages'] %}
+          <tr>
+            <td>
+              <a href="?do=up&amp;id={{ stage['id'] }}" class="btn btn-xs btn-info" > <span class="glyphicon glyphicon-arrow-up"></span></a>
+              <a href="?do=down&amp;id={{ stage['id'] }}" class="btn btn-xs btn-info" > <span class="glyphicon glyphicon-arrow-down"></span></a>
+            </td>
+            <td>{{ stage['name'] }}</td>
+            <td>{{ stage['cost'] }}</td>
+            <td>
+              <a href="{{ reverse_url("config.stage.edit") }}?stage={{ stage['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a>
+            </td>
+          </tr>
+
+          {% end %}
+        </table>
+
+        <p> <button class="btn btn-success btn-sm" > <span class="glyphicon glyphicon-plus"></span> Add new</button></p>
+
+      {% end %}
+
+      <hr />
+
+    </div>
+
+  </body>
+</html>

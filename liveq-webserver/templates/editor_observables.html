@@ -16,10 +16,12 @@
       <hr />
       <table class="table table-condensed" width="100%">
         <tr>
-          <th width="70">Observable ID</th>
-          <th width="100">Short</th>
-          <th width="200">Book</th>
-          <th>Name</th>
+          <th width="70"><a href="?sort=id">Observable ID</a></th>
+          <th width="100"><a href="?sort=short">Short</a></th>
+          <th width="200"><a href="?sort=book">Book</a></th>
+          <th><a href="?sort=name">Name</a></th>
+          <th><a href="?sort=process">Proc</a></th>
+          <th><a href="?sort=cuts">Cuts</a></th>
           <th width="200">Actions</th>
         </tr>
         {% for observable in observables %}
@@ -28,6 +30,8 @@
           <td>{{ observable['short'] }}</td>
           <td>{{ observable['book'] }}</td>
           <td>{{ observable['name'] }}</td>
+          <td>{{ observable['process'] }}</td>
+          <td>{{ observable['cuts'] }}</td>
           <td><a href="{{ reverse_url("config.observables.edit") }}?observable={{ observable['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
         </tr>
         {% end %}
