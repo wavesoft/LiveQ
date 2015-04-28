@@ -409,14 +409,14 @@ def process():
 	if maxWorkers < 1:
 		maxWorkers = 1
 
-	# Cap 'totalSlots'
-	if maxWorkers < totalSlots:
-		logger.info("Going to use %i slots because we have %i events left" % (maxWorkers, eventsLeft))
-		totalSlots = maxWorkers
-
 	# Try to occupy free slots
 	slots = res.getFree( totalSlots )
 	usedSlots += len( slots )
+
+	# Cap 'usedSlots'
+	if maxWorkers < usedSlots:
+		logger.info("Going to use %i slots because we have %i events left" % (maxWorkers, eventsLeft))
+		usedSlots = maxWorkers
 
 	logger.info("Found %i free slots on group %s" % ( usedSlots, job.group ))
 
