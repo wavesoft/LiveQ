@@ -548,11 +548,16 @@ class HLUser_Papers:
 				histo_ids = self.getKnownObservables()
 
 				# Calculate average chi2 fit for these histograms
+				histo_count = 0
 				for histo in histo_ids:
-					fit += resultsMeta['fitscores'][histo]
+					if histo in resultsMeta['fitscores']:
+						fit += resultsMeta['fitscores'][histo]
+						histo_count += 1
+					else:
+						self.logger.warn("Missing histogram %s from fitscores of job %i!" % (histo, run.id))
 
 				# Average
-				fit /= len(histo_ids)
+				fit /= histo_count
 
 			# Collect entry
 			jobsList.append({
