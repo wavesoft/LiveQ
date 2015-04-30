@@ -42,7 +42,7 @@ from liveq.reporting.lars import LARS
 from liveq.data.tune import Tune
 from liveq.data.histo.intermediate import IntermediateHistogramCollection, IntermediateHistogram
 from liveq.data.histo.interpolate import InterpolatableCollection
-from liveq.data.histo.reference import collectionChi2Reference
+from liveq.data.histo.reference import collectionChi2Reference, loadReferenceHistogram
 
 class JobManagerComponent(Component):
 	"""
@@ -129,6 +129,10 @@ class JobManagerComponent(Component):
 		for h in createHistograms:
 			collection[h] = IntermediateHistogram.empty( h )
 			logAdded.append(h)
+
+		# Perform rebinning where appliable
+		for k,v in collection.iteritems():
+			collection[k].rebinWithRef( loadReferenceHistogram(k) )
 
 		# Log
 		self.logger.debug("Adapt REM: %s" % ",".join(logRemoved))

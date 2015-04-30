@@ -487,6 +487,190 @@ class IntermediateHistogram:
 		"""
 		return numpy.sqrt( self.SumW2 ) / self.width()
 
+	def rebinWithRef(self, referenceHistogram):
+		"""
+		Re-bin the histogram (if needed) using the reference histogram specified
+		"""
+
+		# We should cap the bins to the reference histogram bins
+		refX = referenceHistogram.x
+		refXMin = referenceHistogram.xErrMinus
+		refXPls = referenceHistogram.xErrPlus
+		refBins = referenceHistogram.bins
+
+		# Cap edges
+		# TODO: Assume edges match
+
+		# If same number of bins, we don't have to do anything
+		if refBins == self.bins:
+			return
+
+		# Distribute bins
+		i = 0; j = 0; mFrom = None; mTo = None
+		while i < refBins:
+
+			# Reference bin edges
+			r0 = refX[i] - refXMin[i]
+			r1 = refX[i] + refXPls[i]
+
+			# The matching bin edges
+			x0 = self.xlow[j]
+			x1 = self.xhigh[j]
+
+			# Match beginning if we don't have one
+			if (mFrom is None) and (r0 == x0):
+				mFrom = [i, j]
+
+			# Inner loop
+			if not (mFrom is None):
+				while j < self.bins:
+
+					# The matching bin edges
+					x0 = self.xlow[j]
+					x1 = self.xhigh[j]
+
+					# If the high edge is higher than the
+					# reference high edge, continue with
+					# the outer loop
+					if x1 > r1:
+						break
+
+					# Match ending if we don't have one
+					if (mTo is None) and (r1 == x1):
+						mTo = [i, j]
+
+						# Check if we need to remap
+						if (mTo[1] != mFrom[1]) or (mTo[0] != mFrom[0]):
+
+							# Expand or divide?
+							if (mTo[1]-mFrom[1]) > (mTo[0]-mFrom[0]):
+								#print "Merge %i,%i to %i,%i" % (mFrom[0], mFrom[1], mTo[0], mTo[1])
+
+								# Merge bins {mFrom[1] - mTo[1]} in order to fit
+								# the edges of bins {mFrom[0] - mTo[0]}
+
+								k0 = self.xlow[mFrom[1]]
+								k1 = self.xhigh[mTo[1]]
+								#print " - Edges: %f - %f" % (k0, k1)
+
+								# Merge entries
+								m_Entries = []
+								m_SumW = []
+								m_SumW2 = []
+								m_SumXW = []
+								m_SumX2W = []
+
+								# Collect entry values
+								for k in range(mFrom[1], mTo[1]+1):
+									#print " - Collect %i" % k
+									m_Entries.append( self.Entries[k] )
+									m_SumW.append( self.SumW[k] )
+									m_SumW2.append( self.SumW2[k] )
+									m_SumXW.append( self.SumXW[k] )
+									m_SumX2W.append( self.SumX2W[k] )
+
+								# Update edge bins
+								s = mFrom[1]; e = mTo[1]; l = e-s+1
+								#print "Merge: %r" % m_Entries
+								self.Entries[s] = numpy.sum( m_Entries )
+								self.SumW[s] = numpy.sum( m_SumW )
+								self.SumW2[s] = numpy.sum( m_SumW2 )
+								self.SumXW[s] = numpy.sum( m_SumXW )
+								self.SumX2W[s] = numpy.sum( m_SumX2W )
+
+								#print " - Merge to %i" % s
+
+								# Update bin edge and focus
+								#print " - Left edge (%f) should be %f" % (self.xlow[s], k0)
+								#print " - Right edge from %f to %f" % (self.xhigh[s], k1)
+								self.xhigh[s] = k1
+								#print " - Focus point from %f to %f" % (self.xfocus[s], (k0+k1)/2.0)
+								self.xfocus[s] = (k0+k1)/2.0
+
+								# Delete intermediate entries
+								for k in range(mFrom[1]+1, mTo[1]+1):
+									#print " - Delete & lshift %i" % k
+									self.xlow = numpy.delete( self.xlow, k)
+									self.xfocus = numpy.delete( self.xfocus, k)
+									self.xhigh = numpy.delete( self.xhigh, k)
+									self.Entries = numpy.delete( self.Entries, k)
+									self.SumW = numpy.delete( self.SumW, k)
+									self.SumW2 = numpy.delete( self.SumW2, k)
+									self.SumXW = numpy.delete( self.SumXW, k)
+									self.SumX2W = numpy.delete( self.SumX2W, k)
+
+									# Shift trim indices
+									self.bins -= 1
+									j -= 1
+
+							else:
+
+								# Split bins {mFrom[1] - mTo[1]} in order to match
+								# the sub-bins from {mFrom[0] - mTo[0]}
+								print "Divide %i,%i to %i,%i" % (mFrom[0], mFrom[1], mTo[0], mTo[1])
+
+								# Currently not implemented
+								raise ValueError("Dividing bins is not currently supported!")
+
+
+						# Reset
+						mFrom = [i+1,j+1]
+						mTo = None
+
+						# Continue
+						j += 1
+						break
+
+					# Continue with next
+					j += 1
+
+			# Continue with next
+			i += 1
+
+		return
+
+		# Find the starting point in our bins
+		iStart = None
+		xCmp = refX[0] - refXMin[0]
+		for i in range(0, self.bins):
+			x = self.xlow[i]
+			print "[%i: %f - %f]" % (i, xCmp, x)
+			if xCmp == x:
+				iStart = i
+				break
+
+		# If we didn't manage to find a match, that's a serious error
+		if iStart is None:
+			raise ValueError("Unable to find starting cap position")
+
+		# Find the ending point in our bins
+		iEnd = None
+		xCmp = refX[refBins-1] + refXPls[refBins-1]
+		for i in range(self.bins-1, 0, -1):
+			x = self.xhigh[i]
+			print "<%i: %f - %f>" % (i, xCmp, x)
+			if xCmp == x:
+				iEnd = i
+				break
+
+		# If we didn't manage to find a match, that's a serious error
+		if iEnd is None:
+			raise ValueError("Unable to find ending cap position")
+
+		# If cap didn't change, we don't have to do anything
+		if (iStart != 0) or (iEnd != self.bins-1):
+			return
+
+		# Cap bins and values
+		self.xlow = self.xlow[iStart:iEnd]
+		self.xfocus = self.xfocus[iStart:iEnd]
+		self.xhigh = self.xhigh[iStart:iEnd]
+		self.Entries = self.Entries[iStart:iEnd]
+		self.SumW = self.SumW[iStart:iEnd]
+		self.SumW2 = self.SumW2[iStart:iEnd]
+		self.SumXW = self.SumXW[iStart:iEnd]
+		self.SumX2W = self.SumX2W[iStart:iEnd]
+
 	def toHistogram(self):
 		"""
 		Convert the intermediate histogram into a histogram

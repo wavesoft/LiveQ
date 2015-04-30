@@ -28,6 +28,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from util.config import Config
+from util.histoviz import plotHistograms
 
 from liveq import handleSIGINT, exit
 from liveq.exceptions import ConfigException
@@ -74,57 +75,5 @@ print "     Histograms: %i" % len(histograms)
 if len(subset) > 2:
 	print "Plotting subset: %s" % "j".join(subset)
 
-# Prepare unified view of the plots
-if len(subset) > 0:
-	rc = int(math.ceil(math.sqrt(len(subset))))
-else:
-	rc = int(math.ceil(math.sqrt(len(histograms))))
-
-# Minimum 2x2
-if rc < 2:
-	rc = 2
-
-# Prepare axes
-fig, axes = plt.subplots(nrows=rc, ncols=rc)
-
-# Build plots
-i = 0
-for k,v in histograms.iteritems():
-
-	# Keep only subset
-	if (len(subset) > 0) and not (k in subset):
-		continue
-
-	# Cast to histogram
-	hist = v.toHistogram().normalize()
-
-	# Plot histogram
-	ax = axes.flat[i]
-	ax.errorbar(
-		hist.x,
-		hist.y,
-		xerr=hist.xErrPlus,
-		yerr=hist.yErrPlus
-		)
-	ax.set_title(k)
-
-	# Load reference histogram
-	refhist = loadReferenceHistogram( k )
-	if refhist:
-		# Plot histogram
-		ax = axes.flat[i]
-		ax.errorbar(
-			refhist.x,
-			refhist.y,
-			xerr=refhist.xErrPlus,
-			yerr=refhist.yErrPlus
-			)
-	else:
-		print "Could not load reference for %s" % k
-
-	# Go to next plot
-	i += 1
-
-# Tight and plot
-plt.tight_layout()
-plt.show()
+# Plot histograms
+plotHistograms( histograms, subset, ref=True )
