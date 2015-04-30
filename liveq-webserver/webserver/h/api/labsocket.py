@@ -690,8 +690,9 @@ class LabSocketInterface(APIInterface):
 				if (len(self.trimObs) > 0) and (not hid in self.trimObs):
 					continue
 
-				# Rebin histograms
+				# Rebin and normalize histograms
 				rebinToReference( h, loadReferenceHistogram(h.name) )
+				h.normalize(copy=False)
 
 				# Pack buffers
 				histoBuffers.append( js.packHistogram(h) )
