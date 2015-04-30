@@ -84,6 +84,19 @@ class Histogram:
 				xErrMinus=numpy.copy(self.xErrMinus)
 			)
 
+	def clear(self):
+		"""
+		Reset the values of the bins
+		"""
+
+		# Reset bin values
+		self.y = numpy.zeros(self.bins)
+		self.yErrPlus = numpy.zeros(self.bins)
+		self.yErrMinus = numpy.zeros(self.bins)
+		self.x = numpy.zeros(self.bins)
+		self.xErrPlus = numpy.zeros(self.bins)
+		self.xErrMinus = numpy.zeros(self.bins)
+
 	def isNormalized(self, tollerance=0.1):
 		"""
 		Check if the specified histogram is normalized.
