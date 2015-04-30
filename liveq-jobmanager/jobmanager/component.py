@@ -40,6 +40,7 @@ from liveq.reporting.postmortem import PostMortem
 from liveq.reporting.lars import LARS
 
 from liveq.data.tune import Tune
+from liveq.data.histo.utils import rebinToReference
 from liveq.data.histo.intermediate import IntermediateHistogramCollection, IntermediateHistogram
 from liveq.data.histo.interpolate import InterpolatableCollection
 from liveq.data.histo.reference import collectionChi2Reference, loadReferenceHistogram
@@ -137,7 +138,7 @@ class JobManagerComponent(Component):
 
 		# Perform rebinning where appliable
 		for k,v in collection.iteritems():
-			collection[k].rebinWithRef( loadReferenceHistogram(k) )
+			rebinToReference( collection[k], loadReferenceHistogram(k) )
 
 		# Return the updated collection
 		return collection

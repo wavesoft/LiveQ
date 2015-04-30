@@ -31,6 +31,8 @@ import tornado.escape
 from liveq.models import Lab, Observable, TunableToObservable, Agent, JobQueue
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
+from liveq.data.histo.utils import rebinToReference
+from liveq.data.histo.reference import loadReferenceHistogram
 
 from webserver.common.api import compileObservableHistoBuffers, compileTunableHistoBuffers
 
@@ -687,6 +689,9 @@ class LabSocketInterface(APIInterface):
 				# Skip untrimmed histograms 
 				if (len(self.trimObs) > 0) and (not hid in self.trimObs):
 					continue
+
+				# Rebin histograms
+				rebinToReference( h, loadReferenceHistogram(h.name) )
 
 				# Pack buffers
 				histoBuffers.append( js.packHistogram(h) )
