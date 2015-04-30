@@ -506,9 +506,18 @@ class IntermediateHistogram:
 		if refBins == self.bins:
 			return
 
-		# If either bins are zero, there is a problem
-		if (refBins == 0) or (self.bins == 0):
+		# Handle cases where we just empty the histogram
+		if (refBins == 0) and (self.bins != 0):
+			# Empty bins
+			self.bins = 0
+			self.clear()
 			return
+
+		# Handle cases where we previously had no bins
+		if (self.bins == 0) and (refBins != 0):
+			# Create blank bins
+			self.bins = refBins
+			self.clear()
 
 		# Distribute bins
 		i = 0; j = 0; mFrom = None; mTo = None
