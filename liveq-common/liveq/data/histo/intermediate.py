@@ -507,6 +507,7 @@ class IntermediateHistogram:
 
 		# Handle cases where we just empty the histogram
 		if (refBins == 0) and (self.bins != 0):
+
 			# Empty bins
 			self.bins = 0
 			self.clear()
@@ -685,7 +686,7 @@ class IntermediateHistogram:
 		"""
 
 		# Return an empty histogram
-		return IntermediateHistogram(name=name)
+		return IntermediateHistogram(name=name,meta={'nevts':0, 'crosssection':0.0})
 
 	@staticmethod
 	def fromFLAT(filename):
