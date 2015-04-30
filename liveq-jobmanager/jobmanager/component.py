@@ -130,14 +130,14 @@ class JobManagerComponent(Component):
 			collection[h] = IntermediateHistogram.empty( h )
 			logAdded.append(h)
 
-		# Perform rebinning where appliable
-		for k,v in collection.iteritems():
-			collection[k].rebinWithRef( loadReferenceHistogram(k) )
-
 		# Log
 		self.logger.debug("Adapt REM: %s" % ",".join(logRemoved))
 		self.logger.debug("Adapt ADD: %s" % ",".join(logAdded))
 		self.logger.info("Adapting collection from %i to %i histograms" % (numBefore, len(collection)))
+
+		# Perform rebinning where appliable
+		for k,v in collection.iteritems():
+			collection[k].rebinWithRef( loadReferenceHistogram(k) )
 
 		# Return the updated collection
 		return collection

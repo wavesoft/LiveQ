@@ -505,6 +505,10 @@ class IntermediateHistogram:
 		if refBins == self.bins:
 			return
 
+		# If either bins are zero, there is a problem
+		if (refBins == 0) or (self.bins == 0):
+			return
+
 		# Distribute bins
 		i = 0; j = 0; mFrom = None; mTo = None
 		while i < refBins:
@@ -626,50 +630,6 @@ class IntermediateHistogram:
 
 			# Continue with next
 			i += 1
-
-		return
-
-		# Find the starting point in our bins
-		iStart = None
-		xCmp = refX[0] - refXMin[0]
-		for i in range(0, self.bins):
-			x = self.xlow[i]
-			print "[%i: %f - %f]" % (i, xCmp, x)
-			if xCmp == x:
-				iStart = i
-				break
-
-		# If we didn't manage to find a match, that's a serious error
-		if iStart is None:
-			raise ValueError("Unable to find starting cap position")
-
-		# Find the ending point in our bins
-		iEnd = None
-		xCmp = refX[refBins-1] + refXPls[refBins-1]
-		for i in range(self.bins-1, 0, -1):
-			x = self.xhigh[i]
-			print "<%i: %f - %f>" % (i, xCmp, x)
-			if xCmp == x:
-				iEnd = i
-				break
-
-		# If we didn't manage to find a match, that's a serious error
-		if iEnd is None:
-			raise ValueError("Unable to find ending cap position")
-
-		# If cap didn't change, we don't have to do anything
-		if (iStart != 0) or (iEnd != self.bins-1):
-			return
-
-		# Cap bins and values
-		self.xlow = self.xlow[iStart:iEnd]
-		self.xfocus = self.xfocus[iStart:iEnd]
-		self.xhigh = self.xhigh[iStart:iEnd]
-		self.Entries = self.Entries[iStart:iEnd]
-		self.SumW = self.SumW[iStart:iEnd]
-		self.SumW2 = self.SumW2[iStart:iEnd]
-		self.SumXW = self.SumXW[iStart:iEnd]
-		self.SumX2W = self.SumX2W[iStart:iEnd]
 
 	def toHistogram(self):
 		"""
