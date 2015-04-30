@@ -190,6 +190,7 @@ class IntermediateHistogramCollection(dict):
 			# Read the numpy buffers
 			npBufferLen = 8 * 8 * hBins
 			npBuffer = numpy.frombuffer( buf[p:p+npBufferLen], dtype=numpy.float64 )
+			npBuffer.setflags(write=True)
 			p += npBufferLen
 
 			# Create histogram
