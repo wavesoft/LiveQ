@@ -502,8 +502,11 @@ class IntermediateHistogram:
 		# Cap edges
 		# TODO: Assume edges match
 
+		print " - Rebinning %s:" % self.name,
+
 		# If same number of bins, we don't have to do anything
 		if refBins == self.bins:
+			print "[Match]"
 			return
 
 		# Handle cases where we just empty the histogram
@@ -511,6 +514,7 @@ class IntermediateHistogram:
 			# Empty bins
 			self.bins = 0
 			self.clear()
+			print "[Emptied]"
 			return
 
 		# Handle cases where we previously had no bins
@@ -518,6 +522,8 @@ class IntermediateHistogram:
 			# Create blank bins
 			self.bins = refBins
 			self.clear()
+			print "[Defined c=%i]"
+			return
 
 		# Distribute bins
 		i = 0; j = 0; mFrom = None; mTo = None
@@ -558,7 +564,7 @@ class IntermediateHistogram:
 
 							# Expand or divide?
 							if (mTo[1]-mFrom[1]) > (mTo[0]-mFrom[0]):
-								#print "Merge %i,%i to %i,%i" % (mFrom[0], mFrom[1], mTo[0], mTo[1])
+								print "[Merge %i,%i to %i,%i]" % (mFrom[0], mFrom[1], mTo[0], mTo[1]),
 
 								# Merge bins {mFrom[1] - mTo[1]} in order to fit
 								# the edges of bins {mFrom[0] - mTo[0]}
@@ -640,6 +646,8 @@ class IntermediateHistogram:
 
 			# Continue with next
 			i += 1
+			
+		print ""
 
 	def toHistogram(self):
 		"""
