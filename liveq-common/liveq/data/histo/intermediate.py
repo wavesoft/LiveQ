@@ -494,19 +494,15 @@ class IntermediateHistogram:
 		"""
 
 		# We should cap the bins to the reference histogram bins
-		refX = referenceHistogram.x
-		refXMin = referenceHistogram.xErrMinus
-		refXPls = referenceHistogram.xErrPlus
+		refXLow = referenceHistogram.x - referenceHistogram.xErrMinus
+		refXHigh = referenceHistogram.x + referenceHistogram.xErrPlus
 		refBins = referenceHistogram.bins
 
 		# Cap edges
 		# TODO: Assume edges match
 
-		print " - Rebinning %s:" % self.name,
-
 		# If same number of bins, we don't have to do anything
 		if refBins == self.bins:
-			print "[Match]"
 			return
 
 		# Handle cases where we just empty the histogram
@@ -514,15 +510,21 @@ class IntermediateHistogram:
 			# Empty bins
 			self.bins = 0
 			self.clear()
-			print "[Emptied]"
 			return
 
 		# Handle cases where we previously had no bins
 		if (self.bins == 0) and (refBins != 0):
+
 			# Create blank bins
 			self.bins = refBins
 			self.clear()
-			print "[Defined c=%i]"
+
+			# Import bin information from reference
+			self.xlow = refXLow
+			self.xhigh = refXHigh
+			self.xfocus = (refXLow + refXHigh) / 2.0
+
+			# We are good
 			return
 
 		# Distribute bins
@@ -530,8 +532,8 @@ class IntermediateHistogram:
 		while i < refBins:
 
 			# Reference bin edges
-			r0 = refX[i] - refXMin[i]
-			r1 = refX[i] + refXPls[i]
+			r0 = refXLow[i]
+			r1 = refXHigh[i]
 
 			# The matching bin edges
 			x0 = self.xlow[j]
@@ -564,7 +566,7 @@ class IntermediateHistogram:
 
 							# Expand or divide?
 							if (mTo[1]-mFrom[1]) > (mTo[0]-mFrom[0]):
-								print "[Merge %i,%i to %i,%i]" % (mFrom[0], mFrom[1], mTo[0], mTo[1]),
+								#print "Merge %i,%i to %i,%i" % (mFrom[0], mFrom[1], mTo[0], mTo[1])
 
 								# Merge bins {mFrom[1] - mTo[1]} in order to fit
 								# the edges of bins {mFrom[0] - mTo[0]}
@@ -646,8 +648,6 @@ class IntermediateHistogram:
 
 			# Continue with next
 			i += 1
-			
-		print ""
 
 	def toHistogram(self):
 		"""
