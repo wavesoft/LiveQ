@@ -54,8 +54,11 @@ def loadReferenceHistogram(histoPath):
 		print "%s not found" % histoPath
 		return None
 
-	# Load & Cache histogram
+	# Load & Normalize histogram
 	histo = Histogram.fromFLAT( histoPath )
+	histo.normalize(copy=False)
+
+	# Store it on cache
 	HISTOREF_CACHE[histoPath] = histo
 	return histo
 
