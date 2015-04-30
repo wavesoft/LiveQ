@@ -131,8 +131,8 @@ class JobManagerComponent(Component):
 			logAdded.append(h)
 
 		# Log
-		self.logger.debug("Adapt REM: %s" % ",".join(logRemoved))
-		self.logger.debug("Adapt ADD: %s" % ",".join(logAdded))
+		self.logger.info("Adapt REM: %s" % ",".join(logRemoved))
+		self.logger.info("Adapt ADD: %s" % ",".join(logAdded))
 		self.logger.info("Adapting collection from %i to %i histograms" % (numBefore, len(collection)))
 
 		# Perform rebinning where appliable
