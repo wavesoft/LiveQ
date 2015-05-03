@@ -79,6 +79,12 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		if not self.analyticsProfile is None:
 			self.analyticsTrackID = self.analyticsProfile.uuid
 
+		# Re-generate invalid caches
+		if (not self.dbUser.state) or (self.dbUser.state == "{}"):
+			self.updateCache_Achievements()
+			self.updateCache_Books()
+			self.updateCache_Feats()
+
 		# Preheat user cache
 		self.loadCache_Achievements()
 		self.loadCache_Books()
