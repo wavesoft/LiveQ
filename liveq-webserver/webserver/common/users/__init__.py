@@ -79,16 +79,6 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		if not self.analyticsProfile is None:
 			self.analyticsTrackID = self.analyticsProfile.uuid
 
-		# Re-generate invalid caches
-		if (not self.dbUser.state) or (self.dbUser.state == "{}"):
-			self.updateCache_Achievements()
-			self.updateCache_Books()
-			self.updateCache_Feats()
-
-		# Preheat user cache
-		self.loadCache_Achievements()
-		self.loadCache_Books()
-
 		# Cache my information
 		self.name = user.displayName
 		self.id = user.id
@@ -110,6 +100,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 		# Get a reference to user triggers
 		self.triggers = Triggers( self )
+
+		# Re-generate invalid caches
+		if (not self.dbUser.state) or (self.dbUser.state == "{}"):
+			self.updateCache_Achievements()
+			self.updateCache_Books()
+			self.updateCache_Feats()
+			self.save()
+
+		# Preheat user cache
+		self.loadCache_Achievements()
+		self.loadCache_Books()
 
 		# Allocate unique token to the user
 		self.token = UserTokens(user=self.dbUser, token=uuid.uuid4().hex)
