@@ -130,6 +130,22 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		self.updateCache_MachinePart()
 
 	@staticmethod
+	def sendActivationMail(user, activateUrl):
+		"""
+		Send activation mail to the specified user
+		"""
+
+		# Create a user activation mail token for this user
+		token = UserActivationMailToken.forUser(user)
+
+		# Prepare e-mail macros
+		macros = user.serialize()
+		macros['activateurl'] = "%s?token=%s" % (activateUrl, token.token)
+
+		# Send e-mail confirmation mail
+		EMail.queue( user.email, "verify", macros=macros )
+
+	@staticmethod
 	def register(profile, activateUrl):
 		"""
 		Register a new user
@@ -252,19 +268,8 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		hluser.updateCache_Feats()
 		user.save()
 
-		# -----------------
-		# Validation e-mail
-		# -----------------
-
-		# Create a user activation mail token for this user
-		token = UserActivationMailToken.forUser(user)
-
-		# Prepare e-mail macros
-		macros = user.serialize()
-		macros['activateurl'] = "%s?token=%s" % (activateUrl, token.token)
-
-		# Send e-mail confirmation mail
-		EMail.queue( email, "verify", macros=macros )
+		# Send validation mail
+		HLUser.sendActivationMail( user, activateUrl )
 
 		# Return hluser
 		return hluser

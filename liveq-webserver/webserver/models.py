@@ -575,14 +575,25 @@ class UserActivationMailToken(BaseModel):
 		specified user.
 		"""
 
-		# Create new random token
-		token = "".join([random.choice(string.letters) for x in range(0,64)])
+		# Check if we already have a validation token for this user
+		try:
 
-		# Create and return
-		return UserActivationMailToken.create(
-				user=user,
-				token=token
-				)
+			# Lookup existing token
+			token = UserActivationMailToken.get( UserActivationMailToken.user == user )
+
+			# Return token
+			return token
+
+		except UserActivationMailToken.DoesNotExist:
+
+			# Create new random token
+			token = "".join([random.choice(string.letters) for x in range(0,64)])
+
+			# Create and return
+			return UserActivationMailToken.create(
+					user=user,
+					token=token
+					)
 
 class UserTokens(BaseModel):
 	"""
