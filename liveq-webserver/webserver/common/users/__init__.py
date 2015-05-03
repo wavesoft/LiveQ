@@ -106,7 +106,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 			self.updateCache_Achievements()
 			self.updateCache_Books()
 			self.updateCache_Feats()
-			self.save()
+			self.dbUser.save()
 
 		# Preheat user cache
 		self.loadCache_Achievements()
