@@ -127,6 +127,10 @@ class EMail:
 		if not tpl:
 			raise IOError("Template '%s' could not be loaded" % template)
 
+		# Ensure e-mail is array
+		if (type(recepients) is str) or (type(recepients) is unicode):
+			recepients = [recepients]
+
 		# Queue e-mails
 		EmailConfig.EMAIL.queue(
 			recepients,
