@@ -77,7 +77,7 @@ if dbVersion < newVersion:
 	print "Will upgrade from version %i to %i" % (dbVersion, newVersion)
 
 	# Create migrator
-	migrator = SqliteMigrator( Config.DB )
+	migrator = MySQLMigrator( Config.DB )
 
 	# Perform patches
 	for i in range(dbVersion, newVersion):
@@ -88,7 +88,7 @@ if dbVersion < newVersion:
 			getattr(patches, functions[i])(migrator)
 
 # Update version record
-verInfo.val = "%i" % len(functions)
+verInfo.val = "%i" % newVersion
 verInfo.save()
 
 # We are done
