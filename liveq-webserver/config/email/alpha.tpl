@@ -35,7 +35,7 @@ You can always visit the game forum too: https://test4theory.cern.ch/forum
 
 Let's do it!
 
-Click here to visit the game : https://test4theory.cern.ch/vas/game/
+Click here to visit the game : https://test4theory.cern.ch/vas
 
 
 ~ The Virtual Atom Smasher Team
@@ -70,7 +70,7 @@ Click here to visit the game : https://test4theory.cern.ch/vas/game/
 		</p>
 		<h3>Let's do it!</h3>
 		<p>
-			Click here to visit the game : <a href="https://test4theory.cern.ch/vas/game/">https://test4theory.cern.ch/vas/game/</a>
+			Click here to visit the game : <a href="https://test4theory.cern.ch/vas">https://test4theory.cern.ch/vas</a>
 		</p>
 		<p>
 			<em>~ The Virtual Atom Smasher Team</em>
