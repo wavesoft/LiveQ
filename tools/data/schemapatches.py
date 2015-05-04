@@ -25,11 +25,10 @@ class SchemaPatches:
 
 	def patch_1(self, migrator):
 		"""
-		(Patch description here)
+		Adding the 'playTime' field in the User model
 		"""
 
+		# Insert the 'playTime' field in the user table
 		migrate(
-		    migrator.add_column('some_table', 'title', title_field),
-		    migrator.add_column('some_table', 'status', status_field),
-		    migrator.drop_column('some_table', 'old_column'),
+		    migrator.add_column('user', 'playTime', IntegerField(default=0)),
 		)

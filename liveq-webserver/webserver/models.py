@@ -321,6 +321,9 @@ class User(BaseModel):
 	#: Link to analytics profile
 	analyticsProfile = ForeignKeyField(AnalyticsProfile, null=True, default=None)
 
+	#: Play time
+	playTime = IntegerField(default=0)
+
 	def __str__(self):
 		"""
 		Stringify result

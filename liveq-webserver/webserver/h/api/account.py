@@ -97,6 +97,14 @@ class AccountInterface(APIInterface):
 						})
 
 			##################################################
+			# Update user activity counters
+			# ------------------------------------------------
+			elif action == "user.activity":
+
+				# Update user activity
+				self.user.updateActivityCounter( int(param['counter']) )
+
+			##################################################
 			# Get a value from a save slot
 			# ------------------------------------------------
 			elif action == "save.get":

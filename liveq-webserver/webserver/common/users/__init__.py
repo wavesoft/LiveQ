@@ -84,6 +84,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		self.id = user.id
 		self.lab = user.lab
 		self.activePaper_id = user.activePaper_id
+		self.activityCounter = user.playTime
 
 		# Keep a cache of acknowledged PM reads
 		self.forumUserID = forumUidFromUser( self.dbUser )
@@ -347,6 +348,10 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 		if self.userEventsListener != None:
 			self.userEvents.removeListener( self.userEventsListener )
 		self.userEvents.release()
+
+		# Commit activity at cleanup
+		self.dbUser.playTime = self.activityCounter
+		self.dbUser.save()
 
 		# Delete token
 		self.token.delete_instance()
@@ -1203,6 +1208,14 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 	###################################
 	# In-game information queries
 	###################################
+
+	def updateActivityCounter(self, counter):
+		"""
+		Update user's record
+		"""
+
+		# Update activity counter
+		self.activityCounter += counter
 
 	def getUserMessages(self):
 		"""
