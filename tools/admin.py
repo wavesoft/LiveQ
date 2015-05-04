@@ -251,10 +251,10 @@ def cmd_listusers():
 	# Table
 	print_table(
 		User\
-			.select( User.id, User.displayName, User.email, User.points, User.totalPoints )
+			.select( User.id, User.displayName, User.email, User.points, User.totalPoints, User.playTime )
 			.dicts(),
-		["id", "displayName", "email", "points", "totalPoints" ],
-		["ID", "Display Name", "E-Mail", "Points", "Total Points" ]
+		["id", "displayName", "email", "points", "totalPoints", "playTime" ],
+		["ID", "Display Name", "E-Mail", "Points", "Total Points", "Play Time" ]
 		)
 
 	# Footer
