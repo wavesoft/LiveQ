@@ -53,3 +53,5 @@ source/web/dat
 test/histo*
 
 tools/dump.sql
+
+*.sql
