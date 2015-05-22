@@ -31,6 +31,7 @@ from tornado.web import URLSpec
 from webserver.h.index import *
 from webserver.h.account import *
 from webserver.h.configure import *
+from webserver.h.infoapi import *
 from webserver.h.apisocket import APISocketHandler
 from webserver.h.tootr import TootrGetAnimation
 from webserver.config import Config
@@ -77,6 +78,7 @@ class VirtualAtomSmasherServer(tornado.web.Application):
 			URLSpec(r"%s/tootr/anim" % Config.BASE_PATH,			TootrGetAnimation, 				name="tootr.anim"),
 			URLSpec(r"%s/api/io" % Config.BASE_PATH,				APISocketHandler, 				name="api"),
 			URLSpec(r"%s/api/account/activate" % Config.BASE_PATH,	MailActivateHandler,			name="account.activate"),
+			URLSpec(r"%s/api/team/(\w+)" % Config.BASE_PATH,		InfoAPITeams, 					name="api.teams"),
 		]
 
 		# Get root dir of files
