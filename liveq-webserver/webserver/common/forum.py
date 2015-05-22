@@ -97,6 +97,18 @@ def forumUsernameExists(displayName):
 	# User exists
 	return True
 
+def banForumUser(user):
+	"""
+	Ban a user from forum
+	"""
+	pass
+
+def unbanForumUser(user):
+	"""
+	Un-ban a user from forum
+	"""
+	pass
+
 def deleteForumReflection(user, wipe=False):
 	"""
 	Delete the username (or the entire user content if wipe=True) from

@@ -40,7 +40,7 @@ from webserver.h.api.db import DatabaseInterface
 from webserver.config import Config
 from webserver.common.users import HLUser
 from webserver.common.userevents import UserEvents
-from webserver.common.forum import deleteForumReflection
+from webserver.common.forum import deleteForumReflection, banForumUser
 
 from webserver.models import User, Lab, AnalyticsProfile, TeamMembers
 from tornado.ioloop import IOLoop
@@ -419,25 +419,32 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				# Send activation e-mail
 				HLUser.sendActivationMail( user, Config.BASE_URL + self.reverse_url("account.activate") )
 
+			# Check if account is disabled
+			if (user.status & User.STATUS_DISABLED) != 0:
+
+				# Reply denial
+				self.sendAction('account.login.response', {
+						'status' : 'error',
+						'message': "Your account has been disabled because the e-mail was not confirmed."
+					})
+				return
+
 			# Check if account is not yet activated
-			if (user.status & 1) == 0:
+			if (user.status & User.STATUS_ACTIVATED) == 0:
 
 				# Calculate time delta
 				delta = (datetime.datetime.now() - user.created).days
 
-				# After 7 days, delete account
+				# After 7 days, disable account
 				if delta > 7:
 
-					# First delete forum reflection for this user
-					deleteForumReflection(user)
+					# First disable forum reflection for this user
+					banForumUser(user)
 
-					# Delete user
-					user.delete_instance(recursive=True)
-
-					# Reply the same way as no-user found
+					# Reply denial
 					self.sendAction('account.login.response', {
 							'status' : 'error',
-							'message': "A user with this e-mail does not exist!"
+							'message': "Your account has been disabled because the e-mail was not confirmed."
 						})
 					return
 
@@ -445,7 +452,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				elif delta > 1:
 
 					# Send notification
-					self.sendNotification("Please validate your e-mail address or your account will be deleted in %i days!" % (7 - delta), 'alert')
+					self.sendNotification("Please validate your e-mail address or your account will be deleted in %i day(s)!" % (7 - delta), 'alert')
 
 			# Success
 			self.user = HLUser(user)

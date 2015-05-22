@@ -256,6 +256,10 @@ class User(BaseModel):
 	#: JSON Fields in this model
 	JSON_FIELDS = ['variables', 'state']
 
+	# Status bits
+	STATUS_ACTIVATED = 1
+	STATUS_DISABLED = 2
+
 	# -----------------------------------
 	# Log-in and profile
 	# -----------------------------------

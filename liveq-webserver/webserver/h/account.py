@@ -22,7 +22,8 @@ import tornado.escape
 import tornado.web
 
 from webserver.config import Config
-from webserver.models import UserActivationMailToken
+from webserver.models import UserActivationMailToken, User
+from webserver.common.forum import unbanForumUser
 
 """
 E-Mail activation handler
@@ -53,7 +54,18 @@ class MailActivateHandler(tornado.web.RequestHandler):
 			if (user.status & 1) == 0:
 
 				# Activate
-				user.status |= 1
+				user.status |= User.STATUS_ACTIVATED
+
+				# If disabled, re-enable
+				if (user.status & User.STATUS_DISABLED):
+
+					# Enable account
+					user.status &= ~User.STATUS_DISABLED
+
+					# Un-ban forum user
+					unbanForumUser(user)
+
+				# Save user record
 				user.save()
 
 				# Success
