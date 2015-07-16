@@ -763,6 +763,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 						# Give 20 points
 						self.earnPoints(20, "for a perfect match")
 
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "not-good"
+								}
+							})
+
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
@@ -777,6 +788,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 						# Give 20 points
 						self.earnPoints(30, "for a perfect match, right away!")
+
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "perfect"
+								}
+							})
 
 						# Send notification
 						self.userEvents.send({
@@ -793,6 +815,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 						# Give 5 points
 						self.earnPoints(5, "for a better match!")
 
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "good"
+								}
+							})
+
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
@@ -807,6 +840,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 						# Give 20 points
 						self.earnPoints(10, "for a good match")
+
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "fair"
+								}
+							})
 
 						# Send notification
 						self.userEvents.send({
@@ -823,6 +867,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 						# Give 2 points
 						self.earnPoints(2, "for a better match!")
 
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "could-be-better"
+								}
+							})
+
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
@@ -833,6 +888,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 
 					else:
 
+						# Send analytics helper
+						self.userEvents.send({
+							"type"	 : "analytics",
+							"id"     : "tuning.values.validate",
+							"data"	 : {
+								"fit": fitAfter,
+								"lastFit": fitBefore,
+								"status": "bad"
+								}
+							})
+
 						# Send notification
 						self.userEvents.send({
 							"type"   : "flash",
@@ -842,6 +908,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
 							})
 
 				else:
+
+					# Send analytics helper
+					self.userEvents.send({
+						"type"	 : "analytics",
+						"id"     : "tuning.values.validate",
+						"data"	 : {
+							"fit": fitAfter,
+							"lastFit": fitBefore,
+							"status": "not-better"
+							}
+						})
 
 					# Send notification
 					self.userEvents.send({
