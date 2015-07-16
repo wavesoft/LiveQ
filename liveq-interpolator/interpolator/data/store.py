@@ -249,7 +249,7 @@ class HistogramStore:
 		return HistogramStore._unpickle( vBuf, mBuf )
 
 	@staticmethod
-	def getInterpolator(tune, function='linear', histograms=None, minSamples=10, maxIterations=10, maxSamples=50):
+	def getInterpolator(tune, function='linear', histograms=None, minSamples=10, maxIterations=10, maxSamples=100):
 		"""
 		Return an initialized interpolator instance with the required
 		data from the appropriate neighborhoods.
@@ -297,6 +297,15 @@ class HistogramStore:
 		if len(indexvars) == 0:
 			return None
 
-		# Create and return interpolator
-		return Rbf( *indexvars, data=datavalues, function=function )
+		# Calculate average distance to neighrborhood
+		avgDistance = 0
+		for ic in data:
+			avgDistance += tune.distanceTo( ic.tune )
+		avgDistance /= len(data)
 
+		# Create and return interpolator
+		return Rbf( *indexvars, data=datavalues, function=function, meta={
+				'samples' 		: len(data),
+				'maxsamples' 	: maxSamples,
+				'normdist'		: avgDistance / tune.binRadius()
+			})

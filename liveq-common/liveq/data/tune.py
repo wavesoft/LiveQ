@@ -21,6 +21,7 @@ import math
 import logging
 import numpy as np
 
+from numpy import sqrt, sum
 from liveq.models import Lab
 from liveq.config.tuneaddressing import TuneAddressingConfig
 
@@ -78,22 +79,69 @@ class Tune(dict):
 		# Return tune
 		return tune
 
+	def binRadius(self):
+		"""
+		Get the radius of the interpolation bin.
+
+		This is the half of the eucledian distance of the coordinates
+		of the edges of any bin used by the interpolation binning
+		mechanism.
+		"""
+
+		# Distances for each diemtion
+		dist = []
+
+		# Iterate over the keys
+		for k in self.keys():
+
+			# Setup default tune value calculation variables
+			vRound = TuneAddressingConfig.TUNE_DEFAULT_ROUND
+
+			# Get tune-tuning per tune parameter
+			lk = k.lower()
+			if lk in TuneAddressingConfig.TUNE_CONFIG:
+
+				# Get parameters
+				tv = TuneAddressingConfig.TUNE_CONFIG[lk]
+				vRound = float(tv['round'])
+
+			# Return distance
+			dist.append( vRound ** 2 )
+
+		# Return square root of all the distances
+		return sum(sqrt( np.array(dist) ))
+
+	def distanceTo(self, tune):
+		"""
+		Get the eucledian distance to another tune
+		"""
+
+		# Ensure tune lab integrity
+		if self.labid != tune.labid:
+			raise ValueError("Measuing tunes of different labs")
+
+		# Get tune values
+		x1 = self.getValues()
+		x2 = tune.getValues()
+
+		# Calculate eucledian distance of every parameter
+		return sqrt( ((x1 - x2)**2).sum(axis=0) )
+
 	def equal(self, tune):
 		"""
 		Check if this tune is equal to another
 		"""
 
-		# Ensure tune
+		# Ensure tune lab integrity
 		if self.labid != tune.labid:
-			print "!!! Tune lab mismatch"
-			return False
+			raise ValueError("Comparing tunes of different labs")
 
 		# Ensure values are the same
-		myVar = self.getValues()
-		tuVar = tune.getValues()
+		x1 = self.getValues()
+		x2 = tune.getValues()
 
 		# Compare
-		return np.all( myVar == tuVar )
+		return np.all( x1 == x2 )
 
 	def getNeighborhoodID(self, labid=None, offset=0):
 		"""

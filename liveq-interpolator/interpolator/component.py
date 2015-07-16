@@ -92,10 +92,14 @@ class InterpolatorComponent(Component):
 		# Run interpolation and get an InterpolatableCollection collection
 		histograms = ipol(*tune.getValues())
 
+		# Log
+		self.logger.info("Interpolating metadata: %r" % (ipol.meta,))
+
 		# Return a packed histogram collection
 		self.ipolChannel.reply({
 				'result': 'ok',
 				'exact': 0,
+				'meta': ipol.meta,
 				'data': histograms.pack()
 			})
 

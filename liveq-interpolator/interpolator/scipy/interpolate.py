@@ -199,6 +199,9 @@ class Rbf(object):
 			raise ValueError("data= kwargument was not specified!")
 		data = kwargs.pop('data')
 
+		# Pop metadata
+		self.meta = kwargs.pop('meta', { })
+
 		# Process arguments
 		self.xi = asarray([asarray(a, dtype=float_).flatten()
 						   for a in args])
