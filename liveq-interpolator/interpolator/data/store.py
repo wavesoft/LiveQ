@@ -206,6 +206,7 @@ class HistogramStore:
 		# Debug
 		print "--[ Appending ]------------"
 		print "Size=%i" % len(collection)
+		print "Neighborhood=%s" % nid
 		print "Neighbors=%i" % len(neighbors)
 		if neighbors:
 			print "Neighbor histograms=%i" % len(neighbors[0])
