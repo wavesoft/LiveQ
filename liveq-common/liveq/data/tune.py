@@ -106,7 +106,7 @@ class Tune(dict):
 				vRound = float(tv['round'])
 
 			# Return distance
-			dist.append( vRound ** 2 )
+			dist.append( (vRound/2.0) ** 2 )
 
 		# Return square root of all the distances
 		return sum(sqrt( np.array(dist) ))
