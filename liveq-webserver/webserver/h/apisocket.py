@@ -510,6 +510,19 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			for i in self.interfaces:
 				i.ready()
 
+		# Handle logout
+		elif action == "account.logout":
+
+			# Disconnect user
+			if self.user:
+				self.user.cleanup()
+				self.user = None
+
+			# Fire callback
+			self.sendAction('account.logout.response', {
+					'status' : 'ok'
+				})
+
 		else:
 
 			# Forward to API interfaces and catch APIError
