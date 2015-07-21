@@ -507,7 +507,14 @@ class Histogram:
 
 		# Convert values into a flat 2D numpy array
 		values = numpy.array(vBins, dtype=numpy.float64).flatten()
-		name = data['HISTOGRAM']['d']['AidaPath']
+
+		# Use 'AidaPath' or 'Path'
+		if 'AidaPath' in data['HISTOGRAM']['d']:
+			name = data['HISTOGRAM']['d']['AidaPath']
+		elif 'Path' in data['HISTOGRAM']['d']:
+			name = data['HISTOGRAM']['d']['Path']
+		else:
+			raise ValueError("Missing 'Path' or 'AidaPath' in the HISTOGRAM section")
 
 		# If we have:
 		# 6 values we have : xLow, xFocus, xHigh, y, yErrMin, yErrMax
