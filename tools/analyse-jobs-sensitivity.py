@@ -142,7 +142,7 @@ def importFile(args):
 					baseName = ".".join(parts[0:len(parts)-1])
 
 					# If not candidate, place it
-					if not m.name in histo_candidate:
+					if not baseName in histo_candidate:
 						histo_candidate[baseName] = m
 
 					# If already candidate, we found a histo
