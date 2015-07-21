@@ -173,7 +173,7 @@ def importFile( tarFile ):
 					histograms[hinst.name] = hinst
 
 				except Exception as e:
-					sys.stderr.write("Exception loading histogram %s\n" % h.name)
+					sys.stderr.write("Exception loading histogram %s (%s)\n" % (h.name, str(e)))
 					sys.stderr.flush()
 
 			# Check if we have histograms
@@ -185,19 +185,28 @@ def importFile( tarFile ):
 		# Close tarfile
 		f.close()
 
+		# Prepare response
+		ans = {
+			'tune': tuneData,
+			'histo': histograms,
+			'flags': flags
+		}
+
+		# Include optional parameters
+		if jobData:
+			ans['exitcode'] = jobData['exitcode'],
+
 		# Prepare CSV Record
-		return {
-				'exitcode': jobData['exitcode'],
-				'tune': tuneData,
-				'histo': histograms,
-				'flags': flags
-			}
+		return ans
 
 	except Exception as e:
 
 		# Trap unhandled exceptions
 		traceback.print_exc()
 		print e
+
+		# Mark as invalid
+		flags['valid'] = False
 		return {
 				'flags': flags,
 				'exception': e
