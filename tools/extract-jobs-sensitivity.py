@@ -97,8 +97,10 @@ def importFile(args):
 			flags["jobdata"] = True
 
 		except Exception as e:
-			outputQueue.put({ "flags": flags })
-			pass
+
+			# Continue even if we didn't find job data
+			sys.stderr.write("WARN: Could not load jobdata\n")
+			sys.stderr.flush()
 
 		# Get generator tune record from tar archive
 		tuneData = {}
@@ -114,10 +116,10 @@ def importFile(args):
 			flags["tunedata"] = True
 
 		except Exception as e:
+
 			# Continue even if we didn't find a generator.tune
-			sys.stderr.write("Unparsable generator.tune\n")
+			sys.stderr.write("WARN: Could not load generator.tune\n")
 			sys.stderr.flush()
-			pass
 
 		# Load histograms
 		histograms = { }
@@ -177,13 +179,12 @@ def importFile(args):
 					sys.stderr.flush()
 					pass
 
-			# We now have histograms
-			flags['histo'] = True
+			# Check if we have histograms
+			flags['histo'] = (len(histograms) > 0)
 
 		except Exception as e:
 			outputQueue.put({ "flags": flags })
 			return
-
 
 		# Close tarfile
 		f.close()
@@ -201,36 +202,84 @@ def importFile(args):
 		print e
 		return
 
+def deltaHistograms(refHisto, runHisto):
+	"""
+	Calculate the chi square-fit between the two histogram sets
+	"""
+
+	ans = { }
+	for hname, h in refHisto.iteritems():
+
+		# Fail if a histogram is missing
+		if not hname in runHisto:
+			return None
+
+		# Store histogram resunt
+		ans[hname] = runHisto[hname].chi2ToReference( h )
+
+	# Return result
+	return ans
+
+def sortAndStringify(dictionary):
+	"""
+	Sort dictionary by key and return a string that contains
+	the values, separated with space
+	"""
+
+	# Iterate over sorted values by key
+	ans = ""
+	for v in [ x[1] for x in sorted( dictionary.items(), key=lambda x: x[0] ) ]:
+		if ans:
+			ans += " "
+		ans += "%f" % v
+
+	return ans
+
 # Run threaded
 if __name__ == '__main__':
 	try:
 
 		# Ensure we have at least one parameter
-		if (len(sys.argv) < 3) or (not sys.argv[1]) or (not sys.argv[2]):
+		if len(sys.argv) < 5:
 			print "Analyze MCPlot job completion statistics"
 			print "Usage:"
 			print ""
-			print " import-mcplots-interpolation.py <path to mcplots jobs dir> [+]<csv file>"
+			print " import-mcplots-interpolation.py <model input> <model output> "
+			print "                   <reference archive> <path to mcplots jobs dir>"
 			print ""
 			sys.exit(1)
 
 		# Check if we have directory
-		if not os.path.isdir(sys.argv[1]):
-			print "ERROR: Could not find %s!" % sys.argv[2]
+		if not os.path.isfile(sys.argv[3]):
+			print "ERROR: Could not find reference archive %s!" % sys.argv[2]
+			sys.exit(1)
+		if not os.path.isdir(sys.argv[4]):
+			print "ERROR: Could not find directory %s!" % sys.argv[3]
 			sys.exit(1)
 
-		# Get base dir and csv file
-		baseDir = sys.argv[1]
-		csvFilename = sys.argv[2]
+		# Get base dir, csv file and reference archive
+		model_in = sys.argv[1]
+		model_out = sys.argv[2]
+		baseDir = sys.argv[4]
 
-		# Open csv file
-		if csvFilename[0] == "+":
-			# Append
-			csvFile = open(csvFilename[1:], 'a')
-		else:
-			# Open for writing
-			csvFile = open(csvFilename, 'w')
-			csvFile.write("User ID,Exit Code (0=Success),Completed at (UNIX Timestamp),Completed at (Readable Date),CPU Usage,Disk Usage\n")
+		# Load reference archive
+		try:
+			refArchive = importFile( sys.argv[3] )
+		except Exception as e:
+			print "ERROR: Could not load reference archive: %s" % str(e)
+			sys.exit(1)
+
+		# Validate reference archive
+		if not refArchive['flags']['valid']:
+			print "ERROR: Could not open reference archive"
+			sys.exit(1)
+		if not refArchive['flags']['histo']:
+			print "ERROR: Missing histograms in reference archive"
+			sys.exit(1)
+
+		# Open input and output file
+		inFile = open(model_in, 'a')
+		outFile = open(model_out, 'a')
 
 		# Prepare the list of histograms to process
 		histogramQueue = glob.glob("%s/*%s" % (baseDir, ".tgz"))
@@ -283,12 +332,20 @@ if __name__ == '__main__':
 				sys.stdout.flush()
 				continue
 
+			# Calculate the goodness of fit between the two parameters
+			delta = deltaHistograms( refArchive['histo'], q['histo'] )
+
+			# Update input & output file
+			inFile.write( sortAndStringify(q['tune']) + "\n" )
+			outFile.write( sortAndStringify(delta) + "\n" )
+
 			# Process
-			sys.stdout.write("ok (%i histos)\n" % len(q['histo']))
+			sys.stdout.write("ok (%i histos, %i params)\n" % (len(q['histo']), len(q['tune']))
 			sys.stdout.flush()
 
 		# We are completed
-		csvFile.close()
+		inFile.close()
+		outFile.close()
 		print "\nCompleted!"
 
 	except Exception as e:
