@@ -239,8 +239,10 @@ def deltaHistograms(refHisto, runHisto):
 		# Store histogram resunt
 		try:
 			ans[hname] = runHisto[hname].chi2ToReference( h )
-		except ValueError:
+		except ValueError as e:
 			# In case of an error, put zero
+			sys.stderr.write("Exception comparing histogram %s (%s)\n" % (hname, str(e)))
+			sys.stderr.flush()
 			ans[hname] = 0
 
 	# Return result
