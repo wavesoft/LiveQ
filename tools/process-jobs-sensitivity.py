@@ -18,6 +18,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import os
+import sys
+
 from SALib.sample import saltelli
 from SALib.analyze import sobol
 from SALib.test_functions import Ishigami
@@ -75,6 +78,7 @@ if __name__ == "__main__":
 			parts = line.strip().split(" ")
 			sens_input.append([ float(x) for x in parts ])
 	print " -- Read %i samples" % len(sens_input)
+	X = np.array(sens_input)
 
 	# Create n-dimentional outout
 	sens_output = [ [] for x in sens_histograms ]
@@ -100,6 +104,7 @@ if __name__ == "__main__":
 		sys.exit(1)
 
 	# Open interpreter
+	Y = np.array(sens_output[i])
 	import code
 	code.interact(local=locals())
 
@@ -108,6 +113,7 @@ if __name__ == "__main__":
 	for i in range(0, len(sens_histograms)):
 
 		# Find the appropriate number of samples
+		Y = np.array(sens_output[i])
 
 		# Find sensitive parameters
 		Si = sobol.analyze(problem, sens_output[i], print_to_console=False)
