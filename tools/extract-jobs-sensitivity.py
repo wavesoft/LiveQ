@@ -237,7 +237,11 @@ def deltaHistograms(refHisto, runHisto):
 			return None
 
 		# Store histogram resunt
-		ans[hname] = runHisto[hname].chi2ToReference( h )
+		try:
+			ans[hname] = runHisto[hname].chi2ToReference( h )
+		except ValueError:
+			# In case of an error, put zero
+			ans[hname] = 0
 
 	# Return result
 	return ans
