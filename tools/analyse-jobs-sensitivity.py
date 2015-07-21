@@ -115,6 +115,8 @@ def importFile(args):
 
 		except Exception as e:
 			# Continue even if we didn't find a generator.tune
+			sys.stderr.write("Unparsable generator.tune\n")
+			sys.stderr.flush()
 			pass
 
 		# Load histograms
@@ -159,7 +161,7 @@ def importFile(args):
 				try:
 
 					# Load
-					histoFile = f.extractfile(tuneDataInfo)
+					histoFile = f.extractfile(h)
 					hinst = Histogram.fromFLAT( histoFile )
 					histoFile.close()
 
@@ -167,7 +169,8 @@ def importFile(args):
 					histograms[hinst.name] = hinst
 
 				except Exception as e:
-					# Ignore I/O Errors
+					sys.stderr.write("Exception loading histogram %s\n" % h.name)
+					sys.stderr.flush()
 					pass
 
 			# We now have histograms
@@ -255,7 +258,8 @@ if __name__ == '__main__':
 				continue
 
 			# Debug
-			sys.stdout.write("Job %04i: " % numCompleted)
+			numCompleted += 1
+			sys.stdout.write("Job %04i/%04i: " % (numCompleted, numTotal))
 
 			# Validate job
 			if not q['flags']['valid']:
@@ -276,14 +280,8 @@ if __name__ == '__main__':
 				continue
 
 			# Process
-			sys.stdout.write("ok\n")
+			sys.stdout.write("ok (%i histos)\n" % len(q['histo']))
 			sys.stdout.flush()
-
-			# Display progress every once in a while
-			numCompleted += 1
-			if (numCompleted % 500) == 0:
-				sys.stdout.write("[%i%%]" % (int(100*numCompleted/numTotal)))
-				sys.stdout.flush()
 
 		# We are completed
 		csvFile.close()
