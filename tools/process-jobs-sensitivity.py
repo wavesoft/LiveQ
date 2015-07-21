@@ -99,10 +99,21 @@ if __name__ == "__main__":
 		print " !! Mismatch input/output file data"
 		sys.exit(1)
 
+	# Open interpreter
+	import code
+	code.interact(local=locals())
+
 	# Run analyses
 	print " = Running analyses"
 	for i in range(0, len(sens_histograms)):
 
+		# Find the appropriate number of samples
+
 		# Find sensitive parameters
-		Si = sobol.analyze(problem, Y, print_to_console=False)
+		Si = sobol.analyze(problem, sens_output[i], print_to_console=False)
+
+		# Find where this histogram is more sensitive at
+		sens = Si['S1']
+
+
 
