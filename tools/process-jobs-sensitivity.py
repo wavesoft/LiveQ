@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
 	# Check if we have directory
 	if not os.path.isfile(sys.argv[1]):
-		print "ERROR: Could not find model input file %s!" % sys.argv[2]
+		print "ERROR: Could not find model input file %s!" % sys.argv[1]
 		sys.exit(1)
 	if not os.path.isfile(sys.argv[2]):
 		print "ERROR: Could not find model output file %s!" % sys.argv[2]
@@ -50,9 +50,9 @@ if __name__ == "__main__":
 	fOut = sys.argv[2]
 
 	fParameters = "sens.parameters"
-	if (len(sys.argv) > 2):
+	if (len(sys.argv) > 3):
 		if not os.path.isfile(sys.argv[3]):
-			print "ERROR: Could not find parameters file %s!" % sys.argv[2]
+			print "ERROR: Could not find parameters file %s!" % sys.argv[3]
 			sys.exit(1)
 		fParameters = sys.argv[3]
 
