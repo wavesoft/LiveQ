@@ -255,7 +255,28 @@ if __name__ == '__main__':
 				continue
 
 			# Debug
-			sys.stdout.write("flags=%i" % q['flags'])
+			sys.stdout.write("Job %04i: " % numCompleted)
+
+			# Validate job
+			if not q['flags']['valid']:
+				sys.stdout.write("invalid\n")
+				sys.stdout.flush()
+				continue
+			if not q['flags']['jobdata']:
+				sys.stdout.write("missing jobdata\n")
+				sys.stdout.flush()
+				continue
+			if not q['flags']['tunedata']:
+				sys.stdout.write("missing tune data\n")
+				sys.stdout.flush()
+				continue
+			if not q['flags']['histo']:
+				sys.stdout.write("missing historams\n")
+				sys.stdout.flush()
+				continue
+
+			# Process
+			sys.stdout.write("ok\n")
 			sys.stdout.flush()
 
 			# Display progress every once in a while
