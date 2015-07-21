@@ -340,7 +340,7 @@ if __name__ == '__main__':
 			outFile.write( sortAndStringify(delta) + "\n" )
 
 			# Process
-			sys.stdout.write("ok (%i histos, %i params)\n" % (len(q['histo']), len(q['tune']))
+			sys.stdout.write( "ok (%i histos, %i params)\n" % (len(q['histo']), len(q['tune'])) )
 			sys.stdout.flush()
 
 		# We are completed
