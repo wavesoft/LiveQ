@@ -259,7 +259,7 @@ def sortAndStringify(dictionary):
 	for v in [ x[1] for x in sorted( dictionary.items(), key=lambda x: x[0] ) ]:
 		if ans:
 			ans += " "
-		ans += "%f" % v
+		ans += "%f" % float(v)
 
 	return ans
 
