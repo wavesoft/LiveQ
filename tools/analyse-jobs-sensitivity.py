@@ -137,9 +137,13 @@ def importFile(args):
 				# Wait for matching .dat AND .params file
 				if m.name.endswith(".dat") or m.name.endswith(".params"):
 
+					# Strip extension from name
+					parts = m.name.split(".")
+					baseName = ".".join(parts[0:len(parts)-1])
+
 					# If not candidate, place it
 					if not m.name in histo_candidate:
-						histo_candidate[m.name] = m
+						histo_candidate[baseName] = m
 
 					# If already candidate, we found a histo
 					else:
@@ -149,10 +153,10 @@ def importFile(args):
 						if m.name.endswith(".dat"):
 							histo.append( m )
 						else:
-							histo.append( histo_candidate[m.name] )
+							histo.append( histo_candidate[baseName] )
 
 						# Delete candidate record
-						del histo_candidate[m.name]
+						del histo_candidate[baseName]
 
 			# Load all histograms
 			for h in histo:
