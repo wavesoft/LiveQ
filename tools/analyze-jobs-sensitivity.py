@@ -92,7 +92,9 @@ def importFile( tarFile ):
 			jobDataFile = f.extractfile(jobDataInfo)
 			jobData = readConfig(jobDataFile)
 			jobDataFile.close()
-			flags["jobdata"] = True
+
+			# Set job data flag
+			flags["jobdata"] = bool(jobData)
 
 		except Exception as e:
 
@@ -111,7 +113,9 @@ def importFile( tarFile ):
 			tuneDataFile = f.extractfile(tuneDataInfo)
 			tuneData = readConfig(tuneDataFile)
 			tuneDataFile.close()
-			flags["tunedata"] = True
+
+			# Set tune data flag
+			flags["tunedata"] = bool(tuneData)
 
 		except Exception as e:
 
