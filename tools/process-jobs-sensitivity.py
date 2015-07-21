@@ -21,6 +21,8 @@
 import os
 import sys
 import json
+import code
+import time
 import traceback
 
 from SALib.sample import saltelli
@@ -28,6 +30,34 @@ from SALib.analyze import delta
 from SALib.test_functions import Ishigami
 from SALib.util import read_param_file
 import numpy as np
+
+from multiprocessing import Pool, Manager
+from threading import Thread, Lock
+
+#: Number of parallel workers
+NUM_WORKERS = 8
+
+def analyzeSampleSensitivity(args):
+	"""
+	Analysis map function
+	"""
+
+	index = args[0]
+	problem = args[1]
+	X = args[2]
+	Y = np.array(args[3])
+	queue = args[4]
+
+	# Find sensitive parameters
+	try:
+		S = delta.analyze(problem, X, Y, print_to_console=False)
+	except Exception as e:
+		print "Error: %s" % str(e)
+		queue.put( (index,None) )
+		return
+
+	# Return the 'most correlated' parameters
+	queue.put( (index, S['S1']) )
 
 if __name__ == "__main__":
 
@@ -87,17 +117,16 @@ if __name__ == "__main__":
 
 	# Load input
 	print " = Reading output"
-	with open(fIn, 'r') as f:
+	with open(fOut, 'r') as f:
 		for line in f:
 			# Read input
 			parts = line.strip().split(" ")
 			values = [ float(x) for x in parts ]
 
 			# Store output values to each output dimention
-			i = 0
-			for v in values:
-				sens_output[i].append(v)
-				i += 1
+			for i in range(0, len(values)):
+				sens_output[i].append(values[i])
+
 	print " -- Read %i samples" % len(sens_output[0])
 
 	# Validate
@@ -105,34 +134,53 @@ if __name__ == "__main__":
 		print " !! Mismatch input/output file data"
 		sys.exit(1)
 
-	# Run analyses
-	ans = {}
-	print " = Running analyses"
-	for i in range(0, len(sens_histograms)):
+	# Process the data with a multi-threaded worker queue
+	manager = Manager()
+	outputQueue = manager.Queue()
 
-		# Find the appropriate number of samples
-		Y = np.array(sens_output[i])
-		histoName = sens_histograms[i]
-		print " -- Correlations of %s" % histoName
+	# Run a pool of 4 workers
+	print " = Analyzing sensitivity with %i workers" % NUM_WORKERS
+	pool = Pool(NUM_WORKERS)
+	r = pool.map_async( 
+		analyzeSampleSensitivity, 
+		[(i, sens_problem, X, sens_output[i], outputQueue) for i in range(0, len(sens_output)) ]
+	)
 
-		# Find sensitive parameters
+	# Wait all workers to complete and print queue output
+	eCount = 0
+	ans = { }
+	while (not r.ready()) or (not outputQueue.empty()):
+
+		# Get element
 		try:
-			S = delta.analyze(sens_problem, X, Y, print_to_console=False)
-		except Exception as e:
-			traceback.print_exc()
-			import code
-			code.interact(local=locals())
+			# Drain when completed
+			(index, S1) = outputQueue.get(False)
+		except Exception:
+			# Queue is empty, retry in a while
+			time.sleep(0.1)
+			continue
 
-		S1 = S['S1']
+		# Get element count
+		eCount += 1
 
+		# Get histogram name
+		histoName = sens_histograms[index]
+		if S1 is None:
+			print " --[%03i/%03i] Error processing histogram %s" % (eCount, len(sens_output), histoName)
+			continue
+
+		# Log
+		print " --[%03i/%03i] Correlations of histogram %s" % (eCount, len(sens_output), histoName)
 
 		# Find the maximum correlation value
 		maxVal = np.max(S1)
+		maxItem = list(S1).index(maxVal)
+		print " --- Mostly correlated with %s (%f)" % ( sens_problem['names'][maxItem], maxVal )
 
 		# Find one or more reasonably correlated variables
 		corr = [ ]
 		for j in range(0,len(S1)):
-			if abs(S1[j] - maxVal) <= 0.15:
+			if abs(S1[j] - maxVal) <= 0.12:
 				print " --- Found with %s (%f)" % ( sens_problem['names'][j], S1[j] )
 				corr.append({
 						"property": sens_problem['names'][j],
@@ -140,7 +188,10 @@ if __name__ == "__main__":
 					})
 
 		# Store on analysis index
-		ans[histoName] = corr
+		ans[histoName] = {
+			"most": sens_problem['names'][maxItem],
+			"all": corr
+		}
 
 	# Print results
 	print "--------"
