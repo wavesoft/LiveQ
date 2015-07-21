@@ -20,6 +20,7 @@
 
 import os
 import sys
+import json
 
 from SALib.sample import saltelli
 from SALib.analyze import sobol
@@ -133,4 +134,6 @@ if __name__ == "__main__":
 		# Store on analysis index
 		ans[histoName] = corr
 
-
+	# Print results
+	print "--------"
+	print json.dumps(ans)
