@@ -21,9 +21,10 @@
 import os
 import sys
 import json
+import traceback
 
 from SALib.sample import saltelli
-from SALib.analyze import sobol
+from SALib.analyze import delta
 from SALib.test_functions import Ishigami
 from SALib.util import read_param_file
 import numpy as np
@@ -115,8 +116,15 @@ if __name__ == "__main__":
 		print " -- Correlations of %s" % histoName
 
 		# Find sensitive parameters
-		S = sobol.analyze(problem, sens_output[i], print_to_console=False)
+		try:
+			S = delta.analyze(sens_problem, X, Y, print_to_console=False)
+		except Exception as e:
+			traceback.print_exc()
+			import code
+			code.interact(local=locals())
+
 		S1 = S['S1']
+
 
 		# Find the maximum correlation value
 		maxVal = np.max(S1)
