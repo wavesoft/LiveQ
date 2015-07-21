@@ -54,14 +54,55 @@ if __name__ == "__main__":
 		fParameters = sys.argv[3]
 
 	# Load parameters
-	print " - Reading parameters"
+	print " = Reading parameters"
 	sens_problem = read_param_file('sens.parameters')
+	print " -- Using %i dimentions" % sens_problem['num_vars']
+
+	# Load histograms
+	print " = Reading histograms"
+	sens_histograms = []
+	with open('sens.histograms', 'r') as f:
+		for line in f:
+			sens_histograms.append( line.strip() )
+	print " -- Using %i histograms" % len(sens_histograms)
 
 	# Load input
-	print " - Reading input"
+	print " = Reading input"
+	sens_input = []
 	with open(fIn, 'r') as f:
-		while line = f.readline():
+		for line in f:
 			# Read input
-			parts = line.split(" ")
-			sens_input = [ float(x) for x in parts ]
+			parts = line.strip().split(" ")
+			sens_input.append([ float(x) for x in parts ])
+	print " -- Read %i samples" % len(sens_input)
+
+	# Create n-dimentional outout
+	sens_output = [ [] for x in sens_histograms ]
+
+	# Load input
+	print " = Reading output"
+	with open(fIn, 'r') as f:
+		for line in f:
+			# Read input
+			parts = line.strip().split(" ")
+			values = [ float(x) for x in parts ]
+
+			# Store output values to each output dimention
+			i = 0
+			for v in values:
+				sens_output[i].append(v)
+				i += 1
+	print " -- Read %i samples" % len(sens_output[0])
+
+	# Validate
+	if len(sens_output[0]) != len(sens_input):
+		print " !! Mismatch input/output file data"
+		sys.exit(1)
+
+	# Run analyses
+	print " = Running analyses"
+	for i in range(0, len(sens_histograms)):
+
+		# Find sensitive parameters
+		Si = sobol.analyze(problem, Y, print_to_console=False)
 

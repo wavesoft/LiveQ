@@ -319,7 +319,7 @@ if __name__ == '__main__':
 		outputQueue = manager.Queue()
 
 		# Run a pool of 4 workers
-		pool = Pool(4)
+		pool = Pool(8)
 		r = pool.map_async( 
 			importFileMap, 
 			[(x, outputQueue) for x in histogramQueue]
