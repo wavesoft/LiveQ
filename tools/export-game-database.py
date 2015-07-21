@@ -109,6 +109,9 @@ with open(sys.argv[1], 'w') as toFile:
 		Team.id == 1
 		))
 
+	# Dump tunable-to-observable correlations
+	SQLExport(toFile, TunableToObservable, TunableToObservable.select())
+
 	# Dump all tootr animations
 	SQLExport(toFile, TootrAnimation, TootrAnimation.select())
 
