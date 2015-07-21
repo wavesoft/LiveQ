@@ -366,6 +366,9 @@ if __name__ == '__main__':
 
 			# Calculate the goodness of fit between the two parameters
 			delta = deltaHistograms( refArchive['histo'], q['histo'] )
+			if not delta:
+				sys.stdout.write("mismatch histograms to reference\n")
+				sys.stdout.flush()
 
 			# Update input & output file
 			inFile.write( sortAndStringify(q['tune']) + "\n" )
