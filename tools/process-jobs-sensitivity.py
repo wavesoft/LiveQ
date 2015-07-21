@@ -103,23 +103,34 @@ if __name__ == "__main__":
 		print " !! Mismatch input/output file data"
 		sys.exit(1)
 
-	# Open interpreter
-	Y = np.array(sens_output[i])
-	import code
-	code.interact(local=locals())
-
 	# Run analyses
+	ans = {}
 	print " = Running analyses"
 	for i in range(0, len(sens_histograms)):
 
 		# Find the appropriate number of samples
 		Y = np.array(sens_output[i])
+		histoName = sens_histograms[i]
+		print " -- Correlations of %s" % histoName
 
 		# Find sensitive parameters
-		Si = sobol.analyze(problem, sens_output[i], print_to_console=False)
+		S = sobol.analyze(problem, sens_output[i], print_to_console=False)
+		S1 = S['S1']
 
-		# Find where this histogram is more sensitive at
-		sens = Si['S1']
+		# Find the maximum correlation value
+		maxVal = np.max(S1)
 
+		# Find one or more reasonably correlated variables
+		corr = [ ]
+		for j in range(0,len(S1)):
+			if abs(S1[j] - maxVal) <= 0.15:
+				print " --- Found with %s (%f)" % ( sens_problem['names'][j], S1[j] )
+				corr.append({
+						"property": sens_problem['names'][j],
+						"strength": S1[j]
+					})
+
+		# Store on analysis index
+		ans[histoName] = corr
 
 
