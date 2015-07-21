@@ -1,0 +1,15 @@
+TimeShower:alphaSvalue 0.125000 0.145000
+StringPT:sigma 0.125000 0.145000
+StringZ:aLund 0.125000 0.145000
+StringZ:bLund 0.125000 0.145000
+StringZ:aExtraDiquark 0.125000 0.145000
+StringFlav:ProbStoUD 0.125000 0.145000
+StringFlav:mesonUDvector 0.125000 0.145000
+StringFlav:mesonSvector 0.125000 0.145000
+StringFlav:etaSup 0.125000 0.145000
+StringFlav:mesonCvector 0.125000 0.145000
+StringFlav:mesonBvector 0.125000 0.145000
+StringFlav:probQQtoQ 0.125000 0.145000
+StringFlav:probQQ1toQQ0 0.125000 0.145000
+StringZ:rFactB 0.125000 0.145000
+StringFlav:probSQtoQQ 0.125000 0.145000

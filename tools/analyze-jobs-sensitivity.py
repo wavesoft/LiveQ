@@ -365,7 +365,9 @@ if __name__ == '__main__':
 
 			# Update input & output file
 			inFile.write( sortAndStringify(q['tune']) + "\n" )
+			inFile.flush()
 			outFile.write( sortAndStringify(delta) + "\n" )
+			outFile.flush()
 
 			# Process
 			sys.stdout.write( "ok (%i histos, %i params)\n" % (len(q['histo']), len(q['tune'])) )
