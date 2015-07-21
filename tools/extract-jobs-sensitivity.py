@@ -62,13 +62,12 @@ def readConfig(fileObject):
 	# Return 
 	return ans
 
-def importFile(args):
+def importFile( tarFile ):
 	"""
 	Open tarfile
 	"""
 
-	tarFile = args[0]
-	outputQueue = args[1]
+	# Initialize flags
 	flags = { "valid": False, "jobdata": False, "tunedata": False, "histo": False }
 
 	try:
@@ -80,8 +79,7 @@ def importFile(args):
 			f = tarfile.open(tarFile)
 			flags["valid"] = True
 		except Exception as e:
-			outputQueue.put({ "flags": flags })
-			return
+			return { "flags": flags }
 
 		# Get jobdata record from tar archive
 		jobData = None
@@ -177,30 +175,45 @@ def importFile(args):
 				except Exception as e:
 					sys.stderr.write("Exception loading histogram %s\n" % h.name)
 					sys.stderr.flush()
-					pass
 
 			# Check if we have histograms
 			flags['histo'] = (len(histograms) > 0)
 
 		except Exception as e:
-			outputQueue.put({ "flags": flags })
-			return
+			return { "flags": flags }
 
 		# Close tarfile
 		f.close()
 
 		# Prepare CSV Record
-		outputQueue.put({
+		return {
 				'exitcode': jobData['exitcode'],
 				'tune': tuneData,
 				'histo': histograms,
 				'flags': flags
-			})
+			}
 
 	except Exception as e:
+
+		# Trap unhandled exceptions
 		traceback.print_exc()
 		print e
-		return
+		return {
+				'flags': flags,
+				'exception': e
+			}
+
+def importFileMap(args):
+	"""
+	Open tarfile
+	"""
+
+	# Fetch arguments
+	tarFile = args[0]
+	outputQueue = args[1]
+
+	# Put on the output queue the imported file
+	outputQueue.put( importFile(tarFile) )
 
 def deltaHistograms(refHisto, runHisto):
 	"""
@@ -293,7 +306,7 @@ if __name__ == '__main__':
 		# Run a pool of 4 workers
 		pool = Pool(4)
 		r = pool.map_async( 
-			importFile, 
+			importFileMap, 
 			[(x, outputQueue) for x in histogramQueue]
 		)
 
