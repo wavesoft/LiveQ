@@ -95,7 +95,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		"""
 		Allow test4theory.cern.ch as domain 
 		"""
-		return bool(re.match(r'^.*?test4theory\.cern\.ch', origin))
+		return True
+		#return bool(re.match(r'^.*?test4theory\.cern\.ch', origin))
 
 	def allow_draft76(self):
 		"""
