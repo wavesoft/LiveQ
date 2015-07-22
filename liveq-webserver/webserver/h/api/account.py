@@ -489,6 +489,17 @@ class AccountInterface(APIInterface):
 					"data": self.user.getAchievementsTree()
 					})
 
+			##################################################
+			# Return details for the specified observables
+			# ------------------------------------------------
+			elif action == "observables.details":
+
+				# Return achievements tree
+				self.sendResponse({
+					"status": "ok",
+					"data": self.user.getObservableDetails( param['observables'] )
+					})
+
 		#######################################################
 		# Handle all exceptions
 		# -----------------------------------------------------

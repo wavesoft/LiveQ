@@ -42,6 +42,7 @@ from webserver.common.users.papers import HLUser_Papers
 from webserver.common.users.books import HLUser_Books
 from webserver.common.users.team import HLUser_Team
 from webserver.common.users.job import HLUser_Job
+from webserver.common.users.observables import HLUser_Observables
 
 #: The user hasn't visited this book
 BOOK_UNKNOWN = 0
@@ -51,7 +52,7 @@ BOOK_KNOWN = 1
 BOOK_MASTERED = 2
 
 
-class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job):
+class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observables):
 	"""
 	Collection of high-level operations on the user object
 	"""
