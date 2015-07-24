@@ -33,6 +33,9 @@ class HLUser_Observables:
 		if (type(observableList) is str) or (type(observableList) is unicode):
 			observableList = [observableList]
 
+		# Get known observables
+		knownTunables = self.getKnownTunables()
+
 		# Get all records
 		ans = []
 		for record in Observable.select().where( Observable.name << observableList ):
@@ -42,6 +45,10 @@ class HLUser_Observables:
 			for corr in TunableToObservable.select() \
 				.where( TunableToObservable.observable == record.name ) \
 				.order_by( TunableToObservable.importance.desc() ):
+
+				# Skip unknown tunables
+				if not corr.tunable in knownTunables:
+					continue
 
 				# Get correlation
 				correlations.append( corr.serialize() )
