@@ -155,6 +155,19 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		EMail.queue( user.email, "verify", macros=macros )
 
 	@staticmethod
+	def sendPasswordResetMail(user, pin):
+		"""
+		Send pasword reset e-mail to the specified user
+		"""
+
+		# Prepare e-mail macros
+		macros = user.serialize()
+		macros['pin'] = pin
+
+		# Send e-mail confirmation mail
+		EMail.queue( user.email, "passwordreset", macros=macros )
+
+	@staticmethod
 	def register(profile, activateUrl):
 		"""
 		Register a new user

@@ -201,7 +201,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		# If the action is not 'login' and we don't have a user, 
 		# conider this invalid
 		if not self.user:
-			if (action != "account.login") and (action != "account.register"):
+			if (action != "account.login") and (action != "account.register") and (action != "account.passwordReset"):
 				self.sendError("The user was not logged in!")
 				return
 
@@ -510,6 +510,68 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			# Let all interface know that we are ready
 			for i in self.interfaces:
 				i.ready()
+
+		# Reset password
+		elif action == "account.passwordReset":
+
+			# Fetch user entry
+			try:
+				email = str(param['email']).lower()
+				user = User.get(User.email == email)
+			except User.DoesNotExist:
+				self.sendAction('account.passwordReset.response', {
+						'status' : 'error',
+						'message': "A user with this e-mail does not exist!"
+					})
+				return
+
+			# If 'pin' is missing, create new pin and send e-mail
+			if not 'pin' in param:
+
+				# Create a random pin
+				pin = ""
+				for i in range(0,6):
+					pin += random.choice("01234567890")
+
+				# Store pin in state record
+				user.setState("passwordpin", pin)
+				user.save()
+
+				# Send password reset e-mail
+				HLUser.sendPasswordResetMail( user, pin )
+				self.sendAction('account.passwordReset.response', {
+						'status' : 'ok'
+					})
+
+			else:
+
+				# Validate pin
+				v_pin = user.getState("passwordpin")
+				if v_pin != param['pin']:
+					self.sendAction('account.passwordReset.response', {
+							'status' : 'error',
+							'message': "The password reset pin does not match!"
+						})
+					return
+
+				# Update password
+				user.password = hashlib.sha1("%s:%s" % (user.salt, param['password'])).hexdigest()
+				user.setState("passwordpin", "")
+				user.save()
+
+				# Success
+				self.user = HLUser(user)
+				self.sendAction('account.login.response', {
+						'status' : 'ok'
+					})
+				self.sendUserProfile()
+
+				# Listen for user events
+				self.user.receiveEvents( self.handleEvent )
+
+				# Let all interface know that we are ready
+				for i in self.interfaces:
+					i.ready()
 
 		# Handle logout
 		elif action == "account.logout":
