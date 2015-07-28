@@ -528,17 +528,20 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			# If 'pin' is missing, create new pin and send e-mail
 			if not 'pin' in param:
 
-				# Create a random pin
-				pin = ""
-				for i in range(0,6):
-					pin += random.choice("01234567890")
+				# Create a random pin if not already set
+				pin = user.getState("passwordpin", "")
+				if not pin:
+					for i in range(0,6):
+						pin += random.choice("01234567890")
 
-				# Store pin in state record
-				user.setState("passwordpin", pin)
-				user.save()
+					# Store pin in state record
+					user.setState("passwordpin", pin)
+					user.save()
 
-				# Send password reset e-mail
-				HLUser.sendPasswordResetMail( user, pin )
+					# Send password reset e-mail
+					HLUser.sendPasswordResetMail( user, pin )
+
+				# We are good
 				self.sendAction('account.passwordReset.response', {
 						'status' : 'ok'
 					})

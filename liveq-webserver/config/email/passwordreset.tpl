@@ -7,19 +7,19 @@ Virtual Atom Smasher - Password Reset
 
 ===TEXT===
 
-Dear %(name)s,
+Dear %(displayName)s,
 
 you have requested a password reset for your account. You will need the following one-time 
 pin number in order to complete this process.
 
-Your PIN number is: %s(pin)s
+Your PIN number is: %(pin)s
 
 ===HTML===
 
 <html lang="en">
 	<head></head>
 	<body>
-		<p>Dear %(name)s,</p>
+		<p>Dear %(displayName)s,</p>
 		<p>you have requested a password reset for your account. You will need the following one-time 
 		   pin number in order to complete this process.
 		</p>
