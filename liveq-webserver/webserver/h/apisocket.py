@@ -564,7 +564,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 				# Success
 				self.user = HLUser(user)
-				self.sendAction('account.login.response', {
+				self.sendAction('account.passwordReset.response', {
 						'status' : 'ok'
 					})
 				self.sendUserProfile()
