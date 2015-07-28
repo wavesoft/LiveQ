@@ -553,7 +553,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 				if v_pin != param['pin']:
 					self.sendAction('account.passwordReset.response', {
 							'status' : 'error',
-							'message': "The password reset pin does not match!"
+							'message': "The password reset pin is not valid!"
 						})
 					return
 
