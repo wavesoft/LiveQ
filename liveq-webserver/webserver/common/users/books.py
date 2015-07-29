@@ -252,7 +252,7 @@ class HLUser_Books:
 				book = Book.get( Book.id == k )
 
 				# Fire event
-				self.userEvents.send({
+				self.userEvents.send("alert", {
 					"type"   : "flash",
 					"icon"   : "flash-icons/books.png",
 					"title"  : "Mastered topic",
@@ -287,7 +287,7 @@ class HLUser_Books:
 			self.dbUser.save()
 
 			# Trigger notification
-			self.userEvents.send({
+			self.userEvents.send("alert", {
 				"type"   : "info",
 				"title"  : "Knowledge explored",
 				"message": "That's the first time you see the term <em>%s</em>" % bookName

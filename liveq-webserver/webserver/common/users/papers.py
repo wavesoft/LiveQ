@@ -70,7 +70,7 @@ class HLUser_Papers:
 		self.dbUser.save()
 
 		# Send notification
-		self.userEvents.send({
+		self.userEvents.send("alert", {
 			"type"   : "success",
 			"title"  : "Active paper",
 			"message": "You are now working on paper <em>%s</em>." % paper.title
@@ -485,7 +485,7 @@ class HLUser_Papers:
 		citation.save()
 
 		# Notify user
-		self.userEvents.send({
+		self.userEvents.send("alert", {
 			"type"   : "flash",
 			"icon"   : "flash-icons/books.png",
 			"title"  : "Cited paper",

@@ -59,11 +59,17 @@ class UserEvents:
 		# Return true if it was handled
 		return handled
 
-	def send(self, event, important=False):
+	def send(self, eventName, eventData={}, important=False):
 		"""
 		Push the specified event object to the event queue.
 		If the event is important it will also be stored on the user's queue.
 		"""
+
+		# Build an event
+		event = {
+			"name": eventName,
+			"data": eventData
+		}
 
 		# If nobody handled the message and it's important, push it on queue
 		if not self._trigger(event) and important:

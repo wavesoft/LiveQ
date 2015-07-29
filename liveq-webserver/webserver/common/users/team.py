@@ -46,15 +46,14 @@ class HLUser_Team:
 		self.resourceGroup = self.teamMembership.team.agentGroup
 
 		# Send notification
-		self.userEvents.send({
+		self.userEvents.send("alert", {
 			"type"   : "info",
 			"title"  : "Changed Team",
 			"message": "You are now member of the team <strong>%s</strong>" % self.teamMembership.team.name
 			})
 
 		# Inform server that the profile has changed
-		self.userEvents.send({
-			"type" 	 : "server",
+		self.userEvents.send("server", {
 			"event"	 : "profile.changed"
 			})
 

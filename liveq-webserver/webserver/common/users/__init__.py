@@ -418,7 +418,10 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 
 			# Forward record as-is for notification
 			del actionRecord['action']
-			self.userEvents.send(actionRecord)
+			self.userEvents.send(
+				actionRecord.get('name', ""), 
+				actionRecord.get('data', {})
+			)
 
 
 	###################################
@@ -778,8 +781,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						self.earnPoints(20, "for a perfect match")
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -789,7 +791,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/good.png",
 							"title"  : "Perfect Match",
@@ -804,8 +806,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						self.earnPoints(30, "for a perfect match, right away!")
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -815,7 +816,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/perfect.png",
 							"title"  : "Perfect Match",
@@ -830,8 +831,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						self.earnPoints(5, "for a better match!")
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -841,7 +841,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/good.png",
 							"title"  : "Amazing!",
@@ -856,8 +856,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						self.earnPoints(10, "for a good match")
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -867,7 +866,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/fair.png",
 							"title"  : "Good Match",
@@ -882,8 +881,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						self.earnPoints(2, "for a better match!")
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -893,7 +891,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/fair.png",
 							"title"  : "Good Match",
@@ -903,8 +901,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 					else:
 
 						# Send analytics helper
-						self.userEvents.send({
-							"type"	 : "analytics",
+						self.userEvents.send("analytics", {
 							"id"     : "tuning.values.validate",
 							"data"	 : {
 								"fit": fitAfter,
@@ -914,7 +911,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 							})
 
 						# Send notification
-						self.userEvents.send({
+						self.userEvents.send("alert", {
 							"type"   : "flash",
 							"icon"   : "models/bad.png",
 							"title"  : "Bad Match",
@@ -924,8 +921,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 				else:
 
 					# Send analytics helper
-					self.userEvents.send({
-						"type"	 : "analytics",
+					self.userEvents.send("analytics", {
 						"id"     : "tuning.values.validate",
 						"data"	 : {
 							"fit": fitAfter,
@@ -935,7 +931,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 						})
 
 					# Send notification
-					self.userEvents.send({
+					self.userEvents.send("alert", {
 						"type"   : "flash",
 						"icon"   : "models/acceptable.png",
 						"title"  : "Not good",
@@ -959,7 +955,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 				]
 
 				# Send event
-				self.userEvents.send({
+				self.userEvents.send("alert", {
 					"type"   : "info",
 					"title"  : "Job Queue",
 					"message": "Your job with id #%i %s" % (job.id, statusMsg[job.status])
@@ -980,7 +976,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 			if not pm['id'] in self.forumAcknowledgedPMs:
 
 				# Send event
-				self.userEvents.send({
+				self.userEvents.send("alert", {
 					"type"   : "info",
 					"title"  : "Private Message",
 					"message": "You have a new message from <strong>%s</strong> with subject <em>%s</em>" % (pm['from'], pm['subject'])
@@ -1054,8 +1050,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		self.dbUser.save()
 
 		# Inform server that the profile has changed
-		self.userEvents.send({
-			"type" 	 : "server",
+		self.userEvents.send("server", {
 			"event"	 : "profile.changed"
 			})
 
@@ -1283,16 +1278,21 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 			reason = " " + reason
 
 		# Fire event
-		self.userEvents.send({
+		self.userEvents.send("alert", {
 			"type"   : "success",
 			"icon"   : "flash-icons/labo.png",
 			"title"  : "Science Points",
 			"message": "You have just earned <em>%i</em> science points%s!" % (points, reason)
 			})
 
+		# Send credits notification
+		self.userEvents.send("credits", {
+			"value"	 : points,
+			"reason" : reason
+			})
+
 		# Inform server that the profile has changed
-		self.userEvents.send({
-			"type" 	 : "server",
+		self.userEvents.send("server", {
 			"event"	 : "profile.changed"
 			})
 
@@ -1376,7 +1376,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		self.dbUser.save()
 
 		# Fire event
-		self.userEvents.send({
+		self.userEvents.send("alert", {
 			"type"   : "flash",
 			"icon"   : "flash-icons/unlock.png",
 			"title"  : "Unlocked Stage",

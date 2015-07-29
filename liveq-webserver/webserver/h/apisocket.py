@@ -321,13 +321,16 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Push a notification to the user
 		"""
 
-		# Send notification action
-		self.sendAction("ui.notification", {
+		# Send an alert event
+		self.sendEvent({
+			"name": "alert",
+			"data": {
 				"type": msgType,
 				"title": title,
 				"icon": icon,
 				"message": message
-			})
+			}
+		})
 
 	def handleEvent(self, event):
 		"""
@@ -339,7 +342,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 			return
 
 		# Handle server-side events
-		if event['type'] == "server":
+		if event['name'] == "server":
 
 			# Check invalid event format
 			if not 'event' in event:
@@ -358,28 +361,8 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		Forward the specified event to the user
 		"""
 
-		# If we don't even have a message, that's a non-visual event
-		if not 'message' in event:
-
-			# Trigger non-visual action
-			self.sendAction("ui.command", event)
-
-		else:
-
-			# Extract parameters from the event and fire notification
-			n_message = event['message']
-			n_type = "info"
-			n_title = ""
-			n_icon = ""
-			if 'type' in event:
-				n_type = event['type']
-			if 'title' in event:
-				n_title = event['title']
-			if 'icon' in event:
-				n_icon = event['icon']
-
-			# Send notification
-			self.sendNotification( n_message, n_type, n_title, n_icon )
+		# Send server event
+		self.sendAction("ui.event", event)
 
 	def handleAction(self, action, param):
 		"""
