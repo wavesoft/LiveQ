@@ -338,7 +338,7 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		"""
 
 		# Check invalid event format
-		if not 'type' in event:
+		if not 'name' in event:
 			return
 
 		# Handle server-side events
