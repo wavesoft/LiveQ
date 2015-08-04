@@ -111,6 +111,13 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 		# Get user ID
 		self.remote_ip = self.request.remote_ip
+
+		# If we have x-forwarded-for, update remote IP accordingly
+		xheaders = self.request.headers.get("X-Forwarded-For", None)
+		if xheaders:
+			self.remote_ip = xheaders.split(",")[0]
+
+		# Log activity
 		self.logger.info("[%s] Socket open", self.remote_ip)
 
 		# We are connected
@@ -312,8 +319,14 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		if not self.user:
 			return
 
+		# Compile profile
+		profile = self.user.getProfile()
+
+		# Include client IP
+		profile['ip'] = self.remote_ip
+
 		# Compile and send user profile
-		self.sendAction('account.profile', self.user.getProfile())
+		self.sendAction('account.profile', profile)
 
 
 	def sendNotification(self, message, msgType="info", title="", icon=""):
