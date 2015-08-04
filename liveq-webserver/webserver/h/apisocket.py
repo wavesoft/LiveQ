@@ -104,23 +104,15 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 		"""
 		return True
 
-	def initialize(self, *args, **kwargs):
+	def open(self):
 		"""
-		Initialize websocket
+		Real-Time API socket open
 		"""
 
 		# Get remote IP
 		self.remote_ip = self.request.headers.get('X-Forwarded-For', self.request.headers.get('X-Real-Ip', self.request.remote_ip))
 		if ',' in self.remote_ip:
 			self.remote_ip = self.remote_ip.split(",")[0]
-
-		# Forward to websocket
-		super(tornado.websocket.WebSocketHandler, self).initialize(*args, **kwargs)
-
-	def open(self):
-		"""
-		Real-Time API socket open
-		"""
 
 		# Log activity
 		self.logger.info("[%s] Socket open", self.remote_ip)
