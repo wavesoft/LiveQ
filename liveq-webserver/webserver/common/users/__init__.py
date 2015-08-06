@@ -1532,5 +1532,6 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 			'papers'		: self.countPapers(),
 			'servertime'	: int(time.time()),
 			'team'			: teamName,
+			'playtime'		: self.activityCounter,
 			}
 
