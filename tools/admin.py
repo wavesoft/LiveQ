@@ -121,6 +121,62 @@ def user_from_uid(uid):
 # Administration Commands definition
 ################################################################
 
+@command("listawardusers", help="Find users deserving an award.")
+def cmd_find_listawardusers():
+	"""
+	Delete user 
+	"""
+
+	# Collect user information
+	users = [ ]
+
+	# Get all users
+	for user in User.select().where( User.analyticsProfile != None, User.playTime >= 3600000 ):
+
+		# Get properties
+		v = json.loads(user.variables)
+		first_time = v.get('first_time', {})
+		level_counters = user.getState("partcounters", {})
+
+		# Get level counters
+		total = 0
+		unlocked = 0
+		for k,v in level_counters.iteritems():
+			total += v.get("total", 0)
+			unlocked += v.get("unlocked", 0)
+
+		# Calculate percentage
+		if total == 0:
+			percent = 0
+		else:
+			percent = int(float(unlocked) * 100.0 / total)
+		preeval = 'learningeval.pre' in first_time
+		posteval = 'learningeval.post' in first_time
+
+		# Collect info
+		users.append({
+				"uid": user.id,
+				"email": user.email,
+				"name": user.displayName,
+				"percent": percent,
+				"preeval": preeval,
+				"posteval": posteval,
+				"points": user.totalPoints,
+				"playHours": "%0.2f" % (float(user.playTime) / 3600000.0),
+			})
+
+	# Sort users
+	users.sort(lambda a,b: (b['percent']*10 + int(float(b['playHours'])) + int(b['posteval'])*20000) - \
+						   (a['percent']*10 + int(float(a['playHours'])) + int(a['posteval'])*20000) )
+
+	# Print
+	print_table(
+		users,
+		["uid", "email", "name", "points", "percent", "playHours", "posteval"],
+		["ID", "EMail", "Name", "Points", "Completed %", "Play hours", "Post-Eval"]
+	)
+
+
 @command("deluser", args=["uid|email|name"], help="Delete the specified user from the database.")
 def cmd_deluser(uid):
 	"""
