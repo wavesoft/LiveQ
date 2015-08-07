@@ -17,7 +17,7 @@ To do so, just log-in again with your account in the game: http://test4theory.ce
 
 Having done that, pass by my office in 2/R-021 to collect your lunch ticket, before 6pm. If you can’t manage that, please contact me (ioannis.charalampidis@cern.ch) and we’ll arrange another pickup.
 
-Thank you again for your participation, and bon appétit!
+Thank you again for your participation, and bon appetit!
 
 Ioannis Charalampidis,
 Developer of Virtual Atom Smasher
@@ -36,7 +36,7 @@ Ps. This is an e-mail intended only for the CERN Summer Students, CERN OpenLab s
 		<p>There is one last thing we need you to do... please fill in the post-evaluation questionnaire so we can measure what you learnt by playing the game.</p>
 		<p>To do so, just log-in again with your account in the game: <a href="http://test4theory.cern.ch/vas">http://test4theory.cern.ch/vas</a></p>
 		<p>Having done that, pass by my office in <strong>2/R-021</strong> to collect your lunch ticket, before 6pm. If you can’t manage that, please contact me (<a href="mailto:ioannis.charalampidis@cern.ch">ioannis.charalampidis@cern.ch</a>) and we’ll arrange another pickup.</p>
-		<p>Thank you again for your participation, and bon appétit!</p>
+		<p>Thank you again for your participation, and bon app&eacute;tit!</p>
 		<p>Ioannis Charalampidis,<br />Developer of Virtual Atom Smasher</p>
 		<hr>
 		<p>
