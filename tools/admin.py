@@ -131,7 +131,9 @@ def cmd_find_listawardusers():
 	users = [ ]
 
 	# Get all users
-	for user in User.select().where( User.analyticsProfile != None, User.playTime >= 3600000 ):
+	#for user in User.select().where( User.analyticsProfile != None, User.playTime >= 3600000 ):
+	mark_date = datetime.datetime.strptime("2015-08-05 00:00:00", "%Y-%m-%d %H:%M:%S")
+	for user in User.select().where( User.analyticsProfile != None, User.created >= mark_date ):
 
 		# Get properties
 		v = json.loads(user.variables)
@@ -233,6 +235,7 @@ def cmd_batch_mail(template, target):
 
 		# Reset e-mail list
 		targets = []
+		macros = []
 
 		# Read e-mails from list
 		with open(target, 'r') as f:
@@ -249,8 +252,15 @@ def cmd_batch_mail(template, target):
 					print "WARNING: Skipping line '%s' because is not a valid e-mail" % line
 					continue
 
+				# Get the user account
+				try:
+					user = Users.get( User.email == line )
+				except USers.DoesNotExist:
+					print "WARNING: Skipping line '%s' because a VAS user with this e-mail does not exist" % line
+
 				# Put on list
 				targets.append( line )
+				macros.append( user.serialize() )
 
 	elif not '@' in target:
 		print "ERROR: '%s' is not a filename (list of e-mails) nor an e-mail address!"
@@ -270,6 +280,7 @@ def cmd_batch_mail(template, target):
 		tpl.subject,
 		tpl.text,
 		tpl.html,
+		macros,
 		)
 
 	# Inform user
