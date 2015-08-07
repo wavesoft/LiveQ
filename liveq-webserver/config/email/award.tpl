@@ -7,7 +7,7 @@ One step away from the lunch coupon!
 
 ===TEXT===
 
-Congratulations %(name)s!
+Congratulations %(displayName)s!
 
 You are among one of the top 20 people that participated in the "Free Lunch" challenge and got the highest score! This means that you are eligible for your *free lunch ticket* ! 
 
@@ -31,7 +31,7 @@ Ps. This is an e-mail intended only for the CERN Summer Students, CERN OpenLab s
 <html lang="en">
 	<head></head>
 	<body>
-		<p>Congratulations %(name)s!</p>
+		<p>Congratulations %(displayName)s!</p>
 		<p>You are among one of the top 20 people that participated in the <em>Free Lunch</em> challenge and got the highest score! This means that you are eligible for your <strong>free lunch ticket</strong>!</p>
 		<p>There is one last thing left to do... you will need to fill-in the post-evaluation questionnaire from which we can measure what did you learn by playing the game.</p>
 		<p>To do so, just log-in again with your account in the game: <a href="http://test4theory.cern.ch/vas">http://test4theory.cern.ch/vas</a></p>
