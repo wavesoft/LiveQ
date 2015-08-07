@@ -252,7 +252,7 @@ def cmd_batch_mail(template, target):
 					continue
 
 				# Put on list
-				targets.append( line )
+				targets.append( line.strip() )
 
 	elif not '@' in target:
 		print "ERROR: '%s' is not a filename (list of e-mails) nor an e-mail address!"
