@@ -235,7 +235,6 @@ def cmd_batch_mail(template, target):
 
 		# Reset e-mail list
 		targets = []
-		macros = []
 
 		# Read e-mails from list
 		with open(target, 'r') as f:
@@ -252,19 +251,24 @@ def cmd_batch_mail(template, target):
 					print "WARNING: Skipping line '%s' because is not a valid e-mail" % line
 					continue
 
-				# Get the user account
-				try:
-					user = Users.get( User.email == line )
-				except USers.DoesNotExist:
-					print "WARNING: Skipping line '%s' because a VAS user with this e-mail does not exist" % line
-
 				# Put on list
 				targets.append( line )
-				macros.append( user.serialize() )
 
 	elif not '@' in target:
 		print "ERROR: '%s' is not a filename (list of e-mails) nor an e-mail address!"
 		exit(1)
+
+	# Compile macros from targets
+	macros = []
+	for t in targets:
+
+		# Get the user account
+		try:
+			user = Users.get( User.email == line )
+			macros.append( user.serialize() )
+		except USers.DoesNotExist:
+			print "WARNING: Using dummy record for target '%s' because a VAS user with this e-mail does not exist" % line
+			macros.append( { 'displayName': 'player' } )
 
 	# Inform about submission
 	print "INFO: Sending e-mails to %i target(s)" % len(targets)
