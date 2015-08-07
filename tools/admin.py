@@ -266,7 +266,7 @@ def cmd_batch_mail(template, target):
 		try:
 			user = Users.get( User.email == line )
 			macros.append( user.serialize() )
-		except USers.DoesNotExist:
+		except Users.DoesNotExist:
 			print "WARNING: Using dummy record for target '%s' because a VAS user with this e-mail does not exist" % line
 			macros.append( { 'displayName': 'player' } )
 
