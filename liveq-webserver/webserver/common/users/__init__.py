@@ -363,6 +363,9 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 			self.userEvents.removeListener( self.userEventsListener )
 		self.userEvents.release()
 
+		# Fetch updates that may have happened from outside
+		self.reload()
+
 		# Commit activity at cleanup
 		self.dbUser.playTime = self.activityCounter
 		self.dbUser.save()
