@@ -14,6 +14,19 @@
       <p>The following table contains all the different tunables currently registered in the database.</p>
       <p> <a href="{{ reverse_url("config.tunables.edit") }}" class="btn btn-success" > <span class="glyphicon glyphicon-plus"></span> Add new</a></p>
       <hr />
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="labSelector" class="col-sm-2 control-label">Filter by lab:</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="labSelector" onchange="var l=''+window.location;window.location=(l.indexOf('lab=')<0)?('?lab='+this.value):(l.replace(/lab=[0-9]*/i,'lab='+this.value))">
+              <option value="">All</option>
+              {% for l in labs %}
+              <option value="{{l.id}}" {% if str(l.id) == lab %}selected="selected"{% end %}>{{l.name}}</option>
+              {% end %}
+            </select>
+          </div>
+        </div>
+      </div>
       <table class="table table-condensed" width="100%">
         <tr>
           <th width="70">Tunable ID</th>
@@ -25,7 +38,7 @@
         {% for tunable in tunables %}
         <tr>
           <td>{{ tunable['id'] }}</td>
-          <td>{{ tunable['short'] }}</td>
+          <td>{% raw tunable['short'] %}</td>
           <td>{{ tunable['book'] }}</td>
           <td>{{ tunable['name'] }}</td>
           <td><a href="{{ reverse_url("config.tunables.edit") }}?tunable={{ tunable['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>

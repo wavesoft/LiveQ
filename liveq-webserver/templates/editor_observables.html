@@ -14,25 +14,38 @@
       <p>The following table contains all the different observables (Histograms) currently registered in the database.</p>
       <p> <a href="{{ reverse_url("config.observables.edit") }}" class="btn btn-success" > <span class="glyphicon glyphicon-plus"></span> Add new</a></p>
       <hr />
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label for="labSelector" class="col-sm-2 control-label">Filter by lab:</label>
+          <div class="col-sm-10">
+            <select class="form-control" id="labSelector" onchange="var l=''+window.location;window.location=(l.indexOf('lab=')<0)?('?lab='+this.value):(l.replace(/lab=[0-9]*/i,'lab='+this.value))">
+              <option value="">All</option>
+              {% for l in labs %}
+              <option value="{{l.id}}" {% if str(l.id) == lab %}selected="selected"{% end %}>{{l.name}}</option>
+              {% end %}
+            </select>
+          </div>
+        </div>
+      </div>
       <table class="table table-condensed" width="100%">
         <tr>
-          <th width="70"><a href="?sort=id">Observable ID</a></th>
-          <th width="100"><a href="?sort=short">Short</a></th>
-          <th width="200"><a href="?sort=book">Book</a></th>
-          <th><a href="?sort=name">Name</a></th>
-          <th><a href="?sort=process">Proc</a></th>
-          <th><a href="?sort=cuts">Cuts</a></th>
+          <th width="70"><a href="?sort=id&amp;lab={{ lab }}">Observable ID</a></th>
+          <th width="100"><a href="?sort=short&amp;lab={{ lab }}">Short</a></th>
+          <th width="200"><a href="?sort=book&amp;lab={{ lab }}">Book</a></th>
+          <th><a href="?sort=name&amp;lab={{ lab }}">Name</a></th>
+          <th><a href="?sort=process&amp;lab={{ lab }}">Proc</a></th>
+          <th><a href="?sort=cuts&amp;lab={{ lab }}">Cuts</a></th>
           <th width="200">Actions</th>
         </tr>
         {% for observable in observables %}
         <tr>
           <td>{{ observable['id'] }}</td>
-          <td>{{ observable['short'] }}</td>
+          <td>{% raw observable['short'] %}</td>
           <td>{{ observable['book'] }}</td>
           <td>{{ observable['name'] }}</td>
           <td>{{ observable['process'] }}</td>
           <td>{{ observable['cuts'] }}</td>
-          <td><a href="{{ reverse_url("config.observables.edit") }}?observable={{ observable['id'] }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
+          <td><a href="{{ reverse_url("config.observables.edit") }}?observable={{ observable['id'] }}&amp;lab={{ lab }}" class="btn btn-sm btn-info" > <span class="glyphicon glyphicon-pencil"></span> Edit</a></td>
         </tr>
         {% end %}
       </table>

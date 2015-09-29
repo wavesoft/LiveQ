@@ -24,7 +24,7 @@ import tornado.web
 
 from webserver.config import Config
 from webserver.common.navbar import getNavbarData
-from webserver.models import Book, BookQuestion, Tunable, Observable, MachinePart, MachinePartStage
+from webserver.models import Lab, Book, BookQuestion, Tunable, Observable, MachinePart, MachinePartStage
 
 class ConfigHandler(tornado.web.RequestHandler):
 	"""
@@ -32,7 +32,9 @@ class ConfigHandler(tornado.web.RequestHandler):
 	"""
 
 	def get(self):
-		self.render("configure.html", navbar=getNavbarData())
+		self.render("configure.html", 
+			navbar=getNavbarData()
+			)
 
 class ConfigBooksHandler(tornado.web.RequestHandler):
 	"""
@@ -57,7 +59,7 @@ class ConfigBooksHandler(tornado.web.RequestHandler):
 		# Render
 		self.render("editor_books.html", 
 			navbar=getNavbarData(),
-			books=books
+			books=books,
 		)
 
 class ConfigEditBookHandler(tornado.web.RequestHandler):
@@ -85,7 +87,7 @@ class ConfigEditBookHandler(tornado.web.RequestHandler):
 		self.render("editor_books_edit.html", 
 			navbar=getNavbarData(),
 			book=book,
-			book_questions=json.dumps( book_questions )
+			book_questions=json.dumps( book_questions ),
 			)
 
 	def post(self):
@@ -177,17 +179,29 @@ class ConfigTunablesHandler(tornado.web.RequestHandler):
 
 	def get(self):
 
-		# Get all tunables
-		tunables = []
-		for b in Tunable.select().order_by( Tunable.book.desc() ).dicts():
+		# Pick the active lab
+		lab = self.get_argument("lab", "")
+		if not lab:
+			lab = self.get_cookie("lab", "")
+		else:
+			self.set_cookie("lab", lab)
 
-			# Collect
-			tunables.append(b)
+		# Prepare query
+		query = Tunable.select().order_by( Tunable.book.desc() )
+
+		# Apply lab filter
+		if lab:
+
+			# Get names of observables in the lab
+			labInst = Lab.get(id=int(lab))
+			query = query.where( Tunable.name << labInst.getTunableNames() )
 
 		# Render
 		self.render("editor_tunables.html", 
 			navbar=getNavbarData(),
-			tunables=tunables
+			tunables=query.dicts(),
+			labs=Lab.select(),
+			lab=lab,
 		)
 
 class ConfigEditTunableHandler(tornado.web.RequestHandler):
@@ -279,6 +293,13 @@ class ConfigObservablesHandler(tornado.web.RequestHandler):
 
 	def get(self):
 
+		# Pick the active lab
+		lab = self.get_argument("lab", "")
+		if not lab:
+			lab = self.get_cookie("lab", "")
+		else:
+			self.set_cookie("lab", lab)
+
 		# Pick sort key
 		sort = self.get_argument("sort", "book")
 		try:
@@ -287,17 +308,22 @@ class ConfigObservablesHandler(tornado.web.RequestHandler):
 			sort = "book"
 			order_key = getattr( Observable, sort )
 
-		# Get all tunables
-		observables = []
-		for b in Observable.select().order_by( order_key.desc() ).dicts():
+		# Prepare query
+		query = Observable.select().order_by( order_key.desc() )
 
-			# Collect
-			observables.append(b)
+		# Apply lab filter
+		if lab:
+
+			# Get names of observables in the lab
+			labInst = Lab.get(id=int(lab))
+			query = query.where( Observable.name << labInst.getHistograms() )
 
 		# Render
 		self.render("editor_observables.html", 
 			navbar=getNavbarData(),
-			observables=observables
+			observables=query.dicts(),
+			labs=Lab.select(),
+			lab=lab,
 		)
 
 class ConfigEditObservableHandler(tornado.web.RequestHandler):
