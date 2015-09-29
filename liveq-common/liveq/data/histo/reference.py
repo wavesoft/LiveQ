@@ -24,86 +24,110 @@ import traceback
 from liveq.config.histograms import HistogramsConfig
 from liveq.data.histo import Histogram
 
-#: Cache of reference histograms
-HISTOREF_CACHE = {}
-
-def loadReferenceHistogram(histoPath):
+class ReferenceHistograms:
 	"""
-	Load reference data for the given histogram
-	"""
-	global HISTOREF_CACHE
-
-	# Strip heading '/REF'
-	if histoPath.startswith("/REF"):
-		histoPath = histoPath[4:]
-
-	# Strip heading slash
-	if histoPath[0] == "/":
-		histoPath = histoPath[1:]
-
-	# Convert slashes to underscores
-	histoPath = histoPath.replace("/", "_")
-
-	# If cached, use now
-	if histoPath in HISTOREF_CACHE:
-		return HISTOREF_CACHE[histoPath]
-
-	# Lookup if such historam exists
-	histoPath = "%s/%s.dat" % (HistogramsConfig.HISTOREF_PATH, histoPath)
-	if not os.path.isfile(histoPath):
-		print "%s not found" % histoPath
-		return None
-
-	# Load & Normalize histogram
-	histo = Histogram.fromFLAT( histoPath )
-	histo.normalize(copy=False)
-
-	# Store it on cache
-	HISTOREF_CACHE[histoPath] = histo
-	return histo
-
-def histoChi2Reference(histo):
-	"""
-	Compare the histogram specified with the reference version
-	of the histogram and return the chi2 fit.
+	A class that provides comparison against a set of reference histograms
+	stored in a directory.
 	"""
 
-	# If histogram is empty return 0.0
-	if (histo.bins == 0):
-		return 0.0
+	def __init__(self, baseDirectory):
+		"""
+		Initialize the reference histograms located in the specified path
+		"""
 
-	# Get reference histogram
-	ref = loadReferenceHistogram( histo.name )
-	if not ref:
-		return 0.0
+		#: The base directory where the histograms are located
+		self.baseDirectory = baseDirectory
 
-	# Return chi2 fit to reference
-	try:
-		normHisto = histo.toHistogram().normalize()
-		return normHisto.chi2ToReference( ref )
-	except Exception as e:
-		logging.error("Exception while calculating chi2 of histogram %s: %s" % (str(histo.name), str(e)))
-		traceback.print_exc()
-		return 0.0
+		#: Cached histogram objects for rapid accessing
+		self.CACHE = { }
 
-def collectionChi2Reference(histoCollection):
-	"""
-	Compare all histograms of the specified collection and
-	return the chi-squared score
-	"""
+	def loadReferenceHistogram(self, histoPath):
+		"""
+		Return the histogram object for the specified AIDA Path
+		"""
 
-	# Prepare properties
-	chi2sum = 0
-	chi2count = 0
-	chi2list = {}
+		# Strip heading '/REF'
+		if histoPath.startswith("/REF"):
+			histoPath = histoPath[4:]
 
-	# Iterate in the collection
-	for histo in histoCollection.values():
-		chi2value = histoChi2Reference( histo )
-		chi2list[histo.name] = chi2value
-		if chi2value > 0.0:
-			chi2sum += chi2value
-			chi2count += 1
+		# Strip heading slash
+		if histoPath[0] == "/":
+			histoPath = histoPath[1:]
 
-	# Return average and list
-	return (chi2sum / chi2count, chi2list)
+		# Convert slashes to underscores
+		histoPath = histoPath.replace("/", "_")
+
+		# If cached, use now
+		if histoPath in self.CACHE:
+			return self.CACHE[histoPath]
+
+		# Lookup if such historam exists
+		histoPath = "%s/%s.dat" % (self.baseDirectory, histoPath)
+		if not os.path.isfile(histoPath):
+			print "%s not found" % histoPath
+			return None
+
+		# Load & Normalize histogram
+		histo = Histogram.fromFLAT( histoPath )
+		histo.normalize(copy=False)
+
+		# Store it on cache
+		self.CACHE[histoPath] = histo
+		return histo
+
+	def histoChi2Reference(self, histo):
+		"""
+		Compare the histogram specified with the reference version
+		of the histogram and return the chi2 fit.
+		"""
+
+		# If histogram is empty return 0.0
+		if (histo.bins == 0):
+			return 0.0
+
+		# Get reference histogram
+		ref = self.loadReferenceHistogram( histo.name )
+		if not ref:
+			return 0.0
+
+		# Return chi2 fit to reference
+		try:
+			if not isinstance(histo, Histogram):
+				normHisto = histo.toHistogram().normalize()
+			else:
+				normHisto = histo.copy().normalize()
+			return normHisto.chi2ToReference( ref )
+		except Exception as e:
+			logging.error("Exception while calculating chi2 of histogram %s: %s" % (str(histo.name), str(e)))
+			traceback.print_exc()
+			return 0.0
+
+	def collectionChi2Reference(self, histoCollection):
+		"""
+		Compare all histograms of the specified collection and
+		return the chi-squared score
+		"""
+
+		# Prepare properties
+		chi2sum = 0
+		chi2count = 0
+		chi2list = {}
+
+		# Iterate in the collection
+		for histo in histoCollection.values():
+			chi2value = self.histoChi2Reference( histo )
+			chi2list[histo.name] = chi2value
+			if chi2value > 0.0:
+				chi2sum += chi2value
+				chi2count += 1
+
+		# Return average and list
+		return (chi2sum / chi2count, chi2list)
+
+#: Create the default histogram feren
+DEFAULT = ReferenceHistograms( HistogramsConfig.HISTOREF_PATH )
+
+# Keep a reference of the default functions
+loadReferenceHistogram = DEFAULT.loadReferenceHistogram
+histoChi2Reference = DEFAULT.histoChi2Reference
+collectionChi2Reference = DEFAULT.collectionChi2Reference
