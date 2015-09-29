@@ -523,12 +523,19 @@ class APISocketHandler(tornado.websocket.WebSocketHandler):
 
 				# Create a random pin if not already set
 				pin = user.getState("passwordpin", "")
-				if not pin:
+				pinDate = user.getState("passwordpindate", time.time())
+
+				# Generate new pin once per hour
+				if (not pin) or (time.time() - pinDate >= 3600):
+
+					# Create new pin
+					pin = ""
 					for i in range(0,6):
 						pin += random.choice("01234567890")
 
 					# Store pin in state record
 					user.setState("passwordpin", pin)
+					user.setState("passwordpindate", time.time())
 					user.save()
 
 					# Send password reset e-mail
