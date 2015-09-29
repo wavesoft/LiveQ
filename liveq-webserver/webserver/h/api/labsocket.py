@@ -236,17 +236,37 @@ class LabSocketInterface(APIInterface):
 			if ans['result'] == 'error':
 				return self.sendError("Unable to place a job request: %s" % ans['error'])
 
-			# Send status
-			self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
+			# Check if this job is already calculated
+			if ans['result'] == 'exists':
 
-			# The job started, switch to that job
-			self.switchToJob( ans['jid'] )			
+				# Send configuration frame if not already sent
+				if not self.sentConfigFrame:
+					self.sendConfigurationFrame()
 
-			# Send response
-			self.sendResponse({ 
-					"status": "ok",
-					"jid": ans['jid']
+				# Send data
+				self.onBusData( ans )
+
+				# Return details of the specified job
+				self.sendResponse({ 
+					"status": "ok"
 					})
+
+				# Forward event to the user socket
+				self.sendAction( "job.exists", { } )
+
+			else:
+
+				# Send status
+				self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
+
+				# The job started, switch to that job
+				self.switchToJob( ans['jid'] )			
+
+				# Send response
+				self.sendResponse({ 
+						"status": "ok",
+						"jid": ans['jid']
+						})
 
 		##################################################
 		# Estimate the results of the specified job
