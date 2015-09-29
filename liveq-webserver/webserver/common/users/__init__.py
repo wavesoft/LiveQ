@@ -633,7 +633,6 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		# Update 'leaf_achievements' state
 		self.dbUser.setState("leaf_achievements", leaf_achievements_id)
 
-
 	def updateCache_Books(self):
 		"""
 		Update the user's status on each book
@@ -1302,6 +1301,48 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 	###################################
 	# In-game information queries
 	###################################
+
+	def getLevels(self):
+		"""
+		Return a list of Level objects, along with it's status information
+		from the Level query
+		"""
+
+		# Fetch all levels
+		levels = Level.select().order_by('order')[:]
+
+		# Compile user-levels lookup table
+		user_state = { }
+		for l in UserLevel.select().where(
+					UserLevel.user == self.dbUser,
+					UserLevel.level << levels
+				):
+			user_state[l.level.id] = l
+
+		# Calculate level index
+		index = 1
+
+		# Compile a unified response
+		response = []
+		for l in levels:
+
+			# Serialize record
+			r = l.serialize()
+			r['status'] = None
+
+			# Update level index
+			r['index'] = index
+			index += 1
+
+			# Check if we have a user status
+			if l.id in user_state:
+				r['status'] = user_state[l.id].serialize()
+
+			# Store in responses
+			response.append(r)
+
+		# Return level
+		return response
 
 	def updateActivityCounter(self, counter):
 		"""

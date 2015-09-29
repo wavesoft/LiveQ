@@ -180,8 +180,8 @@ class ConfigTunablesHandler(tornado.web.RequestHandler):
 	def get(self):
 
 		# Pick the active lab
-		lab = self.get_argument("lab", "")
-		if not lab:
+		lab = self.get_argument("lab", None)
+		if lab is None:
 			lab = self.get_cookie("lab", "")
 		else:
 			self.set_cookie("lab", lab)
@@ -294,8 +294,8 @@ class ConfigObservablesHandler(tornado.web.RequestHandler):
 	def get(self):
 
 		# Pick the active lab
-		lab = self.get_argument("lab", "")
-		if not lab:
+		lab = self.get_argument("lab", None)
+		if lab is None:
 			lab = self.get_cookie("lab", "")
 		else:
 			self.set_cookie("lab", lab)

@@ -444,6 +444,17 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Get user's levels, including their status
+			# ------------------------------------------------
+			elif action == "levels.enum":
+
+				# Return details
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getLevels()
+					})
+
+			##################################################
 			# Get machine parts
 			# ------------------------------------------------
 			elif action == "parts.details":

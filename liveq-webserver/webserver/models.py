@@ -46,7 +46,7 @@ def createWebserverTables():
 				   AnalyticsEvent, Achievement, Definition, FirstTime, TootrAnimation,
 				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation,
 				   MachinePart, MachinePartStage, MachinePartStageUnlock,
-				   Questionnaire, QuestionnaireResponses ]:
+				   Questionnaire, QuestionnaireResponses, Level, UserLevel ]:
 
 		# Do nothing if the table is already there
 		table.create_table(True)
@@ -86,7 +86,7 @@ class AnalyticsProfile(BaseModel):
 
 	def save(self, *args, **kwargs):
 		"""
-		Auto-update lastEvent on save
+		Auto-update 'lastEvent' field on save
 		"""
 		self.lastEvent = datetime.datetime.now()
 		return super(AnalyticsProfile, self).save(*args, **kwargs)
@@ -291,7 +291,7 @@ class User(BaseModel):
 	# Game elements
 	# -----------------------------------
 
-	#: Currently ctive lab
+	#: Currently active lab
 	lab = ForeignKeyField(Lab)
 
 	#: User science points
@@ -710,7 +710,7 @@ class Paper(BaseModel):
 
 	def save(self, *args, **kwargs):
 		"""
-		Auto-update lastEdited on save
+		Auto-update 'lastEdited' field on save
 		"""
 		self.lastEdited = datetime.datetime.now()
 		return super(Paper, self).save(*args, **kwargs)
@@ -969,7 +969,7 @@ class BookQuestionAnswer(BaseModel):
 
 	def save(self, *args, **kwargs):
 		"""
-		Auto-update answerTimestamp on save
+		Auto-update 'answerTimestamp' field on save
 		"""
 		self.answerTimestamp = datetime.datetime.now()
 		return super(BookQuestionAnswer, self).save(*args, **kwargs)
@@ -1137,6 +1137,101 @@ class QuestionnaireResponses(BaseModel):
 
 		# Update responses
 		self.responses = json.dumps(responses)
+
+
+class Level(BaseModel):
+	"""
+	A linear leveling system level
+	"""
+
+	#: JSON Fields in this model
+	JSON_FIELDS = ['features']
+
+	#: The level order
+	order = IntegerField(default=0)
+
+	#: The enabled tunables in this level
+	tunables = TextField(default="")
+
+	#: The enabled observables in this level
+	observables = TextField(default="")
+
+	#: The unlockable features with this level
+	features = TextField(default="{}")
+
+	#: The lab to use for this level
+	lab = ForeignKeyField(Lab)
+
+	def getTunables(self):
+		"""
+		Split tunables
+		"""
+		if not self.tunables:
+			return []
+		return self.tunables.split(",")
+
+	def setTunables(self, tunables=[]):
+		"""
+		Update tunables
+		"""
+		self.tunables = ",".join(tunables)
+
+	def getObservables(self):
+		"""
+		Split observables
+		"""
+		if not self.observables:
+			return []
+		return self.observables.split(",")
+
+	def setObservables(self, observables=[]):
+		"""
+		Update observables
+		"""
+		self.observables = ",".join(observables)
+
+	def getFeatures(self):
+		"""
+		Return the unlockable features
+		"""	
+		try:
+			return json.loads(self.features)
+		except ValueError as e:
+			logging.error("ValueError parsing 'features' of model '%s', key %s" % (self.__class__.__name__, self.id))
+			return {}
+
+	def setFeatures(self, data):
+		"""
+		Define the unlockable features
+		"""
+		self.features = json.dumps(data)
+
+class UserLevel(BaseModel):
+	"""
+	User score on each level
+	"""
+
+	#: The related user
+	user = ForeignKeyField(User)
+
+	#: The related level
+	level = ForeignKeyField(Level)
+
+	#: The date it was unlocked
+	created = DateTimeField(default=datetime.datetime.now)
+
+	#: Last change in this level
+	updated = DateTimeField(default=datetime.datetime.now)
+
+	#: The user's score in this level
+	score = FloatField(default=0.0)
+
+	def save(self, *args, **kwargs):
+		"""
+		Auto-update 'updated' field on save
+		"""
+		self.updated = datetime.datetime.now()
+		return super(AnalyticsProfile, self).save(*args, **kwargs)
 
 
 # -----------------------------------------------------
