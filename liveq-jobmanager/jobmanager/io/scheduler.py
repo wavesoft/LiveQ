@@ -109,6 +109,10 @@ class GroupResources:
 		Return TRUE if it's possible to squeeze another job
 		"""
 
+		# If we have no, forget about it
+		if self.total == 0:
+			return False
+
 		# If we have free, it can fit
 		if self.free > 0:
 			return True
@@ -282,7 +286,9 @@ def popQueuedJob():
 
 		# Otherwise we do have an instance in place
 		logger.info("Popped job %s from queue '%s'" % (job.id, job.group))
-		lastGroupIndex = gid
+
+		# Schedule next group ID & Return job
+		lastGroupIndex = gid + 1
 		return job
 
 
