@@ -18,7 +18,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-# This script imports all Tunables from a Pythia8 installation
+# Common administration interface for platform operations
 
 # ----------
 import os
@@ -31,7 +31,6 @@ sys.path.append("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.r
 import traceback
 import json
 import os
-import util.pythia as pythia
 
 from util import print_table
 from util.wsconfig import Config
@@ -362,6 +361,139 @@ def cmd_workers_purge_idle():
 
 	# Get all idle workers
 	q = Agent.lastActivity
+
+@command("console", help="Start a python console with the environment initialized.")
+def cmd_console():
+	"""
+	Start python console
+	"""
+
+	# Open interpreter
+	import code
+	code.interact(local=locals())
+
+@command("exportdb", args=["file.sql"], help="Export the game database in the specified SQL file.")
+def cmd_exportdb(filename):
+	"""
+	Dump game database in an SQL file
+	"""
+
+	import time
+	from util.peeweedump import SQLExport
+
+	# Start dumping
+	with open(filename, 'w') as toFile:
+
+		# Add a comment regarding the model name
+		toFile.write("-- \n")
+		toFile.write("-- Virtual Atom Smasher Data File\n")
+		toFile.write("-- \n")
+		toFile.write("-- Exported at %s\n" % time.strftime("%Y-%m-%d %H:%M:%S"))
+		toFile.write("-- \n\n")
+
+		# Import configuration
+		toFile.write("SET NAMES utf8;\n");
+		toFile.write("SET FOREIGN_KEY_CHECKS = 0;\n\n");
+
+		# Public agent group
+		SQLExport(toFile, AgentGroup, AgentGroup.select().where(
+			AgentGroup.id == 1
+			))
+
+		# Dump all books
+		SQLExport(toFile, Book, Book.select())
+
+		# Dump all book questions
+		SQLExport(toFile, BookQuestion, BookQuestion.select())
+
+		# Dump all definitions
+		SQLExport(toFile, Definition, Definition.select())
+
+		# Dump all definitions
+		SQLExport(toFile, FirstTime, FirstTime.select())
+
+		# Dump all labs
+		SQLExport(toFile, Lab, Lab.select())
+
+		# Dump all machine parts
+		SQLExport(toFile, MachinePart, MachinePart.select())
+
+		# Dump all machine parts
+		SQLExport(toFile, MachinePartStage, MachinePartStage.select())
+
+		# Dump all observables
+		SQLExport(toFile, Observable, Observable.select())
+
+		# Dump newbie team
+		SQLExport(toFile, Team, Team.select().where(
+			Team.id == 1
+			))
+
+		# Dump tunable-to-observable correlations
+		SQLExport(toFile, TunableToObservable, TunableToObservable.select())
+
+		# Dump all tootr animations
+		SQLExport(toFile, TootrAnimation, TootrAnimation.select())
+
+		# Dump all tootr interface tutorials
+		SQLExport(toFile, TootrInterfaceTutorial, TootrInterfaceTutorial.select())
+
+		# Dump all tunables
+		SQLExport(toFile, Tunable, Tunable.select())
+
+		# Export Questionnaires
+		SQLExport(toFile, Questionnaire, Questionnaire.select())
+
+@command("updatedb", help="Apply outstanding database patches.")
+def cmd_updatedb():
+	"""
+	Apply outstanding database patches
+	"""
+
+	from data.schemapatches import SchemaPatches
+	from playhouse.migrate import MySQLMigrator
+
+	# Identify the current database version
+	try:
+		verInfo = DBInfo.get(key="version")
+	except DBInfo.DoesNotExist:
+		verInfo = DBInfo.create(
+			key="version",
+			val="0"
+			)
+	dbVersion = int(verInfo.val)
+
+	# Get the schema patches
+	patches = SchemaPatches()
+
+	# Sort all the patch_XXXX functions from
+	# the schema patches class
+	functions = sorted([x for x in dir(patches) if x[0:6] == "patch_"], key=lambda x: int(x[6:]))
+	newVersion = len(functions)
+
+	# Check if there is nothing to do
+	if dbVersion < newVersion:
+
+		# Notify
+		print "Schema upgrade from version %i to version %i" % (dbVersion, newVersion)
+
+		# Create migrator
+		migrator = MySQLMigrator( Config.DB )
+
+		# Perform patches
+		for i in range(dbVersion, newVersion):
+
+			# Run patch in a transaction
+			with Config.DB.transaction():
+				print "- Patch #%i..." % (i+1)
+				getattr(patches, functions[i])(migrator)
+
+	# Update version record
+	verInfo.val = "%i" % newVersion
+	verInfo.save()
+
+	# We are done
+	print "Your database is now on version %i" % newVersion
 
 #####################s###########################################
 # Administration Interface Entry Point
