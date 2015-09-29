@@ -21,6 +21,7 @@ import datetime
 import json
 import traceback
 import logging
+import struct
 
 from liveq import exit
 
@@ -266,6 +267,9 @@ class JobQueue(BaseModel):
 	#: JSON Fields in this model
 	JSON_FIELDS = ['userTunes', 'resultsMeta']
 
+	#: An indexing key for looking-up values
+	valueIndex = CharField(max_length=256, index=True, unique=False, default="")
+
 	#: When the job was submitted
 	submitted = DateTimeField(default=datetime.datetime.now)
 
@@ -316,6 +320,7 @@ class JobQueue(BaseModel):
 	FAILED  	= 3
 	CANCELLED   = 4
 	STALLED		= 5
+	CLONED 		= 6
 
 	def getTunableValues(self):
 		"""
@@ -338,6 +343,7 @@ class JobQueue(BaseModel):
 		Return the tunable configuration
 		"""
 		self.userTunes = json.dumps(data)
+		self.valueIndex = JobQueue.getValueIndex(data)
 
 	def getTunableNames(self):
 		"""
@@ -413,6 +419,35 @@ class JobQueue(BaseModel):
 		results = self.getResultsMeta()
 		results[key] = value
 		self.setResultsMeta( results )
+
+	@staticmethod
+	def getMatchingJob(values, lab):
+		"""
+		Calculate index key
+		"""
+
+		# Calculate value index
+		index = JobQueue.getValueIndex( values )
+
+		# Find relevant items
+		return JobQueue.get( valueIndex=index, status=JobQueue.COMPLETED, lab=lab )
+
+	@staticmethod
+	def getValueIndex(values):
+		"""
+		Update index key
+		"""
+
+		# Sort keys
+		keys = sorted(values.keys())
+		
+		# Compile index
+		idx = ""
+		for k in keys:
+			idx += "%08x" % struct.unpack('<I', struct.pack('<f', values[k]))[0]
+
+		# Return index
+		return idx
 
 class AgentGroup(BaseModel):
 	"""

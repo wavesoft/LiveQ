@@ -32,3 +32,22 @@ class SchemaPatches:
 		migrate(
 		    migrator.add_column('user', 'playTime', IntegerField(default=0)),
 		)
+
+	def patch_2(self, migrator):
+		"""
+		Adding the 'valueIndex' field in the User model
+		"""
+
+		# Insert the 'valueIndex' field in the user table
+		migrate(
+		    migrator.add_column('jobqueue', 'valueIndex', CharField(max_length=256, index=True, unique=False, default="")),
+		)
+
+		# Update all current fields
+		from liveq.models import JobQueue
+		for record in JobQueue.select():
+
+			# Define value index
+			record.valueIndex = JobQueue.getValueIndex( record.getTunableValues() )
+			record.save()
+

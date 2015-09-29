@@ -34,7 +34,7 @@ from liveq.component import Component
 from liveq.io.eventbroadcast import EventBroadcast
 from liveq.io.bus import BusChannelException
 from liveq.classes.bus.xmppmsg import XMPPBus
-from liveq.models import Agent, AgentGroup, AgentMetrics, Observable
+from liveq.models import Agent, AgentGroup, AgentMetrics, Observable, JobQueue
 
 from liveq.reporting.postmortem import PostMortem
 from liveq.reporting.lars import LARS
@@ -689,6 +689,25 @@ class JobManagerComponent(Component):
 		# That's the channel name in IBUS where we should dump the data
 		dataChannel = "data-%s" % uuid.uuid4().hex
 
+		# Lookup previous job
+		job = jobs.findJob( lab, parameters )
+		if job:
+
+			# Fetch raw payload
+			payload = results.loadRaw(job.id)
+			if payload:
+
+				# Link job
+				job = jobs.cloneJob( job, group, userID, teamID, paperID )
+
+				# A job with this parameters already exist, return right away
+				self.jobChannel.reply({
+						'jid': job.id,
+						'result': 'exists',
+						'data': payload
+					})
+				return
+
 		# Create a new job descriptor
 		job = jobs.createJob( lab, parameters, group, userID, teamID, paperID, dataChannel )
 		if not job:
@@ -832,6 +851,32 @@ class JobManagerComponent(Component):
 		# Fetch JID from request
 		jid = message['jid']
 		self.logger.info("Requesting results of job #%s" % jid)
+
+		# Fetch job class
+		job = jobs.getJob(jid)
+		if not job:
+			self.logger.warn("[IBUS] The job %s does not exist" % jid)
+			self.jobChannel.reply({
+					'result': 'error',
+					'error': "The job %s does not exist" % jid
+				})
+			return
+
+		# Check if this is a cloned job
+		if job.status == JobQueue.CLONED:
+
+			# Get job metadata
+			meta = job.getResultsMeta()
+			if not 'reference' in meta:
+				self.logger.warn("[IBUS] The job %s is cloned but reference data are missing" % jid)
+				self.jobChannel.reply({
+						'result': 'error',
+						'error': "The job %s is cloned but reference data are missing" % jid
+					})
+				return
+
+			# Get reference jid
+			jid = meta['reference']
 
 		# Fetch raw payload
 		payload = results.loadRaw(jid)

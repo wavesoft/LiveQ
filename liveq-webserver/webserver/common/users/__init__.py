@@ -723,7 +723,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 			nackJobList.append( job.id )
 
 			# Trigger events
-			if job.status == JobQueue.COMPLETED:
+			if (job.status == JobQueue.COMPLETED) or (job.status == JobQueue.CLONED):
 
 				# Give credits
 				self.earnPoints(2, "for completing a simulation")

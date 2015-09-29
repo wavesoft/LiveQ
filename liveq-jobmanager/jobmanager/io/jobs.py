@@ -40,7 +40,7 @@ COMPLETED = JobQueue.COMPLETED
 FAILED = JobQueue.FAILED
 #: Reason: Job was cancelled
 CANCELLED = JobQueue.CANCELLED
-# :Reason: Job stalled
+#: Reason: Job stalled
 STALLED = JobQueue.STALLED
 
 class Job:
@@ -219,7 +219,8 @@ class Job:
 		self.job.save()
 
 		# Close channel
-		self.channel.close()
+		if self.channel:
+			self.channel.close()
 
 	def addAgentInfo(self, agent):
 		"""
@@ -250,10 +251,11 @@ class Job:
 		"""
 
 		# Send status message
-		self.channel.send("job_status", {
-				"message": message,
-				'vars': varMetrics
-			})
+		if self.channel:
+			self.channel.send("job_status", {
+					"message": message,
+					'vars': varMetrics
+				})
 
 	def getRemainingEvents(self):
 		"""
@@ -348,6 +350,66 @@ class Job:
 #  INTERFACE FUNCTIONS
 # ------------------------------------------------------------
 ##############################################################
+
+def findJob( lab, parameters ):
+	"""
+	Locate a matching job
+	"""
+
+	# Try to lookup a lab with the given ID
+	labInst = None
+	try:
+		labInst = Lab.get( Lab.uuid == lab)
+	except Lab.DoesNotExist:
+		logging.warn("Could not find lab #%s" % lab)
+		return None
+
+	# Ensure user-provided tunes follow the appropriate format
+	userTunes = labInst.formatTunables(parameters)
+
+	# Return
+	try:
+		return JobQueue.getMatchingJob( userTunes, labInst )
+	except JobQueue.DoesNotExist:
+		return None
+
+def cloneJob( refJob, group, userID, teamID, paperID ):
+	"""
+	The user tried to run a tune that already exists, so just clone the job, linked
+	to the previous job in the user's account.
+	"""
+
+	# Create a new job record
+	job = JobQueue.create(
+
+		# Set this properties on the job
+		group=group,
+		user_id=userID,
+		team_id=teamID,
+		paper_id=paperID,
+
+		# Do not use a data channel
+		dataChannel="",
+
+		# Clone job data
+		lab=refJob.lab,
+		userTunes=refJob.userTunes,
+		parameters=refJob.parameters,
+		events=refJob.events,
+		resultsMeta=refJob.resultsMeta,
+		fit=refJob.fit,
+		)
+
+	# Update linked job data and status
+	job.updateResultsMeta( "reference", refJob.id )
+
+	# Set an un-acknowledged status change
+	job.status = JobQueue.CLONED
+	job.acknowledged = 0
+
+	# Save
+	job.save()
+	return job
 
 def createJob( lab, parameters, group, userID, teamID, paperID, dataChannel ):
 	"""
