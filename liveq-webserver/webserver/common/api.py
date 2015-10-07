@@ -19,13 +19,13 @@
 
 import tornado.escape
 import liveq.data.js as js
+import liveq.data.histo.reference as reference
 
 from liveq.models import Observable, Tunable
-from liveq.data.histo.reference import loadReferenceHistogram
 
 from webserver.common.minimacros import convertMiniMacros
 
-def compileObservableHistoBuffers(histo_ids):
+def compileObservableHistoBuffers( lab, histo_ids ):
 	"""
 	Compile a histogram buffer configuration for histograms with the
 	specified list of IDs.
@@ -77,7 +77,10 @@ def compileObservableHistoBuffers(histo_ids):
 			raise IOError("Could not find assisting information for histogram %s" % hid)
 
 		# Lookup reference histogram
-		refHisto = loadReferenceHistogram( hid )
+		if lab is None:
+			refHisto = reference.DEFAULT.loadReferenceHistogram( hid )
+		else:
+			refHisto = reference.forLab( lab.uuid ).loadReferenceHistogram( hid )
 		if not refHisto:
 			raise IOError("Could not find reference data for %s" % hid)
 

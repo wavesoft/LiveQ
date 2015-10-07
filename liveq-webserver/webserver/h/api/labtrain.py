@@ -149,7 +149,7 @@ class LabTrainInterface(APIInterface):
 		# ==========================
 
 		# Fetch descriptions for the histograms
-		histoBuffers = compileObservableHistoBuffers( self.observables )
+		histoBuffers = compileObservableHistoBuffers( None, self.observables )
 
 		# Compile buffer and send
 		self.sendBuffer( 0x01, 

@@ -58,7 +58,7 @@ def getAgentGroups(invalidateCache=False):
 		AGENT_GROUPS = map(lambda x: x[0], groups)
 
 		# Return the list
-		print ">>> %r" % AGENT_GROUPS
+		logging.info("Operating over the following groups: %s" % ",".join(AGENT_GROUPS))
 		return AGENT_GROUPS
 
 	except Exception as e:

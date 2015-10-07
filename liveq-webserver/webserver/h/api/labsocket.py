@@ -25,6 +25,7 @@ import base64
 
 import liveq.data.js as js
 import liveq.data.histo.io as io
+import liveq.data.histo.reference as reference
 
 import tornado.escape
 
@@ -32,7 +33,6 @@ from liveq.models import Lab, Observable, TunableToObservable, Agent, JobQueue
 from liveq.data.histo.intermediate import IntermediateHistogramCollection
 from liveq.data.histo.interpolate import InterpolatableCollection
 from liveq.data.histo.utils import rebinToReference
-from liveq.data.histo.reference import loadReferenceHistogram
 
 from webserver.common.api import compileObservableHistoBuffers, compileTunableHistoBuffers
 
@@ -635,7 +635,7 @@ class LabSocketInterface(APIInterface):
 		# Fetch descriptions for the histograms
 		histo_ids = self.lab.getHistograms()
 		histo_ids = list(set(histo_ids) & set(self.trimObs))
-		histoBuffers = compileObservableHistoBuffers( histo_ids )
+		histoBuffers = compileObservableHistoBuffers( self.lab, histo_ids )
 
 		# Compile buffer and send
 		self.sendBuffer( 0x01, 
@@ -711,7 +711,7 @@ class LabSocketInterface(APIInterface):
 					continue
 
 				# Rebin and normalize histograms
-				rebinToReference( h, loadReferenceHistogram(h.name) )
+				rebinToReference( h, reference.forLab(self.lab).loadReferenceHistogram(h.name) )
 				h.normalize(copy=False)
 
 				# Pack buffers

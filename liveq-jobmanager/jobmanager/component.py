@@ -27,6 +27,7 @@ import jobmanager.io.jobs as jobs
 import jobmanager.io.scheduler as scheduler
 import jobmanager.io.agents as agents
 import jobmanager.io.results as results
+import liveq.data.histo.reference as reference
 
 from jobmanager.config import Config
 
@@ -43,7 +44,6 @@ from liveq.data.tune import Tune
 from liveq.data.histo.utils import rebinToReference
 from liveq.data.histo.intermediate import IntermediateHistogramCollection, IntermediateHistogram
 from liveq.data.histo.interpolate import InterpolatableCollection
-from liveq.data.histo.reference import collectionChi2Reference, loadReferenceHistogram
 
 class JobManagerComponent(Component):
 	"""
@@ -98,7 +98,7 @@ class JobManagerComponent(Component):
 		# Channel mapping
 		self.channels = { }
 
-	def adaptCollection(self, collection, requiredHistograms):
+	def adaptCollection(self, lab, collection, requiredHistograms):
 		"""
 		Trim histograms that does not belong to requiredHistograms
 		and/or create missing histograms using reference values.
@@ -138,7 +138,7 @@ class JobManagerComponent(Component):
 
 		# Perform rebinning where appliable
 		for k,v in collection.iteritems():
-			rebinToReference( collection[k], loadReferenceHistogram(k) )
+			rebinToReference( collection[k], reference.forLab( lab ).loadReferenceHistogram(k) )
 
 		# Return the updated collection
 		return collection
@@ -364,7 +364,7 @@ class JobManagerComponent(Component):
 		job.sendStatus("All workers have finished. Collecting final results.")
 
 		# Calculate chi2 of the collection
-		(chi2fit, chi2list) = collectionChi2Reference( histoCollection )
+		(chi2fit, chi2list) = reference.forLab( job.lab ).collectionChi2Reference( histoCollection )
 
 		# Store the results
 		results.dump( job, histoCollection )
@@ -551,7 +551,7 @@ class JobManagerComponent(Component):
 			return
 
 		# Adapt histogram collection to the lab tunables
-		agentHistos = self.adaptCollection( agentHistos, job.lab.getHistograms() )
+		agentHistos = self.adaptCollection( job.lab, agentHistos, job.lab.getHistograms() )
 
 		# Merge histograms with other histograms of the same job
 		# and return resulting histogram collection
