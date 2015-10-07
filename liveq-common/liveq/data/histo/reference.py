@@ -24,6 +24,9 @@ import traceback
 from liveq.config.histograms import HistogramsConfig
 from liveq.data.histo import Histogram
 
+#: Reference histograms for every lab
+LAB_REFERENCE_HISTOGRAMS = { }
+
 class ReferenceHistograms:
 	"""
 	A class that provides comparison against a set of reference histograms
@@ -125,7 +128,24 @@ class ReferenceHistograms:
 		return (chi2sum / chi2count, chi2list)
 
 #: Create the default histogram feren
-DEFAULT = ReferenceHistograms( HistogramsConfig.HISTOREF_PATH )
+DEFAULT = ReferenceHistograms( "%s/%s" % (HistogramsConfig.HISTOREF_PATH, HistogramsConfig.HISTOREF_DEFAULT) )
+
+#: Return a reference histogram for the specified lab
+def forLab(uuid):
+	"""
+	Return a ReferenceHistograms class for the specified lab UUID
+	"""
+
+	# Get cached version
+	if uuid in LAB_REFERENCE_HISTOGRAMS:
+		return LAB_REFERENCE_HISTOGRAMS[uuid]
+
+	# Otherwise create new and cache
+	histos = ReferenceHistograms( "%s/%s" % (HistogramsConfig.HISTOREF_PATH, uuid) )
+	LAB_REFERENCE_HISTOGRAMS[uuid] = histos
+
+	# And return it
+	return histos
 
 # Keep a reference of the default functions
 loadReferenceHistogram = DEFAULT.loadReferenceHistogram
