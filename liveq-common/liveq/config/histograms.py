@@ -28,6 +28,9 @@ class HistogramsConfig(ComponentClassConfig):
 	#: The global tune precision configuration
 	HISTOREF_PATH = ""
 
+	#: THe name of the default histogram
+	HISTOREF_DEFAULT = "rivet"
+
 	@staticmethod
 	@configexceptions(section="histograms")
 	def fromConfig(config, runtimeConfig):
@@ -36,5 +39,7 @@ class HistogramsConfig(ComponentClassConfig):
 		contents of the specified config object
 		"""
 
-		# Reset maps
-		HistogramsConfig.HISTOREF_PATH = config.get("histograms", "historef_path")
+		# Populate config
+		HistogramsConfig.HISTOREF_PATH = config.get("histograms", "path")
+		HistogramsConfig.HISTOREF_DEFAULT = config.get("histograms", "default")
+
