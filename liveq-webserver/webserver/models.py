@@ -1206,6 +1206,18 @@ class Level(BaseModel):
 		"""
 		self.features = json.dumps(data)
 
+	def getNext(self):
+		"""
+		Get the next level in sequence
+		"""
+
+		# Return the entry with the next order sequence
+		return Level.select() \
+					.order_by('order') \
+					.where(Level.order > self.order) \
+					.get()
+
+
 class UserLevel(BaseModel):
 	"""
 	User score on each level
@@ -1217,21 +1229,28 @@ class UserLevel(BaseModel):
 	#: The related level
 	level = ForeignKeyField(Level)
 
+	#: The relevant job ID whose results update it
+	job_id = IntegerField(default=0)
+
 	#: The date it was unlocked
 	created = DateTimeField(default=datetime.datetime.now)
 
 	#: Last change in this level
 	updated = DateTimeField(default=datetime.datetime.now)
 
-	#: The user's score in this level
+	#: The last's score in this level
 	score = FloatField(default=0.0)
+
+	#: The status of this level
+	#: 0=Not completed, 1=1-Star, .. 3=3-Star
+	status = IntegerField(default=0)
 
 	def save(self, *args, **kwargs):
 		"""
 		Auto-update 'updated' field on save
 		"""
 		self.updated = datetime.datetime.now()
-		return super(AnalyticsProfile, self).save(*args, **kwargs)
+		return super(UserLevel, self).save(*args, **kwargs)
 
 
 # -----------------------------------------------------

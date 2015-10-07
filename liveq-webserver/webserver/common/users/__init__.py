@@ -734,6 +734,13 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 					self.logger.warn("Cannot update paper %s with the results!" % job.paper_id)
 					continue
 
+				# Get a relevant level
+				try:
+					level = UserLevel.get( UserLevel.job_id == job.id, UserLevel.user == self.dbUser )
+				except UserLevel.DoesNotExist:
+					self.logger.warn("Cannot find a releval level for job %i!" % job.id)
+					continue
+
 				# Update paper score
 				fitBefore = paper.bestFit
 
@@ -1311,12 +1318,14 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		# Fetch all levels
 		levels = Level.select().order_by('order')[:]
 
+		# Prepare query
+		query = UserLevel.select().where(UserLevel.user == self.dbUser)
+		if levels:
+			query = query.where( UserLevel.level << levels )
+
 		# Compile user-levels lookup table
 		user_state = { }
-		for l in UserLevel.select().where(
-					UserLevel.user == self.dbUser,
-					UserLevel.level << levels
-				):
+		for l in query:
 			user_state[l.level.id] = l
 
 		# Calculate level index
@@ -1343,6 +1352,23 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 
 		# Return level
 		return response
+
+	def getLevelDetails(self, level):
+		"""
+		Compile and return level details
+		"""
+
+		# Get level configuration
+		try:
+			level = Level.get( Level.id == level )
+		except Level.DoesNotExist:
+			raise HLUserError("The specified error does not exists!", "not-exists")
+
+		# Collect level details
+		return {
+			'tunables': level.getTunables(),
+			'features': level.getFeatures()
+		}
 
 	def updateActivityCounter(self, counter):
 		"""

@@ -36,6 +36,7 @@ from liveq.data.histo.utils import rebinToReference
 
 from webserver.common.api import compileObservableHistoBuffers, compileTunableHistoBuffers
 
+from webserver.models import UserLevel
 from webserver.config import Config
 from webserver.h.api import APIInterface
 
@@ -235,6 +236,32 @@ class LabSocketInterface(APIInterface):
 			# Check for error response
 			if ans['result'] == 'error':
 				return self.sendError("Unable to place a job request: %s" % ans['error'])
+
+			# If we have a 'level' parameter (that denotes the level the
+			# user submitted the simulation from), and also a job ID 
+			# in the response record, tag that particular level
+			if ('jid' in ans) and ('level' in param) and (param['level']):
+
+				# Check if such record exists
+				record = UserLevel.select().where(
+						UserLevel.user == self.user.id,
+						UserLevel.level == int(param['level'])
+					)
+
+				# If it exists, update it
+				if record.exists():
+					level = record.get()
+					level.job_id = int(ans['jid'])
+					level.save()
+
+				# Otherwise create it
+				else:
+					level = UserLevel.create(
+							user=self.user.id,
+							level=int(param['level']),
+							job_id=int(ans['jid'])
+						)
+					level.save()
 
 			# Check if this job is already calculated
 			if ans['result'] == 'exists':

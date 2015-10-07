@@ -455,6 +455,17 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Get details for a particular level
+			# ------------------------------------------------
+			elif action == "levels.details":
+
+				# Return details
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getLevelDetails( int(param['level']) )
+					})
+
+			##################################################
 			# Get machine parts
 			# ------------------------------------------------
 			elif action == "parts.details":
