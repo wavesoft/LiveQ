@@ -32,6 +32,9 @@ import glob
 import tempfile
 import time
 import copy
+import hashlib
+import random
+import datetime
 import os, signal
 import shlex, subprocess, threading
 
@@ -93,7 +96,7 @@ class MCPlots(JobApplication):
 		JobApplication.__init__(self, config)
 		self.config = config 
 		self.jobconfig = { }
-		self.workdir = config.WORKDIR
+		self.softwareDir = config.WORKDIR
 		self.tunename = ""
 		self.tunefile = ""
 		self.monitorThread = None
@@ -150,12 +153,12 @@ class MCPlots(JobApplication):
 		envDict['LIVEQ_DATDIR'] = self.datdir
 
 		# Launch process in it's own process group
-		self.process = subprocess.Popen(args, cwd=self.workdir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+		self.process = subprocess.Popen(args, cwd=self.softwareDir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 		self.logger.debug("Process started with PID=%i" % self.process.pid)
 
 		# Include details in the postmortem
 		self.postmortem.addInfo("env", envDict, "Process")
-		self.postmortem.addInfo("cwd", self.workdir, "Process")
+		self.postmortem.addInfo("cwd", self.softwareDir, "Process")
 		self.postmortem.addInfo("tune", self.jobconfig['tune'], "Process")
 		self.postmortem.addInfo("histograms", self.jobconfig['histograms'], "Process")
 		self.postmortem.addInfo("revision", self.jobconfig['repoTag'], "Process")
@@ -237,9 +240,23 @@ class MCPlots(JobApplication):
 			raise JobConfigException("Parameter 'tune' has an incompatible format")
 		if type(config["histograms"]) != list:
 			raise JobConfigException("Parameter 'histograms' has an incompatible format")
+		if not config['repoType'] in ( 'svn', 'git', 'cvmfs' ):
+			raise JobInternalException("Unknown repository type '%s'" % config['repoType'])
+
+		# Calculate a unique ID for the software to use
+		swRepoID = "%s-%s" % (
+			config['repoType'], 
+			hashlib.sha256("a").hexdigest("%s:%s" % (config['repoURL'], config['repoTag'])) 
+			)
+
+		# Find the directory were to deploy the software
+		swDir = os.path.join( self.config.WORKDIR, "sw", swRepoID )
+		if config['repoType'] == "cvmfs":
+			swDir = config['repoURL']
+			if config['repoTag']:
+				swDir += "/%s" % config['repoTag']
 
 		# Check if the software directory is not properly populated
-		swDir = os.path.join( self.config.WORKDIR, self.jobconfig['repoTag'] )
 		if not os.path.isfile( "%s/ready.flag" % swDir ):
 			os.system("rm -rf '%s'" % swDir)
 
@@ -290,11 +307,8 @@ class MCPlots(JobApplication):
 				with open("%s/ready.flag" % swDir, "w") as f:
 					pass
 
-			else:
-				raise JobInternalException("Unknown repository type '%s'" % self.jobconfig['repoType'])
-
-		# Update workdir
-		self.workdir = swDir
+		# Update software dir
+		self.softwareDir = swDir
 
 		# Find tune filename
 		self.tunefile = "%s/configuration/%s-%s.tune" % ( swDir, config['generator'], self.config.TUNE  )
