@@ -17,14 +17,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
+import sys
 import traceback
 import threading
 import time
 import Queue
 import logging
+import liveq
 
 from liveq.events import GlobalEvents
-from liveq import exit
 
 class Component:
 	"""
@@ -87,7 +88,7 @@ class Component:
 			except Exception as e:
 				traceback.print_exc()
 				logging.error("Main thread exited with exception %s: %s" % ( e.__class__.__name__, str(e) ))
-				exit(128)
+				liveq.exit(128)
 
 
 		# Start and wait for thread to exit
@@ -98,6 +99,10 @@ class Component:
 		# Wait for the thread to exit
 		while thread.is_alive():
 			time.sleep(1)
+
+		# If we exited with an error code, raise it now
+		if liveq.exitCode != 0:
+			sys.exit(liveq.exitCode)
 
 	@classmethod
 	def runStatic(cls):
@@ -115,5 +120,5 @@ class Component:
 		except Exception as e:
 			traceback.print_exc()
 			logging.error("Main thread exited with exception %s: %s" % ( e.__class__.__name__, str(e) ))
-			exit(128)
+			liveq.exit(128)
 

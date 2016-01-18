@@ -24,6 +24,9 @@ import logging
 
 from liveq.events import GlobalEvents
 
+#: Globally available current exit code
+exitCode = 0
+
 def handleSIGINT():
 	"""
 	Register a CTRL+C (SIGINT) handler and raise a system-wide ``shutdown`` signal
@@ -64,6 +67,7 @@ def exit(code):
 
 	# Send shutdown event
 	GlobalEvents.System.trigger('shutdown')
+	exitCode = code
 
-	# Exit
+	# Exit (Warning if called within thread, this will exit the thread)
 	sys.exit(code)

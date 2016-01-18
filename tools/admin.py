@@ -509,7 +509,6 @@ def cmd_controlworkers(action):
 	Config.initEBUS()
 
 	# Open a control channel to each agent and send command
-	print "----------------------"
 	for agent in agents.getOnlineAgents():
 
 		# Get channel
@@ -521,8 +520,10 @@ def cmd_controlworkers(action):
 		if ans is None:
 			print "timeout"
 		else:
-			print ans['result']
-	print "----------------------"
+			if 'error' in ans:
+				print "%s (%s)" % (ans['result'], ans['error'])
+			else:
+				print ans['result']
 
 #####################s###########################################
 # Administration Interface Entry Point
