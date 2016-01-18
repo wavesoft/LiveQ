@@ -17,13 +17,13 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ################################################################
 
-import sys
 import traceback
 import threading
 import time
 import Queue
 import logging
 import liveq
+import sys
 
 from liveq.events import GlobalEvents
 
@@ -100,9 +100,9 @@ class Component:
 		while thread.is_alive():
 			time.sleep(1)
 
-		# If we exited with an error code, raise it now
+		# Trigger real exit code
 		if liveq.exitCode != 0:
-			sys.exit(liveq.exitCode)
+			sys.exit( liveq.exitCode )
 
 	@classmethod
 	def runStatic(cls):

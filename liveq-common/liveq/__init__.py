@@ -67,6 +67,9 @@ def exit(code):
 
 	# Send shutdown event
 	GlobalEvents.System.trigger('shutdown')
+
+	# Update global exit code
+	global exitCode
 	exitCode = code
 
 	# Exit (Warning if called within thread, this will exit the thread)
