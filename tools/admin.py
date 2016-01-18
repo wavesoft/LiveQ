@@ -28,7 +28,6 @@ sys.path.append("%s/liveq-webserver" % os.path.dirname(os.path.dirname(os.path.r
 # ----------
 
 #import argparse
-import traceback
 import json
 import os
 
@@ -576,7 +575,6 @@ if __name__ == "__main__":
 	except Exception as e:
 
 		print "ERROR: %s Exception while handling your request! %s" % (e.__class__.__name__, str(e))
-		traceback.print_exc()
 		exit(2)	
 
 
