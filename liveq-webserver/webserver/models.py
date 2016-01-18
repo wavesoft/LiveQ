@@ -1162,6 +1162,15 @@ class Level(BaseModel):
 	#: The lab to use for this level
 	lab = ForeignKeyField(Lab)
 
+	#: The level title
+	title = CharField(default="", max_length=256)
+
+	#: The level description
+	desc = TextField(default="")
+
+	#: The reference dataset for star calculation
+	reference = CharField(default="rivet", max_length=256)
+
 	def getTunables(self):
 		"""
 		Split tunables

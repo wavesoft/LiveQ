@@ -59,6 +59,15 @@ class JobManagerComponent(Component):
 		# Setup properties
 		self.degree_cache = {}
 
+		# The IDs of the agents that were online up til the moment
+		# we got a presence handshake with the job managers
+		self.negotiationOnlineAgents = []
+		self.negotiationMode = True
+		self.onlyJobManager = True
+
+		# Calculate server JID
+		self.serverJID = "%s@%s" % (Config.EBUS_CONFIG.USERNAME, Config.EBUS_CONFIG.DOMAIN)
+
 		# Setup logger
 		self.logger = logging.getLogger("job-manager")
 		self.logger.info("JobManager component started")
@@ -67,16 +76,10 @@ class JobManagerComponent(Component):
 		LARS.initialize()
 		LARS.openEntity("components/job-manager", "%s#%s" % (Config.EBUS.jid, Config.EBUS.resource), autoKeepalive=True, alias="core")
 
-		# TODO: Uhnack this
-		# This establishes a presence relationship with the given entity.
-		if isinstance(Config.EBUS, XMPPBus):
-			for jid in Config.TRUSTED_CHANNELS:
-				self.logger.debug("Subscribing %s to my roster" % jid)
-				Config.EBUS.send_presence(pto=jid, ptype='subscribe')
-
 		# Register the arbitrary channel creations that can happen
 		# when we have an incoming agent handshake
 		Config.EBUS.on('channel', self.onChannelCreation)
+		Config.EBUS.on('online', self.onEBUSOnline)
 
 		# Register callbacks from the internal message bus, such as
 		# job creation and abortion
@@ -90,7 +93,12 @@ class JobManagerComponent(Component):
 		self.ipolChannel = Config.IBUS.openChannel("interpolate")
 
 		# Open the results manager channel where we are dumping the final results
-		#self.resultsChannel = Config.IBUS.openChannel("results")
+		# self.resultsChannel = Config.IBUS.openChannel("results")
+
+		# Open an internal channel to use for job manager intercommunication
+		self.jmChannel = Config.EBUS.openChannel( self.serverJID )
+		self.jmChannel.on('online_query', self.onOnlineQuery)
+		self.jmChannel.on('online_reply', self.onOnlineReply)
 
 		# Open a global notifications channel
 		self.notificationsChannel = EventBroadcast.forChannel("notifications")
@@ -421,17 +429,97 @@ class JobManagerComponent(Component):
 	####################################################################################
 
 	# =========================
+	# Intercom Channel Callback
+	# =========================
+
+	def onOnlineQuery(self, message):
+		"""
+		Online request sent
+		"""
+
+		# Send reply only if this message does not originate from us
+		if message['res'] != Config.EBUS_CONFIG.RESOURCE:
+			self.jmChannel.send('online_reply', { 'res': Config.EBUS_CONFIG.RESOURCE })
+
+	def onOnlineReply(self, message):
+		"""
+		Reply to channel ping
+		"""
+
+		# Mark us as not the only job manager
+		self.onlyJobManager = False
+
+	# =========================
 	# Job Agent Callbacks
 	# =========================
+
+
+	def onEBUSOnline(self):
+		"""
+		Callback when the external bus channel is online
+		"""
+
+		# # TODO: Uhnack this
+		# # This establishes a presence relationship with known entities.
+		# if isinstance(Config.EBUS, XMPPBus):
+		
+		# 	# Subscribe to agents
+		# 	for jid in Config.TRUSTED_CHANNELS:
+		# 		self.logger.debug("Subscribing %s to my roster" % jid)
+		# 		Config.EBUS.send_presence(pto=jid, ptype='subscribe')
+
+		# 	# Include server status in the roster 
+		# 	self.logger.info("Subscribing %s to my roster" % self.serverJID)
+		# 	Config.EBUS.send_presence_subscription(self.serverJID)
+		# 
+		# 	# If we are the only job manager in the roster, reset the
+		# 	# states of all worker nodes
+		# 	isOnly = True
+		# 	if self.serverJID in Config.EBUS.client_roster:
+		# 		resources = Config.EBUS.client_roster[self.serverJID].resources.keys()
+		# 		if len(resources) == 1:
+		# 			isOnly = (resources[0] == Config.EBUS_CONFIG.RESOURCE)
+		# 
+		# 	# If we are only, reset all agent status
+		# 	if isOnly:
+		# 		self.logger.info("I am the only job manager. Resetting all agent status.")
+
+		# Wait for 1 sec for reply
+		# msg = self.jmChannel.send('ping', {})
+		# if msg is None:
+		# 	# If we had no pong, exit
+		# 	self.logger.info("I am the only job manager. Resetting all agent status.")
+
+		# Send online query
+		self.jmChannel.send('online_query', {'res': Config.EBUS_CONFIG.RESOURCE })
+		Config.EBUS.schedule( "decision", 1, self.onNegotiationTimeout )
+
+	def onNegotiationTimeout(self):
+		"""
+		Negotiation times out after some time, that's time for decisions
+		"""
+
+		# Turn off negotiation mode
+		self.negotiationMode = False
+
+		# Check if we should reset and which agents we should reset
+		if self.onlyJobManager:
+			self.logger.warn("We are the only job manager alive. Resetting state of workers!")
+
+			# Reset workers not present in the ones found already online
+			self.logger.info("Excluding agents %r" % self.negotiationOnlineAgents)
+			agents.updateAllPresence(0, exclude=self.negotiationOnlineAgents)
 
 	def onChannelCreation(self, channel):
 		"""
 		Callback when a channel is up
 		"""
+
 		self.logger.info("[%s] Channel created" % channel.name)
 
 		# Store on local map
 		self.channels[channel.name] = channel
+		self.negotiationOnlineAgents.append(channel.name)
 
 		# Setup callbacks
 		self._setupChannelCallbacks(channel)

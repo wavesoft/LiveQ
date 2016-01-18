@@ -495,6 +495,27 @@ def cmd_updatedb():
 	# We are done
 	print "Your database is now on version %i" % newVersion
 
+@command("controlworkers", args=["action"], help="Send a control command to all job agents.")
+def cmd_controlworkers(action):
+	"""
+	Find all agents, open output channel and send data
+	"""
+
+	# Include job manager API
+	sys.path.append("%s/liveq-jobmanager" % os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+	import jobmanager.io.agents as agents
+
+	# Init EBUS
+	Config.initEBUS()
+
+	# Open a control channel to each agent and send command
+	for agent in agents.getOnlineAgents():
+
+		# Get channel
+		print "INFO: Sending to %s" % agent.uuid
+		channel = Config.EBUS.openChannel( agent.uuid )
+		channel.send("command", { "action": action })
+
 #####################s###########################################
 # Administration Interface Entry Point
 ################################################################

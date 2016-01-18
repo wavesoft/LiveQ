@@ -121,6 +121,14 @@ def getAgentFromJob(jid):
 		# Return none if missing
 		return None
 
+def getOnlineAgents():
+	"""
+	Return all the online agents
+	"""
+
+	# Return all the agents
+	return Agent.select().where( Agent.state == 1 )
+
 def updateActivity(uid):
 	"""
 	Update the agent activity timestamp to avoid expiry
@@ -150,6 +158,27 @@ def updatePresence(uid, state=1):
 	# Send report to LARS
 	report = LARS.openGroup("agents", uid, alias=uid)
 	report.set("presence", state)
+
+def updateAllPresence(state=1, exclude=[]):
+	"""
+	Update the presence of all workers
+	"""
+
+	# Prepare query
+	query = Agent.select()
+	if len(exclude) > 0:
+		query = query.where( Agent.uuid.not_in( exclude ) )
+
+	# Iterate over agents
+	for agentEntry in query:
+
+		# Switch state and last time seen
+		agentEntry.state = state
+		if state:
+			agentEntry.lastActivity = time.time()
+
+		# Save entry
+		agentEntry.save()
 
 def updateHandshake(uid, attrib):
 	"""
@@ -183,9 +212,12 @@ def updateHandshake(uid, attrib):
 		ip = attrib['ip']
 
 		# Geolocate IP
-		match = geolite2.lookup(ip)
-		if not (match is None):
-			(lat, lng) = match.location
+		try:
+			match = geolite2.lookup(ip)
+			if not (match is None):
+				(lat, lng) = match.location
+		except ValueError:
+			(lat, lng) = (27.955591, -71.213379)
 
 	# Fetch references
 	groupEntry = getAgentGroup(group)
@@ -194,7 +226,7 @@ def updateHandshake(uid, attrib):
 	# If this group is not cached, reload 
 	# agent group cache
 	if not group in AGENT_GROUPS:
-		self.getAgentGroups( invalidateCache=True )
+		getAgentGroups( invalidateCache=True )
 
 	# Update fields
 	agentEntry.lastActivity = time.time()
@@ -203,7 +235,7 @@ def updateHandshake(uid, attrib):
 	agentEntry.features = features
 	agentEntry.version = version
 	agentEntry.ip = ip
-	agentEntry.latlng = "%.5f,%s" % (lat,lng)
+	agentEntry.latlng = "%.5f,%5f" % (lat,lng)
 
 	# The agent is now active
 	agentEntry.state = 1

@@ -128,6 +128,7 @@ class AgentComponent(Component):
 			action = message['action']
 
 		# Handle action
+		self.logger.info("Got agent control command: %s" % action)
 		if action == "restart":
 			# Return 100, that the wrapper script
 			# should interpret as "re-run script"

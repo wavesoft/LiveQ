@@ -41,6 +41,7 @@ from sleekxmpp import ClientXMPP, Callback, MatchXPath, StanzaPath, Iq
 from sleekxmpp.exceptions import IqError, IqTimeout
 from sleekxmpp.xmlstream.stanzabase import ElementBase
 from sleekxmpp.xmlstream import register_stanza_plugin
+from sleekxmpp.xmlstream.scheduler import Task
 
 from liveq.events import GlobalEvents
 from liveq.io.bus import Bus, BusChannel, NoBusChannelException, BusChannelException
@@ -307,7 +308,7 @@ class XMPPUserChannel(BusChannel):
 
 	def close(self, unregister=True):
 		"""
-		Close the XMLL channel
+		Close the XMPP channel
 		"""
 
 		# Release all threads waiting in queues
@@ -411,8 +412,8 @@ class XMPPBus(Bus, ClientXMPP):
 		self['feature_mechanisms'].unencrypted_plain = True
 
 		# Setup auto accept
-		self.auto_subscribe=True
-		self.auto_authorize=True
+		self.auto_subscribe = True
+		self.auto_authorize = True
 
 		# Setup logging
 		self.logger = logging.getLogger("xmpp-bus")
@@ -424,6 +425,7 @@ class XMPPBus(Bus, ClientXMPP):
 		self.add_event_handler("presence_available", self.onAvailable)
 		self.add_event_handler("presence_unavailable", self.onUnavailable)
 		self.add_event_handler("message", self.onMessage)
+		self.add_event_handler("roster_update", self.onRosterUpdate)
 
 		# Prepare variables
 		self.channels = { }
@@ -439,20 +441,27 @@ class XMPPBus(Bus, ClientXMPP):
 		# Bind to the system shutdown callback
 		GlobalEvents.System.on('shutdown', self.systemShutdown)
 
+	def onRosterUpdate(self, event):
+		"""
+		Callback when roster is updated
+		"""
+
+		# Let everybody know that the channel is online only
+		# after we got roster update.
+		self.trigger("online")
+
 	def onAvailable(self, event):
 		"""
 		Callback when a user becomes available
 		"""
 
-		# Get JID
-		jid = str(event['from'])
-
 		# Notify bare id (if exists) that the connection is now open
-		barejid = jid.split("/")[0]
+		barejid = event['from'].bare
 		if barejid in self.channels:
 			self.channels[barejid].trigger('open')
 
 		# Notify that channel (if exist) that the connection is now open
+		jid = event['from'].full
 		if jid in self.channels:
 			self.channels[jid].trigger('open')
 
@@ -461,15 +470,13 @@ class XMPPBus(Bus, ClientXMPP):
 		Callback when a user becomes unavailable
 		"""
 
-		# Get JID
-		jid = str(event['from'])
-
 		# Notify bare id channels (if exists) that the connection is now closed
-		barejid = jid.split("/")[0]
+		barejid = event['from'].bare
 		if barejid in self.channels:
 			self.channels[barejid].trigger('close')
 
 		# Notify that channel (if exist) that the connection is now closed
+		jid = event['from'].full
 		if jid in self.channels:
 			self.channels[jid].trigger('close')
 
@@ -538,9 +545,6 @@ class XMPPBus(Bus, ClientXMPP):
 		self.send_presence()
 		self.get_roster()
 
-		# Let everybody know that the channel is online
-		self.trigger("online")
-
 	def onMessage(self, msg):
 		"""
 		Message I/O
@@ -551,11 +555,8 @@ class XMPPBus(Bus, ClientXMPP):
 		if msg['type'] == 'headline':
 
 			# Get JID
-			jid = str(msg['from'])
-
-			# Calculate the bare jid
-			parts = str(jid).split("/")
-			bare_jid = parts[0]
+			jid = msg['from'].full
+			bare_jid = msg['from'].bare
 
 			# Check if we have a bare jid as a channel
 			handled = False
@@ -589,17 +590,17 @@ class XMPPBus(Bus, ClientXMPP):
 		if msg['type'] == 'error':
 
 			# Get JID
-			jid = str(msg['from'])
+			jid = msg['from'].full
+			bare_jid = msg['from'].bare
 
 			# Check if we can find a channel without resource
 			# (for load-balancing for example)
 			if not jid in self.channels:
-				parts = str(jid).split("/")
 
 				# If such channel exists, use that instead.
 				# Otherwise, keep doing what we were supposed to do
-				if parts[0] in self.channels:
-					jid = parts[0]
+				if bare_jid in self.channels:
+					jid = bare_jid
 
 			# We don't have to create 
 			if jid in self.channels:
@@ -638,3 +639,4 @@ class XMPPBus(Bus, ClientXMPP):
 		# Delete channel from our list
 		if name in self.channels:
 			del self.channels[name]
+

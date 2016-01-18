@@ -1364,10 +1364,28 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		except Level.DoesNotExist:
 			raise HLUserError("The specified error does not exists!", "not-exists")
 
+		# Get tunables
+		tunObjects = []
+		tunDict = {}
+		tunNames = level.getTunables()
+		if tunNames:
+
+			# Fast access on database using 'for X in Y'
+			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
+				tunDict[tun['name']] = tun
+
+			# Correct ordering of the items
+			for n in tunNames:
+				tunObjects.append( tunDict[n] )
+
 		# Collect level details
 		return {
-			'tunables': level.getTunables(),
-			'features': level.getFeatures()
+			'index'   : level.id,
+			'tunables': tunObjects,
+			'features': level.getFeatures(),
+			'title'	  : level.title,
+			'desc'    : level.desc,
+			'ref'	  : level.reference,
 		}
 
 	def updateActivityCounter(self, counter):
@@ -1552,17 +1570,17 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		self.reload()
 
 		# Get tunables
-		tunOjects = []
+		tunObjects = []
 		tunNames = self.dbUser.getState("tunables", [])
 		if tunNames:
 			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
-				tunOjects.append( tun )
+				tunObjects.append( tun )
 
 		# Prepare configuration
 		return {
 			"configurations" : self.dbUser.getState("config", []),
 			"observables"    : self.dbUser.getState("observables", []),
-			"tunables"		 : tunOjects
+			"tunables"		 : tunObjects
 		}
 
 	def getProfile(self):

@@ -23,6 +23,7 @@ import os.path
 from liveq.config.core import CoreConfig
 from liveq.config.store import StoreConfig
 from liveq.config.internalbus import InternalBusConfig
+from liveq.config.externalbus import ExternalBusConfig
 from liveq.config.database import DatabaseConfig
 from liveq.config.histograms import HistogramsConfig
 from liveq.config.email import EmailConfig
@@ -32,7 +33,11 @@ from webserver.config import ForumConfig
 """
 Create a configuration for the TOOLS based on the core config plus webserver forum
 """
-class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, HistogramsConfig, EmailConfig, ForumConfig):
+class Config(CoreConfig, StoreConfig, InternalBusConfig, ExternalBusConfig, DatabaseConfig, HistogramsConfig, EmailConfig, ForumConfig):
+
+	# Keep for delay initialization
+	_config = {}
+	_runtimeConfig = {}
 
 	"""
 	Update class variables by reading the config file
@@ -45,10 +50,13 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, Histogr
 		config = ConfigParser.SafeConfigParser()
 		config.read(confFile)
 
+		# Keep for delay initialization
+		Config._config = config
+		Config._runtimeConfig = runtimeConfig
+
 		# Initialize subclasses
 		CoreConfig.fromConfig( config, runtimeConfig )
 		StoreConfig.fromConfig( config, runtimeConfig )
-		InternalBusConfig.fromConfig( config, runtimeConfig )
 		DatabaseConfig.fromConfig( config, runtimeConfig )
 		HistogramsConfig.fromConfig( config, runtimeConfig )
 		EmailConfig.fromConfig( config, runtimeConfig )
@@ -56,3 +64,19 @@ class Config(CoreConfig, StoreConfig, InternalBusConfig, DatabaseConfig, Histogr
 
 		# Ensure base tables exist
 		createBaseTables()
+
+	@staticmethod 
+	def initEBUS():
+		"""
+		Delayed initialization of external bus
+		"""
+		ExternalBusConfig.fromConfig( Config._config, Config._runtimeConfig )
+
+	@staticmethod 
+	def initIBUS():
+		"""
+		Delayed initialization of internal bus
+		"""
+		InternalBusConfig.fromConfig( Config._config, Config._runtimeConfig )
+
+
