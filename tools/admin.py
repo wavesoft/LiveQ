@@ -509,12 +509,20 @@ def cmd_controlworkers(action):
 	Config.initEBUS()
 
 	# Open a control channel to each agent and send command
+	print "----------------------"
 	for agent in agents.getOnlineAgents():
 
 		# Get channel
-		print "INFO: Sending to %s" % agent.uuid
 		channel = Config.EBUS.openChannel( agent.uuid )
-		channel.send("command", { "action": action })
+
+		# Send and wait reply
+		ans = channel.send("agent_control", { "action": action }, waitReply=True, timeout=1)
+		print "- Sending '%s' to %s..." % ( action, agent.uuid),
+		if ans is None:
+			print "timeout"
+		else:
+			print ans['result']
+	print "----------------------"
 
 #####################s###########################################
 # Administration Interface Entry Point

@@ -131,13 +131,21 @@ class AgentComponent(Component):
 		self.logger.info("Got agent control command: %s" % action)
 		if action == "restart":
 			# Return 100, that the wrapper script
-			# should interpret as "re-run script"
+			# should interpret as "re-run script"		
+			self.jobmanagers.reply({ 'result': 'ok' })
 			exit(100)
 
 		elif action == "reboot":
 			# Return 101, that the wrapper script
 			# should interpret as system reboot
+			self.jobmanagers.reply({ 'result': 'ok' })
 			exit(101)
+
+		else:
+			self.jobmanagers.reply({
+					'result': 'error',
+					'error': "Unknown control command"
+				})
 
 	def cmdJobStart(self, message):
 		"""
