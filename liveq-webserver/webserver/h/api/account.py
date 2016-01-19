@@ -165,6 +165,17 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Return team resources
+			# ------------------------------------------------
+			elif action == "team.resources":
+
+				# Return team resources
+				self.sendResponse({
+						"status": "ok",
+						"data" : self.user.getTeamResources()
+					})
+
+			##################################################
 			# Return team listing
 			# ------------------------------------------------
 			elif action == "team.listing":

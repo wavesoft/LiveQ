@@ -88,7 +88,7 @@ class HLUser_Team:
 		"""
 
 		# This only works if member of team
-		if self.teamMembership is None:
+		if self.resourceGroup is None:
 			return []
 
 		# Collect relevant agents
@@ -99,6 +99,7 @@ class HLUser_Team:
 			) \
 			.join( AgentMetrics ) \
 			.where( Agent.group == self.resourceGroup ) \
+			.where( Agent.state == 1 ) \
 			.dicts():
 
 			# Append additional information

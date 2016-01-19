@@ -147,6 +147,7 @@ def updatePresence(uid, state=1):
 	"""
 	
 	agentEntry = getAgent(uid)
+	agentMetrics = getAgentMetrics(uid)
 
 	# Switch state and last time seen
 	agentEntry.state = state
