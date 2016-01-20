@@ -1364,6 +1364,9 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 		except Level.DoesNotExist:
 			raise HLUserError("The specified error does not exists!", "not-exists")
 
+		# Check were to focus
+		focusTun = level.getFocusTunables()
+
 		# Get tunables
 		tunObjects = []
 		tunDict = {}
@@ -1372,6 +1375,7 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 
 			# Fast access on database using 'for X in Y'
 			for tun in Tunable.select().where( Tunable.name << tunNames ).dicts():
+				tun['focus'] = tun['name'] in focusTun
 				tunDict[tun['name']] = tun
 
 			# Correct ordering of the items

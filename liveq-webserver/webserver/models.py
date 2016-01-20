@@ -1162,6 +1162,9 @@ class Level(BaseModel):
 	#: The lab to use for this level
 	lab = ForeignKeyField(Lab)
 
+	#: Were to focus
+	focus = TextField(default="")
+
 	#: The level title
 	title = CharField(default="", max_length=256)
 
@@ -1170,6 +1173,14 @@ class Level(BaseModel):
 
 	#: The reference dataset for star calculation
 	reference = CharField(default="rivet", max_length=256)
+
+	def getFocusTunables(self):
+		"""
+		Get focus tunables
+		"""
+		if not self.focus:
+			return []
+		return self.focus.split(",")
 
 	def getTunables(self):
 		"""

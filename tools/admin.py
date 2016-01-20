@@ -443,6 +443,9 @@ def cmd_exportdb(filename):
 		# Export Questionnaires
 		SQLExport(toFile, Questionnaire, Questionnaire.select())
 
+		# Export Levels
+		SQLExport(toFile, Level, Level.select())
+
 @command("updatedb", help="Apply outstanding database patches.")
 def cmd_updatedb():
 	"""

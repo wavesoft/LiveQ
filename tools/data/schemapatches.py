@@ -30,7 +30,7 @@ class SchemaPatches:
 
 		# Insert the 'playTime' field in the user table
 		migrate(
-		    migrator.add_column('user', 'playTime', IntegerField(default=0)),
+			migrator.add_column('user', 'playTime', IntegerField(default=0)),
 		)
 
 	def patch_2(self, migrator):
@@ -40,7 +40,7 @@ class SchemaPatches:
 
 		# Insert the 'valueIndex' field in the user table
 		migrate(
-		    migrator.add_column('jobqueue', 'valueIndex', CharField(max_length=256, index=True, unique=False, default="")),
+			migrator.add_column('jobqueue', 'valueIndex', CharField(max_length=256, index=True, unique=False, default="")),
 		)
 
 		# Update all current fields
@@ -50,4 +50,17 @@ class SchemaPatches:
 			# Define value index
 			record.valueIndex = JobQueue.getValueIndex( record.getTunableValues() )
 			record.save()
+
+	def patch_3(self, migrator):
+		"""
+		Adding 'title', 'desc', 'reference', 'focus' on level
+		"""
+
+		# Insert the 'valueIndex' field in the user table
+		migrate(
+			migrator.add_column('level', 'focus', TextField(default="")),
+			migrator.add_column('level', 'title', CharField(default="", max_length=256)),
+			migrator.add_column('level', 'desc', TextField(default="")),
+			migrator.add_column('level', 'reference', CharField(default="rivet", max_length=256)),
+		)
 

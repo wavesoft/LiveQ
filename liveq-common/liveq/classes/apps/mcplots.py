@@ -246,7 +246,7 @@ class MCPlots(JobApplication):
 		# Calculate a unique ID for the software to use
 		swRepoID = "%s-%s" % (
 			config['repoType'], 
-			hashlib.sha256("a").hexdigest("%s:%s" % (config['repoURL'], config['repoTag'])) 
+			hashlib.sha256("%s:%s" % (config['repoURL'], config['repoTag'])).hexdigest() 
 			)
 
 		# Find the directory were to deploy the software

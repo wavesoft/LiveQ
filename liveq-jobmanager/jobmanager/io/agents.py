@@ -101,13 +101,18 @@ def getAgentMetrics(uid):
 	"""
 
 	# First, get the agent entry
-	agent = getAgent(uid)
+	if isinstance(uid, Agent):
+		agent = uid
+	else:
+		agent = getAgent(uid)
 
 	# Fetch or create group
 	try:
-		return AgentMetrics.get(AgentMetrics.uuid==uid)
+		return AgentMetrics.get(AgentMetrics.uuid==agent.uuid)
 	except AgentMetrics.DoesNotExist:
-		return AgentMetrics.create(uuid=uid, agent=agent)
+		am = AgentMetrics.create(uuid=agent.uuid, agent=agent)
+		am.save()
+		return am
 
 def getAgentFromJob(jid):
 	"""
