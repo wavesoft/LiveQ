@@ -21,6 +21,7 @@ import os
 import logging
 import traceback
 
+from liveq.models import Lab
 from liveq.config.histograms import HistogramsConfig
 from liveq.data.histo import Histogram
 
@@ -37,6 +38,7 @@ class ReferenceHistograms:
 		"""
 		Initialize the reference histograms located in the specified path
 		"""
+		logging.info("Using labref on %s" % baseDirectory)
 
 		#: The base directory where the histograms are located
 		self.baseDirectory = baseDirectory
@@ -59,6 +61,8 @@ class ReferenceHistograms:
 
 		# Convert slashes to underscores
 		histoPath = histoPath.replace("/", "_")
+
+		logging.info("Looking for %s/%s.dat" % (self.baseDirectory, histoPath))
 
 		# If cached, use now
 		if histoPath in self.CACHE:
@@ -131,10 +135,16 @@ class ReferenceHistograms:
 DEFAULT = ReferenceHistograms( "%s/%s" % (HistogramsConfig.HISTOREF_PATH, HistogramsConfig.HISTOREF_DEFAULT) )
 
 #: Return a reference histogram for the specified lab
-def forLab(uuid):
+def forLab(lab):
 	"""
 	Return a ReferenceHistograms class for the specified lab UUID
 	"""
+
+	# Check if instnace of lab
+	if isinstance(lab, Lab):
+		uuid = lab.uuid
+	else:
+		uuid = str(lab)
 
 	# Get cached version
 	if uuid in LAB_REFERENCE_HISTOGRAMS:
