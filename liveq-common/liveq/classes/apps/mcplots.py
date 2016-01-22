@@ -151,6 +151,7 @@ class MCPlots(JobApplication):
 		envDict = dict(os.environ)
 		envDict['LIVEQ_JOBDIR'] = self.jobdir
 		envDict['LIVEQ_DATDIR'] = self.datdir
+		envDict['LIVEQ_TUNE'] = self.tunefile
 
 		# Launch process in it's own process group
 		self.process = subprocess.Popen(args, cwd=self.softwareDir, preexec_fn=os.setpgrp, env=envDict, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -310,17 +311,20 @@ class MCPlots(JobApplication):
 		# Update software dir
 		self.softwareDir = swDir
 
-		# Find tune filename
-		self.tunefile = "%s/configuration/%s-%s.tune" % ( swDir, config['generator'], self.config.TUNE  )
+		# Create a new tune file
+		if self.tunefile:
+			os.unlink(self.tunefile)
+		(fid, self.tunefile) = tempfile.mkstemp('%s-%s.tune' % (config['generator'], self.config.TUNE))
 
 		# Update tune file
 		self.logger.debug("Updating tune file '%s'" % self.tunefile)
 		try:
-			with open(self.tunefile, 'w') as f:
-				for key, value in config['tune'].iteritems():
-					f.write("%s = %s\n" % (key, value))
+			for key, value in config['tune'].iteritems():
+				os.write(fid, "%s = %s\n" % (key, value))
 		except IOError as e:
 			raise JobConfigException("Unable to open tune file (%s) for writing: %s" % (self.tunefile, str(e)))
+		finally:
+			os.close(fid)
 
 	##################################################################################
 	###
