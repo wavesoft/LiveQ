@@ -413,6 +413,10 @@ class MCPlots(JobApplication):
 			self.logger.debug("Cleaning-up data directory %s" % self.datdir)
 			os.system("rm -rf '%s'" % self.datdir)
 
+		# Remove tune file
+		if self.tunefile:
+			os.unlink(self.tunefile)
+
 		# Reset the tracking file
 		self.trackingFile = None
 		self.trackingTime = 0
