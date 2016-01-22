@@ -58,3 +58,4 @@ tools/dump.sql
 
 # Virtualenv
 .virtualenv
+tools/reference-run.tgz

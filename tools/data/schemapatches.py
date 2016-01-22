@@ -35,7 +35,7 @@ class SchemaPatches:
 
 	def patch_2(self, migrator):
 		"""
-		Adding the 'valueIndex' field in the User model
+		Adding the 'valueIndex' field in the JobQueue model
 		"""
 
 		# Insert the 'valueIndex' field in the user table
