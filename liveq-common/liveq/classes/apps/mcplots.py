@@ -102,6 +102,7 @@ class MCPlots(JobApplication):
 		self.monitorThread = None
 		self.trackingFile = None
 		self.trackingTime = 0
+		self.lastState = ""
 		self.state = STATE_ABORTED
 
 	##################################################################################
@@ -134,6 +135,9 @@ class MCPlots(JobApplication):
 		self.datdir = tempfile.mkdtemp()
 		if not self.datdir:
 			raise JobRuntimeException("Unable to create data directory")
+
+		# Reset last state
+		self.lastState = ""
 
 		# Prepare post-mortem for the mcplots app
 		self.postmortem = PostMortem()
@@ -337,6 +341,15 @@ class MCPlots(JobApplication):
 		Check if the job data files are modified
 		"""
 
+		# Get intermediate histograms only when running
+		state = self.getState()
+		if state != self.lastState:
+			self.logger("Job state changed to '%s'" % state)
+
+		# Do not continue unless state is 'running'
+		if state !=	"running":
+			return False
+
 		# Check if we have a valid tracking file
 		if (not self.trackingFile) or (not os.path.isfile(self.trackingFile)):
 
@@ -515,14 +528,11 @@ class MCPlots(JobApplication):
 			# Every time the histogram timestamp is changed, send the updates to the server.
 			if ((self.state == STATE_RUNNING) or (self.state == STATE_COMPLETED)) and self.isDatasetModified():
 
-				# Get intermediate histograms only when running
-				if self.getState() == "running":
-
-					# Fetch itermediate results from the job and send
-					# them to listeners
-					results = self.readIntermediateHistograms()
-					if results:
-						self.trigger("job_data", False, results)
+				# Fetch itermediate results from the job and send
+				# them to listeners
+				results = self.readIntermediateHistograms()
+				if results:
+					self.trigger("job_data", False, results)
 
 			# Runtime clock and CPU anti-hoging
 			time.sleep(1)
