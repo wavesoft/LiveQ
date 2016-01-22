@@ -497,6 +497,39 @@ def cmd_updatedb():
 	# We are done
 	print "Your database is now on version %i" % newVersion
 
+@command("installdb", help="Create tables and import initial game data to the database.")
+def cmd_installdb():
+	"""
+	Create tables and import initial game data to the database
+	"""
+
+	# Base tables are already created by the config, we need
+	# to create the webserver tables now
+	import webserver.models as wsmodels
+	print "Creating tables..."
+	wsmodels.createWebserverTables() 
+
+	# Load game data from file
+	print "Importing game data from schema/liveq.sql.gz..."
+	import gzip
+	with gzip.open('../schema/liveq.sql.gz', 'rb') as f:
+
+		# Disable auto-commit
+		Config.DB.set_autocommit(False)
+
+		# Iterate over liens
+		for line in f:
+			line = line.strip()
+			if (not line) or (line[0] == "-"):
+				continue
+
+			# Execute
+			Config.DB.execute_sql(line.replace("%", "%%"))
+
+	# Commit
+	Config.DB.commit()
+
+
 @command("controlworkers", args=["action"], help="Send a control command to all job agents.")
 def cmd_controlworkers(action):
 	"""

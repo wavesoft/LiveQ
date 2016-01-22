@@ -42,8 +42,8 @@ def createWebserverTables():
 	"""
 
 	# Create the tables in the basic model
-	for table in [ AnalyticsProfile, User, UserActivationMailToken, UserTokens, Team, TeamMembers, Tutorials, 
-				   AnalyticsEvent, Achievement, Definition, FirstTime, TootrAnimation,
+	for table in [ AnalyticsProfile, Achievement, User, UserActivationMailToken, UserTokens, Team, TeamMembers, 
+				   Tutorials, AnalyticsEvent, Definition, FirstTime, TootrAnimation,
 				   TootrInterfaceTutorial, Book, BookQuestion, BookQuestionAnswer, Paper, PaperCitation,
 				   MachinePart, MachinePartStage, MachinePartStageUnlock,
 				   Questionnaire, QuestionnaireResponses, Level, UserLevel ]:

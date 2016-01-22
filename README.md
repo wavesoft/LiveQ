@@ -185,6 +185,17 @@ That's perhaps the most important component of all, since it allows you to check
 
 The sections are already explained before, so just copy them.
 
+### 4. Installing the database
+
+Having all the components configured it's now time to install the game framework database. The `admin.py` utility can take care of this task:
+
+```
+cd tools
+./admin.py installdb
+```
+
+A few moments later your database should be installed and ready to use!
+
 ### 3. Running the Services
 
 There is a bootstrap utility that takes care of setting up the environment and running the component. You can use it for example like this:
