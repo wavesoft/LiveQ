@@ -65,6 +65,7 @@ class CoreConfig:
 		CoreConfig.LOG_LEVEL = level_map[ config.get("general", "loglevel") ]
 
 		# Initialize config
+		logging.getLogger('').handlers = []
 		logging.basicConfig(level=CoreConfig.LOG_LEVEL, datefmt='%d-%m-%Y %H:%M:%S', format='%(asctime)s.%(msecs)04d [%(levelname)s.%(name)s]: %(message)s')
 
 class StaticConfig:
