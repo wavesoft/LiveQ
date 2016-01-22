@@ -346,6 +346,7 @@ class MCPlots(JobApplication):
 		state = self.getState()
 		if state != self.lastState:
 			self.logger.info("Job state changed to '%s'" % state)
+			self.lastState = state
 
 		# Do not continue unless state is 'running'
 		if state !=	"running":
