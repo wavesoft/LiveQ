@@ -165,7 +165,7 @@ def forumUidFromUser(user):
 	# Open a database cursor
 	c = getDBCursor()
 	if c is None:
-		return None
+		return 0
 
 	# Lookup users with that username
 	c.execute(
@@ -187,7 +187,7 @@ def forumUserUnreadPMs(uid):
 	# Open a database cursor
 	c = getDBCursor()
 	if c is None:
-		return None
+		return []
 
 	# Lookup PMS
 	c.execute(
