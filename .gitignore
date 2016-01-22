@@ -55,3 +55,6 @@ test/histo*
 tools/dump.sql
 
 *.sql
+
+# Virtualenv
+.virtualenv
