@@ -14,6 +14,7 @@ if [ ! -d "${VENV_DIR}" ]; then
 	virtualenv --prompt="(LiveQ) $PS1" ${VENV_DIR}
 
 	echo "INFO: Installing requirements"
+	source ${VENV_DIR}/bin/activate
 	pip install -r ${BASE_DIR}/requirements.txt
 fi
 
@@ -27,6 +28,13 @@ if [ -z "$COMPONENT" ]; then
 
 elif [ "$COMPONENT" == "shell" ]; then
 	bash
+
+elif [ "$COMPONENT" == "admin" ]; then
+	
+	# Launch admin and pass-through commands
+	shift
+	cd "${BASE_DIR}/tools"
+	${BASE_DIR}/tools/admin.py $*
 
 else
 
