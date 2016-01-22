@@ -51,8 +51,11 @@ class BaseModel(Model):
 		Serialize the current record to a dictionary
 		"""
 
-		# Get model fields
-		FIELDS = self.__class__._meta.get_field_names()
+		# Get model fields (backwards compatibility)
+		if hasattr(self.__class__._meta, 'sorted_field_names'):
+			FIELDS = self.__class__._meta.sorted_field_names
+		else:
+			FIELDS = self.__class__._meta.get_field_names()
 
 		# Compile document
 		document = {}

@@ -60,6 +60,12 @@ def getDBCursor():
 	# Get logger
 	logger = logging.getLogger("forum-sync")
 
+	# If there is no forum configured display a warning and return None
+	if (not ForumConfig.FORUM_SERVER) or (not ForumConfig.FORUM_USER) or \
+	   (not ForumConfig.FORUM_PASSWORD) or (not ForumConfig.FORUM_DB):
+		logger.warn("Missing forum configuration, disabling forum sync")
+		return None
+
 	# Connect to SQL
 	try:
 		sql = MySQL.connect( ForumConfig.FORUM_SERVER, ForumConfig.FORUM_USER, \
