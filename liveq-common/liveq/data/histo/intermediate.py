@@ -723,7 +723,14 @@ class IntermediateHistogram:
 		vMeta['logY'] = logY
 
 		# Get histogram name
-		name = data['HISTOSTATS']['d']['AidaPath']
+
+		# Use 'AidaPath' or 'Path'
+		if 'AidaPath' in data['HISTOSTATS']['d']:
+			name = data['HISTOSTATS']['d']['AidaPath']
+		elif 'Path' in data['HISTOSTATS']['d']:
+			name = data['HISTOSTATS']['d']['Path']
+		else:
+			raise ValueError("Missing 'Path' or 'AidaPath' in the HISTOSTATS section")
 
 		# Convert values into a flat 2D numpy array
 		values = numpy.array(vBins, dtype=numpy.float64).flatten()
