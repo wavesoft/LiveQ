@@ -200,6 +200,7 @@ class MCPlots(JobApplication):
 		self.state = STATE_KILLING
 
 		# Complete post-mortem
+		self.logger.info("Simulation aborted")
 		self.postmortem.log("Killed upon user request")
 		self.postmortem.complete()
 
@@ -344,7 +345,7 @@ class MCPlots(JobApplication):
 		# Get intermediate histograms only when running
 		state = self.getState()
 		if state != self.lastState:
-			self.logger("Job state changed to '%s'" % state)
+			self.logger.info("Job state changed to '%s'" % state)
 
 		# Do not continue unless state is 'running'
 		if state !=	"running":
