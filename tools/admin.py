@@ -455,6 +455,10 @@ def cmd_updatedb():
 	from data.schemapatches import SchemaPatches
 	from playhouse.migrate import MySQLMigrator
 
+	# Create webserver tables
+	import webserver.models as wsmodels
+	wsmodels.createWebserverTables() 
+
 	# Identify the current database version
 	try:
 		verInfo = DBInfo.get(key="version")
@@ -505,8 +509,8 @@ def cmd_installdb():
 
 	# Base tables are already created by the config, we need
 	# to create the webserver tables now
-	import webserver.models as wsmodels
 	print "Creating tables..."
+	import webserver.models as wsmodels
 	wsmodels.createWebserverTables() 
 
 	# Load game data from file

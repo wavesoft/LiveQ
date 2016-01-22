@@ -40,9 +40,9 @@ def print_table( data, fields=None, headers=None ):
 
 				# Stringify field
 				if not f in d:
-					s = "None"
+					s = u"None"
 				else:
-					s = str(d[f])
+					s = unicode(d[f])
 
 				# Get column index
 				i = len(row)
@@ -69,7 +69,7 @@ def print_table( data, fields=None, headers=None ):
 			for f in d:
 
 				# Stringify field
-				s = str(f)
+				s = unicode(f)
 
 				# Get column index
 				i = len(row)
@@ -95,7 +95,7 @@ def print_table( data, fields=None, headers=None ):
 		for h in headers:
 
 			# Stringify
-			h = str(h)
+			h = unicode(h)
 
 			# Update text length if needed
 			if i >= len(cw):
