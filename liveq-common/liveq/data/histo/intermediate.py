@@ -139,7 +139,7 @@ class IntermediateHistogramCollection(dict):
 			try:
 				histo = IntermediateHistogram.fromFLAT( ffile )
 			except Exception as e:
-				logging.error("Exception while loading file %s" % ffile)
+				logging.error("Exception while loading file %s (%s)" % (ffile, str(e)))
 				continue
 
 			# Report errors
