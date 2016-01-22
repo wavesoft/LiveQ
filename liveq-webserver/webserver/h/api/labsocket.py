@@ -242,26 +242,26 @@ class LabSocketInterface(APIInterface):
 			# in the response record, tag that particular level
 			if ('jid' in ans) and ('level' in param) and (param['level']):
 
-				# Check if such record exists
-				record = UserLevel.select().where(
-						UserLevel.user == self.user.id,
-						UserLevel.level == int(param['level'])
+				# # Check if such record exists
+				# record = UserLevel.select().where(
+				# 		UserLevel.user == self.user.id,
+				# 		UserLevel.level == int(param['level'])
+				# 	)
+
+				# # If it exists, update it
+				# if record.exists():
+				# 	level = record.get()
+				# 	level.job_id = int(ans['jid'])
+				# 	level.save()
+
+				# # Otherwise create it
+				# else:
+				level = UserLevel.create(
+						user=self.user.id,
+						level=int(param['level']),
+						job_id=int(ans['jid'])
 					)
-
-				# If it exists, update it
-				if record.exists():
-					level = record.get()
-					level.job_id = int(ans['jid'])
-					level.save()
-
-				# Otherwise create it
-				else:
-					level = UserLevel.create(
-							user=self.user.id,
-							level=int(param['level']),
-							job_id=int(ans['jid'])
-						)
-					level.save()
+				level.save()
 
 			# Check if this job is already calculated
 			if ans['result'] == 'exists':
@@ -286,14 +286,14 @@ class LabSocketInterface(APIInterface):
 				# Send status
 				self.sendStatus("Job #%s started" % ans['jid'], {"JOB_STATUS": "started"})
 
-				# The job started, switch to that job
-				self.switchToJob( ans['jid'] )			
-
 				# Send response
 				self.sendResponse({ 
 						"status": "ok",
 						"jid": ans['jid']
 						})
+
+				# The job started, switch to that job
+				self.switchToJob( ans['jid'] )			
 
 		##################################################
 		# Estimate the results of the specified job
@@ -554,6 +554,19 @@ class LabSocketInterface(APIInterface):
 		# Serialize job
 		jobData = jobRef.serialize()
 		jobData['maxEvents'] = self.lab.getEventCount()
+
+		# Get level data of this job
+		record = UserLevel.select().where(
+				UserLevel.user == self.user.id,
+				UserLevel.job_id == jobRef.id
+			)
+		if record.exists():
+			level = record.get()
+			jobData['level'] = level.level.id
+		else:
+			jobData['level'] = None
+
+		# Send job details
 		self.sendAction("job.details", {
 				'job': jobData,
 				'agents': self.getAgents( jobRef )
