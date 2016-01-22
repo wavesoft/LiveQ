@@ -430,6 +430,7 @@ class XMPPBus(Bus, ClientXMPP):
 		# Prepare variables
 		self.channels = { }
 		self.disconnecting = False
+		self.sentOnline = False
 
 		# Connect to the XMPP client
 		self.connect()
@@ -448,7 +449,9 @@ class XMPPBus(Bus, ClientXMPP):
 
 		# Let everybody know that the channel is online only
 		# after we got roster update.
-		self.trigger("online")
+		if not self.sentOnline:
+			self.sentOnline = True
+			self.trigger("online")
 
 	def onAvailable(self, event):
 		"""
@@ -495,6 +498,7 @@ class XMPPBus(Bus, ClientXMPP):
 
 		# Update state
 		self.connected = False
+		self.sentOnline = False
 
 		# If that's expected do nothing
 		# Otherwise try to recover connection
