@@ -21,6 +21,7 @@ from peewee import fn, JOIN_LEFT_OUTER
 
 from webserver.models import *
 from webserver.common.users.exceptions import HLUserError
+from webserver.common.forum import forumGetTeamDiscussionThread
 
 class HLUser_Team:
 
@@ -220,4 +221,13 @@ class HLUser_Team:
 
 		# Return
 		return ans
+
+	def getTeamNotes(self, count=100):
+		"""
+		Get team notes from the forum
+		"""
+
+		# Return thread comments from forum discussion
+		return forumGetTeamDiscussionThread( self.teamMembership.team.name, count )
+
 

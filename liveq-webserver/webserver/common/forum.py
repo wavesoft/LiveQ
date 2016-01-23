@@ -220,3 +220,105 @@ def forumUserUnreadPMs(uid):
 
 	# Return messages
 	return messages
+
+def forumGetPosts(tid, maxCount=100):
+	"""
+	Get forum posts
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return []
+
+	# Lookup PMS
+	c.execute(
+		"SELECT %susers.username, \
+				%sposts.message, \
+				%sposts.dateline\
+			FROM %sposts INNER JOIN %susers ON %sposts.uid = %susers.uid \
+			WHERE %sposts.tid = %i AND %sposts.visible = 1 \
+			ORDER BY %sposts.pid DESC \
+			LIMIT 0,%i"
+		% ( ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, ForumConfig.FORUM_DB_PREFIX, tid, ForumConfig.FORUM_DB_PREFIX,
+			ForumConfig.FORUM_DB_PREFIX, maxCount )
+		)
+
+	# Start fetching
+	messages = []
+	row = c.fetchone()
+	while row:
+		messages.append({
+				'username': row[0],
+				'message': row[1],
+				'dateline': row[2],
+			})
+		row = c.fetchone()
+
+	# Return messages
+	return messages
+
+def forumFindTidBySubject(subject, fid):
+	"""
+	Search on the specified forum and find the thread with the specified subject
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return 0
+
+	# Lookup users with that username
+	c.execute(
+		"SELECT `tid` FROM %sposts WHERE subject = '%s' AND fid = %i"
+		% ( ForumConfig.FORUM_DB_PREFIX, subject, fid )
+		)
+
+	# Fetch user ID
+	row = c.fetchone()
+	if not row:
+		return 0
+	return int(row[0])
+
+def forumFindFidByName(name):
+	"""
+	Search on forums and find the appropriate forum by name
+	"""
+
+	# Open a database cursor
+	c = getDBCursor()
+	if c is None:
+		return 0
+
+	# Lookup users with that username
+	c.execute(
+		"SELECT `fid` FROM %sforums WHERE name = '%s'"
+		% ( ForumConfig.FORUM_DB_PREFIX, name )
+		)
+
+	# Fetch user ID
+	row = c.fetchone()
+	if not row:
+		return 0
+	return int(row[0])
+
+def forumGetTeamDiscussionThread(teamName, lastMessages=100):
+	"""
+	Get the team discussion thread messages from the forum
+	"""
+
+	# Find team forum id
+	fid = forumFindFidByName(teamName)
+	if not fid:
+		return None
+
+	# Find team forum's notes
+	tid = forumFindTidBySubject("Notes", fid)
+	if not tid:
+		return None
+
+	# Return the last X posts
+	return forumGetPosts(tid, lastMessages)
+

@@ -953,6 +953,12 @@ class HLUser(HLUser_Papers, HLUser_Books, HLUser_Team, HLUser_Job, HLUser_Observ
 
 			else:
 
+				# Send job update
+				self.userEvents.send("job_update", {
+					"job"    : job.id,
+					"status" : job.status
+					})
+
 				# Calculate status message
 				statusMsg = [
 					"is pending execution", 

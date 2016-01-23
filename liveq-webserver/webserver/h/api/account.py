@@ -154,6 +154,17 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Return team notes
+			# ------------------------------------------------
+			elif action == "team.notes":
+
+				# Return team nodes
+				self.sendResponse({
+						"status": "ok",
+						"data": self.user.getTeamNotes()
+					})
+
+			##################################################
 			# Return team details
 			# ------------------------------------------------
 			elif action == "team.details":
