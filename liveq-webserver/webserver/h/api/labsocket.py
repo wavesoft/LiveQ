@@ -266,17 +266,18 @@ class LabSocketInterface(APIInterface):
 			# Check if this job is already calculated
 			if ans['result'] == 'exists':
 
+				# Return details of the specified job
+				self.sendResponse({ 
+						"status": "ok",
+						"jid": ans['jid']
+					})
+
 				# Send configuration frame if not already sent
 				if not self.sentConfigFrame:
 					self.sendConfigurationFrame()
 
 				# Send data
 				self.onBusData( ans )
-
-				# Return details of the specified job
-				self.sendResponse({ 
-					"status": "ok"
-					})
 
 				# Forward event to the user socket
 				self.sendAction( "job.exists", { } )
@@ -562,6 +563,7 @@ class LabSocketInterface(APIInterface):
 			)
 		if record.exists():
 			level = record.get()
+			print level
 			jobData['level'] = level.level.id
 		else:
 			jobData['level'] = None

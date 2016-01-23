@@ -453,10 +453,12 @@ def createJob( lab, parameters, group, userID, teamID, paperID, dataChannel ):
 		team_id=teamID,
 		user_id=userID,
 		paper_id=paperID,
-		userTunes=json.dumps(userTunes),
 		parameters=json.dumps(mergedParameters),
 		events=0,
 		)
+
+	# Define user tunes
+	job.setTunableValues( userTunes )
 
 	# Save and return
 	job.save()

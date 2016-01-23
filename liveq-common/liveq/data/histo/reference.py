@@ -62,8 +62,6 @@ class ReferenceHistograms:
 		# Convert slashes to underscores
 		histoPath = histoPath.replace("/", "_")
 
-		logging.info("Looking for %s/%s.dat" % (self.baseDirectory, histoPath))
-
 		# If cached, use now
 		if histoPath in self.CACHE:
 			return self.CACHE[histoPath]
