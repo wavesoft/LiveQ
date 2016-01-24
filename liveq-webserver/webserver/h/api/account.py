@@ -221,6 +221,51 @@ class AccountInterface(APIInterface):
 					})
 
 			##################################################
+			# Return user's last results
+			# ------------------------------------------------
+			elif action == "job.last":
+
+				# Return a summary of paper results
+				self.sendResponse({
+						"status" : "ok",
+						"data"   : self.user.getUserLastJob()
+					})
+
+			##################################################
+			# Return user's favourite job details
+			# ------------------------------------------------
+			elif action == "job.fav":
+
+				# Get user's favourite object
+				fav = self.user.getVariable( "personal", "favjob", None )
+				if not fav:
+
+					# Return a summary of paper results
+					self.sendResponse({
+							"status"  : "ok",
+							"data"    : None
+						})
+
+				else:
+
+					# Return a summary of paper results
+					self.sendResponse({
+							"status" : "ok",
+							"data"   : self.user.getResultDetails( fav )
+						})
+
+			##################################################
+			# Return user's history of jobs
+			# ------------------------------------------------
+			elif action == "jobs.completed":
+
+				# Return a summary of paper results
+				self.sendResponse({
+						"status" : "ok",
+						"data"   : self.user.getUserCompletedJobs( int(param['page']) )
+					})
+
+			##################################################
 			# Return paper results
 			# ------------------------------------------------
 			elif action == "papers.results":

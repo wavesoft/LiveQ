@@ -91,21 +91,72 @@ class HLUser_Job:
 		# Return results
 		return job_dict
 
-	def getJobResults(self, job_id):
+
+	def getQuickJobResults(self, job_id):
 		"""
-		Return a summary of the results of the specified job
+		Return quick job details without too much querying
 		"""
 
 		# Try to get job record
-		job = self.getJob(job_id)
-		if not job:
-			raise HLUserError("Could not access job %s" % job_id, "not-exists")
+		if isinstance(job_id, JobQueue):
+			job = job_id
+		else:
+			job = self.getJob(job_id)
+			if not job:
+				raise HLUserError("Could not access job %s" % job_id, "not-exists")
 
 		# Get results metadata
 		resultsMeta = job.getResultsMeta()
 
 		# Process observables metadata
 		observables = []
+		fit = job.fit
+		if 'fitscores' in resultsMeta:
+
+			# Get average of known observables
+			fitAverageCalc = 0
+			fitAverageCount = 0
+			is_known = self.getKnownObservables()
+			for k,chi2 in resultsMeta['fitscores'].iteritems():
+				if k in is_known:
+					fitAverageCalc += chi2
+					fitAverageCount += 1
+
+			# Update fit
+			if fitAverageCount == 0:
+				fit = 0
+			else:
+				fit = fitAverageCalc / fitAverageCount
+
+		# Prepare response record
+		return {
+			"jid": job.id,
+			"fit": fit,
+			"status": job.status,
+			"events": job.events,
+			"submitted": str(job.submitted),
+			"lastEvent": str(job.lastEvent),
+		}
+
+	def getJobResults(self, job_id):
+		"""
+		Return a summary of the results of the specified job
+		"""
+
+		# Try to get job record
+		if isinstance(job_id, JobQueue):
+			job = job_id
+		else:
+			job = self.getJob(job_id)
+			if not job:
+				raise HLUserError("Could not access job %s" % job_id, "not-exists")
+
+		# Get results metadata
+		resultsMeta = job.getResultsMeta()
+
+		# Process observables metadata
+		observables = []
+		fit = job.fit
 		if 'fitscores' in resultsMeta:
 
 			# Get all histogram IDs
@@ -115,6 +166,8 @@ class HLUser_Job:
 			is_known = self.getKnownObservables()
 
 			# Get observable details
+			fitAverageCalc = 0
+			fitAverageCount = 0
 			for histo in Observable.select( Observable.name, Observable.title, Observable.short ).where( Observable.name << histo_ids ):
 
 				# Skip unknown histograms
@@ -123,6 +176,8 @@ class HLUser_Job:
 
 				# Get fit
 				chi2 = resultsMeta['fitscores'][histo.name]
+				fitAverageCalc += chi2
+				fitAverageCount += 1
 
 				# Store on observables
 				observables.append({
@@ -130,6 +185,12 @@ class HLUser_Job:
 					"title": histo.title,
 					"fit": "%.4f" % chi2
 					})
+
+			# Update fit
+			if fitAverageCount == 0:
+				fit = 0
+			else:
+				fit = fitAverageCalc / fitAverageCount
 
 		# Process tunables
 		tunables = []
@@ -147,9 +208,49 @@ class HLUser_Job:
 			"tunables": tunables,
 			"observables": observables,
 
+			"jid": job.id,
+			"fit": fit,
 			"status": job.status,
 			"events": job.events,
 			"submitted": str(job.submitted),
 			"lastEvent": str(job.lastEvent),
 		}
+
+	def getUserCompletedJobs(self, page=0, page_items=50):
+		"""
+		Return the user runs
+		"""
+
+		# Return all the latest results
+		query = JobQueue.select().where(
+					JobQueue.user_id == self.id,
+					JobQueue.status << [JobQueue.COMPLETED, JobQueue.CLONED] 
+				) \
+				.order_by( JobQueue.id.desc() ) \
+				.paginate( page, page_items )
+
+		# Return serialized items
+		items = []
+		for q in query:
+			items.append( self.getQuickJobResults(q) )
+		return items
+
+
+	def getUserLastJob(self):
+		"""
+		Return the user's last result only
+		"""
+
+		# Return all the latest results
+		query = JobQueue.select().where(
+					JobQueue.user_id == self.id,
+					JobQueue.status << [JobQueue.COMPLETED, JobQueue.CLONED]
+				) \
+				.order_by( JobQueue.id.desc() )
+
+		# Return serialized items
+		if query.exists():
+			return self.getJobResults( query.get() )
+		else:
+			return None
 
