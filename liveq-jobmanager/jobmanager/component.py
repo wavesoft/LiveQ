@@ -951,7 +951,7 @@ class JobManagerComponent(Component):
 			return
 
 		# Check if this is a cloned job
-		if job.status == JobQueue.CLONED:
+		if job.job.status == JobQueue.CLONED:
 
 			# Get job metadata
 			meta = job.getResultsMeta()

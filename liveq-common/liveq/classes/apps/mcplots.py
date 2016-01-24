@@ -365,7 +365,6 @@ class MCPlots(JobApplication):
 
 			# Check for empty file list
 			if not files:
-				self.logger.warn("Empty dump directory - Could not track changes")
 				return False
 
 			# Find the file modified the last
