@@ -40,6 +40,11 @@ from webserver.models import UserLevel
 from webserver.config import Config
 from webserver.h.api import APIInterface
 
+# Flags
+FLAG_INTERPOLATION = 1
+FLAG_EXISTS = 2
+FLAG_CHANNEL_2 = 4
+
 class LabSocketError(Exception):
 	"""
 	An error occured in a high-level user-action
@@ -274,10 +279,10 @@ class LabSocketInterface(APIInterface):
 
 				# Send configuration frame if not already sent
 				if not self.sentConfigFrame:
-					self.sendConfigurationFrame()
+					self.sendConfigurationFrame( FLAG_EXISTS )
 
 				# Send data
-				self.onBusData( ans )
+				self.onBusData( ans, FLAG_EXISTS )
 
 				# Forward event to the user socket
 				self.sendAction( "job.exists", { } )
@@ -379,15 +384,17 @@ class LabSocketInterface(APIInterface):
 			if not job:
 				return self.sendError("Could not fetch details of the specified job!")
 
-			# Switch to the user's lab
-			if not self.switchLab( self.user.lab ):
-				self.sendError("Cannot resolve user's lab", "not-found")
-				return False
+			# Check if we need to switch labs
+			switchBackToLab = self.lab
+			if not (self.lab is None) and (self.lab.id == job.lab.id):
+				switchBackToLab = None
+			else:
+				if not self.switchLab( job.lab ):
+					self.sendError("Cannot resolve job's lab", "not-found")
+					return False
 
-			# Send configuation frame only once
-			if not self.sentConfigFrame:
-				# Send configuration frame
-				self.sendConfigurationFrame()
+			# Send configuration frame to the secondary channel
+			self.sendConfigurationFrame( FLAG_CHANNEL_2 )
 
 			# Ask job manager to fetch the results of the specifeid job
 			ans = self.jobChannel.send('job_results', {
@@ -402,13 +409,17 @@ class LabSocketInterface(APIInterface):
 			if ans['result'] == 'error':
 				return self.sendError("Unable to fetch results of the job: %s" % ans['error'])
 
-			# Send bus data
-			self.onBusData( ans )
+			# Send bus data on the secondary channel
+			self.onBusData( ans, FLAG_CHANNEL_2 )
 
 			# Return details of the specified job
 			self.sendResponse({ 
 				"status": "ok"
 				})
+
+			# Check if we should switch back to the previous lab
+			if switchBackToLab:
+				self.switchLab(switchBackToLab)
 
 		else:
 
@@ -421,7 +432,7 @@ class LabSocketInterface(APIInterface):
 	# --------------------------------------------------------------------------------
 	####################################################################################
 
-	def onBusData(self, data):
+	def onBusData(self, data, flags=0):
 		"""
 		[Bus Event] Data available
 		"""
@@ -448,7 +459,7 @@ class LabSocketInterface(APIInterface):
 				# Header must be 64-bit aligned
 				struct.pack("<BBHI", 
 					2, 						# [8-bit]  Protocol
-					0, 						# [8-bit]  Flags (1=FromInterpolation)
+					flags, 					# [8-bit]  Flags (1=FromInterpolation)
 					0, 						# [16-bit] (Reserved)
 					len(histoBuffers)		# [32-bit] Number of histograms
 				) + ''.join(histoBuffers)
@@ -665,7 +676,7 @@ class LabSocketInterface(APIInterface):
 		})
 
 
-	def sendConfigurationFrame(self):
+	def sendConfigurationFrame(self, flags=0):
 		"""
 		Send the first, configuration frame to the agent
 		"""
@@ -684,7 +695,7 @@ class LabSocketInterface(APIInterface):
 				# Header must be 64-bit aligned
 				struct.pack("<BBHI", 
 					2, 						# [8-bit]  Protocol
-					0, 						# [8-bit]  Flags
+					flags, 					# [8-bit]  Flags
 					0, 						# [16-bit] Number of events
 					len(histoBuffers)		# [32-bit] Number of histograms
 				) + ''.join(histoBuffers)
