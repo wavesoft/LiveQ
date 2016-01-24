@@ -87,7 +87,7 @@ EOF
 		# Check system memory		
 		MEMORY_KB=$(grep MemTotal /proc/meminfo | grep -E --only-matching '[[:digit:]]+')
 
-		# Create a swapfile equal to memory
+		# Create a swapfile equal to memory (64Kb block size)
 		SWAPFILE_BLOCKS=$((MEMORY_KB/64))
 		dd if=/dev/zero of=${SWAPFILE} bs=65536 count=${SWAPFILE_BLOCKS} >/dev/null 2>/tmp/err.log
 
@@ -98,9 +98,9 @@ EOF
 		# Make swap
 		mkswap "${SWAPFILE}" >/dev/null 2>/tmp/err.log
 
-		# Activate and register
+		# Activate and register at boot time
 		swapon "${SWAPFILE}" >/dev/null 2>/tmp/err.log
-		echo "${SWAPFILE}	swap	swap	defaults	0	0" >> /etc/fstab
+		echo "${SWAPFILE}	none	swap	sw		0 0" >> /etc/fstab
 
 	fi
 
