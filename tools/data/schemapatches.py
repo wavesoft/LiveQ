@@ -51,16 +51,3 @@ class SchemaPatches:
 			record.valueIndex = JobQueue.getValueIndex( record.getTunableValues() )
 			record.save()
 
-	def patch_3(self, migrator):
-		"""
-		Adding 'title', 'desc', 'reference', 'focus' on level
-		"""
-
-		# Insert the 'valueIndex' field in the user table
-		migrate(
-			migrator.add_column('level', 'focus', TextField(default="")),
-			migrator.add_column('level', 'title', CharField(default="", max_length=256)),
-			migrator.add_column('level', 'desc', TextField(default="")),
-			migrator.add_column('level', 'reference', CharField(default="rivet", max_length=256)),
-		)
-

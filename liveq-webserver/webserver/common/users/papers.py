@@ -632,3 +632,43 @@ class HLUser_Papers:
 
 		# We are good
 		return True
+
+
+	def getUserResults(self, page=0, page_items=100):
+		"""
+		Return the user runs
+		"""
+
+		# Return all the latest results
+		query = JobQueue.select().where(
+					JobQueue.user_id == self.id,
+					JobQueue.status << [JobQueue.COMPLETED, JobQueue.CLONED] 
+				) \
+				.order_by( JobQueue.id.desc() ) \
+				.paginate( page, page_items )
+
+		# Return serialized items
+		items = []
+		for q in query:
+			items.append( q.serialize() )
+		return items
+
+
+	def getUserLastResult(self):
+		"""
+		Return the user's last result only
+		"""
+
+		# Return all the latest results
+		query = JobQueue.select().where(
+					JobQueue.user_id == self.id,
+					JobQueue.status << [JobQueue.COMPLETED, JobQueue.CLONED]
+				) \
+				.order_by( JobQueue.id.desc() ) \
+				.paginate( page, page_items )
+
+		# Return serialized items
+		items = []
+		for q in query:
+			items.append( q.serialize() )
+		return items
