@@ -28,6 +28,9 @@ from liveq.data.histo import Histogram
 #: Reference histograms for every lab
 LAB_REFERENCE_HISTOGRAMS = { }
 
+#: Reference histograms for every level
+LEVEL_REFERENCE_HISTOGRAMS = { }
+
 class ReferenceHistograms:
 	"""
 	A class that provides comparison against a set of reference histograms
@@ -151,6 +154,26 @@ def forLab(lab):
 	# Otherwise create new and cache
 	histos = ReferenceHistograms( "%s/%s" % (HistogramsConfig.HISTOREF_PATH, uuid) )
 	LAB_REFERENCE_HISTOGRAMS[uuid] = histos
+
+	# And return it
+	return histos
+
+#: Return a reference histogram for the specified level
+def forLevel(level):
+	"""
+	Return a ReferenceHistograms class for the specified level ID
+	"""
+
+	# Generate a uuid from level
+	uuid = "level-%i" % level
+
+	# Get cached version
+	if uuid in LEVEL_REFERENCE_HISTOGRAMS:
+		return LEVEL_REFERENCE_HISTOGRAMS[uuid]
+
+	# Otherwise create new and cache
+	histos = ReferenceHistograms( "%s/%s" % (HistogramsConfig.HISTOREF_PATH, uuid) )
+	LEVEL_REFERENCE_HISTOGRAMS[uuid] = histos
 
 	# And return it
 	return histos

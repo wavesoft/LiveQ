@@ -113,7 +113,7 @@ class Job:
 		# Return collection
 		return hc
 
-	def updateResults(self, chi2=0.0, chi2list={}):
+	def updateResults(self, chi2=0.0, chi2list={}, chi2level=0.0, chi2level_list={}):
 		"""
 		Update the results of this job
 		"""
@@ -123,6 +123,8 @@ class Job:
 
 		# Store the list of chi2 fits
 		self.job.updateResultsMeta('fitscores', chi2list)
+		self.job.updateResultsMeta('levelfit', chi2level)
+		self.job.updateResultsMeta('levelscores', chi2level_list)
 
 		# Save job record
 		self.job.save()
@@ -373,7 +375,7 @@ def findJob( lab, parameters ):
 	except JobQueue.DoesNotExist:
 		return None
 
-def cloneJob( refJob, group, userID, teamID, paperID ):
+def cloneJob( refJob, group, userID, teamID, levelID ):
 	"""
 	The user tried to run a tune that already exists, so just clone the job, linked
 	to the previous job in the user's account.
@@ -386,7 +388,7 @@ def cloneJob( refJob, group, userID, teamID, paperID ):
 		group=group,
 		user_id=userID,
 		team_id=teamID,
-		paper_id=paperID,
+		level_id=levelID,
 
 		# Do not use a data channel
 		dataChannel="",
@@ -411,7 +413,7 @@ def cloneJob( refJob, group, userID, teamID, paperID ):
 	job.save()
 	return job
 
-def createJob( lab, parameters, group, userID, teamID, paperID, dataChannel ):
+def createJob( lab, parameters, group, userID, teamID, levelID, dataChannel ):
 	"""
 	This function will create a new Job with a unique ID and will set-up
 	the response channel for the internal bus to `dataChannel`
@@ -452,7 +454,7 @@ def createJob( lab, parameters, group, userID, teamID, paperID, dataChannel ):
 		dataChannel=dataChannel,
 		team_id=teamID,
 		user_id=userID,
-		paper_id=paperID,
+		level_id=levelID,
 		parameters=json.dumps(mergedParameters),
 		events=0,
 		)

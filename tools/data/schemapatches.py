@@ -51,3 +51,12 @@ class SchemaPatches:
 			record.valueIndex = JobQueue.getValueIndex( record.getTunableValues() )
 			record.save()
 
+	def patch_3(self, migrator):
+		"""
+		Renamed 'paper_id' field to 'level_id' in the JobQueue table
+		"""
+
+		# Insert the 'playTime' field in the user table
+		migrate(
+			migrator.rename_column('jobqueue', 'paper_id', 'level_id'),
+		)

@@ -371,14 +371,20 @@ class JobManagerComponent(Component):
 		# Send status
 		job.sendStatus("All workers have finished. Collecting final results.")
 
-		# Calculate chi2 of the collection
-		(chi2fit, chi2list) = reference.forLab( job.lab ).collectionChi2Reference( histoCollection )
-
 		# Store the results
 		results.dump( job, histoCollection )
 
-		# Update information on the job
-		job.updateResults( chi2=chi2fit, chi2list=chi2list )
+		# Calculate level score [Theoretial Data]
+		chi2level = 0.0
+		chi2level_list = {}
+		if job.level_id:		
+			(chi2level, chi2level_list) = reference.forLab( job.level_id ).collectionChi2Reference( histoCollection )
+
+		# Calculate chi2 of the collection [Experimental Data]
+		(chi2fit, chi2list) = reference.forLab( job.lab ).collectionChi2Reference( histoCollection )
+
+		# Update results
+		job.updateResults( chi2=chi2fit, chi2list=chi2list, chi2level=chi2level, chi2level_list=chi2level_list )
 
 		# Reply to the job channel the final job data
 		job.channel.send("job_completed", {
@@ -757,7 +763,7 @@ class JobManagerComponent(Component):
 
 		self.logger.info("Got job request in IBUS")
 
-		if not all(x in message for x in ('lab', 'parameters', 'group', 'user', 'team', 'paper')):
+		if not all(x in message for x in ('lab', 'parameters', 'group', 'user', 'team', 'level')):
 			self.logger.warn("Missing parameters on 'job_start' message on IBUS!")
 			self.jobChannel.reply({
 					'result': 'error',
@@ -769,7 +775,7 @@ class JobManagerComponent(Component):
 		lab = message['lab']
 		userID = message['user']
 		teamID = message['team']
-		paperID = message['paper']
+		levelID = message['level']
 		parameters = message['parameters']
 		group = message['group']
 
@@ -786,7 +792,7 @@ class JobManagerComponent(Component):
 			if payload:
 
 				# Link job
-				job = jobs.cloneJob( job, group, userID, teamID, paperID )
+				job = jobs.cloneJob( job, group, userID, teamID, levelID )
 
 				# A job with this parameters already exist, return right away
 				self.jobChannel.reply({
@@ -797,7 +803,7 @@ class JobManagerComponent(Component):
 				return
 
 		# Create a new job descriptor
-		job = jobs.createJob( lab, parameters, group, userID, teamID, paperID, dataChannel )
+		job = jobs.createJob( lab, parameters, group, userID, teamID, levelID, dataChannel )
 		if not job:
 			# Reply failure
 			self.jobChannel.reply({
